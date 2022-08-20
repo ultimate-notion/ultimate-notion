@@ -9,11 +9,18 @@
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/ultimate-notion)
 -->
 
-# ultimate-notion
+# Ultimate-Notion
 
 > Add a short description here!
 
 A longer description of your project goes here...
+
+## Ideas
+
+* Simplify the querying. Maybe use SQL style for that?
+* Have a nice show function
+* Fix the bug that querying somehow keeps a global state when filtering
+* Get uniqueness by having a.b.c.database_name
 
 ## Installation
 

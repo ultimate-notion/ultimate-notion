@@ -5,7 +5,7 @@ channels:
   - pytorch
   # - fastai
 dependencies:
-  - python>=3.6
+  - python>=3.8
   - pip
   # BASICS
   - numpy
@@ -38,7 +38,12 @@ dependencies:
   # - dask
   # - snakeviz
   - pip:
-     - -e .  # install git checkout of ultimate-notion in editable mode
+     - -e .  # install git checkout of ultimatenotion in editable mode
+     - notion-client
+     # - notional # take this from git clone
+     - google-api-python-client
+     - google-auth-httplib2
+     - google-auth-oauthlib
      # add here only pip-packages that are not available in conda/conda-forge! E.g.:
      # - icecream
      # - jax
