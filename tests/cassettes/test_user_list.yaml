@@ -5,7 +5,7 @@ interactions:
       accept:
       - '*/*'
       accept-encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       authorization:
       - secret...
       connection:
@@ -17,9 +17,9 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/users?page_size=100
   response:
-    content: '{"object":"list","results":[{"object":"user","id":"ea74294e-d4c7-41f0-8929-805c80ea0d7f","name":"Jason
-      Heddings","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/f9ef1e79-a305-4182-94bb-2eed05e9a752/Jason_Heddings_30.png","type":"person","person":{"email":"jason@heddings.com"}},{"object":"user","id":"0b9fa76f-1fbe-410c-95cc-34b74a4ad423","name":"MyComix","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/9eaa1337-19e9-428a-958b-31cf25bf02bf/comic-book-icon-png-5.png","type":"bot","bot":{}},{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1","name":"SDK
-      Development","avatar_url":null,"type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}},{"object":"user","id":"660f65a9-2a71-4e4a-8e21-ac7bb3349345","name":"Notes2Notion","avatar_url":null,"type":"bot","bot":{}},{"object":"user","id":"6b3259d1-9a7a-4135-8a36-3d38f040a9ce","name":"Repeaty","avatar_url":null,"type":"bot","bot":{}},{"object":"user","id":"9ef2cc87-7c49-4410-ba6d-ea512661c42e","name":"IFTTT","avatar_url":null,"type":"bot","bot":{}}],"next_cursor":null,"has_more":false,"type":"user","user":{}}'
+    content: '{"object":"list","results":[{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322","name":"Florian
+      Wilhelm","avatar_url":"https://lh3.googleusercontent.com/a-/AAuE7mBBGq22qnRbLoOSo5zScC4miXci-xi4vELc30G9Aw=s100","type":"person","person":{"email":"florian.wilhelm@gmail.com"}},{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
+      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}}],"next_cursor":null,"has_more":false,"type":"user","user":{}}'
     headers: {}
     http_version: HTTP/1.1
     status_code: 200
@@ -29,7 +29,7 @@ interactions:
       accept:
       - '*/*'
       accept-encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       authorization:
       - secret...
       connection:
@@ -39,10 +39,10 @@ interactions:
       notion-version:
       - '2022-02-22'
     method: GET
-    uri: https://api.notion.com/v1/users/ea74294e-d4c7-41f0-8929-805c80ea0d7f
+    uri: https://api.notion.com/v1/users/b10cb6df-12ef-44d3-88ad-250168f66322
   response:
-    content: '{"object":"user","id":"ea74294e-d4c7-41f0-8929-805c80ea0d7f","name":"Jason
-      Heddings","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/f9ef1e79-a305-4182-94bb-2eed05e9a752/Jason_Heddings_30.png","type":"person","person":{"email":"jason@heddings.com"}}'
+    content: '{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322","name":"Florian
+      Wilhelm","avatar_url":"https://lh3.googleusercontent.com/a-/AAuE7mBBGq22qnRbLoOSo5zScC4miXci-xi4vELc30G9Aw=s100","type":"person","person":{"email":"florian.wilhelm@gmail.com"}}'
     headers: {}
     http_version: HTTP/1.1
     status_code: 200
@@ -52,7 +52,7 @@ interactions:
       accept:
       - '*/*'
       accept-encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       authorization:
       - secret...
       connection:
@@ -62,256 +62,10 @@ interactions:
       notion-version:
       - '2022-02-22'
     method: GET
-    uri: https://api.notion.com/v1/users/0b9fa76f-1fbe-410c-95cc-34b74a4ad423
+    uri: https://api.notion.com/v1/users/645e79dd-3e43-40de-9d51-39357c1c427f
   response:
-    content: '{"object":"user","id":"0b9fa76f-1fbe-410c-95cc-34b74a4ad423","name":"MyComix","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/9eaa1337-19e9-428a-958b-31cf25bf02bf/comic-book-icon-png-5.png","type":"bot","bot":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/6860cd48-ced8-41b3-b824-c7d039085db1
-  response:
-    content: '{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1","name":"SDK
-      Development","avatar_url":null,"type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/660f65a9-2a71-4e4a-8e21-ac7bb3349345
-  response:
-    content: '{"object":"user","id":"660f65a9-2a71-4e4a-8e21-ac7bb3349345","name":"Notes2Notion","avatar_url":null,"type":"bot","bot":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/6b3259d1-9a7a-4135-8a36-3d38f040a9ce
-  response:
-    content: '{"object":"user","id":"6b3259d1-9a7a-4135-8a36-3d38f040a9ce","name":"Repeaty","avatar_url":null,"type":"bot","bot":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/9ef2cc87-7c49-4410-ba6d-ea512661c42e
-  response:
-    content: '{"object":"user","id":"9ef2cc87-7c49-4410-ba6d-ea512661c42e","name":"IFTTT","avatar_url":null,"type":"bot","bot":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users?page_size=100
-  response:
-    content: '{"object":"list","results":[{"object":"user","id":"ea74294e-d4c7-41f0-8929-805c80ea0d7f","name":"Jason
-      Heddings","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/f9ef1e79-a305-4182-94bb-2eed05e9a752/Jason_Heddings_30.png","type":"person","person":{"email":"jason@heddings.com"}},{"object":"user","id":"0b9fa76f-1fbe-410c-95cc-34b74a4ad423","name":"MyComix","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/9eaa1337-19e9-428a-958b-31cf25bf02bf/comic-book-icon-png-5.png","type":"bot","bot":{}},{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1","name":"SDK
-      Development","avatar_url":null,"type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}},{"object":"user","id":"660f65a9-2a71-4e4a-8e21-ac7bb3349345","name":"Notes2Notion","avatar_url":null,"type":"bot","bot":{}},{"object":"user","id":"6b3259d1-9a7a-4135-8a36-3d38f040a9ce","name":"Repeaty","avatar_url":null,"type":"bot","bot":{}},{"object":"user","id":"9ef2cc87-7c49-4410-ba6d-ea512661c42e","name":"IFTTT","avatar_url":null,"type":"bot","bot":{}}],"next_cursor":null,"has_more":false,"type":"user","user":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/ea74294e-d4c7-41f0-8929-805c80ea0d7f
-  response:
-    content: '{"object":"user","id":"ea74294e-d4c7-41f0-8929-805c80ea0d7f","name":"Jason
-      Heddings","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/f9ef1e79-a305-4182-94bb-2eed05e9a752/Jason_Heddings_30.png","type":"person","person":{"email":"jason@heddings.com"}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/0b9fa76f-1fbe-410c-95cc-34b74a4ad423
-  response:
-    content: '{"object":"user","id":"0b9fa76f-1fbe-410c-95cc-34b74a4ad423","name":"MyComix","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/9eaa1337-19e9-428a-958b-31cf25bf02bf/comic-book-icon-png-5.png","type":"bot","bot":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/6860cd48-ced8-41b3-b824-c7d039085db1
-  response:
-    content: '{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1","name":"SDK
-      Development","avatar_url":null,"type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/660f65a9-2a71-4e4a-8e21-ac7bb3349345
-  response:
-    content: '{"object":"user","id":"660f65a9-2a71-4e4a-8e21-ac7bb3349345","name":"Notes2Notion","avatar_url":null,"type":"bot","bot":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/6b3259d1-9a7a-4135-8a36-3d38f040a9ce
-  response:
-    content: '{"object":"user","id":"6b3259d1-9a7a-4135-8a36-3d38f040a9ce","name":"Repeaty","avatar_url":null,"type":"bot","bot":{}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/9ef2cc87-7c49-4410-ba6d-ea512661c42e
-  response:
-    content: '{"object":"user","id":"9ef2cc87-7c49-4410-ba6d-ea512661c42e","name":"IFTTT","avatar_url":null,"type":"bot","bot":{}}'
+    content: '{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
+      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}}'
     headers: {}
     http_version: HTTP/1.1
     status_code: 200

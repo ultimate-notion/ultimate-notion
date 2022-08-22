@@ -5,7 +5,7 @@ interactions:
       accept:
       - '*/*'
       accept-encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       authorization:
       - secret...
       connection:
@@ -17,31 +17,8 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/users/me
   response:
-    content: '{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1","name":"SDK
-      Development","avatar_url":null,"type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}}'
-    headers: {}
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-02-22'
-    method: GET
-    uri: https://api.notion.com/v1/users/me
-  response:
-    content: '{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1","name":"SDK
-      Development","avatar_url":null,"type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}}'
+    content: '{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
+      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true}}}'
     headers: {}
     http_version: HTTP/1.1
     status_code: 200
