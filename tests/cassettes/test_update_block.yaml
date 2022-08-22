@@ -1,0 +1,220 @@
+interactions:
+- request:
+    body: '{"children": [{"type": "to_do", "object": "block", "has_children": false,
+      "archived": false, "to_do": {"rich_text": [{"type": "text", "plain_text": "Important
+      Task", "text": {"content": "Important Task"}}], "checked": false, "color": "default"}}]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '247'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: PATCH
+    uri: https://api.notion.com/v1/blocks/250662d9783d483cb131341ed479f96c/children
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"a339c7aa-3118-4ce2-97d6-954cbb6b0139","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:46:00.000Z","last_edited_time":"2022-07-24T23:46:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":false,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":false,"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"type": "to_do", "archived": false, "to_do": {"rich_text": [{"type": "text",
+      "plain_text": "Important Task", "annotations": {"bold": false, "italic": false,
+      "strikethrough": false, "underline": false, "code": false, "color": "default"},
+      "text": {"content": "Important Task"}}], "checked": true, "color": "default"}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '316'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: PATCH
+    uri: https://api.notion.com/v1/blocks/a339c7aa31184ce297d6954cbb6b0139
+  response:
+    content: '{"object":"block","id":"a339c7aa-3118-4ce2-97d6-954cbb6b0139","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:46:00.000Z","last_edited_time":"2022-07-24T23:46:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":false,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":true,"color":"default"}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: GET
+    uri: https://api.notion.com/v1/blocks/a339c7aa-3118-4ce2-97d6-954cbb6b0139
+  response:
+    content: '{"object":"block","id":"a339c7aa-3118-4ce2-97d6-954cbb6b0139","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:46:00.000Z","last_edited_time":"2022-07-24T23:46:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":false,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":true,"color":"default"}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: DELETE
+    uri: https://api.notion.com/v1/blocks/a339c7aa31184ce297d6954cbb6b0139
+  response:
+    content: '{"object":"block","id":"a339c7aa-3118-4ce2-97d6-954cbb6b0139","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:46:00.000Z","last_edited_time":"2022-07-24T23:46:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":true,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":true,"color":"default"}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"children": [{"type": "to_do", "object": "block", "has_children": false,
+      "archived": false, "to_do": {"rich_text": [{"type": "text", "plain_text": "Important
+      Task", "text": {"content": "Important Task"}}], "checked": false, "color": "default"}}]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '247'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: PATCH
+    uri: https://api.notion.com/v1/blocks/250662d9783d483cb131341ed479f96c/children
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"af3ba13f-5aea-414a-8bb2-8437fba0980d","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:55:00.000Z","last_edited_time":"2022-07-24T23:55:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":false,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":false,"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"type": "to_do", "archived": false, "to_do": {"rich_text": [{"type": "text",
+      "plain_text": "Important Task", "annotations": {"bold": false, "italic": false,
+      "strikethrough": false, "underline": false, "code": false, "color": "default"},
+      "text": {"content": "Important Task"}}], "checked": true, "color": "default"}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '316'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: PATCH
+    uri: https://api.notion.com/v1/blocks/af3ba13f5aea414a8bb28437fba0980d
+  response:
+    content: '{"object":"block","id":"af3ba13f-5aea-414a-8bb2-8437fba0980d","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:55:00.000Z","last_edited_time":"2022-07-24T23:55:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":false,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":true,"color":"default"}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: GET
+    uri: https://api.notion.com/v1/blocks/af3ba13f-5aea-414a-8bb2-8437fba0980d
+  response:
+    content: '{"object":"block","id":"af3ba13f-5aea-414a-8bb2-8437fba0980d","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:55:00.000Z","last_edited_time":"2022-07-24T23:55:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":false,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":true,"color":"default"}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-02-22'
+    method: DELETE
+    uri: https://api.notion.com/v1/blocks/af3ba13f5aea414a8bb28437fba0980d
+  response:
+    content: '{"object":"block","id":"af3ba13f-5aea-414a-8bb2-8437fba0980d","parent":{"type":"page_id","page_id":"250662d9-783d-483c-b131-341ed479f96c"},"created_time":"2022-07-24T23:55:00.000Z","last_edited_time":"2022-07-24T23:55:00.000Z","created_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"last_edited_by":{"object":"user","id":"6860cd48-ced8-41b3-b824-c7d039085db1"},"has_children":false,"archived":true,"type":"to_do","to_do":{"rich_text":[{"type":"text","text":{"content":"Important
+      Task","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Important
+      Task","href":null}],"checked":true,"color":"default"}}'
+    headers: {}
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

@@ -21,6 +21,15 @@ A longer description of your project goes here...
 * Have a nice show function
 * Fix the bug that querying somehow keeps a global state when filtering
 * Get uniqueness by having a.b.c.database_name
+* Eigenes Package
+  * Es gibt eine Schema MetaClass
+  * Ein Database Object was das Schema und eine Session nimmt
+  * Dann eine create & connect methode und eine `from_db_id` constructor sowie `from_db_name`
+  * auch ein `create_tabe`
+  * connect nimmt eine `db_id`
+  * Eine Page ist quasi ein Schema instanziiert. 
+  * https://github.com/jheddings/notional/blob/main/examples/catalog.py
+  * auch dieses Property Descriptor Feature nutzen.__set_name__
 
 ## Installation
 

@@ -1,76 +1,307 @@
-from typing import Optional
+"""Base classes for working with the Notion API."""
+
+import inspect
+import logging
+from datetime import date, datetime
+from enum import Enum
 from uuid import UUID
-from functools import cache
 
-import pandas as pd
+from pydantic import BaseModel
+from pydantic.main import ModelMetaclass, validate_model
 
-import notional
-
-from notional.orm import connected_page
-from notional.session import Session
-from notional.query import QueryBuilder
-from notional.records import Database
-from notional import types
+log = logging.getLogger(__name__)
 
 
-class NotionSession(Session):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+def make_api_safe(data):
+    """Recursively convert the given data to an API-safe form.
 
-    def get_dbs_by_name(self, db_name: str) -> [Database]:
-        return list(self.search(db_name).filter(property="object", value="database").execute())
+    This is mostly to handle data types that will not directly serialize to JSON.
+    """
 
-    def get_db_id(self, db_name: str) -> UUID:
-        dbs = self.get_dbs_by_name(db_name)
-        if not dbs:
-            raise RuntimeError(f"No database `{db_name}` found.")
-        if len(dbs) > 1:
-            raise RuntimeError(f"{len(dbs)} databases of name `{db_name}` found.")
-        return dbs[0].id
+    # https://github.com/samuelcolvin/pydantic/issues/1409#issuecomment-877175194
 
-    def get_db(self, *, db_id: Optional[str] = None, db_name: Optional[str] = None) -> Database:
-        if (db_id is not None) == (db_name is not None):
-            raise RuntimeError("Either `db_id` or `db_name` must be given.")
-        if db_name is not None:
-            db_id = self.get_db_id(db_name)
-        return self.databases.retrieve(db_id)
+    if isinstance(data, (date, datetime)):
+        return data.isoformat()
 
-    def query_db(self, *, db_id: Optional[str] = None, db_name: Optional[str] = None, live_updates=True) -> QueryBuilder:
-        db_obj = self.get_db(db_id=db_id, db_name=db_name)
+    if isinstance(data, UUID):
+        return str(data)
 
-        if live_updates:
-            cpage = connected_page(session=self, source_db=db_obj)
-            return cpage.query()
-        else:
-            return self.databases.query(db_id)
+    if isinstance(data, Enum):
+        return data.value
 
-    def get_db_as_df(self, db: Database) -> pd.DataFrame:
-        rows = (self._page_to_row(page) for page in self.databases.query(db.id).execute())
-        return pd.DataFrame(rows)
+    if isinstance(data, dict):
+        return {name: make_api_safe(value) for name, value in data.items()}
 
-    @cache
-    def get_page(self, page_id):
-        return self.pages.retrieve(page_id)
+    if isinstance(data, list):
+        return [make_api_safe(value) for value in data]
 
-    def _resolve_relation(self, relation):
-        for ref in relation:
-            yield self.get_page(ref.id)
+    if isinstance(data, tuple):
+        return [make_api_safe(value) for value in data]
 
-    def _page_to_row(self, page):
-        row = dict(page_title=page.Title,
-                   page_id=page.id,
-                   page_created_time=page.created_time,
-                   page_last_edited_time=page.last_edited_time)
-        for k, v in page.properties.items():
-            if isinstance(v, (types.Date, types.MultiSelect)):
-                v = str(v)
-            elif isinstance(v, types.Relation):
-                v = ", ".join((p.Title for p in self._resolve_relation(v)))
-            elif isinstance(v, types.DateFormula):
-                v = str(v.Result)
-            elif isinstance(v, types.Formula):
-                v = v.Result
+    return data
+
+
+class ComposableObject(ModelMetaclass):
+    """Presents a metaclass that composes objects using simple values.
+
+    This is primarily to allow easy definition of data objects without disrupting the
+    `BaseModel` constructor.  e.g. rather than requiring a caller to understand how
+    nested data works in the data objects, they can compose objects from simple values.
+
+    Compare the following code for declaring a Paragraph:
+
+    ```python
+    # using nested data objects:
+    text = "hello world"
+    nested = TextObject._NestedData(content=text)
+    rtf = text.TextObject(text=nested, plain_text=text)
+    content = blocks.Paragraph._NestedData(text=[rtf])
+    para = blocks.Paragraph(paragraph=content)
+
+    # using a composable object:
+    para = blocks.Paragraph["hello world"]
+    ```
+
+    Classes that support composition in this way must define and implement the internal
+    `__compose__` method.  This method takes an arbitrary number of parameters, based
+    on the needs of the implementation.  It is up to the implementing class to ensure
+    that the parameters are specified correctly.
+    """
+
+    def __getitem__(self, params):
+        """Return the requested class by composing using the given param.
+
+        Types found in `params` will be compared to expected types in the `__compose__`
+        method.
+
+        If the requested class does not expose the `__compose__` method, this will raise
+        an exception.
+        """
+
+        if not hasattr(self, "__compose__"):
+            raise NotImplementedError(f"{self} does not support object composition")
+
+        # XXX if params is empty / None, consider calling the default constructor
+
+        compose = self.__compose__
+
+        if type(params) is tuple:
+            return compose(*params)
+
+        return compose(params)
+
+
+class DataObject(BaseModel, metaclass=ComposableObject):
+    """The base for all API objects."""
+
+    def __setattr__(self, name, value):
+        """Set the attribute of this object to a given value.
+
+        The implementation of `BaseModel.__setattr__` does not allow for properties.
+
+        See https://github.com/samuelcolvin/pydantic/issues/1577
+        """
+        try:
+            super().__setattr__(name, value)
+        except ValueError as err:
+            setters = inspect.getmembers(
+                self.__class__,
+                predicate=lambda x: isinstance(x, property) and x.fset is not None,
+            )
+            for setter_name, _ in setters:
+                if setter_name == name:
+                    object.__setattr__(self, name, value)
+                    break
             else:
-                v = v.Value
-            row[k] = v
-        return row
+                raise err
+
+    @classmethod
+    def _modify_field_(cls, name, default=None):
+        """Modify the `BaseModel` field information for a specific class instance.
+
+        This is necessary in particular for subclasses that change the default values
+        of a model when defined.  Notable examples are `TypedObject` and `NamedObject`.
+
+        :param name: the named attribute in the class
+        :param default: the new default for the named field
+        """
+        setattr(cls, name, default)
+
+        cls.__fields__[name].default = default
+        cls.__fields__[name].required = default is None
+
+    # https://github.com/samuelcolvin/pydantic/discussions/3139
+    def refresh(__pydantic_self__, **data):
+        """Refresh the internal attributes with new data."""
+
+        values, fields, error = validate_model(__pydantic_self__.__class__, data)
+
+        if error:
+            raise error
+
+        for name in fields:
+            value = values[name]
+            log.debug("set object data -- %s => %s", name, value)
+            setattr(__pydantic_self__, name, value)
+
+        return __pydantic_self__
+
+    def to_api(self):
+        """Convert to a suitable representation for the Notion API."""
+
+        # the API doesn't like "undefined" values...
+
+        data = self.dict(exclude_none=True, by_alias=True)
+
+        # we need to convert "special" types to string forms to help the JSON encoder.
+        # there are efforts underway in pydantic to make this easier, but for now...
+
+        return make_api_safe(data)
+
+
+class NamedObject(DataObject):
+    """A Notion API object."""
+
+    # XXX should NamedObject have the same typing ability as TypedObject?
+
+    object: str
+
+    def __init_subclass__(cls, object=None, **kwargs):
+        """Update `DataObject` defaults for the named object."""
+        super().__init_subclass__(**kwargs)
+
+        if object is not None:
+            cls._modify_field_("object", default=object)
+
+
+class TypedObject(DataObject):
+    """A type-referenced object.
+
+    Many objects in the Notion API follow a generic->specific pattern with a 'type'
+    parameter followed by additional data.  These objects must specify a `type`
+    attribute to ensure that the correct object is created.
+
+    Calling the object provides direct access to the data stored in `{type}`.
+    """
+
+    type: str
+
+    # modified from the methods described in this discussion:
+    # - https://github.com/samuelcolvin/pydantic/discussions/3091
+
+    def __init_subclass__(cls, type=None, **kwargs):
+        """Register the subtypes of the TypedObject subclass."""
+        super().__init_subclass__(**kwargs)
+
+        if type is not None:
+            sub_type = type
+
+        elif hasattr(cls, "__type__"):
+            sub_type = cls.__type__
+
+        else:
+            sub_type = cls.__name__
+
+        cls._modify_field_("type", default=sub_type)
+
+        # initialize a __typemap__ map for each direct child of TypedObject
+
+        # this allows different class trees to have the same 'type' name
+        # but point to a different object (e.g. the 'date' type may have
+        # different implementations depending where it is used in the API)
+
+        # also, due to the order in which typed classes are defined, once
+        # the map is defined for a subclass of TypedObject, any further
+        # descendants of that class will have the new map via inheritance
+
+        if TypedObject in cls.__bases__ and not hasattr(cls, "__typemap__"):
+            cls.__typemap__ = {}
+
+        if sub_type in cls.__typemap__:
+            raise ValueError(f"Duplicate subtype for class - {sub_type} :: {cls}")
+
+        log.debug("registered new subtype: %s => %s", sub_type, cls)
+
+        cls.__typemap__[sub_type] = cls
+
+    def __call__(self, field=None):
+        """Return nested data from this Block.
+
+        If a field is provided, the contents of that field in the NestedData will be
+        returned.  Otherwise, the full contents of the NestedData will be returned.
+        """
+
+        type = getattr(self, "type", None)
+
+        if type is None:
+            raise AttributeError("type not specified")
+
+        nested = getattr(self, type)
+
+        if field is not None:
+            nested = getattr(nested, field)
+
+        return nested
+
+    @classmethod
+    def __get_validators__(cls):
+        """Provide `BaseModel` with the means to convert `TypedObject`'s."""
+        yield cls._convert_to_real_type_
+
+    @classmethod
+    def parse_obj(cls, obj):
+        """Parse the structured object data into an instance of `TypedObject`.
+
+        This method overrides `BaseModel.parse_obj()`.
+        """
+        return cls._convert_to_real_type_(obj)
+
+    @classmethod
+    def _convert_to_real_type_(cls, data):
+        """Instantiate the correct object based on the 'type' field."""
+
+        if isinstance(data, cls):
+            return data
+
+        if not isinstance(data, dict):
+            raise ValueError("Invalid 'data' object")
+
+        data_type = data.get("type")
+
+        if data_type is None:
+            raise ValueError("Missing 'type' in TypedObject")
+
+        if not hasattr(cls, "__typemap__"):
+            raise TypeError(f"Invalid TypedObject: {cls} - missing __typemap__")
+
+        sub = cls.__typemap__.get(data_type)
+
+        if sub is None:
+            raise TypeError(f"Unsupported sub-type: {data_type}")
+
+        log.debug(
+            "initializing typed object %s :: %s => %s -- %s", cls, data_type, sub, data
+        )
+
+        return sub(**data)
+
+
+class NestedObject(DataObject):
+    """Represents an API object with nested data.
+
+    These objects require a 'type' property and a matching property of the same
+    name, which holds additional data.
+
+    For example, this contains a nested 'text' object:
+
+        data = {
+            type: "text",
+            ...
+            text: {
+                ...
+            }
+        }
+
+    Currently, this is a convenience class for clarity - it does not provide additional
+    functionality at this time.
+    """
