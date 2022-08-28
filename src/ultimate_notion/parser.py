@@ -21,7 +21,7 @@ import html5lib
 from .core import schema, types, blocks
 from .core.text import Annotations, TextObject, lstrip, rstrip, truncate
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 # parse embedded image data
 img_data_re = re.compile("^data:image/([^;]+);([^,]+),(.+)$")
@@ -284,17 +284,17 @@ class HtmlParser(DocumentParser):
         :param elem: the ElementTree object to render
         :param parent: the parent block for the rendered content or `None`
         """
-        log.debug("rendering element - %s :: %s", elem.tag, type(parent))
+        _log.debug("rendering element - %s :: %s", elem.tag, type(parent))
 
         if parent is None:
             parent = self.content
 
         if hasattr(self, f"_render_{elem.tag}"):
-            log.debug("handler func -- _render_%s", elem.tag)
+            _log.debug("handler func -- _render_%s", elem.tag)
             pfunc = getattr(self, f"_render_{elem.tag}")
             pfunc(elem, parent)
 
-        log.debug("block complete; %d total block(s)", len(self.content))
+        _log.debug("block complete; %d total block(s)", len(self.content))
 
     def _render_a(self, elem, parent):
         self._current_href = elem.get("href")
@@ -525,7 +525,7 @@ class HtmlParser(DocumentParser):
 
         When appropriate, whitespace in the text will be removed.
         """
-        log.debug("appending text :: %s => '%s'", parent.type, truncate(text, 10))
+        _log.debug("appending text :: %s => '%s'", parent.type, truncate(text, 10))
 
         if not isinstance(parent, blocks.Code):
             text = condense_text(text)
@@ -544,7 +544,7 @@ class HtmlParser(DocumentParser):
 
         This will process all children of the element, including text and nodes.
         """
-        log.debug("processing contents :: %s %s", elem.tag, type(parent))
+        _log.debug("processing contents :: %s %s", elem.tag, type(parent))
 
         # empty elements don't need text processing...
         if not elem_has_text(elem, with_children=False):
@@ -598,7 +598,7 @@ class HtmlParser(DocumentParser):
         import base64
         import tempfile
 
-        log.debug("processing image")
+        _log.debug("processing image")
 
         # TODO this probably needs more error handling and better flow
 
@@ -612,19 +612,19 @@ class HtmlParser(DocumentParser):
         img_data_enc = m.groups()[1]
         img_data_str = m.groups()[2]
 
-        log.debug("decoding embedded image: %s [%s]", img_type, img_data_enc)
+        _log.debug("decoding embedded image: %s [%s]", img_type, img_data_enc)
 
         if img_data_enc == "base64":
-            log.debug("decoding base64 image: %d bytes", len(img_data_str))
+            _log.debug("decoding base64 image: %d bytes", len(img_data_str))
             img_data_b64 = img_data_str.encode("ascii")
             img_data = base64.b64decode(img_data_b64)
         else:
             raise ValueError(f"Unsupported img encoding: {img_data_enc}")
 
-        log.debug("preparing %d bytes for image upload", len(img_data))
+        _log.debug("preparing %d bytes for image upload", len(img_data))
 
         with tempfile.NamedTemporaryFile(suffix=f".{img_type}") as fp:
-            log.debug("using temporary file: %s", fp.name)
+            _log.debug("using temporary file: %s", fp.name)
             fp.write(img_data)
 
             # TODO upload the image to Notion

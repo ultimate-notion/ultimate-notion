@@ -8,10 +8,10 @@ from ultimate_notion.core import records
 @pytest.mark.vcr()
 def test_active_session(notion):
     """Verify the session reports as active."""
-    assert notion.IsActive
+    assert notion.is_active
 
     notion.close()
-    assert not notion.IsActive
+    assert not notion.is_active
 
 
 @pytest.mark.vcr()

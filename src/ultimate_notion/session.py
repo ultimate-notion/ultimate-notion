@@ -7,7 +7,7 @@ from notion_client.errors import APIResponseError
 
 from .core.endpoints import BlocksEndpoint, DatabasesEndpoint, PagesEndpoint, SearchEndpoint, UsersEndpoint
 
-_logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class SessionError(Exception):
@@ -37,10 +37,10 @@ class Session(object):
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
 
-        _logger.info("Initialized Notion SDK client")
+        _log.info("Initialized Notion SDK client")
 
     @property
-    def IsActive(self):
+    def is_active(self):
         """Determine if the current session is active.
 
         The session is considered "active" if it has not been closed.  This does not
@@ -63,7 +63,7 @@ class Session(object):
         Raises SessionError if there is a problem, otherwise returns True.
         """
 
-        if self.IsActive is False:
+        if self.is_active is False:
             return False
 
         error = None

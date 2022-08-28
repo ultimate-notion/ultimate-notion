@@ -50,14 +50,9 @@ def notion():
     if auth_token is None:
         pytest.skip("missing NOTION_AUTH_TOKEN")
 
-    notion = ultimate_notion.connect(auth=auth_token)
-
-    assert notion.IsActive
-
-    yield notion
-
-    if notion.IsActive:
-        notion.close()
+    with ultimate_notion.connect(auth=auth_token) as sess:
+        assert sess.is_active
+        yield sess
 
 
 @pytest.fixture

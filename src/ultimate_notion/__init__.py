@@ -1,4 +1,5 @@
 import logging
+from contextlib import contextmanager
 from importlib.metadata import PackageNotFoundError, version
 
 try:
@@ -12,12 +13,18 @@ finally:
 from .session import Session
 
 __all__ = ["__version__", "connect"]
-_logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
+@ contextmanager
 def connect(**kwargs):
     """Connect to Notion using the provided integration token."""
 
-    _logger.debug("connecting to Notion...")
-
-    return Session(**kwargs)
+    _log.debug("Connecting to Notion...")
+    sess = Session(**kwargs)
+    try:
+        yield sess
+    finally:
+        if sess.is_active:
+            _log.debug("Closing connection to Notion...")
+            sess.close()
