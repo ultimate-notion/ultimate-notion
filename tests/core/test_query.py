@@ -4,7 +4,7 @@ import pytest
 
 from ultimate_notion.core import query
 
-from .mocks import MockDataObject, mock_endpoint
+from ..mocks import MockDataObject, mock_endpoint
 
 # NOTE these tests help to debug issues in the query builder, however they do not
 # perform an actual query.  the intent of these objects is to represent the API

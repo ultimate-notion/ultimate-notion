@@ -2,7 +2,7 @@
 
 from ultimate_notion.core.iterator import EndpointIterator
 
-from .mocks import mock_endpoint
+from ..mocks import mock_endpoint
 
 
 def test_basic_usage():

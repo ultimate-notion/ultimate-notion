@@ -4,7 +4,7 @@ import pytest
 
 from ultimate_notion.core import blocks, schema, types
 
-from .utils import mktitle
+from ..utils import mktitle
 
 
 def iterate_blocks(notion, parent, include_children=False):
