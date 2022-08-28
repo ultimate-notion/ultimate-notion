@@ -2,7 +2,7 @@
 
 import pytest
 
-from ultimate_notion import query
+from ultimate_notion.core import query
 
 from .mocks import MockDataObject, mock_endpoint
 

@@ -10,7 +10,7 @@ import logging
 from abc import ABC
 from typing import Any, List, Optional, Union
 
-from .core import NestedObject, TypedObject
+from .api import NestedObject, TypedObject
 from .records import BlockRef, ParentRef, Record
 from .text import (
     CodingLanguage,

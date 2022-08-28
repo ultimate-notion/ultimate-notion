@@ -6,7 +6,7 @@ from typing import List
 
 import pytest
 
-from ultimate_notion.core import NamedObject, NestedObject, TypedObject
+from ultimate_notion.core.api import NamedObject, NestedObject, TypedObject
 
 # keep logging output to a minimum for testing
 logging.basicConfig(level=logging.INFO)

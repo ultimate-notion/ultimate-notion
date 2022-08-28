@@ -2,7 +2,7 @@
 
 import pytest
 
-from ultimate_notion import blocks, schema, types
+from ultimate_notion.core import blocks, schema, types
 
 from .utils import mktitle
 

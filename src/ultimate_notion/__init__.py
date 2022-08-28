@@ -9,8 +9,7 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .api import NotionSession
-from .session import Session
+from .core.session import Session
 
 __all__ = ["__version__", "connect"]
 _logger = logging.getLogger(__name__)

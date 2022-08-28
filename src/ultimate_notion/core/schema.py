@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Any, List, Optional
 from uuid import UUID
 
-from .core import DataObject, NestedObject, TypedObject
+from .api import DataObject, NestedObject, TypedObject
 from .text import Color
 
 

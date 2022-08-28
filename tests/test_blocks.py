@@ -2,7 +2,7 @@
 
 import pytest
 
-from ultimate_notion import blocks
+from ultimate_notion.core import blocks
 
 
 def test_bookmark_from_url():

@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 import pytest
 from pydantic import ValidationError
 
-from ultimate_notion import schema, types, user
+from ultimate_notion.core import schema, types, user
 
 # TODO look for opportunities to parse using VCR - avoid keeping embedded data
 

@@ -1,6 +1,6 @@
 """Unit tests for the Notional iterators."""
 
-from ultimate_notion.iterator import EndpointIterator
+from ultimate_notion.core.iterator import EndpointIterator
 
 from .mocks import mock_endpoint
 

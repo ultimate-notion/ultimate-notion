@@ -14,8 +14,8 @@ import os
 import pytest
 
 import ultimate_notion
-from ultimate_notion import records, schema
-from ultimate_notion.orm import Property, connected_page
+from ultimate_notion.core import records, schema
+from ultimate_notion.core.orm import Property, connected_page
 
 from .utils import mktitle
 

@@ -7,7 +7,7 @@ from typing import Optional
 
 from emoji import EMOJI_DATA
 
-from .core import DataObject, NestedObject, TypedObject
+from .api import DataObject, NestedObject, TypedObject
 
 # this might be a place to capture other utilities for working with markdown, text
 # rich text, etc...  the challenge is not importing types due to a circular ref.

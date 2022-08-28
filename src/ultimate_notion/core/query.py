@@ -11,7 +11,7 @@ from notion_client.api_endpoints import SearchEndpoint
 from pydantic import Field, validator
 
 from .blocks import Block
-from .core import DataObject
+from .api import DataObject
 from .iterator import EndpointIterator
 from .orm import ConnectedPage
 from .records import Database, Page, ParentRef, Record
@@ -291,17 +291,16 @@ class QueryBuilder:
 
             if isinstance(self.endpoint, SearchEndpoint):
                 filter = SearchFilter.parse_obj(kwargs)
+            elif "property" in kwargs:
+                filter = PropertyFilter.parse_obj(kwargs)
+            elif "timestamp" in kwargs and kwargs["timestamp"] == "created_time":
+                filter = CreatedTimeFilter.parse_obj(kwargs)
+            elif (
+                "timestamp" in kwargs and kwargs["timestamp"] == "last_edited_time"
+            ):
+                filter = LastEditedTimeFilter.parse_obj(kwargs)
             else:
-                if "property" in kwargs:
-                    filter = PropertyFilter.parse_obj(kwargs)
-                elif "timestamp" in kwargs and kwargs["timestamp"] == "created_time":
-                    filter = CreatedTimeFilter.parse_obj(kwargs)
-                elif (
-                    "timestamp" in kwargs and kwargs["timestamp"] == "last_edited_time"
-                ):
-                    filter = LastEditedTimeFilter.parse_obj(kwargs)
-                else:
-                    raise ValueError("unrecognized filter")
+                raise ValueError("unrecognized filter")
 
         elif not isinstance(filter, QueryFilter):
             raise ValueError("filter must be of type QueryFilter")

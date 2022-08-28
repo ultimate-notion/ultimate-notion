@@ -4,8 +4,8 @@ from uuid import uuid4
 
 import pytest
 
-from ultimate_notion import blocks, schema, types
-from ultimate_notion.orm import ConnectedPage, Property, connected_page
+from ultimate_notion.core import blocks, schema, types
+from ultimate_notion.core.orm import ConnectedPage, Property, connected_page
 
 
 def test_property_type():

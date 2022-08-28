@@ -2,8 +2,8 @@
 
 import re
 
-from ultimate_notion import blocks
-from ultimate_notion.text import (
+from ultimate_notion.core import blocks
+from ultimate_notion.core.text import (
     Annotations,
     CodingLanguage,
     TextObject,

@@ -2,7 +2,7 @@
 
 import pytest
 
-from ultimate_notion import records
+from ultimate_notion.core import records
 
 
 @pytest.mark.vcr()

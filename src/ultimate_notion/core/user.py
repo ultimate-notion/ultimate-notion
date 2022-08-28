@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from .core import DataObject, NestedObject
+from .api import DataObject, NestedObject
 
 log = logging.getLogger(__name__)
 

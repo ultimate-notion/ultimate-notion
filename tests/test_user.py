@@ -2,7 +2,7 @@
 
 import pytest
 
-from ultimate_notion.user import Bot, Person, User
+from ultimate_notion.core.user import Bot, Person, User
 
 ALICE = """{
   "type": "person",
