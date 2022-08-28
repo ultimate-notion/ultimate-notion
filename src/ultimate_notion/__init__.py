@@ -16,7 +16,7 @@ __all__ = ["__version__", "connect"]
 _log = logging.getLogger(__name__)
 
 
-@ contextmanager
+@contextmanager
 def connect(**kwargs):
     """Connect to Notion using the provided integration token."""
 

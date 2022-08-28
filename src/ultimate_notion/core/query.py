@@ -10,8 +10,8 @@ from uuid import UUID
 from notion_client.api_endpoints import SearchEndpoint
 from pydantic import Field, validator
 
-from .blocks import Block
 from .api import DataObject
+from .blocks import Block
 from .iterator import EndpointIterator
 from .orm import ConnectedPage
 from .records import Database, Page, ParentRef, Record
@@ -295,9 +295,7 @@ class QueryBuilder:
                 filter = PropertyFilter.parse_obj(kwargs)
             elif "timestamp" in kwargs and kwargs["timestamp"] == "created_time":
                 filter = CreatedTimeFilter.parse_obj(kwargs)
-            elif (
-                "timestamp" in kwargs and kwargs["timestamp"] == "last_edited_time"
-            ):
+            elif "timestamp" in kwargs and kwargs["timestamp"] == "last_edited_time":
                 filter = LastEditedTimeFilter.parse_obj(kwargs)
             else:
                 raise ValueError("unrecognized filter")

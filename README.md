@@ -27,7 +27,7 @@ A longer description of your project goes here...
   * Dann eine create & connect methode und eine `from_db_id` constructor sowie `from_db_name`
   * auch ein `create_tabe`
   * connect nimmt eine `db_id`
-  * Eine Page ist quasi ein Schema instanziiert. 
+  * Eine Page ist quasi ein Schema instanziiert.
   * https://github.com/jheddings/notional/blob/main/examples/catalog.py
   * auch dieses Property Descriptor Feature nutzen.__set_name__
 

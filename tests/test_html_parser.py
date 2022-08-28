@@ -5,8 +5,8 @@ import os
 import pytest
 
 from ultimate_notion.core import blocks
-from ultimate_notion.parser import HtmlParser
 from ultimate_notion.core.text import plain_text
+from ultimate_notion.parser import HtmlParser
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 

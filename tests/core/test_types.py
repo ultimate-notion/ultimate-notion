@@ -536,7 +536,7 @@ def test_parse_files_data():
                 "name": "glass.jpg",
                 "type": "external",
                 "external": {
-                    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Glass_of_Milk_%2833657535532%29.jpg"
+                    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Glass_of_Milk_%2833657535532%29.jpg"  # noqa: E501
                 },
             }
         ],
@@ -580,7 +580,7 @@ def test_created_by():
             "object": "user",
             "id": "65970102-79f4-48ed-8065-0ff257e46558",
             "name": "Bob the Person",
-            "avatar_url": "https://upload.wikimedia.org/wikipedia/en/d/d0/Dogecoin_Logo.png",
+            "avatar_url": "https://upload.wikimedia.org/wikipedia/en/d/d0/Dogecoin_Logo.png",  # noqa: E501
             "type": "person",
             "person": {"email": "bob@example.com"},
         },

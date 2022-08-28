@@ -5,7 +5,13 @@ import notion_client
 from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
-from .core.endpoints import BlocksEndpoint, DatabasesEndpoint, PagesEndpoint, SearchEndpoint, UsersEndpoint
+from .core.endpoints import (
+    BlocksEndpoint,
+    DatabasesEndpoint,
+    PagesEndpoint,
+    SearchEndpoint,
+    UsersEndpoint,
+)
 
 _log = logging.getLogger(__name__)
 

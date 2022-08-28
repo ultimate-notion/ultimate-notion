@@ -13,7 +13,7 @@ ALICE = """{
   "person": {
     "email": "nobody@null.com"
   }
-}"""
+}"""  # noqa: E501
 
 BOB = """{
   "type": "bot",
