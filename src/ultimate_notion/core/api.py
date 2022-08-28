@@ -12,8 +12,8 @@ from pydantic.main import ModelMetaclass, validate_model
 _log = logging.getLogger(__name__)
 
 
-def make_api_safe(data):
-    """Recursively convert the given data to an API-safe form.
+def json_serialize(data):
+    """Recursively serialize the given nested data structure to JSON compliance.
 
     This is mostly to handle data types that will not directly serialize to JSON.
     """
@@ -30,13 +30,13 @@ def make_api_safe(data):
         return data.value
 
     if isinstance(data, dict):
-        return {name: make_api_safe(value) for name, value in data.items()}
+        return {name: json_serialize(value) for name, value in data.items()}
 
     if isinstance(data, list):
-        return [make_api_safe(value) for value in data]
+        return [json_serialize(value) for value in data]
 
     if isinstance(data, tuple):
-        return [make_api_safe(value) for value in data]
+        return [json_serialize(value) for value in data]
 
     return data
 
@@ -156,7 +156,7 @@ class DataObject(BaseModel, metaclass=ComposableObject):
         # we need to convert "special" types to string forms to help the JSON encoder.
         # there are efforts underway in pydantic to make this easier, but for now...
 
-        return make_api_safe(data)
+        return json_serialize(data)
 
 
 class NamedObject(DataObject):
