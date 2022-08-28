@@ -15,7 +15,7 @@ from .schema import PropertyObject
 from .text import plain_text
 from .types import EmojiObject, FileObject, PropertyValue, RichTextObject
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class ParentRef(TypedObject):
@@ -106,7 +106,7 @@ class Page(Record, object="page"):
         :param name: the name of the property to get from the internal properties
         """
 
-        log.debug("get property :: {%s} [%s]", self.id, name)
+        _log.debug("get property :: {%s} [%s]", self.id, name)
 
         if self.properties is None:
             raise AttributeError("No properties in Page")
@@ -129,7 +129,7 @@ class Page(Record, object="page"):
         :param value: the new value for the given property
         """
 
-        log.debug("set property :: {%s} [%s] => %s", self.id, name, value)
+        _log.debug("set property :: {%s} [%s] => %s", self.id, name, value)
 
         if value is None:
             self.properties.pop(name, None)

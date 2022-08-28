@@ -9,7 +9,7 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .core.session import Session
+from .session import Session
 
 __all__ = ["__version__", "connect"]
 _logger = logging.getLogger(__name__)

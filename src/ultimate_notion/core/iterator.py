@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 CONTENT_PAGE_SIZE = 100
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class ContentIterator(ABC):
@@ -16,7 +16,7 @@ class ContentIterator(ABC):
 
     def __init__(self):
         """Initialize the iterator."""
-        self.log = log.getChild("ContentIterator")
+        self.log = _log.getChild("ContentIterator")
 
         self.page = None
         self.page_index = -1
@@ -167,7 +167,7 @@ class EndpointIterator(ResultSetIterator):
 
         self.endpoint = endpoint
         self.params = params or {}
-        self.log = log.getChild("EndpointIterator")
+        self.log = _log.getChild("EndpointIterator")
 
     def __setitem__(self, name, value):
         """Set the parameter in this `EndpointIterator`."""

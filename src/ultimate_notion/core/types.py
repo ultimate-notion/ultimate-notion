@@ -15,7 +15,7 @@ from .schema import Function
 from .text import Color, RichTextObject, TextObject, plain_text
 from .user import User
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class PageReference(DataObject):
@@ -738,7 +738,7 @@ class Files(PropertyValue, type="files"):
 
         :param ref: the `FileObject` to be added
         """
-        log.debug("append file - %s", obj)
+        _log.debug("append file - %s", obj)
         self.files.append(obj)
 
     def remove(self, obj):
@@ -746,7 +746,7 @@ class Files(PropertyValue, type="files"):
 
         :param ref: the `FileObject` to be removed
         """
-        log.debug("remove file - %s", obj)
+        _log.debug("remove file - %s", obj)
         self.files.remove(obj)
 
 

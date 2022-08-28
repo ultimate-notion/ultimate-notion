@@ -1,7 +1,7 @@
 """Unit tests for the Notional parsers."""
 
 from ultimate_notion.core import schema, types
-from ultimate_notion.core.parser import CsvParser
+from ultimate_notion.parser import CsvParser
 
 
 def test_basic_csv_data_check():

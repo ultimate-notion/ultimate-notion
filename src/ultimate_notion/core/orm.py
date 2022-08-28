@@ -14,7 +14,7 @@ from .schema import PropertyObject, RichText
 from .text import is_emoji, make_safe_python_name
 from .types import EmojiObject, ExternalFile, PropertyValue
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class ConnectedProperty:
@@ -73,7 +73,7 @@ class ConnectedProperty:
 
     def get(self):
         """Return the current value of the property as a python object."""
-        log.debug("fget :: %s [%s]", self.type_name, self.name)
+        _log.debug("fget :: %s [%s]", self.type_name, self.name)
 
         # TODO raise instead?
         if self.page_data is None:
@@ -96,7 +96,7 @@ class ConnectedProperty:
 
     def set(self, value):
         """Set the property to the given value."""
-        log.debug("fset :: %s [%s] => %s", self.type_name, self.name, type(value))
+        _log.debug("fset :: %s [%s] => %s", self.type_name, self.name, type(value))
 
         # TODO raise instead?
         if self.page_data is None:
@@ -136,7 +136,7 @@ def Property(name, schema=None, default=...):
     :param default: a default value when creating new objects
     """
 
-    log.debug("creating new Property: %s", name)
+    _log.debug("creating new Property: %s", name)
 
     if schema is None:
         schema = RichText()
@@ -264,7 +264,7 @@ class ConnectedPage:
         if self._notional__session is None:
             raise ValueError("Cannot append blocks; invalid session")
 
-        log.debug(
+        _log.debug(
             "appending %d blocks to page :: %s", len(blocks), self._notional__page.id
         )
 
@@ -310,7 +310,7 @@ class ConnectedPage:
         if cls._notional__database is None:
             raise ValueError("Cannot create Page; invalid database")
 
-        log.debug("creating new %s :: %s", cls, cls._notional__database)
+        _log.debug("creating new %s :: %s", cls, cls._notional__database)
 
         parent = DatabaseRef(database_id=cls._notional__database)
 

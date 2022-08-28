@@ -16,7 +16,7 @@ from .iterator import EndpointIterator
 from .orm import ConnectedPage
 from .records import Database, Page, ParentRef, Record
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 def get_target_id(target):
@@ -362,7 +362,7 @@ class QueryBuilder:
         if self.endpoint is None:
             raise ValueError("cannot execute query; no endpoint provided")
 
-        log.debug("executing query - %s", self.query)
+        _log.debug("executing query - %s", self.query)
 
         query = self.query.to_api()
 
@@ -379,7 +379,7 @@ class QueryBuilder:
         try:
             return next(self.execute())
         except StopIteration:
-            log.debug("iterator returned empty result set")
+            _log.debug("iterator returned empty result set")
 
         return None
 

@@ -7,7 +7,7 @@ from uuid import UUID
 
 from .api import DataObject, NestedObject
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class UserType(str, Enum):

@@ -1,11 +1,7 @@
-"""Provides direct access to the Notion API."""
+"""Provides direct access to the endpoints of the Notion API."""
 
 import logging
 from inspect import isclass
-
-import notion_client
-from httpx import ConnectError
-from notion_client.errors import APIResponseError
 
 from .blocks import Block
 from .iterator import EndpointIterator
@@ -16,15 +12,7 @@ from .text import TextObject
 from .types import Title
 from .user import User
 
-log = logging.getLogger(__name__)
-
-
-class SessionError(Exception):
-    """Raised when there are issues with the Notion session."""
-
-    def __init__(self, message):
-        """Initialize the `SessionError` with a supplied message.."""
-        super().__init__(message)
+_log = logging.getLogger(__name__)
 
 
 class Endpoint(object):
@@ -56,7 +44,7 @@ class BlocksEndpoint(Endpoint):
 
             children = [block.to_api() for block in blocks if block is not None]
 
-            log.info("Appending %d blocks to %s ...", len(children), parent_id)
+            _log.info("Appending %d blocks to %s ...", len(children), parent_id)
 
             data = self().append(block_id=parent_id, children=children)
 
@@ -69,10 +57,10 @@ class BlocksEndpoint(Endpoint):
                         block.refresh(**result)
 
                 else:
-                    log.warning("Unable to refresh results; size mismatch")
+                    _log.warning("Unable to refresh results; size mismatch")
 
             else:
-                log.warning("Unable to refresh results; not provided")
+                _log.warning("Unable to refresh results; not provided")
 
             return parent
 
@@ -84,7 +72,7 @@ class BlocksEndpoint(Endpoint):
 
             blocks = EndpointIterator(endpoint=self().list, block_id=parent_id)
 
-            log.info("Listing blocks for %s...", parent_id)
+            _log.info("Listing blocks for %s...", parent_id)
 
             return ResultSet(exec=blocks, cls=Block)
 
@@ -102,7 +90,7 @@ class BlocksEndpoint(Endpoint):
     def delete(self, block):
         """Delete (archive) the specified Block."""
 
-        log.info("Deleting block :: %s", block.id)
+        _log.info("Deleting block :: %s", block.id)
 
         data = self().delete(block.id.hex)
 
@@ -111,7 +99,7 @@ class BlocksEndpoint(Endpoint):
     def restore(self, block):
         """Restore (unarchive) the specified Block."""
 
-        log.info("Restoring block :: %s", block.id)
+        _log.info("Restoring block :: %s", block.id)
 
         data = self().update(block.id.hex, archived=False)
 
@@ -121,7 +109,7 @@ class BlocksEndpoint(Endpoint):
     def retrieve(self, block_id):
         """Return the Block with the given ID."""
 
-        log.info("Retrieving block :: %s", block_id)
+        _log.info("Retrieving block :: %s", block_id)
 
         data = self().retrieve(block_id)
 
@@ -134,7 +122,7 @@ class BlocksEndpoint(Endpoint):
         The block info will be refreshed to the latest version from the server.
         """
 
-        log.info("Updating block :: %s", block.id)
+        _log.info("Updating block :: %s", block.id)
 
         data = self().update(block.id.hex, **block.to_api())
 
@@ -182,7 +170,7 @@ class DatabasesEndpoint(Endpoint):
     def create(self, parent, schema, title=None):
         """Add a database to the given Page parent."""
 
-        log.info("Creating database %s - %s", parent, title)
+        _log.info("Creating database %s - %s", parent, title)
 
         request = self._build_request(parent, schema, title)
 
@@ -196,7 +184,7 @@ class DatabasesEndpoint(Endpoint):
 
         # DEPRECATED ENDPOINT ###
 
-        log.info("Listing known databases...")
+        _log.info("Listing known databases...")
 
         databases = EndpointIterator(endpoint=self().list)
         return ResultSet(exec=databases, cls=Database)
@@ -205,7 +193,7 @@ class DatabasesEndpoint(Endpoint):
     def retrieve(self, database_id):
         """Return the Database with the given ID."""
 
-        log.info("Retrieving database :: %s", database_id)
+        _log.info("Retrieving database :: %s", database_id)
 
         data = self().retrieve(database_id)
 
@@ -220,7 +208,7 @@ class DatabasesEndpoint(Endpoint):
 
         dbid = get_target_id(database)
 
-        log.info("Updating database info :: %s", dbid)
+        _log.info("Updating database info :: %s", dbid)
 
         request = self._build_request(schema=schema, title=title)
 
@@ -232,12 +220,12 @@ class DatabasesEndpoint(Endpoint):
 
     def delete(self, database):
         """Delete (archive) the specified Database."""
-        log.info("Deleting database :: %s", database.id)
+        _log.info("Deleting database :: %s", database.id)
         return self.session.blocks.delete(database)
 
     def restore(self, database):
         """Restore (unarchive) the specified Database."""
-        log.info("Restoring database :: %s", database.id)
+        _log.info("Restoring database :: %s", database.id)
         return self.session.blocks.restore(database)
 
     # https://developers.notion.com/reference/post-database-query
@@ -247,7 +235,7 @@ class DatabasesEndpoint(Endpoint):
         :param target: either a string with the database ID or an ORM class
         """
 
-        log.info("Initializing database query :: {%s}", get_target_id(target))
+        _log.info("Initializing database query :: {%s}", get_target_id(target))
 
         database_id = get_target_id(target)
 
@@ -296,7 +284,7 @@ class PagesEndpoint(Endpoint):
                 child.to_api() for child in children if child is not None
             ]
 
-        log.info("Creating page :: %s => %s", parent, title)
+        _log.info("Creating page :: %s => %s", parent, title)
 
         data = self().create(**request)
 
@@ -314,7 +302,7 @@ class PagesEndpoint(Endpoint):
     def retrieve(self, page_id):
         """Return the Page with the given ID."""
 
-        log.info("Retrieving page :: %s", page_id)
+        _log.info("Retrieving page :: %s", page_id)
 
         data = self().retrieve(page_id)
 
@@ -332,7 +320,7 @@ class PagesEndpoint(Endpoint):
         The page info will be refreshed to the latest version from the server.
         """
 
-        log.info("Updating page info :: %s", page.id)
+        _log.info("Updating page info :: %s", page.id)
 
         if not properties:
             properties = page.properties
@@ -353,24 +341,24 @@ class PagesEndpoint(Endpoint):
         """
 
         if cover is None:
-            log.info("Removing page cover :: %s", page.id)
+            _log.info("Removing page cover :: %s", page.id)
             data = self().update(page.id.hex, cover={})
         elif cover is not False:
-            log.info("Setting page cover :: %s => %s", page.id, cover)
+            _log.info("Setting page cover :: %s => %s", page.id, cover)
             data = self().update(page.id.hex, cover=cover.to_api())
 
         if icon is None:
-            log.info("Removing page icon :: %s", page.id)
+            _log.info("Removing page icon :: %s", page.id)
             data = self().update(page.id.hex, icon={})
         elif icon is not False:
-            log.info("Setting page icon :: %s => %s", page.id, icon)
+            _log.info("Setting page icon :: %s => %s", page.id, icon)
             data = self().update(page.id.hex, icon=icon.to_api())
 
         if archived is False:
-            log.info("Restoring page :: %s", page.id)
+            _log.info("Restoring page :: %s", page.id)
             data = self().update(page.id.hex, archived=False)
         elif archived is True:
-            log.info("Archiving page :: %s", page.id)
+            _log.info("Archiving page :: %s", page.id)
             data = self().update(page.id.hex, archived=True)
 
         return page.refresh(**data)
@@ -409,7 +397,7 @@ class UsersEndpoint(Endpoint):
         """Return an iterator for all users in the workspace."""
 
         users = EndpointIterator(endpoint=self().list)
-        log.info("Listing known users...")
+        _log.info("Listing known users...")
 
         return ResultSet(exec=users, cls=User)
 
@@ -417,7 +405,7 @@ class UsersEndpoint(Endpoint):
     def retrieve(self, user_id):
         """Return the User with the given ID."""
 
-        log.info("Retrieving user :: %s", user_id)
+        _log.info("Retrieving user :: %s", user_id)
 
         data = self().retrieve(user_id)
 
@@ -427,77 +415,8 @@ class UsersEndpoint(Endpoint):
     def me(self):
         """Return the current bot User."""
 
-        log.info("Retrieving current integration bot")
+        _log.info("Retrieving current integration bot")
 
         data = self().me()
 
         return User.parse_obj(data)
-
-
-class Session(object):
-    """An active session with the Notion SDK."""
-
-    def __init__(self, **kwargs):
-        """Initialize the `Session` object and the endpoints.
-
-        `kwargs` will be passed direction to the Notion SDK Client.  For more details,
-        see the (full docs)[https://ramnes.github.io/notion-sdk-py/reference/client/].
-
-        :param auth: bearer token for authentication
-        """
-        self.client = notion_client.Client(**kwargs)
-
-        self.blocks = BlocksEndpoint(self)
-        self.databases = DatabasesEndpoint(self)
-        self.pages = PagesEndpoint(self)
-        self.search = SearchEndpoint(self)
-        self.users = UsersEndpoint(self)
-
-        log.info("Initialized Notion SDK client")
-
-    @property
-    def IsActive(self):
-        """Determine if the current session is active.
-
-        The session is considered "active" if it has not been closed.  This does not
-        determine if the session can connect to the Notion API.
-        """
-        return self.client is not None
-
-    def close(self):
-        """Close the session and release resources."""
-
-        if self.client is None:
-            raise SessionError("Session is not active.")
-
-        self.client.close()
-        self.client = None
-
-    def ping(self):
-        """Confirm that the session is active and able to connect to Notion.
-
-        Raises SessionError if there is a problem, otherwise returns True.
-        """
-
-        if self.IsActive is False:
-            return False
-
-        error = None
-
-        try:
-
-            me = self.users.me()
-
-            if me is None:
-                raise SessionError("Unable to get current user")
-
-        except ConnectError:
-            error = "Unable to connect to Notion"
-
-        except APIResponseError as err:
-            error = str(err)
-
-        if error is not None:
-            raise SessionError(error)
-
-        return True

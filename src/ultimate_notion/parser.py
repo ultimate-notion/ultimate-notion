@@ -18,8 +18,8 @@ from os.path import basename
 
 import html5lib
 
-from . import schema, types, blocks
-from .text import Annotations, TextObject, lstrip, rstrip, truncate
+from .core import schema, types, blocks
+from .core.text import Annotations, TextObject, lstrip, rstrip, truncate
 
 log = logging.getLogger(__name__)
 

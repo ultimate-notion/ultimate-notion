@@ -9,7 +9,7 @@ from uuid import UUID
 from pydantic import BaseModel
 from pydantic.main import ModelMetaclass, validate_model
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 def make_api_safe(data):
@@ -141,7 +141,7 @@ class DataObject(BaseModel, metaclass=ComposableObject):
 
         for name in fields:
             value = values[name]
-            log.debug("set object data -- %s => %s", name, value)
+            _log.debug("set object data -- %s => %s", name, value)
             setattr(__pydantic_self__, name, value)
 
         return __pydantic_self__
@@ -220,7 +220,7 @@ class TypedObject(DataObject):
         if sub_type in cls.__typemap__:
             raise ValueError(f"Duplicate subtype for class - {sub_type} :: {cls}")
 
-        log.debug("registered new subtype: %s => %s", sub_type, cls)
+        _log.debug("registered new subtype: %s => %s", sub_type, cls)
 
         cls.__typemap__[sub_type] = cls
 
@@ -279,7 +279,7 @@ class TypedObject(DataObject):
         if sub is None:
             raise TypeError(f"Unsupported sub-type: {data_type}")
 
-        log.debug(
+        _log.debug(
             "initializing typed object %s :: %s => %s -- %s", cls, data_type, sub, data
         )
 
