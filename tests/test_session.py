@@ -6,18 +6,9 @@ from ultimate_notion.core import records
 
 
 @pytest.mark.vcr()
-def test_active_session(notion):
-    """Verify the session reports as active."""
-    assert notion.is_active
-
-    notion.close()
-    assert not notion.is_active
-
-
-@pytest.mark.vcr()
-def test_ping_session(notion):
-    """Verify the active session responds to a ping."""
-    assert notion.ping()
+def test_session_raise_for_status(notion):
+    """Verify the active session responds or raise."""
+    assert notion.raise_for_status() is None
 
 
 @pytest.mark.vcr()

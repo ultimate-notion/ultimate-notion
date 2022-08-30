@@ -1,5 +1,7 @@
 """Session object"""
 import logging
+from types import TracebackType
+from typing import Type
 
 import notion_client
 from httpx import ConnectError
@@ -20,7 +22,7 @@ class SessionError(Exception):
     """Raised when there are issues with the Notion session."""
 
     def __init__(self, message):
-        """Initialize the `SessionError` with a supplied message.."""
+        """Initialize the `SessionError` with a supplied message."""
         super().__init__(message)
 
 
@@ -45,37 +47,32 @@ class Session(object):
 
         _log.info("Initialized Notion SDK client")
 
-    @property
-    def is_active(self):
-        """Determine if the current session is active.
+    def __enter__(self) -> "Session":
+        _log.debug("Connecting to Notion...")
+        self.client.__enter__()
+        return self
 
-        The session is considered "active" if it has not been closed.  This does not
-        determine if the session can connect to the Notion API.
-        """
-        return self.client is not None
+    def __exit__(
+        self,
+        exc_type: Type[BaseException],
+        exc_value: BaseException,
+        traceback: TracebackType,
+    ) -> None:
+        _log.debug("Closing connection to Notion...")
+        self.client.__exit__(exc_type, exc_value, traceback)
 
     def close(self):
         """Close the session and release resources."""
-
-        if self.client is None:
-            raise SessionError("Session is not active.")
-
         self.client.close()
-        self.client = None
 
-    def ping(self):
-        """Confirm that the session is active and able to connect to Notion.
+    def raise_for_status(self):
+        """Confirm that the session is active and raise otherwise.
 
-        Raises SessionError if there is a problem, otherwise returns True.
+        Raises SessionError if there is a problem, otherwise returns None.
         """
-
-        if self.is_active is False:
-            return False
-
         error = None
 
         try:
-
             me = self.users.me()
 
             if me is None:
@@ -89,5 +86,3 @@ class Session(object):
 
         if error is not None:
             raise SessionError(error)
-
-        return True
