@@ -21,6 +21,7 @@ A longer description of your project goes here...
 * Have a nice show function
 * Fix the bug that querying somehow keeps a global state when filtering
 * Get uniqueness by having a.b.c.database_name
+* Add Markdown stuff from https://github.com/jamalex/notion-py/blob/master/notion/markdown.py
 * Eigenes Package
   * Es gibt eine Schema MetaClass
   * Ein Database Object was das Schema und eine Session nimmt

@@ -1,5 +1,8 @@
 """Session object"""
+from __future__ import annotations
+
 import logging
+import os
 from types import TracebackType
 from typing import Type
 
@@ -14,19 +17,22 @@ from .core.endpoints import (
     SearchEndpoint,
     UsersEndpoint,
 )
+from .database import Database
+from .utils import slist
 
 _log = logging.getLogger(__name__)
+ENV_NOTION_AUTH_TOKEN = "NOTION_AUTH_TOKEN"
 
 
-class SessionError(Exception):
+class NotionSessionError(Exception):
     """Raised when there are issues with the Notion session."""
 
     def __init__(self, message):
-        """Initialize the `SessionError` with a supplied message."""
+        """Initialize the `NotionSessionError` with a supplied message."""
         super().__init__(message)
 
 
-class Session(object):
+class NotionSession(object):
     """An active session with the Notion SDK."""
 
     def __init__(self, **kwargs):
@@ -35,8 +41,11 @@ class Session(object):
         `kwargs` will be passed direction to the Notion SDK Client.  For more details,
         see the (full docs)[https://ramnes.github.io/notion-sdk-py/reference/client/].
 
+        :param live_updates: changes will be propagated to Notion
         :param auth: bearer token for authentication
         """
+        self.live_updates = kwargs.pop("live_updates", True)
+        kwargs.setdefault("auth", os.getenv(ENV_NOTION_AUTH_TOKEN))
         self.client = notion_client.Client(**kwargs)
 
         self.blocks = BlocksEndpoint(self)
@@ -45,9 +54,9 @@ class Session(object):
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
 
-        _log.info("Initialized Notion SDK client")
+        _log.info("Initialized Notion session")
 
-    def __enter__(self) -> "Session":
+    def __enter__(self) -> NotionSession:
         _log.debug("Connecting to Notion...")
         self.client.__enter__()
         return self
@@ -76,7 +85,7 @@ class Session(object):
             me = self.users.me()
 
             if me is None:
-                raise SessionError("Unable to get current user")
+                raise NotionSessionError("Unable to get current user")
 
         except ConnectError:
             error = "Unable to connect to Notion"
@@ -85,4 +94,12 @@ class Session(object):
             error = str(err)
 
         if error is not None:
-            raise SessionError(error)
+            raise NotionSessionError(error)
+
+    def search_db(self, db_name: str) -> slist[Database]:
+        return slist(
+            Database(db, self)
+            for db in self.search(db_name)
+            .filter(property="object", value="database")
+            .execute()
+        )

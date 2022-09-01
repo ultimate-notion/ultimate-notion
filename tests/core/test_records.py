@@ -3,6 +3,7 @@
 import pytest
 
 from ultimate_notion.core import blocks, schema, types
+from ultimate_notion.core.text import plain_text
 
 from ..utils import mktitle
 
@@ -184,5 +185,5 @@ def test_update_schema(notion, blank_db):
 
     improved_db = notion.databases.retrieve(blank_db.id)
 
-    assert improved_db.Title == "Improved Database"
+    assert plain_text(*improved_db.title) == "Improved Database"
     assert len(improved_db.properties) == len(props)

@@ -12,7 +12,6 @@ from uuid import UUID
 
 from .api import NamedObject, TypedObject
 from .schema import PropertyObject
-from .text import plain_text
 from .types import EmojiObject, FileObject, PropertyValue, RichTextObject
 
 _log = logging.getLogger(__name__)
@@ -82,14 +81,6 @@ class Database(Record, object="database"):
     properties: Dict[str, PropertyObject] = {}
     description: Optional[List[RichTextObject]] = None
     is_inline: bool = False
-
-    @property
-    def Title(self):
-        """Return the title of this database as plain text."""
-        if self.title is None or len(self.title) == 0:
-            return None
-
-        return plain_text(*self.title)
 
 
 class Page(Record, object="page"):

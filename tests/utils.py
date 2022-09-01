@@ -1,6 +1,7 @@
 """Utilities for unit tests."""
 
 import os
+from functools import wraps
 
 
 def mktitle(title=None):
@@ -12,3 +13,16 @@ def mktitle(title=None):
         text += " :: " + title
 
     return text
+
+
+def store_retvals(func):
+    """Decorator storing the return values as function attribute for later cleanups"""
+
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        retval = func(*args, **kwargs)
+        wrapped.retvals.append(retval)
+        return retval
+
+    wrapped.retvals = []
+    return wrapped

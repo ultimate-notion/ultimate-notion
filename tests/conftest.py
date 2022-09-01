@@ -10,14 +10,18 @@ Required environment variables for "connected" fixtures:
 """
 
 import os
+import time
 
 import pytest
 
 import ultimate_notion
 from ultimate_notion.core import records, schema
 from ultimate_notion.core.orm import Property, connected_page
+from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 
-from .utils import mktitle
+from .utils import mktitle, store_retvals
+
+SLEEP_SECS_AFTER_DB_CREATE = 1
 
 
 @pytest.fixture(scope="module")
@@ -45,13 +49,11 @@ def notion():
     present, this fixture will skip the current test.
     """
 
-    auth_token = os.getenv("NOTION_AUTH_TOKEN", None)
-
-    if auth_token is None:
+    if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
         pytest.skip("missing NOTION_AUTH_TOKEN")
 
-    with ultimate_notion.Session(auth=auth_token) as sess:
-        yield sess
+    with ultimate_notion.NotionSession() as notion:
+        yield notion
 
 
 @pytest.fixture
@@ -108,6 +110,33 @@ def blank_db(notion, test_area):
     yield db
 
     notion.databases.delete(db)
+
+
+@pytest.fixture
+def create_blank_db(notion, test_area):
+    """Return a function to temporary create an (empty) database for testing.
+
+    This database will be deleted during teardown.
+    """
+
+    @store_retvals
+    def nested_func(db_name):
+        db = notion.databases.create(
+            parent=test_area,
+            title=db_name,
+            schema={
+                "Name": schema.Title(),
+            },
+        )
+        # ToDo: Why is this needed?
+        time.sleep(SLEEP_SECS_AFTER_DB_CREATE)
+        return db
+
+    yield nested_func
+
+    # clean up by deleting the db of each prior call
+    for db in nested_func.retvals:
+        notion.databases.delete(db)
 
 
 @pytest.fixture

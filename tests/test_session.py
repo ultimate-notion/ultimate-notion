@@ -3,6 +3,7 @@
 import pytest
 
 from ultimate_notion.core import records
+from ultimate_notion.utils import slist
 
 
 @pytest.mark.vcr()
@@ -25,3 +26,17 @@ def test_simple_search(notion):
 
     # sanity check to make sure some results came back
     assert num_results > 0
+
+
+@pytest.mark.vcr()
+def test_search_db(notion, create_blank_db):
+    dbs = notion.search_db("TestDB")
+    assert isinstance(dbs, slist)
+
+    with pytest.raises(ValueError):
+        dbs.item()
+
+    create_blank_db("TestDB")
+
+    db = notion.search_db("TestDB").item()
+    assert db.Title == "TestDB"
