@@ -66,9 +66,12 @@ class Record(NamedObject):
     id: UUID = None
     created_time: datetime = None
     last_edited_time: datetime = None
+    # ToDo: Check if this should be up here as Database(Record)
+    #  doesn't have this property
     has_children: bool = False
     archived: bool = False
     parent: ParentRef = None
+    # ToDo: is here created_by and last_edited_by missing?
 
 
 class Database(Record, object="database"):

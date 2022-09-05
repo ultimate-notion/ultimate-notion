@@ -39,4 +39,16 @@ def test_search_db(notion, create_blank_db):
     create_blank_db("TestDB")
 
     db = notion.search_db("TestDB").item()
-    assert db.Title == "TestDB"
+    assert db.title == "TestDB"
+
+
+@pytest.mark.vcr()
+def test_get_db(notion, create_blank_db):
+    create_blank_db("TestDB_for_id")
+    db1 = notion.search_db("TestDB_for_id").item()
+
+    db2 = notion.get_db(db1.id)  # as uuid
+    assert db1.id == db2.id
+
+    db2 = notion.get_db(str(db1.id))  # as str
+    assert db1.id == db2.id

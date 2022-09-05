@@ -4,7 +4,8 @@ from __future__ import annotations
 import logging
 import os
 from types import TracebackType
-from typing import Type
+from typing import Type, Union
+from uuid import UUID
 
 import notion_client
 from httpx import ConnectError
@@ -45,7 +46,9 @@ class NotionSession(object):
         :param auth: bearer token for authentication
         """
         self.live_updates = kwargs.pop("live_updates", True)
-        kwargs.setdefault("auth", os.getenv(ENV_NOTION_AUTH_TOKEN))
+        if (env_token := os.getenv(ENV_NOTION_AUTH_TOKEN)) is not None:
+            kwargs.setdefault("auth", env_token)
+
         self.client = notion_client.Client(**kwargs)
 
         self.blocks = BlocksEndpoint(self)
@@ -103,3 +106,7 @@ class NotionSession(object):
             .filter(property="object", value="database")
             .execute()
         )
+
+    def get_db(self, db_id: Union[str, UUID]) -> Database:
+        db_uuid = db_id if isinstance(db_id, UUID) else UUID(db_id)
+        return self.databases.retrieve(db_uuid)

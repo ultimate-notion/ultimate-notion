@@ -50,7 +50,7 @@ def notion():
     """
 
     if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
-        pytest.skip("missing NOTION_AUTH_TOKEN")
+        pytest.skip(f"missing environment variable {ENV_NOTION_AUTH_TOKEN}")
 
     with ultimate_notion.NotionSession() as notion:
         yield notion
