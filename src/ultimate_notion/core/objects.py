@@ -1,4 +1,4 @@
-"""Base classes for working with the Notion API."""
+"""Base objects for working with the Notion API."""
 
 import inspect
 import logging

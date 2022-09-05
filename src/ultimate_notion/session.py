@@ -19,6 +19,7 @@ from .core.endpoints import (
     UsersEndpoint,
 )
 from .database import Database
+from .page import Page
 from .utils import slist
 
 _log = logging.getLogger(__name__)
@@ -101,7 +102,7 @@ class NotionSession(object):
 
     def search_db(self, db_name: str) -> slist[Database]:
         return slist(
-            Database(db, self)
+            Database(db_obj=db, session=self)
             for db in self.search(db_name)
             .filter(property="object", value="database")
             .execute()
@@ -109,4 +110,7 @@ class NotionSession(object):
 
     def get_db(self, db_id: Union[str, UUID]) -> Database:
         db_uuid = db_id if isinstance(db_id, UUID) else UUID(db_id)
-        return self.databases.retrieve(db_uuid)
+        return Database(db_obj=self.databases.retrieve(db_uuid), session=self)
+
+    def get_page(self, page_id: Union[str, UUID]) -> Page:
+        return Page(page_obj=self.pages.retrieve(page_id), session=self)

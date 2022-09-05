@@ -10,9 +10,9 @@ from uuid import UUID
 from notion_client.api_endpoints import SearchEndpoint
 from pydantic import Field, validator
 
-from .api import DataObject
 from .blocks import Block
 from .iterator import EndpointIterator
+from .objects import DataObject
 from .orm import ConnectedPage
 from .records import Database, Page, ParentRef, Record
 

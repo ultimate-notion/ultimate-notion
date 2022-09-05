@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from .api import NamedObject, TypedObject
+from .objects import NamedObject, TypedObject
 from .schema import PropertyObject
 from .types import EmojiObject, FileObject, PropertyValue, RichTextObject
 
@@ -134,6 +134,7 @@ class Page(Record, object="page"):
         else:
             self.properties[name] = value
 
+    # ToDo: Move this in actual Page class
     @property
     def Title(self):
         """Return the title of this page as a string.

@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from .api import DataObject, NestedObject
+from .objects import DataObject, NestedObject
 
 _log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class UserType(str, Enum):
 class User(DataObject):
     """Represents a User in Notion."""
 
-    # XXX why isn't this a TypedObject ?
+    # ToDo: why isn't this a TypedObject ?
 
     id: UUID
     object: str = "user"

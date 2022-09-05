@@ -5,6 +5,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 from uuid import UUID
 
+import pandas as pd
+
 from .core import records
 from .core.records import ParentRef
 from .core.schema import PropertyObject
@@ -82,3 +84,26 @@ class Database:
     @property
     def is_inline(self) -> bool:
         return self.db_obj.is_inline
+
+    # ToDo: implement this and add unit test
+    def as_df(self) -> pd.DataFrame:
+        rows = (
+            page.to_dict() for page in self.session.databases.query(self.id).execute()
+        )
+        return pd.DataFrame(rows)
+
+    # ToDo: Implement this.
+    # def query_db(
+    #     self,
+    #     *,
+    #     db_id: Optional[str] = None,
+    #     db_name: Optional[str] = None,
+    #     live_updates=True,
+    # ) -> QueryBuilder:
+    #     db_obj = self.get_db(db_id=db_id, db_name=db_name)
+    #
+    #     if live_updates:
+    #         cpage = connected_page(session=self, source_db=db_obj)
+    #         return cpage.query()
+    #     else:
+    #         return self.databases.query(db_id)
