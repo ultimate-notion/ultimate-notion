@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from .objects import NamedObject, TypedObject
+from .bases import NamedObject, TypedObject
 from .schema import PropertyObject
 from .types import EmojiObject, FileObject, PropertyValue, RichTextObject
 

@@ -31,6 +31,7 @@ A longer description of your project goes here...
   * Eine Page ist quasi ein Schema instanziiert.
   * https://github.com/jheddings/notional/blob/main/examples/catalog.py
   * auch dieses Property Descriptor Feature nutzen.__set_name__
+* nutze https://github.com/puppeteer/puppeteer für code execution
 
 ## Installation
 
