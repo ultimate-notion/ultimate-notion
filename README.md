@@ -32,7 +32,9 @@ A longer description of your project goes here...
   * https://github.com/jheddings/notional/blob/main/examples/catalog.py
   * auch dieses Property Descriptor Feature nutzen.__set_name__
 * nutze https://github.com/puppeteer/puppeteer für code execution
-
+* https://medium.com/@ipenywis/create-a-remote-jobs-automated-scraping-bot-on-nodejs-and-puppeteer-with-express-and-crontab-fe6cf39ae780
+* chrome --headless --disable-gpu  test.html
+* bree https://blog.logrocket.com/comparing-best-node-js-schedulers/
 ## Installation
 
 In order to set up the necessary environment:
