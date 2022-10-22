@@ -147,7 +147,7 @@ no-cov = "cov --no-cov {args}"
 [[tool.hatch.envs.test.matrix]]
 python = ["38", "39", "310"]
 
-[envs.lint]
+[tool.hatch.envs.lint]
 skip-install = true
 dependencies = [
     "flake8>=4.0.1",
@@ -157,7 +157,8 @@ dependencies = [
     "isort>=5.10.1",
     "mypy>=0.942",
 ]
-[envs.lint.scripts]
+
+[tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive src/ultimate_notion tests"
 style = [
     "flake8 .",
