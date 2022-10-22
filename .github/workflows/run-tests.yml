@@ -1,12 +1,12 @@
-name: Run unit tests
+name: Run Unit Tests
 
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 concurrency:
   group: test-${{ github.head_ref }}
