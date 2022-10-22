@@ -37,7 +37,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "htts://ultimate-notion.com/"
+# Todo: fix this when set up
+# Documentation = "htts://ultimate-notion.com/"
 Sponsor = "https://github.com/sponsors/FlorianWilhelm"
 Tracker = "https://github.com/ultimate-notion/ultimate-notion/issues"
 Source = "https://github.com/ultimate-notion/ultimate-notion"
@@ -126,6 +127,8 @@ exclude_lines = [
 
 [tool.hatch.envs.default]
 dependencies = [
+    "hatch",
+    "hatch-vcs", # to make `hatch version` available
     "coverage[toml]>=6.2",
     "pytest",
     "pytest-cov",
