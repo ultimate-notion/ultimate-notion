@@ -2,6 +2,10 @@
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
+####################
+# Project Metadata #
+####################
+
 [project]
 name = "ultimate-notion"
 description = "The ultimate Python library for Notion!"
@@ -10,20 +14,20 @@ requires-python = ">=3.8"
 license = "MIT"
 keywords = ["notion"]
 authors = [
-  { name = "Florian Wilhelm", email = "Florian.Wilhelm@gmail.com" },
+    { name = "Florian Wilhelm", email = "Florian.Wilhelm@gmail.com" },
 ]
 classifiers = [
-  "Development Status :: 3 - Alpha",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: Implementation :: CPython",
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: Implementation :: CPython",
 ]
 dependencies = [
     "notion-client",
     "pydantic",
+    "html5lib",
     "emoji",
     "pandas",
     "google-api-python-client",
@@ -38,6 +42,10 @@ Sponsor = "https://github.com/sponsors/FlorianWilhelm"
 Tracker = "https://github.com/ultimate-notion/ultimate-notion/issues"
 Source = "https://github.com/ultimate-notion/ultimate-notion"
 
+######################
+# Build & Versioning #
+######################
+
 [tool.hatch.version]
 source = "vcs"
 raw-options = { version_scheme = "no-guess-dev" }
@@ -47,8 +55,12 @@ version-file = "src/ultimate_notion/_version.py"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
-  "/.github",
+    "/.github",
 ]
+
+##################
+# External Tools #
+##################
 
 [tool.mypy]
 disallow_untyped_defs = false
@@ -74,57 +86,9 @@ line_length = 120
 multi_line_output = 3
 use_parentheses = true
 
-[tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.2",
-  "pytest",
-  "pytest-cov",
-  "pytest-mock",
-  "jupyterlab",
-]
-
-[tool.hatch.envs.docs]
-dependencies = [
-  "mkdocs"
-]
-
-[tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
-no-cov = "cov --no-cov {args}"
-
-[[tool.hatch.envs.test.matrix]]
-python = ["38", "39", "310", "311"]
-
-[envs.lint]
-skip-install = true
-dependencies = [
-  "flake8>=4.0.1",
-  "flake8-bugbear>=22.3.23",
-  "flake8-quotes>=3.3.1",
-  "black>=22.3.0",
-  "isort>=5.10.1",
-  "mypy>=0.942",
-]
-[envs.lint.scripts]
-typing = "mypy --install-types --non-interactive src/hatch_showcase tests"
-style = [
-  "flake8 .",
-  "black --check --diff .",
-  "isort --check-only --diff .",
-]
-fmt = [
-  "isort .",
-  "black .",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
-
 [tool.coverage.run]
 branch = true
-source = "ultimate_notion"
+source = ["src/ultimate_notion"]
 # omit = [
 #   "bad_file.py",
 # ]
@@ -154,4 +118,58 @@ exclude_lines = [
     "if 0:",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
+]
+
+#####################
+# Environment Setup #
+#####################
+
+[tool.hatch.envs.default]
+dependencies = [
+    "coverage[toml]>=6.2",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-vcr",
+    "jupyterlab",
+    "pre-commit",
+]
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "mkdocs"
+]
+
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
+no-cov = "cov --no-cov {args}"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["38", "39", "310"]
+
+[envs.lint]
+skip-install = true
+dependencies = [
+    "flake8>=4.0.1",
+    "flake8-bugbear>=22.3.23",
+    "flake8-quotes>=3.3.1",
+    "black>=22.3.0",
+    "isort>=5.10.1",
+    "mypy>=0.942",
+]
+[envs.lint.scripts]
+typing = "mypy --install-types --non-interactive src/ultimate_notion tests"
+style = [
+    "flake8 .",
+    "black --check --diff .",
+    "isort --check-only --diff .",
+]
+fmt = [
+    "isort .",
+    "black .",
+    "style",
+]
+all = [
+    "style",
+    "typing",
 ]
