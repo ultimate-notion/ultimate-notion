@@ -2,9 +2,8 @@
 *~
 *.py[cod]
 *.so
+*.dll
 *.cfg
-!.isort.cfg
-!setup.cfg
 *.orig
 *.log
 *.pot
@@ -37,6 +36,7 @@ htmlcov/*
 junit*.xml
 coverage.xml
 .pytest_cache/
+.mypy_cache/
 
 # Build and docs folder/files
 build/*
@@ -50,5 +50,9 @@ MANIFEST
 
 # Per-project virtualenvs
 .venv*/
+.env/
 .conda*/
 .python-version
+
+# Version file
+/src/hatch_showcase/_version.py

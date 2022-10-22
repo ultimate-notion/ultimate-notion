@@ -4,8 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ultimate-notion"
-description = "The ultimate Python tool for Notion!"
+description = "The ultimate Python library for Notion!"
 readme = "README.md"
+requires-python = ">=3.8"
 license = "MIT"
 keywords = ["notion"]
 authors = [
@@ -20,29 +21,106 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
-dependencies = []
+dependencies = [
+    "notion-client",
+    "pydantic",
+    "emoji",
+    "pandas",
+    "google-api-python-client",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
+]
 dynamic = ["version"]
 
 [project.urls]
 Documentation = "htts://ultimate-notion.com/"
-Issues = "https://github.com/ultimate-notion/ultimate-notion/issues"
+Sponsor = "https://github.com/sponsors/FlorianWilhelm"
+Tracker = "https://github.com/ultimate-notion/ultimate-notion/issues"
 Source = "https://github.com/ultimate-notion/ultimate-notion"
 
 [tool.hatch.version]
 source = "vcs"
 raw-options = { version_scheme = "no-guess-dev" }
 
+[tool.hatch.build.hooks.vcs]
+version-file = "src/ultimate_notion/_version.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+]
+
+[tool.mypy]
+disallow_untyped_defs = false
+follow_imports = "normal"
+ignore_missing_imports = true
+pretty = true
+show_column_numbers = true
+warn_no_return = false
+warn_unused_ignores = true
+
+[tool.black]
+include = '\.pyi?$'
+line-length = 120
+skip-string-normalization = true
+target-version = ["py38"]
+
+[tool.isort]
+default_section = "THIRDPARTY"
+force_grid_wrap = 0
+include_trailing_comma = true
+known_first_party = ["ultimate_notion"]
+line_length = 120
+multi_line_output = 3
+use_parentheses = true
+
 [tool.hatch.envs.default]
 dependencies = [
+  "coverage[toml]>=6.2",
   "pytest",
   "pytest-cov",
+  "pytest-mock",
+  "jupyterlab",
 ]
+
+[tool.hatch.envs.docs]
+dependencies = [
+  "mkdocs"
+]
+
 [tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ultimate_notion --cov=tests {args}"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
 no-cov = "cov --no-cov {args}"
 
 [[tool.hatch.envs.test.matrix]]
 python = ["38", "39", "310", "311"]
+
+[envs.lint]
+skip-install = true
+dependencies = [
+  "flake8>=4.0.1",
+  "flake8-bugbear>=22.3.23",
+  "flake8-quotes>=3.3.1",
+  "black>=22.3.0",
+  "isort>=5.10.1",
+  "mypy>=0.942",
+]
+[envs.lint.scripts]
+typing = "mypy --install-types --non-interactive src/hatch_showcase tests"
+style = [
+  "flake8 .",
+  "black --check --diff .",
+  "isort --check-only --diff .",
+]
+fmt = [
+  "isort .",
+  "black .",
+  "style",
+]
+all = [
+  "style",
+  "typing",
+]
 
 [tool.coverage.run]
 branch = true
