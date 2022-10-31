@@ -1,0 +1,166 @@
+# Project information
+site_name: Ultimate-Notion
+site_description: The ultimate Python library for Notion!
+site_author: Florian Wilhelm
+site_url: https://ultimate-notion.com/latest/
+copyright: 'Copyright &copy; Florian Wilhelm 2022-present'
+
+# Repository
+repo_name: ultimate-notion
+repo_url: https://github.com/ultimate-notion/ultimate-notion
+edit_uri: blob/master/docs
+
+# Navigation
+nav:
+  - Home:
+    - About: index.md
+    - Authors: authors.md
+    - Changelog: changelog.md
+    # - Contributing: contributing.md
+    - Licence: license.md
+    # defer to gen-files + literate-nav
+    - Reference: reference/
+
+# Configuration
+docs_dir: docs
+site_dir: site
+theme:
+  name: material
+  language: en
+  favicon: assets/images/logo.svg
+  icon:
+    repo: fontawesome/brands/github-alt
+    logo: material/rocket-launch-outline
+  font:
+    text: Roboto
+    code: Roboto Mono
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: purple
+      accent: purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: purple
+      accent: purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+  features:
+    - navigation.sections
+#    - navigation.expand
+#    - navigation.tabs # have additional tabs on top bar
+    - navigation.tabs.sticky
+    - navigation.instant
+
+watch:
+- src/ultimate_notion
+
+# Extensions
+plugins:
+  # Built-in
+  search: {}
+  # Extra
+  include-markdown: {}
+  glightbox: {}
+  minify:
+    minify_html: true
+  mike:
+    alias_type: copy
+  gen-files:
+    scripts:
+      - docs/gen_ref_nav.py
+  literate-nav:
+    nav_file: SUMMARY.md
+  mkdocstrings:
+    default_handler: python
+    handlers:
+      python:
+        paths:
+          - src
+        options:
+          docstring_style: google
+          docstring_options:
+            ignore_init_summary: yes
+          merge_init_into_class: yes
+          show_submodules: no
+          # Headings
+          show_root_heading: true
+          show_root_full_path: false
+          # Docstrings
+          show_if_no_docstring: true
+          # Signatures/annotations
+          show_signature_annotations: true
+          # Other
+          show_bases: false
+
+markdown_extensions:
+  # Built-in
+  - markdown.extensions.abbr:
+  - markdown.extensions.admonition:
+  - markdown.extensions.attr_list:
+  - markdown.extensions.footnotes:
+  - markdown.extensions.meta:
+  - markdown.extensions.tables:
+  - markdown.extensions.toc:
+      permalink: true
+  # Extra
+  - pymdownx.arithmatex:
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret:
+  - pymdownx.critic:
+  - pymdownx.details:
+  - pymdownx.emoji:
+      # https://github.com/twitter/twemoji
+      # https://raw.githubusercontent.com/facelessuser/pymdown-extensions/master/pymdownx/twemoji_db.py
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      guess_lang: false
+      linenums_style: pymdownx-inline
+      use_pygments: true
+  - pymdownx.inlinehilite:
+  - pymdownx.keys:
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      social_url_shortener: true
+      social_url_shorthand: true
+      normalize_issue_symbols: true
+      provider: github
+      user: pypa
+      repo: hatch
+  - pymdownx.mark:
+  - pymdownx.progressbar:
+  - pymdownx.saneheaders:
+  - pymdownx.smartsymbols:
+  - pymdownx.snippets:
+      check_paths: true
+      base_path:
+        - docs/snippets
+      auto_append:
+        - links.txt
+        # - abbrs.txt
+  - pymdownx.superfences:
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde:
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/ultimate-notion/ultimate-notion
+#    - icon: fontawesome/solid/blog
+#      link: https://....
+#    - icon: fontawesome/brands/twitter
+#      link: https://twitter.com/florianwilhelm
+#    - icon: fontawesome/brands/linkedin
+#      link: https://www.linkedin.com/in/florianwilhelm/

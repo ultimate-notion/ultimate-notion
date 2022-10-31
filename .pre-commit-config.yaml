@@ -11,6 +11,7 @@ repos:
   - id: check-merge-conflict
   - id: check-xml
   - id: check-yaml
+    args: ['--unsafe']  # needed for !! tags in mkdocs.yml
   - id: debug-statements
   - id: end-of-file-fixer
   - id: requirements-txt-fixer

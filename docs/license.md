@@ -1,5 +1,3 @@
-# License
-
-```{literalinclude} ../LICENSE.txt
-:language: text
-```
+{%
+   include-markdown "../LICENSE.txt"
+%}

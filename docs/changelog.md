@@ -1,4 +1,3 @@
-```{include} ../CHANGELOG.md
-:relative-docs: docs/
-:relative-images:
-```
+{%
+   include-markdown "../CHANGELOG.md"
+%}

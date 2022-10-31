@@ -1,4 +1,3 @@
-```{include} ../AUTHORS.md
-:relative-docs: docs/
-:relative-images:
-```
+{%
+   include-markdown "../AUTHORS.md"
+%}

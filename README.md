@@ -13,6 +13,8 @@
 
 </div>
 
+-----
+
 **This is a pre-alpha version! Don't use it!**
 
 ## Features
@@ -33,13 +35,17 @@ the unitest with or without coverage reports, respectively.
 
 ## Documentation
 
-The [documentation](https://ultimate-notion.ultimate-notion.io/) is made with [Material for MkDocs](https://github.com/squidfunk/mkdocs-material) and is hosted by [GitHub Pages](https://docs.github.com/en/pages).
+The [documentation](https://ultimate-notion.com/) is made with [Material for MkDocs](https://github.com/squidfunk/mkdocs-material) and is hosted by [GitHub Pages](https://docs.github.com/en/pages).
 
 ## License
 
 Hatch is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
+## Credits
+
+To start this project off a lot of inspiration and code was taken from [hatch] and [notional].
 
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/
 [pre-commit]: https://pre-commit.com/
+[national]: https://github.com/jheddings/notional/
