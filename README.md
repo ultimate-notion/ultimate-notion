@@ -48,4 +48,4 @@ To start this project off a lot of inspiration and code was taken from [hatch] a
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/
 [pre-commit]: https://pre-commit.com/
-[national]: https://github.com/jheddings/notional/
+[notional]: https://github.com/jheddings/notional/
