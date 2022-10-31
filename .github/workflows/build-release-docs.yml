@@ -32,9 +32,11 @@ jobs:
     - name: Ensure latest pip
       run: python -m pip install --upgrade pip
 
+    - name: Install Hatch
+      run: pip install --upgrade --pre hatch
+
     - name: Install ourself
-      run: |
-        pip install -e .
+      run: pip install -e .
 
     - name: Configure Git for GitHub Actions bot
       run: |
