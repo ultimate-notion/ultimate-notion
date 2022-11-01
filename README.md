@@ -39,7 +39,7 @@ The [documentation](https://ultimate-notion.com/) is made with [Material for MkD
 
 ## License
 
-Hatch is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+Ultimate-Notion is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
 ## Credits
 

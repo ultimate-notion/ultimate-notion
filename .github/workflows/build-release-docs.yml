@@ -8,8 +8,16 @@ on:
     branches:
     - main
 
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
   group: docs-deploy
+  cancel-in-progress: true
 
 env:
   FORCE_COLOR: "1"
@@ -57,28 +65,44 @@ jobs:
         name: documentation
         path: site.zip
 
-  publish:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs:
     - build
 
     steps:
-    - uses: actions/download-artifact@v3
+    - name: Download Archive
+      uses: actions/download-artifact@v3
       with:
         name: documentation
 
-    - name: Unpack archive
+    - name: Unpack Archive
       run: python -m zipfile -e site.zip site
 
-    - uses: peaceiris/actions-gh-pages@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v2
+
+    - name: Upload Pages
+      uses: actions/upload-pages-artifact@v1
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: site
-        commit_message: ${{ github.event.head_commit.message }}
-        # Write .nojekyll at the root, see:
-        # https://help.github.com/en/github/working-with-github-pages/about-github-pages#static-site-generators
-        enable_jekyll: false
-        # Only deploy if there were changes
-        allow_empty_commit: false
+        # Upload entire repository
+        path: '.'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v1
+
+#    - uses: peaceiris/actions-gh-pages@v3
+#      with:
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
+#        publish_dir: site
+#        commit_message: ${{ github.event.head_commit.message }}
+#        # Write .nojekyll at the root, see:
+#        # https://help.github.com/en/github/working-with-github-pages/about-github-pages#static-site-generators
+#        enable_jekyll: false
+#        # Only deploy if there were changes
+#        allow_empty_commit: false
