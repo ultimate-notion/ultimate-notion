@@ -42,7 +42,7 @@ jobs:
       run: hatch run lint:all
 
     - name: Run tests and track code coverage
-      run: hatch run cov
+      run: hatch run cov --cov-report lcov
 
     - name: Coveralls Parallel
       uses: coverallsapp/github-action@master
@@ -50,6 +50,7 @@ jobs:
         github-token: ${{ secrets.github_token }}
         flag-name: run-${{ matrix.test_number }}
         parallel: true
+        path-to-lcov: coverage.lcov
 
   finish-coveralls:
       needs: run-github-job-matrix
