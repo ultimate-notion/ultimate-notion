@@ -1,4 +1,4 @@
-name: Run Unit Tests
+name: Tests
 
 on:
   push:
@@ -37,12 +37,29 @@ jobs:
     - name: Install Hatch
       run: pip install --upgrade --pre hatch
 
-    - if: matrix.python-version == '3.10' && runner.os == 'Linux'
-      name: Lint
+    - name: Lint
+      if: matrix.python-version == '3.10' && runner.os == 'Linux'
       run: hatch run lint:all
 
     - name: Run tests and track code coverage
       run: hatch run cov
+
+    - name: Coveralls Parallel
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        flag-name: run-${{ matrix.test_number }}
+        parallel: true
+
+  finish-coveralls:
+      needs: run-github-job-matrix
+      runs-on: ubuntu-latest
+      steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true
 
   run-hatch-test-matrix:
     name: Hatch matrix on Linux
