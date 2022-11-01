@@ -51,7 +51,7 @@ jobs:
 
     - name: Commit documentation on gh-pages
       # ToDo: use later the hatch docs approach with splitting dev vs. tags/latest
-      run: hatch run docs:ci-build latest
+      run: hatch run docs:ci-build dev
 
     - name: Create archive
       run: git archive -o site.zip gh-pages

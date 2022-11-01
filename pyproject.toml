@@ -37,8 +37,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-# Todo: fix this when set up
-# Documentation = "htts://ultimate-notion.com/"
+Documentation = "https://ultimate-notion.com/"
 Sponsor = "https://github.com/sponsors/FlorianWilhelm"
 Tracker = "https://github.com/ultimate-notion/ultimate-notion/issues"
 Source = "https://github.com/ultimate-notion/ultimate-notion"
@@ -147,6 +146,7 @@ dependencies = [
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
     "mkdocs-minify-plugin~=0.5.0",
+    "mkdocs-section-index",
     "mkdocs-git-revision-date-localized-plugin~=1.1.0",
     "mkdocstrings-python~=0.7.1",
     "mkdocs-redirects~=1.1.0",
@@ -169,11 +169,12 @@ MKDOCS_CONFIG = "mkdocs.yml"
 build = "mkdocs build --config-file {env:MKDOCS_CONFIG} --clean --strict {args}"
 serve = "mkdocs serve --config-file {env:MKDOCS_CONFIG} --dev-addr localhost:8000 {args}"
 ci-build = "mike deploy --config-file {env:MKDOCS_CONFIG} --update-aliases {args}"
-validate = "linkchecker --config .linkcheckerrc --ignore-url=/reference site"
+# --ignore-url=None since the SUMMARY.md file leaves a <toc>None</toc> in sitemap.xml
+validate = "linkchecker --config .linkcheckerrc --ignore-url=/reference --ignore-url=None site"
 # https://github.com/linkchecker/linkchecker/issues/678
 build-check = [
-    "build --no-directory-urls",
-   # "validate", # Todo: Activate this later again
+    "build",
+    "validate",
 ]
 
 [tool.hatch.envs.default.scripts]

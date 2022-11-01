@@ -2,7 +2,7 @@
 site_name: Ultimate-Notion
 site_description: The ultimate Python library for Notion!
 site_author: Florian Wilhelm
-site_url: https://www.ultimate-notion.com/latest/
+site_url: https://ultimate-notion.com/latest/
 copyright: 'Copyright &copy; Florian Wilhelm 2022-present'
 
 # Repository
@@ -16,8 +16,8 @@ nav:
     - About: index.md
     - Authors: authors.md
     - Changelog: changelog.md
-    # - Contributing: contributing.md
-    - Licence: license.md
+    - Contributing: contributing.md
+    - License: license.md
     # defer to gen-files + literate-nav
     - Reference: reference/
 
@@ -75,6 +75,7 @@ plugins:
       - docs/gen_ref_nav.py
   literate-nav:
     nav_file: SUMMARY.md
+  section-index: {}
   mkdocstrings:
     default_handler: python
     handlers:
