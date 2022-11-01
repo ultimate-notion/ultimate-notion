@@ -80,18 +80,6 @@ jobs:
     - name: Unpack archive
       run: python -m zipfile -e site.zip site
 
-#    - name: Setup GitHub Pages
-#      uses: actions/configure-pages@v2
-#
-#    - name: Upload pages
-#      uses: actions/upload-pages-artifact@v1
-#      with:
-#        # Upload entire repository
-#        path: '.'
-#    - name: Deploy to GitHub Pages
-#      id: deployment
-#      uses: actions/deploy-pages@v1
-
     - uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -101,4 +89,4 @@ jobs:
         # https://help.github.com/en/github/working-with-github-pages/about-github-pages#static-site-generators
         enable_jekyll: false
         # Only deploy if there were changes
-        allow_empty_commit: true # ToDo: change to false later
+        allow_empty_commit: false
