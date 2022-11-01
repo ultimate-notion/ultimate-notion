@@ -54,7 +54,7 @@ jobs:
     - name: Build documentation
       run: hatch run docs:build-check
 
-    - name: Commit documentation
+    - name: Commit documentation on gh-pages
       run: hatch run docs:ci-build dev
 
     - name: Create archive
@@ -76,22 +76,22 @@ jobs:
     - build
 
     steps:
-    - name: Download Archive
+    - name: Download archive
       uses: actions/download-artifact@v3
       with:
         name: documentation
 
-    - name: Unpack Archive
+    - name: Unpack archive
       run: python -m zipfile -e site.zip site
 
-    - name: Setup Pages
+    - name: Setup GitHub Pages
       uses: actions/configure-pages@v2
 
-    - name: Upload Pages
+    - name: Upload pages
       uses: actions/upload-pages-artifact@v1
       with:
         # Upload entire repository
-        path: 'site/'
+        path: '.'
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v1
