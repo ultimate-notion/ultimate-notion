@@ -53,14 +53,16 @@ jobs:
         path-to-lcov: coverage.lcov
 
   finish-coveralls:
+      if: ${{ always() }}
       needs: run-github-job-matrix
       runs-on: ubuntu-latest
       steps:
-      - name: Coveralls Finished
+      - name: Coveralls finished
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
+          path-to-lcov: coverage.lcov
 
   run-hatch-test-matrix:
     name: Hatch matrix on Linux
