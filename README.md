@@ -29,7 +29,7 @@ After having cloned this repository:
 1. install [hatch] globally, e.g. `pipx install hatch`,
 2. create the default environment with `hatch env create`,
 3. activate the default environment with `hatch shell`,
-4. [only once] run `pre-commit install` to install [pre-commit],
+4. \[only once\] run `pre-commit install` to install [pre-commit],
 
 and then you are already set up to start hacking. Use `hatch run test:cov` or `hatch run test:no-cov` to run
 the unitest with or without coverage reports, respectively.
