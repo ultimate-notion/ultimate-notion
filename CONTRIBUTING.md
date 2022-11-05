@@ -77,20 +77,17 @@ This often provides additional considerations and avoids unnecessary work.
    page. This creates a copy of the code under your account on GitHub.
 
 3. Clone this copy to your local disk:
-
    ```
    git clone git@github.com:YourLogin/ultimate-notion.git
    cd ultimate-notion
    ```
 
 4. Make sure [hatch] is installed using [pipx]:
-
    ```
    pipx install hatch
    ```
 
 5. \[only once\] install [pre-commit] hooks in the default environment with:
-
    ```
    hatch run pre-commit install
    ```
@@ -98,11 +95,9 @@ This often provides additional considerations and avoids unnecessary work.
 ### Implement your changes
 
 1. Create a branch to hold your changes:
-
    ```
    git checkout -b my-feature
    ```
-
    and start making changes. Never work on the main branch!
 
 2. Start your work on this branch. Don't forget to add [docstrings] in [Google style]
@@ -111,31 +106,27 @@ This often provides additional considerations and avoids unnecessary work.
 3. Add yourself to the list of contributors in `AUTHORS.md`.
 
 4. When you’re done editing, do:
-
    ```
    git add <MODIFIED FILES>
    git commit
    ```
-
    to record your changes in [git].
-
+   <br>
    Please make sure to see the validation messages from [pre-commit] and fix
    any eventual issues.
    This should automatically use [flake8]/[black] to check/fix the code style
    in a way that is compatible with the project.
 
-   !!! info
-   Don't forget to add unit tests and documentation in case your
-   contribution adds a feature and is not just a bugfix.
+    !!! info
+        Don't forget to add unit tests and documentation in case your
+        contribution adds a feature and is not just a bugfix.
 
-   Moreover, writing an [descriptive commit message] is highly recommended.
-   In case of doubt, you can check the commit history with:
-
-   ```
-   git log --graph --decorate --pretty=oneline --abbrev-commit --all
-   ```
-
-   to look for recurring communication patterns.
+        Moreover, writing an [descriptive commit message] is highly recommended.
+        In case of doubt, you can check the commit history with:
+        ```
+        git log --graph --decorate --pretty=oneline --abbrev-commit --all
+        ```
+        to look for recurring communication patterns.
 
 5. Please check that your changes don't break any unit tests with
    `hatch run test:cov` or `hatch run test:no-cov` to run the unitest with
