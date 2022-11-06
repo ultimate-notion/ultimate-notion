@@ -51,7 +51,8 @@ def notion():
     """
 
     if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
-        pytest.skip(f"missing environment variable {ENV_NOTION_AUTH_TOKEN}")
+        # set it to dummy and assume we are reading a VCR anyway
+        os.environ[ENV_NOTION_AUTH_TOKEN] = "secret_DUMMY_AUTH_TOKEN"
 
     with ultimate_notion.NotionSession() as notion:
         yield notion
@@ -68,7 +69,8 @@ def test_area():
     parent_id = os.getenv(ENV_NOTION_TEST_AREA, None)
 
     if parent_id is None:
-        pytest.skip(f"missing ${ENV_NOTION_TEST_AREA}")
+        # set it to a dummy parent id of a page
+        parent_id = "5f505199b2924713920b61d813bf72a3"
 
     return records.PageRef(page_id=parent_id)
 
