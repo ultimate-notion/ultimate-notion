@@ -180,6 +180,8 @@ build-check = [
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
 no-cov = "cov --no-cov {args}"
+ci = "cov --vcr-record=none --cov-report lcov {args}"
+record = "cov --vcr-record=all {args}" # re-record all vcr cassettes
 
 [[tool.hatch.envs.test.matrix]]
 python = ["38", "39", "310"]
@@ -209,5 +211,5 @@ fmt = [
 ]
 all = [
     "style",
-    "typing",
+#    "typing", # ToDo: Reintroduce later when things are more stable
 ]

@@ -15,6 +15,8 @@ concurrency:
 env:
   PYTHONUNBUFFERED: "1"
   FORCE_COLOR: "1"
+  NOTION_AUTH_TOKEN: "secret_DUMMY_AUTH_TOKEN"
+  NOTION_TEST_AREA: "DUMMY_PAGE_ID"
 
 jobs:
   run-github-job-matrix:
@@ -42,7 +44,7 @@ jobs:
       run: hatch run lint:all
 
     - name: Run tests and track code coverage
-      run: hatch run cov --cov-report lcov
+      run: hatch run ci
 
     - name: Coveralls Parallel
       uses: coverallsapp/github-action@master
