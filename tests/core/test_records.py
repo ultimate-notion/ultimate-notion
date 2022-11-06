@@ -125,9 +125,7 @@ def test_page_cover(notion, blank_page):
     """Set a page cover and confirm."""
     assert blank_page.cover is None
 
-    loved = types.ExternalFile[
-        "https://raw.githubusercontent.com/jheddings/notional/main/tests/data/loved.png"
-    ]
+    loved = types.ExternalFile["https://raw.githubusercontent.com/jheddings/notional/main/tests/data/loved.png"]
     notion.pages.set(blank_page, cover=loved)
 
     covered = notion.pages.retrieve(blank_page.id)

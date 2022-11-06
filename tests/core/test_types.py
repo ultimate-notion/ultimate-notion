@@ -565,9 +565,7 @@ def test_created_time():
     created = types.CreatedTime.parse_obj(test_data)
     assert created.type == "created_time"
 
-    assert created.created_time == datetime(
-        1999, 12, 31, 23, 59, 59, 999000, timezone.utc
-    )
+    assert created.created_time == datetime(1999, 12, 31, 23, 59, 59, 999000, timezone.utc)
 
 
 def test_created_by():

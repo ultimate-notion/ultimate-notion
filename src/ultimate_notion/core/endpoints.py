@@ -160,8 +160,7 @@ class DatabasesEndpoint(Endpoint):
 
         if schema is not None:
             request["properties"] = {
-                name: value.to_api() if value is not None else None
-                for name, value in schema.items()
+                name: value.to_api() if value is not None else None for name, value in schema.items()
             }
 
         return request
@@ -274,15 +273,10 @@ class PagesEndpoint(Endpoint):
         if title is not None:
             properties["title"] = Title[title]
 
-        request["properties"] = {
-            name: prop.to_api() if prop is not None else None
-            for name, prop in properties.items()
-        }
+        request["properties"] = {name: prop.to_api() if prop is not None else None for name, prop in properties.items()}
 
         if children is not None:
-            request["children"] = [
-                child.to_api() for child in children if child is not None
-            ]
+            request["children"] = [child.to_api() for child in children if child is not None]
 
         _log.info("Creating page :: %s => %s", parent, title)
 
@@ -325,10 +319,7 @@ class PagesEndpoint(Endpoint):
         if not properties:
             properties = page.properties
 
-        props = {
-            name: value.to_api() if value is not None else None
-            for name, value in properties.items()
-        }
+        props = {name: value.to_api() if value is not None else None for name, value in properties.items()}
 
         data = self().update(page.id.hex, properties=props)
 

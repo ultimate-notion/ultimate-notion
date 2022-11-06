@@ -3,14 +3,7 @@
 import re
 
 from ultimate_notion.core import blocks
-from ultimate_notion.core.text import (
-    Annotations,
-    CodingLanguage,
-    TextObject,
-    is_emoji,
-    markdown,
-    plain_text,
-)
+from ultimate_notion.core.text import Annotations, CodingLanguage, TextObject, is_emoji, markdown, plain_text
 
 
 def confirm_rtf_markdown(plain, md, rtf):

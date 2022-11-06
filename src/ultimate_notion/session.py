@@ -11,13 +11,7 @@ import notion_client
 from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
-from .core.endpoints import (
-    BlocksEndpoint,
-    DatabasesEndpoint,
-    PagesEndpoint,
-    SearchEndpoint,
-    UsersEndpoint,
-)
+from .core.endpoints import BlocksEndpoint, DatabasesEndpoint, PagesEndpoint, SearchEndpoint, UsersEndpoint
 from .database import Database
 from .page import Page
 from .utils import slist
@@ -103,9 +97,7 @@ class NotionSession(object):
     def search_db(self, db_name: str) -> slist[Database]:
         return slist(
             Database(db_obj=db, session=self)
-            for db in self.search(db_name)
-            .filter(property="object", value="database")
-            .execute()
+            for db in self.search(db_name).filter(property="object", value="database").execute()
         )
 
     def get_db(self, db_id: Union[str, UUID]) -> Database:

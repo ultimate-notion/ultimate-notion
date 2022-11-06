@@ -138,9 +138,7 @@ class ResultSetIterator(PositionalIterator, ABC):
             items=data["results"] if "results" in data else None,
         )
 
-        self.log.debug(
-            "loaded %d results; next cursor: %s", results.page_size, results.next_cursor
-        )
+        self.log.debug("loaded %d results; next cursor: %s", results.page_size, results.next_cursor)
 
         return results
 

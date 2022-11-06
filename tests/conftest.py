@@ -22,6 +22,7 @@ from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 from .utils import mktitle, store_retvals
 
 SLEEP_SECS_AFTER_DB_CREATE = 1
+ENV_NOTION_TEST_AREA = "NOTION_TEST_AREA"
 
 
 @pytest.fixture(scope="module")
@@ -64,10 +65,10 @@ def test_area():
     present, this fixture will skip the current test.
     """
 
-    parent_id = os.getenv("NOTION_TEST_AREA", None)
+    parent_id = os.getenv(ENV_NOTION_TEST_AREA, None)
 
     if parent_id is None:
-        pytest.skip("missing NOTION_TEST_AREA")
+        pytest.skip(f"missing ${ENV_NOTION_TEST_AREA}")
 
     return records.PageRef(page_id=parent_id)
 
@@ -114,7 +115,7 @@ def blank_db(notion, test_area):
 
 @pytest.fixture
 def create_blank_db(notion, test_area):
-    """Return a function to temporary create an (empty) database for testing.
+    """Return a function to temporarily create an (empty) database for testing.
 
     This database will be deleted during teardown.
     """

@@ -264,9 +264,7 @@ class ConnectedPage:
         if self._notional__session is None:
             raise ValueError("Cannot append blocks; invalid session")
 
-        _log.debug(
-            "appending %d blocks to page :: %s", len(blocks), self._notional__page.id
-        )
+        _log.debug("appending %d blocks to page :: %s", len(blocks), self._notional__page.id)
 
         self._notional__session.blocks.children.append(self._notional__page, *blocks)
 

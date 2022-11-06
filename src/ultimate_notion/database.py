@@ -87,9 +87,7 @@ class Database:
 
     # ToDo: implement this and add unit test
     def as_df(self) -> pd.DataFrame:
-        rows = (
-            page.to_dict() for page in self.session.databases.query(self.id).execute()
-        )
+        rows = (page.to_dict() for page in self.session.databases.query(self.id).execute())
         return pd.DataFrame(rows)
 
     # ToDo: Implement this.
