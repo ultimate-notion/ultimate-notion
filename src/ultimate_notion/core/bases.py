@@ -131,10 +131,10 @@ class DataObject(BaseModel, metaclass=ComposableObject):
         cls.__fields__[name].required = default is None
 
     # https://github.com/samuelcolvin/pydantic/discussions/3139
-    def refresh(__pydantic_self__, **data):
+    def refresh(self, **data):
         """Refresh the internal attributes with new data."""
 
-        values, fields, error = validate_model(__pydantic_self__.__class__, data)
+        values, fields, error = validate_model(self.__class__, data)
 
         if error:
             raise error
@@ -142,9 +142,9 @@ class DataObject(BaseModel, metaclass=ComposableObject):
         for name in fields:
             value = values[name]
             _log.debug("set object data -- %s => %s", name, value)
-            setattr(__pydantic_self__, name, value)
+            setattr(self, name, value)
 
-        return __pydantic_self__
+        return self
 
     def to_api(self):
         """Convert to a suitable representation for the Notion API."""
@@ -279,9 +279,7 @@ class TypedObject(DataObject):
         if sub is None:
             raise TypeError(f"Unsupported sub-type: {data_type}")
 
-        _log.debug(
-            "initializing typed object %s :: %s => %s -- %s", cls, data_type, sub, data
-        )
+        _log.debug("initializing typed object %s :: %s => %s -- %s", cls, data_type, sub, data)
 
         return sub(**data)
 

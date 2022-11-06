@@ -259,6 +259,7 @@ class Query(DataObject):
     page_size: int = 100
 
     @validator("page_size")
+    @classmethod
     def valid_page_size(cls, value):
         """Validate that the given page size meets the Notion API requirements."""
 

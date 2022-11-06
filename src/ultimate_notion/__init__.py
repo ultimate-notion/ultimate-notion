@@ -1,8 +1,7 @@
 from importlib.metadata import PackageNotFoundError, version
 
 try:
-    dist_name = "ultimate-notion"
-    __version__ = version(dist_name)
+    __version__ = version("ultimate-notion")
 except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
 finally:

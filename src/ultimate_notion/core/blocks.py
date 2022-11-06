@@ -1,26 +1,17 @@
 """Wrapper for Notion API blocks.
 
-Blocks are specifc records that hold content.
+Blocks are specific records that hold content.
 
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
 """
 
 import logging
-from abc import ABC
 from typing import Any, List, Optional, Union
 
 from .bases import NestedObject, TypedObject
 from .records import BlockRef, ParentRef, Record
-from .text import (
-    CodingLanguage,
-    FullColor,
-    RichTextObject,
-    TextObject,
-    chunky,
-    markdown,
-    plain_text,
-)
+from .text import CodingLanguage, FullColor, RichTextObject, TextObject, chunky, markdown, plain_text
 from .types import EmojiObject, FileObject
 
 _log = logging.getLogger(__name__)
@@ -42,14 +33,14 @@ class UnsupportedBlock(Block, type="unsupported"):
     unsupported: Optional[_NestedData] = None
 
 
-class TextBlock(Block, ABC):
+class TextBlock(Block):
     """A standard text block object in Notion."""
 
     # text blocks have a nested object with 'type' name and a 'text' child
 
     @property
     def __text__(self):
-        """Provide short-hand access to the nested text content in this block."""
+        """Provide shorthand access to the nested text content in this block."""
 
         return self("rich_text")
 
