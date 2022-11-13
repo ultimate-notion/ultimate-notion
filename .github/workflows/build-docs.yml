@@ -119,12 +119,22 @@ jobs:
     needs: [build-dev, build-stable]
 
     steps:
-    - name: Download archive
+    - name: Download dev archive
       uses: actions/download-artifact@v3
       with:
         name: dev-docs
 
-    - name: Unpack archive
+    - name: Unpack dev archive
+      run: python -m zipfile -e dev-site.zip site
+
+    - name: Download stable archive
+      if: contains(github.ref, 'refs/tags/')
+      uses: actions/download-artifact@v3
+      with:
+        name: stable-docs
+
+    - name: Unpack stable archive
+      if: contains(github.ref, 'refs/tags/')
       run: python -m zipfile -e stable-site.zip site
 
     - uses: peaceiris/actions-gh-pages@v3
