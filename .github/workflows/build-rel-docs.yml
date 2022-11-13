@@ -50,7 +50,7 @@ jobs:
       run: hatch run docs:build-check
 
     - name: Commit documentation on gh-pages
-      run: hatch run docs:ci-build $ULIMATE_NOTION_VERSION latest
+      run: hatch run docs:ci-build $ULTIMATE_NOTION_VERSION latest
 
     - name: Create archive
       run: git archive -o site.zip gh-pages
