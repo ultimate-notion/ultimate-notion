@@ -82,7 +82,7 @@ jobs:
       run: python -m pip install --upgrade pip
 
     - name: Install Hatch
-      run: pip install --upgrade --pre hatch
+      run: pip install --upgrade --pre hatch hatch-vcs
 
     - name: Install ourself
       run: pip install -e .
