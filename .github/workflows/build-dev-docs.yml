@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
 
 concurrency:
+  group: docs-deploy
   cancel-in-progress: true
 
 env:
