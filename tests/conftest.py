@@ -15,11 +15,7 @@ import time
 import pytest
 
 import ultimate_notion
-from ultimate_notion.core import records, schema
-from ultimate_notion.core.orm import Property, connected_page
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
-
-from .utils import mktitle, store_retvals
 
 SLEEP_SECS_AFTER_DB_CREATE = 1
 ENV_NOTION_TEST_AREA = "NOTION_TEST_AREA"
