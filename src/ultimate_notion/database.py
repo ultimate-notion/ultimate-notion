@@ -1,97 +1,75 @@
 """Database object"""
 from __future__ import annotations
 
-from datetime import datetime
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
-from uuid import UUID
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-import pandas as pd
+from notional import blocks, types
+from notional.schema import PropertyObject
 
-from .core import records
-from .core.records import ParentRef
-from .core.schema import PropertyObject
-from .core.text import plain_text
-from .core.types import EmojiObject, FileObject, RichTextObject
+from .page import Page
+from .record import Record
+from .view import View
 
 if TYPE_CHECKING:
-    from .session import NotionSession
+    from .session import Session
 
 
-class Database:
-    def __init__(self, db_obj: records.Database, session: NotionSession):
-        self.db_obj = db_obj
+class Database(Record):
+    def __init__(self, obj_ref: blocks.Database, session: Session):
+        self.obj_ref: blocks.Database = obj_ref
         self.session = session
 
-    @property
-    def id(self) -> UUID:
-        return self.db_obj.id
+    def __str__(self) -> str:
+        cls_name = self.__class__.__name__
+        return f"{cls_name}: '{self.title}'"
 
-    @property
-    def created_time(self) -> datetime:
-        return self.db_obj.created_time
-
-    # ToDo: Add this
-    # @property
-    # def created_by(self):
-    #     return self.db_obj.created_by
-
-    @property
-    def last_edited_time(self) -> datetime:
-        return self.db_obj.last_edited_time
-
-    # ToDo: Add this
-    # @property
-    # def last_edited_by(self):
-    #     return self.db_obj.last_edited_by
+    def __repr__(self) -> str:
+        return f"<{str(self)} at {hex(id(self))}>"
 
     @property
     def title(self) -> str:
         """Return the title of this database as plain text."""
-        if self.db_obj.title is None or len(self.db_obj.title) == 0:
-            return None
-
-        return plain_text(*self.db_obj.title)
+        return self.obj_ref.Title
 
     @property
-    def description(self) -> Optional[List[RichTextObject]]:
-        return self.db_obj.description
+    def description(self) -> Optional[List[types.RichTextObject]]:
+        return self.obj_ref.description
 
     @property
-    def icon(self) -> Optional[Union[FileObject, EmojiObject]]:
-        return self.db_obj.icon
+    def icon(self) -> Optional[Union[types.FileObject, types.EmojiObject]]:
+        return self.obj_ref.icon
 
     @property
-    def cover(self) -> Optional[FileObject]:
-        return self.db_obj.cover
+    def cover(self) -> Optional[types.FileObject]:
+        return self.obj_ref.cover
+
+    @property
+    def meta_properties(self) -> Dict[str, Any]:
+        return super().to_dict()
 
     @property
     def properties(self) -> Dict[str, PropertyObject]:
-        return self.db_obj.properties
-
-    @property
-    def parent(self) -> ParentRef:
-        # ToDo: Resolve page when calling?
-        return self.db_obj.parent
+        return self.obj_ref.properties
 
     @property
     def url(self) -> str:
-        return self.db_obj.url
+        return self.obj_ref.url
 
     @property
     def archived(self) -> bool:
-        return self.db_obj.archived
+        return self.obj_ref.archived
 
     @property
     def is_inline(self) -> bool:
-        return self.db_obj.is_inline
+        return self.obj_ref.is_inline
 
-    # ToDo: implement this and add unit test
-    def as_df(self) -> pd.DataFrame:
-        rows = (page.to_dict() for page in self.session.databases.query(self.id).execute())
-        return pd.DataFrame(rows)
+    def view(self, live=True) -> View:
+        session = self.session if live else None
+        pages = [Page(page_obj, session) for page_obj in self.session.databases.query(self.id).execute()]
+        return View(database=self, pages=pages)
 
-    # ToDo: Implement this.
-    # def query_db(
+    # ToDo: Implement this and return view.
+    # def query(
     #     self,
     #     *,
     #     db_id: Optional[str] = None,

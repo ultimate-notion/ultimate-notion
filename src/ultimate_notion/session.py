@@ -1,26 +1,32 @@
-"""Session object"""
+"""Session object
+
+Replicates some parts of `notional.session` but the API is changed
+"""
 from __future__ import annotations
 
 import logging
 import os
 from types import TracebackType
-from typing import Type, Union
+from typing import Optional, Type, Union
 from uuid import UUID
 
 import notion_client
+from cachetools import TTLCache, cached
 from httpx import ConnectError
 from notion_client.errors import APIResponseError
+from notional import types
+from notional.session import BlocksEndpoint, DatabasesEndpoint, PagesEndpoint, SearchEndpoint, UsersEndpoint
 
-from .core.endpoints import BlocksEndpoint, DatabasesEndpoint, PagesEndpoint, SearchEndpoint, UsersEndpoint
 from .database import Database
 from .page import Page
-from .utils import slist
+from .user import User
+from .utils import SList
 
 _log = logging.getLogger(__name__)
 ENV_NOTION_AUTH_TOKEN = "NOTION_AUTH_TOKEN"
 
 
-class NotionSessionError(Exception):
+class SessionError(Exception):
     """Raised when there are issues with the Notion session."""
 
     def __init__(self, message):
@@ -28,10 +34,10 @@ class NotionSessionError(Exception):
         super().__init__(message)
 
 
-class NotionSession(object):
+class Session(object):
     """An active session with the Notion SDK."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, auth: Optional[str] = None, **kwargs):
         """Initialize the `Session` object and the endpoints.
 
         `kwargs` will be passed direction to the Notion SDK Client.  For more details,
@@ -40,11 +46,13 @@ class NotionSession(object):
         :param live_updates: changes will be propagated to Notion
         :param auth: bearer token for authentication
         """
-        self.live_updates = kwargs.pop("live_updates", True)
-        if (env_token := os.getenv(ENV_NOTION_AUTH_TOKEN)) is not None:
-            kwargs.setdefault("auth", env_token)
+        if auth is None:
+            if (env_token := os.getenv(ENV_NOTION_AUTH_TOKEN)) is not None:
+                auth = env_token
+            else:
+                raise RuntimeError(f"Either pass `auth` or set {ENV_NOTION_AUTH_TOKEN}")
 
-        self.client = notion_client.Client(**kwargs)
+        self.client = notion_client.Client(auth=auth, **kwargs)
 
         self.blocks = BlocksEndpoint(self)
         self.databases = DatabasesEndpoint(self)
@@ -52,9 +60,21 @@ class NotionSession(object):
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
 
+        self._search_db = self.search_db
+        self._get_db = self.get_db
+        self._get_page = self.get_page
+        self._get_user = self.get_user
+        self.set_cache()
         _log.info("Initialized Notion session")
 
-    def __enter__(self) -> NotionSession:
+    def set_cache(self, ttl=30, maxsize=1024):
+        wrapper = cached(cache=TTLCache(maxsize=maxsize, ttl=ttl))
+        self.search_db = wrapper(self._search_db)
+        self.get_db = wrapper(self._get_db)
+        self.get_page = wrapper(self._get_page)
+        self.get_user = wrapper(self._get_user)
+
+    def __enter__(self) -> Session:
         _log.debug("Connecting to Notion...")
         self.client.__enter__()
         return self
@@ -83,26 +103,36 @@ class NotionSession(object):
             me = self.users.me()
 
             if me is None:
-                raise NotionSessionError("Unable to get current user")
-
+                raise SessionError("Unable to get current user")
         except ConnectError:
             error = "Unable to connect to Notion"
-
         except APIResponseError as err:
             error = str(err)
 
         if error is not None:
-            raise NotionSessionError(error)
+            raise SessionError(error)
 
-    def search_db(self, db_name: str) -> slist[Database]:
-        return slist(
-            Database(db_obj=db, session=self)
+    def search_db(self, db_name: Optional[str] = None, exact: bool = True) -> SList[Database]:
+        """Search a database by name
+
+        Args:
+            db_name: name/title of the database, return all if `None`
+            exact: perform an exact search, not only a substring match
+        """
+        dbs = SList(
+            Database(obj_ref=db, session=self)
             for db in self.search(db_name).filter(property="object", value="database").execute()
         )
+        if exact and db_name is not None:
+            dbs = SList(db for db in dbs if db.title == db_name)
+        return dbs
 
     def get_db(self, db_id: Union[str, UUID]) -> Database:
         db_uuid = db_id if isinstance(db_id, UUID) else UUID(db_id)
-        return Database(db_obj=self.databases.retrieve(db_uuid), session=self)
+        return Database(obj_ref=self.databases.retrieve(db_uuid), session=self)
 
     def get_page(self, page_id: Union[str, UUID]) -> Page:
-        return Page(page_obj=self.pages.retrieve(page_id), session=self)
+        return Page(obj_ref=self.pages.retrieve(page_id), session=self)
+
+    def get_user(self, user_id: Union[str, UUID]) -> types.User:
+        return User(obj_ref=self.users.retrieve(user_id))

@@ -7,6 +7,6 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .session import NotionSession
+from .session import Session
 
-__all__ = ["__version__", "NotionSession"]
+__all__ = ["__version__", "Session"]

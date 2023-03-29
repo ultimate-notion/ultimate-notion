@@ -27,12 +27,14 @@ classifiers = [
 dependencies = [
     "notion-client",
     "notional",
-    "pydantic",
-    "emoji",
-    "pandas",
-    "google-api-python-client",
-    "google-auth-httplib2",
-    "google-auth-oauthlib",
+    "tabulate",
+    "cachetools",
+#    "pydantic",
+#    "emoji",
+#    "pandas",
+#    "google-api-python-client",
+#    "google-auth-httplib2",
+#    "google-auth-oauthlib",
 ]
 dynamic = ["version"]
 
@@ -135,6 +137,9 @@ dependencies = [
     "pytest-vcr",
     "jupyterlab",
     "pre-commit",
+    "seaborn",
+    "scipy",
+    "pandas",
 ]
 
 [tool.hatch.envs.docs]
