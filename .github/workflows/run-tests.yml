@@ -15,6 +15,7 @@ concurrency:
 env:
   PYTHONUNBUFFERED: "1"
   FORCE_COLOR: "1"
+  NOTION_AUTH_TOKEN: "${{ secrets.NOTION_AUTH_TOKEN }}"
 
 jobs:
   run-github-job-matrix:
