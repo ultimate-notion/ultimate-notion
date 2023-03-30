@@ -65,7 +65,7 @@ class Database(Record):
 
     def view(self, live=True) -> View:
         session = self.session if live else None
-        pages = [Page(page_obj, session) for page_obj in self.session.databases.query(self.id).execute()]
+        pages = [Page(page_obj, session) for page_obj in self.session.notional.databases.query(self.id).execute()]
         return View(database=self, pages=pages)
 
     # ToDo: Implement this and return view.

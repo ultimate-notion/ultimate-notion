@@ -1,21 +1,17 @@
-"""Session object
-
-Replicates some parts of `notional.session` but the API is changed
-"""
+"""Session object"""
 from __future__ import annotations
 
 import logging
 import os
 from types import TracebackType
-from typing import Optional, Type, Union
+from typing import Iterable, List, Optional, Type, Union
 from uuid import UUID
 
-import notion_client
 from cachetools import TTLCache, cached
 from httpx import ConnectError
 from notion_client.errors import APIResponseError
 from notional import types
-from notional.session import BlocksEndpoint, DatabasesEndpoint, PagesEndpoint, SearchEndpoint, UsersEndpoint
+from notional.session import Session as NotionalSession
 
 from .database import Database
 from .page import Page
@@ -52,14 +48,9 @@ class Session(object):
             else:
                 raise RuntimeError(f"Either pass `auth` or set {ENV_NOTION_AUTH_TOKEN}")
 
-        self.client = notion_client.Client(auth=auth, **kwargs)
+        self.notional = NotionalSession(auth=auth, **kwargs)
 
-        self.blocks = BlocksEndpoint(self)
-        self.databases = DatabasesEndpoint(self)
-        self.pages = PagesEndpoint(self)
-        self.search = SearchEndpoint(self)
-        self.users = UsersEndpoint(self)
-
+        # prepare API methods for decoration
         self._search_db = self.search_db
         self._get_db = self.get_db
         self._get_page = self.get_page
@@ -76,7 +67,7 @@ class Session(object):
 
     def __enter__(self) -> Session:
         _log.debug("Connecting to Notion...")
-        self.client.__enter__()
+        self.notional.client.__enter__()
         return self
 
     def __exit__(
@@ -86,11 +77,11 @@ class Session(object):
         traceback: TracebackType,
     ) -> None:
         _log.debug("Closing connection to Notion...")
-        self.client.__exit__(exc_type, exc_value, traceback)
+        self.notional.client.__exit__(exc_type, exc_value, traceback)
 
     def close(self):
         """Close the session and release resources."""
-        self.client.close()
+        self.notional.client.close()
 
     def raise_for_status(self):
         """Confirm that the session is active and raise otherwise.
@@ -100,7 +91,7 @@ class Session(object):
         error = None
 
         try:
-            me = self.users.me()
+            me = self.whoami()
 
             if me is None:
                 raise SessionError("Unable to get current user")
@@ -112,16 +103,23 @@ class Session(object):
         if error is not None:
             raise SessionError(error)
 
-    def search_db(self, db_name: Optional[str] = None, exact: bool = True) -> SList[Database]:
+    def search_db(
+        self, db_name: Optional[str] = None, exact: bool = True, parents: Optional[Iterable[str]] = None
+    ) -> SList[Database]:
         """Search a database by name
 
         Args:
             db_name: name/title of the database, return all if `None`
             exact: perform an exact search, not only a substring match
+            parents: list of parent pages to further refine the search
         """
+        if parents is not None:
+            # ToDo: Implement a search that also considers the parents
+            raise NotImplementedError
+
         dbs = SList(
             Database(obj_ref=db, session=self)
-            for db in self.search(db_name).filter(property="object", value="database").execute()
+            for db in self.notional.search(db_name).filter(property="object", value="database").execute()
         )
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
@@ -129,10 +127,25 @@ class Session(object):
 
     def get_db(self, db_id: Union[str, UUID]) -> Database:
         db_uuid = db_id if isinstance(db_id, UUID) else UUID(db_id)
-        return Database(obj_ref=self.databases.retrieve(db_uuid), session=self)
+        return Database(obj_ref=self.notional.databases.retrieve(db_uuid), session=self)
+
+    def search_page(
+        self, page_name: Optional[str] = None, exact: bool = True, parents: Optional[Iterable[str]] = None
+    ) -> SList[Page]:
+        raise NotImplementedError
 
     def get_page(self, page_id: Union[str, UUID]) -> Page:
-        return Page(obj_ref=self.pages.retrieve(page_id), session=self)
+        page_uuid = page_id if isinstance(page_id, UUID) else UUID(page_id)
+        return Page(obj_ref=self.notional.pages.retrieve(page_uuid), session=self)
 
     def get_user(self, user_id: Union[str, UUID]) -> types.User:
-        return User(obj_ref=self.users.retrieve(user_id))
+        user_uuid = user_id if isinstance(user_id, UUID) else UUID(user_id)
+        return User(obj_ref=self.notional.users.retrieve(user_uuid))
+
+    def whoami(self) -> User:
+        """Return the user object of this bot"""
+        return self.notional.users.me()
+
+    def all_users(self) -> List[User]:
+        """Retrieve all users of this workspace"""
+        return self.notional.users.list()

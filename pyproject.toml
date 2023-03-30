@@ -25,7 +25,6 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
 ]
 dependencies = [
-    "notion-client",
     "notional",
     "tabulate",
     "cachetools",
@@ -210,8 +209,8 @@ dependencies = [
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive src/ultimate_notion tests"
 style = [
-    "flake8 .",
     "black --check --diff .",
+    "flake8 .",
     "isort --check-only --diff .",
 ]
 fmt = [
@@ -222,6 +221,10 @@ fmt = [
 all = [
     "style",
     "typing",
+]
+fix = [
+    "black .",
+    "isort .",
 ]
 
 # Test matrix replacing the functionality of tox
