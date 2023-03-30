@@ -31,16 +31,14 @@ class SessionError(Exception):
 
 
 class Session(object):
-    """An active session with the Notion SDK."""
+    """A session for the Notion API"""
 
     def __init__(self, auth: Optional[str] = None, **kwargs):
-        """Initialize the `Session` object and the endpoints.
+        """Initialize the `Session` object and the Notional endpoints.
 
-        `kwargs` will be passed direction to the Notion SDK Client.  For more details,
-        see the (full docs)[https://ramnes.github.io/notion-sdk-py/reference/client/].
-
-        :param live_updates: changes will be propagated to Notion
-        :param auth: bearer token for authentication
+        Args:
+            auth: secret token from the Notion integration
+            **kwargs: Arguments for the [Notion SDK Client][https://ramnes.github.io/notion-sdk-py/reference/client/]
         """
         if auth is None:
             if (env_token := os.getenv(ENV_NOTION_AUTH_TOKEN)) is not None:

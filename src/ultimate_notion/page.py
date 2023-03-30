@@ -44,7 +44,6 @@ class Page(Record):
             elif isinstance(v, types.Date):
                 v = v.date
             elif isinstance(v, types.Relation):
-                assert isinstance(self.session, Session)
                 v = [p.title for p in self._resolve_relation(v)]
             elif isinstance(v, types.Formula):
                 v = v.Result

@@ -1,7 +1,7 @@
 """View representing the result of a Query"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 import pandas as pd
 from notional.schema import Title
@@ -13,13 +13,15 @@ from .utils import SList, is_notebook
 if TYPE_CHECKING:
     from .database import Database
 
+ColType = Union[str, List[str]]
+
 
 class View:
     def __init__(self, database: Database, pages: List[Page]):
         self.database = database
         self.pages = pages
-        self.columns = list(self.database.properties.keys())
-        self._title_col = SList(col for col, val in database.properties.items() if isinstance(val, Title)).item()
+        self.columns = list(self.database.schema.keys())
+        self._title_col = SList(col for col, val in database.schema.items() if isinstance(val, Title)).item()
         self._has_index = False
         self._index_name: Optional[str] = None
 
@@ -30,24 +32,30 @@ class View:
         view._index_name = self._index_name
         return view
 
+    def __len__(self):
+        return len(self.pages)
+
     def __str__(self) -> str:
         rows = self.rows()
+        cols = self.columns[:]
+
+        if self.has_index:
+            assert self._index_name is not None
+            cols.insert(0, self._index_name)
 
         if is_notebook():
             from IPython.core.display import display_html
 
-            return display_html(tabulate(rows, headers=self.columns, tablefmt="html"))
+            return display_html(tabulate(rows, headers=cols, tablefmt="html"))
         else:
-            return tabulate(rows, headers=self.columns)
+            return tabulate(rows, headers=cols)
 
     def row(self, idx: int) -> List[Any]:
         page_dct = self.pages[idx].to_dict()
-        row = []
+        row = [idx] if self.has_index else []
         for col in self.columns:
             if col == self._title_col:
                 row.append(page_dct['title'])
-            elif col == self._index_name:
-                row.append(idx)
             else:
                 row.append(page_dct[col])
         return row
@@ -67,7 +75,6 @@ class View:
         view = self.clone()
         view._has_index = True
         view._index_name = name
-        view.columns.insert(0, name)
         return view
 
     def without_index(self) -> View:
@@ -75,8 +82,6 @@ class View:
             return self
 
         view = self.clone()
-        assert isinstance(self._index_name, str)
-        view.columns.remove(self._index_name)
         view._has_index = False
         view._index_name = None
         return view
@@ -99,8 +104,17 @@ class View:
         view = self.without_index() if self.has_index else self
         return pd.DataFrame(view.rows(), columns=view.columns)
 
-    def select(self, *cols):
-        raise NotImplementedError
+    def select(self, cols: ColType, *more_cols: str) -> View:
+        if isinstance(cols, str):
+            cols = [cols]
+        if more_cols:
+            cols += more_cols
+
+        if not_included := set(cols) - set(self.columns):
+            raise RuntimeError(f"Some columns, i.e. {', '.join(not_included)}, are not in view")
+        view = self.clone()
+        view.columns = list(cols)
+        return view
 
     def apply(self, udf):
         raise NotImplementedError

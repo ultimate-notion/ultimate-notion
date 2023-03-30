@@ -41,9 +41,20 @@ def notion():
     This fixture depends on the `NOTION_AUTH_TOKEN` environment variable.  If it is not
     present, this fixture will skip the current test.
     """
-
     if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
         raise RuntimeError(f"{ENV_NOTION_AUTH_TOKEN} not defined! Use `export {ENV_NOTION_AUTH_TOKEN}=secret_...`")
 
     with ultimate_notion.Session() as notion:
         yield notion
+
+
+@pytest.fixture
+def database(notion):
+    """Return a test database"""
+    return notion.search_db("Contacts").item()
+
+
+@pytest.fixture
+def view(database):
+    """Return a test view"""
+    return database.view()

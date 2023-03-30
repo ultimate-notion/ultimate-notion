@@ -48,7 +48,7 @@ class Database(Record):
         return super().to_dict()
 
     @property
-    def properties(self) -> Dict[str, PropertyObject]:
+    def schema(self) -> Dict[str, PropertyObject]:
         return self.obj_ref.properties
 
     @property
