@@ -1,7 +1,7 @@
 """Page object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from notional import blocks, types
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class Page(Record):
-    def __init__(self, obj_ref: blocks.Page, session: Session):
+    def __init__(self, obj_ref: blocks.Page, session: Optional[Session]):
         self.obj_ref: blocks.Page = obj_ref
         self.session = session
 
@@ -44,12 +44,15 @@ class Page(Record):
             elif isinstance(v, types.Date):
                 v = v.date
             elif isinstance(v, types.Relation):
+                assert isinstance(self.session, Session)
                 v = [p.title for p in self._resolve_relation(v)]
             elif isinstance(v, types.Formula):
                 v = v.Result
             elif isinstance(v, (types.LastEditedBy, types.CreatedBy)):
+                assert isinstance(self.session, Session)
                 v = self.session.get_user(v.last_edited_by.id).name
             elif isinstance(v, types.DatabaseRef):
+                assert isinstance(self.session, Session)
                 v = self.session.get_db(v.database_id).title
             else:
                 assert isinstance(v, types.NativeTypeMixin)

@@ -1,6 +1,6 @@
 """Core building block is a Record"""
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from uuid import UUID
 
 from notional import blocks, types
@@ -9,7 +9,7 @@ from notional import blocks, types
 class Record:
     """The base type for all Notion objects."""
 
-    obj_ref: Optional[blocks.DataRecord] = None
+    obj_ref: blocks.DataRecord = None
 
     @property
     def id(self) -> UUID:

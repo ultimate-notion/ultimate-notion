@@ -10,15 +10,11 @@ Required environment variables for "connected" fixtures:
 """
 
 import os
-import time
 
 import pytest
 
 import ultimate_notion
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
-
-SLEEP_SECS_AFTER_DB_CREATE = 1
-ENV_NOTION_TEST_AREA = "NOTION_TEST_AREA"
 
 
 @pytest.fixture(scope="module")
@@ -47,148 +43,7 @@ def notion():
     """
 
     if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
-        # set it to dummy and assume we are reading a VCR anyway
-        os.environ[ENV_NOTION_AUTH_TOKEN] = "secret_DUMMY_AUTH_TOKEN"
+        raise RuntimeError(f"{ENV_NOTION_AUTH_TOKEN} not defined! Use `export {ENV_NOTION_AUTH_TOKEN}=secret_...`")
 
-    with ultimate_notion.NotionSession() as notion:
+    with ultimate_notion.Session() as notion:
         yield notion
-
-
-@pytest.fixture
-def test_area():
-    """Return the `PageRef` used for live testing.
-
-    This fixture depends on the `NOTION_TEST_AREA` environment variable.  If it is not
-    present, this fixture will skip the current test.
-    """
-
-    parent_id = os.getenv(ENV_NOTION_TEST_AREA, None)
-
-    if parent_id is None:
-        # set it to a dummy parent id of a page
-        parent_id = "5f505199b2924713920b61d813bf72a3"
-
-    return records.PageRef(page_id=parent_id)
-
-
-@pytest.fixture
-def blank_page(notion, test_area):
-    """Return a temporary (empty) page for testing.
-
-    This page will be deleted during teardown.
-    """
-
-    page = notion.pages.create(
-        parent=test_area,
-        title=mktitle(),
-    )
-
-    assert page.id is not None
-    assert page.parent == test_area
-
-    yield page
-
-    notion.pages.delete(page)
-
-
-@pytest.fixture
-def blank_db(notion, test_area):
-    """Return a temporary (empty) database for testing.
-
-    This database will be deleted during teardown.
-    """
-
-    db = notion.databases.create(
-        parent=test_area,
-        title=mktitle(),
-        schema={
-            "Name": schema.Title(),
-        },
-    )
-
-    yield db
-
-    notion.databases.delete(db)
-
-
-@pytest.fixture
-def create_blank_db(notion, test_area):
-    """Return a function to temporarily create an (empty) database for testing.
-
-    This database will be deleted during teardown.
-    """
-
-    @store_retvals
-    def nested_func(db_name):
-        db = notion.databases.create(
-            parent=test_area,
-            title=db_name,
-            schema={
-                "Name": schema.Title(),
-            },
-        )
-        # ToDo: Why is this needed?
-        time.sleep(SLEEP_SECS_AFTER_DB_CREATE)
-        return db
-
-    yield nested_func
-
-    # clean up by deleting the db of each prior call
-    for db in nested_func.retvals:
-        notion.databases.delete(db)
-
-
-@pytest.fixture
-def local_model():
-    """Return an un-bound ORM model."""
-
-    CustomPage = connected_page()
-
-    class _LocalType(CustomPage):
-        __database__ = None
-
-        Name = Property("Name", schema.Title())
-        Index = Property("Index", schema.Number())
-        Notes = Property("Notes", schema.RichText())
-        Complete = Property("Complete", schema.Checkbox())
-        DueDate = Property("DueDate", schema.Date())
-        Tags = Property("Tags", schema.MultiSelect())
-
-    yield _LocalType
-
-
-@pytest.fixture
-def simple_db(notion, test_area):
-    """Return a temporary (empty) database for testing.
-
-    This database will be deleted during teardown.
-    """
-
-    # TODO - can we derive the schema from local_model?
-
-    db = notion.databases.create(
-        parent=test_area,
-        title=mktitle(),
-        schema={
-            "Name": schema.Title(),
-            "Index": schema.Number(),
-            "Notes": schema.RichText(),
-            "Complete": schema.Checkbox(),
-            "Due Date": schema.Date(),
-            "Tags": schema.MultiSelect(),
-        },
-    )
-
-    yield db
-
-    notion.databases.delete(db)
-
-
-@pytest.fixture
-def simple_model(notion, simple_db):
-    """Return a Connected Page that matches the schema for `simple_db`.
-
-    The model's database will be deleted during teardown.
-    """
-
-    yield connected_page(session=notion, source_db=simple_db)

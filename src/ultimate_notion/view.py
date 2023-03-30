@@ -21,9 +21,16 @@ class View:
         self.columns = list(self.database.properties.keys())
         self._title_col = SList(col for col, val in database.properties.items() if isinstance(val, Title)).item()
         self._has_index = False
-        self._index_name = None
+        self._index_name: Optional[str] = None
 
-    def __str__(self) -> Optional[str]:
+    def clone(self) -> View:
+        view = View(self.database, self.pages[:])
+        view.columns = self.columns[:]
+        view._has_index = self._has_index
+        view._index_name = self._index_name
+        return view
+
+    def __str__(self) -> str:
         rows = self.rows()
 
         if is_notebook():
@@ -32,10 +39,6 @@ class View:
             return display_html(tabulate(rows, headers=self.columns, tablefmt="html"))
         else:
             return tabulate(rows, headers=self.columns)
-
-    @property
-    def has_index(self):
-        return self._has_index
 
     def row(self, idx: int) -> List[Any]:
         page_dct = self.pages[idx].to_dict()
@@ -52,16 +55,15 @@ class View:
     def rows(self) -> List[List[Any]]:
         return [self.row(idx) for idx in range(len(self.pages))]
 
-    def clone(self) -> View:
-        view = View(self.database, self.pages[:])
-        view.columns = self.columns[:]
-        view._has_index = self._has_index
-        view._index_name = self._index_name
-        return view
+    @property
+    def has_index(self):
+        return self._has_index
 
     def with_index(self, name="index") -> View:
+        if self.has_index:
+            return self
+
         assert name not in self.columns, f"index '{name}' is already a column name"
-        assert not self._has_index, f"an index '{self._index_name}' already exists"
         view = self.clone()
         view._has_index = True
         view._index_name = name
@@ -69,21 +71,51 @@ class View:
         return view
 
     def without_index(self) -> View:
-        assert self.has_index, "there is no index"
+        if not self.has_index:
+            return self
+
         view = self.clone()
+        assert isinstance(self._index_name, str)
         view.columns.remove(self._index_name)
         view._has_index = False
         view._index_name = None
         return view
 
-    def limit(self, num: int) -> View:
+    def head(self, num: int) -> View:
         view = self.clone()
         view.pages = view.pages[:num]
         return view
 
+    def limit(self, num: int) -> View:
+        """Alias for `head`"""
+        return self.head(num)
+
+    def tail(self, num: int) -> View:
+        view = self.clone()
+        view.pages = view.pages[-num:]
+        return view
+
     def as_df(self) -> pd.DataFrame:
-        if self.has_index:
-            view = self.without_index()
-        else:
-            view = self
+        view = self.without_index() if self.has_index else self
         return pd.DataFrame(view.rows(), columns=view.columns)
+
+    def select(self, *cols):
+        raise NotImplementedError
+
+    def apply(self, udf):
+        raise NotImplementedError
+
+    def rename(self):
+        raise NotImplementedError
+
+    def reverse(self):
+        raise NotImplementedError
+
+    def sort(self):
+        raise NotImplementedError
+
+    def filter(self):
+        raise NotImplementedError
+
+    def append(self):
+        raise NotImplementedError

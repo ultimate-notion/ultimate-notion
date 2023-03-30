@@ -88,6 +88,16 @@ line_length = 120
 multi_line_output = 3
 use_parentheses = true
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+markers = [
+    "webtest: tests that use the Notion web API"
+]
+
 [tool.coverage.run]
 branch = true
 source = ["src/ultimate_notion"]
@@ -141,6 +151,11 @@ dependencies = [
     "scipy",
     "pandas",
 ]
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
+no-cov = "cov --no-cov {args}"
+ci = "cov --vcr-record=none --cov-report lcov {args}"
+record = "cov --vcr-record=all {args}" # re-record all vcr cassettes
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -182,15 +197,6 @@ build-check = [
     "validate",
 ]
 
-[tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
-no-cov = "cov --no-cov {args}"
-ci = "cov --vcr-record=none --cov-report lcov {args}"
-record = "cov --vcr-record=all {args}" # re-record all vcr cassettes
-
-[[tool.hatch.envs.test.matrix]]
-python = ["38", "39", "310"]
-
 [tool.hatch.envs.lint]
 skip-install = true
 dependencies = [
@@ -201,7 +207,6 @@ dependencies = [
     "isort>=5.10.1",
     "mypy>=0.942",
 ]
-
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive src/ultimate_notion tests"
 style = [
@@ -216,5 +221,9 @@ fmt = [
 ]
 all = [
     "style",
-#    "typing", # ToDo: Reintroduce later when things are more stable
+    "typing",
 ]
+
+# Test matrix replacing the functionality of tox
+[[tool.hatch.envs.test.matrix]]
+python = ["38", "39", "310"]
