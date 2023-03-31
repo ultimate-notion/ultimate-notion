@@ -36,7 +36,7 @@ class View:
 
     def reset(self) -> View:
         """Reset the view, i.e. remove filtering, index and sorting"""
-        self._with_icons = True
+        self._icon_name: Optional[str] = None
         self._id_name: Optional[str] = None
         self._index_name: Optional[str] = None
         self._row_indices = np.arange(len(self._pages))
@@ -54,6 +54,9 @@ class View:
     def columns(self) -> List[str]:
         """Columns of the database view aligned with the elements of a row"""
         cols = list(self._columns[self._col_indices])
+        if self.has_icon:
+            assert self._icon_name is not None
+            cols.insert(0, self._icon_name)
         if self.has_id:
             assert self._id_name is not None
             cols.insert(0, self._id_name)
@@ -76,15 +79,18 @@ class View:
         return [self.page(idx) for idx in range(len(self))]
 
     def row(self, idx: int) -> List[Any]:
-        page_dct = self.page(idx).to_dict()
+        page = self.page(idx)
+        page_dct = page.to_dict()
         row = []
         for col in self.columns:
             if col == self._title_col:
-                row.append(page_dct["title"])
+                row.append(page.title)
             elif col == self._id_name:
-                row.append(page_dct["id"])
+                row.append(page.id)
             elif col == self._index_name:
                 row.append(idx)
+            elif col == self._icon_name:
+                row.append(page.icon)
             else:
                 row.append(page_dct[col])
         return row
@@ -95,14 +101,14 @@ class View:
     def _html_for_icon(self, rows: List[Any], cols: List[str]) -> List[Any]:
         # escape everything as we ask tabulate not to do it
         rows = [[htmlescape(elem) if isinstance(elem, str) else elem for elem in row] for row in rows]
-        if (title_idx := find_index(self._title_col, cols)) is None:
+        if (title_idx := find_index(self._icon_name, cols)) is None:
             return rows
         for idx, row in enumerate(rows):
             page = self.page(idx)
             if is_emoji(page.icon):
-                row[title_idx] = f"{page.icon} {row[title_idx]}"
-            else:
-                row[title_idx] = f'<img src="{page.icon}" style="height:1em;float:left">{row[title_idx]}'
+                row[title_idx] = f"{page.icon}"
+            else:  # assume it's an external image resource that html can load directly
+                row[title_idx] = f'<img src="{page.icon}" style="height:1em">'
         return rows
 
     def show(self, html: Optional[bool] = None):
@@ -118,7 +124,7 @@ class View:
             html = is_notebook()
 
         if html:
-            if self._with_icons:
+            if self.has_icon:
                 rows = self._html_for_icon(rows, cols)
                 html_str = tabulate(rows, headers=cols, tablefmt="unsafehtml")
             else:
@@ -163,25 +169,25 @@ class View:
         return view
 
     @property
-    def has_icons(self) -> bool:
-        return self._with_icons
+    def has_icon(self) -> bool:
+        return self._icon_name is not None
 
-    def with_icons(self) -> View:
+    def with_icon(self, name="icon") -> View:
         """Show icons in HTML output"""
-        if self._with_icons:
+        if self.has_icon and name == self._icon_name:
             return self
 
         view = self.clone()
-        view._with_icons = True
+        view._icon_name = name
         return view
 
-    def without_icons(self) -> View:
+    def without_icon(self) -> View:
         """Don't show icons in HTML output"""
-        if not self._with_icons:
+        if not self.has_icon:
             return self
 
         view = self.clone()
-        view._with_icons = False
+        view._icon_name = None
         return view
 
     @property
@@ -223,6 +229,7 @@ class View:
         return view
 
     def to_pandas(self) -> pd.DataFrame:
+        # remove index as pandas uses its own
         view = self.without_index() if self.has_index else self
         return pd.DataFrame(view.rows(), columns=view.columns)
 
@@ -232,11 +239,12 @@ class View:
         if more_cols:
             cols += more_cols
 
-        if not_included := set(cols) - set(self.columns):
+        curr_cols = self._columns  # we only consider non-meta columns, e.g. no index, etc.
+        if not_included := set(cols) - set(curr_cols):
             raise RuntimeError(f"Some columns, i.e. {', '.join(not_included)}, are not in view")
 
         view = self.clone()
-        select_col_indices = find_indices(cols, self.columns)
+        select_col_indices = find_indices(cols, curr_cols)
         view._col_indices = view._col_indices[select_col_indices]
         return view
 

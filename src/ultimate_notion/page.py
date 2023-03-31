@@ -51,7 +51,6 @@ class Page(Record):
 
     def to_dict(self) -> Dict[str, Any]:
         dct = super().to_dict()
-        dct['title'] = self.title
         for k, v in self.properties.items():
             if isinstance(v, types.MultiSelect):
                 v = str(v)
