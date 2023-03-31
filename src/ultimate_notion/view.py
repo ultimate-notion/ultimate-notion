@@ -109,24 +109,32 @@ class View:
         """Show the view
 
         Args:
-            html: display in html or not, or determine automatically based on context, e.g. Jupyter lab.
+            html: output in html or not, or determine automatically based on context, e.g. Jupyter lab.
         """
         rows = self.rows()
         cols = self.columns
 
-        if html or (html is None and is_notebook()):
-            from IPython.core.display import display_html
+        if html is None:
+            html = is_notebook()
 
+        if html:
             if self._with_icons:
                 rows = self._html_for_icon(rows, cols)
-                return display_html(tabulate(rows, headers=cols, tablefmt="unsafehtml"))
+                html_str = tabulate(rows, headers=cols, tablefmt="unsafehtml")
             else:
-                return display_html(tabulate(rows, headers=cols, tablefmt="html"))
+                html_str = tabulate(rows, headers=cols, tablefmt="html")
+            return html_str
         else:
             return tabulate(rows, headers=cols)
 
     def __repr__(self) -> str:
-        return self.show()
+        repr_str = self.show()
+        if is_notebook():
+            from IPython.core.display import display_html
+
+            display_html(repr_str)
+        else:
+            return repr_str
 
     def __str__(self) -> str:
         return self.show(html=False)
