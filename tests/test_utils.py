@@ -37,3 +37,10 @@ def test_deepcopy_with_sharing():
     copy = utils.deepcopy_with_sharing(obj, shared_attributes=["shared"])
     assert obj.copied is not copy.copied
     assert obj.shared is copy.shared
+
+
+def test_find_index():
+    test_set = [2, 4, 72, 23]
+    assert utils.find_index(4, test_set) == 1
+    assert utils.find_index(23, test_set) == 3
+    assert utils.find_index(42, test_set) is None

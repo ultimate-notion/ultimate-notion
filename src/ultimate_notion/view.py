@@ -1,10 +1,7 @@
-"""View representing the result of a Query
-
-ToDo:
-    * also show icon
-"""
+"""View representing the result of a Query"""
 from __future__ import annotations
 
+from html import escape as htmlescape
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 import numpy as np
@@ -14,7 +11,7 @@ from notional.schema import Title
 from tabulate import tabulate
 
 from .page import Page
-from .utils import SList, find_indices, is_notebook
+from .utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
 
 if TYPE_CHECKING:
     from .database import Database
@@ -40,7 +37,7 @@ class View:
     def reset(self) -> View:
         """Reset the view, i.e. remove filtering, index and sorting"""
         self._with_icons = True
-        self._has_index = False
+        self._id_name: Optional[str] = None
         self._index_name: Optional[str] = None
         self._row_indices = np.arange(len(self._pages))
         self._col_indices = np.arange(len(self._columns))
@@ -48,26 +45,22 @@ class View:
 
     def clone(self) -> View:
         """Clone the current view"""
-        view = View(self.database, list(self._pages))
-
-        view._with_icons = self._with_icons
-        view._has_index = self._has_index
-        view._index_name = self._index_name
-        view._row_indices = self._row_indices
-        view._col_indices = self._col_indices
-        return view
+        return deepcopy_with_sharing(self, shared_attributes=["database", "_pages"])
 
     def __len__(self):
         return len(self._row_indices)
 
     @property
-    def has_index(self):
-        return self._has_index
-
-    @property
     def columns(self) -> List[str]:
-        """Columns of the database view"""
-        return list(self._columns[self._col_indices])
+        """Columns of the database view aligned with the elements of a row"""
+        cols = list(self._columns[self._col_indices])
+        if self.has_id:
+            assert self._id_name is not None
+            cols.insert(0, self._id_name)
+        if self.has_index:
+            assert self._index_name is not None
+            cols.insert(0, self._index_name)
+        return cols
 
     def page(self, idx: int) -> Page:
         """Retrieve a page by index of the view
@@ -84,10 +77,14 @@ class View:
 
     def row(self, idx: int) -> List[Any]:
         page_dct = self.page(idx).to_dict()
-        row = [idx] if self.has_index else []
+        row = []
         for col in self.columns:
             if col == self._title_col:
-                row.append(page_dct['title'])
+                row.append(page_dct["title"])
+            elif col == self._id_name:
+                row.append(page_dct["id"])
+            elif col == self._index_name:
+                row.append(idx)
             else:
                 row.append(page_dct[col])
         return row
@@ -96,9 +93,10 @@ class View:
         return [self.row(idx) for idx in range(len(self))]
 
     def _html_for_icon(self, rows: List[Any], cols: List[str]) -> List[Any]:
-        if self._title_col not in cols:
+        # escape everything as we ask tabulate not to do it
+        rows = [[htmlescape(elem) if isinstance(elem, str) else elem for elem in row] for row in rows]
+        if (title_idx := find_index(self._title_col, cols)) is None:
             return rows
-        title_idx = cols.index(self._title_col)
         for idx, row in enumerate(rows):
             page = self.page(idx)
             if is_emoji(page.icon):
@@ -115,10 +113,6 @@ class View:
         """
         rows = self.rows()
         cols = self.columns
-
-        if self.has_index:
-            assert self._index_name is not None
-            cols.insert(0, self._index_name)
 
         if html or (html is None and is_notebook()):
             from IPython.core.display import display_html
@@ -137,36 +131,72 @@ class View:
     def __str__(self) -> str:
         return self.show(html=False)
 
+    @property
+    def has_index(self) -> bool:
+        return self._index_name is not None
+
     def with_index(self, name="index") -> View:
-        """Display the index as first column when printing"""
-        if self.has_index:
+        """Add an index column to the view"""
+        if self.has_index and name == self._index_name:
             return self
 
         assert name not in self.columns, f"index '{name}' is already a column name"
         view = self.clone()
-        view._has_index = True
         view._index_name = name
         return view
 
     def without_index(self) -> View:
-        """Do not show the index as first column when printing"""
+        """Remove index column from the view"""
         if not self.has_index:
             return self
 
         view = self.clone()
-        view._has_index = False
         view._index_name = None
         return view
 
+    @property
+    def has_icons(self) -> bool:
+        return self._with_icons
+
     def with_icons(self) -> View:
         """Show icons in HTML output"""
-        self._with_icons = True
-        return self
+        if self._with_icons:
+            return self
+
+        view = self.clone()
+        view._with_icons = True
+        return view
 
     def without_icons(self) -> View:
         """Don't show icons in HTML output"""
-        self._with_icons = False
-        return self
+        if not self._with_icons:
+            return self
+
+        view = self.clone()
+        view._with_icons = False
+        return view
+
+    @property
+    def has_id(self) -> bool:
+        return self._id_name is not None
+
+    def with_id(self, name: str = "id") -> View:
+        """Add an id column to the view"""
+        if self.has_id and name == self._id_name:
+            return self
+
+        view = self.clone()
+        view._id_name = name
+        return view
+
+    def without_id(self) -> View:
+        """Remove id column from the view"""
+        if not self.has_id:
+            return self
+
+        view = self.clone()
+        view._id_name = None
+        return view
 
     def head(self, num: int) -> View:
         """Keep only the first `num` elements in view"""

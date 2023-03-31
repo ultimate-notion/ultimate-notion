@@ -83,6 +83,14 @@ def find_indices(elements: Union[np.ndarray, List[Any]], total_set: Union[np.nda
     return result
 
 
+def find_index(elem: Any, lst: List[Any]) -> Optional[int]:
+    """Find the index of the element in the list or return `None`"""
+    if elem not in lst:
+        return None
+    else:
+        return lst.index(elem)
+
+
 def deepcopy_with_sharing(obj: Any, shared_attributes: List[str], memo: Optional[Dict[int, Any]] = None):
     """
     Deepcopy an object, except for a given list of attributes, which should
