@@ -1,0 +1,39 @@
+import numpy as np
+import pytest
+from numpy.testing import assert_array_equal
+
+from ultimate_notion import utils
+
+
+def test_find_indices():
+    elems = np.array([7, 2, 4])
+    total_set = np.array([1, 2, 7, 3, 6, 4])
+    idx = utils.find_indices(elems, total_set)
+    assert_array_equal(idx, np.array([2, 1, 5]))
+
+    elems = np.array(["Col7", "Col2", "Col4"])
+    total_set = np.array(["Col1", "Col2", "Col7", "Col3", "Col6", "Col4"])
+    idx = utils.find_indices(elems, total_set)
+    assert_array_equal(idx, np.array([2, 1, 5]))
+
+
+def test_slist():
+    lst = utils.SList(range(3))
+    assert isinstance(lst, list)
+    with pytest.raises(ValueError):
+        lst.item()
+    lst = utils.SList([42])
+    item = lst.item()
+    assert item == 42
+
+
+def test_deepcopy_with_sharing():
+    class Class:
+        def __init__(self):
+            self.shared = dict(a=1)
+            self.copied = dict(a=2)
+
+    obj = Class()
+    copy = utils.deepcopy_with_sharing(obj, shared_attributes=["shared"])
+    assert obj.copied is not copy.copied
+    assert obj.shared is copy.shared

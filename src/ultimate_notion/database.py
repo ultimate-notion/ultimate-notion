@@ -68,6 +68,9 @@ class Database(Record):
         pages = [Page(page_obj, session) for page_obj in self.session.notional.databases.query(self.id).execute()]
         return View(database=self, pages=pages)
 
+    def add_item(self):
+        raise NotImplementedError
+
     # ToDo: Implement this and return view.
     # def query(
     #     self,

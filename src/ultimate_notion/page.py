@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 from notional import blocks, types
 
 from .record import Record
+from .utils import deepcopy_with_sharing
 
 if TYPE_CHECKING:
     from .session import Session
@@ -28,8 +29,21 @@ class Page(Record):
         return self.obj_ref.Title
 
     @property
+    def icon(self) -> str:
+        icon = self.obj_ref.icon
+        if isinstance(icon, types.FileObject):
+            return icon.URL
+        elif isinstance(icon, types.EmojiObject):
+            return icon.emoji
+        else:
+            raise RuntimeError(f"unknown icon object of {type(icon)}")
+
+    @property
     def properties(self) -> Dict[str, types.PropertyValue]:
         return self.obj_ref.properties
+
+    def clone(self) -> Page:
+        return deepcopy_with_sharing(self, shared_attributes=['session'])
 
     def _resolve_relation(self, relation):
         for ref in relation:
