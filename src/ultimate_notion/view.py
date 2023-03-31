@@ -81,7 +81,7 @@ class View:
     def row(self, idx: int) -> List[Any]:
         page = self.page(idx)
         page_dct = page.to_dict()
-        row = []
+        row: List[Any] = []
         for col in self.columns:
             if col == self._title_col:
                 row.append(page.title)
@@ -133,7 +133,7 @@ class View:
         else:
             return tabulate(rows, headers=cols)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         repr_str = self.show()
         if is_notebook():
             from IPython.core.display import display_html
@@ -142,7 +142,7 @@ class View:
         else:
             return repr_str
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.show(html=False)
 
     @property
