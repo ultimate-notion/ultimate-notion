@@ -1,14 +1,14 @@
 """Additional utilities that fit nowhere else"""
 from copy import deepcopy
 from functools import wraps
-from typing import Any, Dict, List, Optional, TypeVar
+from typing import Any, Dict, List, Optional, TypeAlias, TypeVar
 from uuid import UUID
 
 import numpy as np
 from notional import types
 
 T = TypeVar('T')
-ObjRef = UUID | str | types.ParentRef | types.GenericObject
+ObjRef: TypeAlias = UUID | str | types.ParentRef | types.GenericObject
 
 
 class SList(List[T]):
