@@ -1,7 +1,7 @@
 """Additional utilities that fit nowhere else"""
 from copy import deepcopy
 from functools import wraps
-from typing import Any, Dict, List, Optional, TypeVar, Union
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from uuid import UUID
 
 import numpy as np
@@ -160,5 +160,5 @@ def make_obj_ref(obj: ObjRef):
     return types.ObjectReference[obj]
 
 
-def schema2prop_type(schema_type: str) -> type[types.PropertyValue]:
+def schema2prop_type(schema_type: str) -> Type[types.PropertyValue]:
     return types.PropertyValue.__notional_typemap__[schema_type]

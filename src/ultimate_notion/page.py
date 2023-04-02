@@ -6,7 +6,7 @@ ToDo:
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional, Type
 
 from notional import blocks, types
 
@@ -85,7 +85,7 @@ class Page(Record):
             val = val.Value
         return val
 
-    def _get_prop_type(self, property_name: str) -> type[types.PropertyValue]:
+    def _get_prop_type(self, property_name: str) -> Type[types.PropertyValue]:
         db = self.database
         assert db is not None, "this page is not within a database"
         return schema2prop_type(db.schema[property_name].type)
