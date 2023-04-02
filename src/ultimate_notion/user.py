@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from notional import types, user
 
 
@@ -30,10 +32,20 @@ class User:
         return self.obj_ref.type.value
 
     @property
+    def is_person(self) -> bool:
+        return isinstance(self.obj_ref, user.Person)
+
+    @property
+    def is_bot(self) -> bool:
+        return isinstance(self.obj_ref, user.Bot)
+
+    @property
     def avatar_url(self):
         return self.obj_ref.avatar_url
 
     @property
-    def email(self):
-        assert isinstance(self.obj_ref, user.Person), "only a person type has an e-mail"
-        return self.obj_ref.person.email
+    def email(self) -> Optional[str]:
+        if isinstance(self.obj_ref, user.Person):
+            return self.obj_ref.person.email
+        else:  # it's a bot without an e-mail
+            return None

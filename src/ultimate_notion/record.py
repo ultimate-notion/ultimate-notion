@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any, Dict
 from uuid import UUID
 
+from notion_client.helpers import get_url
 from notional import blocks, types
 
 
@@ -43,6 +44,10 @@ class Record:
     @property
     def archived(self) -> bool:
         return self.obj_ref.archived
+
+    @property
+    def url(self) -> str:
+        return get_url(str(self.id))
 
     def to_dict(self) -> Dict[str, Any]:
         return dict(
