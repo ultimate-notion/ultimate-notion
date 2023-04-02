@@ -10,7 +10,7 @@ build-backend = "hatchling.build"
 name = "ultimate-notion"
 description = "The ultimate Python library for Notion!"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = ["notion"]
 authors = [
@@ -19,8 +19,6 @@ authors = [
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -231,4 +229,4 @@ fix = [
 
 # Test matrix replacing the functionality of tox
 [[tool.hatch.envs.test.matrix]]
-python = ["38", "39", "310", "311"]
+python = ["310", "311"]

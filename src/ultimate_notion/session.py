@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import os
 from types import TracebackType
-from typing import Iterable, List, Optional, Type
+from typing import Iterable, List, Optional
 from uuid import UUID
 
 from cachetools import TTLCache, cached
@@ -70,7 +70,7 @@ class Session(object):
 
     def __exit__(
         self,
-        exc_type: Type[BaseException],
+        exc_type: type[BaseException],
         exc_value: BaseException,
         traceback: TracebackType,
     ) -> None:

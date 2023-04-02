@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ from .utils import SList, deepcopy_with_sharing, find_index, find_indices, is_no
 if TYPE_CHECKING:
     from .database import Database
 
-ColType = Union[str, List[str]]
+ColType = str | List[str]
 T = TypeVar('T')
 
 

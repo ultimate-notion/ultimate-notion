@@ -1,7 +1,7 @@
 """Database object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from notional import blocks, types
 from notional.schema import PropertyObject
@@ -36,7 +36,7 @@ class Database(Record):
         return self.obj_ref.description
 
     @property
-    def icon(self) -> Optional[Union[types.FileObject, types.EmojiObject]]:
+    def icon(self) -> Optional[types.FileObject | types.EmojiObject]:
         return self.obj_ref.icon
 
     @property

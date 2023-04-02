@@ -1,14 +1,14 @@
 """Additional utilities that fit nowhere else"""
 from copy import deepcopy
 from functools import wraps
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, List, Optional, TypeVar
 from uuid import UUID
 
 import numpy as np
 from notional import types
 
 T = TypeVar('T')
-ObjRef = Union[UUID, str, types.ParentRef, types.GenericObject]
+ObjRef = UUID | str | types.ParentRef | types.GenericObject
 
 
 class SList(List[T]):
@@ -75,7 +75,7 @@ def store_retvals(func):
     return wrapped
 
 
-def find_indices(elements: Union[np.ndarray, List[Any]], total_set: Union[np.ndarray, List[Any]]) -> np.array:
+def find_indices(elements: np.ndarray | List[Any], total_set: np.ndarray | List[Any]) -> np.array:
     """Finds the indices of the elements in the total set"""
     if not isinstance(total_set, np.ndarray):
         total_set = np.array(total_set)
@@ -160,5 +160,5 @@ def make_obj_ref(obj: ObjRef):
     return types.ObjectReference[obj]
 
 
-def schema2prop_type(schema_type: str) -> Type[types.PropertyValue]:
+def schema2prop_type(schema_type: str) -> type[types.PropertyValue]:
     return types.PropertyValue.__notional_typemap__[schema_type]
