@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar, Union
 
 import numpy as np
 import pandas as pd
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from .database import Database
 
 ColType = Union[str, List[str]]
+T = TypeVar('T')
 
 
 class View:
@@ -211,6 +212,26 @@ class View:
         view._id_name = None
         return view
 
+    @property
+    def live_update(self):
+        return self._live_update
+
+    def with_live_update(self) -> View:
+        if self.live_update:
+            return self
+        for page in self._pages:
+            page.live_update = True
+        self._live_update = True
+        return self
+
+    def without_live_update(self) -> View:
+        if not self.live_update:
+            return self
+        for page in self._pages:
+            page.live_update = False
+        self._live_update = False
+        return self
+
     def head(self, num: int) -> View:
         """Keep only the first `num` elements in view"""
         view = self.clone()
@@ -247,9 +268,15 @@ class View:
         view._col_indices = view._col_indices[select_col_indices]
         return view
 
-    def apply(self, udf, dry_run=False):
-        """Apply function to all pages in view"""
-        raise NotImplementedError
+    def apply(self, func: Callable[[Page], T]) -> List[T]:
+        """Apply function to all pages in view
+
+        If the function modifies a page, the pages will be broadcast to Notion if `live_update` is True
+
+        Args:
+            func: function taking a Page as input
+        """
+        return [func(page) for page in self.pages()]
 
     def reverse(self) -> View:
         """Reverse the order of the rows"""

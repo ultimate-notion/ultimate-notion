@@ -99,8 +99,9 @@ class Page(Record):
         else:
             raise TypeError(f"Unsupported value type for {value_type.type}")
 
-        # update the property on the server (which will refresh the local data)
-        self.session.notional.pages.update(self.obj_ref, **{property_name: prop})
+        if self.live_update:
+            # update the property on the server (which will refresh the local data)
+            self.session.notional.pages.update(self.obj_ref, **{property_name: prop})
 
     def __delitem__(self, key):
         # ToDo: Implement me!
