@@ -15,16 +15,16 @@ if TYPE_CHECKING:
 
 
 class Database(Record):
-    def __init__(self, obj_ref: blocks.Database, session: Session):
-        self.obj_ref: blocks.Database = obj_ref
-        self.session = session
+    def __init__(self, db_block: blocks.Database, session: Session):
+        self.obj_ref: blocks.Database = db_block
+        self.session: Session = session
 
-    def __str__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"{cls_name}: '{self.title}'"
+    def __str__(self):
+        return self.title
 
     def __repr__(self) -> str:
-        return f"<{str(self)} at {hex(id(self))}>"
+        cls_name = self.__class__.__name__
+        return f"<{cls_name}: '{str(self)}' at {hex(id(self))}>"
 
     @property
     def title(self) -> str:
@@ -63,12 +63,15 @@ class Database(Record):
     def is_inline(self) -> bool:
         return self.obj_ref.is_inline
 
-    def view(self, live=True) -> View:
-        session = self.session if live else None
-        pages = [Page(page_obj, session) for page_obj in self.session.notional.databases.query(self.id).execute()]
-        return View(database=self, pages=pages)
+    def view(self, live_update=True) -> View:
+        query = self.session.notional.databases.query(self.id)
+        pages = [Page(page_obj, self.session, live_update) for page_obj in query.execute()]
+        return View(database=self, pages=pages, query=query, live_update=live_update)
 
-    def add_item(self):
+    def add_page(self):
+        raise NotImplementedError
+
+    def del_page(self):
         raise NotImplementedError
 
     # ToDo: Implement this and return view.

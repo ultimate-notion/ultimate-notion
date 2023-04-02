@@ -4,19 +4,19 @@ from __future__ import annotations
 import logging
 import os
 from types import TracebackType
-from typing import Iterable, List, Optional, Type, Union
+from typing import Iterable, List, Optional, Type
 from uuid import UUID
 
 from cachetools import TTLCache, cached
 from httpx import ConnectError
 from notion_client.errors import APIResponseError
-from notional import types
+from notional import blocks, types
 from notional.session import Session as NotionalSession
 
 from .database import Database
 from .page import Page
 from .user import User
-from .utils import SList
+from .utils import ObjRef, SList, make_obj_ref
 
 _log = logging.getLogger(__name__)
 ENV_NOTION_AUTH_TOKEN = "NOTION_AUTH_TOKEN"
@@ -49,19 +49,19 @@ class Session(object):
         self.notional = NotionalSession(auth=auth, **kwargs)
 
         # prepare API methods for decoration
-        self._search_db = self.search_db
-        self._get_db = self.get_db
-        self._get_page = self.get_page
-        self._get_user = self.get_user
+        self._search_db_unwrapped = self.search_db
+        self._get_db_unwrapped = self._get_db
+        self._get_page_unwrapped = self._get_page
+        self._get_user_unwrapped = self._get_user
         self.set_cache()
         _log.info("Initialized Notion session")
 
     def set_cache(self, ttl=30, maxsize=1024):
         wrapper = cached(cache=TTLCache(maxsize=maxsize, ttl=ttl))
-        self.search_db = wrapper(self._search_db)
-        self.get_db = wrapper(self._get_db)
-        self.get_page = wrapper(self._get_page)
-        self.get_user = wrapper(self._get_user)
+        self.search_db = wrapper(self._search_db_unwrapped)
+        self._get_db = wrapper(self._get_db_unwrapped)
+        self._get_page = wrapper(self._get_page_unwrapped)
+        self._get_user = wrapper(self._get_user_unwrapped)
 
     def __enter__(self) -> Session:
         _log.debug("Connecting to Notion...")
@@ -115,29 +115,47 @@ class Session(object):
             # ToDo: Implement a search that also considers the parents
             raise NotImplementedError
 
-        dbs = SList(
-            Database(obj_ref=db, session=self)
-            for db in self.notional.search(db_name).filter(property="object", value="database").execute()
-        )
+        query = self.notional.search(db_name).filter(property="object", value="database")
+        dbs = SList(Database(db_block=db, session=self) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
         return dbs
 
-    def get_db(self, db_id: Union[str, UUID]) -> Database:
-        db_uuid = db_id if isinstance(db_id, UUID) else UUID(db_id)
-        return Database(obj_ref=self.notional.databases.retrieve(db_uuid), session=self)
+    def _get_db(self, uuid: UUID) -> blocks.Database:
+        """Retrieve Notional database block by uuid
+
+        This indirection is needed since more general object references are not hashable.
+        """
+        return self.notional.databases.retrieve(uuid)
+
+    def get_db(self, db_ref: ObjRef) -> Database:
+        db_uuid = make_obj_ref(db_ref).id
+        return Database(db_block=self._get_db(db_uuid), session=self)
+
+    def _search_page(self):
+        raise NotImplementedError
 
     def search_page(
         self, page_name: Optional[str] = None, exact: bool = True, parents: Optional[Iterable[str]] = None
     ) -> SList[Page]:
         raise NotImplementedError
 
-    def get_page(self, page_id: Union[str, UUID]) -> Page:
-        page_uuid = page_id if isinstance(page_id, UUID) else UUID(page_id)
-        return Page(obj_ref=self.notional.pages.retrieve(page_uuid), session=self)
+    def _get_page(self, uuid: UUID) -> blocks.Page:
+        """Retrieve Notional page by uuid
 
-    def get_user(self, user_id: Union[str, UUID]) -> types.User:
-        user_uuid = user_id if isinstance(user_id, UUID) else UUID(user_id)
+        This indirection is needed since more general object references are not hashable.
+        """
+        return self.notional.pages.retrieve(uuid)
+
+    def get_page(self, page_ref: ObjRef) -> Page:
+        page_uuid = make_obj_ref(page_ref).id
+        return Page(obj_ref=self._get_page(page_uuid), session=self)
+
+    def _get_user(self, uuid: UUID) -> types.User:
+        return self.notional.users.retrieve(uuid)
+
+    def get_user(self, user_ref: ObjRef) -> User:
+        user_uuid = make_obj_ref(user_ref).id
         return User(obj_ref=self.notional.users.retrieve(user_uuid))
 
     def whoami(self) -> User:
@@ -146,4 +164,4 @@ class Session(object):
 
     def all_users(self) -> List[User]:
         """Retrieve all users of this workspace"""
-        return self.notional.users.list()
+        return [User(obj_ref=user) for user in self.notional.users.list()]

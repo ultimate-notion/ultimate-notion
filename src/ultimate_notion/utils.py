@@ -2,10 +2,13 @@
 from copy import deepcopy
 from functools import wraps
 from typing import Any, Dict, List, Optional, TypeVar, Union
+from uuid import UUID
 
 import numpy as np
+from notional import types
 
 T = TypeVar('T')
+ObjRef = Union[UUID, str, types.ParentRef, types.GenericObject]
 
 
 class SList(List[T]):
@@ -150,3 +153,12 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: List[str], memo: Optional
         del clone.__deepcopy__
 
     return clone
+
+
+def make_obj_ref(obj: ObjRef):
+    """Makes a general-purpose object reference with id and url in the Notion API"""
+    return types.ObjectReference[obj]
+
+
+def schema2prop_type(schema_type: str) -> type[types.PropertyValue]:
+    return types.PropertyValue.__notional_typemap__[schema_type]

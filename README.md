@@ -44,6 +44,12 @@ Ultimate-Notion is distributed under the terms of the [MIT](https://spdx.org/lic
 
 To start this project off a lot of inspiration and code was taken from [hatch] and [notional].
 
+## ToDos:
+
+* Implement the capability to get the url from any reference
+* Implement the creation and filling of a database to make writing unit tests easier
+* Implement setting attributes
+
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/
 [pre-commit]: https://pre-commit.com/

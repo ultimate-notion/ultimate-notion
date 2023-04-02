@@ -10,3 +10,11 @@ finally:
 from .session import Session
 
 __all__ = ["__version__", "Session"]
+
+# ToDo: Remove later on
+# start debugger on exception
+import sys
+
+from IPython.core import ultratb
+
+sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=True)

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Union
 import numpy as np
 import pandas as pd
 from emoji import is_emoji
+from notional.query import QueryBuilder
 from notional.schema import Title
 from tabulate import tabulate
 
@@ -20,8 +21,10 @@ ColType = Union[str, List[str]]
 
 
 class View:
-    def __init__(self, database: Database, pages: List[Page]):
+    def __init__(self, database: Database, pages: List[Page], query: QueryBuilder, live_update: bool):
         self.database = database
+        self._live_update = live_update
+        self._query = query
         self._title_col = SList(col for col, val in database.schema.items() if isinstance(val, Title)).item()
         self._columns = self._get_columns(self._title_col)
         self._pages = np.array(pages)
@@ -45,7 +48,7 @@ class View:
 
     def clone(self) -> View:
         """Clone the current view"""
-        return deepcopy_with_sharing(self, shared_attributes=["database", "_pages"])
+        return deepcopy_with_sharing(self, shared_attributes=["database", "_pages", "_query"])
 
     def __len__(self):
         return len(self._row_indices)
@@ -66,13 +69,8 @@ class View:
         return cols
 
     def page(self, idx: int) -> Page:
-        """Retrieve a page by index of the view
-
-        Returned pages are clones of the ones from the view and thus modifications
-        will not be reflected in the view. Use `apply` to modify the actual pages
-        of the database.
-        """
-        return self._pages[self._row_indices[idx]].clone()
+        """Retrieve a page by index of the view"""
+        return self._pages[self._row_indices[idx]]
 
     def pages(self) -> List[Page]:
         """Retrieve all pages in view"""
@@ -108,7 +106,7 @@ class View:
             if is_emoji(page.icon):
                 row[title_idx] = f"{page.icon}"
             else:  # assume it's an external image resource that html can load directly
-                row[title_idx] = f'<img src="{page.icon}" style="height:1em">'
+                row[title_idx] = f'<img src="{page.icon}" style="height:1.2em">'
         return rows
 
     def show(self, html: Optional[bool] = None):
@@ -133,16 +131,17 @@ class View:
         else:
             return tabulate(rows, headers=cols)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         repr_str = self.show()
         if is_notebook():
             from IPython.core.display import display_html
 
             display_html(repr_str)
+            return ""
         else:
             return repr_str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.show(html=False)
 
     @property
@@ -248,7 +247,7 @@ class View:
         view._col_indices = view._col_indices[select_col_indices]
         return view
 
-    def apply(self, udf):
+    def apply(self, udf, dry_run=False):
         """Apply function to all pages in view"""
         raise NotImplementedError
 
@@ -264,10 +263,8 @@ class View:
     def filter(self):
         raise NotImplementedError
 
-    def reload(self):
+    def reload(self) -> View:
         """Reload all pages by re-executing the query that generated the view"""
-        raise NotImplementedError
-
-    def upload(self):
-        """Push all modified pages to Notion"""
-        raise NotImplementedError
+        view = self.clone()
+        view._pages = [Page(page_obj, self.database.session, self._live_update) for page_obj in self._query.execute()]
+        return view
