@@ -161,4 +161,10 @@ def make_obj_ref(obj: ObjRef):
 
 
 def schema2prop_type(schema_type: str) -> type[types.PropertyValue]:
+    """Map the name of a schema attribute to the corresponding property type
+
+    Args:
+        schema_type: name of the schema property, e.g. `status`, `url`, etc.
+            The name is defined in `name` in the classes of `notional.schema`.
+    """
     return types.PropertyValue.__notional_typemap__[schema_type]

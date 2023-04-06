@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 
 class Database(Record):
-    def __init__(self, db_block: blocks.Database, session: Session):
-        self.obj_ref: blocks.Database = db_block
+    def __init__(self, db_ref: blocks.Database, session: Session):
+        self.obj_ref: blocks.Database = db_ref
         self.session: Session = session
 
     def __str__(self):
@@ -49,6 +49,7 @@ class Database(Record):
 
     @property
     def schema(self) -> Dict[str, PropertyObject]:
+        # ToDo: Wrap these properties in our schema props from `.schema` to avoid confusion
         return self.obj_ref.properties
 
     @property

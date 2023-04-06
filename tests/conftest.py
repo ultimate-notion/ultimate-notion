@@ -36,7 +36,7 @@ def vcr_config():
 
 @pytest.fixture
 def notion():
-    """Return the `PageRef` used for live testing.
+    """Return the notion session used for live testing.
 
     This fixture depends on the `NOTION_AUTH_TOKEN` environment variable.  If it is not
     present, this fixture will skip the current test.
@@ -58,3 +58,9 @@ def database(notion):
 def view(database):
     """Return a test view"""
     return database.view()
+
+
+@pytest.fixture
+def parent_page(notion):
+    """Return the page reference used as parent page for live testing"""
+    return notion.search_page("Tests", exact=True).item()

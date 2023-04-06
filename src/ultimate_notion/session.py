@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import os
 from types import TracebackType
-from typing import Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional
 from uuid import UUID
 
 from cachetools import TTLCache, cached
@@ -15,6 +15,7 @@ from notional.session import Session as NotionalSession
 
 from .database import Database
 from .page import Page
+from .schema import PropertyObject
 from .user import User
 from .utils import ObjRef, SList, make_obj_ref
 
@@ -101,6 +102,20 @@ class Session(object):
         if error is not None:
             raise SessionError(error)
 
+    def create_db(self, parent_page: Page, schema: Dict[str, PropertyObject], title=None) -> Database:
+        """Create a new database"""
+        schema = {k: v.obj_ref for k, v in schema.items()}
+        db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema)
+        return Database(db_ref=db, session=self)
+
+    def delete_db(self, db: ObjRef | Database):
+        """Delete a database"""
+        if isinstance(db, Database):
+            db_uuid = db.id
+        else:
+            db_uuid = make_obj_ref(db).id
+        return self.notional.blocks.delete(db_uuid)
+
     def search_db(
         self, db_name: Optional[str] = None, exact: bool = True, parents: Optional[Iterable[str]] = None
     ) -> SList[Database]:
@@ -116,7 +131,7 @@ class Session(object):
             raise NotImplementedError
 
         query = self.notional.search(db_name).filter(property="object", value="database")
-        dbs = SList(Database(db_block=db, session=self) for db in query.execute())
+        dbs = SList(Database(db_ref=db, session=self) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
         return dbs
@@ -124,21 +139,34 @@ class Session(object):
     def _get_db(self, uuid: UUID) -> blocks.Database:
         """Retrieve Notional database block by uuid
 
-        This indirection is needed since more general object references are not hashable.
+        This indirection is needed since more general object references are not hashable, which is needed for caching
         """
         return self.notional.databases.retrieve(uuid)
 
     def get_db(self, db_ref: ObjRef) -> Database:
+        """Retrieve Notional database block by uuid"""
         db_uuid = make_obj_ref(db_ref).id
-        return Database(db_block=self._get_db(db_uuid), session=self)
-
-    def _search_page(self):
-        raise NotImplementedError
+        return Database(db_ref=self._get_db(db_uuid), session=self)
 
     def search_page(
         self, page_name: Optional[str] = None, exact: bool = True, parents: Optional[Iterable[str]] = None
     ) -> SList[Page]:
-        raise NotImplementedError
+        """Search a page by name
+
+        Args:
+            page_name: name/title of the page, return all if `None`
+            exact: perform an exact search, not only a substring match
+            parents: list of parent pages to further refine the search
+        """
+        if parents is not None:
+            # ToDo: Implement a search that also considers the parents
+            raise NotImplementedError
+
+        query = self.notional.search(page_name).filter(property="object", value="page")
+        pages = SList(Page(page_ref=page, session=self) for page in query.execute())
+        if exact and page_name is not None:
+            pages = SList(page for page in pages if page.title == page_name)
+        return pages
 
     def _get_page(self, uuid: UUID) -> blocks.Page:
         """Retrieve Notional page by uuid
@@ -149,7 +177,7 @@ class Session(object):
 
     def get_page(self, page_ref: ObjRef) -> Page:
         page_uuid = make_obj_ref(page_ref).id
-        return Page(obj_ref=self._get_page(page_uuid), session=self)
+        return Page(page_ref=self._get_page(page_uuid), session=self)
 
     def _get_user(self, uuid: UUID) -> types.User:
         return self.notional.users.retrieve(uuid)

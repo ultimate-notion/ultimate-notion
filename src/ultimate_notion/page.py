@@ -22,8 +22,8 @@ if TYPE_CHECKING:
 
 
 class Page(Record):
-    def __init__(self, obj_ref: blocks.Page, session: Session, live_update: bool = True):
-        self.obj_ref: blocks.Page = obj_ref
+    def __init__(self, page_ref: blocks.Page, session: Session, live_update: bool = True):
+        self.obj_ref: blocks.Page = page_ref
         self.session = session
         self.live_update = live_update
 
