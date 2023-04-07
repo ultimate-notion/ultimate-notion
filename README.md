@@ -57,4 +57,4 @@ on top of the excellent [notion-sdk-py].
 [hatch]: https://hatch.pypa.io/
 [pre-commit]: https://pre-commit.com/
 [notional]: https://github.com/jheddings/notional/
-[notion-sdk-py]: https://github.com/ramnes/notion-sdk-py
+[notion-sdk-py]: https://github.com/ramnes/notion-sdk-py/
