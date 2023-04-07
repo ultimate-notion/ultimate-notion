@@ -15,9 +15,9 @@ def test_basic_schema(notion, parent_page):
     # # define our schema from Property Objects
 
     db_schema = {
-        "Name": schema.Title(),
-        "Estimate": schema.Number(schema.NumberFormat.DOLLAR),
-        "Comment": schema.Text()
+        'Name': schema.Title(),
+        'Estimate': schema.Number(schema.NumberFormat.DOLLAR),
+        'Comment': schema.Text()
         # "Approved": schema.Checkbox(),
         # "Points": schema.Number(),
         # "Due Date": schema.Date(),

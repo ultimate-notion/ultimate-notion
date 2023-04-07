@@ -1,6 +1,6 @@
 """Core building block is a Record"""
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 from uuid import UUID
 
 from notion_client.helpers import get_url
@@ -13,7 +13,7 @@ class Record:
     obj_ref: blocks.DataRecord = None
 
     @property
-    def id(self) -> UUID:
+    def id(self) -> UUID:  # noqa: A003
         return self.obj_ref.id
 
     @property
@@ -49,14 +49,14 @@ class Record:
     def url(self) -> str:
         return get_url(str(self.id))
 
-    def to_dict(self) -> Dict[str, Any]:
-        return dict(
-            id=self.id,
-            created_time=self.created_time,
-            created_by=self.created_by,
-            last_edited_time=self.last_edited_time,
-            last_edited_by=self.last_edited_by,
-            parent=self.parent,
-            has_children=self.has_children,
-            archived=self.archived,
-        )
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'id': self.id,
+            'created_time': self.created_time,
+            'created_by': self.created_by,
+            'last_edited_time': self.last_edited_time,
+            'last_edited_by': self.last_edited_by,
+            'parent': self.parent,
+            'has_children': self.has_children,
+            'archived': self.archived,
+        }

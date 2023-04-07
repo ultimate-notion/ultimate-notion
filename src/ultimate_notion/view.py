@@ -1,8 +1,9 @@
 """View representing the result of a Query"""
 from __future__ import annotations
 
+from collections.abc import Callable
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -11,18 +12,18 @@ from notional.query import QueryBuilder
 from notional.schema import Title
 from tabulate import tabulate
 
-from .page import Page
-from .utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
+from ultimate_notion.page import Page
+from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
 
 if TYPE_CHECKING:
-    from .database import Database
+    from ultimate_notion.database import Database
 
-ColType = str | List[str]
+ColType = str | list[str]
 T = TypeVar('T')
 
 
 class View:
-    def __init__(self, database: Database, pages: List[Page], query: QueryBuilder, live_update: bool):
+    def __init__(self, database: Database, pages: list[Page], query: QueryBuilder, live_update: bool):
         self.database = database
         self._live_update = live_update
         self._query = query
@@ -40,32 +41,29 @@ class View:
 
     def reset(self) -> View:
         """Reset the view, i.e. remove filtering, index and sorting"""
-        self._icon_name: Optional[str] = None
-        self._id_name: Optional[str] = None
-        self._index_name: Optional[str] = None
+        self._icon_name: str | None = None
+        self._id_name: str | None = None
+        self._index_name: str | None = None
         self._row_indices = np.arange(len(self._pages))
         self._col_indices = np.arange(len(self._columns))
         return self
 
     def clone(self) -> View:
         """Clone the current view"""
-        return deepcopy_with_sharing(self, shared_attributes=["database", "_pages", "_query"])
+        return deepcopy_with_sharing(self, shared_attributes=['database', '_pages', '_query'])
 
     def __len__(self):
         return len(self._row_indices)
 
     @property
-    def columns(self) -> List[str]:
+    def columns(self) -> list[str]:
         """Columns of the database view aligned with the elements of a row"""
         cols = list(self._columns[self._col_indices])
         if self.has_icon:
-            assert self._icon_name is not None
             cols.insert(0, self._icon_name)
         if self.has_id:
-            assert self._id_name is not None
             cols.insert(0, self._id_name)
         if self.has_index:
-            assert self._index_name is not None
             cols.insert(0, self._index_name)
         return cols
 
@@ -73,14 +71,14 @@ class View:
         """Retrieve a page by index of the view"""
         return self._pages[self._row_indices[idx]]
 
-    def pages(self) -> List[Page]:
+    def pages(self) -> list[Page]:
         """Retrieve all pages in view"""
         return [self.page(idx) for idx in range(len(self))]
 
-    def row(self, idx: int) -> List[Any]:
+    def row(self, idx: int) -> list[Any]:
         page = self.page(idx)
         page_dct = page.to_dict()
-        row: List[Any] = []
+        row: list[Any] = []
         for col in self.columns:
             if col == self._title_col:
                 row.append(page.title)
@@ -94,10 +92,10 @@ class View:
                 row.append(page_dct[col])
         return row
 
-    def rows(self) -> List[List[Any]]:
+    def rows(self) -> list[list[Any]]:
         return [self.row(idx) for idx in range(len(self))]
 
-    def _html_for_icon(self, rows: List[Any], cols: List[str]) -> List[Any]:
+    def _html_for_icon(self, rows: list[Any], cols: list[str]) -> list[Any]:
         # escape everything as we ask tabulate not to do it
         rows = [[htmlescape(elem) if isinstance(elem, str) else elem for elem in row] for row in rows]
         if (title_idx := find_index(self._icon_name, cols)) is None:
@@ -105,12 +103,12 @@ class View:
         for idx, row in enumerate(rows):
             page = self.page(idx)
             if is_emoji(page.icon):
-                row[title_idx] = f"{page.icon}"
+                row[title_idx] = f'{page.icon}'
             else:  # assume it's an external image resource that html can load directly
                 row[title_idx] = f'<img src="{page.icon}" style="height:1.2em">'
         return rows
 
-    def show(self, html: Optional[bool] = None):
+    def show(self, html: bool | None = None):
         """Show the view
 
         Args:
@@ -125,9 +123,9 @@ class View:
         if html:
             if self.has_icon:
                 rows = self._html_for_icon(rows, cols)
-                html_str = tabulate(rows, headers=cols, tablefmt="unsafehtml")
+                html_str = tabulate(rows, headers=cols, tablefmt='unsafehtml')
             else:
-                html_str = tabulate(rows, headers=cols, tablefmt="html")
+                html_str = tabulate(rows, headers=cols, tablefmt='html')
             return html_str
         else:
             return tabulate(rows, headers=cols)
@@ -138,7 +136,7 @@ class View:
             from IPython.core.display import display_html
 
             display_html(repr_str)
-            return ""
+            return ''
         else:
             return repr_str
 
@@ -149,12 +147,15 @@ class View:
     def has_index(self) -> bool:
         return self._index_name is not None
 
-    def with_index(self, name="index") -> View:
+    def with_index(self, name='index') -> View:
         """Add an index column to the view"""
         if self.has_index and name == self._index_name:
             return self
 
-        assert name not in self.columns, f"index '{name}' is already a column name"
+        if name in self.columns:
+            msg = f"index '{name}' is already a column name"
+            raise RuntimeError(msg)
+
         view = self.clone()
         view._index_name = name
         return view
@@ -172,7 +173,7 @@ class View:
     def has_icon(self) -> bool:
         return self._icon_name is not None
 
-    def with_icon(self, name="icon") -> View:
+    def with_icon(self, name='icon') -> View:
         """Show icons in HTML output"""
         if self.has_icon and name == self._icon_name:
             return self
@@ -194,7 +195,7 @@ class View:
     def has_id(self) -> bool:
         return self._id_name is not None
 
-    def with_id(self, name: str = "id") -> View:
+    def with_id(self, name: str = 'id') -> View:
         """Add an id column to the view"""
         if self.has_id and name == self._id_name:
             return self
@@ -261,14 +262,15 @@ class View:
 
         curr_cols = self._columns  # we only consider non-meta columns, e.g. no index, etc.
         if not_included := set(cols) - set(curr_cols):
-            raise RuntimeError(f"Some columns, i.e. {', '.join(not_included)}, are not in view")
+            msg = f"Some columns, i.e. {', '.join(not_included)}, are not in view"
+            raise RuntimeError(msg)
 
         view = self.clone()
         select_col_indices = find_indices(cols, curr_cols)
         view._col_indices = view._col_indices[select_col_indices]
         return view
 
-    def apply(self, func: Callable[[Page], T]) -> List[T]:
+    def apply(self, func: Callable[[Page], T]) -> list[T]:
         """Apply function to all pages in view
 
         If the function modifies a page, the pages will be broadcast to Notion if `live_update` is True
@@ -287,7 +289,7 @@ class View:
     def sort(self):
         raise NotImplementedError
 
-    def filter(self):
+    def filter(self):  # noqa: A003
         raise NotImplementedError
 
     def reload(self) -> View:

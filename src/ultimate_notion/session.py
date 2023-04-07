@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Iterable
 from types import TracebackType
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any
 from uuid import UUID
 
 from cachetools import TTLCache, cached
@@ -13,14 +14,14 @@ from notion_client.errors import APIResponseError
 from notional import blocks, types
 from notional.session import Session as NotionalSession
 
-from .database import Database
-from .page import Page
-from .schema import PropertyObject
-from .user import User
-from .utils import ObjRef, SList, make_obj_ref
+from ultimate_notion.database import Database
+from ultimate_notion.page import Page
+from ultimate_notion.schema import PropertyObject
+from ultimate_notion.user import User
+from ultimate_notion.utils import ObjRef, SList, make_obj_ref
 
 _log = logging.getLogger(__name__)
-ENV_NOTION_AUTH_TOKEN = "NOTION_AUTH_TOKEN"
+ENV_NOTION_AUTH_TOKEN = 'NOTION_AUTH_TOKEN'
 
 
 class SessionError(Exception):
@@ -31,10 +32,10 @@ class SessionError(Exception):
         super().__init__(message)
 
 
-class Session(object):
+class Session:
     """A session for the Notion API"""
 
-    def __init__(self, auth: Optional[str] = None, **kwargs: Any):
+    def __init__(self, auth: str | None = None, **kwargs: Any):
         """Initialize the `Session` object and the Notional endpoints.
 
         Args:
@@ -45,7 +46,8 @@ class Session(object):
             if (env_token := os.getenv(ENV_NOTION_AUTH_TOKEN)) is not None:
                 auth = env_token
             else:
-                raise RuntimeError(f"Either pass `auth` or set {ENV_NOTION_AUTH_TOKEN}")
+                msg = f'Either pass `auth` or set {ENV_NOTION_AUTH_TOKEN}'
+                raise RuntimeError(msg)
 
         self.notional = NotionalSession(auth=auth, **kwargs)
 
@@ -55,7 +57,7 @@ class Session(object):
         self._get_page_unwrapped = self._get_page
         self._get_user_unwrapped = self._get_user
         self.set_cache()
-        _log.info("Initialized Notion session")
+        _log.info('Initialized Notion session')
 
     def set_cache(self, ttl=30, maxsize=1024):
         wrapper = cached(cache=TTLCache(maxsize=maxsize, ttl=ttl))
@@ -65,7 +67,7 @@ class Session(object):
         self._get_user = wrapper(self._get_user_unwrapped)
 
     def __enter__(self) -> Session:
-        _log.debug("Connecting to Notion...")
+        _log.debug('Connecting to Notion...')
         self.notional.client.__enter__()
         return self
 
@@ -75,7 +77,7 @@ class Session(object):
         exc_value: BaseException,
         traceback: TracebackType,
     ) -> None:
-        _log.debug("Closing connection to Notion...")
+        _log.debug('Closing connection to Notion...')
         self.notional.client.__exit__(exc_type, exc_value, traceback)
 
     def close(self):
@@ -93,16 +95,17 @@ class Session(object):
             me = self.whoami()
 
             if me is None:
-                raise SessionError("Unable to get current user")
+                msg = 'Unable to get current user'
+                raise SessionError(msg)
         except ConnectError:
-            error = "Unable to connect to Notion"
+            error = 'Unable to connect to Notion'
         except APIResponseError as err:
             error = str(err)
 
         if error is not None:
             raise SessionError(error)
 
-    def create_db(self, parent_page: Page, schema: Dict[str, PropertyObject], title=None) -> Database:
+    def create_db(self, parent_page: Page, schema: dict[str, PropertyObject], title=None) -> Database:
         """Create a new database"""
         schema = {k: v.obj_ref for k, v in schema.items()}
         db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema)
@@ -110,14 +113,11 @@ class Session(object):
 
     def delete_db(self, db: ObjRef | Database):
         """Delete a database"""
-        if isinstance(db, Database):
-            db_uuid = db.id
-        else:
-            db_uuid = make_obj_ref(db).id
+        db_uuid = db.id if isinstance(db, Database) else make_obj_ref(db).id
         return self.notional.blocks.delete(db_uuid)
 
     def search_db(
-        self, db_name: Optional[str] = None, exact: bool = True, parents: Optional[Iterable[str]] = None
+        self, db_name: str | None = None, exact: bool = True, parents: Iterable[str] | None = None
     ) -> SList[Database]:
         """Search a database by name
 
@@ -130,7 +130,7 @@ class Session(object):
             # ToDo: Implement a search that also considers the parents
             raise NotImplementedError
 
-        query = self.notional.search(db_name).filter(property="object", value="database")
+        query = self.notional.search(db_name).filter(property='object', value='database')
         dbs = SList(Database(db_ref=db, session=self) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
@@ -149,7 +149,7 @@ class Session(object):
         return Database(db_ref=self._get_db(db_uuid), session=self)
 
     def search_page(
-        self, page_name: Optional[str] = None, exact: bool = True, parents: Optional[Iterable[str]] = None
+        self, page_name: str | None = None, exact: bool = True, parents: Iterable[str] | None = None
     ) -> SList[Page]:
         """Search a page by name
 
@@ -162,7 +162,7 @@ class Session(object):
             # ToDo: Implement a search that also considers the parents
             raise NotImplementedError
 
-        query = self.notional.search(page_name).filter(property="object", value="page")
+        query = self.notional.search(page_name).filter(property='object', value='page')
         pages = SList(Page(page_ref=page, session=self) for page in query.execute())
         if exact and page_name is not None:
             pages = SList(page for page in pages if page.title == page_name)
@@ -190,6 +190,6 @@ class Session(object):
         """Return the user object of this bot"""
         return self.notional.users.me()
 
-    def all_users(self) -> List[User]:
+    def all_users(self) -> list[User]:
         """Retrieve all users of this workspace"""
         return [User(obj_ref=user) for user in self.notional.users.list()]

@@ -11,8 +11,8 @@ def test_find_indices():
     idx = utils.find_indices(elems, total_set)
     assert_array_equal(idx, np.array([2, 1, 5]))
 
-    elems = np.array(["Col7", "Col2", "Col4"])
-    total_set = np.array(["Col1", "Col2", "Col7", "Col3", "Col6", "Col4"])
+    elems = np.array(['Col7', 'Col2', 'Col4'])
+    total_set = np.array(['Col1', 'Col2', 'Col7', 'Col3', 'Col6', 'Col4'])
     idx = utils.find_indices(elems, total_set)
     assert_array_equal(idx, np.array([2, 1, 5]))
 
@@ -30,11 +30,11 @@ def test_slist():
 def test_deepcopy_with_sharing():
     class Class:
         def __init__(self):
-            self.shared = dict(a=1)
-            self.copied = dict(a=2)
+            self.shared = {'a': 1}
+            self.copied = {'a': 2}
 
     obj = Class()
-    copy = utils.deepcopy_with_sharing(obj, shared_attributes=["shared"])
+    copy = utils.deepcopy_with_sharing(obj, shared_attributes=['shared'])
     assert obj.copied is not copy.copied
     assert obj.shared is copy.shared
 

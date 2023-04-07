@@ -17,20 +17,20 @@ import ultimate_notion
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='module')
 def vcr_config():
     """Configure pytest-vcr."""
 
     def remove_headers(response):
-        response["headers"] = {}
+        response['headers'] = {}
         return response
 
     return {
-        "filter_headers": [
-            ("authorization", "secret..."),
-            ("user-agent", None),
+        'filter_headers': [
+            ('authorization', 'secret...'),
+            ('user-agent', None),
         ],
-        "before_record_response": remove_headers,
+        'before_record_response': remove_headers,
     }
 
 
@@ -42,7 +42,8 @@ def notion():
     present, this fixture will skip the current test.
     """
     if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
-        raise RuntimeError(f"{ENV_NOTION_AUTH_TOKEN} not defined! Use `export {ENV_NOTION_AUTH_TOKEN}=secret_...`")
+        msg = f'{ENV_NOTION_AUTH_TOKEN} not defined! Use `export {ENV_NOTION_AUTH_TOKEN}=secret_...`'
+        raise RuntimeError(msg)
 
     with ultimate_notion.Session() as notion:
         yield notion
@@ -51,7 +52,7 @@ def notion():
 @pytest.fixture
 def database(notion):
     """Return a test database"""
-    return notion.search_db("Contacts").item()
+    return notion.search_db('Contacts').item()
 
 
 @pytest.fixture
@@ -63,4 +64,4 @@ def view(database):
 @pytest.fixture
 def parent_page(notion):
     """Return the page reference used as parent page for live testing"""
-    return notion.search_page("Tests", exact=True).item()
+    return notion.search_page('Tests', exact=True).item()

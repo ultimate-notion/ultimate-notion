@@ -1,17 +1,17 @@
 """Database object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any
 
 from notional import blocks, types
 from notional.schema import PropertyObject
 
-from .page import Page
-from .record import Record
-from .view import View
+from ultimate_notion.page import Page
+from ultimate_notion.record import Record
+from ultimate_notion.view import View
 
 if TYPE_CHECKING:
-    from .session import Session
+    from ultimate_notion.session import Session
 
 
 class Database(Record):
@@ -32,23 +32,23 @@ class Database(Record):
         return self.obj_ref.Title
 
     @property
-    def description(self) -> Optional[List[types.RichTextObject]]:
+    def description(self) -> list[types.RichTextObject] | None:
         return self.obj_ref.description
 
     @property
-    def icon(self) -> Optional[types.FileObject | types.EmojiObject]:
+    def icon(self) -> types.FileObject | types.EmojiObject | None:
         return self.obj_ref.icon
 
     @property
-    def cover(self) -> Optional[types.FileObject]:
+    def cover(self) -> types.FileObject | None:
         return self.obj_ref.cover
 
     @property
-    def meta_properties(self) -> Dict[str, Any]:
+    def meta_properties(self) -> dict[str, Any]:
         return super().to_dict()
 
     @property
-    def schema(self) -> Dict[str, PropertyObject]:
+    def schema(self) -> dict[str, PropertyObject]:
         # ToDo: Wrap these properties in our schema props from `.schema` to avoid confusion
         return self.obj_ref.properties
 
@@ -68,7 +68,7 @@ class Database(Record):
         """Delete this database"""
         self.session.delete_db(self)
 
-    def view(self, live_update=True) -> View:
+    def view(self, live_update: bool = True) -> View:
         query = self.session.notional.databases.query(self.id)
         pages = [Page(page_obj, self.session, live_update) for page_obj in query.execute()]
         return View(database=self, pages=pages, query=query, live_update=live_update)

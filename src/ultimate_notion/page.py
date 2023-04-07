@@ -6,16 +6,16 @@ ToDo:
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any
 
 from notional import blocks, types
 
-from .record import Record
-from .utils import deepcopy_with_sharing, schema2prop_type
+from ultimate_notion.record import Record
+from ultimate_notion.utils import deepcopy_with_sharing, schema2prop_type
 
 if TYPE_CHECKING:
-    from .database import Database
-    from .session import Session
+    from ultimate_notion.database import Database
+    from ultimate_notion.session import Session
 
 # ToDo:
 #   * use the schema of the database to see which properties are writeable at all.
@@ -28,7 +28,7 @@ class Page(Record):
         self.live_update = live_update
 
     @property
-    def database(self) -> Optional[Database]:
+    def database(self) -> Database | None:
         """Retrieve database from parent or None"""
         if not isinstance(self.parent, types.DatabaseRef):
             return None
@@ -54,10 +54,11 @@ class Page(Record):
         elif isinstance(icon, types.EmojiObject):
             return icon.emoji
         else:
-            raise RuntimeError(f"unknown icon object of {type(icon)}")
+            msg = f'unknown icon object of {type(icon)}'
+            raise RuntimeError(msg)
 
     @property
-    def properties(self) -> Dict[str, types.PropertyValue]:
+    def properties(self) -> dict[str, types.PropertyValue]:
         return self.obj_ref.properties
 
     def clone(self) -> Page:
@@ -75,29 +76,33 @@ class Page(Record):
             val = [p.title for p in self._resolve_relation(val)]
         elif isinstance(val, types.Formula):
             val = val.Result
-        elif isinstance(val, (types.LastEditedBy, types.CreatedBy)):
-            assert isinstance(self.session, Session)
+        elif isinstance(val, types.LastEditedBy | types.CreatedBy):
             val = str(self.session.get_user(val.last_edited_by.id))
         elif isinstance(val, types.MultiSelect):
             val = val.Values
-        else:
-            assert isinstance(val, types.NativeTypeMixin)
+        elif isinstance(val, types.NativeTypeMixin):
             val = val.Value
+        else:
+            msg = f'Unknown property type {type(val)}'
+            raise RuntimeError(msg)
         return val
 
     def _get_prop_type(self, property_name: str) -> type[types.PropertyValue]:
         db = self.database
-        assert db is not None, "this page is not within a database"
+        if db is None:
+            msg = 'this page is not within a database'
+            raise RuntimeError(msg)
         return schema2prop_type(db.schema[property_name].type)
 
     def __setitem__(self, property_name: str, value: Any):
         value_type = self._get_prop_type(property_name)
         if isinstance(value, value_type):
             prop = value
-        elif hasattr(value_type, "__compose__"):
+        elif hasattr(value_type, '__compose__'):
             prop = value_type[value]
         else:
-            raise TypeError(f"Unsupported value type for {value_type.type}")
+            msg = f'Unsupported value type for {value_type.type}'
+            raise TypeError(msg)
 
         if self.live_update:
             # update the property on the server (which will refresh the local data)
@@ -107,8 +112,8 @@ class Page(Record):
         # ToDo: Implement me!
         pass
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         dct = super().to_dict()  # meta properties
-        for k in self.properties.keys():
+        for k in self.properties:
             dct[k] = self[k]
         return dct

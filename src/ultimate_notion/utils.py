@@ -1,7 +1,7 @@
 """Additional utilities that fit nowhere else"""
 from copy import deepcopy
 from functools import wraps
-from typing import Any, Dict, List, Optional, TypeAlias, TypeVar
+from typing import Any, TypeAlias, TypeVar
 from uuid import UUID
 
 import numpy as np
@@ -11,14 +11,14 @@ T = TypeVar('T')
 ObjRef: TypeAlias = UUID | str | types.ParentRef | types.GenericObject
 
 
-class SList(List[T]):
+class SList(list[T]):
     """A list that holds often only a single element"""
 
     def item(self) -> T:
         if len(self) == 1:
             return self[0]
         elif len(self) == 0:
-            msg = "list is empty"
+            msg = 'list is empty'
         else:
             msg = f"list of '{type(self[0]).__name__}' objects has more than one element"
         raise ValueError(msg)
@@ -75,18 +75,18 @@ def store_retvals(func):
     return wrapped
 
 
-def find_indices(elements: np.ndarray | List[Any], total_set: np.ndarray | List[Any]) -> np.array:
+def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[Any]) -> np.array:
     """Finds the indices of the elements in the total set"""
     if not isinstance(total_set, np.ndarray):
         total_set = np.array(total_set)
     mask = np.isin(total_set, elements)
     indices = np.where(mask)[0]
-    lookup = dict(zip(total_set[mask], indices))
+    lookup = dict(zip(total_set[mask], indices, strict=True))
     result = np.array([lookup.get(x, None) for x in elements])
     return result
 
 
-def find_index(elem: Any, lst: List[Any]) -> Optional[int]:
+def find_index(elem: Any, lst: list[Any]) -> int | None:
     """Find the index of the element in the list or return `None`"""
     if elem not in lst:
         return None
@@ -94,7 +94,7 @@ def find_index(elem: Any, lst: List[Any]) -> Optional[int]:
         return lst.index(elem)
 
 
-def deepcopy_with_sharing(obj: Any, shared_attributes: List[str], memo: Optional[Dict[int, Any]] = None):
+def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int, Any] | None = None):
     """
     Deepcopy an object, except for a given list of attributes, which should
     be shared between the original object and its copy.
@@ -129,7 +129,6 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: List[str], memo: Optional
 
     Original from https://stackoverflow.com/a/24621200
     """
-    assert isinstance(shared_attributes, (list, tuple))
     shared_attrs = {k: getattr(obj, k) for k in shared_attributes}
 
     deepcopy_defined = hasattr(obj, '__deepcopy__')

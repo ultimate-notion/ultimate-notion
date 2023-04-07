@@ -10,7 +10,7 @@ def test_raise_for_status(notion):
 @pytest.mark.webtest
 def test_search_get_db(notion):
     db_by_name = notion.search_db('Contacts').item()
-    assert db_by_name.title == "Contacts"
+    assert db_by_name.title == 'Contacts'
 
     db_by_id = notion.get_db(db_by_name.id)
     assert db_by_id.id == db_by_name.id
@@ -18,15 +18,15 @@ def test_search_get_db(notion):
 
 @pytest.mark.webtest
 def test_get_page(notion):
-    page_id = "e9f53dc380ce4a979424659ef13a0d2e"
+    page_id = 'e9f53dc380ce4a979424659ef13a0d2e'
     page = notion.get_page(page_id)
-    assert page.title == "ACME Template"
+    assert page.title == 'ACME Template'
 
 
 @pytest.mark.webtest
 def test_whoami_get_user(notion):
     me = notion.whoami()
-    assert me.name == "Github Unittests"
+    assert me.name == 'Github Unittests'
     user = notion.get_user(me.id)
     assert user.id == me.id
 

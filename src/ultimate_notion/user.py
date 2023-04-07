@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from notional import types, user
 
 
@@ -20,7 +18,7 @@ class User:
         return self.id == other.id
 
     @property
-    def id(self):
+    def id(self):  # noqa: A003
         return self.obj_ref.id
 
     @property
@@ -28,7 +26,7 @@ class User:
         return self.obj_ref.name
 
     @property
-    def type(self):
+    def type(self):  # noqa: A003
         return self.obj_ref.type.value
 
     @property
@@ -44,7 +42,7 @@ class User:
         return self.obj_ref.avatar_url
 
     @property
-    def email(self) -> Optional[str]:
+    def email(self) -> str | None:
         if isinstance(self.obj_ref, user.Person):
             return self.obj_ref.person.email
         else:  # it's a bot without an e-mail
