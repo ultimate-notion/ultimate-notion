@@ -1,10 +1,11 @@
-# Ultimate-Notion
-
 <div align="center">
 
 <img src="https://raw.githubusercontent.com/ultimate-notion/ultimate-notion/master/docs/assets/images/logo_with_text.svg" alt="Ultimate-Notion logo" width="500" role="img">
+</div>
+<br/>
 
- The ultimate Python library for [Notion]!
+Ultimate Notion is the ultimate Python library for [Notion]! It allows you to access and modify your Notion databases and
+pages in the most convenient and pythonic way.
 
 |         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 |---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -12,7 +13,7 @@
 | Package | [![PyPI - Version](https://img.shields.io/pypi/v/ultimate-notion.svg?logo=pypi&label=PyPI&logoColor=gold)](https://pypi.org/project/ultimate-notion/) [![PyPI - Downloads](https://img.shields.io/pypi/dm/ultimate-notion.svg?color=blue&label=Downloads&logo=pypi&logoColor=gold)](https://pepy.tech/project/ultimate-notion) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ultimate-notion.svg?logo=python&label=Python&logoColor=gold)](https://pypi.org/project/ultimate-notion/)                                                                                                                                                                                                                                                                                                                                        |
 | Details | [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/) [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch) [![code style - black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![types - Mypy](https://img.shields.io/badge/types-Mypy-blue.svg)](https://github.com/ambv/black) [![imports - isort](https://img.shields.io/badge/imports-isort-ef8336.svg)](https://github.com/pycqa/isort) [![License - MIT](https://img.shields.io/badge/license-MIT-9400d3.svg)](https://spdx.org/licenses/) [![GitHub Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4)](https://github.com/sponsors/FlorianWilhelm) |
 
-</div>
+
 
 **This is a pre-alpha version! Don't use it!**
 
@@ -42,7 +43,9 @@ Ultimate-Notion is distributed under the terms of the [MIT](https://spdx.org/lic
 
 ## Credits
 
-To start this project off a lot of inspiration and code was taken from [hatch] and [notional].
+To start this project off a lot of inspiration and code was taken from [hatch] and [notional]. Ultimate Notion makes
+heavy use of [notional] and is a more user-friendly layer on top of it just the same way that [notional] is a layer
+on top of the excellent [notion-sdk-py].
 
 ## ToDos:
 
@@ -54,3 +57,4 @@ To start this project off a lot of inspiration and code was taken from [hatch] a
 [hatch]: https://hatch.pypa.io/
 [pre-commit]: https://pre-commit.com/
 [notional]: https://github.com/jheddings/notional/
+[notion-sdk-py]: https://github.com/ramnes/notion-sdk-py
