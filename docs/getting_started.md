@@ -28,7 +28,7 @@ and choose <kbd>Develop or manage integrations</kbd>. This should take you to th
 <kbd>+ Create new integration</kbd>, provide a name, a logo and select the Notion workspace the integration should be
 associated to. After that click the <kbd>Submit</kbd> button.
 
-![Notion integration](assets/images/notion-integration-create.png){: style="height:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion integration](assets/images/notion-integration-create.png){: style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 This brings you to the Secrets-site where you need to copy and save the *Internal Integration Token*, which always starts
 with `secret_`. This token will be used by Ultimate Notion for authentication.
@@ -42,17 +42,18 @@ select the <kbd>···</kbd> on the upper right. In the drop-down menu, scroll d
 search and select your created integration. A pop-up that you need to confirm will inform you that your integration
 will have access to the selected page as well as all its children.
 
-![Notion integration](assets/images/notion-integration-add.png){: style="height:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion integration](assets/images/notion-integration-add.png){: style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 
 ## Access the page with Python
 
 To try out if your integration works, just copy&paste the following code into your favorite editor. Replace the content
-of `TOKEN` with the Internal Integration Token you saved and the content of `PAGE` with the title of the page, you granted
+of `TOKEN` with the Internal Integration Token you saved and the content of `PAGE_TITLE` with the title of the page, you granted
 access for your integration.
 
-``` py title="getting_started.py
---8<-- "../examples/getting_started.py"
+
+``` py
+--8<-- "../../examples/getting_started.py"
 ```
 
 

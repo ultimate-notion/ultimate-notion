@@ -1,6 +1,6 @@
 # Contributing
 
-Welcome to the contributor guide of Ultimate-Notion.
+Welcome to the contributor guide of Ultimate Notion.
 
 This document focuses on getting any potential contributor familiarized with
 the development processes, but [other kinds of contributions] are also appreciated.
@@ -33,18 +33,17 @@ you help us to identify the root cause of the issue.
 
 ## Documentation improvements
 
-You can help improve `ultimate-notion` docs by making them more readable and coherent, or
+You can help improve the documentation of Ultimate Notion by making them more readable and coherent, or
 by adding missing information and correcting mistakes.
 
-`ultimate-notion` documentation uses [mkdocs] as its main documentation compiler.
+This documentation uses [mkdocs] as its main documentation compiler.
 This means that the docs are kept in the same repository as the project code, and
 that any documentation update is done in the same way was a code contribution.
 
 !!! tip
-      Please notice that the [GitHub web interface] provides a quick way of
-      propose changes in `ultimate-notion`'s files. While this mechanism can
-      be tricky for normal code contributions, it works perfectly fine for
-      contributing to the docs, and can be quite handy.
+      Please notice that the [GitHub web interface] provides a quick way for
+      proposing changes. While this mechanism can  be tricky for normal code contributions,
+      it works perfectly fine for contributing to the docs, and can be quite handy.
 
       If you are interested in trying this method out, please navigate to
       the `docs` folder in the source [repository], find which file you
