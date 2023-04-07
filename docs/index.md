@@ -1,6 +1,6 @@
 # ​
 
-![Ultimate-Notion logo](assets/images/logo_with_text.svg){: width=600 height=300 style="align:center"}
+![Ultimate-Notion logo](assets/images/logo_with_text.svg){: width=400 style="height:200px; display:block; margin-left:auto; margin-right:auto;"}
 
 
 Ultimate Notion is the ultimate Python library for [Notion]! It allows you to access and modify your Notion databases and
