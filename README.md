@@ -44,7 +44,7 @@ Ultimate-Notion is distributed under the terms of the [MIT](https://spdx.org/lic
 ## Credits
 
 To start this project off a lot of inspiration and code was taken from [hatch] and [notional]. Ultimate Notion makes
-heavy use of [notional] and is a more user-friendly layer on top of it just the same way that [notional] is a layer
+heavy use of [notional] and is a more user-friendly layer on top of it, just the same way that [notional] is a layer
 on top of the excellent [notion-sdk-py].
 
 ## ToDos:
