@@ -29,6 +29,12 @@ repos:
       --remove-unused-variables,
     ]
 
+# Ruff replaces flake8 and isort
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: 'v0.0.260'
+  hooks:
+    - id: ruff
+
 - repo: https://github.com/psf/black
   rev: 23.1.0
   hooks:
