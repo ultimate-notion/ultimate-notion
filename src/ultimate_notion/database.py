@@ -68,9 +68,9 @@ class Database(Record):
         """Delete this database"""
         self.session.delete_db(self)
 
-    def view(self, live_update: bool = True) -> View:
+    def view(self, *, live_update: bool = True) -> View:
         query = self.session.notional.databases.query(self.id)
-        pages = [Page(page_obj, self.session, live_update) for page_obj in query.execute()]
+        pages = [Page(page_obj, self.session, live_update=live_update) for page_obj in query.execute()]
         return View(database=self, pages=pages, query=query, live_update=live_update)
 
     def add_page(self):

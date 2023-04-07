@@ -23,7 +23,7 @@ T = TypeVar('T')
 
 
 class View:
-    def __init__(self, database: Database, pages: list[Page], query: QueryBuilder, live_update: bool):
+    def __init__(self, database: Database, pages: list[Page], query: QueryBuilder, *, live_update: bool):
         self.database = database
         self._live_update = live_update
         self._query = query
@@ -295,5 +295,7 @@ class View:
     def reload(self) -> View:
         """Reload all pages by re-executing the query that generated the view"""
         view = self.clone()
-        view._pages = [Page(page_obj, self.database.session, self._live_update) for page_obj in self._query.execute()]
+        view._pages = [
+            Page(page_obj, self.database.session, live_update=self._live_update) for page_obj in self._query.execute()
+        ]
         return view

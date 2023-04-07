@@ -117,7 +117,7 @@ class Session:
         return self.notional.blocks.delete(db_uuid)
 
     def search_db(
-        self, db_name: str | None = None, exact: bool = True, parents: Iterable[str] | None = None
+        self, db_name: str | None = None, *, exact: bool = True, parents: Iterable[str] | None = None
     ) -> SList[Database]:
         """Search a database by name
 
@@ -149,7 +149,7 @@ class Session:
         return Database(db_ref=self._get_db(db_uuid), session=self)
 
     def search_page(
-        self, page_name: str | None = None, exact: bool = True, parents: Iterable[str] | None = None
+        self, page_name: str | None = None, *, exact: bool = True, parents: Iterable[str] | None = None
     ) -> SList[Page]:
         """Search a page by name
 
