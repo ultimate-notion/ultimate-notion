@@ -1,7 +1,9 @@
 # Getting Started
 
 Before we get started a few words about Notion and its basic concepts are appropriate. In Notion everything is either
-a *page* or a *block*. An important and special block is the *database*, which may be  within a page, i.e. *inline*,
+a *page* or a *block*. Typical blocks are headings, text, bulleted list, tables, quotes and so on.
+
+An important and special block is the *database*, which may be  within a page, i.e. *inline*,
 or at the same hierarchy level as a *page*. A *database* has a *schema*, that specifies various structured *properties*
 of the individual pages contained in that database. Only pages contained in a database have properties. Regardless of
 the properties, each page has *attributes* such as a title, cover, icon, or whether it is archived or not.
@@ -42,7 +44,7 @@ select the <kbd>···</kbd> on the upper right. In the drop-down menu, scroll d
 search and select your created integration. A pop-up that you need to confirm will inform you that your integration
 will have access to the selected page as well as all its children.
 
-![Notion integration](assets/images/notion-integration-add.png){: style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion integration](assets/images/notion-integration-add.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
 
 
 ## Access the page with Python
