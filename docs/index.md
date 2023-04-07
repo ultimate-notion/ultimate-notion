@@ -1,4 +1,8 @@
-# Ultimate-Notion
+# ​
+
+![Ultimate-Notion logo](assets/images/logo_with_text.svg){: style="align:center;"}
+
+logo_with_text.svg
 
 > The ultimate Python library for Notion!
 

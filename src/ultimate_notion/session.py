@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import os
 from types import TracebackType
-from typing import Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
 from uuid import UUID
 
 from cachetools import TTLCache, cached
@@ -34,7 +34,7 @@ class SessionError(Exception):
 class Session(object):
     """A session for the Notion API"""
 
-    def __init__(self, auth: Optional[str] = None, **kwargs):
+    def __init__(self, auth: Optional[str] = None, **kwargs: Any):
         """Initialize the `Session` object and the Notional endpoints.
 
         Args:
