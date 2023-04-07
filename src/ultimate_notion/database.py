@@ -64,6 +64,10 @@ class Database(Record):
     def is_inline(self) -> bool:
         return self.obj_ref.is_inline
 
+    def delete(self):
+        """Delete this database"""
+        self.session.delete_db(self)
+
     def view(self, live_update=True) -> View:
         query = self.session.notional.databases.query(self.id)
         pages = [Page(page_obj, self.session, live_update) for page_obj in query.execute()]

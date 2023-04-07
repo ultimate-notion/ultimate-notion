@@ -1,6 +1,6 @@
 # ​
 
-![Ultimate-Notion logo](assets/images/logo_with_text.svg){: width=400 style="height:200px; display:block; margin-left:auto; margin-right:auto;"}
+![Ultimate-Notion logo](assets/images/logo_with_text.svg){: style="height:200px; display:block; margin-left:auto; margin-right:auto;"}
 
 <br>
 
