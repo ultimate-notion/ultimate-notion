@@ -11,8 +11,10 @@ pages in the most convenient and pythonic way.
 
 ## Features
 
-[ ] Databases ...
-[ ]
+- Databases:
+  - [x] create & delete
+  - [ ] add & remove pages
+- [ ] ...
 
 ## License
 

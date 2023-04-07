@@ -76,7 +76,7 @@ class Database(Record):
     def add_page(self):
         raise NotImplementedError
 
-    def del_page(self):
+    def remove_page(self):
         raise NotImplementedError
 
     # ToDo: Implement this and return view.
