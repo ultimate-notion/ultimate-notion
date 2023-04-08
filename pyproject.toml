@@ -191,6 +191,7 @@ ban-relative-imports = "all"
 # Environment Setup #
 #####################
 
+# Default environment
 [tool.hatch.envs.default]
 dependencies = [
     "hatch",
@@ -212,6 +213,7 @@ no-cov = "cov --no-cov {args}"
 ci = "cov --vcr-record=none --cov-report lcov {args}"
 record = "cov --vcr-record=all {args}" # re-record all vcr cassettes
 
+# Docs environment
 [tool.hatch.envs.docs]
 dependencies = [
     "mkdocs~=1.4.0",
@@ -252,12 +254,14 @@ build-check = [
     "validate",
 ]
 
+# Lint environment
 [tool.hatch.envs.lint]
 skip-install = true
 dependencies = [
     "black>=23.1.0",
     "mypy>=1.0.0",
     "ruff>=0.0.259",
+    "autoflake>=2.0",
 ]
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive src/ultimate_notion tests"
@@ -267,6 +271,7 @@ style = [
 ]
 fmt = [
     "black {args:.}",
+    "autoflake --in-place --remove-all-unused-imports --remove-unused-variables {args:.}",
     "ruff --fix {args:.}",
     "style",
 ]
