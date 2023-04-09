@@ -7,6 +7,7 @@ from notional import blocks, types
 from notional.schema import PropertyObject
 
 from ultimate_notion.page import Page
+from ultimate_notion.query import QueryBuilder
 from ultimate_notion.record import Record
 from ultimate_notion.view import View
 
@@ -73,24 +74,9 @@ class Database(Record):
         pages = [Page(page_obj, self.session, live_update=live_update) for page_obj in query.execute()]
         return View(database=self, pages=pages, query=query, live_update=live_update)
 
-    def add_page(self):
+    def create_page(self):
         raise NotImplementedError
 
-    def remove_page(self):
-        raise NotImplementedError
-
-    # ToDo: Implement this and return view.
-    # def query(
-    #     self,
-    #     *,
-    #     db_id: Optional[str] = None,
-    #     db_name: Optional[str] = None,
-    #     live_updates=True,
-    # ) -> QueryBuilder:
-    #     db_obj = self.get_db(db_id=db_id, db_name=db_name)
-    #
-    #     if live_updates:
-    #         cpage = connected_page(session=self, source_db=db_obj)
-    #         return cpage.query()
-    #     else:
-    #         return self.databases.query(db_id)
+    def query(self) -> QueryBuilder:
+        """Query a (large) database for pages in a more specific way"""
+        return QueryBuilder(self)

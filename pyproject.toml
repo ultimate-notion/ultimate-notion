@@ -12,7 +12,7 @@ description = "The ultimate Python library for Notion!"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-keywords = ["notion"]
+keywords = ["notion", "notion client"]
 authors = [
     { name = "Florian Wilhelm", email = "Florian.Wilhelm@gmail.com" },
 ]
@@ -25,7 +25,7 @@ classifiers = [
 ]
 dependencies = [
     "notion-client",
-    "notional",
+    "notional>=0.8",
     "tabulate",
     "cachetools",
     "numpy",
@@ -271,7 +271,7 @@ style = [
 ]
 fmt = [
     "black {args:.}",
-    "autoflake --in-place --remove-all-unused-imports --remove-unused-variables {args:.}",
+    "autoflake --recursive --in-place --remove-all-unused-imports --remove-unused-variables {args:.}",
     "ruff --fix {args:.}",
     "style",
 ]

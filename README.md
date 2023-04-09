@@ -44,14 +44,15 @@ Ultimate-Notion is distributed under the terms of the [MIT](https://spdx.org/lic
 ## Credits
 
 To start this project off a lot of inspiration and code was taken from [hatch] and [notional]. Ultimate Notion makes
-heavy use of [notional] and is a more user-friendly layer on top of it, just the same way that [notional] is a layer
-on top of the excellent [notion-sdk-py].
+heavy use of [notional] and aims at being a more user-friendly layer on top of it, just the same way that [notional] is
+a layer on top of the excellent [notion-sdk-py].
 
 ## ToDos:
 
 * Implement the capability to get the url from any reference
 * Implement the creation and filling of a database to make writing unit tests easier
 * Implement setting attributes
+* Be listed here: https://github.com/spencerpauly/awesome-notion
 
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/

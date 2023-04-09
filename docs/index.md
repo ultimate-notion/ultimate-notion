@@ -1,6 +1,6 @@
 # ​
 
-![Ultimate-Notion logo](assets/images/logo_with_text.svg){: style="height:200px; display:block; margin-left:auto; margin-right:auto;"}
+![Ultimate Notion logo](assets/images/logo_with_text.svg){: style="height:200px; display:block; margin-left:auto; margin-right:auto;"}
 
 <br>
 
@@ -11,14 +11,28 @@ pages in the most convenient and pythonic way.
 
 ## Features
 
-- Databases:
-  - [x] create & delete
-  - [ ] add & remove pages
-- [ ] ...
+- working with databases:
+  - [x] searching & retrieving databases by name and id
+  - [x] creating new databases and deleting them
+  - [ ] modifying properties of contained pages
+  - [ ] archiving and creating new pages using the schema of the database
+  - [ ] having an easy-to-use sorted & filtered, *view* on the database, e.g. in [Jupyter Lab]
+  - [ ] update the attributes or schema of a database
+- working with pages:
+  - [ ] searching & retrieving pages by name and id
+  - [ ] modifying the attributes of pages, i.e. title, icon, etc.
+  - [ ] modifying the blocks, e.g. headlines, bulleted lists, etc. of pages
+  - [ ] viewing the content of pages in different formats, e.g. [Markdown]
+- working with users:
+  - [x] list all users and self identify
+  - [x] retrieve a user and its properties
+- working with comments:
+  - [ ] creating a comment
+  - [ ] retrieving a comment
 
 ## License
 
-Ultimate-Notion is distributed under the terms of the [MIT] license.
+Ultimate Notion is distributed under the terms of the [MIT] license.
 
 ## Navigation
 

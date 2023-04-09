@@ -1,9 +1,4 @@
-"""Page object
-
-ToDo:
-    * make use of ObjectReference and wrap it own function
-
-"""
+"""Page object"""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any

@@ -18,7 +18,7 @@ from ultimate_notion.database import Database
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PropertyObject
 from ultimate_notion.user import User
-from ultimate_notion.utils import ObjRef, SList, make_obj_ref
+from ultimate_notion.utils import ObjRef, SList, get_uuid
 
 _log = logging.getLogger(__name__)
 ENV_NOTION_AUTH_TOKEN = 'NOTION_AUTH_TOKEN'
@@ -111,10 +111,9 @@ class Session:
         db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema)
         return Database(db_ref=db, session=self)
 
-    def delete_db(self, db: ObjRef | Database):
-        """Delete a database"""
-        db_uuid = db.id if isinstance(db, Database) else make_obj_ref(db).id
-        return self.notional.blocks.delete(db_uuid)
+    def delete_db(self, db_ref: Database | ObjRef):
+        db_uuid = db_ref.id if isinstance(db_ref, Database) else get_uuid(db_ref)
+        self.notional.blocks.delete(db_uuid)
 
     def search_db(
         self, db_name: str | None = None, *, exact: bool = True, parents: Iterable[str] | None = None
@@ -145,7 +144,7 @@ class Session:
 
     def get_db(self, db_ref: ObjRef) -> Database:
         """Retrieve Notional database block by uuid"""
-        db_uuid = make_obj_ref(db_ref).id
+        db_uuid = get_uuid(db_ref)
         return Database(db_ref=self._get_db(db_uuid), session=self)
 
     def search_page(
@@ -176,14 +175,14 @@ class Session:
         return self.notional.pages.retrieve(uuid)
 
     def get_page(self, page_ref: ObjRef) -> Page:
-        page_uuid = make_obj_ref(page_ref).id
+        page_uuid = get_uuid(page_ref)
         return Page(page_ref=self._get_page(page_uuid), session=self)
 
     def _get_user(self, uuid: UUID) -> types.User:
         return self.notional.users.retrieve(uuid)
 
     def get_user(self, user_ref: ObjRef) -> User:
-        user_uuid = make_obj_ref(user_ref).id
+        user_uuid = get_uuid(user_ref)
         return User(obj_ref=self.notional.users.retrieve(user_uuid))
 
     def whoami(self) -> User:

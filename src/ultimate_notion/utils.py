@@ -8,7 +8,7 @@ import numpy as np
 from notional import types
 
 T = TypeVar('T')
-ObjRef: TypeAlias = UUID | str | types.ParentRef | types.GenericObject
+ObjRef: TypeAlias = UUID | str
 
 
 class SList(list[T]):
@@ -154,9 +154,12 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int
     return clone
 
 
-def make_obj_ref(obj: ObjRef):
-    """Makes a general-purpose object reference with id and url in the Notion API"""
-    return types.ObjectReference[obj]
+def get_uuid(obj: ObjRef | types.ParentRef | types.GenericObject) -> UUID:
+    """Retrieves a UUID from an object reference using Notional
+
+    Only meant for internal use.
+    """
+    return types.ObjectReference[obj].id
 
 
 def schema2prop_type(schema_type: str) -> type[types.PropertyValue]:
