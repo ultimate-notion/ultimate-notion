@@ -1,12 +1,13 @@
 """Page object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal, overload
 
+from notion2md.exporter.block import StringExporter
 from notional import blocks, types
 
 from ultimate_notion.record import Record
-from ultimate_notion.utils import deepcopy_with_sharing, schema2prop_type
+from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook, schema2prop_type
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -22,24 +23,65 @@ class Page(Record):
         self.session = session
         self.live_update = live_update
 
+    # ToDo: Build a real hierarchy of Pages and Blocks here
+    #     self._children = list(self.session.notional.blocks.children.list(parent=self.obj_ref))
+    #
+    # @property
+    # def children(self) -> List[blocks.Block]:
+    #     """Return all blocks belonging to this page"""
+    #     return self._children
+
     @property
     def database(self) -> Database | None:
         """Retrieve database from parent or None"""
         if not isinstance(self.parent, types.DatabaseRef):
             return None
         else:
-            return self.session.get_db(self.parent)
+            return self.session.get_db(get_uuid(self.parent))
 
     @property
     def title(self) -> str:
         return self.obj_ref.Title
 
-    def __str__(self):
-        return self.title
+    def markdown(self) -> str:
+        """Return the content of the page as Markdown"""
+        md = f'# {self.title}\n'
+        # ToDo: This retrieves the content again, could be done internally.
+        #       Also notion2md is quiet buggy in generating MD and notion2markdown is better but hard to use.
+        md += StringExporter(block_id=str(self.id)).export()
+        return md
+
+    @overload
+    def show(self, *, display: Literal[False]) -> str:
+        ...
+
+    @overload
+    def show(self, *, display: Literal[True]) -> None:
+        ...
+
+    @overload
+    def show(self, *, display: None) -> str | None:
+        ...
+
+    def show(self, *, display=None):
+        """Show the content of the page as markdown, rendered in Jupyter Lab"""
+        if display is None:
+            display = is_notebook()
+
+        md = self.markdown()
+        if display:
+            from IPython.core.display import display_markdown
+
+            display_markdown(md, raw=True)
+        else:
+            return md
+
+    def __str__(self) -> str:
+        return self.show(display=False)
 
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{str(self)}' at {hex(id(self))}>"
+        return f"<{cls_name}: '{self.title}' at {hex(id(self))}>"
 
     @property
     def icon(self) -> str:
@@ -53,8 +95,12 @@ class Page(Record):
             raise RuntimeError(msg)
 
     @property
-    def properties(self) -> dict[str, types.PropertyValue]:
-        return self.obj_ref.properties
+    def properties(self) -> dict[str, Any]:
+        """Return page properties as dictionary"""
+        dct = super().to_dict()  # meta properties
+        for k in self.obj_ref.properties:
+            dct[k] = self[k]
+        return dct
 
     def clone(self) -> Page:
         return deepcopy_with_sharing(self, shared_attributes=['session'])
@@ -106,9 +152,3 @@ class Page(Record):
     def __delitem__(self, key):
         # ToDo: Implement me!
         pass
-
-    def to_dict(self) -> dict[str, Any]:
-        dct = super().to_dict()  # meta properties
-        for k in self.properties:
-            dct[k] = self[k]
-        return dct

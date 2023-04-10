@@ -108,7 +108,7 @@ class View:
                 row[title_idx] = f'<img src="{page.icon}" style="height:1.2em">'
         return rows
 
-    def show(self, html: bool | None = None):
+    def show(self, *, html: bool | None = None):
         """Show the view
 
         Args:
