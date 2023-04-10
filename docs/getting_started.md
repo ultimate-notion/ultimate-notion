@@ -7,7 +7,7 @@ and so on.
 An important and special block is the *database*, which may be  within a page, i.e. *inline*,
 or at the same hierarchy level as a *page*. A *database* has a *schema*, that specifies various structured *properties*
 of the individual pages contained in that database. Only pages contained in a database have properties. Notion itself
-also offers *linked databases* (with ↗ next to the database title) but those are not accessible via the API thus you must
+also offers *linked databases* (with ↗ next to the database title) but those are not accessible via the API, thus you must
 always work with the source database.
 
 Regardless of the properties, each page has *attributes* such as a title, cover, icon, or whether it is archived or not. The *title*
