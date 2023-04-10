@@ -96,8 +96,11 @@ class Page(Record):
 
     @property
     def properties(self) -> dict[str, Any]:
-        """Return page properties as dictionary"""
-        dct = super().to_dict()  # meta properties
+        """Page properties as dictionary.
+
+        This includes properties defined by a database schema as well as meta properties like creation time, etc.
+        """
+        dct = super().properties  # meta properties
         for k in self.obj_ref.properties:
             dct[k] = self[k]
         return dct

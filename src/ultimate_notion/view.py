@@ -77,7 +77,6 @@ class View:
 
     def row(self, idx: int) -> list[Any]:
         page = self.page(idx)
-        page_dct = page.to_dict()
         row: list[Any] = []
         for col in self.columns:
             if col == self._title_col:
@@ -89,7 +88,7 @@ class View:
             elif col == self._icon_name:
                 row.append(page.icon)
             else:
-                row.append(page_dct[col])
+                row.append(page.properties[col])
         return row
 
     def rows(self) -> list[list[Any]]:

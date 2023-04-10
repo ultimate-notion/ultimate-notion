@@ -49,7 +49,8 @@ class Record:
     def url(self) -> str:
         return get_url(str(self.id))
 
-    def to_dict(self) -> dict[str, Any]:
+    @property
+    def properties(self) -> dict[str, Any]:
         return {
             'id': self.id,
             'created_time': self.created_time,

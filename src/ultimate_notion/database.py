@@ -1,7 +1,7 @@
 """Database object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from notional import blocks, types
 from notional.schema import PropertyObject
@@ -43,10 +43,6 @@ class Database(Record):
     @property
     def cover(self) -> types.FileObject | None:
         return self.obj_ref.cover
-
-    @property
-    def meta_properties(self) -> dict[str, Any]:
-        return super().to_dict()
 
     @property
     def schema(self) -> dict[str, PropertyObject]:
