@@ -11,22 +11,22 @@ pages in the most convenient and pythonic way.
 
 ## Features
 
-- working with databases:
+#### Databases:
   - [x] searching & retrieving databases by name and id
   - [x] creating new databases and deleting them
   - [ ] modifying properties of contained pages
   - [ ] archiving and creating new pages using the schema of the database
   - [ ] having an easy-to-use sorted & filtered, *view* on the database, e.g. in [Jupyter Lab]
   - [ ] update the attributes or schema of a database
-- working with pages:
+#### Pages:
   - [ ] searching & retrieving pages by name and id
   - [ ] modifying the attributes of pages, i.e. title, icon, etc.
   - [ ] modifying the blocks, e.g. headlines, bulleted lists, etc. of pages
   - [ ] viewing the content of pages in different formats, e.g. [Markdown]
-- working with users:
+#### Users:
   - [x] list all users and self identify
   - [x] retrieve a user and its properties
-- working with comments:
+#### Comments:
   - [ ] creating a comment
   - [ ] retrieving a comment
 

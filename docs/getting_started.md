@@ -24,10 +24,12 @@ be only granted to pages, not to complete workspaces encompassing all pages.
 To identify a page, block, user, comment or even a property, Notion assigns each of them a universally unique identifier (UUID).
 Using for instance, the uuid of a database instead of its title, always you to reference it in your code even after someone
 changed its title. The UUIDs of pages and databases can be retrieved by using the web interface of Notion or using
-<kbd>Copy link<kbd> from the <kbd>···</kbd> Menu in the upper right corner. The link will have the schema:
+<kbd>Copy link</kbd> from the <kbd>···</kbd>-menu in the upper right corner. The link will have the schema:
 ```
 https://www.notion.so/{Title}-{UUID}
 ```
+UUIDs of other entities like blocks, properties, users etc. can only be retrieved via the API. Ultimate Notion provides
+an `id`-property on most of its object for that.
 
 ## Installation
 
