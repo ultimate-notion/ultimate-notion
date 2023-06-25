@@ -53,14 +53,11 @@ that any documentation update is done in the same way was a code contribution.
       which changes have you made and what are the motivations behind them and
       submit your proposal.
 
-
 When working on documentation changes in your local machine, you can
 build and serve them using [hatch] with `hatch run docs:build` and
 `hatch run docs:serve`, respectively.
 
-
 ## Code Contributions
-
 
 ### Submit an issue
 
@@ -76,17 +73,20 @@ This often provides additional considerations and avoids unnecessary work.
    page. This creates a copy of the code under your account on GitHub.
 
 3. Clone this copy to your local disk:
-   ```
+
+   ```console
    git clone git@github.com:YourLogin/ultimate-notion.git
    cd ultimate-notion
    ```
 
 4. Make sure [hatch] is installed using [pipx]:
+
    ```
    pipx install hatch
    ```
 
 5. \[only once\] install [pre-commit] hooks in the default environment with:
+
    ```
    hatch run pre-commit install
    ```
@@ -94,9 +94,11 @@ This often provides additional considerations and avoids unnecessary work.
 ### Implement your changes
 
 1. Create a branch to hold your changes:
-   ```
+
+   ```console
    git checkout -b my-feature
    ```
+
    and start making changes. Never work on the main branch!
 
 2. Start your work on this branch. Don't forget to add [docstrings] in [Google style]
@@ -105,12 +107,14 @@ This often provides additional considerations and avoids unnecessary work.
 3. Add yourself to the list of contributors in `AUTHORS.md`.
 
 4. When you’re done editing, do:
+
    ```
    git add <MODIFIED FILES>
    git commit
    ```
+
    to record your changes in [git].
-   <br>
+
    Please make sure to see the validation messages from [pre-commit] and fix
    any eventual issues.
    This should automatically use [flake8]/[black] to check/fix the code style
@@ -146,28 +150,20 @@ This often provides additional considerations and avoids unnecessary work.
    the PR as a draft first and mark it as ready for review after the feedbacks
    from the continuous integration (CI) system or any required fixes.
 
-
 [^contrib1]: Even though, these resources focus on open source projects and
     communities, the general ideas behind collaborating with other developers
     to collectively create software are general and can be applied to all sorts
     of environments, including private companies and proprietary code bases.
 
-
 [black]: https://pypi.org/project/black/
 [contribution-guide.org]: http://www.contribution-guide.org/
 [creating a PR]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
-[descriptive commit message]: https://chris.beams.io/posts/git-commit
 [docstrings]: https://peps.python.org/pep-0257/
 [flake8]: https://flake8.pycqa.org/en/stable/
 [git]: https://git-scm.com
 [github web interface]: https://docs.github.com/en/github/managing-files-in-a-repository/managing-files-on-github/editing-files-in-your-repository
-[github's code editor]: https://docs.github.com/en/github/managing-files-in-a-repository/managing-files-on-github/editing-files-in-your-repository
-[github's fork and pull request workflow]: https://guides.github.com/activities/forking/
-[guide created by freecodecamp]: https://github.com/freecodecamp/how-to-contribute-to-open-source
 [other kinds of contributions]: https://opensource.guide/how-to-contribute
 [pre-commit]: https://pre-commit.com/
 [pipx]: https://pypa.github.io/pipx/
-[pytest can drop you]: https://docs.pytest.org/en/stable/usage.html#dropping-to-pdb-python-debugger-at-the-start-of-a-test
 [python software foundation's code of conduct]: https://www.python.org/psf/conduct/
-[tox]: https://tox.readthedocs.io/en/stable/
 [Google style]: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
