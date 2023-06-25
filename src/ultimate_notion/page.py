@@ -62,7 +62,7 @@ class Page(Record):
         ...
 
     @overload
-    def show(self, *, display: None) -> str | None:
+    def show(self) -> str | None:
         ...
 
     def show(self, *, display=None):

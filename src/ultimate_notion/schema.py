@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from notional import schema
 
@@ -138,8 +138,8 @@ class PropertyType:
 
     obj_ref: schema.PropertyObject
 
-    _notional_type_map: dict[type[schema.PropertyObject], type[PropertyType]] = {}
-    _has_compose: dict[type[schema.PropertyObject], bool] = {}
+    _notional_type_map: ClassVar[dict[type[schema.PropertyObject], type[PropertyType]]] = {}
+    _has_compose: ClassVar[dict[type[schema.PropertyObject], bool]] = {}
 
     @property
     def id(self):  # noqa: A003
