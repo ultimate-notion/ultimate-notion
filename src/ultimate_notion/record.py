@@ -1,16 +1,32 @@
-"""Core building block is a Record"""
+"""Core building blocks for pages and databases"""
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from notion_client.helpers import get_url
 from notional import blocks, types
 
+if TYPE_CHECKING:
+    from ultimate_notion.session import Session
+
 
 class Record:
     """The base type for all Notion objects."""
 
-    obj_ref: blocks.DataRecord = None
+    obj_ref: blocks.DataRecord
+
+    def __init__(self, obj_ref):
+        """Notional object reference for dispatch"""
+        self.obj_ref = obj_ref
+
+    @property
+    def session(self) -> Session:
+        """Return the currently active session"""
+        from ultimate_notion.session import Session
+
+        return Session.get_active()
 
     @property
     def id(self) -> UUID:  # noqa: A003

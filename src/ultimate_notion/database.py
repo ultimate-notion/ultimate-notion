@@ -1,8 +1,6 @@
 """Database object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from notional import blocks, types
 from notional.schema import PropertyObject
 
@@ -11,21 +9,19 @@ from ultimate_notion.query import QueryBuilder
 from ultimate_notion.record import Record
 from ultimate_notion.view import View
 
-if TYPE_CHECKING:
-    from ultimate_notion.session import Session
-
 
 class Database(Record):
-    def __init__(self, db_ref: blocks.Database, session: Session):
-        self.obj_ref: blocks.Database = db_ref
-        self.session: Session = session
+    obj_ref: blocks.Database
+
+    def __init__(self, obj_ref: blocks.Database):
+        super().__init__(obj_ref)
 
     def __str__(self):
         return self.title
 
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{str(self)}' at {hex(id(self))}>"
+        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
 
     @property
     def title(self) -> str:
@@ -49,6 +45,8 @@ class Database(Record):
         # ToDo: Wrap these properties in our schema props from `.schema` to avoid confusion
         return self.obj_ref.properties
 
+    # ToDo: Have a setter method for schema too?
+
     @property
     def url(self) -> str:
         return self.obj_ref.url
@@ -65,12 +63,20 @@ class Database(Record):
         """Delete this database"""
         self.session.delete_db(self)
 
+    def _pages_from_query(self, *, query, live_update: bool = True) -> list[Page]:
+        pages = [Page(page_obj) for page_obj in query.execute()]
+        for page in pages:
+            page.live_update = live_update
+        return pages
+
     def view(self, *, live_update: bool = True) -> View:
         query = self.session.notional.databases.query(self.id)
-        pages = [Page(page_obj, self.session, live_update=live_update) for page_obj in query.execute()]
+        pages = self._pages_from_query(query=query, live_update=live_update)
         return View(database=self, pages=pages, query=query, live_update=live_update)
 
-    def create_page(self):
+    def create_page(self, *, live_update: bool = True):
+        """Return page object"""
+        # ToDo: Use Schema for this.
         raise NotImplementedError
 
     def query(self) -> QueryBuilder:

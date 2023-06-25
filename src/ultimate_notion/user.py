@@ -12,7 +12,7 @@ class User:
 
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{str(self)}' at {hex(id(self))}>"
+        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
 
     def __eq__(self, other):
         return self.id == other.id

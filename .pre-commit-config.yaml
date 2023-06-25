@@ -40,4 +40,5 @@ repos:
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: ''  # Use the sha / tag you want to point at
   hooks:
-    -   id: mypy
+    - id: mypy
+      additional_dependencies: [types-tabulate, types-cachetools]

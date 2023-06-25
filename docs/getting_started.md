@@ -19,25 +19,27 @@ A page, e.g. with title "child-page", can be contained in another page, e.g. wit
 hierarchy that is typically used for structuring content. We say that "parent-page" is the *parent* of "child-page" and
 "child-page" is one of the *children* of "parent-page". A page at the root of the workspace has the workspace itself as parent.
 This concept is important as access permissions for integrations are inherited from parent pages. Permissions can
-be only granted to pages, not to complete workspaces encompassing all pages.
+only be granted to pages, not to complete workspaces encompassing all pages.
 
 To identify a page, block, user, comment or even a property, Notion assigns each of them a universally unique identifier (UUID),
 which is composed of 32 hexadecimal digits, potentially structured in various fields by a dash, i.e. `-`.
 Using for instance, the uuid of a database instead of its title, always you to reference it in your code even after someone
 changed its title. The UUIDs of pages and databases can be retrieved by using the web interface of Notion or using
 <kbd>Copy link</kbd> from the <kbd>···</kbd>-menu in the upper right corner. The link will have the schema:
-```
-https://www.notion.so/{Title}-{UUID}?{PARAMS}
-```
+
+    https://www.notion.so/{Title}-{UUID}?{PARAMS}
+
 UUIDs of other entities like blocks, properties, users etc. can only be retrieved via the API. Ultimate Notion provides
-an `id`-property on most of its object for that.
+an `id`-property on most of its objects for that.
 
 ## Installation
 
 To install Ultimate Notion simple run:
-```commandline
+
+```console
 pip install ultimate-notion
 ```
+
 Ultimate Notion needs at least Pyton 3.10. Depending on your system, you might need to use [pyenv], [conda], etc. to
 install a more recent version.
 

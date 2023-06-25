@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import os
 from collections.abc import Iterable
+from threading import RLock
 from types import TracebackType
 from typing import Any
 from uuid import UUID
@@ -16,7 +17,7 @@ from notional.session import Session as NotionalSession
 
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
-from ultimate_notion.schema import PropertyObject
+from ultimate_notion.schema import PropertyType
 from ultimate_notion.user import User
 from ultimate_notion.utils import ObjRef, SList, get_uuid
 
@@ -33,7 +34,13 @@ class SessionError(Exception):
 
 
 class Session:
-    """A session for the Notion API"""
+    """A session for the Notion API
+
+    This is a singleton
+    """
+
+    _active_session: Session | None = None
+    _lock = RLock()
 
     def __init__(self, auth: str | None = None, **kwargs: Any):
         """Initialize the `Session` object and the Notional endpoints.
@@ -49,6 +56,8 @@ class Session:
                 msg = f'Either pass `auth` or set {ENV_NOTION_AUTH_TOKEN}'
                 raise RuntimeError(msg)
 
+        _log.debug('Initializing Notion session...')
+        Session._ensure_initialized(self)
         self.notional = NotionalSession(auth=auth, **kwargs)
 
         # prepare API methods for decoration
@@ -58,6 +67,25 @@ class Session:
         self._get_user_unwrapped = self._get_user
         self.set_cache()
         _log.info('Initialized Notion session')
+
+    @classmethod
+    def _ensure_initialized(cls, instance: Session):
+        with Session._lock:
+            if Session._active_session and Session._active_session is not instance:
+                msg = 'Cannot initialize multiple Sessions at once'
+                raise ValueError(msg)
+            else:
+                Session._active_session = instance
+
+    @classmethod
+    def get_active(cls):
+        """Return the current active session or raise"""
+        with Session._lock:
+            if Session._active_session:
+                return Session._active_session
+            else:
+                msg = 'There is no activate Session'
+                raise ValueError(msg)
 
     def set_cache(self, ttl=30, maxsize=1024):
         wrapper = cached(cache=TTLCache(maxsize=maxsize, ttl=ttl))
@@ -79,10 +107,12 @@ class Session:
     ) -> None:
         _log.debug('Closing connection to Notion...')
         self.notional.client.__exit__(exc_type, exc_value, traceback)
+        Session._active_session = None
 
     def close(self):
         """Close the session and release resources."""
         self.notional.client.close()
+        Session._active_session = None
 
     def raise_for_status(self):
         """Confirm that the session is active and raise otherwise.
@@ -105,11 +135,11 @@ class Session:
         if error is not None:
             raise SessionError(error)
 
-    def create_db(self, parent_page: Page, schema: dict[str, PropertyObject], title=None) -> Database:
+    def create_db(self, parent_page: Page, schema: dict[str, PropertyType], title=None) -> Database:
         """Create a new database"""
         schema = {k: v.obj_ref for k, v in schema.items()}
         db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema)
-        return Database(db_ref=db, session=self)
+        return Database(obj_ref=db)
 
     def delete_db(self, db_ref: Database | ObjRef):
         db_uuid = db_ref.id if isinstance(db_ref, Database) else get_uuid(db_ref)
@@ -130,7 +160,7 @@ class Session:
             raise NotImplementedError
 
         query = self.notional.search(db_name).filter(property='object', value='database')
-        dbs = SList(Database(db_ref=db, session=self) for db in query.execute())
+        dbs = SList(Database(obj_ref=db) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
         return dbs
@@ -145,7 +175,7 @@ class Session:
     def get_db(self, db_ref: ObjRef) -> Database:
         """Retrieve Notional database block by uuid"""
         db_uuid = get_uuid(db_ref)
-        return Database(db_ref=self._get_db(db_uuid), session=self)
+        return Database(obj_ref=self._get_db(db_uuid))
 
     def search_page(
         self, page_name: str | None = None, *, exact: bool = True, parents: Iterable[str] | None = None
@@ -162,7 +192,7 @@ class Session:
             raise NotImplementedError
 
         query = self.notional.search(page_name).filter(property='object', value='page')
-        pages = SList(Page(page_ref=page, session=self) for page in query.execute())
+        pages = SList(Page(obj_ref=page) for page in query.execute())
         if exact and page_name is not None:
             pages = SList(page for page in pages if page.title == page_name)
         return pages
@@ -176,7 +206,7 @@ class Session:
 
     def get_page(self, page_ref: ObjRef) -> Page:
         page_uuid = get_uuid(page_ref)
-        return Page(page_ref=self._get_page(page_uuid), session=self)
+        return Page(obj_ref=self._get_page(page_uuid))
 
     def _get_user(self, uuid: UUID) -> types.User:
         return self.notional.users.retrieve(uuid)

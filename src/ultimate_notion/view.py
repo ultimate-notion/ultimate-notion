@@ -294,7 +294,5 @@ class View:
     def reload(self) -> View:
         """Reload all pages by re-executing the query that generated the view"""
         view = self.clone()
-        view._pages = [
-            Page(page_obj, self.database.session, live_update=self._live_update) for page_obj in self._query.execute()
-        ]
+        view._pages = self.database._pages_from_query(query=self._query, live_update=self._live_update)
         return view

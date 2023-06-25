@@ -4,24 +4,26 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from notion2md.exporter.block import StringExporter
-from notional import blocks, types
+from notional import types
 
 from ultimate_notion.record import Record
 from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook, schema2prop_type
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-    from ultimate_notion.session import Session
 
 # ToDo:
 #   * use the schema of the database to see which properties are writeable at all.
 
 
+class Properties:
+    """Properties namespace for a page"""
+
+    ...
+
+
 class Page(Record):
-    def __init__(self, page_ref: blocks.Page, session: Session, *, live_update: bool = True):
-        self.obj_ref: blocks.Page = page_ref
-        self.session = session
-        self.live_update = live_update
+    live_update: bool = True
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     #     self._children = list(self.session.notional.blocks.children.list(parent=self.obj_ref))

@@ -1,9 +1,56 @@
 """Functionality around defining a database schema"""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
+from typing import TYPE_CHECKING, Any
 
 from notional import schema
+
+if TYPE_CHECKING:
+    pass
+
+
+class PageSchema:
+    @classmethod
+    def to_dict(cls) -> dict[str, PropertyType]:
+        return {prop.name: prop.type for prop in cls.__dict__.values() if isinstance(prop, Property)}
+
+    @classmethod
+    def create(cls, **kwargs):
+        """Create a page using this schema"""
+        # ToDo: Next Step
+        # """Create a new instance of the ConnectedPage type.
+
+        # Any properties that support object composition may be defined in `kwargs`.
+
+        # This operation takes place on the Notion server, creating the page immediately.
+
+        # :param kwargs: the properties to initialize for this object as parameters, i.e.
+        #   `name=value`, where `name` is the attribute in the custom type and `value` is
+        #   a supported type for composing.
+        # """
+
+        # if cls._notional__session is None:
+        #     raise ValueError("Cannot create Page; invalid session")
+
+        # if cls._notional__database is None:
+        #     raise ValueError("Cannot create Page; invalid database")
+
+        # logger.debug("creating new %s :: %s", cls, cls._notional__database)
+        # parent = DatabaseRef(database_id=cls._notional__database)
+
+        # page = cls._notional__session.pages.create(parent=parent)
+        # logger.debug("=> connected page :: %s", page.id)
+
+        # connected = cls(page)
+
+        # # FIXME it would be better to convert properties to a dict and pass to the API,
+        # # rather than setting them individually here...
+        # for name, value in kwargs.items():
+        #     setattr(connected, name, value)
+
+        # return connected
 
 
 class Function(str, Enum):
@@ -83,10 +130,16 @@ class NumberFormat(str, Enum):
     URUGUAYAN_PESO = 'uruguayan_peso'
 
 
-class PropertyObject:
-    """Base class for Notion property objects."""
+class PropertyType:
+    """Base class for Notion property objects.
+
+    Used to map our objects to Notional objects.
+    """
 
     obj_ref: schema.PropertyObject
+
+    _notional_type_map: dict[type[schema.PropertyObject], type[PropertyType]] = {}
+    _has_compose: dict[type[schema.PropertyObject], bool] = {}
 
     @property
     def id(self):  # noqa: A003
@@ -96,26 +149,46 @@ class PropertyObject:
     def name(self):
         return self.obj_ref.name
 
+    @property
+    def _notional_type_map_inv(self) -> dict[type[PropertyType], type[schema.PropertyObject]]:
+        return {v: k for k, v in self._notional_type_map.items()}
 
-class Title(PropertyObject):
+    def __init_subclass__(cls, type: type[schema.PropertyObject], **kwargs: Any):  # noqa: A002
+        super().__init_subclass__(**kwargs)
+        cls._notional_type_map[type] = cls
+        cls._has_compose[type] = hasattr(type, '__compose__')
+
+    def __init__(self, *args, **kwargs):
+        notional_type = self._notional_type_map_inv[self.__class__]
+        if self._has_compose[notional_type]:
+            assert not kwargs  # noqa: S101
+            self.obj_ref = notional_type[args]
+        else:
+            assert not args  # noqa: S101
+            self.obj_ref = notional_type(**kwargs)
+
+
+@dataclass
+class Property:
+    """Property for defining a Notion database schema"""
+
+    name: str
+    type: PropertyType  # noqa: A003
+
+
+class Title(PropertyType, type=schema.Title):
     """Mandatory Title property"""
 
-    def __init__(self):
-        self.obj_ref = schema.Title()
 
-
-class Text(PropertyObject):
+class Text(PropertyType, type=schema.RichText):
     """Text property"""
 
-    def __init__(self):
-        self.obj_ref = schema.RichText()
 
-
-class Number(PropertyObject):
+class Number(PropertyType, type=schema.Number):
     """Mandatory Title property"""
 
     def __init__(self, number_format: NumberFormat):
-        self.obj_ref = schema.Number[number_format]
+        super().__init__(number_format)
 
 
 #

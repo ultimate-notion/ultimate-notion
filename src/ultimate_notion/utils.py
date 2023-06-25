@@ -170,3 +170,8 @@ def schema2prop_type(schema_type: str) -> type[types.PropertyValue]:
             The name is defined in `name` in the classes of `notional.schema`.
     """
     return types.PropertyValue.__notional_typemap__[schema_type]
+
+
+def wait_until_exists(obj: ObjRef):
+    """Wait until object exists after creation"""
+    # ToDo: Implement me

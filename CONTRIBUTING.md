@@ -33,8 +33,8 @@ you help us to identify the root cause of the issue.
 
 ## Documentation improvements
 
-You can help improve the documentation of Ultimate Notion by making them more readable and coherent, or
-by adding missing information and correcting mistakes.
+You can help improve the documentation of Ultimate Notion by making them more readable
+and coherent, or by adding missing information and correcting mistakes.
 
 This documentation uses [mkdocs] as its main documentation compiler.
 This means that the docs are kept in the same repository as the project code, and
@@ -81,13 +81,13 @@ This often provides additional considerations and avoids unnecessary work.
 
 4. Make sure [hatch] is installed using [pipx]:
 
-   ```
+   ```console
    pipx install hatch
    ```
 
 5. \[only once\] install [pre-commit] hooks in the default environment with:
 
-   ```
+   ```console
    hatch run pre-commit install
    ```
 
@@ -108,7 +108,7 @@ This often provides additional considerations and avoids unnecessary work.
 
 4. When you’re done editing, do:
 
-   ```
+   ```console
    git add <MODIFIED FILES>
    git commit
    ```
@@ -139,7 +139,7 @@ This often provides additional considerations and avoids unnecessary work.
 
 1. If everything works fine, push your local branch to the remote server with:
 
-   ```
+   ```console
    git push -u origin my-feature
    ```
 
