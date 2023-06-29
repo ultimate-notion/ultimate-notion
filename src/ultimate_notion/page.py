@@ -7,7 +7,7 @@ from notion2md.exporter.block import StringExporter
 from notional import types
 
 from ultimate_notion.record import Record
-from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook, schema2prop_type
+from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -133,26 +133,18 @@ class Page(Record):
             raise RuntimeError(msg)
         return val
 
-    def _get_prop_type(self, property_name: str) -> type[types.PropertyValue]:
-        db = self.database
-        if db is None:
-            msg = 'this page is not within a database'
-            raise RuntimeError(msg)
-        return schema2prop_type(db.schema[property_name].type)
-
     def __setitem__(self, property_name: str, value: Any):
-        value_type = self._get_prop_type(property_name)
-        if isinstance(value, value_type):
-            prop = value
-        elif hasattr(value_type, '__compose__'):
-            prop = value_type[value]
-        else:
-            msg = f'Unsupported value type for {value_type.type}'
-            raise TypeError(msg)
+        if not self.database:
+            msg = 'This page is not within a database'
+            raise RuntimeError(msg)
+
+        value_type = type(self.database.schema.to_dict()[property_name])
+        prop = value_type(value)
+        self.obj_ref[property_name] = prop.obj_ref
 
         if self.live_update:
             # update the property on the server (which will refresh the local data)
-            self.session.notional.pages.update(self.obj_ref, **{property_name: prop})
+            self.session.notional.pages.update(self.obj_ref, **{property_name: self.obj_ref[property_name]})
 
     def __delitem__(self, key):
         # ToDo: Implement me!

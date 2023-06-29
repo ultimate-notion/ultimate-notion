@@ -3,7 +3,8 @@ import pytest
 
 
 @pytest.mark.webtest
-def test_select(view):
+def test_select(contacts_db):
+    view = contacts_db.view()
     sub_view = view.select('Name', 'Role')
     assert sub_view.columns == ['Name', 'Role']
     sub_view = view.select(['Name', 'Role'])
@@ -19,7 +20,8 @@ def test_select(view):
 
 
 @pytest.mark.webtest
-def test_rows(view):
+def test_rows(contacts_db):
+    view = contacts_db.view()
     rows = view.rows()
     assert len(rows) == len(view)
     view = view.select('Name', 'Role')
@@ -30,7 +32,8 @@ def test_rows(view):
 
 
 @pytest.mark.webtest
-def test_index(view):
+def test_index(contacts_db):
+    view = contacts_db.view()
     assert not view.has_index
     view = view.with_index('my_index')
     assert view.has_index

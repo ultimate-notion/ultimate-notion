@@ -1,12 +1,6 @@
 """Fixtures for Ultimate-Notion unit tests.
 
-Some fixtures are considered "connected" since they interact directly with the
-Notion API.  In general, tests using these fixtures should be marked with `vcr`
-to improve performance and ensure reproducibility.
-
-Required environment variables for "connected" fixtures:
-  - `NOTION_AUTH_TOKEN`: the integration token used for testing.
-  - `NOTION_TEST_AREA`: a page ID that can be used for testing
+Set `ENV_NOTION_AUTH_TOKEN` for tests intracting with the Notion API.
 """
 
 import os
@@ -14,6 +8,7 @@ import os
 import pytest
 
 import ultimate_notion
+from ultimate_notion import schema
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 
 
@@ -38,7 +33,7 @@ def vcr_config():
 def notion():
     """Return the notion session used for live testing.
 
-    This fixture depends on the `NOTION_AUTH_TOKEN` environment variable.  If it is not
+    This fixture depends on the `NOTION_AUTH_TOKEN` environment variable. If it is not
     present, this fixture will skip the current test.
     """
     if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
@@ -50,18 +45,26 @@ def notion():
 
 
 @pytest.fixture
-def database(notion):
+def contacts_db(notion):
     """Return a test database"""
     return notion.search_db('Contacts').item()
 
 
 @pytest.fixture
-def view(database):
-    """Return a test view"""
-    return database.view()
+def root_page(notion):
+    """Return the page reference used as parent page for live testing"""
+    return notion.search_page('Tests', exact=True).item()
 
 
 @pytest.fixture
-def parent_page(notion):
-    """Return the page reference used as parent page for live testing"""
-    return notion.search_page('Tests', exact=True).item()
+def simple_db(notion, root_page):
+    """Simple database of articles"""
+
+    class Article(schema.PageSchema):
+        name = schema.Property('Name', schema.Title())
+        cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
+        desc = schema.Property('Description', schema.Text())
+
+    db = notion.create_db(parent_page=root_page, schema=Article, title='Articles')
+    yield db
+    notion.delete_db(db)

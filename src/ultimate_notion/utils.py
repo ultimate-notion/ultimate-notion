@@ -1,11 +1,16 @@
 """Additional utilities that fit nowhere else"""
+from collections.abc import Callable
 from copy import deepcopy
 from functools import wraps
 from typing import Any, TypeAlias, TypeVar
 from uuid import UUID
 
 import numpy as np
+from notion_client.errors import APIResponseError
 from notional import types
+from polling2 import poll
+
+from ultimate_notion.record import Record
 
 T = TypeVar('T')
 ObjRef: TypeAlias = UUID | str
@@ -162,16 +167,26 @@ def get_uuid(obj: ObjRef | types.ParentRef | types.GenericObject) -> UUID:
     return types.ObjectReference[obj].id
 
 
-def schema2prop_type(schema_type: str) -> type[types.PropertyValue]:
-    """Map the name of a schema attribute to the corresponding property type
+def wait_until_exists(record: Record, step: int = 1, timeout: int = 10):
+    """Wait until object exists after creation
 
-    Args:
-        schema_type: name of the schema property, e.g. `status`, `url`, etc.
-            The name is defined in `name` in the classes of `notional.schema`.
+    In most cases, this is not really necessary to use.
     """
-    return types.PropertyValue.__notional_typemap__[schema_type]
+    from ultimate_notion.database import Database
+    from ultimate_notion.page import Page
+
+    poll_func: Callable[[UUID | str], Record]
+    if isinstance(record, Database):
+        poll_func = record.session.get_db
+    elif isinstance(record, Page):
+        poll_func = record.session.get_page
+    else:  # Todo: Should we handle blocks here too?
+        msg = f'Unknown object type: {type(record)}'
+        raise RuntimeError(msg)
+
+    poll(lambda: poll_func(record.id), step=step, timeout=timeout, ignore_exceptions=(APIResponseError,))
 
 
-def wait_until_exists(obj: ObjRef):
-    """Wait until object exists after creation"""
-    # ToDo: Implement me
+def decapitalize(string: str) -> str:
+    """Inverse of capitalize"""
+    return string[0].lower() + string[1:]

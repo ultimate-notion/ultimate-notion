@@ -17,7 +17,7 @@ from notional.session import Session as NotionalSession
 
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
-from ultimate_notion.schema import PropertyType
+from ultimate_notion.schema import PageSchema
 from ultimate_notion.user import User
 from ultimate_notion.utils import ObjRef, SList, get_uuid
 
@@ -119,26 +119,22 @@ class Session:
 
         Raises SessionError if there is a problem, otherwise returns None.
         """
-        error = None
-
         try:
             me = self.whoami()
-
-            if me is None:
-                msg = 'Unable to get current user'
-                raise SessionError(msg)
-        except ConnectError:
-            error = 'Unable to connect to Notion'
+        except ConnectError as err:
+            msg = 'Unable to connect to Notion'
+            raise SessionError(msg) from err
         except APIResponseError as err:
-            error = str(err)
+            msg = 'Invalid API reponse'
+            raise SessionError(msg) from err
+        if me is None:
+            msg = 'Unable to get current user'
+            raise SessionError(msg)
 
-        if error is not None:
-            raise SessionError(error)
-
-    def create_db(self, parent_page: Page, schema: dict[str, PropertyType], title=None) -> Database:
+    def create_db(self, parent_page: Page, schema: type[PageSchema], title=None) -> Database:
         """Create a new database"""
-        schema = {k: v.obj_ref for k, v in schema.items()}
-        db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema)
+        schema_dct = {k: v.obj_ref for k, v in schema.to_dict().items()}
+        db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema_dct)
         return Database(obj_ref=db)
 
     def delete_db(self, db_ref: Database | ObjRef):
@@ -222,3 +218,7 @@ class Session:
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace"""
         return [User(obj_ref=user) for user in self.notional.users.list()]
+
+    def get_block(self, block_ref: ObjRef):
+        # ToDo: Implement me
+        raise NotImplementedError

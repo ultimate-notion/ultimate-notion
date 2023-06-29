@@ -9,11 +9,10 @@ import numpy as np
 import pandas as pd
 from emoji import is_emoji
 from notional.query import QueryBuilder
-from notional.schema import Title
 from tabulate import tabulate
 
 from ultimate_notion.page import Page
-from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
+from ultimate_notion.utils import deepcopy_with_sharing, find_index, find_indices, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -27,7 +26,7 @@ class View:
         self.database = database
         self._live_update = live_update
         self._query = query
-        self._title_col = SList(col for col, val in database.schema.items() if isinstance(val, Title)).item()
+        self._title_col = database.schema.get_title_property_name()
         self._columns = self._get_columns(self._title_col)
         self._pages = np.array(pages)
 
@@ -35,7 +34,7 @@ class View:
 
     def _get_columns(self, title_col: str) -> np.ndarray:
         """Make sure title column is the first columns"""
-        cols = list(self.database.schema.keys())
+        cols = list(self.database.schema.to_dict().keys())
         cols.insert(0, cols.pop(cols.index(title_col)))
         return np.array(cols)
 

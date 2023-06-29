@@ -1,23 +1,31 @@
 """Database object"""
 from __future__ import annotations
 
+from copy import deepcopy
+
 from notional import blocks, types
-from notional.schema import PropertyObject
+from notional.text import make_safe_python_name
 
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
 from ultimate_notion.record import Record
+from ultimate_notion.schema import PageSchema, Property, PropertyType, SchemaError
+from ultimate_notion.utils import decapitalize
 from ultimate_notion.view import View
 
 
 class Database(Record):
     obj_ref: blocks.Database
+    _schema: type[PageSchema] | None = None
 
     def __init__(self, obj_ref: blocks.Database):
         super().__init__(obj_ref)
 
     def __str__(self):
-        return self.title
+        if self.title:
+            return self.title
+        else:
+            return 'Untitled'
 
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
@@ -40,12 +48,37 @@ class Database(Record):
     def cover(self) -> types.FileObject | None:
         return self.obj_ref.cover
 
-    @property
-    def schema(self) -> dict[str, PropertyObject]:
-        # ToDo: Wrap these properties in our schema props from `.schema` to avoid confusion
-        return self.obj_ref.properties
+    def reflect_schema(self) -> type[PageSchema]:
+        """Reflection about the database schema"""
+        cls_name = f'{make_safe_python_name(self.title).capitalize()}Schema'
 
-    # ToDo: Have a setter method for schema too?
+        def clear(prop_obj):
+            """Clear PropertyObject from any residues coming from the reflection"""
+            prop_obj = deepcopy(prop_obj)
+            prop_obj.name = None
+            prop_obj.id = None
+            return prop_obj
+
+        attrs = {
+            decapitalize(make_safe_python_name(k)): Property(k, PropertyType.wrap_obj_ref(clear(v)))
+            for k, v in self.obj_ref.properties.items()
+        }
+        return type(cls_name, (PageSchema,), attrs)
+
+    @property
+    def schema(self) -> type[PageSchema]:
+        if not self._schema:
+            self._schema = self.reflect_schema()
+        return self._schema
+
+    @schema.setter
+    def schema(self, schema: type[PageSchema]):
+        """Set a custom schema in order to change the Python variables names"""
+        if schema() == self.reflect_schema()():
+            self._schema = schema
+        else:
+            msg = 'Provided schema is not consistent with schema of the database!'
+            raise SchemaError(msg)
 
     @property
     def url(self) -> str:
@@ -70,7 +103,7 @@ class Database(Record):
         return pages
 
     def view(self, *, live_update: bool = True) -> View:
-        query = self.session.notional.databases.query(self.id)
+        query = self.session.notional.databases.query(self.id)  # ToDo: use self.query when implemented
         pages = self._pages_from_query(query=query, live_update=live_update)
         return View(database=self, pages=pages, query=query, live_update=live_update)
 
