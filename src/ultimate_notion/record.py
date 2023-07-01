@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from notion_client.helpers import get_url
-from notional import blocks, types
+
+from ultimate_notion.obj_api import blocks, types
 
 if TYPE_CHECKING:
     from ultimate_notion.session import Session

@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING, Any, TypeVar
 import numpy as np
 import pandas as pd
 from emoji import is_emoji
-from notional.query import QueryBuilder
 from tabulate import tabulate
 
+from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.page import Page
 from ultimate_notion.utils import deepcopy_with_sharing, find_index, find_indices, is_notebook
 

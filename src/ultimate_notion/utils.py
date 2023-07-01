@@ -7,9 +7,9 @@ from uuid import UUID
 
 import numpy as np
 from notion_client.errors import APIResponseError
-from notional import types
 from polling2 import poll
 
+from ultimate_notion.obj_api import types
 from ultimate_notion.record import Record
 
 T = TypeVar('T')

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from notional import types, user
+from ultimate_notion.obj_api import types, user
 
 
 class User:

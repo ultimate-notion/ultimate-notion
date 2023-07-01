@@ -12,10 +12,10 @@ from uuid import UUID
 from cachetools import TTLCache, cached
 from httpx import ConnectError
 from notion_client.errors import APIResponseError
-from notional import blocks, types
-from notional.session import Session as NotionalSession
 
 from ultimate_notion.database import Database
+from ultimate_notion.obj_api import blocks, types
+from ultimate_notion.obj_api.session import Session as NotionalSession
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema
 from ultimate_notion.user import User
@@ -137,12 +137,16 @@ class Session:
         db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema_dct)
         return Database(obj_ref=db)
 
+    def ensure_db(self):
+        """Get or create the database"""
+        # TODO: Implement
+
     def delete_db(self, db_ref: Database | ObjRef):
         db_uuid = db_ref.id if isinstance(db_ref, Database) else get_uuid(db_ref)
         self.notional.blocks.delete(db_uuid)
 
     def search_db(
-        self, db_name: str | None = None, *, exact: bool = True, parents: Iterable[str] | None = None
+        self, db_name: str | None = None, *, exact: bool = True, parent: Page | None = None
     ) -> SList[Database]:
         """Search a database by name
 
@@ -151,7 +155,7 @@ class Session:
             exact: perform an exact search, not only a substring match
             parents: list of parent pages to further refine the search
         """
-        if parents is not None:
+        if parent is not None:
             # ToDo: Implement a search that also considers the parents
             raise NotImplementedError
 

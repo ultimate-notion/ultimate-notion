@@ -3,9 +3,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from notional import blocks, types
-from notional.text import make_safe_python_name
-
+from ultimate_notion.obj_api import blocks, types
+from ultimate_notion.obj_api.text import make_safe_python_name
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
 from ultimate_notion.record import Record

@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from notion2md.exporter.block import StringExporter
-from notional import types
+from ultimate_notion.obj_api import types
 
 from ultimate_notion.record import Record
 from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook

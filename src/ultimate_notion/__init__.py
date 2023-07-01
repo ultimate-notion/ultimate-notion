@@ -11,14 +11,7 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
+from ultimate_notion.schema import PageSchema, Property
 from ultimate_notion.session import Session
 
-__all__ = ['__version__', 'Session']
-
-# ToDo: Remove later on
-# start debugger on exception
-import sys
-
-from IPython.core import ultratb
-
-sys.excepthook = ultratb.ColorTB()
+__all__ = ['__version__', 'Session', 'PageSchema', 'Property']

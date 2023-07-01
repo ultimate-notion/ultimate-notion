@@ -68,3 +68,10 @@ def simple_db(notion, root_page):
     db = notion.create_db(parent_page=root_page, schema=Article, title='Articles')
     yield db
     notion.delete_db(db)
+
+
+# ToDo: Implement pargent in search and then activate.
+# @pytest.fixture(scope='session', autouse=True)
+# def remove_all_dbs(notion, root_page):
+#     for db in notion.search_db(parent=root_page):
+#         notion.delete_db(db)

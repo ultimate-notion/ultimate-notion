@@ -25,7 +25,6 @@ classifiers = [
 ]
 dependencies = [
     "notion-client",
-    "notional>=0.8",
     "notion2md",
     "tabulate",
     "cachetools",
@@ -83,9 +82,10 @@ target-version = ["py38"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
+addopts = "-ra -q --doctest-glob='*.md'"
 testpaths = [
     "tests",
+    "docs/examples/" # doctests
 ]
 markers = [
     "webtest: tests that use the Notion web API"
