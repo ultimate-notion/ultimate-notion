@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import logging
 import os
-from collections.abc import Iterable
 from threading import RLock
 from types import TracebackType
 from typing import Any
@@ -131,13 +130,13 @@ class Session:
             msg = 'Unable to get current user'
             raise SessionError(msg)
 
-    def create_db(self, parent_page: Page, schema: type[PageSchema], title=None) -> Database:
+    def create_db(self, parent: Page, schema: type[PageSchema], title: str | None = None) -> Database:
         """Create a new database"""
         schema_dct = {k: v.obj_ref for k, v in schema.to_dict().items()}
-        db = self.notional.databases.create(parent=parent_page.obj_ref, title=title, schema=schema_dct)
+        db = self.notional.databases.create(parent=parent.obj_ref, title=title, schema=schema_dct)
         return Database(obj_ref=db)
 
-    def ensure_db(self):
+    def ensure_db(self, parent: Page, schema: type[PageSchema], title: str | None = None):
         """Get or create the database"""
         # TODO: Implement
 
@@ -145,20 +144,13 @@ class Session:
         db_uuid = db_ref.id if isinstance(db_ref, Database) else get_uuid(db_ref)
         self.notional.blocks.delete(db_uuid)
 
-    def search_db(
-        self, db_name: str | None = None, *, exact: bool = True, parent: Page | None = None
-    ) -> SList[Database]:
+    def search_db(self, db_name: str | None = None, *, exact: bool = True) -> SList[Database]:
         """Search a database by name
 
         Args:
             db_name: name/title of the database, return all if `None`
             exact: perform an exact search, not only a substring match
-            parents: list of parent pages to further refine the search
         """
-        if parent is not None:
-            # ToDo: Implement a search that also considers the parents
-            raise NotImplementedError
-
         query = self.notional.search(db_name).filter(property='object', value='database')
         dbs = SList(Database(obj_ref=db) for db in query.execute())
         if exact and db_name is not None:
@@ -177,24 +169,17 @@ class Session:
         db_uuid = get_uuid(db_ref)
         return Database(obj_ref=self._get_db(db_uuid))
 
-    def search_page(
-        self, page_name: str | None = None, *, exact: bool = True, parents: Iterable[str] | None = None
-    ) -> SList[Page]:
+    def search_page(self, title: str | None = None, *, exact: bool = True) -> SList[Page]:
         """Search a page by name
 
         Args:
-            page_name: name/title of the page, return all if `None`
+            title: title of the page, return all if `None`
             exact: perform an exact search, not only a substring match
-            parents: list of parent pages to further refine the search
         """
-        if parents is not None:
-            # ToDo: Implement a search that also considers the parents
-            raise NotImplementedError
-
-        query = self.notional.search(page_name).filter(property='object', value='page')
+        query = self.notional.search(title).filter(property='object', value='page')
         pages = SList(Page(obj_ref=page) for page in query.execute())
-        if exact and page_name is not None:
-            pages = SList(page for page in pages if page.title == page_name)
+        if exact and title is not None:
+            pages = SList(page for page in pages if page.title == title)
         return pages
 
     def _get_page(self, uuid: UUID) -> blocks.Page:
@@ -208,12 +193,18 @@ class Session:
         page_uuid = get_uuid(page_ref)
         return Page(obj_ref=self._get_page(page_uuid))
 
+    def create_page(self, parent: Page, title: str | None = None) -> Page:
+        return Page(obj_ref=self.notional.pages.create(parent=parent.obj_ref, title=title))
+
+    def delete_page(self, page: Page):
+        self.notional.pages.delete(page.obj_ref)
+
     def _get_user(self, uuid: UUID) -> types.User:
         return self.notional.users.retrieve(uuid)
 
     def get_user(self, user_ref: ObjRef) -> User:
         user_uuid = get_uuid(user_ref)
-        return User(obj_ref=self.notional.users.retrieve(user_uuid))
+        return User(obj_ref=self._get_user(user_uuid))
 
     def whoami(self) -> User:
         """Return the user object of this bot"""

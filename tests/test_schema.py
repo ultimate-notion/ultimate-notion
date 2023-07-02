@@ -9,5 +9,5 @@ def test_schema_class(notion, root_page):
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
 
-    db = notion.create_db(parent_page=root_page, schema=Article)
+    db = notion.create_db(parent=root_page, schema=Article)
     notion.delete_db(db)

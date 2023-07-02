@@ -65,9 +65,19 @@ def simple_db(notion, root_page):
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
 
-    db = notion.create_db(parent_page=root_page, schema=Article, title='Articles')
+    db = notion.create_db(parent=root_page, schema=Article, title='Articles')
     yield db
     notion.delete_db(db)
+
+
+@pytest.fixture
+def page_hierarchy(notion, root_page):
+    """Simple hierarch of 3 pages nested in eachother: root -> l1 -> l2"""
+    l1_page = notion.create_page(parent=root_page, title='level_1')
+    l2_page = notion.create_page(parent=l1_page, title='level_2')
+    yield root_page, l1_page, l2_page
+    notion.delete_page(l2_page)
+    notion.delete_page(l1_page)
 
 
 # ToDo: Implement pargent in search and then activate.

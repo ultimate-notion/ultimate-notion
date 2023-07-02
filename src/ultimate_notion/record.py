@@ -18,9 +18,16 @@ class Record:
 
     obj_ref: blocks.DataRecord
 
+    # Todo: Implement here some singleton principle so that getting the same page results in just looking up the record.
+
     def __init__(self, obj_ref):
         """Notional object reference for dispatch"""
         self.obj_ref = obj_ref
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Record):
+            raise RuntimeError(f"Cannot compare a Record with {type(other)}")
+        return self.id == other.id
 
     @property
     def session(self) -> Session:
@@ -50,9 +57,29 @@ class Record:
         return self.obj_ref.last_edited_by
 
     @property
-    def parent(self) -> types.ParentRef:
-        # ToDo: Resolve page when calling?
-        return self.obj_ref.parent
+    def parent(self) -> Record | None:
+        """Return the parent record or None if the workspace is the parent"""
+        match (parent := self.obj_ref.parent):
+            case types.WorkspaceRef():
+                return None
+            case types.PageRef():
+                return self.session.get_page(page_ref=parent.page_id)
+            case types.DatabaseRef():
+                return self.session.get_db(db_ref=parent.database_id)
+            case types.BlockRef():
+                return self.session.get_block(block_ref=parent.block_id)
+            case _:
+                msg = f'Unknown parent reference {type(parent)}'
+                raise RuntimeError(msg)
+
+    @property
+    def parents(self) -> tuple[Record, ...]:
+        """Return all parents from the workspace to the actual record (excluding)"""
+        match (parent := self.parent):
+            case None:
+                return ()
+            case _:
+                return parent.parents + (parent,)
 
     @property
     def has_children(self) -> bool:

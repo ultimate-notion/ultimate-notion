@@ -4,8 +4,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from notion2md.exporter.block import StringExporter
-from ultimate_notion.obj_api import types
 
+from ultimate_notion.obj_api import types
 from ultimate_notion.record import Record
 from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook
 
@@ -123,7 +123,9 @@ class Page(Record):
         elif isinstance(val, types.Formula):
             val = val.Result
         elif isinstance(val, types.LastEditedBy | types.CreatedBy):
-            val = str(self.session.get_user(val.last_edited_by.id))
+            if not (user_id := val.last_edited_by.id):
+                raise RuntimeError("Cannot determine id of user!")
+            val = str(self.session.get_user(user_id))
         elif isinstance(val, types.MultiSelect):
             val = val.Values
         elif isinstance(val, types.NativeTypeMixin):
