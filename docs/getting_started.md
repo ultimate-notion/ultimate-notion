@@ -4,7 +4,7 @@ Before we get started a few words about Notion and its basic concepts are approp
 a *page* or a *block*. A page contains a number of blocks, e.g. headings, text, bulleted list, tables, quotes
 and so on.
 
-An important and special block is the *database*, which may be  within a page, i.e. *inline*,
+An important and special block is the *database*, which may be within a page, i.e. *inline*, as a block
 or at the same hierarchy level as a *page*. A *database* has a *schema*, that specifies various structured *properties*
 of the individual pages contained in that database. Only pages contained in a database have properties. Notion itself
 also offers *linked databases* (with ↗ next to the database title) but those are not accessible via the API, thus you must
@@ -12,8 +12,11 @@ always work with the source database.
 
 Regardless of the properties, each page has *attributes* such as a title, cover, icon, or whether it is archived or not. The *title*
 attribute of a page is special and will always be shown as database property, while the actual name of the property
-can be customized. Consequently, a schema always has a title property. If a page is deleted by you using Ultimate Notion,
-it will not be deleted but *archived* and this page attribute will be set accordingly.
+can be customized. Consequently, a schema always has a title property. When a page is in a database, think of the title
+as a kind of primary key or human-readable identifier, but it does not have to be unique! This concept is important
+when *relation* properties are used between different databases as the title property of a linked page will show up in the relation
+column.
+If a page is deleted by you using Ultimate Notion, it will not be deleted but *archived* and this page attribute will be set accordingly.
 
 A page, e.g. with title "child-page", can be contained in another page, e.g. with title "parent-page". This leads to a
 hierarchy that is typically used for structuring content. We say that "parent-page" is the *parent* of "child-page" and

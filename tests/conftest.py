@@ -15,6 +15,7 @@ from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 @pytest.fixture(scope='module')
 def vcr_config():
     """Configure pytest-vcr."""
+    # ToDo: See if this is still important
 
     def remove_headers(response):
         response['headers'] = {}
@@ -29,7 +30,7 @@ def vcr_config():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def notion():
     """Return the notion session used for live testing.
 
@@ -44,13 +45,13 @@ def notion():
         yield notion
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def contacts_db(notion):
     """Return a test database"""
     return notion.search_db('Contacts').item()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def root_page(notion):
     """Return the page reference used as parent page for live testing"""
     return notion.search_page('Tests', exact=True).item()
@@ -70,7 +71,7 @@ def simple_db(notion, root_page):
     notion.delete_db(db)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def page_hierarchy(notion, root_page):
     """Simple hierarch of 3 pages nested in eachother: root -> l1 -> l2"""
     l1_page = notion.create_page(parent=root_page, title='level_1')
@@ -80,8 +81,12 @@ def page_hierarchy(notion, root_page):
     notion.delete_page(l1_page)
 
 
-# ToDo: Implement pargent in search and then activate.
-# @pytest.fixture(scope='session', autouse=True)
-# def remove_all_dbs(notion, root_page):
-#     for db in notion.search_db(parent=root_page):
-#         notion.delete_db(db)
+@pytest.fixture(scope="session", autouse=True)
+def test_cleanups(notion, root_page):
+    """Delete all databases and pages in the root_page before we start"""
+    for db in notion.search_db():
+        if db.parents[0] == root_page:
+            notion.delete_db(db)
+    for page in notion.search_page():
+        if page.parents and page.parents[0] == root_page:
+            notion.delete_page(page)

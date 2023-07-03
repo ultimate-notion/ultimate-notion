@@ -115,6 +115,7 @@ class Page(Record):
             yield self.session.get_page(ref.id)
 
     def __getitem__(self, property_name) -> types.PropertyValue:
+        # ToDo change the logic here. Use a wrapper functionality as in `schmema`
         val = self.obj_ref[property_name]
         if isinstance(val, types.Date):
             val = val.date

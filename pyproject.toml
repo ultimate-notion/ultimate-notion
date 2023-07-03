@@ -33,6 +33,7 @@ dependencies = [
     "emoji",
     "pandas",
     "polling2",
+    "pydantic",
 #    "google-api-python-client",
 #    "google-auth-httplib2",
 #    "google-auth-oauthlib",
@@ -87,7 +88,6 @@ minversion = "6.0"
 addopts = "-ra -q --doctest-glob='*.md'"
 testpaths = [
     "tests",
-    "docs/examples/" # doctests
 ]
 markers = [
     "webtest: tests that use the Notion web API"
@@ -220,6 +220,7 @@ cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ul
 no-cov = "cov --no-cov {args}"
 ci = "cov --vcr-record=none --cov-report lcov {args}"
 record = "cov --vcr-record=all {args}" # re-record all vcr cassettes
+doctest = "pytest docs/examples/"
 
 # Docs environment
 [tool.hatch.envs.docs]

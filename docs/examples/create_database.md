@@ -29,6 +29,7 @@ We start by defining the schema for our items:
 ...     name = Property("Name", schema.Title())
 ...     size = Property("Size", schema.SingleSelect(sizes))
 ...     price = Property("price", schema.Number(schema.NumberFormat.DOLLAR))
+
 ```
 
 Since a database needs to be a block wighin a page, we assume there is a page called
@@ -36,18 +37,19 @@ Since a database needs to be a block wighin a page, we assume there is a page ca
 this page and create the database with the page as parent page.
 
 ```python
-root_page = notion.search_page('Tests', exact=True).item()
-item_db = notion.create_db(parent_page=root_page, schema=Item, title='Items')
+>>> root_page = notion.search_page('Tests', exact=True).item()
+>>> item_db = notion.create_db(parent=root_page, schema=Item, title='Items')
+
 ```
 
 Now we create a database for our customers and define a one-way relation to the items:
 
 ```python
 >>> class Customer(PageSchema):
->>>     name = Property("Name", schema.Title())
->>>     purchases = Property("Items Purchased", schema.Relation(item_db))
+...     name = Property("Name", schema.Title())
+...     purchases = Property("Items Purchased", schema.Relation(item_db))
 >>>
->>> customer_db = notion.create_db(parent_page=root_page, schema=Customer, title='Customers')
+>>> customer_db = notion.create_db(parent=root_page, schema=Customer, title='Customers')
 
 ```
 
@@ -63,6 +65,7 @@ The databases are created and we can start filling them with a few items.
 >>> lovelace = customer_db.create_page(name="Ada Lovelace")
 >>> hertzfeld = customer_db.create_page(name="Andy Herzfeld")
 >>> Engelbart = customer_db.create_page(name="Doug Engelbart")
+
 ```
 
 Note that that the keyword-arguments are exactly the class variables from the page

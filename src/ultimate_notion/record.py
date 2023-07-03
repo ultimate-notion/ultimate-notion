@@ -75,6 +75,7 @@ class Record:
     @property
     def parents(self) -> tuple[Record, ...]:
         """Return all parents from the workspace to the actual record (excluding)"""
+        # ToDo: Check if an option skip_blocks flag makes sense and only show pages and databases as records.
         match (parent := self.parent):
             case None:
                 return ()

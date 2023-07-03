@@ -12,6 +12,7 @@ from cachetools import TTLCache, cached
 from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
+from ultimate_notion.blocks import Block
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api import blocks, types
 from ultimate_notion.obj_api.session import Session as NotionalSession
@@ -60,6 +61,7 @@ class Session:
         self.notional = NotionalSession(auth=auth, **kwargs)
 
         # prepare API methods for decoration
+        # TODO: Remove this whole caching concept...
         self._search_db_unwrapped = self.search_db
         self._get_db_unwrapped = self._get_db
         self._get_page_unwrapped = self._get_page
@@ -215,5 +217,5 @@ class Session:
         return [User(obj_ref=user) for user in self.notional.users.list()]
 
     def get_block(self, block_ref: ObjRef):
-        # ToDo: Implement me
-        raise NotImplementedError
+        """Retrieve a block"""
+        return Block(obj_ref=self.notional.blocks.retrieve(block_ref))
