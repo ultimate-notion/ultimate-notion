@@ -227,10 +227,11 @@ class PropertyRelation(TypedObject):
 
 
 class SinglePropertyRelation(PropertyRelation, type="single_property"):
-    """Defines a single-property relation configuration for a database property."""
+    """Defines a one-way relation configuration for a database property."""
 
     single_property: Any = {}
 
+    # ToDo: This is not really needed
     @classmethod
     def __compose__(cls, dbref):
         """Create a `single_property` relation using the target database reference.
@@ -242,7 +243,10 @@ class SinglePropertyRelation(PropertyRelation, type="single_property"):
 
 
 class DualPropertyRelation(PropertyRelation, type="dual_property"):
-    """Defines a dual-property relation configuration for a database property."""
+    """Defines a two-way relation configuration for a database property.
+
+    If a two-way relation property X relates to Y then the two-way relation property Y relates to X.
+    """
 
     class _NestedData(GenericObject):
         synced_property_name: Optional[str] = None

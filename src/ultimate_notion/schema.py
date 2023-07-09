@@ -1,6 +1,8 @@
 """Functionality around defining a database schema"""
 from __future__ import annotations
 
+import inspect
+import importlib
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -21,6 +23,7 @@ class SchemaError(Exception):
 
 
 class PageSchema:
+    _database: Database | None = None
     # ToDo: Raise excpetion if any of these methods is overwritten!
 
     @classmethod
@@ -46,20 +49,28 @@ class PropertyType:
     obj_ref: obj_schema.PropertyObject
 
     _obj_api_map: ClassVar[dict[type[obj_schema.PropertyObject], type[PropertyType]]] = {}
-    _is_nested: ClassVar[dict[type[obj_schema.PropertyObject], bool]] = {}
+    # _is_nested: ClassVar[dict[type[obj_schema.PropertyObject], bool]] = {}
+    _has_compose: ClassVar[dict[type[obj_schema.PropertyObject], bool]] = {}
+
+    def __new__(cls, *args, **kwargs) -> PropertyType:
+        # Needed for wrap_obj_ref and its call to __new__ to work!
+        return super().__new__(cls)
+
+    def __init_subclass__(cls, type: type[obj_schema.PropertyObject], **kwargs: Any):  # noqa: A002
+        super().__init_subclass__(**kwargs)
+        cls._obj_api_map[type] = cls
+        cls._has_compose[type] = hasattr(type, '__compose__')
 
     @property
     def _obj_api_map_inv(self) -> dict[type[PropertyType], type[obj_schema.PropertyObject]]:
         return {v: k for k, v in self._obj_api_map.items()}
 
-    def __init_subclass__(cls, type: type[obj_schema.PropertyObject], **kwargs: Any):  # noqa: A002
-        super().__init_subclass__(**kwargs)
-        cls._obj_api_map[type] = cls
-        cls._is_nested[type] = '_NestedData' in {cls.__name__ for cls in type.__annotations__.values()}
-
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_schema.PropertyObject) -> PropertyType:
-        return cls._obj_api_map[type(obj_ref)](obj_ref)
+        prop_type_cls = cls._obj_api_map[type(obj_ref)]
+        prop_type = prop_type_cls.__new__(prop_type_cls)
+        prop_type.obj_ref = obj_ref
+        return prop_type
 
     @staticmethod
     def _unwrap_obj_api(props: PropertyType | list[PropertyType]):
@@ -68,17 +79,12 @@ class PropertyType:
         return [prop.obj_ref if hasattr(prop, 'obj_ref') else prop for prop in props]
 
     def __init__(self, *args, **kwargs):
-        # check if we just need to wrap, in case `wrap_obj_ref` was called
-        if len(args) == 1 and isinstance(args[0], obj_schema.PropertyObject) and not kwargs:
-            self.obj_ref = args[0]
-            return
-
         # dispatch to __compose__ or __init__ if it has _NestedData or not, respectively
         obj_api_type = self._obj_api_map_inv[self.__class__]
-        if self._is_nested[obj_api_type] and len(args) == 1 and not kwargs:
+        if self._has_compose[obj_api_type] and len(args) == 1 and not kwargs:
             params = self._unwrap_obj_api(args[0])
             self.obj_ref = obj_api_type[params]
-        elif not self._is_nested[obj_api_type] and not args:
+        elif not self._has_compose[obj_api_type] and not args:
             self.obj_ref = obj_api_type(**kwargs)
         else:
             msg = 'Use args for types with nested data and kwargs otherwise'
@@ -86,6 +92,20 @@ class PropertyType:
 
     def __eq__(self, other):
         return self.obj_ref == other.obj_ref
+
+
+def resolve_schema(schema_name: str) -> PageSchema:
+    if ":" in schema_name:
+        module_name, class_name = schema_name.split(":")  # Assuming format "module_name:ClassName"
+        module = importlib.import_module(module_name)
+        cls = getattr(module, class_name)
+    else:
+        cls = globals().get(schema_name)
+
+    if inspect.isclass(cls) and issubclass(cls, PageSchema):
+        return cls
+    else:
+        raise TypeError(f"Schema name '{schema_name}' does not refer to a `PageSchema` subclass.")
 
 
 @dataclass
@@ -156,17 +176,28 @@ class Formula(PropertyType, type=obj_schema.Formula):
 
 
 class Relation(PropertyType, type=obj_schema.Relation):
-    """Two-way relation configuration for a database property."""
+    _schema: str | None = None
+    _backref: str | None = None
 
-    def __init__(self, db: Database, *, two_way: bool = False):
-        pass
-        # Construct depending on two_way or one_way Relation
+    def __init__(self, schema: str | PageSchema, two_way: bool = False, related_prop: str | None = None):
+        self._schema = schema
+        self._backref = backref
+
+    def bind_db(self):
+        """Actual Notion object obj_ref is constructed"""
+        schema = resolve_schema(self._schema)
+        if self._backref:
+            super().__init__(schema._database.id)
+        else:
+            super().__init__(schema._database.id)
+
+    # ToDo: Let the PageSchema object do the late binding! When used in create_db ensure_db or set schema!
 
 
 class Rollup(PropertyType, type=obj_schema.Rollup):
     """Defines the rollup configuration for a database property."""
 
-    # ToDo: Neeeds a constructor?
+    # ToDo: Needs a constructor?
 
 
 class CreatedTime(PropertyType, type=obj_schema.CreatedTime):

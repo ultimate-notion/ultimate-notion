@@ -3,6 +3,8 @@
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
 """
+# ToDo: Could this be split up into properties relating to the schema and actual types that are inline in blocks but also properties?
+
 
 from abc import ABC, abstractmethod
 from datetime import date, datetime
@@ -143,7 +145,7 @@ class FileObject(TypedObject):
 
     Depending on the context, a FileObject may require a name (such as in the `Files`
     property).  This makes the object hierarchy difficult, so here we simply allow
-    `name` to be optional.  It is the responsibility of the caller to set `name` if
+    `name` to be optional. It is the responsibility of the caller to set `name` if
     required by the API.
     """
 
