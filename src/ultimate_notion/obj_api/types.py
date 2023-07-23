@@ -1,14 +1,9 @@
-"""Wrapper for Notion API data types like parents, mentions, emojis
+"""Wrapper for various Notion API data types like parents, mentions, emojis
 
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
 """
-# ToDo: Could this be split up into properties relating to the schema and actual types that are inline in blocks but also properties?
-
-
-from abc import ABC, abstractmethod
 from datetime import date, datetime
-from typing import List, Optional, Union
 from uuid import UUID
 
 from notion_client import helpers
@@ -148,7 +143,7 @@ class FileObject(TypedObject):
     required by the API.
     """
 
-    name: Optional[str] = None
+    name: str | None = None
 
     def __str__(self):
         """Return a string representation of this object."""
@@ -165,7 +160,7 @@ class HostedFile(FileObject, type="file"):
 
     class _NestedData(GenericObject):
         url: str
-        expiry_time: Optional[datetime] = None
+        expiry_time: datetime | None = None
 
     file: _NestedData
 
@@ -196,8 +191,8 @@ class ExternalFile(FileObject, type="external"):
 class DateRange(GenericObject):
     """A Notion date range, with an optional end date."""
 
-    start: Union[date, datetime]
-    end: Optional[Union[date, datetime]] = None
+    start: date | datetime
+    end: date | datetime | None = None
 
     def __str__(self):
         """Return a string representation of this object."""
