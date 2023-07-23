@@ -1,4 +1,18 @@
-"""Functionality around defining a database schema"""
+"""Functionality around defining a database schema
+
+
+### Design Principles
+
+A schema is a subclass of `PageShema` that holds `Property` objects with a name and an
+actual `PropertyType`, e.g. `Text`, `Number`. A `PropertyType` is a thin wrapper for the
+actual `PropertyObject` of the Notion API, which is referenced by `obj_ref`, to allow
+more user-friendly definition of a data model, especially if it has relations.
+
+The source of truth is always the `obj_ref` and a `PropertyType` holds only auxilliary
+information if actually needed. Since the object references `obj_ref` must always point
+to the actual `obj_api.blocks.Database.properties` value if the schema is bound to an database,
+the method `_remap_obj_refs` rewires this when a schema is used to create a database.
+"""
 from __future__ import annotations
 
 import inspect
@@ -7,37 +21,133 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import ultimate_notion.obj_api.schema as obj_schema
+import ultimate_notion.obj_api.blocks as obj_blocks
 from ultimate_notion.obj_api.schema import NumberFormat
+from ultimate_notion.obj_api.text import Color
 from ultimate_notion.utils import SList
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
+    from ultimate_notion.session import Session
 
 
 class SchemaError(Exception):
     """Raised when there are issues with the schema of a database."""
 
     def __init__(self, message):
-        """Initialize the `NotionSessionError` with a supplied message."""
+        """Initialize the `SchemaError` with a supplied message."""
         super().__init__(message)
 
 
+class SchemaNotBoundError(SchemaError):
+    """Raised when the schema is not bound to a database."""
+
+
 class PageSchema:
+    """ "Base class for the schema of a database."""
+
+    db_title: str
+    # ToDo: if custom_schema is True don't allow changing the schema otherwise it's fine
+    custom_schema: bool = True
     _database: Database | None = None
-    # ToDo: Raise excpetion if any of these methods is overwritten!
+
+    def __init_subclass__(cls, db_title: str, **kwargs: Any):  # noqa: A002
+        cls.db_title = db_title
+        super().__init_subclass__(**kwargs)
+
+    @classmethod
+    def reload(cls, *, check_consistency: bool = False):
+        db = cls.get_db()
+        db.reload(check_consistency=check_consistency)
+
+    # ToDo: Check if we really need this
+    @classmethod
+    def get_props(cls) -> list[Property]:
+        """Return attributes and properties of this schema"""
+        return [prop for prop in cls.__dict__.values() if isinstance(prop, Property)]
+
+    # @classmethod
+    # def get_attr_name(cls, prop_name: str) -> str:
+    #     return {prop.name: attr for attr, prop in cls.get_props().items()}[prop_name]
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
-        return {prop.name: prop.type for prop in cls.__dict__.values() if isinstance(prop, Property)}
+        return {prop.name: prop.type for prop in cls.get_props()}
 
     @classmethod
     def get_title_property_name(cls):
         return SList(col for col, val in cls.to_dict().items() if isinstance(val, Title)).item()
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, PageSchema):
-            return NotImplemented
-        return self.to_dict() == other.to_dict()
+    @classmethod
+    def is_consistent_with(cls, other_schema: PageSchema) -> bool:
+        """Is this schema consistent with another ignoring backward relations if not in other schema"""
+        own_schema_dct = cls.to_dict()
+        other_schema_dct = other_schema.to_dict()
+
+        if own_schema_dct == other_schema_dct:
+            # backward relation was initialized in the other schema
+            return True
+
+        other_schema_no_backrels_dct = {
+            name: prop_type
+            for name, prop_type in other_schema_dct.items()
+            if not (isinstance(prop_type, Relation) and not prop_type.schema)
+        }
+
+        if other_schema_no_backrels_dct == own_schema_dct:
+            # backward relation was not yet initialised in the other schema (during the creation of the data model)
+            return True
+
+        return False
+
+    @classmethod
+    def _init_forward_relations(cls):
+        """Initialise all relations assuming that the databases of related schemas were created"""
+        for relation in (prop_type for prop_type in cls.to_dict().values() if isinstance(prop_type, Relation)):
+            if relation.schema:
+                relation.make_obj_ref()
+
+    @classmethod
+    def _init_backward_relations(cls):
+        """Update the default property name in case of a two-way relation
+
+        By default the property in the target schema is named "Related to <this_database> (<this_field>)"
+        which is then set to the name specified as backward reference.
+        """
+        for prop_type in cls.to_dict().values():
+            if isinstance(prop_type, Relation) and prop_type.is_two_way:
+                prop_type._init_backward_relation()
+
+    @classmethod
+    def bind_db(cls, db: Database):
+        """Bind the PageSchema to the corresponding database for back-reference"""
+        cls._database = db
+        cls._remap_obj_refs()
+
+    @classmethod
+    def get_db(cls) -> Database:
+        if cls.is_bound():
+            return cls._database
+        else:
+            msg = f"Schema {cls.__name__} is not bound to any database"
+            raise SchemaNotBoundError(msg)
+
+    @classmethod
+    def is_bound(cls) -> bool:
+        """Returns if the schema is bound to a database"""
+        return cls._database is not None
+
+    def __getitem__(self, prop_name: str) -> Property:
+        return self.to_dict()[prop_name]
+
+    @classmethod
+    def _remap_obj_refs(cls):
+        """Remap all obj_refs from the properties of the schema to obj_ref.properties of the bound database"""
+        db_props_dct = cls.get_db().obj_ref.properties
+        for prop_name, prop_type in cls.to_dict().items():
+            obj_ref = db_props_dct.get(prop_name)
+            if obj_ref:
+                prop_type.obj_ref = obj_ref
 
 
 class PropertyType:
@@ -47,9 +157,9 @@ class PropertyType:
     """
 
     obj_ref: obj_schema.PropertyObject
+    prop_ref: Property
 
     _obj_api_map: ClassVar[dict[type[obj_schema.PropertyObject], type[PropertyType]]] = {}
-    # _is_nested: ClassVar[dict[type[obj_schema.PropertyObject], bool]] = {}
     _has_compose: ClassVar[dict[type[obj_schema.PropertyObject], bool]] = {}
 
     def __new__(cls, *args, **kwargs) -> PropertyType:
@@ -61,10 +171,6 @@ class PropertyType:
         cls._obj_api_map[type] = cls
         cls._has_compose[type] = hasattr(type, '__compose__')
 
-    @property
-    def _obj_api_map_inv(self) -> dict[type[PropertyType], type[obj_schema.PropertyObject]]:
-        return {v: k for k, v in self._obj_api_map.items()}
-
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_schema.PropertyObject) -> PropertyType:
         prop_type_cls = cls._obj_api_map[type(obj_ref)]
@@ -72,48 +178,57 @@ class PropertyType:
         prop_type.obj_ref = obj_ref
         return prop_type
 
-    @staticmethod
-    def _unwrap_obj_api(props: PropertyType | list[PropertyType]):
-        if not isinstance(props, list):
-            props = [props]
-        return [prop.obj_ref if hasattr(prop, 'obj_ref') else prop for prop in props]
+    @property
+    def _obj_api_map_inv(self) -> dict[type[PropertyType], type[obj_schema.PropertyObject]]:
+        return {v: k for k, v in self._obj_api_map.items()}
 
     def __init__(self, *args, **kwargs):
-        # dispatch to __compose__ or __init__ if it has _NestedData or not, respectively
         obj_api_type = self._obj_api_map_inv[self.__class__]
-        if self._has_compose[obj_api_type] and len(args) == 1 and not kwargs:
-            params = self._unwrap_obj_api(args[0])
-            self.obj_ref = obj_api_type[params]
-        elif not self._has_compose[obj_api_type] and not args:
-            self.obj_ref = obj_api_type(**kwargs)
+        if hasattr(obj_api_type, "__compose__"):
+            self.obj_ref = obj_api_type.__compose__(*args, **kwargs)
         else:
-            msg = 'Use args for types with nested data and kwargs otherwise'
-            raise RuntimeError(msg)
+            self.obj_ref = obj_api_type(*args, **kwargs)
 
-    def __eq__(self, other):
-        return self.obj_ref == other.obj_ref
-
-
-def resolve_schema(schema_name: str) -> PageSchema:
-    if ":" in schema_name:
-        module_name, class_name = schema_name.split(":")  # Assuming format "module_name:ClassName"
-        module = importlib.import_module(module_name)
-        cls = getattr(module, class_name)
-    else:
-        cls = globals().get(schema_name)
-
-    if inspect.isclass(cls) and issubclass(cls, PageSchema):
-        return cls
-    else:
-        raise TypeError(f"Schema name '{schema_name}' does not refer to a `PageSchema` subclass.")
+    def __eq__(self, other: PropertyType):
+        return self.obj_ref.type == other.obj_ref.type and self.obj_ref() == self.obj_ref()
 
 
-@dataclass
 class Property:
-    """Property for defining a Notion database schema"""
+    """Property for defining a Notion database schema
 
-    name: str
-    type: PropertyType  # noqa: A003
+    This is implemented as a descriptor.
+    """
+
+    _name: str
+    _type: PropertyType  # noqa: A003
+    # properties below are set by __set_name__
+    _schema: PageSchema
+    _attr_name: str  # Python name of the property in the schema
+
+    def __init__(self, name: str, type: PropertyType) -> None:
+        self._name = name
+        self._type = type
+
+    def __set_name__(self, owner: PageSchema, name: str):
+        self._schema = owner
+        self._attr_name = name
+        self._type.prop_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, new_name: str):
+        raise NotImplementedError
+
+    @property
+    def type(self) -> PropertyType:
+        return self._type
+
+    @type.setter
+    def type(self, new_type: PropertyType):
+        raise NotImplementedError
 
 
 class Title(PropertyType, type=obj_schema.Title):
@@ -134,9 +249,17 @@ class Number(PropertyType, type=obj_schema.Number):
 class SelectOption(PropertyType, type=obj_schema.SelectOption):
     """Option for select & multi-select property"""
 
+    def __init__(self, name, color=Color.DEFAULT):
+        """Create a `SelectOption` object from the given name and color."""
+        super().__init__(name=name, color=color)
+
 
 class SingleSelect(PropertyType, type=obj_schema.Select):
     """Single selection property"""
+
+    def __init__(self, options: list[SelectOption]):
+        options = [option.obj_ref for option in options]
+        super().__init__(options)
 
 
 class MultiSelect(PropertyType, type=obj_schema.MultiSelect):
@@ -171,27 +294,86 @@ class URL(PropertyType, type=obj_schema.URL):
     """URL property"""
 
 
+class PhoneNumber(PropertyType, type=obj_schema.PhoneNumber):
+    """Phone number property"""
+
+
 class Formula(PropertyType, type=obj_schema.Formula):
     """Formula Property"""
 
 
+class RelationError(SchemaError):
+    """Error if a Relation Property cannot be initialised"""
+
+    pass
+
+
 class Relation(PropertyType, type=obj_schema.Relation):
-    _schema: str | None = None
-    _backref: str | None = None
+    obj_ref: obj_schema.Relation | None = None
+    _schema: PageSchema | None = None
+    _two_way_prop: Property | None = None
 
-    def __init__(self, schema: str | PageSchema, two_way: bool = False, related_prop: str | None = None):
+    def __init__(self, schema: PageSchema | type[PageSchema] | None = None, *, two_way_prop: Property | None = None):
+        if two_way_prop and not schema:
+            raise RuntimeError("`schema` needs to be provided if `two_way_prop` is set")
+        if isinstance(schema, type):
+            schema = schema()
         self._schema = schema
-        self._backref = backref
+        self._two_way_prop = two_way_prop
 
-    def bind_db(self):
-        """Actual Notion object obj_ref is constructed"""
-        schema = resolve_schema(self._schema)
-        if self._backref:
-            super().__init__(schema._database.id)
+    @property
+    def schema(self) -> PageSchema | None:
+        if self._schema:
+            return self._schema
+        elif self.prop_ref._schema.is_bound():
+            db = self.prop_ref._schema._database
+            return db.session.get_db(self.obj_ref.relation.database_id).schema
         else:
-            super().__init__(schema._database.id)
+            return self._schema
 
-    # ToDo: Let the PageSchema object do the late binding! When used in create_db ensure_db or set schema!
+    @property
+    def is_two_way(self) -> bool:
+        return self.two_way_prop is not None
+
+    @property
+    def two_way_prop(self) -> Property:
+        if self.obj_ref and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
+            # ToDo: This should actually return a property! We might have to resolve things here.
+            return self.obj_ref.relation.dual_property.synced_property_name
+        else:
+            return self._two_way_prop
+
+    def make_obj_ref(self):
+        try:
+            db = self.schema.get_db()
+        except SchemaNotBoundError as e:
+            msg = f"A database with schema '{self.schema.__name__}' needs to be created first!"
+            raise RelationError(msg) from e
+
+        if self.schema:
+            if self.two_way_prop:
+                self.obj_ref = obj_schema.DualPropertyRelation[db.id]
+            else:
+                self.obj_ref = obj_schema.SinglePropertyRelation[db.id]
+
+    def _init_backward_relation(self):
+        if not isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
+            msg = f"Trying to inialize backward relation for forward relation {self.prop_ref.name}"
+            raise SchemaError(msg)
+
+        obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
+        two_wap_prop_name = self._two_way_prop.name
+        if obj_synced_property_name != two_wap_prop_name:
+            # change the old default name in the target schema what was passed during initialization
+            other_db = self.schema.get_db()
+            prop_id = self.obj_ref.relation.dual_property.synced_property_id
+            schema_dct = {prop_id: obj_schema.RenameProp(name=two_wap_prop_name)}
+            other_db.session.notional.databases.update(dbref=other_db.obj_ref, schema=schema_dct)
+            other_db.schema._remap_obj_refs()
+
+            our_db = self.prop_ref._schema.get_db()
+            our_db.session.notional.databases.update(dbref=our_db.obj_ref, schema={})  # sync obj_ref
+            our_db.schema._remap_obj_refs()
 
 
 class Rollup(PropertyType, type=obj_schema.Rollup):

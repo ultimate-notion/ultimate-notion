@@ -149,7 +149,7 @@ class Select(PropertyObject, type="select"):
     select: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, *options):
+    def __compose__(cls, options):
         """Create a `Select` object from the list of `SelectOption`'s."""
         return cls(select=cls._NestedData(options=options))
 
@@ -231,7 +231,6 @@ class SinglePropertyRelation(PropertyRelation, type="single_property"):
 
     single_property: Any = {}
 
-    # ToDo: This is not really needed
     @classmethod
     def __compose__(cls, dbref):
         """Create a `single_property` relation using the target database reference.
@@ -253,6 +252,14 @@ class DualPropertyRelation(PropertyRelation, type="dual_property"):
         synced_property_id: Optional[str] = None
 
     dual_property: _NestedData = _NestedData()
+
+    @classmethod
+    def __compose__(cls, dbref):
+        """Create a `dual_property` relation using the target database reference.
+
+        `dbref` must be either a string or UUID.
+        """
+        return Relation(relation=DualPropertyRelation(database_id=dbref))
 
 
 class Relation(PropertyObject, type="relation"):
@@ -304,3 +311,9 @@ class LastEditedTime(PropertyObject, type="last_edited_time"):
     """Defines the last-edited-time configuration for a database property."""
 
     last_edited_time: Any = {}
+
+
+class RenameProp(GenericObject):
+    """Use to rename a property during a database update"""
+
+    name: str

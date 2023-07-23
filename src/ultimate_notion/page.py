@@ -115,7 +115,7 @@ class Page(Record):
             yield self.session.get_page(ref.id)
 
     def __getitem__(self, property_name) -> types.PropertyValue:
-        # ToDo change the logic here. Use a wrapper functionality as in `schmema`
+        # ToDo change the logic here. Use a wrapper functionality as in `schema`
         val = self.obj_ref[property_name]
         if isinstance(val, types.Date):
             val = val.date
@@ -152,3 +152,6 @@ class Page(Record):
     def __delitem__(self, key):
         # ToDo: Implement me!
         pass
+
+    def delete(self):
+        self.session.notional.pages.delete(self.obj_ref)

@@ -226,6 +226,7 @@ class TypedObject(GenericObject):
 
         cls._register_type(type_name)
 
+    # todo: Rename this!!!
     def __call__(self, field=None):
         """Return the nested data object contained by this `TypedObject`.
 

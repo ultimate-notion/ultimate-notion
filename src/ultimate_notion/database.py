@@ -14,8 +14,16 @@ from ultimate_notion.view import View
 
 
 class Database(Record):
+    """A Notion database object, not a linked databases
+
+    If a custom schema is provided, i.e. specified during creating are the `schema` was set
+    then the schemy is verified.
+
+    https://developers.notion.com/docs/working-with-databases
+    """
+
     obj_ref: blocks.Database
-    _schema: type[PageSchema] | None = None
+    _schema: PageSchema | None = None
 
     def __init__(self, obj_ref: blocks.Database):
         super().__init__(obj_ref)
@@ -29,6 +37,16 @@ class Database(Record):
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
         return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+
+    def reload(self, *, check_consistency: bool = False):
+        """Reload the metadata of the database and update the schema if necessary"""
+        new_db = self.session._get_db(self.id)  # circumvent session cache
+        if check_consistency and not self.schema.is_consistent_with(new_db.schema):
+            msg = f"Schema of database {self.title} no longer consistent with schema after refresh!"
+            raise SchemaError(msg)
+
+        self.schema._enrich(new_db.schema)
+        # self.obj_ref = new_db.obj_ref
 
     @property
     def title(self) -> str:
@@ -47,36 +65,35 @@ class Database(Record):
     def cover(self) -> types.FileObject | None:
         return self.obj_ref.cover
 
-    def reflect_schema(self) -> type[PageSchema]:
+    def _reflect_schema(self, obj_ref: blocks.Database) -> PageSchema:
         """Reflection about the database schema"""
         cls_name = f'{make_safe_python_name(self.title).capitalize()}Schema'
-
-        def clear(prop_obj):
-            """Clear PropertyObject from any residues coming from the reflection"""
-            prop_obj = deepcopy(prop_obj)
-            prop_obj.name = None
-            prop_obj.id = None
-            return prop_obj
-
         attrs = {
-            decapitalize(make_safe_python_name(k)): Property(k, PropertyType.wrap_obj_ref(clear(v)))
-            for k, v in self.obj_ref.properties.items()
+            decapitalize(make_safe_python_name(k)): Property(k, PropertyType.wrap_obj_ref(v))
+            for k, v in obj_ref.properties.items()
         }
-        return type(cls_name, (PageSchema,), attrs)
+        schema = type(cls_name, (PageSchema,), attrs, db_title=self.title)
+        schema.bind_db(self)
+        schema.custom_schema = False
+        return schema()
 
     @property
-    def schema(self) -> type[PageSchema]:
+    def schema(self) -> PageSchema:
         if not self._schema:
-            self._schema = self.reflect_schema()
+            self._schema = self._reflect_schema(self.obj_ref)
         return self._schema
 
     @schema.setter
-    def schema(self, schema: type[PageSchema]):
+    def schema(self, schema: PageSchema | type[PageSchema]):
         """Set a custom schema in order to change the Python variables names"""
-        if schema() == self.reflect_schema()():
+        if isinstance(schema, type):
+            schema = schema()
+
+        if self.schema.is_consistent_with(schema):
+            schema.bind_db(self)
             self._schema = schema
         else:
-            msg = 'Provided schema is not consistent with schema of the database!'
+            msg = 'Provided schema is not consistent with the current schema of the database!'
             raise SchemaError(msg)
 
     @property
@@ -93,7 +110,7 @@ class Database(Record):
 
     def delete(self):
         """Delete this database"""
-        self.session.delete_db(self)
+        self.session.notional.blocks.delete(self.id)
 
     def _pages_from_query(self, *, query, live_update: bool = True) -> list[Page]:
         pages = [Page(page_obj) for page_obj in query.execute()]

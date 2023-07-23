@@ -9,6 +9,8 @@ import pytest
 
 import ultimate_notion
 from ultimate_notion import schema
+from ultimate_notion.page import Page
+from ultimate_notion import Session
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 
 
@@ -46,47 +48,47 @@ def notion():
 
 
 @pytest.fixture(scope="session")
-def contacts_db(notion):
+def contacts_db(notion: Session):
     """Return a test database"""
     return notion.search_db('Contacts').item()
 
 
 @pytest.fixture(scope="session")
-def root_page(notion):
+def root_page(notion: Session):
     """Return the page reference used as parent page for live testing"""
     return notion.search_page('Tests', exact=True).item()
 
 
 @pytest.fixture
-def simple_db(notion, root_page):
+def simple_db(notion: Session, root_page: Page):
     """Simple database of articles"""
 
-    class Article(schema.PageSchema):
+    class Article(schema.PageSchema, db_title="Articles"):
         name = schema.Property('Name', schema.Title())
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
 
-    db = notion.create_db(parent=root_page, schema=Article, title='Articles')
+    db = notion.create_db(parent=root_page, schema=Article)
     yield db
-    notion.delete_db(db)
+    db.delete()
 
 
 @pytest.fixture(scope="session")
-def page_hierarchy(notion, root_page):
+def page_hierarchy(notion: Session, root_page: Page):
     """Simple hierarch of 3 pages nested in eachother: root -> l1 -> l2"""
     l1_page = notion.create_page(parent=root_page, title='level_1')
     l2_page = notion.create_page(parent=l1_page, title='level_2')
     yield root_page, l1_page, l2_page
-    notion.delete_page(l2_page)
-    notion.delete_page(l1_page)
+    l2_page.delete()
+    l1_page.delete()
 
 
 @pytest.fixture(scope="session", autouse=True)
-def test_cleanups(notion, root_page):
+def test_cleanups(notion: Session, root_page: Page):
     """Delete all databases and pages in the root_page before we start"""
     for db in notion.search_db():
         if db.parents[0] == root_page:
-            notion.delete_db(db)
+            db.delete()
     for page in notion.search_page():
         if page.parents and page.parents[0] == root_page:
-            notion.delete_page(page)
+            page.delete()

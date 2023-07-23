@@ -7,7 +7,7 @@ the development processes, but [other kinds of contributions] are also appreciat
 
 If you are new to using [git] or have never collaborated in a project previously,
 please have a look at [contribution-guide.org]. Other resources are also
-listed in the excellent [guide created by FreeCodeCamp][^contrib1].
+listed in the excellent [guide created by FreeCodeCamp] [^contrib1].
 
 Please notice, all users and contributors are expected to be **open,
 considerate, reasonable, and respectful**. When in doubt,
@@ -167,3 +167,4 @@ This often provides additional considerations and avoids unnecessary work.
 [pipx]: https://pypa.github.io/pipx/
 [python software foundation's code of conduct]: https://www.python.org/psf/conduct/
 [Google style]: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
+[guide created by FreeCodeCamp]: https://github.com/FreeCodeCamp/how-to-contribute-to-open-source

@@ -6,7 +6,7 @@ from ultimate_notion import database, schema
 def test_schema(simple_db: database.Database):
     ref_schema = simple_db.schema
 
-    assert issubclass(ref_schema, schema.PageSchema)
+    assert isinstance(ref_schema, schema.PageSchema)
     db_schema = {
         'Name': schema.Title(),
         'Cost': schema.Number(schema.NumberFormat.DOLLAR),
@@ -14,14 +14,14 @@ def test_schema(simple_db: database.Database):
     }
     assert ref_schema.to_dict() == db_schema
 
-    class MySchema(schema.PageSchema):
+    class MySchema(schema.PageSchema, db_title="My Schema"):
         name = schema.Property('Name', schema.Title())
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
 
     simple_db.schema = MySchema
 
-    class WrongSchema(schema.PageSchema):
+    class WrongSchema(schema.PageSchema, db_title="My Wrong Schema"):
         name = schema.Property('Name', schema.Title())
         cost = schema.Property('Cost', schema.Text())
         desc = schema.Property('Description', schema.Text())
