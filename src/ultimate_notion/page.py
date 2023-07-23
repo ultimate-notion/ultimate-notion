@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 from notion2md.exporter.block import StringExporter
 
 from ultimate_notion.obj_api import types
+from ultimate_notion.obj_api import props
 from ultimate_notion.record import Record
 from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook
 
@@ -117,19 +118,19 @@ class Page(Record):
     def __getitem__(self, property_name) -> types.PropertyValue:
         # ToDo change the logic here. Use a wrapper functionality as in `schema`
         val = self.obj_ref[property_name]
-        if isinstance(val, types.Date):
+        if isinstance(val, props.Date):
             val = val.date
-        elif isinstance(val, types.Relation):
+        elif isinstance(val, props.Relation):
             val = [p.title for p in self._resolve_relation(val)]
-        elif isinstance(val, types.Formula):
+        elif isinstance(val, props.Formula):
             val = val.Result
-        elif isinstance(val, types.LastEditedBy | types.CreatedBy):
+        elif isinstance(val, props.LastEditedBy | props.CreatedBy):
             if not (user_id := val.last_edited_by.id):
                 raise RuntimeError("Cannot determine id of user!")
             val = str(self.session.get_user(user_id))
-        elif isinstance(val, types.MultiSelect):
+        elif isinstance(val, props.MultiSelect):
             val = val.Values
-        elif isinstance(val, types.NativeTypeMixin):
+        elif isinstance(val, props.NativeTypeMixin):
             val = val.Value
         else:
             msg = f'Unknown property type {type(val)}'

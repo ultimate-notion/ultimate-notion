@@ -15,7 +15,8 @@ from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.obj_api.schema import PropertyObject
 from ultimate_notion.obj_api.text import TextObject
-from ultimate_notion.obj_api.types import DatabaseRef, ObjectReference, PageRef, ParentRef, PropertyItem, Title
+from ultimate_notion.obj_api.types import DatabaseRef, ObjectReference, PageRef, ParentRef
+from ultimate_notion.obj_api.props import PropertyItem, Title
 from ultimate_notion.obj_api.user import User
 
 logger = logging.getLogger(__name__)

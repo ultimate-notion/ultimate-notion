@@ -19,7 +19,8 @@ from ultimate_notion.obj_api.text import (
     plain_text,
     rich_text,
 )
-from ultimate_notion.obj_api.types import BlockRef, EmojiObject, FileObject, ParentRef, PropertyValue
+from ultimate_notion.obj_api.types import BlockRef, EmojiObject, FileObject, ParentRef
+from ultimate_notion.obj_api.props import PropertyValue
 from ultimate_notion.obj_api.user import User
 
 
