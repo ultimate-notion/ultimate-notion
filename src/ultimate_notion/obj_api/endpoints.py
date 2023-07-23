@@ -6,14 +6,12 @@ is just referred to as `raw_api`.
 """
 
 import logging
-from inspect import isclass
 from typing import Dict, Union
 
 from pydantic import parse_obj_as
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
-from ultimate_notion.obj_api.orm import ConnectedPage
 from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.obj_api.schema import PropertyObject
 from ultimate_notion.obj_api.text import TextObject
@@ -294,17 +292,8 @@ class DatabasesEndpoint(Endpoint):
 
         :param target: either a `DatabaseRef` type or an ORM class
         """
-
-        if isclass(target) and issubclass(target, ConnectedPage):
-            cls = target
-            dbid = target._notional__database
-
-            if cls._notional__session != self.api:
-                raise ValueError("ConnectedPage belongs to a different session")
-
-        else:
-            cls = None
-            dbid = DatabaseRef[target].database_id
+        cls = None
+        dbid = DatabaseRef[target].database_id
 
         logger.info("Initializing database query :: {%s} [%s]", dbid, cls)
 
