@@ -368,11 +368,11 @@ class Relation(PropertyType, type=obj_schema.Relation):
             other_db = self.schema.get_db()
             prop_id = self.obj_ref.relation.dual_property.synced_property_id
             schema_dct = {prop_id: obj_schema.RenameProp(name=two_wap_prop_name)}
-            other_db.session.notional.databases.update(dbref=other_db.obj_ref, schema=schema_dct)
+            other_db.session.api.databases.update(dbref=other_db.obj_ref, schema=schema_dct)
             other_db.schema._remap_obj_refs()
 
             our_db = self.prop_ref._schema.get_db()
-            our_db.session.notional.databases.update(dbref=our_db.obj_ref, schema={})  # sync obj_ref
+            our_db.session.api.databases.update(dbref=our_db.obj_ref, schema={})  # sync obj_ref
             our_db.schema._remap_obj_refs()
 
 

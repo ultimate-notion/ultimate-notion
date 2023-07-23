@@ -26,7 +26,7 @@ class Page(Record):
     live_update: bool = True
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
-    #     self._children = list(self.session.notional.blocks.children.list(parent=self.obj_ref))
+    #     self._children = list(self.session.api.blocks.children.list(parent=self.obj_ref))
     #
     # @property
     # def children(self) -> List[blocks.Block]:
@@ -147,11 +147,11 @@ class Page(Record):
 
         if self.live_update:
             # update the property on the server (which will refresh the local data)
-            self.session.notional.pages.update(self.obj_ref, **{property_name: self.obj_ref[property_name]})
+            self.session.api.pages.update(self.obj_ref, **{property_name: self.obj_ref[property_name]})
 
     def __delitem__(self, key):
         # ToDo: Implement me!
         pass
 
     def delete(self):
-        self.session.notional.pages.delete(self.obj_ref)
+        self.session.api.pages.delete(self.obj_ref)

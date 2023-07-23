@@ -9,13 +9,14 @@ from typing import Any
 from uuid import UUID
 
 from httpx import ConnectError
+import notion_client
 from notion_client.errors import APIResponseError
 
+from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.record import Record
 from ultimate_notion.blocks import Block
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api import blocks, types
-from ultimate_notion.obj_api.session import Session as NotionalSession
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema, Relation
 from ultimate_notion.user import User
@@ -40,6 +41,8 @@ class Session:
     Use an explicit `.refresh()` to update an object.
     """
 
+    client: notion_client.Client
+    api: NotionAPI
     _active_session: Session | None = None
     _lock = RLock()
     # todo: have different stores for different types
@@ -61,9 +64,8 @@ class Session:
 
         _log.debug('Initializing Notion session...')
         Session._initialize_once(self)
-        # Todo: Put this in `obj_api` name-space instead with just the endpoinds. Use client instead of session.
-        # So have an ObjAPI class that initializes the client int NotionalSession
-        self.notional = NotionalSession(auth=auth, **kwargs)
+        self.client = notion_client.Client(auth=auth, **kwargs)
+        self.api = NotionAPI(self.client)
         _log.info('Initialized Notion session')
 
     @classmethod
@@ -87,7 +89,7 @@ class Session:
 
     def __enter__(self) -> Session:
         _log.debug('Connecting to Notion...')
-        self.notional.client.__enter__()
+        self.client.__enter__()
         return self
 
     def __exit__(
@@ -97,13 +99,13 @@ class Session:
         traceback: TracebackType,
     ) -> None:
         _log.debug('Closing connection to Notion...')
-        self.notional.client.__exit__(exc_type, exc_value, traceback)
+        self.client.__exit__(exc_type, exc_value, traceback)
         Session._active_session = None
         Session._object_store.clear()
 
     def close(self):
         """Close the session and release resources."""
-        self.notional.client.close()
+        self.client.close()
         Session._active_session = None
         Session._object_store.clear()
 
@@ -137,7 +139,7 @@ class Session:
         else:
             schema_dct = {}
 
-        db_obj = self.notional.databases.create(parent=parent.obj_ref, title=schema.db_title, schema=schema_dct)
+        db_obj = self.api.databases.create(parent=parent.obj_ref, title=schema.db_title, schema=schema_dct)
         db = Database(obj_ref=db_obj)
 
         if schema:
@@ -161,7 +163,7 @@ class Session:
             db_name: name/title of the database, return all if `None`
             exact: perform an exact search, not only a substring match
         """
-        query = self.notional.search(db_name).filter(property='object', value='database')
+        query = self.api.search(db_name).filter(property='object', value='database')
         dbs = SList(self._object_store.get(db.id, Database(obj_ref=db)) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
@@ -169,7 +171,7 @@ class Session:
 
     def _get_db(self, db_uuid: UUID) -> Database:
         """Retrieve database circumenventing the session cache"""
-        return Database(obj_ref=self.notional.databases.retrieve(db_uuid))
+        return Database(obj_ref=self.api.databases.retrieve(db_uuid))
 
     def get_db(self, db_ref: ObjRef) -> Database:
         """Retrieve Notion database by uuid"""
@@ -177,7 +179,7 @@ class Session:
         if db_uuid in self._object_store:
             return self._object_store[db_uuid]
         else:
-            db = Database(obj_ref=self.notional.databases.retrieve(db_uuid))
+            db = Database(obj_ref=self.api.databases.retrieve(db_uuid))
             self._object_store[db.id] = db
             return db
 
@@ -188,7 +190,7 @@ class Session:
             title: title of the page, return all if `None`
             exact: perform an exact search, not only a substring match
         """
-        query = self.notional.search(title).filter(property='object', value='page')
+        query = self.api.search(title).filter(property='object', value='page')
         pages = SList(self._object_store.get(page.id, Page(obj_ref=page)) for page in query.execute())
         if exact and title is not None:
             pages = SList(page for page in pages if page.title == title)
@@ -199,17 +201,17 @@ class Session:
         if page_uuid in self._object_store:
             return self._object_store[page_uuid]
         else:
-            page = Page(obj_ref=self.notional.pages.retrieve(page_uuid))
+            page = Page(obj_ref=self.api.pages.retrieve(page_uuid))
             self._object_store[page.id] = page
             return page
 
     def create_page(self, parent: Page, title: str | None = None) -> Page:
-        page = Page(obj_ref=self.notional.pages.create(parent=parent.obj_ref, title=title))
+        page = Page(obj_ref=self.api.pages.create(parent=parent.obj_ref, title=title))
         self._object_store[page.id] = page
         return page
 
     def _get_user(self, uuid: UUID) -> types.User:
-        return self.notional.users.retrieve(uuid)
+        return self.api.users.retrieve(uuid)
 
     def get_user(self, user_ref: ObjRef) -> User:
         user_uuid = get_uuid(user_ref)
@@ -217,12 +219,12 @@ class Session:
 
     def whoami(self) -> User:
         """Return the user object of this bot"""
-        return self.notional.users.me()
+        return self.api.users.me()
 
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace"""
-        return [User(obj_ref=user) for user in self.notional.users.list()]
+        return [User(obj_ref=user) for user in self.api.users.list()]
 
     def get_block(self, block_ref: ObjRef):
         """Retrieve a block"""
-        return Block(obj_ref=self.notional.blocks.retrieve(block_ref))
+        return Block(obj_ref=self.api.blocks.retrieve(block_ref))

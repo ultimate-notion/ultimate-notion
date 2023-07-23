@@ -1,12 +1,14 @@
-"""Provides direct access to the Notion API."""
+"""Provides an object-based Notion API with all endpoints
+
+This pydantic based API is often referred to as just `api` while the low-level
+API of the [Notion Client SDK library](https://github.com/ramnes/notion-sdk-py)
+is just referred to as `raw_api`.
+"""
 
 import logging
 from inspect import isclass
 from typing import Dict, Union
 
-import notion_client
-from httpx import ConnectError
-from notion_client.errors import APIResponseError
 from pydantic import parse_obj_as
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
@@ -29,18 +31,11 @@ class SessionError(Exception):
         super().__init__(message)
 
 
-class Session(object):
-    """An active session with the Notion SDK."""
+class NotionAPI(object):
+    """Object-based Notion API (pydantic) with all endpoints"""
 
-    def __init__(self, **kwargs):
-        """Initialize the `Session` object and the endpoints.
-
-        `kwargs` will be passed direction to the Notion SDK Client.  For more details,
-        see the (full docs)[https://ramnes.github.io/notion-sdk-py/reference/client/].
-
-        :param auth: bearer token for authentication
-        """
-        self.client = notion_client.Client(**kwargs)
+    def __init__(self, client):
+        self.client = client
 
         self.blocks = BlocksEndpoint(self)
         self.databases = DatabasesEndpoint(self)
@@ -48,61 +43,13 @@ class Session(object):
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
 
-        logger.info("Initialized Notion SDK client")
-
-    @property
-    def IsActive(self):
-        """Determine if the current session is active.
-
-        The session is considered "active" if it has not been closed.  This does not
-        determine if the session can connect to the Notion API.
-        """
-        return self.client is not None
-
-    def close(self):
-        """Close the session and release resources."""
-
-        if self.client is None:
-            raise SessionError("Session is not active.")
-
-        self.client.close()
-        self.client = None
-
-    def ping(self):
-        """Confirm that the session is active and able to connect to Notion.
-
-        Raises SessionError if there is a problem, otherwise returns True.
-        """
-
-        if self.IsActive is False:
-            return False
-
-        error = None
-
-        try:
-            me = self.users.me()
-
-            if me is None:
-                raise SessionError("Unable to get current user")
-
-        except ConnectError:
-            error = "Unable to connect to Notion"
-
-        except APIResponseError as err:
-            error = str(err)
-
-        if error is not None:
-            raise SessionError(error)
-
-        return True
-
 
 class Endpoint(object):
     """Notional wrapper for the API endpoints."""
 
-    def __init__(self, session: Session):
+    def __init__(self, api: NotionAPI):
         """Initialize the `Endpoint` for the supplied session."""
-        self.session = session
+        self.api = api
 
 
 class BlocksEndpoint(Endpoint):
@@ -113,7 +60,7 @@ class BlocksEndpoint(Endpoint):
 
         def __call__(self):
             """Return the underlying endpoint in the Notion SDK."""
-            return self.session.client.blocks.children
+            return self.api.client.blocks.children
 
         # https://developers.notion.com/reference/patch-block-children
         def append(self, parent, *blocks: Block):
@@ -170,7 +117,7 @@ class BlocksEndpoint(Endpoint):
 
     def __call__(self):
         """Return the underlying endpoint in the Notion SDK."""
-        return self.session.client.blocks
+        return self.api.client.blocks
 
     # https://developers.notion.com/reference/delete-a-block
     def delete(self, block):
@@ -232,7 +179,7 @@ class DatabasesEndpoint(Endpoint):
 
     def __call__(self):
         """Return the underlying endpoint in the Notion SDK."""
-        return self.session.client.databases
+        return self.api.client.databases
 
     def _build_request(
         self,
@@ -324,7 +271,7 @@ class DatabasesEndpoint(Endpoint):
 
         logger.info("Deleting database :: %s", dbid)
 
-        return self.session.blocks.delete(dbid)
+        return self.api.blocks.delete(dbid)
 
     def restore(self, dbref):
         """Restore (unarchive) the specified Database.
@@ -336,7 +283,7 @@ class DatabasesEndpoint(Endpoint):
 
         logger.info("Restoring database :: %s", dbid)
 
-        return self.session.blocks.restore(dbid)
+        return self.api.blocks.restore(dbid)
 
     # https://developers.notion.com/reference/post-database-query
     def query(self, target):
@@ -349,7 +296,7 @@ class DatabasesEndpoint(Endpoint):
             cls = target
             dbid = target._notional__database
 
-            if cls._notional__session != self.session:
+            if cls._notional__session != self.api:
                 raise ValueError("ConnectedPage belongs to a different session")
 
         else:
@@ -369,7 +316,7 @@ class PagesEndpoint(Endpoint):
 
         def __call__(self):
             """Return the underlying endpoint in the Notion SDK."""
-            return self.session.client.pages.properties
+            return self.api.client.pages.properties
 
         # https://developers.notion.com/reference/retrieve-a-page-property
         def retrieve(self, page_id, property_id):
@@ -390,7 +337,7 @@ class PagesEndpoint(Endpoint):
 
     def __call__(self):
         """Return the underlying endpoint in the Notion SDK."""
-        return self.session.client.pages
+        return self.api.client.pages
 
     # https://developers.notion.com/reference/post-page
     def create(self, parent, title=None, properties=None, children=None):
@@ -542,7 +489,7 @@ class SearchEndpoint(Endpoint):
         if text is not None:
             params["query"] = text
 
-        return QueryBuilder(endpoint=self.session.client.search, **params)
+        return QueryBuilder(endpoint=self.api.client.search, **params)
 
 
 class UsersEndpoint(Endpoint):
@@ -550,7 +497,7 @@ class UsersEndpoint(Endpoint):
 
     def __call__(self):
         """Return the underlying endpoint in the Notion SDK."""
-        return self.session.client.users
+        return self.api.client.users
 
     # https://developers.notion.com/reference/get-users
     def list(self):

@@ -110,7 +110,7 @@ class Database(Record):
 
     def delete(self):
         """Delete this database"""
-        self.session.notional.blocks.delete(self.id)
+        self.session.api.blocks.delete(self.id)
 
     def _pages_from_query(self, *, query, live_update: bool = True) -> list[Page]:
         pages = [Page(page_obj) for page_obj in query.execute()]
@@ -119,7 +119,7 @@ class Database(Record):
         return pages
 
     def view(self, *, live_update: bool = True) -> View:
-        query = self.session.notional.databases.query(self.id)  # ToDo: use self.query when implemented
+        query = self.session.api.databases.query(self.id)  # ToDo: use self.query when implemented
         pages = self._pages_from_query(query=query, live_update=live_update)
         return View(database=self, pages=pages, query=query, live_update=live_update)
 
