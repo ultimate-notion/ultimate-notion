@@ -58,7 +58,8 @@ class BlocksEndpoint(Endpoint):
     class ChildrenEndpoint(Endpoint):
         """Notional interface to the API 'blocks/children' endpoint."""
 
-        def __call__(self):
+        @property
+        def raw_api(self):
             """Return the underlying endpoint in the Notion SDK."""
             return self.api.client.blocks.children
 
@@ -77,7 +78,7 @@ class BlocksEndpoint(Endpoint):
 
             logger.info("Appending %d blocks to %s ...", len(children), parent_id)
 
-            data = self().append(block_id=parent_id, children=children)
+            data = self.raw_api.append(block_id=parent_id, children=children)
 
             if "results" in data:
                 if len(blocks) == len(data["results"]):
@@ -105,7 +106,7 @@ class BlocksEndpoint(Endpoint):
 
             logger.info("Listing blocks for %s...", parent_id)
 
-            blocks = EndpointIterator(endpoint=self().list)
+            blocks = EndpointIterator(endpoint=self.raw_api.list)
 
             return blocks(block_id=parent_id)
 
@@ -115,7 +116,8 @@ class BlocksEndpoint(Endpoint):
 
         self.children = BlocksEndpoint.ChildrenEndpoint(*args, **kwargs)
 
-    def __call__(self):
+    @property
+    def raw_api(self):
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.blocks
 
@@ -129,7 +131,7 @@ class BlocksEndpoint(Endpoint):
         block_id = ObjectReference[block].id
         logger.info("Deleting block :: %s", block_id)
 
-        data = self().delete(block_id)
+        data = self.raw_api.delete(block_id)
 
         return Block.parse_obj(data)
 
@@ -142,7 +144,7 @@ class BlocksEndpoint(Endpoint):
         block_id = ObjectReference[block].id
         logger.info("Restoring block :: %s", block_id)
 
-        data = self().update(block_id, archived=False)
+        data = self.raw_api.update(block_id, archived=False)
 
         return Block.parse_obj(data)
 
@@ -156,7 +158,7 @@ class BlocksEndpoint(Endpoint):
         block_id = ObjectReference[block].id
         logger.info("Retrieving block :: %s", block_id)
 
-        data = self().retrieve(block_id)
+        data = self.raw_api.retrieve(block_id)
 
         return Block.parse_obj(data)
 
@@ -169,7 +171,7 @@ class BlocksEndpoint(Endpoint):
 
         logger.info("Updating block :: %s", block.id)
 
-        data = self().update(block.id.hex, **block.dict())
+        data = self.raw_api.update(block.id.hex, **block.dict())
 
         return block.refresh(**data)
 
@@ -177,7 +179,8 @@ class BlocksEndpoint(Endpoint):
 class DatabasesEndpoint(Endpoint):
     """Notional interface to the API 'databases' endpoint."""
 
-    def __call__(self):
+    @property
+    def raw_api(self):
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.databases
 
@@ -221,7 +224,7 @@ class DatabasesEndpoint(Endpoint):
 
         request = self._build_request(parent_ref, schema, title)
 
-        data = self().create(**request)
+        data = self.raw_api.create(**request)
 
         return Database.parse_obj(data)
 
@@ -236,7 +239,7 @@ class DatabasesEndpoint(Endpoint):
 
         logger.info("Retrieving database :: %s", dbid)
 
-        data = self().retrieve(dbid)
+        data = self.raw_api.retrieve(dbid)
 
         return Database.parse_obj(data)
 
@@ -256,7 +259,7 @@ class DatabasesEndpoint(Endpoint):
         request = self._build_request(schema=schema, title=title)
 
         if request:
-            data = self().update(dbid, **request)
+            data = self.raw_api.update(dbid, **request)
             dbref = dbref.refresh(**data)
 
         return dbref
@@ -305,7 +308,7 @@ class DatabasesEndpoint(Endpoint):
 
         logger.info("Initializing database query :: {%s} [%s]", dbid, cls)
 
-        return QueryBuilder(endpoint=self().query, datatype=cls, database_id=dbid)
+        return QueryBuilder(endpoint=self.raw_api.query, datatype=cls, database_id=dbid)
 
 
 class PagesEndpoint(Endpoint):
@@ -314,7 +317,8 @@ class PagesEndpoint(Endpoint):
     class PropertiesEndpoint(Endpoint):
         """Notional interface to the API 'pages/properties' endpoint."""
 
-        def __call__(self):
+        @property
+        def raw_api(self):
             """Return the underlying endpoint in the Notion SDK."""
             return self.api.client.pages.properties
 
@@ -324,7 +328,7 @@ class PagesEndpoint(Endpoint):
 
             logger.info("Retrieving property :: %s [%s]", property_id, page_id)
 
-            data = self().retrieve(page_id, property_id)
+            data = self.raw_api.retrieve(page_id, property_id)
 
             # TODO should PropertyListItem return an iterator instead?
             return parse_obj_as(Union[PropertyItem, PropertyItemList], obj=data)
@@ -335,7 +339,8 @@ class PagesEndpoint(Endpoint):
 
         self.properties = PagesEndpoint.PropertiesEndpoint(*args, **kwargs)
 
-    def __call__(self):
+    @property
+    def raw_api(self):
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.pages
 
@@ -372,7 +377,7 @@ class PagesEndpoint(Endpoint):
 
         logger.info("Creating page :: %s => %s", parent, title)
 
-        data = self().create(**request)
+        data = self.raw_api.create(**request)
 
         return Page.parse_obj(data)
 
@@ -403,7 +408,7 @@ class PagesEndpoint(Endpoint):
 
         logger.info("Retrieving page :: %s", page_id)
 
-        data = self().retrieve(page_id)
+        data = self.raw_api.retrieve(page_id)
 
         # XXX would it make sense to (optionally) expand the full properties here?
         # e.g. call the PropertiesEndpoint to make sure all data is retrieved
@@ -429,7 +434,7 @@ class PagesEndpoint(Endpoint):
 
         props = {name: value.dict() if value is not None else None for name, value in properties.items()}
 
-        data = self().update(page.id.hex, properties=props)
+        data = self.raw_api.update(page.id.hex, properties=props)
 
         return page.refresh(**data)
 
@@ -466,7 +471,7 @@ class PagesEndpoint(Endpoint):
             logger.info("Archiving page :: %s", page_id)
             props["archived"] = True
 
-        data = self().update(page_id.hex, **props)
+        data = self.raw_api.update(page_id.hex, **props)
 
         return page.refresh(**data)
 
@@ -495,7 +500,8 @@ class SearchEndpoint(Endpoint):
 class UsersEndpoint(Endpoint):
     """Notional interface to the API 'users' endpoint."""
 
-    def __call__(self):
+    @property
+    def raw_api(self):
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.users
 
@@ -505,7 +511,7 @@ class UsersEndpoint(Endpoint):
 
         logger.info("Listing known users...")
 
-        users = EndpointIterator(endpoint=self().list)
+        users = EndpointIterator(endpoint=self.raw_api.list)
 
         return users()
 
@@ -515,7 +521,7 @@ class UsersEndpoint(Endpoint):
 
         logger.info("Retrieving user :: %s", user_id)
 
-        data = self().retrieve(user_id)
+        data = self.raw_api.retrieve(user_id)
 
         return User.parse_obj(data)
 
@@ -525,6 +531,6 @@ class UsersEndpoint(Endpoint):
 
         logger.info("Retrieving current integration bot")
 
-        data = self().me()
+        data = self.raw_api.me()
 
         return User.parse_obj(data)
