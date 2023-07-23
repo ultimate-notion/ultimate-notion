@@ -1,17 +1,17 @@
-"""Wrapper for various Notion API data types like parents, mentions, emojis
+"""Wrapper for various Notion API data types like parents, mentions, emojis & users
 
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
 """
 from datetime import date, datetime
 from uuid import UUID
+from enum import Enum
 
 from notion_client import helpers
 
 from ultimate_notion.obj_api import util
-from ultimate_notion.obj_api.core import GenericObject, TypedObject
+from ultimate_notion.obj_api.core import GenericObject, TypedObject, NotionObject
 from ultimate_notion.obj_api.text import RichTextObject
-from ultimate_notion.obj_api.user import User
 
 
 class ObjectReference(GenericObject):
@@ -119,6 +119,50 @@ class WorkspaceRef(ParentRef, type="workspace"):
     workspace: bool = True
 
 
+class UserRef(NotionObject, object="user"):
+    """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
+
+
+class UserType(str, Enum):
+    """Available user types."""
+
+    PERSON = "person"
+    BOT = "bot"
+
+
+class User(UserRef, TypedObject):
+    """Represents a User in Notion."""
+
+    name: str | None = None
+    avatar_url: str | None = None
+
+
+class Person(User, type="person"):
+    """Represents a Person in Notion."""
+
+    class _NestedData(GenericObject):
+        email: str
+
+    person: _NestedData = None
+
+    def __str__(self):
+        """Return a string representation of this `Person`."""
+        return f"[@{self.name}]"
+
+
+class Bot(User, type="bot"):
+    """Represents a Bot in Notion."""
+
+    class _NestedData(GenericObject):
+        pass
+
+    bot: _NestedData = None
+
+    def __str__(self):
+        """Return a string representation of this `Bot`."""
+        return f"[%{self.name}]"
+
+
 class EmojiObject(TypedObject, type="emoji"):
     """A Notion emoji object."""
 
@@ -210,7 +254,7 @@ class MentionData(TypedObject):
 class MentionUser(MentionData, type="user"):
     """Nested user data for `Mention` properties."""
 
-    user: User
+    user: UserRef
 
     @classmethod
     def __compose__(cls, user: User):

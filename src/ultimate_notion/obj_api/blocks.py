@@ -19,9 +19,8 @@ from ultimate_notion.obj_api.text import (
     plain_text,
     rich_text,
 )
-from ultimate_notion.obj_api.types import BlockRef, EmojiObject, FileObject, ParentRef
+from ultimate_notion.obj_api.types import BlockRef, EmojiObject, FileObject, ParentRef, UserRef
 from ultimate_notion.obj_api.props import PropertyValue
-from ultimate_notion.obj_api.user import User
 
 
 class DataRecord(NotionObject):
@@ -35,10 +34,10 @@ class DataRecord(NotionObject):
     archived: bool = False
 
     created_time: datetime = None
-    created_by: User = None
+    created_by: UserRef = None
 
     last_edited_time: datetime = None
-    last_edited_by: User = None
+    last_edited_by: UserRef = None
 
 
 class Database(DataRecord, object="database"):
