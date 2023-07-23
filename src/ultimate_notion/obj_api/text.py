@@ -10,7 +10,6 @@ from ultimate_notion.obj_api.core import GenericObject, TypedObject
 # this might be a place to capture other utilities for working with markdown, text
 # rich text, etc...  the challenge is not importing types due to a circular ref.
 
-
 # the max text size according to the Notion API is 2000 characters...
 MAX_TEXT_OBJECT_SIZE = 2000
 

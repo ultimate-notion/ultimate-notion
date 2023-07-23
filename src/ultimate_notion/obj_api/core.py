@@ -140,10 +140,10 @@ class GenericObject(BaseModel, metaclass=ComposableObjectMeta):
         field.required = default is None
 
     # https://github.com/samuelcolvin/pydantic/discussions/3139
-    def refresh(__notional_self__, **data):
+    def refresh(self, **data):
         """Refresh the internal attributes with new data."""
 
-        values, fields, error = validate_model(__notional_self__.__class__, data)
+        values, fields, error = validate_model(self.__class__, data)
 
         if error:
             raise error
@@ -151,9 +151,9 @@ class GenericObject(BaseModel, metaclass=ComposableObjectMeta):
         for name in fields:
             value = values[name]
             logger.debug("set object data -- %s => %s", name, value)
-            setattr(__notional_self__, name, value)
+            setattr(self, name, value)
 
-        return __notional_self__
+        return self
 
     def dict(self, **kwargs):
         """Convert to a suitable representation for the Notion API."""
@@ -265,21 +265,21 @@ class TypedObject(GenericObject):
 
         cls._set_field_default("type", default=name)
 
-        # initialize a __notional_typemap__ map for each direct child of TypedObject
+        # initialize a _typemap map for each direct child of TypedObject
 
         # this allows different class trees to have the same 'type' name
         # but point to a different object (e.g. the 'date' type may have
         # different implementations depending where it is used in the API)
 
-        if not hasattr(cls, "__notional_typemap__"):
-            cls.__notional_typemap__ = {}
+        if not hasattr(cls, "_typemap"):
+            cls._typemap = {}
 
-        if name in cls.__notional_typemap__:
+        if name in cls._typemap:
             raise ValueError(f"Duplicate subtype for class - {name} :: {cls}")
 
         logger.debug("registered new subtype: %s => %s", name, cls)
 
-        cls.__notional_typemap__[name] = cls
+        cls._typemap[name] = cls
 
     @classmethod
     def _resolve_type(cls, data):
@@ -291,15 +291,15 @@ class TypedObject(GenericObject):
         if not isinstance(data, dict):
             raise ValueError("Invalid 'data' object")
 
-        if not hasattr(cls, "__notional_typemap__"):
-            raise TypeError(f"Missing '__notional_typemap__' in {cls}")
+        if not hasattr(cls, "_typemap"):
+            raise TypeError(f"Missing '_typemap' in {cls}")
 
         type_name = data.get("type")
 
         if type_name is None:
             raise ValueError("Missing 'type' in data")
 
-        sub = cls.__notional_typemap__.get(type_name)
+        sub = cls._typemap.get(type_name)
 
         if sub is None:
             raise TypeError(f"Unsupported sub-type: {type_name}")

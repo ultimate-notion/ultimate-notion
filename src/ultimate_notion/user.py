@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ultimate_notion.obj_api import types, user
+from ultimate_notion.obj_api import types
 
 
 class User:
@@ -31,11 +31,11 @@ class User:
 
     @property
     def is_person(self) -> bool:
-        return isinstance(self.obj_ref, user.Person)
+        return isinstance(self.obj_ref, types.Person)
 
     @property
     def is_bot(self) -> bool:
-        return isinstance(self.obj_ref, user.Bot)
+        return isinstance(self.obj_ref, types.Bot)
 
     @property
     def avatar_url(self):
@@ -43,7 +43,7 @@ class User:
 
     @property
     def email(self) -> str | None:
-        if isinstance(self.obj_ref, user.Person):
+        if isinstance(self.obj_ref, types.Person):
             return self.obj_ref.person.email
         else:  # it's a bot without an e-mail
             return None
