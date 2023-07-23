@@ -12,15 +12,15 @@ edit_uri: blob/master/docs
 
 # Navigation
 nav:
-  - Home: index.md
-  - "User Guide":
+  - Home:
+    - About: index.md
     - "Getting started": getting_started.md
+    - Changelog: changelog.md
+    - License: license.md
+    - Authors: authors.md
+    - Contributing: contributing.md
   - Examples:
     - "Create a database": examples/create_database.md
-  - Changelog: changelog.md
-  - License: license.md
-  - Authors: authors.md
-  - Contributing: contributing.md
   # defer to gen-files + literate-nav
   - Reference: reference/ultimate_notion/
 
@@ -55,8 +55,8 @@ theme:
         name: Switch to dark mode
   features:
     - navigation.sections
+    - navigation.tabs
 #    - navigation.expand
-#    - navigation.tabs # have additional tabs on top bar
     - navigation.tabs.sticky
     - navigation.instant
 
