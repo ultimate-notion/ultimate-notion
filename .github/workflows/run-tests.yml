@@ -22,6 +22,7 @@ jobs:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
     strategy:
+      max-parallel: 2  # avoids time-outs
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]

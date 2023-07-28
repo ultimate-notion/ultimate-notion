@@ -24,7 +24,7 @@ This brings you to the Secrets-site where you need to copy and save the *Interna
 with `secret_`. This token will be used by Ultimate Notion for authentication.
 
 
-## Granting access to a page for an integration
+## Granting access to an integration
 
 Open Notion, i.e. the web interface or your Notion app. Make sure the integration you created shows up under
 <kbd>Settings & members</kbd> » <kbd>Connections</kbd>. Now select any page you want to access via Ultimate Notion and
@@ -35,7 +35,7 @@ will have access to the selected page as well as all its children.
 ![Notion integration](assets/images/notion-integration-add.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
 
 
-## Access the page with Python
+## Loading a Notion page
 
 To try out if your integration works, just copy&paste the following code into your favorite editor or better [Jupyter Lab]. Replace the content
 of `TOKEN` with the Internal Integration Token you saved and the content of `PAGE_TITLE` with the title of the page, you granted

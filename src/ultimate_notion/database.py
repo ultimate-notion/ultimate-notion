@@ -123,10 +123,9 @@ class Database(Record):
         pages = self._pages_from_query(query=query, live_update=live_update)
         return View(database=self, pages=pages, query=query, live_update=live_update)
 
-    def create_page(self, *, live_update: bool = True):
+    def create_page(self, **kwargs) -> Page:
         """Return page object"""
-        # ToDo: Use Schema for this.
-        raise NotImplementedError
+        return self.schema.create(**kwargs)
 
     def query(self) -> QueryBuilder:
         """Query a (large) database for pages in a more specific way"""

@@ -15,20 +15,20 @@ the method `_remap_obj_refs` rewires this when a schema is used to create a data
 """
 from __future__ import annotations
 
-import inspect
-import importlib
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import ultimate_notion.obj_api.schema as obj_schema
-import ultimate_notion.obj_api.blocks as obj_blocks
 from ultimate_notion.obj_api.schema import NumberFormat
 from ultimate_notion.obj_api.text import Color
 from ultimate_notion.utils import SList
+from ultimate_notion.page import Page
+from ultimate_notion.props import PropertyValue
+from ultimate_notion.record import Record
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-    from ultimate_notion.session import Session
+
+# Todo: Move the functionality from the PyDantic types in here and elimate the __compose__
 
 
 class SchemaError(Exception):
@@ -42,9 +42,13 @@ class SchemaError(Exception):
 class SchemaNotBoundError(SchemaError):
     """Raised when the schema is not bound to a database."""
 
+    def __init__(self, schema: PageSchema):
+        msg = f"Schema {schema.__name__} is not bound to any database"
+        super().__init__(msg)
+
 
 class PageSchema:
-    """ "Base class for the schema of a database."""
+    """Base class for the schema of a database."""
 
     db_title: str
     # ToDo: if custom_schema is True don't allow changing the schema otherwise it's fine
@@ -56,27 +60,47 @@ class PageSchema:
         super().__init_subclass__(**kwargs)
 
     @classmethod
+    def create(cls, **kwargs) -> Page:
+        """Create a page with properties according to the schema within the corresponding database"""
+        schema_kwargs = {attr: prop for attr, prop in cls.__dict__.items() if isinstance(prop, Property)}
+        if not set(kwargs).issubset(set(schema_kwargs)):
+            add_kwargs = set(kwargs) - set(schema_kwargs)
+            msg = f"kwargs {', '.join(add_kwargs)} not defined in schema"
+            raise SchemaError(msg)
+
+        schema_dct = {}
+        for kwarg, value in kwargs.items():
+            prop_type_cls = schema_kwargs[kwarg].type
+            prop_value_cls = PropertyValue._get_value_from_type(prop_type_cls)
+            if isinstance(value, Record):
+                value = value.obj_ref
+
+            prop_value = prop_value_cls(value)
+            schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
+
+        db = cls.get_db()
+        session = db.session
+        page = Page(obj_ref=session.api.pages.create(parent=db.obj_ref, properties=schema_dct))
+        return page
+
+    @classmethod
     def reload(cls, *, check_consistency: bool = False):
         db = cls.get_db()
         db.reload(check_consistency=check_consistency)
 
-    # ToDo: Check if we really need this
     @classmethod
     def get_props(cls) -> list[Property]:
-        """Return attributes and properties of this schema"""
+        """Return all properties of this schema"""
         return [prop for prop in cls.__dict__.values() if isinstance(prop, Property)]
-
-    # @classmethod
-    # def get_attr_name(cls, prop_name: str) -> str:
-    #     return {prop.name: attr for attr, prop in cls.get_props().items()}[prop_name]
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
         return {prop.name: prop.type for prop in cls.get_props()}
 
     @classmethod
-    def get_title_property_name(cls):
-        return SList(col for col, val in cls.to_dict().items() if isinstance(val, Title)).item()
+    def get_title_property(cls) -> Property:
+        """Returns the title property"""
+        return SList(prop for prop in cls.get_props() if isinstance(prop.type, Title)).item()
 
     @classmethod
     def is_consistent_with(cls, other_schema: PageSchema) -> bool:
@@ -101,36 +125,17 @@ class PageSchema:
         return False
 
     @classmethod
-    def _init_forward_relations(cls):
-        """Initialise all relations assuming that the databases of related schemas were created"""
-        for relation in (prop_type for prop_type in cls.to_dict().values() if isinstance(prop_type, Relation)):
-            if relation.schema:
-                relation.make_obj_ref()
-
-    @classmethod
-    def _init_backward_relations(cls):
-        """Update the default property name in case of a two-way relation
-
-        By default the property in the target schema is named "Related to <this_database> (<this_field>)"
-        which is then set to the name specified as backward reference.
-        """
-        for prop_type in cls.to_dict().values():
-            if isinstance(prop_type, Relation) and prop_type.is_two_way:
-                prop_type._init_backward_relation()
+    def get_db(cls) -> Database:
+        if cls.is_bound():
+            return cls._database
+        else:
+            raise SchemaNotBoundError(cls)
 
     @classmethod
     def bind_db(cls, db: Database):
         """Bind the PageSchema to the corresponding database for back-reference"""
         cls._database = db
-        cls._remap_obj_refs()
-
-    @classmethod
-    def get_db(cls) -> Database:
-        if cls.is_bound():
-            return cls._database
-        else:
-            msg = f"Schema {cls.__name__} is not bound to any database"
-            raise SchemaNotBoundError(msg)
+        cls._set_obj_refs()
 
     @classmethod
     def is_bound(cls) -> bool:
@@ -141,8 +146,26 @@ class PageSchema:
         return self.to_dict()[prop_name]
 
     @classmethod
-    def _remap_obj_refs(cls):
-        """Remap all obj_refs from the properties of the schema to obj_ref.properties of the bound database"""
+    def _init_fwd_rels(cls):
+        """Initialise all forward relations assuming that the databases of related schemas were created"""
+        for relation in (prop_type for prop_type in cls.to_dict().values() if isinstance(prop_type, Relation)):
+            if relation.schema:
+                relation.make_obj_ref()
+
+    @classmethod
+    def _init_bwd_rels(cls):
+        """Update the default property name in case of a two-way relation in the target schema.
+
+        By default the property in the target schema is named "Related to <this_database> (<this_field>)"
+        which is then set to the name specified as backward relation.
+        """
+        for prop_type in cls.to_dict().values():
+            if isinstance(prop_type, Relation) and prop_type.is_two_way:
+                prop_type._init_backward_relation()
+
+    @classmethod
+    def _set_obj_refs(cls):
+        """Map obj_refs from the properties of the schema to obj_ref.properties of the bound database"""
         db_props_dct = cls.get_db().obj_ref.properties
         for prop_name, prop_type in cls.to_dict().items():
             obj_ref = db_props_dct.get(prop_name)
@@ -369,11 +392,11 @@ class Relation(PropertyType, type=obj_schema.Relation):
             prop_id = self.obj_ref.relation.dual_property.synced_property_id
             schema_dct = {prop_id: obj_schema.RenameProp(name=two_wap_prop_name)}
             other_db.session.api.databases.update(dbref=other_db.obj_ref, schema=schema_dct)
-            other_db.schema._remap_obj_refs()
+            other_db.schema._set_obj_refs()
 
             our_db = self.prop_ref._schema.get_db()
             our_db.session.api.databases.update(dbref=our_db.obj_ref, schema={})  # sync obj_ref
-            our_db.schema._remap_obj_refs()
+            our_db.schema._set_obj_refs()
 
 
 class Rollup(PropertyType, type=obj_schema.Rollup):

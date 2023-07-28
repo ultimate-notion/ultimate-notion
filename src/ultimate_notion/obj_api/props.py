@@ -308,7 +308,7 @@ class SelectValue(types.GenericObject):
         return cls(name=value, color=color)
 
 
-class SelectOne(NativeTypeMixin, PropertyValue, type="select"):
+class Select(NativeTypeMixin, PropertyValue, type="select"):
     """Notion select type."""
 
     select: SelectValue | None = None
@@ -330,7 +330,7 @@ class SelectOne(NativeTypeMixin, PropertyValue, type="select"):
 
     @classmethod
     def __compose__(cls, value, color=None):
-        """Create a `SelectOne` property from the given value.
+        """Create a `Select` property from the given value.
 
         :param value: a string to use for this property
         :param color: an optional Color for the value

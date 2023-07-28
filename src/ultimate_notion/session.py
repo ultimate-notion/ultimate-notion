@@ -129,7 +129,7 @@ class Session:
     def create_db(self, parent: Page, schema: PageSchema | type[PageSchema] | None) -> Database:
         """Create a new database"""
         if schema:
-            schema._init_forward_relations()
+            schema._init_fwd_rels()
             schema_no_backrels_dct = {
                 name: prop_type
                 for name, prop_type in schema.to_dict().items()
@@ -144,7 +144,7 @@ class Session:
 
         if schema:
             db.schema = schema
-            schema._init_backward_relations()
+            schema._init_bwd_rels()
 
         self._object_store[db.id] = db
         return db

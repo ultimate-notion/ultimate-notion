@@ -26,7 +26,7 @@ class View:
         self.database = database
         self._live_update = live_update
         self._query = query
-        self._title_col = database.schema.get_title_property_name()
+        self._title_col = database.schema.get_title_property().name
         self._columns = self._get_columns(self._title_col)
         self._pages = np.array(pages)
 
