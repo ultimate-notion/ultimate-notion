@@ -13,7 +13,7 @@ import notion_client
 from notion_client.errors import APIResponseError
 
 from ultimate_notion.obj_api.endpoints import NotionAPI
-from ultimate_notion.record import Record
+from ultimate_notion.blocks import Record
 from ultimate_notion.blocks import Block
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api import blocks, types

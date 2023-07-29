@@ -23,7 +23,7 @@ from ultimate_notion.obj_api.text import Color
 from ultimate_notion.utils import SList
 from ultimate_notion.page import Page
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.record import Record
+from ultimate_notion.blocks import Record
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database

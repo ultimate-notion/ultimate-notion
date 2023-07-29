@@ -10,7 +10,7 @@ from notion_client.errors import APIResponseError
 from polling2 import poll
 
 from ultimate_notion.obj_api import types
-from ultimate_notion.record import Record
+from ultimate_notion.blocks import Record
 
 T = TypeVar('T')
 ObjRef: TypeAlias = UUID | str

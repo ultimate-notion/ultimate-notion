@@ -7,7 +7,7 @@ from notion2md.exporter.block import StringExporter
 
 from ultimate_notion.obj_api import types
 from ultimate_notion.obj_api import props
-from ultimate_notion.record import Record
+from ultimate_notion.blocks import Record
 from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 #   * use the schema of the database to see which properties are writeable at all.
 
 
-class Properties:
+class PropsNS:
     """Properties namespace for a page"""
 
     ...
@@ -25,6 +25,9 @@ class Properties:
 
 class Page(Record):
     live_update: bool = True
+
+    def __init__(self, obj_ref):
+        super().__init__(obj_ref)
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     #     self._children = list(self.session.api.blocks.children.list(parent=self.obj_ref))

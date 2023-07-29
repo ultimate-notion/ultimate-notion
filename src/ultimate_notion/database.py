@@ -7,7 +7,7 @@ from ultimate_notion.obj_api import blocks, types
 from ultimate_notion.obj_api.text import make_safe_python_name
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
-from ultimate_notion.record import Record
+from ultimate_notion.blocks import Record
 from ultimate_notion.schema import PageSchema, Property, PropertyType, SchemaError
 from ultimate_notion.utils import decapitalize
 from ultimate_notion.view import View
