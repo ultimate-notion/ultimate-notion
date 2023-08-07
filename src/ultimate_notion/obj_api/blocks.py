@@ -68,58 +68,6 @@ class Page(DataRecord, object="page"):
     cover: Optional[FileObject] = None
     properties: Dict[str, PropertyValue] = {}
 
-    def __getitem__(self, name):
-        """Indexer for the given property name.
-
-        :param name: the name of the property to get from the internal properties
-        """
-
-        prop = self.properties.get(name)
-
-        if prop is None:
-            raise AttributeError(f"No such property: {name}")
-
-        return prop
-
-    def __setitem__(self, name, value):
-        """Set the object data for the given property.
-
-        If `value` is `None`, the property data will be deleted from the page.  This
-        does not affect the schema of the page, only the contents of the property.
-
-        :param name: the name of the property to set in the internal properties
-        :param value: the new value for the given property
-        """
-
-        if value is None:
-            self.properties.pop(name, None)
-
-        elif isinstance(value, PropertyValue):
-            self.properties[name] = value
-
-        else:
-            raise ValueError(f"Unable to set {name} :: unsupported value type")
-
-    # ToDo: Remove this!
-    @property
-    def Title(self):
-        """Return the title of this page as a string.
-
-        The title of a page is stored in its properties.  This method will examine the
-        page properties, looking for the appropriate `title` entry and return as a
-        string.
-        """
-
-        # the 'title' property may (or may not) be indexed by name...  especially in
-        # the case of # database pages.  the only reliable way to find the title is by
-        # scanning each property.
-
-        for prop in self.properties.values():
-            if prop.id == "title":
-                return prop.Value
-
-        return None
-
 
 class Block(DataRecord, TypedObject, object="block"):
     """A standard block object in Notion.

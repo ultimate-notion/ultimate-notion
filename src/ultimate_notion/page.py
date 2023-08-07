@@ -6,11 +6,10 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 from notion2md.exporter.block import StringExporter
 
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.obj_api import props
-from ultimate_notion.obj_api import types
+from ultimate_notion.obj_api import types as obj_types
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.blocks import Record
-from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook
+from ultimate_notion.utils import is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -25,14 +24,14 @@ class PageProperty:
     def __init__(self, prop_name: str):
         self._prop_name = prop_name
 
-    def __get__(self, obj: Properties, type=None) -> PropertyValue:
+    def __get__(self, obj: PageProperties, type=None) -> PropertyValue:
         return obj[self._prop_name]
 
-    def __set__(self, obj: Properties, value):
+    def __set__(self, obj: PageProperties, value):
         obj[self._prop_name] = value
 
 
-class PagePropertiesNS:
+class PageProperties:
     """Properties of a page as defined in the schema of the database
 
     Access with the properties with `.property_name` or `["Property Name"]`.
@@ -40,6 +39,7 @@ class PagePropertiesNS:
 
     def __init__(self, page: Page):
         self._page = page
+        self._schema = page.database.schema
 
     def __getitem__(self, prop_name: str) -> PropertyValue:
         prop = self._page.obj_ref.properties.get(prop_name)
@@ -52,7 +52,7 @@ class PagePropertiesNS:
     def __setitem__(self, prop_name: str, value: Any):
         if not isinstance(value, PropertyValue):
             # construct concrete PropertyValue using the schema
-            prop_type_cls = self._page.database.schema.to_dict()[prop_name]
+            prop_type_cls = self._schema.to_dict()[prop_name]
             prop_value_cls = PropertyValue._get_value_from_type(prop_type_cls)
             value = prop_value_cls(value)
 
@@ -70,21 +70,28 @@ class PagePropertiesNS:
 
 class Page(Record):
     obj_ref: obj_blocks.Page
-    props: PagePropertiesNS | None = None
+    props: PageProperties | None = None
 
     def __init__(self, obj_ref):
         super().__init__(obj_ref)
         if self.database:
-            self.props = self._create_props_ns()
+            self.props = self._create_prop_attrs()
 
-    def _create_props_ns(self) -> PagePropertiesNS:
-        """Create the namespace for the database properties of this page"""
-        # We have to subclass in order to populate it with the descriptor PageProperty as
+    def _create_prop_attrs(self) -> PageProperties:
+        """Create the attributes for the database properties of this page"""
+        # We have to subclass in order to populate it with the descriptor `PageProperty`` as
         # this only works on the class level.
-        page_props_cls = type("PagePropertiesNS", (PagePropertiesNS,), {})
+        page_props_cls = type("_PageProperties", (PageProperties,), {})
         for prop in self.database.schema.get_props():
             setattr(page_props_cls, prop.attr_name, PageProperty(prop.name))
         return page_props_cls(page=self)
+
+    def __str__(self) -> str:
+        return self.show(display=False)
+
+    def __repr__(self) -> str:
+        cls_name = self.__class__.__name__
+        return f"<{cls_name}: '{self.title}' at {hex(id(self))}>"
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     #     self._children = list(self.session.api.blocks.children.list(parent=self.obj_ref))
@@ -106,7 +113,22 @@ class Page(Record):
 
     @property
     def title(self) -> str:
-        return self.obj_ref.Title
+        """Title of the page"""
+        # The 'title' property might be renamed in case of pages in databases, thus look for the actual type.
+        for prop in self.obj_ref.properties.values():
+            if prop.id == "title":
+                return prop.Value
+
+    @property
+    def icon(self) -> str:
+        icon = self.obj_ref.icon
+        if isinstance(icon, obj_types.FileObject):
+            return icon.URL
+        elif isinstance(icon, obj_types.EmojiObject):
+            return icon.emoji
+        else:
+            msg = f'unknown icon object of {type(icon)}'
+            raise RuntimeError(msg)
 
     def markdown(self) -> str:
         """Return the content of the page as Markdown"""
@@ -140,63 +162,6 @@ class Page(Record):
             display_markdown(md, raw=True)
         else:
             return md
-
-    def __str__(self) -> str:
-        return self.show(display=False)
-
-    def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self.title}' at {hex(id(self))}>"
-
-    @property
-    def icon(self) -> str:
-        icon = self.obj_ref.icon
-        if isinstance(icon, types.FileObject):
-            return icon.URL
-        elif isinstance(icon, types.EmojiObject):
-            return icon.emoji
-        else:
-            msg = f'unknown icon object of {type(icon)}'
-            raise RuntimeError(msg)
-
-    def _resolve_relation(self, relation):
-        for ref in relation:
-            yield self.session.get_page(ref.id)
-
-    def __getitem__(self, property_name) -> types.PropertyValue:
-        # ToDo change the logic here. Use a wrapper functionality as in `schema`
-        val = self.obj_ref[property_name]
-        if isinstance(val, props.Date):
-            val = val.date
-        elif isinstance(val, props.Relation):
-            val = [p.title for p in self._resolve_relation(val)]
-        elif isinstance(val, props.Formula):
-            val = val.Result
-        elif isinstance(val, props.LastEditedBy | props.CreatedBy):
-            if not (user_id := val.last_edited_by.id):
-                raise RuntimeError("Cannot determine id of user!")
-            val = str(self.session.get_user(user_id))
-        elif isinstance(val, props.MultiSelect):
-            val = val.Values
-        elif isinstance(val, props.NativeTypeMixin):
-            val = val.Value
-        else:
-            msg = f'Unknown property type {type(val)}'
-            raise RuntimeError(msg)
-        return val
-
-    def __setitem__(self, property_name: str, value: Any):
-        if not self.database:
-            msg = 'This page is not within a database'
-            raise RuntimeError(msg)
-
-        value_type = type(self.database.schema.to_dict()[property_name])
-        prop = value_type(value)
-        self.obj_ref[property_name] = prop.obj_ref
-
-        if self.live_update:
-            # update the property on the server (which will refresh the local data)
-            self.session.api.pages.update(self.obj_ref, **{property_name: self.obj_ref[property_name]})
 
     def delete(self):
         self.session.api.pages.delete(self.obj_ref)
