@@ -5,8 +5,10 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from notion2md.exporter.block import StringExporter
 
-from ultimate_notion.obj_api import types
+from ultimate_notion.props import PropertyValue
 from ultimate_notion.obj_api import props
+from ultimate_notion.obj_api import types
+from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.blocks import Record
 from ultimate_notion.utils import deepcopy_with_sharing, get_uuid, is_notebook
 
@@ -17,17 +19,72 @@ if TYPE_CHECKING:
 #   * use the schema of the database to see which properties are writeable at all.
 
 
-class PropsNS:
-    """Properties namespace for a page"""
+class PageProperty:
+    """Property of a page implementing the descriptor protocol"""
 
-    ...
+    def __init__(self, prop_name: str):
+        self._prop_name = prop_name
+
+    def __get__(self, obj: Properties, type=None) -> PropertyValue:
+        return obj[self._prop_name]
+
+    def __set__(self, obj: Properties, value):
+        obj[self._prop_name] = value
+
+
+class PagePropertiesNS:
+    """Properties of a page as defined in the schema of the database
+
+    Access with the properties with `.property_name` or `["Property Name"]`.
+    """
+
+    def __init__(self, page: Page):
+        self._page = page
+
+    def __getitem__(self, prop_name: str) -> PropertyValue:
+        prop = self._page.obj_ref.properties.get(prop_name)
+        if prop is None:
+            msg = f"No such property: {prop_name}"
+            raise AttributeError(msg)
+
+        return PropertyValue.wrap_obj_ref(obj_ref=prop)
+
+    def __setitem__(self, prop_name: str, value: Any):
+        if not isinstance(value, PropertyValue):
+            # construct concrete PropertyValue using the schema
+            prop_type_cls = self._page.database.schema.to_dict()[prop_name]
+            prop_value_cls = PropertyValue._get_value_from_type(prop_type_cls)
+            value = prop_value_cls(value)
+
+        # update the property on the server (which will refresh the local data)
+        self._page.session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
+
+    def __iter__(self):
+        """Iterator of property names"""
+        yield from self._page.obj_ref.properties.keys()
+
+    def to_dict(self) -> dict[str, Any]:
+        """All page properties as dictionary"""
+        return {prop_name: self[prop_name] for prop_name in self}
 
 
 class Page(Record):
-    live_update: bool = True
+    obj_ref: obj_blocks.Page
+    props: PagePropertiesNS | None = None
 
     def __init__(self, obj_ref):
         super().__init__(obj_ref)
+        if self.database:
+            self.props = self._create_props_ns()
+
+    def _create_props_ns(self) -> PagePropertiesNS:
+        """Create the namespace for the database properties of this page"""
+        # We have to subclass in order to populate it with the descriptor PageProperty as
+        # this only works on the class level.
+        page_props_cls = type("PagePropertiesNS", (PagePropertiesNS,), {})
+        for prop in self.database.schema.get_props():
+            setattr(page_props_cls, prop.attr_name, PageProperty(prop.name))
+        return page_props_cls(page=self)
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     #     self._children = list(self.session.api.blocks.children.list(parent=self.obj_ref))
@@ -39,11 +96,13 @@ class Page(Record):
 
     @property
     def database(self) -> Database | None:
-        """Retrieve database from parent or None"""
-        if not isinstance(self.parent, types.DatabaseRef):
-            return None
+        """If this page is located in a database return the database or None otherwise"""
+        from ultimate_notion.database import Database
+
+        if isinstance(self.parent, Database):
+            return self.parent
         else:
-            return self.session.get_db(get_uuid(self.parent))
+            return None
 
     @property
     def title(self) -> str:
@@ -100,20 +159,6 @@ class Page(Record):
             msg = f'unknown icon object of {type(icon)}'
             raise RuntimeError(msg)
 
-    @property
-    def properties(self) -> dict[str, Any]:
-        """Page properties as dictionary.
-
-        This includes properties defined by a database schema as well as meta properties like creation time, etc.
-        """
-        dct = super().properties  # meta properties
-        for k in self.obj_ref.properties:
-            dct[k] = self[k]
-        return dct
-
-    def clone(self) -> Page:
-        return deepcopy_with_sharing(self, shared_attributes=['session'])
-
     def _resolve_relation(self, relation):
         for ref in relation:
             yield self.session.get_page(ref.id)
@@ -152,10 +197,6 @@ class Page(Record):
         if self.live_update:
             # update the property on the server (which will refresh the local data)
             self.session.api.pages.update(self.obj_ref, **{property_name: self.obj_ref[property_name]})
-
-    def __delitem__(self, key):
-        # ToDo: Implement me!
-        pass
 
     def delete(self):
         self.session.api.pages.delete(self.obj_ref)

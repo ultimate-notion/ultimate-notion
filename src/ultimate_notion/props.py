@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import ClassVar, Any, TYPE_CHECKING
+from abc import abstractmethod
 
 import ultimate_notion.obj_api.props as obj_props
 
@@ -57,6 +58,12 @@ class PropertyValue:
     def _get_value_from_type(cls, type: type[PropertyType]) -> type[PropertyValue]:
         """Retrieve the corresponding property value to a type defined in the schema"""
         return cls._type_value_map[type.obj_ref.type]
+
+    # ToDo: Make this abstract and implement in every subclass
+    @property
+    # @abstractmethod
+    def value(self) -> Any:
+        return self.obj_ref.Value
 
 
 class Title(PropertyValue, type=obj_props.Title):

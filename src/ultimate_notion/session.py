@@ -191,7 +191,7 @@ class Session:
             exact: perform an exact search, not only a substring match
         """
         query = self.api.search(title).filter(property='object', value='page')
-        pages = SList(self._object_store.get(page.id, Page(obj_ref=page)) for page in query.execute())
+        pages = SList(self._object_store.setdefault(page.id, Page(obj_ref=page)) for page in query.execute())
         if exact and title is not None:
             pages = SList(page for page in pages if page.title == title)
         return pages

@@ -72,15 +72,14 @@ class PageSchema:
         for kwarg, value in kwargs.items():
             prop_type_cls = schema_kwargs[kwarg].type
             prop_value_cls = PropertyValue._get_value_from_type(prop_type_cls)
-            if isinstance(value, Record):
+            if isinstance(value, Record):  # unwrap relations
                 value = value.obj_ref
 
             prop_value = prop_value_cls(value)
             schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
 
         db = cls.get_db()
-        session = db.session
-        page = Page(obj_ref=session.api.pages.create(parent=db.obj_ref, properties=schema_dct))
+        page = Page(obj_ref=db.session.api.pages.create(parent=db.obj_ref, properties=schema_dct))
         return page
 
     @classmethod
@@ -98,7 +97,7 @@ class PageSchema:
         return {prop.name: prop.type for prop in cls.get_props()}
 
     @classmethod
-    def get_title_property(cls) -> Property:
+    def get_title_prop(cls) -> Property:
         """Returns the title property"""
         return SList(prop for prop in cls.get_props() if isinstance(prop.type, Title)).item()
 
@@ -226,7 +225,7 @@ class Property:
     _type: PropertyType  # noqa: A003
     # properties below are set by __set_name__
     _schema: PageSchema
-    _attr_name: str  # Python name of the property in the schema
+    _attr_name: str  # Python attribute name of the property in the schema
 
     def __init__(self, name: str, type: PropertyType) -> None:
         self._name = name
@@ -252,6 +251,10 @@ class Property:
     @type.setter
     def type(self, new_type: PropertyType):
         raise NotImplementedError
+
+    @property
+    def attr_name(self) -> str:
+        return self._attr_name
 
 
 class Title(PropertyType, type=obj_schema.Title):

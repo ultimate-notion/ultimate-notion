@@ -26,7 +26,7 @@ class View:
         self.database = database
         self._live_update = live_update
         self._query = query
-        self._title_col = database.schema.get_title_property().name
+        self._title_col = database.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
         self._pages = np.array(pages)
 
@@ -87,7 +87,7 @@ class View:
             elif col == self._icon_name:
                 row.append(page.icon)
             else:
-                row.append(page.properties[col])
+                row.append(page.props[col])
         return row
 
     def rows(self) -> list[list[Any]]:

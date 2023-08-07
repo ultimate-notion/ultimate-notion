@@ -122,6 +122,8 @@ class WorkspaceRef(ParentRef, type="workspace"):
 class UserRef(NotionObject, object="user"):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
 
+    # ToDo: Here is a __compose__ missing
+
 
 class UserType(str, Enum):
     """Available user types."""

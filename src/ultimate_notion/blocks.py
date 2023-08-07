@@ -16,9 +16,9 @@ if TYPE_CHECKING:
 class Record:
     """The base type for all Notion objects."""
 
-    obj_ref: blocks.DataRecord
+    # Todo: Rename this to `DataObject`
 
-    # Todo: Implement here some singleton principle so that getting the same page results in just looking up the record.
+    obj_ref: blocks.DataRecord  # THIS TOO!
 
     def __init__(self, obj_ref):
         """Notional object reference for dispatch"""
@@ -75,7 +75,6 @@ class Record:
     @property
     def parents(self) -> tuple[Record, ...]:
         """Return all parents from the workspace to the actual record (excluding)"""
-        # ToDo: Check if an option skip_blocks flag makes sense and only show pages and databases as records.
         match (parent := self.parent):
             case None:
                 return ()
