@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 ## Installation
 
@@ -22,7 +22,6 @@ associated to. After that click the <kbd>Submit</kbd> button.
 
 This brings you to the Secrets-site where you need to copy and save the *Internal Integration Token*, which always starts
 with `secret_`. This token will be used by Ultimate Notion for authentication.
-
 
 ## Granting access to an integration
 
