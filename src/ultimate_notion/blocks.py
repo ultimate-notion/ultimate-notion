@@ -110,4 +110,4 @@ class Record:
 
 
 class Block(Record):
-    live_update: bool = True
+    pass

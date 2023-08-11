@@ -22,9 +22,8 @@ T = TypeVar('T')
 
 
 class View:
-    def __init__(self, database: Database, pages: list[Page], query: QueryBuilder, *, live_update: bool):
+    def __init__(self, database: Database, pages: list[Page], query: QueryBuilder):
         self.database = database
-        self._live_update = live_update
         self._query = query
         self._title_col = database.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
@@ -211,26 +210,6 @@ class View:
         view._id_name = None
         return view
 
-    @property
-    def live_update(self):
-        return self._live_update
-
-    def with_live_update(self) -> View:
-        if self.live_update:
-            return self
-        for page in self._pages:
-            page.live_update = True
-        self._live_update = True
-        return self
-
-    def without_live_update(self) -> View:
-        if not self.live_update:
-            return self
-        for page in self._pages:
-            page.live_update = False
-        self._live_update = False
-        return self
-
     def head(self, num: int) -> View:
         """Keep only the first `num` elements in view"""
         view = self.clone()
@@ -271,8 +250,6 @@ class View:
     def apply(self, func: Callable[[Page], T]) -> list[T]:
         """Apply function to all pages in view
 
-        If the function modifies a page, the pages will be broadcast to Notion if `live_update` is True
-
         Args:
             func: function taking a Page as input
         """
@@ -293,5 +270,5 @@ class View:
     def reload(self) -> View:
         """Reload all pages by re-executing the query that generated the view"""
         view = self.clone()
-        view._pages = self.database._pages_from_query(query=self._query, live_update=self._live_update)
+        view._pages = self.database._pages_from_query(query=self._query)
         return view

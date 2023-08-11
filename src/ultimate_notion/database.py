@@ -109,16 +109,14 @@ class Database(Record):
         """Delete this database"""
         self.session.api.blocks.delete(self.id)
 
-    def _pages_from_query(self, *, query, live_update: bool = True) -> list[Page]:
-        pages = [Page(page_obj) for page_obj in query.execute()]
-        for page in pages:
-            page.live_update = live_update
-        return pages
+    def _pages_from_query(self, *, query) -> list[Page]:
+        # ToDo: Remove when self.query is implemented!
+        return [Page(page_obj) for page_obj in query.execute()]
 
-    def view(self, *, live_update: bool = True) -> View:
+    def view(self) -> View:
         query = self.session.api.databases.query(self.id)  # ToDo: use self.query when implemented
-        pages = self._pages_from_query(query=query, live_update=live_update)
-        return View(database=self, pages=pages, query=query, live_update=live_update)
+        pages = [Page(page_obj) for page_obj in query.execute()]
+        return View(database=self, pages=pages, query=query)
 
     def create_page(self, **kwargs) -> Page:
         """Return page object"""
