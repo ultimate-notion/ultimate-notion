@@ -1,6 +1,7 @@
 # Data models & schemas
 
 # Todo: Use to run this https://github.com/koaning/mktestdocs
+# ToDo: Create/Read/Update/Delete (CRUD) operations
 
 We gonna create two simple databases with a relation quite similar as described
 in the [Notion docs]. We gonna have a database for customers and one for items
