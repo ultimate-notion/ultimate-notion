@@ -42,7 +42,7 @@ class SchemaError(Exception):
 class SchemaNotBoundError(SchemaError):
     """Raised when the schema is not bound to a database."""
 
-    def __init__(self, schema: PageSchema):
+    def __init__(self, schema: type[PageSchema]):
         msg = f"Schema {schema.__name__} is not bound to any database"
         super().__init__(msg)
 
@@ -102,7 +102,7 @@ class PageSchema:
         return SList(prop for prop in cls.get_props() if isinstance(prop.type, Title)).item()
 
     @classmethod
-    def is_consistent_with(cls, other_schema: PageSchema) -> bool:
+    def is_consistent_with(cls, other_schema: type[PageSchema]) -> bool:
         """Is this schema consistent with another ignoring backward relations if not in other schema"""
         own_schema_dct = cls.to_dict()
         other_schema_dct = other_schema.to_dict()
@@ -140,9 +140,6 @@ class PageSchema:
     def is_bound(cls) -> bool:
         """Returns if the schema is bound to a database"""
         return cls._database is not None
-
-    def __getitem__(self, prop_name: str) -> Property:
-        return self.to_dict()[prop_name]
 
     @classmethod
     def _init_fwd_rels(cls):
@@ -224,14 +221,14 @@ class Property:
     _name: str
     _type: PropertyType  # noqa: A003
     # properties below are set by __set_name__
-    _schema: PageSchema
+    _schema: type[PageSchema]
     _attr_name: str  # Python attribute name of the property in the schema
 
     def __init__(self, name: str, type: PropertyType) -> None:
         self._name = name
         self._type = type
 
-    def __set_name__(self, owner: PageSchema, name: str):
+    def __set_name__(self, owner: type[PageSchema], name: str):
         self._schema = owner
         self._attr_name = name
         self._type.prop_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
@@ -339,7 +336,7 @@ class Relation(PropertyType, type=obj_schema.Relation):
     _schema: PageSchema | None = None
     _two_way_prop: Property | None = None
 
-    def __init__(self, schema: PageSchema | type[PageSchema] | None = None, *, two_way_prop: Property | None = None):
+    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Property | None = None):
         if two_way_prop and not schema:
             raise RuntimeError("`schema` needs to be provided if `two_way_prop` is set")
         if isinstance(schema, type):
@@ -348,7 +345,7 @@ class Relation(PropertyType, type=obj_schema.Relation):
         self._two_way_prop = two_way_prop
 
     @property
-    def schema(self) -> PageSchema | None:
+    def schema(self) -> type[PageSchema] | None:
         if self._schema:
             return self._schema
         elif self.prop_ref._schema.is_bound():

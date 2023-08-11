@@ -6,7 +6,7 @@ from ultimate_notion import database, schema
 def test_schema(simple_db: database.Database):
     ref_schema = simple_db.schema
 
-    assert isinstance(ref_schema, schema.PageSchema)
+    assert issubclass(ref_schema, schema.PageSchema)
     db_schema = {
         'Name': schema.Title(),
         'Cost': schema.Number(schema.NumberFormat.DOLLAR),

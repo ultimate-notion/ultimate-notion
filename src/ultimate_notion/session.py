@@ -126,7 +126,7 @@ class Session:
             msg = 'Unable to get current user'
             raise SessionError(msg)
 
-    def create_db(self, parent: Page, schema: PageSchema | type[PageSchema] | None) -> Database:
+    def create_db(self, parent: Page, schema: type[PageSchema] | None) -> Database:
         """Create a new database"""
         if schema:
             schema._init_fwd_rels()

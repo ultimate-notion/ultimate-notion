@@ -23,7 +23,7 @@ class Database(Record):
     """
 
     obj_ref: blocks.Database
-    _schema: PageSchema | None = None
+    _schema: type[PageSchema] | None = None
 
     def __init__(self, obj_ref: blocks.Database):
         super().__init__(obj_ref)
@@ -65,7 +65,7 @@ class Database(Record):
     def cover(self) -> types.FileObject | None:
         return self.obj_ref.cover
 
-    def _reflect_schema(self, obj_ref: blocks.Database) -> PageSchema:
+    def _reflect_schema(self, obj_ref: blocks.Database) -> type[PageSchema]:
         """Reflection about the database schema"""
         cls_name = f'{make_safe_python_name(self.title).capitalize()}Schema'
         attrs = {
@@ -75,20 +75,17 @@ class Database(Record):
         schema = type(cls_name, (PageSchema,), attrs, db_title=self.title)
         schema.bind_db(self)
         schema.custom_schema = False
-        return schema()
+        return schema
 
     @property
-    def schema(self) -> PageSchema:
+    def schema(self) -> type[PageSchema]:
         if not self._schema:
             self._schema = self._reflect_schema(self.obj_ref)
         return self._schema
 
     @schema.setter
-    def schema(self, schema: PageSchema | type[PageSchema]):
+    def schema(self, schema: type[PageSchema]):
         """Set a custom schema in order to change the Python variables names"""
-        if isinstance(schema, type):
-            schema = schema()
-
         if self.schema.is_consistent_with(schema):
             schema.bind_db(self)
             self._schema = schema
