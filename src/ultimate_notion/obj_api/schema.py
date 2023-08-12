@@ -1,11 +1,11 @@
 """Objects representing a database schema."""
-
+# ToDo: Following line creats a forward reference error in pydantic. Is this fixed in Pydantic 2?
+# from __future__ import annotations
 from enum import Enum
 from typing import Any, List, Optional
 from uuid import UUID
 
 import pydantic
-
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
 from ultimate_notion.obj_api.text import Color
@@ -88,6 +88,13 @@ class NumberFormat(str, Enum):
     URUGUAYAN_PESO = "uruguayan_peso"
 
 
+class VerificationState(str, Enum):
+    """Available verification states for pages in wiki databases"""
+
+    VERIFIED = "verified"
+    UNVERIFIED = "unverified"
+
+
 class PropertyObject(TypedObject):
     """Base class for Notion property objects."""
 
@@ -162,6 +169,11 @@ class MultiSelect(PropertyObject, type="multi_select"):
 
     multi_select: _NestedData = _NestedData()
 
+    # @classmethod
+    # def __compose__(cls, options):
+    #     """Create a `Select` object from the list of `SelectOption`'s."""
+    #     return cls(multi_select=cls._NestedData(options=options))
+
 
 class Status(PropertyObject, type="status"):
     """Defines the status configuration for a database property."""
@@ -218,6 +230,10 @@ class Formula(PropertyObject, type="formula"):
         expression: str = None
 
     formula: _NestedData = _NestedData()
+
+    @classmethod
+    def __compose__(cls, expression):
+        return cls(formula=cls._NestedData(expression=expression))
 
 
 class PropertyRelation(TypedObject):
@@ -288,6 +304,12 @@ class Rollup(PropertyObject, type="rollup"):
 
     rollup: _NestedData = _NestedData()
 
+    @classmethod
+    def __compose__(cls, relation, property, function):
+        return Rollup(
+            rollup=cls._NestedData(function=function, relation_property_name=relation, rollup_property_name=property)
+        )
+
 
 class CreatedTime(PropertyObject, type="created_time"):
     """Defines the created-time configuration for a database property."""
@@ -311,6 +333,18 @@ class LastEditedTime(PropertyObject, type="last_edited_time"):
     """Defines the last-edited-time configuration for a database property."""
 
     last_edited_time: Any = {}
+
+
+class UniqueID(PropertyObject, type="unique_id"):
+    """Unique ID database property"""
+
+    unique_id: Any = {}
+
+
+class Verification(PropertyObject, type="verification"):
+    """Verfication database property of Wiki databases"""
+
+    verification: Any = {}
 
 
 class RenameProp(GenericObject):

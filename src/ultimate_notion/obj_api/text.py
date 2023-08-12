@@ -273,6 +273,8 @@ class RichTextObject(TypedObject):
 class TextObject(RichTextObject, type="text"):
     """Notion text element."""
 
+    # TODO: See if this is really different than RichtTextObject.
+
     class _NestedData(GenericObject):
         content: str = None
         link: Optional[LinkObject] = None

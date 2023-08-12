@@ -1,3 +1,8 @@
+"""
+Page properties especially for pages within databases
+
+The names of the properties reflect the name in the Notion UI.
+"""
 from __future__ import annotations
 
 from typing import ClassVar, Any, TYPE_CHECKING
@@ -90,7 +95,7 @@ class Status(PropertyValue, type=obj_props.Status):
     """Status property value"""
 
 
-class SingleSelect(PropertyValue, type=obj_props.Select):
+class Select(PropertyValue, type=obj_props.Select):
     """Single select property value"""
 
 
@@ -144,3 +149,13 @@ class LastEditedTime(PropertyValue, type=obj_props.LastEditedTime):
 
 class LastEditedBy(PropertyValue, type=obj_props.LastEditedBy):
     """A Notion last-edited-by property value."""
+
+
+class ID(PropertyValue, type=obj_props.UniqueID):
+    """A Notion unique ID property value"""
+
+
+class Verification(PropertyValue, type=obj_props.Verification):
+    """A verification property value of pages in wiki databases"""
+
+    # ToDo: Implement properties to retrieve user, etc. and convert user to actual high-level User object

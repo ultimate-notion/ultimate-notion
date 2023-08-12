@@ -1,5 +1,11 @@
 """Functionality around defining a database schema
 
+Currently only normal databases, no wiki databases, can be created [1].
+Neither the `Unique ID` nor `Status` nor the `Verfication` page property can be set as a database column
+in a custom Schema when creating the database.
+
+[1] https://developers.notion.com/docs/working-with-databases#wiki-databases
+
 
 ### Design Principles
 
@@ -18,7 +24,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import ultimate_notion.obj_api.schema as obj_schema
-from ultimate_notion.obj_api.schema import NumberFormat
+from ultimate_notion.obj_api.schema import NumberFormat, Function
 from ultimate_notion.obj_api.text import Color
 from ultimate_notion.utils import SList
 from ultimate_notion.page import Page
@@ -27,6 +33,7 @@ from ultimate_notion.blocks import Record
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
+
 
 # Todo: Move the functionality from the PyDantic types in here and elimate the __compose__
 
@@ -175,6 +182,8 @@ class PropertyType:
     Used to map high-level objects to low-level Notion-API objects
     """
 
+    readonly: bool = False  # attribute can neither be initialised nor set later
+    allowed_at_creation = True  # wether the Notion API allows new database with a column of that type
     obj_ref: obj_schema.PropertyObject
     prop_ref: Property
 
@@ -255,15 +264,15 @@ class Property:
 
 
 class Title(PropertyType, type=obj_schema.Title):
-    """Mandatory Title property"""
+    """Defines the mandatory title column in a database"""
 
 
 class Text(PropertyType, type=obj_schema.RichText):
-    """Text property"""
+    """Defines a text column in a database"""
 
 
 class Number(PropertyType, type=obj_schema.Number):
-    """Mandatory Title property"""
+    """Defines a number column in a database"""
 
     def __init__(self, number_format: NumberFormat):
         super().__init__(number_format)
@@ -277,8 +286,8 @@ class SelectOption(PropertyType, type=obj_schema.SelectOption):
         super().__init__(name=name, color=color)
 
 
-class SingleSelect(PropertyType, type=obj_schema.Select):
-    """Single selection property"""
+class Select(PropertyType, type=obj_schema.Select):
+    """Defines a select column in a database"""
 
     def __init__(self, options: list[SelectOption]):
         options = [option.obj_ref for option in options]
@@ -286,52 +295,65 @@ class SingleSelect(PropertyType, type=obj_schema.Select):
 
 
 class MultiSelect(PropertyType, type=obj_schema.MultiSelect):
-    """Multi selection property"""
+    """Defines a multi-select column in a database"""
+
+    # def __init__(self, options: list[SelectOption]):
+    #     options = [option.obj_ref for option in options]
+    #     super().__init__(options)
 
 
 class Status(PropertyType, type=obj_schema.Status):
-    """Status property"""
+    """Defines a status column in a database"""
+
+    allowed_at_creation = False
 
 
 class Date(PropertyType, type=obj_schema.Date):
-    """Date property"""
+    """Defines a date column in a database"""
 
 
 class People(PropertyType, type=obj_schema.People):
-    """People property"""
+    """Defines a people column in a database"""
 
 
 class Files(PropertyType, type=obj_schema.Files):
-    """Files property"""
+    """Defines a files column in a database"""
 
 
 class Checkbox(PropertyType, type=obj_schema.Checkbox):
-    """Checkbox property"""
+    """Defines a checkbox column in database"""
 
 
 class Email(PropertyType, type=obj_schema.Email):
-    """E-Mail property"""
+    """Defines an e-mail column in a database"""
 
 
 class URL(PropertyType, type=obj_schema.URL):
-    """URL property"""
+    """Defines a URL column in a database"""
 
 
 class PhoneNumber(PropertyType, type=obj_schema.PhoneNumber):
-    """Phone number property"""
+    """Defines a phone number column in a database"""
 
 
 class Formula(PropertyType, type=obj_schema.Formula):
-    """Formula Property"""
+    """Defines a formula column in a database"""
+
+    readonly = True
+
+    def __init__(self, expression: str):
+        # ToDo: Replace with call to `build` later
+        super().__init__(expression)
 
 
 class RelationError(SchemaError):
-    """Error if a Relation Property cannot be initialised"""
-
-    pass
+    """Error if a Relation cannot be initialised"""
 
 
 class Relation(PropertyType, type=obj_schema.Relation):
+    """Relation to another database"""
+
+    readonly = True
     obj_ref: obj_schema.Relation | None = None
     _schema: PageSchema | None = None
     _two_way_prop: Property | None = None
@@ -399,23 +421,56 @@ class Relation(PropertyType, type=obj_schema.Relation):
             our_db.schema._set_obj_refs()
 
 
-class Rollup(PropertyType, type=obj_schema.Rollup):
-    """Defines the rollup configuration for a database property."""
+class RollupError(SchemaError):
+    """Error if definition of rollup is wrong"""
 
-    # ToDo: Needs a constructor?
+
+class Rollup(PropertyType, type=obj_schema.Rollup):
+    """Defines the rollup column in a database"""
+
+    readonly = True
+
+    def __init__(self, relation: Property, property: Property, calculate: Function):
+        if not isinstance(relation.type, Relation):
+            msg = f"Relation {relation} must be of type Relation"
+            raise RollupError(msg)
+        # ToDo: One could check here if property really is a property in the database where relation points to
+        super().__init__(relation.name, property.name, calculate)
 
 
 class CreatedTime(PropertyType, type=obj_schema.CreatedTime):
-    """Defines the created-time configuration for a database property."""
+    """Defines the created-time column in a database"""
+
+    readonly = True
 
 
 class CreatedBy(PropertyType, type=obj_schema.CreatedBy):
-    """Defines the created-by configuration for a database property."""
+    """Defines the created-by column in a database"""
+
+    readonly = True
 
 
 class LastEditedBy(PropertyType, type=obj_schema.LastEditedBy):
-    """Defines the last-edited-by configuration for a database property."""
+    """Defines the last-edited-by column in a database"""
+
+    readonly = True
 
 
 class LastEditedTime(PropertyType, type=obj_schema.LastEditedTime):
-    """Defines the last-edited-time configuration for a database property."""
+    """Defines the last-edited-time column in a database"""
+
+    readonly = True
+
+
+class ID(PropertyType, type=obj_schema.UniqueID):
+    """Defines a unique ID column in a database"""
+
+    readonly = True
+    allowed_at_creation = False
+
+
+class Verification(PropertyType, type=obj_schema.Verification):
+    """Defines a unique ID column in a database"""
+
+    readonly = True
+    allowed_at_creation = False

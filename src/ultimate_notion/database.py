@@ -1,7 +1,7 @@
 """Database object"""
 from __future__ import annotations
 
-from copy import deepcopy
+from textwrap import dedent
 
 from ultimate_notion.obj_api import blocks, types
 from ultimate_notion.obj_api.text import make_safe_python_name
@@ -9,7 +9,7 @@ from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
 from ultimate_notion.blocks import Record
 from ultimate_notion.schema import PageSchema, Property, PropertyType, SchemaError
-from ultimate_notion.utils import decapitalize
+from ultimate_notion.utils import decapitalize, dict_diff_str
 from ultimate_notion.view import View
 
 
@@ -65,6 +65,11 @@ class Database(Record):
     def cover(self) -> types.FileObject | None:
         return self.obj_ref.cover
 
+    @property
+    def is_wiki(self) -> bool:
+        """Is this database a wiki database"""
+        # ToDo: Implement using the verification property
+
     def _reflect_schema(self, obj_ref: blocks.Database) -> type[PageSchema]:
         """Reflection about the database schema"""
         cls_name = f'{make_safe_python_name(self.title).capitalize()}Schema'
@@ -90,8 +95,13 @@ class Database(Record):
             schema.bind_db(self)
             self._schema = schema
         else:
-            msg = 'Provided schema is not consistent with the current schema of the database!'
-            raise SchemaError(msg)
+            cols_added, cols_removed, cols_changed = dict_diff_str(self.schema.to_dict(), schema.to_dict())
+            msg = f"""Provided schema is not consistent with the current schema of the database:
+                      Columns added: {cols_added}
+                      Columns removed: {cols_removed}
+                      Columns changed: {cols_changed}
+                   """
+            raise SchemaError(dedent(msg))
 
     @property
     def url(self) -> str:

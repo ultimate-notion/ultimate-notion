@@ -13,6 +13,8 @@ from ultimate_notion.obj_api import types
 from ultimate_notion.blocks import Record
 
 T = TypeVar('T')
+KT = TypeVar('KT')
+VT = TypeVar('VT')
 ObjRef: TypeAlias = UUID | str
 
 
@@ -190,3 +192,20 @@ def wait_until_exists(record: Record, step: int = 1, timeout: int = 10):
 def decapitalize(string: str) -> str:
     """Inverse of capitalize"""
     return string[0].lower() + string[1:]
+
+
+def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
+    """Returns the added keys, the removed keys and keys of changed values of both dictionaries"""
+    set1, set2 = set(dct1.keys()), set(dct2.keys())
+    keys_added = list(set2 - set1)
+    keys_removed = list(set1 - set2)
+    values_changed = {key: (dct1[key], dct2[key]) for key in set1 & set2 if dct1[key] != dct2[key]}
+    return keys_added, keys_removed, values_changed
+
+
+def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str]:
+    keys_added, keys_removed, values_changed = dict_diff(dct1, dct2)
+    keys_added_str = ", ".join(keys_added) or 'None'
+    keys_removed_str = ", ".join(keys_removed) or 'None'
+    keys_changed_str = ", ".join(f"{k}: {v[0]} -> {v[1]}" for k, v in values_changed.items()) or 'None'
+    return keys_added_str, keys_removed_str, keys_changed_str

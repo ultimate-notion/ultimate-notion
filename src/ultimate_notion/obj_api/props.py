@@ -2,9 +2,12 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
+import pydantic
+
 from ultimate_notion.obj_api import types
-from ultimate_notion.obj_api.core import NotionObject
-from ultimate_notion.obj_api.schema import Function
+from ultimate_notion.obj_api.core import NotionObject, GenericObject
+from ultimate_notion.obj_api.schema import Function, VerificationState
+from ultimate_notion.obj_api.types import User
 from ultimate_notion.obj_api.text import plain_text, rich_text, Color
 
 
@@ -827,6 +830,37 @@ class LastEditedBy(PropertyValue, type="last_edited_by"):
     def __str__(self):
         """Return the contents of this property as a string."""
         return str(self.last_edited_by)
+
+
+class UniqueID(NativeTypeMixin, PropertyValue, type="unique_id"):
+    """A Notion unique-id property value."""
+
+    class _NestedData(GenericObject):
+        number: int = 0
+        prefix: str | None = None
+
+    unique_id: _NestedData = _NestedData()
+
+    def __str__(self):
+        """Return the contents of this property as a string."""
+        return self.unique_id.prefix + str(self.unique_id.number)
+
+
+class Verification(PropertyValue, type="verification"):
+    """A Notion verification property value"""
+
+    class _NestedData(GenericObject):
+        state: VerificationState = VerificationState.UNVERIFIED
+        verified_by: User | None = None
+        date: datetime | None = None
+
+        # leads to better error messages, see
+        # https://github.com/pydantic/pydantic/issues/355
+        @pydantic.validator("state", pre=True)
+        def validate_enum_field(cls, field: str):
+            return VerificationState(field)
+
+    verification: _NestedData = _NestedData()
 
 
 # https://developers.notion.com/reference/property-item-object

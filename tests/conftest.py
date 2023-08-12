@@ -9,9 +9,14 @@ import pytest
 
 import ultimate_notion
 from ultimate_notion import schema
+from ultimate_notion.database import Database
 from ultimate_notion.page import Page
 from ultimate_notion import Session
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
+
+# Manually created DB in Notion with all possible columns including AI columns!
+ALL_COL_DB = 'All Columns DB'
+WIKI_DB = 'Wiki DB'
 
 
 @pytest.fixture(scope='module')
@@ -75,7 +80,7 @@ def simple_db(notion: Session, root_page: Page):
 
 @pytest.fixture(scope="session")
 def page_hierarchy(notion: Session, root_page: Page):
-    """Simple hierarch of 3 pages nested in eachother: root -> l1 -> l2"""
+    """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2"""
     l1_page = notion.create_page(parent=root_page, title='level_1')
     l2_page = notion.create_page(parent=l1_page, title='level_2')
     yield root_page, l1_page, l2_page
@@ -83,12 +88,24 @@ def page_hierarchy(notion: Session, root_page: Page):
     l1_page.delete()
 
 
+@pytest.fixture(scope="session")
+def all_cols_db(notion: Session):
+    """Return manually created database with all columns, also AI columns"""
+    return notion.search_db(ALL_COL_DB).item()
+
+
+@pytest.fixture(scope="session")
+def wiki_db(notion: Session):
+    """Return manually created wiki db"""
+    return notion.search_db(WIKI_DB).item()
+
+
 @pytest.fixture(scope="session", autouse=True)
-def test_cleanups(notion: Session, root_page: Page):
-    """Delete all databases and pages in the root_page before we start"""
+def test_cleanups(notion: Session, root_page: Page, all_cols_db: Database, wiki_db: Database):
+    """Delete all databases and pages in the root_page before we start except of some special dbs and their content"""
     for db in notion.search_db():
-        if db.parents[0] == root_page:
+        if db.parents[0] == root_page and db not in (all_cols_db, wiki_db):
             db.delete()
     for page in notion.search_page():
-        if page.parents and page.parents[0] == root_page:
+        if page.parents and page.parents[0] == root_page and page.database not in (all_cols_db, wiki_db):
             page.delete()
