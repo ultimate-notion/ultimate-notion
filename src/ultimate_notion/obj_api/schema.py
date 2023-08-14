@@ -169,10 +169,10 @@ class MultiSelect(PropertyObject, type="multi_select"):
 
     multi_select: _NestedData = _NestedData()
 
-    # @classmethod
-    # def __compose__(cls, options):
-    #     """Create a `Select` object from the list of `SelectOption`'s."""
-    #     return cls(multi_select=cls._NestedData(options=options))
+    @classmethod
+    def __compose__(cls, options):
+        """Create a `Select` object from the list of `SelectOption`'s."""
+        return cls(multi_select=cls._NestedData(options=options))
 
 
 class Status(PropertyObject, type="status"):

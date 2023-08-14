@@ -297,9 +297,9 @@ class Select(PropertyType, type=obj_schema.Select):
 class MultiSelect(PropertyType, type=obj_schema.MultiSelect):
     """Defines a multi-select column in a database"""
 
-    # def __init__(self, options: list[SelectOption]):
-    #     options = [option.obj_ref for option in options]
-    #     super().__init__(options)
+    def __init__(self, options: list[SelectOption]):
+        options = [option.obj_ref for option in options]
+        super().__init__(options)
 
 
 class Status(PropertyType, type=obj_schema.Status):
