@@ -6,7 +6,7 @@ import pydantic
 
 from ultimate_notion.obj_api import types
 from ultimate_notion.obj_api.core import NotionObject, GenericObject
-from ultimate_notion.obj_api.schema import Function, VerificationState
+from ultimate_notion.obj_api.schema import Function, VerificationState, SelectOption
 from ultimate_notion.obj_api.types import User
 from ultimate_notion.obj_api.text import plain_text, rich_text, Color
 
@@ -290,31 +290,10 @@ class Status(NativeTypeMixin, PropertyValue, type="status"):
         return self.status.name
 
 
-class SelectValue(types.GenericObject):
-    """Values for select & multi-select properties."""
-
-    name: str
-    id: types.UUID | str | None = None
-    color: Color | None = None
-
-    def __str__(self):
-        """Return a string representation of this property."""
-        return self.name
-
-    @classmethod
-    def __compose__(cls, value, color=None):
-        """Create a `SelectValue` property from the given value.
-
-        :param value: a string to use for this property
-        :param color: an optional Color for the value
-        """
-        return cls(name=value, color=color)
-
-
 class Select(NativeTypeMixin, PropertyValue, type="select"):
     """Notion select type."""
 
-    select: SelectValue | None = None
+    select: SelectOption | None = None
 
     def __str__(self):
         """Return a string representation of this property."""
@@ -338,7 +317,7 @@ class Select(NativeTypeMixin, PropertyValue, type="select"):
         :param value: a string to use for this property
         :param color: an optional Color for the value
         """
-        return cls(select=SelectValue[value, color])
+        return cls(select=SelectOption[value, color])
 
     @property
     def Value(self):
@@ -353,7 +332,7 @@ class Select(NativeTypeMixin, PropertyValue, type="select"):
 class MultiSelect(PropertyValue, type="multi_select"):
     """Notion multi-select type."""
 
-    multi_select: list[SelectValue] = []
+    multi_select: list[SelectOption] = []
 
     def __str__(self):
         """Return a string representation of this property."""
@@ -364,7 +343,7 @@ class MultiSelect(PropertyValue, type="multi_select"):
         return len(self.multi_select)
 
     def __getitem__(self, index):
-        """Return the SelectValue object at the given index."""
+        """Return the SelectOption object at the given index."""
 
         if self.multi_select is None:
             raise IndexError("empty property")
@@ -407,7 +386,7 @@ class MultiSelect(PropertyValue, type="multi_select"):
         return False
 
     def __iter__(self):
-        """Iterate over the SelectValue's in this property."""
+        """Iterate over the SelectOption's in this property."""
 
         if self.multi_select is None:
             return None
@@ -417,7 +396,7 @@ class MultiSelect(PropertyValue, type="multi_select"):
     @classmethod
     def __compose__(cls, *values):
         """Initialize a new MultiSelect from the given value(s)."""
-        select = [SelectValue[value] for value in values if value is not None]
+        select = [SelectOption[value] for value in values if value is not None]
 
         return cls(multi_select=select)
 
@@ -429,7 +408,7 @@ class MultiSelect(PropertyValue, type="multi_select"):
                 raise ValueError("'None' is an invalid value")
 
             if value not in self:
-                self.multi_select.append(SelectValue[value])
+                self.multi_select.append(SelectOption[value])
 
     def remove(self, *values):
         """Remove selected values from this MultiSelect."""

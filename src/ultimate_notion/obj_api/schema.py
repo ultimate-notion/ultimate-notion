@@ -138,7 +138,7 @@ class SelectOption(GenericObject):
     """Options for select & multi-select objects."""
 
     name: str
-    id: str = None
+    id: str | None = None  # According to docs: "These are sometimes, but not always, UUIDs."
     color: str = Color.DEFAULT
 
     @classmethod
