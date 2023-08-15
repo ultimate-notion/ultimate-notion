@@ -5,13 +5,10 @@
 <br>
 
 Ultimate Notion is the ultimate Python library for [Notion]! It allows you to access and modify your Notion databases and
-pages in the most convenient and pythonic way.
+pages in the most convenient and pythonic way. Under [Features](features.md) you will find the current status of the
+implemented functionality. Ultimate Notion is distributed under the terms of the [MIT] license.
 
 **This is a pre-alpha version! Don't use it!**
-
-## License
-
-Ultimate Notion is distributed under the terms of the [MIT] license.
 
 ## Navigation
 
