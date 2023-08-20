@@ -2,19 +2,20 @@
 from collections.abc import Callable
 from copy import deepcopy
 from functools import wraps
-from typing import Any, TypeAlias, TypeVar
+from typing import Any, TypeAlias, TypeVar, Generic, ClassVar, Iterable
 from uuid import UUID
 
 import numpy as np
 from notion_client.errors import APIResponseError
 from polling2 import poll
 
-from ultimate_notion.obj_api import types
-from ultimate_notion.blocks import Record
+from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.blocks import DataObject
 
 T = TypeVar('T')
 KT = TypeVar('KT')
 VT = TypeVar('VT')
+SelfT = TypeVar('SelfT', bound='Wrapper')  # Todo: Newer Python versions provide `Self` directly!
 ObjRef: TypeAlias = UUID | str
 
 
@@ -161,15 +162,15 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int
     return clone
 
 
-def get_uuid(obj: ObjRef | types.ParentRef | types.GenericObject) -> UUID:
+def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject) -> UUID:
     """Retrieves a UUID from an object reference using Notional
 
     Only meant for internal use.
     """
-    return types.ObjectReference[obj].id
+    return objs.ObjectReference[obj].id
 
 
-def wait_until_exists(record: Record, step: int = 1, timeout: int = 10):
+def wait_until_exists(record: DataObject, step: int = 1, timeout: int = 10):
     """Wait until object exists after creation
 
     In most cases, this is not really necessary to use.
@@ -177,7 +178,7 @@ def wait_until_exists(record: Record, step: int = 1, timeout: int = 10):
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
 
-    poll_func: Callable[[UUID | str], Record]
+    poll_func: Callable[[UUID | str], DataObject]
     if isinstance(record, Database):
         poll_func = record.session.get_db
     elif isinstance(record, Page):
@@ -195,7 +196,7 @@ def decapitalize(string: str) -> str:
 
 
 def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
-    """Returns the added keys, the removed keys and keys of changed values of both dictionaries"""
+    """Returns the added keys, removed keys and keys of changed values of both dictionaries"""
     set1, set2 = set(dct1.keys()), set(dct2.keys())
     keys_added = list(set2 - set1)
     keys_removed = list(set1 - set2)
@@ -204,8 +205,54 @@ def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT
 
 
 def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str]:
+    """Returns the added keys, removed keys and keys of changed values of both dictionaries as strings for printing"""
     keys_added, keys_removed, values_changed = dict_diff(dct1, dct2)
     keys_added_str = ", ".join(keys_added) or 'None'
     keys_removed_str = ", ".join(keys_removed) or 'None'
     keys_changed_str = ", ".join(f"{k}: {v[0]} -> {v[1]}" for k, v in values_changed.items()) or 'None'
     return keys_added_str, keys_removed_str, keys_changed_str
+
+
+# ToDo: Check if this is needed actually
+# def ensure_list_of_type(data: Any | list[Any], required_type: type[T]) -> list[T]:
+#     if not isinstance(data, list):
+#         data = [data]
+
+#     return [item if isinstance(item, required_type) else required_type(item) for item in data]
+
+
+# ToDo: Use this generic wrapper everywhere possible and reduce code!
+class Wrapper(Generic[T]):
+    """Convert objects from the obj-based API to the high-level API and vice versa"""
+
+    obj_ref: T
+
+    _obj_api_map: ClassVar[dict[type[T], type[SelfT]]] = {}
+    _has_compose: ClassVar[dict[type[T], bool]] = {}
+
+    def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
+        super().__init_subclass__(**kwargs)
+        cls._obj_api_map[wraps] = cls
+        cls._has_compose[wraps] = hasattr(type, '__compose__')
+
+    def __new__(cls, *args, **kwargs) -> SelfT:
+        # Needed for wrap_obj_ref and its call to __new__ to work!
+        return super().__new__(cls)
+
+    def __init__(self, *args, **kwargs):
+        obj_api_type = self._obj_api_map_inv[self.__class__]
+        if hasattr(obj_api_type, "__compose__"):
+            self.obj_ref = obj_api_type.__compose__(*args, **kwargs)
+        else:
+            self.obj_ref = obj_api_type(*args, **kwargs)
+
+    @classmethod
+    def wrap_obj_ref(cls, obj_ref: T) -> SelfT:
+        hl_cls = cls._obj_api_map[type(obj_ref)]
+        hl_obj = hl_cls.__new__(hl_cls)
+        hl_obj.obj_ref = obj_ref
+        return hl_obj
+
+    @property
+    def _obj_api_map_inv(self) -> dict[type[SelfT], type[T]]:
+        return {v: k for k, v in self._obj_api_map.items()}

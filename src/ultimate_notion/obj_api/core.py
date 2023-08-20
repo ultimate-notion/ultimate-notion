@@ -6,6 +6,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Optional
 from uuid import UUID
+from typing import get_origin
 
 from pydantic import BaseModel, validator
 from pydantic.main import ModelMetaclass, validate_model
@@ -20,6 +21,7 @@ def serialize_to_api(data):
     """
 
     # https://github.com/samuelcolvin/pydantic/issues/1409
+    # ToDo: Seems to be fixed in pydantic v2, remove this workaround
 
     if isinstance(data, (date, datetime)):
         return data.isoformat()
@@ -226,7 +228,14 @@ class TypedObject(GenericObject):
 
         cls._register_type(type_name)
 
-    # todo: Rename this!!!
+    @property
+    def value(self):
+        """Return the nested object"""
+
+        cls = self.__class__
+        return getattr(self, cls.type)
+
+    # todo: Rename this or rather remove it! .value above does the same.
     def __call__(self, field=None):
         """Return the nested data object contained by this `TypedObject`.
 

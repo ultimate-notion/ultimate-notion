@@ -69,9 +69,9 @@ def simple_db(notion: Session, root_page: Page):
     """Simple database of articles"""
 
     class Article(schema.PageSchema, db_title="Articles"):
-        name = schema.Property('Name', schema.Title())
-        cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
-        desc = schema.Property('Description', schema.Text())
+        name = schema.Column('Name', schema.Title())
+        cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
+        desc = schema.Column('Description', schema.Text())
 
     db = notion.create_db(parent=root_page, schema=Article)
     yield db
@@ -100,12 +100,13 @@ def wiki_db(notion: Session):
     return notion.search_db(WIKI_DB).item()
 
 
-@pytest.fixture(scope="session", autouse=True)
-def test_cleanups(notion: Session, root_page: Page, all_cols_db: Database, wiki_db: Database):
-    """Delete all databases and pages in the root_page before we start except of some special dbs and their content"""
-    for db in notion.search_db():
-        if db.parents[0] == root_page and db not in (all_cols_db, wiki_db):
-            db.delete()
-    for page in notion.search_page():
-        if page.parents and page.parents[0] == root_page and page.database not in (all_cols_db, wiki_db):
-            page.delete()
+# ToDo: Activate me later!
+# @pytest.fixture(scope="session", autouse=True)
+# def test_cleanups(notion: Session, root_page: Page, all_cols_db: Database, wiki_db: Database):
+#     """Delete all databases and pages in the root_page before we start except of some special dbs and their content"""
+#     for db in notion.search_db():
+#         if db.parents[0] == root_page and db not in (all_cols_db, wiki_db):
+#             db.delete()
+#     for page in notion.search_page():
+#         if page.parents and page.parents[0] == root_page and page.database not in (all_cols_db, wiki_db):
+#             page.delete()

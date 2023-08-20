@@ -3,17 +3,20 @@ from __future__ import annotations
 
 from textwrap import dedent
 
-from ultimate_notion.obj_api import blocks, types
-from ultimate_notion.obj_api.text import make_safe_python_name
+from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.text import make_safe_python_name
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
-from ultimate_notion.blocks import Record
-from ultimate_notion.schema import PageSchema, Property, PropertyType, SchemaError
+from ultimate_notion.blocks import DataObject
+from ultimate_notion.schema import PageSchema, Column, PropertyType, SchemaError
 from ultimate_notion.utils import decapitalize, dict_diff_str
 from ultimate_notion.view import View
+from ultimate_notion.text import plain_text
 
 
-class Database(Record):
+# ToDo: This could also inherit from DataObject[objs.Database], wraps=.... and DataObject is a Generic!
+class Database(DataObject):
     """A Notion database object, not a linked databases
 
     If a custom schema is provided, i.e. specified during creating are the `schema` was set
@@ -22,10 +25,10 @@ class Database(Record):
     https://developers.notion.com/docs/working-with-databases
     """
 
-    obj_ref: blocks.Database
+    obj_ref: obj_blocks.Database
     _schema: type[PageSchema] | None = None
 
-    def __init__(self, obj_ref: blocks.Database):
+    def __init__(self, obj_ref: obj_blocks.Database):
         super().__init__(obj_ref)
 
     def __str__(self):
@@ -49,20 +52,24 @@ class Database(Record):
         # self.obj_ref = new_db.obj_ref
 
     @property
-    def title(self) -> str:
+    def title(self) -> None | str:
         """Return the title of this database as plain text."""
-        return self.obj_ref.Title
+        title = self.obj_ref.title
+        if title is None or len(title) == 0:
+            return None
+        else:
+            return plain_text(*title)
 
     @property
-    def description(self) -> list[types.RichTextObject] | None:
+    def description(self) -> list[objs.RichTextObject] | None:
         return self.obj_ref.description
 
     @property
-    def icon(self) -> types.FileObject | types.EmojiObject | None:
+    def icon(self) -> objs.FileObject | objs.EmojiObject | None:
         return self.obj_ref.icon
 
     @property
-    def cover(self) -> types.FileObject | None:
+    def cover(self) -> objs.FileObject | None:
         return self.obj_ref.cover
 
     @property
@@ -70,11 +77,11 @@ class Database(Record):
         """Is this database a wiki database"""
         # ToDo: Implement using the verification property
 
-    def _reflect_schema(self, obj_ref: blocks.Database) -> type[PageSchema]:
+    def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[PageSchema]:
         """Reflection about the database schema"""
         cls_name = f'{make_safe_python_name(self.title).capitalize()}Schema'
         attrs = {
-            decapitalize(make_safe_python_name(k)): Property(k, PropertyType.wrap_obj_ref(v))
+            decapitalize(make_safe_python_name(k)): Column(k, PropertyType.wrap_obj_ref(v))
             for k, v in obj_ref.properties.items()
         }
         schema = type(cls_name, (PageSchema,), attrs, db_title=self.title)

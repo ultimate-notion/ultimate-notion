@@ -7,27 +7,30 @@ from uuid import UUID
 
 from notion_client.helpers import get_url
 
-from ultimate_notion.obj_api import blocks, types
+from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import objects as objs
 
 if TYPE_CHECKING:
     from ultimate_notion.session import Session
 
 
-class Record:
-    """The base type for all Notion objects."""
+class DataObject:
+    """The base type for all data-related types, i.e, pages, databases and blocks"""
 
-    # Todo: Rename this to `DataObject`
-
-    obj_ref: blocks.DataRecord  # THIS TOO!
+    obj_ref: obj_blocks.DataObject
 
     def __init__(self, obj_ref):
         """Notional object reference for dispatch"""
         self.obj_ref = obj_ref
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Record):
-            raise RuntimeError(f"Cannot compare a Record with {type(other)}")
-        return self.id == other.id
+        if other is None:
+            return False
+        elif not isinstance(other, DataObject):
+            msg = f"Cannot compare {self.__class__.__name__} with {type(other).__name__}"
+            raise RuntimeError(msg)
+        else:
+            return self.id == other.id
 
     @property
     def session(self) -> Session:
@@ -59,23 +62,23 @@ class Record:
         return self.obj_ref.last_edited_by
 
     @property
-    def parent(self) -> Record | None:
+    def parent(self) -> DataObject | None:
         """Return the parent record or None if the workspace is the parent"""
         match (parent := self.obj_ref.parent):
-            case types.WorkspaceRef():
+            case objs.WorkspaceRef():
                 return None
-            case types.PageRef():
+            case objs.PageRef():
                 return self.session.get_page(page_ref=parent.page_id)
-            case types.DatabaseRef():
+            case objs.DatabaseRef():
                 return self.session.get_db(db_ref=parent.database_id)
-            case types.BlockRef():
+            case objs.BlockRef():
                 return self.session.get_block(block_ref=parent.block_id)
             case _:
                 msg = f'Unknown parent reference {type(parent)}'
                 raise RuntimeError(msg)
 
     @property
-    def parents(self) -> tuple[Record, ...]:
+    def parents(self) -> tuple[DataObject, ...]:
         """Return all parents from the workspace to the actual record (excluding)"""
         match (parent := self.parent):
             case None:
@@ -109,5 +112,5 @@ class Record:
         }
 
 
-class Block(Record):
+class Block(DataObject):
     pass

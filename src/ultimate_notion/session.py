@@ -5,7 +5,7 @@ import logging
 import os
 from threading import RLock
 from types import TracebackType
-from typing import Any
+from typing import Any, TYPE_CHECKING
 from uuid import UUID
 
 from httpx import ConnectError
@@ -13,14 +13,18 @@ import notion_client
 from notion_client.errors import APIResponseError
 
 from ultimate_notion.obj_api.endpoints import NotionAPI
-from ultimate_notion.blocks import Record
-from ultimate_notion.blocks import Block
+from ultimate_notion.blocks import DataObject, Block
+from ultimate_notion.props import Title
 from ultimate_notion.database import Database
-from ultimate_notion.obj_api import blocks, types
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema, Relation
-from ultimate_notion.user import User
+from ultimate_notion.objects import User, RichText
 from ultimate_notion.utils import ObjRef, SList, get_uuid
+from ultimate_notion.text import rich_text
+
+if TYPE_CHECKING:
+    from ultimate_notion.obj_api import objects as objs
+
 
 _log = logging.getLogger(__name__)
 ENV_NOTION_AUTH_TOKEN = 'NOTION_AUTH_TOKEN'
@@ -45,8 +49,7 @@ class Session:
     api: NotionAPI
     _active_session: Session | None = None
     _lock = RLock()
-    # todo: have different stores for different types
-    _object_store: dict[UUID, Record] = {}
+    cache: dict[UUID, DataObject | User] = {}
 
     def __init__(self, auth: str | None = None, **kwargs: Any):
         """Initialize the `Session` object and the Notional endpoints.
@@ -101,13 +104,13 @@ class Session:
         _log.debug('Closing connection to Notion...')
         self.client.__exit__(exc_type, exc_value, traceback)
         Session._active_session = None
-        Session._object_store.clear()
+        Session.cache.clear()
 
     def close(self):
         """Close the session and release resources."""
         self.client.close()
         Session._active_session = None
-        Session._object_store.clear()
+        Session.cache.clear()
 
     def raise_for_status(self):
         """Confirm that the session is active and raise otherwise.
@@ -115,16 +118,13 @@ class Session:
         Raises SessionError if there is a problem, otherwise returns None.
         """
         try:
-            me = self.whoami()
+            self.whoami()
         except ConnectError as err:
             msg = 'Unable to connect to Notion'
             raise SessionError(msg) from err
         except APIResponseError as err:
             msg = 'Invalid API reponse'
             raise SessionError(msg) from err
-        if me is None:
-            msg = 'Unable to get current user'
-            raise SessionError(msg)
 
     def create_db(self, parent: Page, schema: type[PageSchema] | None) -> Database:
         """Create a new database"""
@@ -146,15 +146,18 @@ class Session:
             db.schema = schema
             schema._init_bwd_rels()
 
-        self._object_store[db.id] = db
+        self.cache[db.id] = db
         return db
 
     def create_dbs(self, parents: Page | list[Page], schemas: list[type[PageSchema]]) -> list[Database]:
-        pass
+        """Create new databases in the right order if there a relations between them"""
+        # ToDo: Implement
+        raise NotImplementedError()
 
     def ensure_db(self, parent: Page, schema: type[PageSchema], title: str | None = None):
         """Get or create the database"""
-        # TODO: Implement
+        # ToDo: Implement
+        raise NotImplementedError()
 
     def search_db(self, db_name: str | None = None, *, exact: bool = True) -> SList[Database]:
         """Search a database by name
@@ -164,23 +167,23 @@ class Session:
             exact: perform an exact search, not only a substring match
         """
         query = self.api.search(db_name).filter(property='object', value='database')
-        dbs = SList(self._object_store.get(db.id, Database(obj_ref=db)) for db in query.execute())
+        dbs = SList(self.cache.get(db.id, Database(obj_ref=db)) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
         return dbs
 
     def _get_db(self, db_uuid: UUID) -> Database:
-        """Retrieve database circumenventing the session cache"""
+        """Retrieve obj_api database object circumenventing the session cache"""
         return Database(obj_ref=self.api.databases.retrieve(db_uuid))
 
     def get_db(self, db_ref: ObjRef) -> Database:
         """Retrieve Notion database by uuid"""
         db_uuid = get_uuid(db_ref)
-        if db_uuid in self._object_store:
-            return self._object_store[db_uuid]
+        if db_uuid in self.cache:
+            return self.cache[db_uuid]
         else:
             db = Database(obj_ref=self.api.databases.retrieve(db_uuid))
-            self._object_store[db.id] = db
+            self.cache[db.id] = db
             return db
 
     def search_page(self, title: str | None = None, *, exact: bool = True) -> SList[Page]:
@@ -191,40 +194,50 @@ class Session:
             exact: perform an exact search, not only a substring match
         """
         query = self.api.search(title).filter(property='object', value='page')
-        pages = SList(self._object_store.setdefault(page.id, Page(obj_ref=page)) for page in query.execute())
+        pages = SList(self.cache.setdefault(page.id, Page(obj_ref=page)) for page in query.execute())
         if exact and title is not None:
-            pages = SList(page for page in pages if page.title == title)
+            pages = SList(page for page in pages if page.title.value == title)
         return pages
 
     def get_page(self, page_ref: ObjRef) -> Page:
         page_uuid = get_uuid(page_ref)
-        if page_uuid in self._object_store:
-            return self._object_store[page_uuid]
+        if page_uuid in self.cache:
+            return self.cache[page_uuid]
         else:
             page = Page(obj_ref=self.api.pages.retrieve(page_uuid))
-            self._object_store[page.id] = page
+            self.cache[page.id] = page
             return page
 
-    def create_page(self, parent: Page, title: str | None = None) -> Page:
+    def create_page(self, parent: Page, title: RichText | str | None = None) -> Page:
+        if title:
+            title = Title(title).obj_ref
         page = Page(obj_ref=self.api.pages.create(parent=parent.obj_ref, title=title))
-        self._object_store[page.id] = page
+        self.cache[page.id] = page
         return page
 
-    def _get_user(self, uuid: UUID) -> types.User:
+    def _get_user(self, uuid: UUID) -> objs.User:
+        """Retrieve obj_api user object circumventing the cache"""
         return self.api.users.retrieve(uuid)
 
     def get_user(self, user_ref: ObjRef) -> User:
         user_uuid = get_uuid(user_ref)
-        return User(obj_ref=self._get_user(user_uuid))
+        if user_uuid in self.cache:
+            return self.cache[user_uuid]
+        else:
+            user = User.wrap_obj_ref(self._get_user(user_uuid))
+            self.cache[user.id] = user
+            return user
 
     def whoami(self) -> User:
         """Return the user object of this bot"""
-        return self.api.users.me()
+        user = self.api.users.me()
+        return self.cache.setdefault(user.id, User.wrap_obj_ref(user))
 
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace"""
-        return [User(obj_ref=user) for user in self.api.users.list()]
+        return [self.cache.setdefault(user.id, User.wrap_obj_ref(user)) for user in self.api.users.list()]
 
+    # ToDo: Also put blocks in the cache
     def get_block(self, block_ref: ObjRef):
         """Retrieve a block"""
         return Block(obj_ref=self.api.blocks.retrieve(block_ref))

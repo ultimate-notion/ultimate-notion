@@ -14,8 +14,7 @@ from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.obj_api.schema import PropertyObject
-from ultimate_notion.obj_api.text import TextObject
-from ultimate_notion.obj_api.types import DatabaseRef, ObjectReference, PageRef, ParentRef, User
+from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, User, TextObject
 from ultimate_notion.obj_api.props import PropertyItem, Title
 
 logger = logging.getLogger(__name__)
@@ -334,7 +333,7 @@ class PagesEndpoint(Endpoint):
         return self.api.client.pages
 
     # https://developers.notion.com/reference/post-page
-    def create(self, parent, title=None, properties=None, children=None):
+    def create(self, parent, title: Title | None = None, properties=None, children=None):
         """Add a page to the given parent (Page or Database).
 
         `parent` may be a `ParentRef`, `Page`, or `Database` object.
@@ -357,7 +356,7 @@ class PagesEndpoint(Endpoint):
             properties = {}
 
         if title is not None:
-            properties["title"] = Title[title]
+            properties["title"] = title
 
         request["properties"] = {name: prop.dict() if prop is not None else None for name, prop in properties.items()}
 

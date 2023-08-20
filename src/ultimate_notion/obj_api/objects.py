@@ -1,4 +1,4 @@
-"""Wrapper for various Notion API data types like parents, mentions, emojis & users
+"""Wrapper for various Notion API objects like parents, mentions, emojis & users
 
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
@@ -6,12 +6,26 @@ used in the Notion API as well as higher-level methods.
 from datetime import date, datetime
 from uuid import UUID
 from enum import Enum
+from copy import deepcopy
 
 from notion_client import helpers
 
 from ultimate_notion.obj_api import util
 from ultimate_notion.obj_api.core import GenericObject, TypedObject, NotionObject
-from ultimate_notion.obj_api.text import RichTextObject
+from ultimate_notion.obj_api.enums import FullColor, Color
+
+
+class SelectOption(GenericObject):
+    """Options for select & multi-select objects."""
+
+    name: str
+    id: str | None = None  # According to docs: "These are sometimes, but not always, UUIDs."
+    color: str = Color.DEFAULT
+
+    @classmethod
+    def __compose__(cls, name, color=Color.DEFAULT):
+        """Create a `SelectOption` object from the given name and color."""
+        return cls(name=name, color=color)
 
 
 class ObjectReference(GenericObject):
@@ -58,6 +72,11 @@ class ObjectReference(GenericObject):
         URL exists or that it is accessible by the integration.
         """
         return helpers.get_url(self.id)
+
+
+def make_obj_ref():
+    """make an object referene"""
+    # ToDo: Implement using code above
 
 
 # https://developers.notion.com/reference/parent-object
@@ -177,6 +196,7 @@ class EmojiObject(TypedObject, type="emoji"):
     @classmethod
     def __compose__(cls, emoji):
         """Compose an EmojiObject from the given emoji string."""
+        # Todo: convert string-based emoji to unicode here!
         return EmojiObject(emoji=emoji)
 
 
@@ -249,8 +269,155 @@ class DateRange(GenericObject):
         return f"{self.start} :: {self.end}"
 
 
+class Annotations(GenericObject):
+    """Style information for RichTextObject's."""
+
+    bold: bool = False
+    italic: bool = False
+    strikethrough: bool = False
+    underline: bool = False
+    code: bool = False
+    color: FullColor = None
+
+    @property
+    def is_plain(self):
+        """Determine if any flags are set in this `Annotations` object.
+
+        If all flags match their defaults, this is considered a "plain" style.
+        """
+
+        # XXX a better approach here would be to just compare all fields to defaults
+
+        if self.bold:
+            return False
+        if self.italic:
+            return False
+        if self.strikethrough:
+            return False
+        if self.underline:
+            return False
+        if self.code:
+            return False
+        if self.color is not None:
+            return False
+        return True
+
+
+class RichTextObject(TypedObject):
+    """Base class for Notion rich text elements."""
+
+    plain_text: str
+    href: str | None = None
+    annotations: Annotations | None = None
+
+    def __str__(self):
+        """Return a string representation of this object."""
+
+        if self.href is None:
+            text = self.plain_text or ""
+        elif self.plain_text is None or len(self.plain_text) == 0:
+            text = f"({self.href})"
+        else:
+            text = f"[{self.plain_text}]({self.href})"
+
+        if self.annotations:
+            if self.annotations.bold:
+                text = f"*{text}*"
+            if self.annotations.italic:
+                text = f"**{text}**"
+            if self.annotations.underline:
+                text = f"_{text}_"
+            if self.annotations.strikethrough:
+                text = f"~{text}~"
+            if self.annotations.code:
+                text = f"`{text}`"
+
+        return text
+
+    @classmethod
+    def __compose__(cls, text, href=None, style=None):
+        """Compose a TextObject from the given properties.
+
+        :param text: the plain text of this object
+        :param href: an optional link for this object
+        :param style: an optional Annotations object for this text
+        """
+
+        if text is None:
+            return None
+
+        # TODO convert markdown in text:str to RichText?
+
+        style = deepcopy(style)
+
+        return cls(plain_text=text, href=href, annotations=style)
+
+
+class LinkObject(GenericObject):
+    """Reference a URL."""
+
+    type: str = "url"
+    url: str = None
+
+
+class TextObject(RichTextObject, type="text"):
+    """Notion text element."""
+
+    class _NestedData(GenericObject):
+        content: str = None
+        link: LinkObject | None = None
+
+    text: _NestedData = _NestedData()
+
+    @classmethod
+    def __compose__(cls, text, href=None, style=None):
+        """Compose a TextObject from the given properties.
+
+        :param text: the plain text of this object
+        :param href: an optional link for this object
+        :param style: an optional Annotations object for this text
+        """
+
+        if text is None:
+            return None
+
+        link = LinkObject(url=href) if href else None
+        nested = TextObject._NestedData(content=text, link=link)
+        style = deepcopy(style)
+
+        return cls(
+            plain_text=text,
+            text=nested,
+            href=href,
+            annotations=style,
+        )
+
+
+class EquationObject(RichTextObject, type="equation"):
+    """Notion equation element."""
+
+    class _NestedData(GenericObject):
+        expression: str
+
+    equation: _NestedData
+
+    def __str__(self):
+        """Return a string representation of this object."""
+
+        if self.equation is None:
+            return None
+
+        return self.equation.expression
+
+
 class MentionData(TypedObject):
     """Base class for typed `Mention` data objects."""
+
+
+class MentionObject(RichTextObject, type="mention"):
+    """Notion mention element."""
+
+    mention: MentionData
 
 
 class MentionUser(MentionData, type="user"):
@@ -327,6 +494,12 @@ class MentionTemplateData(TypedObject):
     """Nested template data for `Mention` properties."""
 
 
+class MentionTemplate(MentionData, type="template_mention"):
+    """Nested template data for `Mention` properties."""
+
+    template_mention: MentionTemplateData
+
+
 class MentionTemplateDate(MentionTemplateData, type="template_mention_date"):
     """Nested date template data for `Mention` properties."""
 
@@ -337,32 +510,3 @@ class MentionTemplateUser(MentionTemplateData, type="template_mention_user"):
     """Nested user template data for `Mention` properties."""
 
     template_mention_user: str
-
-
-class MentionTemplate(MentionData, type="template_mention"):
-    """Nested template data for `Mention` properties."""
-
-    template_mention: MentionTemplateData
-
-
-class MentionObject(RichTextObject, type="mention"):
-    """Notion mention element."""
-
-    mention: MentionData
-
-
-class EquationObject(RichTextObject, type="equation"):
-    """Notion equation element."""
-
-    class _NestedData(GenericObject):
-        expression: str
-
-    equation: _NestedData
-
-    def __str__(self):
-        """Return a string representation of this object."""
-
-        if self.equation is None:
-            return None
-
-        return self.equation.expression

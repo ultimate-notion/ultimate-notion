@@ -217,6 +217,7 @@ dependencies = [
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
 no-cov = "cov --no-cov {args}"
+debug =  "cov --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
 ci = "cov --vcr-record=none --cov-report lcov {args}"
 record = "cov --vcr-record=all {args}" # re-record all vcr cassettes
 doctest = "pytest docs/examples/"

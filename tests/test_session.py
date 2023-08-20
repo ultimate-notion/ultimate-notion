@@ -20,7 +20,7 @@ def test_search_get_db(notion):
 def test_get_page(notion):
     page_id = 'e9f53dc380ce4a979424659ef13a0d2e'
     page = notion.get_page(page_id)
-    assert page.title == 'ACME Template'
+    assert page.title.value == 'ACME Template'
 
 
 @pytest.mark.webtest

@@ -1,14 +1,15 @@
 """Page object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload, cast
 
 from notion2md.exporter.block import StringExporter
 
-from ultimate_notion.props import PropertyValue
-from ultimate_notion.obj_api import types as obj_types
+from ultimate_notion.props import PropertyValue, Title
+from ultimate_notion.schema import Column, PropertyType
+from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import blocks as obj_blocks
-from ultimate_notion.blocks import Record
+from ultimate_notion.blocks import DataObject
 from ultimate_notion.utils import is_notebook
 
 if TYPE_CHECKING:
@@ -40,9 +41,10 @@ class PageProperties:
     def __init__(self, page: Page):
         self._page = page
         self._schema = page.database.schema
+        self._properties = page.obj_ref.properties
 
     def __getitem__(self, prop_name: str) -> PropertyValue:
-        prop = self._page.obj_ref.properties.get(prop_name)
+        prop = self._properties.get(prop_name)
         if prop is None:
             msg = f"No such property: {prop_name}"
             raise AttributeError(msg)
@@ -52,38 +54,36 @@ class PageProperties:
     def __setitem__(self, prop_name: str, value: Any):
         if not isinstance(value, PropertyValue):
             # construct concrete PropertyValue using the schema
-            prop_type_cls = self._schema.to_dict()[prop_name]
-            prop_value_cls = PropertyValue._get_value_from_type(prop_type_cls)
-            value = prop_value_cls(value)
+            prop_type = self._schema.to_dict()[prop_name]
+            value = prop_type.prop_value(value)
 
         # update the property on the server (which will refresh the local data)
         self._page.session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
 
     def __iter__(self):
         """Iterator of property names"""
-        yield from self._page.obj_ref.properties.keys()
+        yield from self._properties.keys()
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, PropertyValue]:
         """All page properties as dictionary"""
         return {prop_name: self[prop_name] for prop_name in self}
 
 
-class Page(Record):
+class Page(DataObject):
     obj_ref: obj_blocks.Page
     props: PageProperties | None = None
 
     def __init__(self, obj_ref):
         super().__init__(obj_ref)
-        if self.database:
-            self.props = self._create_prop_attrs()
+        self.props = self._create_prop_attrs() if self.database else None
 
     def _create_prop_attrs(self) -> PageProperties:
         """Create the attributes for the database properties of this page"""
-        # We have to subclass in order to populate it with the descriptor `PageProperty`` as
-        # this only works on the class level.
+        # We have to subclass in order to populate it with the descriptor `PageProperty``
+        # as this only works on the class level and we want a unique class for each property.
         page_props_cls = type("_PageProperties", (PageProperties,), {})
-        for prop in self.database.schema.get_props():
-            setattr(page_props_cls, prop.attr_name, PageProperty(prop.name))
+        for col in self.database.schema.get_cols():
+            setattr(page_props_cls, col.attr_name, PageProperty(col.name))
         return page_props_cls(page=self)
 
     def __str__(self) -> str:
@@ -91,15 +91,13 @@ class Page(Record):
 
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self.title}' at {hex(id(self))}>"
+        return f"<{cls_name}: '{self.title.value}' at {hex(id(self))}>"
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
-    #     self._children = list(self.session.api.blocks.children.list(parent=self.obj_ref))
-    #
     # @property
     # def children(self) -> List[blocks.Block]:
     #     """Return all blocks belonging to this page"""
-    #     return self._children
+    #     return list(self.session.api.blocks.children.list(parent=self.obj_ref))
 
     @property
     def database(self) -> Database | None:
@@ -112,19 +110,20 @@ class Page(Record):
             return None
 
     @property
-    def title(self) -> str:
+    def title(self) -> Title:
         """Title of the page"""
-        # The 'title' property might be renamed in case of pages in databases, thus look for the actual type.
+        # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
         for prop in self.obj_ref.properties.values():
             if prop.id == "title":
-                return prop.Value
+                return cast(Title, PropertyValue.wrap_obj_ref(prop))
+        raise RuntimeError("Encountered a page without title property")
 
     @property
     def icon(self) -> str:
         icon = self.obj_ref.icon
-        if isinstance(icon, obj_types.FileObject):
+        if isinstance(icon, objs.FileObject):
             return icon.URL
-        elif isinstance(icon, obj_types.EmojiObject):
+        elif isinstance(icon, objs.EmojiObject):
             return icon.emoji
         else:
             msg = f'unknown icon object of {type(icon)}'

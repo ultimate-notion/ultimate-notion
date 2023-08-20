@@ -9,7 +9,7 @@ in a custom Schema when creating the database.
 
 ### Design Principles
 
-A schema is a subclass of `PageShema` that holds `Property` objects with a name and an
+A schema is a subclass of `PageShema` that holds `Column` objects with a name and an
 actual `PropertyType`, e.g. `Text`, `Number`. A `PropertyType` is a thin wrapper for the
 actual `PropertyObject` of the Notion API, which is referenced by `obj_ref`, to allow
 more user-friendly definition of a data model, especially if it has relations.
@@ -25,15 +25,15 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion.obj_api.schema import NumberFormat, Function
-from ultimate_notion.obj_api.text import Color
 from ultimate_notion.utils import SList
-from ultimate_notion.page import Page
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.blocks import Record
+from ultimate_notion.blocks import DataObject
+
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-
+    from ultimate_notion.objects import Option
+    from ultimate_notion.page import Page
 
 # Todo: Move the functionality from the PyDantic types in here and elimate the __compose__
 
@@ -50,7 +50,17 @@ class SchemaNotBoundError(SchemaError):
     """Raised when the schema is not bound to a database."""
 
     def __init__(self, schema: type[PageSchema]):
+        self.schema = schema
         msg = f"Schema {schema.__name__} is not bound to any database"
+        super().__init__(msg)
+
+
+class ReadOnlyColumnError(SchemaError):
+    """Raised when a read-only columns tries to be written to."""
+
+    def __init__(self, col: Column):
+        self.col = col
+        msg = f"Argument {col.attr_name} refers to the read-only column '{col.name}' of type {col.type}"
         super().__init__(msg)
 
 
@@ -67,9 +77,17 @@ class PageSchema:
         super().__init_subclass__(**kwargs)
 
     @classmethod
+    def from_dict(cls, schema_dct: dict[str, PropertyType], db_title: str | None = None) -> PageSchema:
+        """Creation of a schema from a dictionary for easy support of dynamically created schemas"""
+        # ToDo: Implement
+
+    @classmethod
     def create(cls, **kwargs) -> Page:
+        # ToDo: Avoid this here by moving the method into database create_page where it makes more sense
+        from ultimate_notion.page import Page
+
         """Create a page with properties according to the schema within the corresponding database"""
-        schema_kwargs = {attr: prop for attr, prop in cls.__dict__.items() if isinstance(prop, Property)}
+        schema_kwargs = {col.attr_name: col for col in cls.get_cols()}
         if not set(kwargs).issubset(set(schema_kwargs)):
             add_kwargs = set(kwargs) - set(schema_kwargs)
             msg = f"kwargs {', '.join(add_kwargs)} not defined in schema"
@@ -77,12 +95,18 @@ class PageSchema:
 
         schema_dct = {}
         for kwarg, value in kwargs.items():
-            prop_type_cls = schema_kwargs[kwarg].type
-            prop_value_cls = PropertyValue._get_value_from_type(prop_type_cls)
-            if isinstance(value, Record):  # unwrap relations
-                value = value.obj_ref
+            col = schema_kwargs[kwarg]
+            prop_value_cls = col.type.prop_value  # map schema to page property
+            # ToDo: Check at that point in case of selectoption if the option is already defined in Schema!
 
-            prop_value = prop_value_cls(value)
+            if prop_value_cls.readonly:
+                raise ReadOnlyColumnError(col)
+
+            if isinstance(value, PropertyValue):
+                prop_value = value
+            else:
+                prop_value = prop_value_cls(value)
+
             schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
 
         db = cls.get_db()
@@ -95,18 +119,18 @@ class PageSchema:
         db.reload(check_consistency=check_consistency)
 
     @classmethod
-    def get_props(cls) -> list[Property]:
-        """Return all properties of this schema"""
-        return [prop for prop in cls.__dict__.values() if isinstance(prop, Property)]
+    def get_cols(cls) -> list[Column]:
+        """Return all columns of this schema"""
+        return [col for col in cls.__dict__.values() if isinstance(col, Column)]
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
-        return {prop.name: prop.type for prop in cls.get_props()}
+        return {col.name: col.type for col in cls.get_cols()}
 
     @classmethod
-    def get_title_prop(cls) -> Property:
+    def get_title_prop(cls) -> Column:
         """Returns the title property"""
-        return SList(prop for prop in cls.get_props() if isinstance(prop.type, Title)).item()
+        return SList(col for col in cls.get_cols() if isinstance(col.type, Title)).item()
 
     @classmethod
     def is_consistent_with(cls, other_schema: type[PageSchema]) -> bool:
@@ -182,10 +206,9 @@ class PropertyType:
     Used to map high-level objects to low-level Notion-API objects
     """
 
-    readonly: bool = False  # attribute can neither be initialised nor set later
     allowed_at_creation = True  # wether the Notion API allows new database with a column of that type
     obj_ref: obj_schema.PropertyObject
-    prop_ref: Property
+    prop_ref: Column
 
     _obj_api_map: ClassVar[dict[type[obj_schema.PropertyObject], type[PropertyType]]] = {}
     _has_compose: ClassVar[dict[type[obj_schema.PropertyObject], bool]] = {}
@@ -207,6 +230,16 @@ class PropertyType:
         return prop_type
 
     @property
+    def prop_value(self) -> type[PropertyValue]:
+        """Return the corresponding PropertyValue"""
+        return PropertyValue._type_value_map[self.obj_ref.type]
+
+    @property
+    def readonly(self) -> bool:
+        """Return if this property type is read-only"""
+        return self.prop_value.readonly
+
+    @property
     def _obj_api_map_inv(self) -> dict[type[PropertyType], type[obj_schema.PropertyObject]]:
         return {v: k for k, v in self._obj_api_map.items()}
 
@@ -221,8 +254,8 @@ class PropertyType:
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref() == self.obj_ref()
 
 
-class Property:
-    """Property for defining a Notion database schema
+class Column:
+    """Column with a name and a certain Property Type for defining a Notion database schema
 
     This is implemented as a descriptor.
     """
@@ -278,18 +311,10 @@ class Number(PropertyType, type=obj_schema.Number):
         super().__init__(number_format)
 
 
-class SelectOption(PropertyType, type=obj_schema.SelectOption):
-    """Option for select & multi-select property"""
-
-    def __init__(self, name, color=Color.DEFAULT):
-        """Create a `SelectOption` object from the given name and color."""
-        super().__init__(name=name, color=color)
-
-
 class Select(PropertyType, type=obj_schema.Select):
     """Defines a select column in a database"""
 
-    def __init__(self, options: list[SelectOption]):
+    def __init__(self, options: list[Option]):
         options = [option.obj_ref for option in options]
         super().__init__(options)
 
@@ -297,7 +322,7 @@ class Select(PropertyType, type=obj_schema.Select):
 class MultiSelect(PropertyType, type=obj_schema.MultiSelect):
     """Defines a multi-select column in a database"""
 
-    def __init__(self, options: list[SelectOption]):
+    def __init__(self, options: list[Option]):
         options = [option.obj_ref for option in options]
         super().__init__(options)
 
@@ -339,8 +364,6 @@ class PhoneNumber(PropertyType, type=obj_schema.PhoneNumber):
 class Formula(PropertyType, type=obj_schema.Formula):
     """Defines a formula column in a database"""
 
-    readonly = True
-
     def __init__(self, expression: str):
         # ToDo: Replace with call to `build` later
         super().__init__(expression)
@@ -353,12 +376,11 @@ class RelationError(SchemaError):
 class Relation(PropertyType, type=obj_schema.Relation):
     """Relation to another database"""
 
-    readonly = True
     obj_ref: obj_schema.Relation | None = None
     _schema: PageSchema | None = None
-    _two_way_prop: Property | None = None
+    _two_way_prop: Column | None = None
 
-    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Property | None = None):
+    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Column | None = None):
         if two_way_prop and not schema:
             raise RuntimeError("`schema` needs to be provided if `two_way_prop` is set")
         if isinstance(schema, type):
@@ -381,7 +403,7 @@ class Relation(PropertyType, type=obj_schema.Relation):
         return self.two_way_prop is not None
 
     @property
-    def two_way_prop(self) -> Property:
+    def two_way_prop(self) -> Column:
         if self.obj_ref and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
             # ToDo: This should actually return a property! We might have to resolve things here.
             return self.obj_ref.relation.dual_property.synced_property_name
@@ -428,9 +450,7 @@ class RollupError(SchemaError):
 class Rollup(PropertyType, type=obj_schema.Rollup):
     """Defines the rollup column in a database"""
 
-    readonly = True
-
-    def __init__(self, relation: Property, property: Property, calculate: Function):
+    def __init__(self, relation: Column, property: Column, calculate: Function):
         if not isinstance(relation.type, Relation):
             msg = f"Relation {relation} must be of type Relation"
             raise RollupError(msg)
@@ -441,36 +461,26 @@ class Rollup(PropertyType, type=obj_schema.Rollup):
 class CreatedTime(PropertyType, type=obj_schema.CreatedTime):
     """Defines the created-time column in a database"""
 
-    readonly = True
-
 
 class CreatedBy(PropertyType, type=obj_schema.CreatedBy):
     """Defines the created-by column in a database"""
-
-    readonly = True
 
 
 class LastEditedBy(PropertyType, type=obj_schema.LastEditedBy):
     """Defines the last-edited-by column in a database"""
 
-    readonly = True
-
 
 class LastEditedTime(PropertyType, type=obj_schema.LastEditedTime):
     """Defines the last-edited-time column in a database"""
-
-    readonly = True
 
 
 class ID(PropertyType, type=obj_schema.UniqueID):
     """Defines a unique ID column in a database"""
 
-    readonly = True
     allowed_at_creation = False
 
 
 class Verification(PropertyType, type=obj_schema.Verification):
     """Defines a unique ID column in a database"""
 
-    readonly = True
     allowed_at_creation = False

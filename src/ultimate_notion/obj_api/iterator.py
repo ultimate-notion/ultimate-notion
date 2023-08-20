@@ -8,7 +8,7 @@ from pydantic import validator
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.props import PropertyItem
-from ultimate_notion.obj_api.types import User
+from ultimate_notion.obj_api.objects import User
 
 MAX_PAGE_SIZE = 100
 

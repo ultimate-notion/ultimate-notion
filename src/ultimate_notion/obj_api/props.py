@@ -4,107 +4,37 @@ from datetime import datetime
 
 import pydantic
 
-from ultimate_notion.obj_api import types
+from ultimate_notion.obj_api import objects
+from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.obj_api.core import NotionObject, GenericObject
 from ultimate_notion.obj_api.schema import Function, VerificationState, SelectOption
-from ultimate_notion.obj_api.types import User
-from ultimate_notion.obj_api.text import plain_text, rich_text, Color
+from ultimate_notion.obj_api.objects import User
 
 
-class NativeTypeMixin:
-    """Mixin class for properties that can be represented as native Python types."""
-
-    def __str__(self):
-        """Return a string representation of this object."""
-
-        value = self.Value
-
-        if value is None:
-            return ""
-
-        return str(value)
-
-    def __eq__(self, other):
-        """Determine if this property is equal to the given object."""
-
-        # if `other` is a NativeTypeMixin, this comparrison will call __eq__ on that
-        # object using this objects `Value` as the value for `other` (allowing callers
-        # to compare using either native types or NativeTypeMixin's)
-
-        return other == self.Value
-
-    def __ne__(self, other):
-        """Determine if this property is not equal to the given object."""
-        return not self.__eq__(other)
-
-    @classmethod
-    def __compose__(cls, value):
-        """Build the property value from the native Python value."""
-
-        # use type-name field to instantiate the class when possible
-        if hasattr(cls, "type"):
-            return cls(**{cls.type: value})
-
-        raise NotImplementedError()
-
-    @property
-    def Value(self):
-        """Get the current value of this property as a native Python type."""
-
-        cls = self.__class__
-
-        # check to see if the object has a field with the type-name
-        # (this is assigned by TypedObject during subclass creation)
-        if hasattr(cls, "type") and hasattr(self, cls.type):
-            return getattr(self, cls.type)
-
-        raise NotImplementedError()
-
-
-class PropertyValue(types.TypedObject):
+class PropertyValue(objects.TypedObject):
     """Base class for Notion property values."""
 
     id: str | None = None
 
+    @classmethod
+    def build(cls, value):
+        """Build the property value from given value, e.g. native Python or nested type.
 
-class Title(NativeTypeMixin, PropertyValue, type="title"):
+        In practice, this is like calling __init__ the right keyword
+        """
+        return cls(**{cls.type: value})
+
+
+class Title(PropertyValue, type="title"):
     """Notion title type."""
 
-    title: list[types.RichTextObject] = []
-
-    def __len__(self):
-        """Return the number of object in the Title object."""
-
-        return len(self.title)
-
-    @classmethod
-    def __compose__(cls, *text):
-        """Create a new `Title` property from the given text elements."""
-        return cls(title=rich_text(*text))
-
-    @property
-    def Value(self):
-        """Return the plain text from this Title."""
-
-        if self.title is None:
-            return None
-
-        return plain_text(*self.title)
+    title: list[objects.RichTextObject] = []
 
 
-class RichText(NativeTypeMixin, PropertyValue, type="rich_text"):
+class RichText(PropertyValue, type="rich_text"):
     """Notion rich text type."""
 
-    rich_text: list[types.RichTextObject] = []
-
-    def __len__(self):
-        """Return the number of object in the RichText object."""
-        return len(self.rich_text)
-
-    @classmethod
-    def __compose__(cls, *text):
-        """Create a new `RichText` property from the given strings."""
-        return cls(rich_text=rich_text(*text))
+    rich_text: list[objects.RichTextObject] = []
 
     @property
     def Value(self):
@@ -113,77 +43,80 @@ class RichText(NativeTypeMixin, PropertyValue, type="rich_text"):
         if self.rich_text is None:
             return None
 
+        # ToDo: Fixme
+        from ultimate_notion.text import plain_text
+
         return plain_text(*self.rich_text)
 
 
-class Number(NativeTypeMixin, PropertyValue, type="number"):
+class Number(PropertyValue, type="number"):
     """Simple number type."""
 
     number: float | int | None = None
 
-    def __float__(self):
-        """Return the Number as a `float`."""
+    # def __float__(self):
+    #     """Return the Number as a `float`."""
 
-        if self.number is None:
-            raise ValueError("Cannot convert 'None' to float")
+    #     if self.number is None:
+    #         raise ValueError("Cannot convert 'None' to float")
 
-        return float(self.number)
+    #     return float(self.number)
 
-    def __int__(self):
-        """Return the Number as an `int`."""
+    # def __int__(self):
+    #     """Return the Number as an `int`."""
 
-        if self.number is None:
-            raise ValueError("Cannot convert 'None' to int")
+    #     if self.number is None:
+    #         raise ValueError("Cannot convert 'None' to int")
 
-        return int(self.number)
+    #     return int(self.number)
 
-    def __iadd__(self, other):
-        """Add the given value to this Number."""
+    # def __iadd__(self, other):
+    #     """Add the given value to this Number."""
 
-        if isinstance(other, Number):
-            self.number += other.Value
-        else:
-            self.number += other
+    #     if isinstance(other, Number):
+    #         self.number += other.Value
+    #     else:
+    #         self.number += other
 
-        return self
+    #     return self
 
-    def __isub__(self, other):
-        """Subtract the given value from this Number."""
+    # def __isub__(self, other):
+    #     """Subtract the given value from this Number."""
 
-        if isinstance(other, Number):
-            self.number -= other.Value
-        else:
-            self.number -= other
+    #     if isinstance(other, Number):
+    #         self.number -= other.Value
+    #     else:
+    #         self.number -= other
 
-        return self
+    #     return self
 
-    def __add__(self, other):
-        """Add the value of `other` and returns the result as a Number."""
-        return Number[other + self.Value]
+    # def __add__(self, other):
+    #     """Add the value of `other` and returns the result as a Number."""
+    #     return Number[other + self.Value]
 
-    def __sub__(self, other):
-        """Subtract the value of `other` and returns the result as a Number."""
-        return Number[self.Value - float(other)]
+    # def __sub__(self, other):
+    #     """Subtract the value of `other` and returns the result as a Number."""
+    #     return Number[self.Value - float(other)]
 
-    def __mul__(self, other):
-        """Multiply the value of `other` and returns the result as a Number."""
-        return Number[other * self.Value]
+    # def __mul__(self, other):
+    #     """Multiply the value of `other` and returns the result as a Number."""
+    #     return Number[other * self.Value]
 
-    def __le__(self, other):
-        """Return `True` if this `Number` is less-than-or-equal-to `other`."""
-        return self < other or self == other
+    # def __le__(self, other):
+    #     """Return `True` if this `Number` is less-than-or-equal-to `other`."""
+    #     return self < other or self == other
 
-    def __lt__(self, other):
-        """Return `True` if this `Number` is less-than `other`."""
-        return other > self.Value
+    # def __lt__(self, other):
+    #     """Return `True` if this `Number` is less-than `other`."""
+    #     return other > self.Value
 
-    def __ge__(self, other):
-        """Return `True` if this `Number` is greater-than-or-equal-to `other`."""
-        return self > other or self == other
+    # def __ge__(self, other):
+    #     """Return `True` if this `Number` is greater-than-or-equal-to `other`."""
+    #     return self > other or self == other
 
-    def __gt__(self, other):
-        """Return `True` if this `Number` is greater-than `other`."""
-        return other < self.Value
+    # def __gt__(self, other):
+    #     """Return `True` if this `Number` is greater-than `other`."""
+    #     return other < self.Value
 
     @property
     def Value(self):
@@ -191,7 +124,7 @@ class Number(NativeTypeMixin, PropertyValue, type="number"):
         return self.number
 
 
-class Checkbox(NativeTypeMixin, PropertyValue, type="checkbox"):
+class Checkbox(PropertyValue, type="checkbox"):
     """Simple checkbox type; represented as a boolean."""
 
     checkbox: bool | None = None
@@ -200,88 +133,96 @@ class Checkbox(NativeTypeMixin, PropertyValue, type="checkbox"):
 class Date(PropertyValue, type="date"):
     """Notion complex date type - may include timestamp and/or be a date range."""
 
-    date: types.DateRange | None = None
+    date: objects.DateRange | None = None
 
-    def __contains__(self, other):
-        """Determine if the given date is in the range (inclusive) of this Date.
+    # def __contains__(self, other):
+    #     """Determine if the given date is in the range (inclusive) of this Date.
 
-        Raises ValueError if the Date object is not a range - e.g. has no end date.
-        """
+    #     Raises ValueError if the Date object is not a range - e.g. has no end date.
+    #     """
 
-        if not self.IsRange:
-            raise ValueError("This date is not a range")
+    #     if not self.IsRange:
+    #         raise ValueError("This date is not a range")
 
-        return self.Start <= other <= self.End
+    #     return self.Start <= other <= self.End
 
-    def __str__(self):
-        """Return a string representation of this property."""
-        return "" if self.date is None else str(self.date)
+    # def __str__(self):
+    #     """Return a string representation of this property."""
+    #     return "" if self.date is None else str(self.date)
+
+    # @classmethod
+    # def build(cls, start, end=None):
+    #     """Create a new Date from the native values."""
+    #     return cls(date=objects.DateRange(start=start, end=end))
 
     @classmethod
-    def __compose__(cls, start, end=None):
+    def build(cls, start, end=None):
         """Create a new Date from the native values."""
-        return cls(date=types.DateRange(start=start, end=end))
+        if isinstance(start, objects.DateRange):
+            return super().build(start)
+        else:
+            return cls(date=objects.DateRange(start=start, end=end))
 
-    @property
-    def IsRange(self):
-        """Determine if this object represents a date range (versus a single date)."""
+    # @property
+    # def IsRange(self):
+    #     """Determine if this object represents a date range (versus a single date)."""
 
-        if self.date is None:
-            return False
+    #     if self.date is None:
+    #         return False
 
-        return self.date.end is not None
+    #     return self.date.end is not None
 
-    @property
-    def Start(self):
-        """Return the start date of this property."""
-        return None if self.date is None else self.date.start
+    # @property
+    # def Start(self):
+    #     """Return the start date of this property."""
+    #     return None if self.date is None else self.date.start
 
-    @property
-    def End(self):
-        """Return the end date of this property."""
-        return None if self.date is None else self.date.end
+    # @property
+    # def End(self):
+    #     """Return the end date of this property."""
+    #     return None if self.date is None else self.date.end
 
 
-class Status(NativeTypeMixin, PropertyValue, type="status"):
+class Status(PropertyValue, type="status"):
     """Notion status property."""
 
-    class _NestedData(types.GenericObject):
-        name: str = None
-        id: types.UUID | str | None = None
+    class _NestedData(objects.GenericObject):
+        name: str
+        id: objects.UUID | str | None = None
         color: Color | None = None
 
     status: _NestedData | None = None
 
-    def __str__(self):
-        """Return a string representation of this property."""
-        return self.Value or ""
+    # def __str__(self):
+    #     """Return a string representation of this property."""
+    #     return self.Value or ""
 
-    def __eq__(self, other):
-        """Determine if this property is equal to the given object.
+    # def __eq__(self, other):
+    #     """Determine if this property is equal to the given object.
 
-        To avoid confusion, this method compares Status options by name.
-        """
+    #     To avoid confusion, this method compares Status options by name.
+    #     """
 
-        if other is None:
-            return self.status is None
+    #     if other is None:
+    #         return self.status is None
 
-        if isinstance(other, Status):
-            return self.status.name == other.status.name
+    #     if isinstance(other, Status):
+    #         return self.status.name == other.status.name
 
-        return self.status.name == other
+    #     return self.status.name == other
 
-    @classmethod
-    def __compose__(cls, name, color=None):
-        """Create a `Status` property from the given name.
+    # ToDo: Remove
+    # @classmethod
+    # def build(cls, name, color=Color.DEFAULT):
+    #     """Create a `Status` property from the given name.
 
-        :param name: a string to use for this property
-        :param color: an optional Color for the status
-        """
-
-        if name is None:
-            raise ValueError("'name' cannot be None")
-
-        return cls(status=Status._NestedData(name=name, color=color))
+    #     :param name: a string to use for this property
+    #     :param color: an optional Color for the status
+    #     """
+    #     if isinstance(name, cls._NestedData):
+    #         return super().build(name)
+    #     else:
+    #         return cls(status=Status._NestedData(name=name, color=color))
 
     @property
     def Value(self):
@@ -290,34 +231,38 @@ class Status(NativeTypeMixin, PropertyValue, type="status"):
         return self.status.name
 
 
-class Select(NativeTypeMixin, PropertyValue, type="select"):
+class Select(PropertyValue, type="select"):
     """Notion select type."""
 
     select: SelectOption | None = None
 
-    def __str__(self):
-        """Return a string representation of this property."""
-        return self.Value or ""
+    # def __str__(self):
+    #     """Return a string representation of this property."""
+    #     return self.Value or ""
 
-    def __eq__(self, other):
-        """Determine if this property is equal to the given object.
+    # def __eq__(self, other):
+    #     """Determine if this property is equal to the given object.
 
-        To avoid confusion, this method compares Select options by name.
-        """
+    #     To avoid confusion, this method compares Select options by name.
+    #     """
 
-        if other is None:
-            return self.select is None
+    #     if other is None:
+    #         return self.select is None
 
-        return other == self.select.name
+    #     return other == self.select.name
 
-    @classmethod
-    def __compose__(cls, value, color=None):
-        """Create a `Select` property from the given value.
+    # ToDo: Remove
+    # @classmethod
+    # def build(cls, value, color=Color.DEFAULT):
+    #     """Create a `Select` property from the given value.
 
-        :param value: a string to use for this property
-        :param color: an optional Color for the value
-        """
-        return cls(select=SelectOption[value, color])
+    #     :param value: a string to use for this property
+    #     :param color: an optional Color for the value
+    #     """
+    #     if isinstance(value, SelectOption):
+    #         return super().build(value)
+    #     else:
+    #         return cls(select=SelectOption[value, color])
 
     @property
     def Value(self):
@@ -334,86 +279,89 @@ class MultiSelect(PropertyValue, type="multi_select"):
 
     multi_select: list[SelectOption] = []
 
-    def __str__(self):
-        """Return a string representation of this property."""
-        return ", ".join(self.Values)
+    # def __str__(self):
+    #     """Return a string representation of this property."""
+    #     return ", ".join(self.Values)
 
-    def __len__(self):
-        """Count the number of selected values."""
-        return len(self.multi_select)
+    # def __len__(self):
+    #     """Count the number of selected values."""
+    #     return len(self.multi_select)
 
-    def __getitem__(self, index):
-        """Return the SelectOption object at the given index."""
+    # def __getitem__(self, index):
+    #     """Return the SelectOption object at the given index."""
 
-        if self.multi_select is None:
-            raise IndexError("empty property")
+    #     if self.multi_select is None:
+    #         raise IndexError("empty property")
 
-        if index > len(self.multi_select):
-            raise IndexError("index out of range")
+    #     if index > len(self.multi_select):
+    #         raise IndexError("index out of range")
 
-        return self.multi_select[index]
+    #     return self.multi_select[index]
 
-    def __iadd__(self, other):
-        """Add the given option to this MultiSelect."""
+    # def __iadd__(self, other):
+    #     """Add the given option to this MultiSelect."""
 
-        if other in self:
-            raise ValueError(f"Duplicate item: {other}")
+    #     if other in self:
+    #         raise ValueError(f"Duplicate item: {other}")
 
-        self.append(other)
+    #     self.append(other)
 
-        return self
+    #     return self
 
-    def __isub__(self, other):
-        """Remove the given value from this MultiSelect."""
+    # def __isub__(self, other):
+    #     """Remove the given value from this MultiSelect."""
 
-        if other not in self:
-            raise ValueError(f"No such item: {other}")
+    #     if other not in self:
+    #         raise ValueError(f"No such item: {other}")
 
-        self.remove(other)
+    #     self.remove(other)
 
-        return self
+    #     return self
 
-    def __contains__(self, name):
-        """Determine if the given name is in this MultiSelect.
+    # def __contains__(self, name):
+    #     """Determine if the given name is in this MultiSelect.
 
-        To avoid confusion, only names are considered for comparison, not ID's.
-        """
+    #     To avoid confusion, only names are considered for comparison, not ID's.
+    #     """
 
-        for opt in self.multi_select:
-            if opt.name == name:
-                return True
+    #     for opt in self.multi_select:
+    #         if opt.name == name:
+    #             return True
 
-        return False
+    #     return False
 
-    def __iter__(self):
-        """Iterate over the SelectOption's in this property."""
+    # def __iter__(self):
+    #     """Iterate over the SelectOption's in this property."""
 
-        if self.multi_select is None:
-            return None
+    #     if self.multi_select is None:
+    #         return None
 
-        return iter(self.multi_select)
+    #     return iter(self.multi_select)
 
-    @classmethod
-    def __compose__(cls, *values):
-        """Initialize a new MultiSelect from the given value(s)."""
-        select = [SelectOption[value] for value in values if value is not None]
+    # ToDo: Remove
+    # @classmethod
+    # def build(cls, values):
+    #     """Initialize a new MultiSelect from the given value(s)."""
+    #     if all(isinstance(value, SelectOption) for value in values):
+    #         return super().build(values)
+    #     else:
+    #         select = [SelectOption[value] for value in values if value is not None]
+    #         return cls(multi_select=select)
 
-        return cls(multi_select=select)
+    # def append(self, *values):
+    #     """Add selected values to this MultiSelect."""
 
-    def append(self, *values):
-        """Add selected values to this MultiSelect."""
+    #     for value in values:
+    #         if value is None:
+    #             raise ValueError("'None' is an invalid value")
 
-        for value in values:
-            if value is None:
-                raise ValueError("'None' is an invalid value")
+    #         if value not in self:
+    #             self.multi_select.append(SelectOption[value])
 
-            if value not in self:
-                self.multi_select.append(SelectOption[value])
+    # def remove(self, *values):
+    #     """Remove selected values from this MultiSelect."""
 
-    def remove(self, *values):
-        """Remove selected values from this MultiSelect."""
-
-        self.multi_select = [opt for opt in self.multi_select if opt.name not in values]
+    #     self.multi_select = [opt for opt in self.multi_select if opt.name not in values]
 
     @property
     def Values(self):
@@ -428,65 +376,65 @@ class MultiSelect(PropertyValue, type="multi_select"):
 class People(PropertyValue, type="people"):
     """Notion people type."""
 
-    people: list[types.User] = []
+    people: list[objects.User] = []
 
-    def __iter__(self):
-        """Iterate over the User's in this property."""
+    # def __iter__(self):
+    #     """Iterate over the User's in this property."""
 
-        if self.people is None:
-            return None
+    #     if self.people is None:
+    #         return None
 
-        return iter(self.people)
+    #     return iter(self.people)
 
-    def __contains__(self, other):
-        """Determine if the given User or name is in this People.
+    # def __contains__(self, other):
+    #     """Determine if the given User or name is in this People.
 
-        To avoid confusion, only names are considered for comparison (not ID's).
-        """
+    #     To avoid confusion, only names are considered for comparison (not ID's).
+    #     """
 
-        for user in self.people:
-            if user == other:
-                return True
+    #     for user in self.people:
+    #         if user == other:
+    #             return True
 
-            if user.name == other:
-                return True
+    #         if user.name == other:
+    #             return True
 
-        return False
+    #     return False
 
-    def __len__(self):
-        """Return the number of People in this property."""
+    # def __len__(self):
+    #     """Return the number of People in this property."""
 
-        return len(self.people)
+    #     return len(self.people)
 
-    def __getitem__(self, index):
-        """Return the People object at the given index."""
+    # def __getitem__(self, index):
+    #     """Return the People object at the given index."""
 
-        if self.people is None:
-            raise IndexError("empty property")
+    #     if self.people is None:
+    #         raise IndexError("empty property")
 
-        if index > len(self.people):
-            raise IndexError("index out of range")
+    #     if index > len(self.people):
+    #         raise IndexError("index out of range")
 
-        return self.people[index]
+    #     return self.people[index]
 
-    def __str__(self):
-        """Return a string representation of this property."""
-        return ", ".join([str(user) for user in self.people])
+    # def __str__(self):
+    #     """Return a string representation of this property."""
+    #     return ", ".join([str(user) for user in self.people])
 
 
-class URL(NativeTypeMixin, PropertyValue, type="url"):
+class URL(PropertyValue, type="url"):
     """Notion URL type."""
 
     url: str | None = None
 
 
-class Email(NativeTypeMixin, PropertyValue, type="email"):
+class Email(PropertyValue, type="email"):
     """Notion email type."""
 
     email: str | None = None
 
 
-class PhoneNumber(NativeTypeMixin, PropertyValue, type="phone_number"):
+class PhoneNumber(PropertyValue, type="phone_number"):
     """Notion phone type."""
 
     phone_number: str | None = None
@@ -495,99 +443,99 @@ class PhoneNumber(NativeTypeMixin, PropertyValue, type="phone_number"):
 class Files(PropertyValue, type="files"):
     """Notion files type."""
 
-    files: list[types.FileObject] = []
+    files: list[objects.FileObject] = []
 
-    def __contains__(self, other):
-        """Determine if the given FileObject or name is in the property."""
+    # def __contains__(self, other):
+    #     """Determine if the given FileObject or name is in the property."""
 
-        if self.files is None:
-            return False
+    #     if self.files is None:
+    #         return False
 
-        for ref in self.files:
-            if ref == other:
-                return True
+    #     for ref in self.files:
+    #         if ref == other:
+    #             return True
 
-            if ref.name == other:
-                return True
+    #         if ref.name == other:
+    #             return True
 
-        return False
+    #     return False
 
-    def __str__(self):
-        """Return a string representation of this property."""
-        return "; ".join([str(file) for file in self.files])
+    # def __str__(self):
+    #     """Return a string representation of this property."""
+    #     return "; ".join([str(file) for file in self.files])
 
-    def __iter__(self):
-        """Iterate over the FileObject's in this property."""
+    # def __iter__(self):
+    #     """Iterate over the FileObject's in this property."""
 
-        if self.files is None:
-            return None
+    #     if self.files is None:
+    #         return None
 
-        return iter(self.files)
+    #     return iter(self.files)
 
-    def __len__(self):
-        """Return the number of Files in this property."""
+    # def __len__(self):
+    #     """Return the number of Files in this property."""
 
-        return len(self.files)
+    #     return len(self.files)
 
-    def __getitem__(self, name):
-        """Return the FileObject with the given name."""
+    # def __getitem__(self, name):
+    #     """Return the FileObject with the given name."""
 
-        if self.files is None:
-            return None
+    #     if self.files is None:
+    #         return None
 
-        for ref in self.files:
-            if ref.name == name:
-                return ref
+    #     for ref in self.files:
+    #         if ref.name == name:
+    #             return ref
 
-        raise AttributeError("No such file")
+    #     raise AttributeError("No such file")
 
-    def __iadd__(self, obj):
-        """Append the given `FileObject` in place."""
+    # def __iadd__(self, obj):
+    #     """Append the given `FileObject` in place."""
 
-        if obj in self:
-            raise ValueError(f"Item exists: {obj}")
+    #     if obj in self:
+    #         raise ValueError(f"Item exists: {obj}")
 
-        self.append(obj)
-        return self
+    #     self.append(obj)
+    #     return self
 
-    def __isub__(self, obj):
-        """Remove the given `FileObject` in place."""
+    # def __isub__(self, obj):
+    #     """Remove the given `FileObject` in place."""
 
-        if obj not in self:
-            raise ValueError(f"No such item: {obj}")
+    #     if obj not in self:
+    #         raise ValueError(f"No such item: {obj}")
 
-        self.remove(obj)
-        return self
+    #     self.remove(obj)
+    #     return self
 
-    def append(self, obj):
-        """Append the given file reference to this property.
+    # def append(self, obj):
+    #     """Append the given file reference to this property.
 
-        :param ref: the `FileObject` to be added
-        """
-        self.files.append(obj)
+    #     :param ref: the `FileObject` to be added
+    #     """
+    #     self.files.append(obj)
 
-    def remove(self, obj):
-        """Remove the given file reference from this property.
+    # def remove(self, obj):
+    #     """Remove the given file reference from this property.
 
-        :param ref: the `FileObject` to be removed
-        """
-        self.files.remove(obj)
+    #     :param ref: the `FileObject` to be removed
+    #     """
+    #     self.files.remove(obj)
 
 
-class FormulaResult(types.TypedObject):
+class FormulaResult(objects.TypedObject):
     """A Notion formula result.
 
     This object contains the result of the expression in the database properties.
     """
 
-    def __str__(self):
-        """Return the formula result as a string."""
-        return self.Result or ""
+    # def __str__(self):
+    #     """Return the formula result as a string."""
+    #     return self.Result or ""
 
-    @property
-    def Result(self):
-        """Return the result of this FormulaResult."""
-        raise NotImplementedError("Result unavailable")
+    # @property
+    # def Result(self):
+    #     """Return the result of this FormulaResult."""
+    #     raise NotImplementedError("Result unavailable")
 
 
 class StringFormula(FormulaResult, type="string"):
@@ -595,10 +543,10 @@ class StringFormula(FormulaResult, type="string"):
 
     string: str | None = None
 
-    @property
-    def Result(self):
-        """Return the result of this StringFormula."""
-        return self.string
+    # @property
+    # def Result(self):
+    #     """Return the result of this StringFormula."""
+    #     return self.string
 
 
 class NumberFormula(FormulaResult, type="number"):
@@ -606,21 +554,21 @@ class NumberFormula(FormulaResult, type="number"):
 
     number: float | int | None = None
 
-    @property
-    def Result(self):
-        """Return the result of this NumberFormula."""
-        return self.number
+    # @property
+    # def Result(self):
+    #     """Return the result of this NumberFormula."""
+    #     return self.number
 
 
 class DateFormula(FormulaResult, type="date"):
     """A Notion date formula result."""
 
-    date: types.DateRange | None = None
+    date: objects.DateRange | None = None
 
-    @property
-    def Result(self):
-        """Return the result of this DateFormula."""
-        return self.date
+    # @property
+    # def Result(self):
+    #     """Return the result of this DateFormula."""
+    #     return self.date
 
 
 class BooleanFormula(FormulaResult, type="boolean"):
@@ -628,10 +576,10 @@ class BooleanFormula(FormulaResult, type="boolean"):
 
     boolean: bool | None = None
 
-    @property
-    def Result(self):
-        """Return the result of this BooleanFormula."""
-        return self.boolean
+    # @property
+    # def Result(self):
+    #     """Return the result of this BooleanFormula."""
+    #     return self.boolean
 
 
 class Formula(PropertyValue, type="formula"):
@@ -639,85 +587,85 @@ class Formula(PropertyValue, type="formula"):
 
     formula: FormulaResult | None = None
 
-    def __str__(self):
-        """Return the result of this formula as a string."""
-        return str(self.Result or "")
+    # def __str__(self):
+    #     """Return the result of this formula as a string."""
+    #     return str(self.Result or "")
 
-    @property
-    def Result(self):
-        """Return the result of this Formula in its native type."""
+    # @property
+    # def Result(self):
+    #     """Return the result of this Formula in its native type."""
 
-        if self.formula is None:
-            return None
+    #     if self.formula is None:
+    #         return None
 
-        return self.formula.Result
+    #     return self.formula.Result
 
 
 class Relation(PropertyValue, type="relation"):
     """A Notion relation property value."""
 
-    relation: list[types.ObjectReference] = []
+    relation: list[objects.ObjectReference] = []
     has_more: bool = False
 
     @classmethod
-    def __compose__(cls, *pages):
+    def build(cls, pages):
         """Return a `Relation` property with the specified pages."""
-        return cls(relation=[types.ObjectReference[page] for page in pages])
+        return cls(relation=[objects.ObjectReference[page] for page in pages])
 
-    def __contains__(self, page):
-        """Determine if the given page is in this Relation."""
-        return types.ObjectReference[page] in self.relation
+    # def __contains__(self, page):
+    #     """Determine if the given page is in this Relation."""
+    #     return objects.ObjectReference[page] in self.relation
 
-    def __iter__(self):
-        """Iterate over the ObjectReference's in this property."""
+    # def __iter__(self):
+    #     """Iterate over the ObjectReference's in this property."""
 
-        if self.relation is None:
-            return None
+    #     if self.relation is None:
+    #         return None
 
-        return iter(self.relation)
+    #     return iter(self.relation)
 
-    def __len__(self):
-        """Return the number of ObjectReference's in this property."""
+    # def __len__(self):
+    #     """Return the number of ObjectReference's in this property."""
 
-        return len(self.relation)
+    #     return len(self.relation)
 
-    def __getitem__(self, index):
-        """Return the ObjectReference object at the given index."""
+    # def __getitem__(self, index):
+    #     """Return the ObjectReference object at the given index."""
 
-        if self.relation is None:
-            raise IndexError("empty property")
+    #     if self.relation is None:
+    #         raise IndexError("empty property")
 
-        if index > len(self.relation):
-            raise IndexError("index out of range")
+    #     if index > len(self.relation):
+    #         raise IndexError("index out of range")
 
-        return self.relation[index]
+    #     return self.relation[index]
 
-    def __iadd__(self, page):
-        """Add the given page to this Relation in place."""
+    # def __iadd__(self, page):
+    #     """Add the given page to this Relation in place."""
 
-        ref = types.ObjectReference[page]
+    #     ref = objects.ObjectReference[page]
 
-        if ref in self.relation:
-            raise ValueError(f"Duplicate item: {ref.id}")
+    #     if ref in self.relation:
+    #         raise ValueError(f"Duplicate item: {ref.id}")
 
-        self.relation.append(ref)
+    #     self.relation.append(ref)
 
-        return self
+    #     return self
 
-    def __isub__(self, page):
-        """Remove the given page from this Relation in place."""
+    # def __isub__(self, page):
+    #     """Remove the given page from this Relation in place."""
 
-        ref = types.ObjectReference[page]
+    #     ref = objects.ObjectReference[page]
 
-        if ref in self.relation:
-            raise ValueError(f"No such item: {ref.id}")
+    #     if ref in self.relation:
+    #         raise ValueError(f"No such item: {ref.id}")
 
-        self.relation.remove(ref)
+    #     self.relation.remove(ref)
 
-        return self
+    #     return self
 
 
-class RollupObject(types.TypedObject, ABC):
+class RollupObject(objects.TypedObject, ABC):
     """A Notion rollup property value."""
 
     function: Function | None = None
@@ -742,7 +690,7 @@ class RollupNumber(RollupObject, type="number"):
 class RollupDate(RollupObject, type="date"):
     """A Notion rollup date property value."""
 
-    date: types.DateRange | None = None
+    date: objects.DateRange | None = None
 
     @property
     def Value(self):
@@ -766,20 +714,20 @@ class Rollup(PropertyValue, type="rollup"):
 
     rollup: RollupObject | None = None
 
-    def __str__(self):
-        """Return a string representation of this Rollup property."""
+    # def __str__(self):
+    #     """Return a string representation of this Rollup property."""
 
-        if self.rollup is None:
-            return ""
+    #     if self.rollup is None:
+    #         return ""
 
-        value = self.rollup.Value
-        if value is None:
-            return ""
+    #     value = self.rollup.Value
+    #     if value is None:
+    #         return ""
 
-        return str(value)
+    #     return str(value)
 
 
-class CreatedTime(NativeTypeMixin, PropertyValue, type="created_time"):
+class CreatedTime(PropertyValue, type="created_time"):
     """A Notion created-time property value."""
 
     created_time: datetime
@@ -788,14 +736,14 @@ class CreatedTime(NativeTypeMixin, PropertyValue, type="created_time"):
 class CreatedBy(PropertyValue, type="created_by"):
     """A Notion created-by property value."""
 
-    created_by: types.User
+    created_by: objects.User
 
-    def __str__(self):
-        """Return the contents of this property as a string."""
-        return str(self.created_by)
+    # def __str__(self):
+    #     """Return the contents of this property as a string."""
+    #     return str(self.created_by)
 
 
-class LastEditedTime(NativeTypeMixin, PropertyValue, type="last_edited_time"):
+class LastEditedTime(PropertyValue, type="last_edited_time"):
     """A Notion last-edited-time property value."""
 
     last_edited_time: datetime
@@ -804,14 +752,14 @@ class LastEditedTime(NativeTypeMixin, PropertyValue, type="last_edited_time"):
 class LastEditedBy(PropertyValue, type="last_edited_by"):
     """A Notion last-edited-by property value."""
 
-    last_edited_by: types.User
+    last_edited_by: objects.User
 
-    def __str__(self):
-        """Return the contents of this property as a string."""
-        return str(self.last_edited_by)
+    # def __str__(self):
+    #     """Return the contents of this property as a string."""
+    #     return str(self.last_edited_by)
 
 
-class UniqueID(NativeTypeMixin, PropertyValue, type="unique_id"):
+class UniqueID(PropertyValue, type="unique_id"):
     """A Notion unique-id property value."""
 
     class _NestedData(GenericObject):
@@ -820,9 +768,9 @@ class UniqueID(NativeTypeMixin, PropertyValue, type="unique_id"):
 
     unique_id: _NestedData = _NestedData()
 
-    def __str__(self):
-        """Return the contents of this property as a string."""
-        return self.unique_id.prefix + str(self.unique_id.number)
+    # def __str__(self):
+    #     """Return the contents of this property as a string."""
+    #     return self.unique_id.prefix + str(self.unique_id.number)
 
 
 class Verification(PropertyValue, type="verification"):

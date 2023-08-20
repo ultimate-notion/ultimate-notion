@@ -11,7 +11,8 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from ultimate_notion.schema import PageSchema, Property
+from ultimate_notion.schema import PageSchema, Column
+from ultimate_notion.objects import File, Option
 from ultimate_notion.session import Session
 
-__all__ = ['__version__', 'Session', 'PageSchema', 'Property']
+__all__ = ['__version__', 'Session', 'PageSchema', 'Column', 'File', 'Option']

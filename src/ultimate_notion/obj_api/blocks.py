@@ -10,20 +10,20 @@ from uuid import UUID
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.schema import PropertyObject
-from ultimate_notion.obj_api.text import (
-    CodingLanguage,
-    FullColor,
+from ultimate_notion.obj_api.enums import CodingLanguage, FullColor
+from ultimate_notion.obj_api.objects import (
+    BlockRef,
+    EmojiObject,
+    FileObject,
+    ParentRef,
+    UserRef,
     RichTextObject,
     TextObject,
-    markdown,
-    plain_text,
-    rich_text,
 )
-from ultimate_notion.obj_api.types import BlockRef, EmojiObject, FileObject, ParentRef, UserRef
 from ultimate_notion.obj_api.props import PropertyValue
 
 
-class DataRecord(NotionObject):
+class DataObject(NotionObject):
     """The base type for all Notion API records."""
 
     id: UUID = None
@@ -40,7 +40,7 @@ class DataRecord(NotionObject):
     last_edited_by: UserRef = None
 
 
-class Database(DataRecord, object="database"):
+class Database(DataObject, object="database"):
     """A database record type."""
 
     title: List[RichTextObject] = None
@@ -51,16 +51,8 @@ class Database(DataRecord, object="database"):
     description: Optional[List[RichTextObject]] = None
     is_inline: bool = False
 
-    @property
-    def Title(self):
-        """Return the title of this database as plain text."""
-        if self.title is None or len(self.title) == 0:
-            return None
 
-        return plain_text(*self.title)
-
-
-class Page(DataRecord, object="page"):
+class Page(DataObject, object="page"):
     """A standard Notion page object."""
 
     url: str = None
@@ -69,7 +61,7 @@ class Page(DataRecord, object="page"):
     properties: Dict[str, PropertyValue] = {}
 
 
-class Block(DataRecord, TypedObject, object="block"):
+class Block(DataObject, TypedObject, object="block"):
     """A standard block object in Notion.
 
     Calling the block will expose the nested data in the object.
@@ -85,16 +77,16 @@ class UnsupportedBlock(Block, type="unsupported"):
     unsupported: Optional[_NestedData] = None
 
 
-class TextBlock(Block, ABC):
+class TextBlock(Block, ABC):  # ToDo: Why do we inherit from ABC here?
     """A standard text block object in Notion."""
 
     # text blocks have a nested object with 'type' name and a 'rich_text' child
 
-    @property
-    def __text__(self):
-        """Provide shorthand access to the nested text content in this block."""
+    # @property
+    # def __text__(self):
+    #     """Provide shorthand access to the nested text content in this block."""
 
-        return self("rich_text")
+    #     return self("rich_text")
 
     @classmethod
     def __compose__(cls, *text):
@@ -105,53 +97,53 @@ class TextBlock(Block, ABC):
 
         return obj
 
-    def concat(self, *text):
-        """Concatenate text (either `RichTextObject` or `str` items) to this block."""
+    # def concat(self, *text):
+    #     """Concatenate text (either `RichTextObject` or `str` items) to this block."""
 
-        rtf = rich_text(*text)
+    #     rtf = rich_text(*text)
 
-        # calling the block returns the nested data...  this helps deal with
-        # sublcasses of `TextBlock` that each have different "type" attributes
-        nested = self()
-        nested.rich_text.extend(rtf)
+    #     # calling the block returns the nested data...  this helps deal with
+    #     # sublcasses of `TextBlock` that each have different "type" attributes
+    #     nested = self()
+    #     nested.rich_text.extend(rtf)
 
-    @property
-    def PlainText(self):
-        """Return the contents of this Block as plain text."""
+    # @property
+    # def PlainText(self):
+    #     """Return the contents of this Block as plain text."""
 
-        content = self.__text__
+    #     content = self.__text__
 
-        return None if content is None else plain_text(*content)
+    #     return None if content is None else plain_text(*content)
 
 
 class WithChildrenMixin:
     """Mixin for blocks that support children blocks."""
 
-    @property
-    def __children__(self):
-        """Provide short-hand access to the children in this block."""
+    # @property
+    # def __children__(self):
+    #     """Provide short-hand access to the children in this block."""
 
-        return self("children")
+    #     return self("children")
 
-    def __iadd__(self, block):
-        """Append the given block to the children of this parent in place."""
-        self.append(block)
-        return self
+    # def __iadd__(self, block):
+    #     """Append the given block to the children of this parent in place."""
+    #     self.append(block)
+    #     return self
 
-    def append(self, block):
-        """Append the given block to the children of this parent."""
+    # def append(self, block):
+    #     """Append the given block to the children of this parent."""
 
-        if block is None:
-            raise ValueError("block cannot be None")
+    #     if block is None:
+    #         raise ValueError("block cannot be None")
 
-        nested = self()
+    #     nested = self()
 
-        if nested.children is None:
-            nested.children = []
+    #     if nested.children is None:
+    #         nested.children = []
 
-        nested.children.append(block)
+    #     nested.children.append(block)
 
-        self.has_children = True
+    #     self.has_children = True
 
 
 class Paragraph(TextBlock, WithChildrenMixin, type="paragraph"):
@@ -164,14 +156,14 @@ class Paragraph(TextBlock, WithChildrenMixin, type="paragraph"):
 
     paragraph: _NestedData = _NestedData()
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.paragraph and self.paragraph.rich_text:
-            return markdown(*self.paragraph.rich_text)
+    #     if self.paragraph and self.paragraph.rich_text:
+    #         return markdown(*self.paragraph.rich_text)
 
-        return ""
+    #     return ""
 
 
 class Heading1(TextBlock, type="heading_1"):
@@ -183,14 +175,14 @@ class Heading1(TextBlock, type="heading_1"):
 
     heading_1: _NestedData = _NestedData()
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.heading_1 and self.heading_1.rich_text:
-            return f"# {markdown(*self.heading_1.rich_text)} #"
+    #     if self.heading_1 and self.heading_1.rich_text:
+    #         return f"# {markdown(*self.heading_1.rich_text)} #"
 
-        return ""
+    #     return ""
 
 
 class Heading2(TextBlock, type="heading_2"):
@@ -202,14 +194,14 @@ class Heading2(TextBlock, type="heading_2"):
 
     heading_2: _NestedData = _NestedData()
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.heading_2 and self.heading_2.rich_text:
-            return f"## {markdown(*self.heading_2.rich_text)} ##"
+    #     if self.heading_2 and self.heading_2.rich_text:
+    #         return f"## {markdown(*self.heading_2.rich_text)} ##"
 
-        return ""
+    #     return ""
 
 
 class Heading3(TextBlock, type="heading_3"):
@@ -221,14 +213,14 @@ class Heading3(TextBlock, type="heading_3"):
 
     heading_3: _NestedData = _NestedData()
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.heading_3 and self.heading_3.rich_text:
-            return f"### {markdown(*self.heading_3.rich_text)} ###"
+    #     if self.heading_3 and self.heading_3.rich_text:
+    #         return f"### {markdown(*self.heading_3.rich_text)} ###"
 
-        return ""
+    #     return ""
 
 
 class Quote(TextBlock, WithChildrenMixin, type="quote"):
@@ -241,14 +233,14 @@ class Quote(TextBlock, WithChildrenMixin, type="quote"):
 
     quote: _NestedData = _NestedData()
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.quote and self.quote.rich_text:
-            return "> " + markdown(*self.quote.rich_text)
+    #     if self.quote and self.quote.rich_text:
+    #         return "> " + markdown(*self.quote.rich_text)
 
-        return ""
+    #     return ""
 
 
 class Code(TextBlock, type="code"):
@@ -268,18 +260,18 @@ class Code(TextBlock, type="code"):
         block.code.language = lang
         return block
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        lang = self.code.language.value if self.code and self.code.language else ""
+    #     lang = self.code.language.value if self.code and self.code.language else ""
 
-        # FIXME this is not the standard way to represent code blocks in markdown...
+    #     # FIXME this is not the standard way to represent code blocks in markdown...
 
-        if self.code and self.code.rich_text:
-            return f"```{lang}\n{markdown(*self.code.rich_text)}\n```"
+    #     if self.code and self.code.rich_text:
+    #         return f"```{lang}\n{markdown(*self.code.rich_text)}\n```"
 
-        return ""
+    #     return ""
 
 
 class Callout(TextBlock, WithChildrenMixin, type="callout"):
@@ -318,14 +310,14 @@ class BulletedListItem(TextBlock, WithChildrenMixin, type="bulleted_list_item"):
 
     bulleted_list_item: _NestedData = _NestedData()
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.bulleted_list_item and self.bulleted_list_item.rich_text:
-            return f"- {markdown(*self.bulleted_list_item.rich_text)}"
+    #     if self.bulleted_list_item and self.bulleted_list_item.rich_text:
+    #         return f"- {markdown(*self.bulleted_list_item.rich_text)}"
 
-        return ""
+    #     return ""
 
 
 class NumberedListItem(TextBlock, WithChildrenMixin, type="numbered_list_item"):
@@ -338,14 +330,14 @@ class NumberedListItem(TextBlock, WithChildrenMixin, type="numbered_list_item"):
 
     numbered_list_item: _NestedData = _NestedData()
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.numbered_list_item and self.numbered_list_item.rich_text:
-            return f"1. {markdown(*self.numbered_list_item.rich_text)}"
+    #     if self.numbered_list_item and self.numbered_list_item.rich_text:
+    #         return f"1. {markdown(*self.numbered_list_item.rich_text)}"
 
-        return ""
+    #     return ""
 
 
 class ToDo(TextBlock, WithChildrenMixin, type="to_do"):
@@ -369,25 +361,25 @@ class ToDo(TextBlock, WithChildrenMixin, type="to_do"):
             )
         )
 
-    @property
-    def IsChecked(self):
-        """Determine if this ToDo is marked as checked or not.
+    # @property
+    # def IsChecked(self):
+    #     """Determine if this ToDo is marked as checked or not.
 
-        If the block is empty (e.g. no nested data), this method returns `None`.
-        """
-        return self.to_do.checked if self.to_do else None
+    #     If the block is empty (e.g. no nested data), this method returns `None`.
+    #     """
+    #     return self.to_do.checked if self.to_do else None
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.to_do and self.to_do.rich_text:
-            if self.to_do.checked:
-                return f"- [x] {markdown(*self.to_do.rich_text)}"
+    #     if self.to_do and self.to_do.rich_text:
+    #         if self.to_do.checked:
+    #             return f"- [x] {markdown(*self.to_do.rich_text)}"
 
-            return f"- [ ] {markdown(*self.to_do.rich_text)}"
+    #         return f"- [ ] {markdown(*self.to_do.rich_text)}"
 
-        return ""
+    #     return ""
 
 
 class Toggle(TextBlock, WithChildrenMixin, type="toggle"):
@@ -443,19 +435,19 @@ class Embed(Block, type="embed"):
         """Create a new `Embed` block from the given URL."""
         return Embed(embed=Embed._NestedData(url=url))
 
-    @property
-    def URL(self):
-        """Return the URL contained in this `Embed` block."""
-        return self.embed.url
+    # @property
+    # def URL(self):
+    #     """Return the URL contained in this `Embed` block."""
+    #     return self.embed.url
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.embed and self.embed.url:
-            return f"<{self.embed.url}>"
+    #     if self.embed and self.embed.url:
+    #         return f"<{self.embed.url}>"
 
-        return ""
+    #     return ""
 
 
 class Bookmark(Block, type="bookmark"):
@@ -472,19 +464,19 @@ class Bookmark(Block, type="bookmark"):
         """Compose a new `Bookmark` block from a specific URL."""
         return Bookmark(bookmark=Bookmark._NestedData(url=url))
 
-    @property
-    def URL(self):
-        """Return the URL contained in this `Bookmark` block."""
-        return self.bookmark.url
+    # @property
+    # def URL(self):
+    #     """Return the URL contained in this `Bookmark` block."""
+    #     return self.bookmark.url
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.bookmark and self.bookmark.url:
-            return f"<{self.bookmark.url}>"
+    #     if self.bookmark and self.bookmark.url:
+    #         return f"<{self.bookmark.url}>"
 
-        return ""
+    #     return ""
 
 
 class LinkPreview(Block, type="link_preview"):
@@ -500,19 +492,19 @@ class LinkPreview(Block, type="link_preview"):
         """Create a new `LinkPreview` block from the given URL."""
         return LinkPreview(link_preview=LinkPreview._NestedData(url=url))
 
-    @property
-    def URL(self):
-        """Return the URL contained in this `LinkPreview` block."""
-        return self.link_preview.url
+    # @property
+    # def URL(self):
+    #     """Return the URL contained in this `LinkPreview` block."""
+    #     return self.link_preview.url
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
 
-        if self.link_preview and self.link_preview.url:
-            return f"<{self.link_preview.url}>"
+    #     if self.link_preview and self.link_preview.url:
+    #         return f"<{self.link_preview.url}>"
 
-        return ""
+    #     return ""
 
 
 class Equation(Block, type="equation"):
@@ -631,9 +623,9 @@ class TableRow(Block, type="table_row"):
 
     table_row: _NestedData = _NestedData()
 
-    def __getitem__(self, cell_num):
-        """Return the cell content for the requested column."""
-        return self.table_row[cell_num]
+    # def __getitem__(self, cell_num):
+    #     """Return the cell content for the requested column."""
+    #     return self.table_row[cell_num]
 
     @classmethod
     def __compose__(cls, *cells):
@@ -645,30 +637,30 @@ class TableRow(Block, type="table_row"):
 
         return row
 
-    def append(self, text):
-        """Append the given text as a new cell in this `TableRow`.
+    # def append(self, text):
+    #     """Append the given text as a new cell in this `TableRow`.
 
-        `text` may be a string, `RichTextObject` or a list of `RichTextObject`'s.
+    #     `text` may be a string, `RichTextObject` or a list of `RichTextObject`'s.
 
-        :param text: the text content to append
-        """
-        if self.table_row.cells is None:
-            self.table_row.cells = []
+    #     :param text: the text content to append
+    #     """
+    #     if self.table_row.cells is None:
+    #         self.table_row.cells = []
 
-        if isinstance(text, list):
-            self.table_row.cells.append(list)
+    #     if isinstance(text, list):
+    #         self.table_row.cells.append(list)
 
-        elif isinstance(text, RichTextObject):
-            self.table_row.cells.append([text])
+    #     elif isinstance(text, RichTextObject):
+    #         self.table_row.cells.append([text])
 
-        else:
-            rtf = TextObject[text]
-            self.table_row.cells.append([rtf])
+    #     else:
+    #         rtf = TextObject[text]
+    #         self.table_row.cells.append([rtf])
 
-    @property
-    def Width(self):
-        """Return the width (number of cells) in this `TableRow`."""
-        return len(self.table_row.cells) if self.table_row.cells else 0
+    # @property
+    # def Width(self):
+    #     """Return the width (number of cells) in this `TableRow`."""
+    #     return len(self.table_row.cells) if self.table_row.cells else 0
 
 
 class Table(Block, WithChildrenMixin, type="table"):
@@ -695,33 +687,33 @@ class Table(Block, WithChildrenMixin, type="table"):
 
         return table
 
-    def append(self, block: TableRow):
-        """Append the given row to this table.
+    # def append(self, block: TableRow):
+    #     """Append the given row to this table.
 
-        This method is only applicable when creating a new `Table` block.  In order to
-        add rows to an existing `Table`, use the `blocks.children.append()` endpoint.
+    #     This method is only applicable when creating a new `Table` block.  In order to
+    #     add rows to an existing `Table`, use the `blocks.children.append()` endpoint.
 
-        When adding a row, this method will rase an exception if the width does not
-        match the expected number of cells for existing rows in the block.
-        """
+    #     When adding a row, this method will rase an exception if the width does not
+    #     match the expected number of cells for existing rows in the block.
+    #     """
 
-        # XXX need to review whether this is applicable during update...  may need
-        # to raise an error if the block has already been created on the server
+    #     # XXX need to review whether this is applicable during update...  may need
+    #     # to raise an error if the block has already been created on the server
 
-        if not isinstance(block, TableRow):
-            raise ValueError("Only TableRow may be appended to Table blocks.")
+    #     if not isinstance(block, TableRow):
+    #         raise ValueError("Only TableRow may be appended to Table blocks.")
 
-        if self.Width == 0:
-            self.table.table_width = block.Width
-        elif self.Width != block.Width:
-            raise ValueError("Number of cells in row must match table")
+    #     if self.Width == 0:
+    #         self.table.table_width = block.Width
+    #     elif self.Width != block.Width:
+    #         raise ValueError("Number of cells in row must match table")
 
-        self.table.children.append(block)
+    #     self.table.children.append(block)
 
-    @property
-    def Width(self):
-        """Return the current width of this table."""
-        return self.table.table_width
+    # @property
+    # def Width(self):
+    #     """Return the current width of this table."""
+    #     return self.table.table_width
 
 
 class LinkToPage(Block, type="link_to_page"):
@@ -739,13 +731,13 @@ class SyncedBlock(Block, WithChildrenMixin, type="synced_block"):
 
     synced_block: _NestedData = _NestedData()
 
-    @property
-    def IsOriginal(self):
-        """Determine if this block represents the original content.
+    # @property
+    # def IsOriginal(self):
+    #     """Determine if this block represents the original content.
 
-        If this method returns `False`, the block represents the sync'ed block.
-        """
-        return self.synced_block.synced_from is None
+    #     If this method returns `False`, the block represents the sync'ed block.
+    #     """
+    #     return self.synced_block.synced_from is None
 
 
 class Template(Block, WithChildrenMixin, type="template"):
