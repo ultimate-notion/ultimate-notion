@@ -241,10 +241,7 @@ class Wrapper(Generic[T]):
 
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
-        if hasattr(obj_api_type, "__compose__"):
-            self.obj_ref = obj_api_type.__compose__(*args, **kwargs)
-        else:
-            self.obj_ref = obj_api_type(*args, **kwargs)
+        self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: T) -> SelfT:

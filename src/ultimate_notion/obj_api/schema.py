@@ -8,15 +8,8 @@ from uuid import UUID
 import pydantic
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
-from ultimate_notion.obj_api.enums import NumberFormat, Function
+from ultimate_notion.obj_api.enums import NumberFormat, Function, VerificationState
 from ultimate_notion.obj_api.objects import SelectOption
-
-
-class VerificationState(str, Enum):
-    """Available verification states for pages in wiki databases"""
-
-    VERIFIED = "verified"
-    UNVERIFIED = "unverified"
 
 
 class PropertyObject(TypedObject):

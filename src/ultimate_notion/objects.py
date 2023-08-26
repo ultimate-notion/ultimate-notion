@@ -19,7 +19,7 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
     obj_ref: objs.FileObject
 
     def __init__(self, url: str) -> None:
-        self.obj_ref = objs.ExternalFile[url, url]  # take the name as url as a name is needed
+        self.obj_ref = objs.ExternalFile.build(url=url, name=url)
 
 
 class RichTextElem(Wrapper[objs.RichTextObject], wraps=objs.RichTextObject):

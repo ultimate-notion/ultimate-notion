@@ -23,7 +23,7 @@ class SelectOption(GenericObject):
     color: Color = Color.DEFAULT
 
     @classmethod
-    def __compose__(cls, name, color=Color.DEFAULT):
+    def build(cls, name, color=Color.DEFAULT):
         """Create a `SelectOption` object from the given name and color."""
         return cls(name=name, color=color)
 
@@ -166,10 +166,6 @@ class Person(User, type="person"):
 
     person: _NestedData = None
 
-    def __str__(self):
-        """Return a string representation of this `Person`."""
-        return f"[@{self.name}]"
-
 
 class Bot(User, type="bot"):
     """Represents a Bot in Notion."""
@@ -179,22 +175,14 @@ class Bot(User, type="bot"):
 
     bot: _NestedData = None
 
-    def __str__(self):
-        """Return a string representation of this `Bot`."""
-        return f"[%{self.name}]"
-
 
 class EmojiObject(TypedObject, type="emoji"):
     """A Notion emoji object."""
 
     emoji: str
 
-    def __str__(self):
-        """Return this EmojiObject as a simple string."""
-        return self.emoji
-
     @classmethod
-    def __compose__(cls, emoji):
+    def build(cls, emoji):
         """Compose an EmojiObject from the given emoji string."""
         # Todo: convert string-based emoji to unicode here!
         return EmojiObject(emoji=emoji)
@@ -210,15 +198,6 @@ class FileObject(TypedObject):
     """
 
     name: str | None = None
-
-    def __str__(self):
-        """Return a string representation of this object."""
-        return self.name or "__unknown__"
-
-    @property
-    def URL(self):
-        """Return the URL to this FileObject."""
-        return self("url")
 
 
 class HostedFile(FileObject, type="file"):
@@ -249,7 +228,7 @@ class ExternalFile(FileObject, type="external"):
         return name
 
     @classmethod
-    def __compose__(cls, url, name=None):
+    def build(cls, url, name=None):
         """Create a new `ExternalFile` from the given URL."""
         return cls(name=name, external=cls._NestedData(url=url))
 
@@ -327,7 +306,7 @@ class RichTextObject(TypedObject):
         return text
 
     @classmethod
-    def __compose__(cls, text, href=None, style=None):
+    def build(cls, text, href=None, style=None):
         """Compose a TextObject from the given properties.
 
         :param text: the plain text of this object
@@ -362,7 +341,7 @@ class TextObject(RichTextObject, type="text"):
     text: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, text, href=None, style=None):
+    def build(cls, text, href=None, style=None):
         """Compose a TextObject from the given properties.
 
         :param text: the plain text of this object

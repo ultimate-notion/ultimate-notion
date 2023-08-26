@@ -3,6 +3,13 @@
 from enum import Enum
 
 
+class VerificationState(str, Enum):
+    """Available verification states for pages in wiki databases"""
+
+    VERIFIED = "verified"
+    UNVERIFIED = "unverified"
+
+
 class Color(str, Enum):
     """Basic color values."""
 

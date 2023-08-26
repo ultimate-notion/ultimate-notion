@@ -198,7 +198,7 @@ class DatabasesEndpoint(Endpoint):
             request["parent"] = parent.dict()
 
         if title is not None:
-            prop = TextObject[title]
+            prop = TextObject.build(title)
             request["title"] = [prop.dict()]
 
         if schema is not None:
