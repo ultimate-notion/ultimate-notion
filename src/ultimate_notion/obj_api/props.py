@@ -6,7 +6,6 @@ from typing import Any
 import pydantic
 
 from ultimate_notion.obj_api import objects
-from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.obj_api.core import NotionObject, GenericObject
 from ultimate_notion.obj_api.schema import Function, VerificationState, SelectOption
 from ultimate_notion.obj_api.objects import User
@@ -184,7 +183,7 @@ class Relation(PropertyValue, type="relation"):
     @classmethod
     def build(cls, pages):
         """Return a `Relation` property with the specified pages."""
-        return cls(relation=[objects.ObjectReference[page] for page in pages])
+        return cls(relation=[objects.ObjectReference.build(page) for page in pages])
 
 
 class RollupObject(objects.TypedObject, ABC):

@@ -69,7 +69,7 @@ class BlocksEndpoint(Endpoint):
             `parent` may be any suitable `ObjectReference` type.
             """
 
-            parent_id = ObjectReference[parent].id
+            parent_id = ObjectReference.build(parent).id
 
             children = [block.dict() for block in blocks if block is not None]
 
@@ -99,7 +99,7 @@ class BlocksEndpoint(Endpoint):
             `parent` may be any suitable `ObjectReference` type.
             """
 
-            parent_id = ObjectReference[parent].id
+            parent_id = ObjectReference.build(parent).id
 
             logger.info("Listing blocks for %s...", parent_id)
 
@@ -125,7 +125,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = ObjectReference[block].id
+        block_id = ObjectReference.build(block).id
         logger.info("Deleting block :: %s", block_id)
 
         data = self.raw_api.delete(block_id)
@@ -138,7 +138,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = ObjectReference[block].id
+        block_id = ObjectReference.build(block).id
         logger.info("Restoring block :: %s", block_id)
 
         data = self.raw_api.update(block_id, archived=False)
@@ -152,7 +152,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = ObjectReference[block].id
+        block_id = ObjectReference.build(block).id
         logger.info("Retrieving block :: %s", block_id)
 
         data = self.raw_api.retrieve(block_id)
@@ -215,7 +215,7 @@ class DatabasesEndpoint(Endpoint):
         `parent` may be any suitable `PageRef` type.
         """
 
-        parent_ref = PageRef[parent]
+        parent_ref = PageRef.build(parent)
 
         logger.info("Creating database @ %s - %s", parent_ref.page_id, title)
 
@@ -232,7 +232,7 @@ class DatabasesEndpoint(Endpoint):
         `dbref` may be any suitable `DatabaseRef` type.
         """
 
-        dbid = DatabaseRef[dbref].database_id
+        dbid = DatabaseRef.build(dbref).database_id
 
         logger.info("Retrieving database :: %s", dbid)
 
@@ -249,7 +249,7 @@ class DatabasesEndpoint(Endpoint):
         `dbref` may be any suitable `DatabaseRef` type.
         """
 
-        dbid = DatabaseRef[dbref].database_id
+        dbid = DatabaseRef.build(dbref).database_id
 
         logger.info("Updating database info :: %s", dbid)
 
@@ -267,7 +267,7 @@ class DatabasesEndpoint(Endpoint):
         `dbref` may be any suitable `DatabaseRef` type.
         """
 
-        dbid = DatabaseRef[dbref].database_id
+        dbid = DatabaseRef.build(dbref).database_id
 
         logger.info("Deleting database :: %s", dbid)
 
@@ -279,7 +279,7 @@ class DatabasesEndpoint(Endpoint):
         `dbref` may be any suitable `DatabaseRef` type.
         """
 
-        dbid = DatabaseRef[dbref].database_id
+        dbid = DatabaseRef.build(dbref).database_id
 
         logger.info("Restoring database :: %s", dbid)
 
@@ -292,7 +292,7 @@ class DatabasesEndpoint(Endpoint):
         :param target: either a `DatabaseRef` type or an ORM class
         """
         cls = None
-        dbid = DatabaseRef[target].database_id
+        dbid = DatabaseRef.build(target).database_id
 
         logger.info("Initializing database query :: {%s} [%s]", dbid, cls)
 
@@ -343,9 +343,9 @@ class PagesEndpoint(Endpoint):
             raise ValueError("'parent' must be provided")
 
         if isinstance(parent, Page):
-            parent = PageRef[parent]
+            parent = PageRef.build(parent)
         elif isinstance(parent, Database):
-            parent = DatabaseRef[parent]
+            parent = DatabaseRef.build(parent)
         elif not isinstance(parent, ParentRef):
             raise ValueError("Unsupported 'parent'")
 
@@ -392,7 +392,7 @@ class PagesEndpoint(Endpoint):
         `page` may be any suitable `PageRef` type.
         """
 
-        page_id = PageRef[page].page_id
+        page_id = PageRef.build(page).page_id
 
         logger.info("Retrieving page :: %s", page_id)
 
@@ -434,7 +434,7 @@ class PagesEndpoint(Endpoint):
         To remove an attribute, set its value to None.
         """
 
-        page_id = PageRef[page].page_id
+        page_id = PageRef.build(page).page_id
 
         props = {}
 

@@ -167,7 +167,7 @@ def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject) -> UUID:
 
     Only meant for internal use.
     """
-    return objs.ObjectReference[obj].id
+    return objs.ObjectReference.build(obj).id
 
 
 def wait_until_exists(record: DataObject, step: int = 1, timeout: int = 10):

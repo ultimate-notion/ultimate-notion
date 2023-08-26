@@ -34,7 +34,7 @@ class ObjectReference(GenericObject):
     id: UUID
 
     @classmethod
-    def __compose__(cls, ref):
+    def build(cls, ref):
         """Compose an ObjectReference from the given reference.
 
         `ref` may be a `UUID`, `str`, `ParentRef` or `GenericObject` with an `id`.
@@ -51,7 +51,7 @@ class ObjectReference(GenericObject):
 
         if isinstance(ref, GenericObject) and hasattr(ref, "id"):
             # re-compose the ObjectReference from the internal ID
-            return ObjectReference[ref.id]
+            return ObjectReference.build(ref.id)
 
         if isinstance(ref, UUID):
             return ObjectReference(id=ref)
@@ -93,12 +93,12 @@ class DatabaseRef(ParentRef, type="database_id"):
     database_id: UUID
 
     @classmethod
-    def __compose__(cls, db_ref):
+    def build(cls, db_ref):
         """Compose a DatabaseRef from the given reference object.
 
         `db_ref` can be either a string, UUID, or database.
         """
-        ref = ObjectReference[db_ref]
+        ref = ObjectReference.build(db_ref)
         return DatabaseRef(database_id=ref.id)
 
 
@@ -108,12 +108,12 @@ class PageRef(ParentRef, type="page_id"):
     page_id: UUID
 
     @classmethod
-    def __compose__(cls, page_ref):
+    def build(cls, page_ref):
         """Compose a PageRef from the given reference object.
 
         `page_ref` can be either a string, UUID, or page.
         """
-        ref = ObjectReference[page_ref]
+        ref = ObjectReference.build(page_ref)
         return PageRef(page_id=ref.id)
 
 
@@ -123,7 +123,7 @@ class BlockRef(ParentRef, type="block_id"):
     block_id: UUID
 
     @classmethod
-    def __compose__(cls, block_ref):
+    def build(cls, block_ref):
         """Compose a BlockRef from the given reference object.
 
         `block_ref` can be either a string, UUID, or block.
@@ -140,8 +140,6 @@ class WorkspaceRef(ParentRef, type="workspace"):
 
 class UserRef(NotionObject, object="user"):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
-
-    # ToDo: Here is a __compose__ missing
 
 
 class UserType(str, Enum):
@@ -281,29 +279,29 @@ class RichTextObject(TypedObject):
     href: str | None = None
     annotations: Annotations | None = None
 
-    def __str__(self):
-        """Return a string representation of this object."""
+    # def __str__(self):
+    #     """Return a string representation of this object."""
 
-        if self.href is None:
-            text = self.plain_text or ""
-        elif self.plain_text is None or len(self.plain_text) == 0:
-            text = f"({self.href})"
-        else:
-            text = f"[{self.plain_text}]({self.href})"
+    #     if self.href is None:
+    #         text = self.plain_text or ""
+    #     elif self.plain_text is None or len(self.plain_text) == 0:
+    #         text = f"({self.href})"
+    #     else:
+    #         text = f"[{self.plain_text}]({self.href})"
 
-        if self.annotations:
-            if self.annotations.bold:
-                text = f"*{text}*"
-            if self.annotations.italic:
-                text = f"**{text}**"
-            if self.annotations.underline:
-                text = f"_{text}_"
-            if self.annotations.strikethrough:
-                text = f"~{text}~"
-            if self.annotations.code:
-                text = f"`{text}`"
+    #     if self.annotations:
+    #         if self.annotations.bold:
+    #             text = f"*{text}*"
+    #         if self.annotations.italic:
+    #             text = f"**{text}**"
+    #         if self.annotations.underline:
+    #             text = f"_{text}_"
+    #         if self.annotations.strikethrough:
+    #             text = f"~{text}~"
+    #         if self.annotations.code:
+    #             text = f"`{text}`"
 
-        return text
+    #     return text
 
     @classmethod
     def build(cls, text, href=None, style=None):
@@ -372,14 +370,6 @@ class EquationObject(RichTextObject, type="equation"):
 
     equation: _NestedData
 
-    def __str__(self):
-        """Return a string representation of this object."""
-
-        if self.equation is None:
-            return None
-
-        return self.equation.expression
-
 
 class MentionData(TypedObject):
     """Base class for typed `Mention` data objects."""
@@ -397,7 +387,7 @@ class MentionUser(MentionData, type="user"):
     user: UserRef
 
     @classmethod
-    def __compose__(cls, user: User):
+    def build(cls, user: User):
         """Build a `Mention` object for the specified user.
 
         The `id` field must be set for the given User.  Other fields may cause errors
@@ -413,7 +403,7 @@ class MentionPage(MentionData, type="page"):
     page: ObjectReference
 
     @classmethod
-    def __compose__(cls, page_ref):
+    def build(cls, page_ref):
         """Build a `Mention` object for the specified page reference."""
 
         ref = ObjectReference[page_ref]
@@ -427,7 +417,7 @@ class MentionDatabase(MentionData, type="database"):
     database: ObjectReference
 
     @classmethod
-    def __compose__(cls, page):
+    def build(cls, page):
         """Build a `Mention` object for the specified database reference."""
 
         ref = ObjectReference[page]
@@ -441,7 +431,7 @@ class MentionDate(MentionData, type="date"):
     date: DateRange
 
     @classmethod
-    def __compose__(cls, start, end=None):
+    def build(cls, start, end=None):
         """Build a `Mention` object for the specified URL."""
 
         date_obj = DateRange(start=start, end=end)
