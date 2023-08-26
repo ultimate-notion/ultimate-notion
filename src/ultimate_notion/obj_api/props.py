@@ -67,12 +67,7 @@ class Date(PropertyValue, type="date"):
 class Status(PropertyValue, type="status"):
     """Notion status property."""
 
-    class _NestedData(objects.GenericObject):
-        name: str
-        id: objects.UUID | str | None = None
-        color: Color | None = None
-
-    status: _NestedData | None = None
+    status: objects.SelectOption | None = None
 
 
 class Select(PropertyValue, type="select"):

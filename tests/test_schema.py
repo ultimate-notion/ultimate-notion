@@ -120,3 +120,4 @@ def test_all_cols_schema(all_cols_db: Database):
 def test_wiki_db_schema(wiki_db: Database):
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
+    wiki_db.view()

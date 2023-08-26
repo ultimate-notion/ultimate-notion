@@ -20,7 +20,7 @@ class SelectOption(GenericObject):
 
     name: str
     id: str | None = None  # According to docs: "These are sometimes, but not always, UUIDs."
-    color: str = Color.DEFAULT
+    color: Color = Color.DEFAULT
 
     @classmethod
     def __compose__(cls, name, color=Color.DEFAULT):
