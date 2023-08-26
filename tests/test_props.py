@@ -1,7 +1,9 @@
+from datetime import datetime, date
+
 from hypothesis import given, strategies as st
 import pytest
 
-from ultimate_notion.props import Number
+from ultimate_notion.props import Number, Date
 
 
 @given(st.floats(allow_nan=False, allow_infinity=False), st.floats(allow_nan=False, allow_infinity=False))
@@ -107,3 +109,12 @@ def test_number_cmp(a, b):
     if a >= b:
         assert num1 >= num2
         assert num1 >= b
+
+
+@given(
+    st.datetimes(min_value=datetime(2000, 1, 1), max_value=datetime(2099, 12, 31)),
+    st.datetimes(min_value=datetime(3000, 1, 1), max_value=datetime(3099, 12, 31)),
+)
+def test_date_with_datetime(d1, d2):
+    date = Date(d1)
+    date_range = Date(d1, d2)

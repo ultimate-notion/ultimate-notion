@@ -5,6 +5,7 @@ The names of the properties reflect the name in the Notion UI.
 """
 from __future__ import annotations
 
+from datetime import date, datetime
 from typing import ClassVar, Any, TYPE_CHECKING
 
 import ultimate_notion.obj_api.props as obj_props
@@ -224,6 +225,19 @@ class Checkbox(PropertyValue, type=obj_props.Checkbox):
 class Date(PropertyValue, type=obj_props.Date):
     """Date(-time) property value"""
 
+    def __init__(self, start: datetime | date, end: datetime | date | None = None):
+        self.obj_ref = obj_props.Date.build(start, end)
+
+    @property
+    def value(self) -> None | datetime | date | tuple[datetime | date, datetime | date]:
+        date = self.obj_ref.date
+        if date is None:
+            return None
+        elif date.end is None:
+            return date.start
+        else:
+            return date.start, date.end
+
 
 class Status(PropertyValue, type=obj_props.Status):
     """Status property value"""
@@ -233,6 +247,10 @@ class Status(PropertyValue, type=obj_props.Status):
             option = Option(option)
 
         super().__init__(option)
+
+    @property
+    def value(self) -> str:
+        return self.obj_ref.status.name
 
 
 class Select(PropertyValue, type=obj_props.Select):
@@ -291,6 +309,10 @@ class Formula(PropertyValue, type=obj_props.Formula):
 
     readonly = True
 
+    @property
+    def value(self):
+        return self.obj_ref.formula.value
+
 
 class Relations(PropertyValue, type=obj_props.Relation):
     """A Notion relation property value."""
@@ -305,6 +327,10 @@ class Rollup(PropertyValue, type=obj_props.Rollup):
     """A Notion rollup property value."""
 
     readonly = True
+
+    @property
+    def value(self):
+        return self.obj_ref.rollup.value
 
 
 class CreatedTime(PropertyValue, type=obj_props.CreatedTime):

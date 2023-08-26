@@ -260,14 +260,6 @@ class DateRange(GenericObject):
     start: date | datetime
     end: date | datetime | None = None
 
-    def __str__(self):
-        """Return a string representation of this object."""
-
-        if self.end is None:
-            return f"{self.start}"
-
-        return f"{self.start} :: {self.end}"
-
 
 class Annotations(GenericObject):
     """Style information for RichTextObject's."""
