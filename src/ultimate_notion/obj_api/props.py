@@ -1,6 +1,7 @@
 """Wrapper for property values of pages"""
 from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Any
 
 import pydantic
 
@@ -20,7 +21,7 @@ class PropertyValue(objects.TypedObject):
     def build(cls, value):
         """Build the property value from given value, e.g. native Python or nested type.
 
-        In practice, this is like calling __init__ the right keyword
+        In practice, this is like calling __init__ with the corresponding keyword.
         """
         return cls(**{cls.type: value})
 
@@ -36,92 +37,14 @@ class RichText(PropertyValue, type="rich_text"):
 
     rich_text: list[objects.RichTextObject] = []
 
-    @property
-    def Value(self):
-        """Return the plain text from this RichText."""
-
-        if self.rich_text is None:
-            return None
-
-        # ToDo: Fixme
-        from ultimate_notion.text import plain_text
-
-        return plain_text(*self.rich_text)
-
 
 class Number(PropertyValue, type="number"):
     """Simple number type."""
 
     number: float | int | None = None
 
-    # def __float__(self):
-    #     """Return the Number as a `float`."""
-
-    #     if self.number is None:
-    #         raise ValueError("Cannot convert 'None' to float")
-
-    #     return float(self.number)
-
-    # def __int__(self):
-    #     """Return the Number as an `int`."""
-
-    #     if self.number is None:
-    #         raise ValueError("Cannot convert 'None' to int")
-
-    #     return int(self.number)
-
-    # def __iadd__(self, other):
-    #     """Add the given value to this Number."""
-
-    #     if isinstance(other, Number):
-    #         self.number += other.Value
-    #     else:
-    #         self.number += other
-
-    #     return self
-
-    # def __isub__(self, other):
-    #     """Subtract the given value from this Number."""
-
-    #     if isinstance(other, Number):
-    #         self.number -= other.Value
-    #     else:
-    #         self.number -= other
-
-    #     return self
-
-    # def __add__(self, other):
-    #     """Add the value of `other` and returns the result as a Number."""
-    #     return Number[other + self.Value]
-
-    # def __sub__(self, other):
-    #     """Subtract the value of `other` and returns the result as a Number."""
-    #     return Number[self.Value - float(other)]
-
-    # def __mul__(self, other):
-    #     """Multiply the value of `other` and returns the result as a Number."""
-    #     return Number[other * self.Value]
-
-    # def __le__(self, other):
-    #     """Return `True` if this `Number` is less-than-or-equal-to `other`."""
-    #     return self < other or self == other
-
-    # def __lt__(self, other):
-    #     """Return `True` if this `Number` is less-than `other`."""
-    #     return other > self.Value
-
-    # def __ge__(self, other):
-    #     """Return `True` if this `Number` is greater-than-or-equal-to `other`."""
-    #     return self > other or self == other
-
-    # def __gt__(self, other):
-    #     """Return `True` if this `Number` is greater-than `other`."""
-    #     return other < self.Value
-
-    @property
-    def Value(self):
-        """Get the current value of this property as a native Python number."""
-        return self.number
+    class Config:
+        smart_union = True  # assures that int is not coerced to a float!
 
 
 class Checkbox(PropertyValue, type="checkbox"):

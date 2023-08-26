@@ -30,7 +30,6 @@ class PropertyValue:
     _param_type: ClassVar[type[RichText] | type[Option] | type[User] | None] = None
     _obj_api_map: ClassVar[dict[type[obj_props.PropertyValue], type[PropertyValue]]] = {}
     _type_value_map: ClassVar[dict[str, type[PropertyValue]]] = {}
-    _has_compose: ClassVar[dict[type[obj_props.PropertyValue], bool]] = {}
 
     def __new__(cls, *args, **kwargs) -> PropertyValue:
         # Needed for wrap_obj_ref and its call to __new__ to work!
@@ -39,7 +38,6 @@ class PropertyValue:
     def __init_subclass__(cls, type: type[obj_props.PropertyValue], **kwargs: Any):  # noqa: A002
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[type] = cls
-        cls._has_compose[type] = hasattr(type, '__compose__')
         cls._type_value_map[type.type] = cls
 
     @classmethod
@@ -104,6 +102,119 @@ class Text(PropertyValue, type=obj_props.RichText):
 
 class Number(PropertyValue, type=obj_props.Number):
     """Simple number property value"""
+
+    def __float__(self):
+        """Return the Number as a `float`."""
+
+        if self.obj_ref.number is None:
+            raise ValueError("Cannot convert 'None' to float")
+
+        return float(self.obj_ref.number)
+
+    def __int__(self):
+        """Return the Number as an `int`."""
+
+        if self.obj_ref.number is None:
+            raise ValueError("Cannot convert 'None' to int")
+
+        return int(self.obj_ref.number)
+
+    def __iadd__(self, other):
+        """Add the given value to this Number."""
+
+        if isinstance(other, Number):
+            self.obj_ref.number += other.value
+        else:
+            self.obj_ref.number += other
+
+        return self
+
+    def __isub__(self, other):
+        """Subtract the given value from this Number."""
+
+        if isinstance(other, Number):
+            self.obj_ref.number -= other.value
+        else:
+            self.obj_ref.number -= other
+
+        return self
+
+    def __imul__(self, other):
+        """Multiply the given value from this Number."""
+
+        if isinstance(other, Number):
+            self.obj_ref.number *= other.value
+        else:
+            self.obj_ref.number *= other
+
+        return self
+
+    def __itruediv__(self, other):
+        """Divide the given value from this Number."""
+
+        if isinstance(other, Number):
+            self.obj_ref.number /= other.value
+        else:
+            self.obj_ref.number /= other
+
+        return self
+
+    def __ifloordiv__(self, other):
+        """Divide the given value from this Number and floor"""
+
+        if isinstance(other, Number):
+            self.obj_ref.number //= other.value
+        else:
+            self.obj_ref.number //= other
+
+        return self
+
+    def __add__(self, other):
+        """Add the value of `other` and returns the result as a Number."""
+        other_value = other.value if isinstance(other, Number) else other
+        return Number(self.value + other_value)
+
+    def __sub__(self, other):
+        """Subtract the value of `other` and returns the result as a Number."""
+        other_value = other.value if isinstance(other, Number) else other
+        return Number(self.value - other_value)
+
+    def __mul__(self, other):
+        """Multiply the value of `other` and returns the result as a Number."""
+        other_value = other.value if isinstance(other, Number) else other
+        return Number(self.value * other_value)
+
+    def __truediv__(self, other):
+        other_value = other.value if isinstance(other, Number) else other
+        return Number(self.value / other_value)
+
+    def __floordiv__(self, other):
+        other_value = other.value if isinstance(other, Number) else other
+        return Number(self.value // other_value)
+
+    def __le__(self, other):
+        """Return `True` if this `Number` is less-than-or-equal-to `other`."""
+        other_value = other.value if isinstance(other, Number) else other
+        return self.value <= other_value
+
+    def __lt__(self, other):
+        """Return `True` if this `Number` is less-than `other`."""
+        other_value = other.value if isinstance(other, Number) else other
+        return self.value < other_value
+
+    def __ge__(self, other):
+        """Return `True` if this `Number` is greater-than-or-equal-to `other`."""
+        other_value = other.value if isinstance(other, Number) else other
+        return self.value >= other_value
+
+    def __gt__(self, other):
+        """Return `True` if this `Number` is greater-than `other`."""
+        other_value = other.value if isinstance(other, Number) else other
+        return self.value > other_value
+
+    def __eq__(self, other):
+        other_value = other.value if isinstance(other, Number) else other
+        return self.value == other_value
 
 
 class Checkbox(PropertyValue, type=obj_props.Checkbox):
