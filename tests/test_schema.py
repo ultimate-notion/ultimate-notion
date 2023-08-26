@@ -99,8 +99,8 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     # creating a page using proper PropertyValues
     b_item1 = db_b.create_page(**kwargs)
 
-    # creating a page using raw Python types
-    b_item2 = db_b.create_page(**{kwarg: prop_value.value for kwarg, prop_value in kwargs.items()})
+    # creating a page using raw Python types using the Schema directly
+    b_item2 = SchemaB.create(**{kwarg: prop_value.value for kwarg, prop_value in kwargs.items()})
 
     for item in (b_item1, b_item2):
         for kwarg, prop in kwargs.items():

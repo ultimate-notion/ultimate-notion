@@ -9,7 +9,7 @@ from ultimate_notion.text import make_safe_python_name
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
 from ultimate_notion.blocks import DataObject
-from ultimate_notion.schema import PageSchema, Column, PropertyType, SchemaError
+from ultimate_notion.schema import PageSchema, Column, PropertyType, SchemaError, PropertyValue, ReadOnlyColumnError
 from ultimate_notion.utils import decapitalize, dict_diff_str
 from ultimate_notion.view import View
 from ultimate_notion.text import plain_text
@@ -136,7 +136,32 @@ class Database(DataObject):
         return View(database=self, pages=pages, query=query)
 
     def create_page(self, **kwargs) -> Page:
-        """Return page object"""
+        """Create a page with properties according to the schema within the corresponding database"""
+        schema_kwargs = {col.attr_name: col for col in self.schema.get_cols()}
+        if not set(kwargs).issubset(set(schema_kwargs)):
+            add_kwargs = set(kwargs) - set(schema_kwargs)
+            msg = f"kwargs {', '.join(add_kwargs)} not defined in schema"
+            raise SchemaError(msg)
+
+        schema_dct = {}
+        for kwarg, value in kwargs.items():
+            col = schema_kwargs[kwarg]
+            prop_value_cls = col.type.prop_value  # map schema to page property
+            # ToDo: Check at that point in case of selectoption if the option is already defined in Schema!
+
+            if prop_value_cls.readonly:
+                raise ReadOnlyColumnError(col)
+
+            if isinstance(value, PropertyValue):
+                prop_value = value
+            else:
+                prop_value = prop_value_cls(value)
+
+            schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
+
+        page = Page(obj_ref=self.session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
+        return page
+
         return self.schema.create(**kwargs)
 
     def query(self) -> QueryBuilder:

@@ -83,35 +83,8 @@ class PageSchema:
 
     @classmethod
     def create(cls, **kwargs) -> Page:
-        # ToDo: Avoid this here by moving the method into database create_page where it makes more sense
-        from ultimate_notion.page import Page
-
-        """Create a page with properties according to the schema within the corresponding database"""
-        schema_kwargs = {col.attr_name: col for col in cls.get_cols()}
-        if not set(kwargs).issubset(set(schema_kwargs)):
-            add_kwargs = set(kwargs) - set(schema_kwargs)
-            msg = f"kwargs {', '.join(add_kwargs)} not defined in schema"
-            raise SchemaError(msg)
-
-        schema_dct = {}
-        for kwarg, value in kwargs.items():
-            col = schema_kwargs[kwarg]
-            prop_value_cls = col.type.prop_value  # map schema to page property
-            # ToDo: Check at that point in case of selectoption if the option is already defined in Schema!
-
-            if prop_value_cls.readonly:
-                raise ReadOnlyColumnError(col)
-
-            if isinstance(value, PropertyValue):
-                prop_value = value
-            else:
-                prop_value = prop_value_cls(value)
-
-            schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
-
-        db = cls.get_db()
-        page = Page(obj_ref=db.session.api.pages.create(parent=db.obj_ref, properties=schema_dct))
-        return page
+        """Create a page using this schema with a bound database"""
+        return cls.get_db().create_page(**kwargs)
 
     @classmethod
     def reload(cls, *, check_consistency: bool = False):
