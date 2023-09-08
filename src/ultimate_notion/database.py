@@ -16,7 +16,7 @@ from ultimate_notion.text import plain_text
 
 
 # ToDo: This could also inherit from DataObject[objs.Database], wraps=.... and DataObject is a Generic!
-class Database(DataObject):
+class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     """A Notion database object, not a linked databases
 
     If a custom schema is provided, i.e. specified during creating are the `schema` was set
@@ -25,11 +25,7 @@ class Database(DataObject):
     https://developers.notion.com/docs/working-with-databases
     """
 
-    obj_ref: obj_blocks.Database
     _schema: type[PageSchema] | None = None
-
-    def __init__(self, obj_ref: obj_blocks.Database):
-        super().__init__(obj_ref)
 
     def __str__(self):
         if self.title:

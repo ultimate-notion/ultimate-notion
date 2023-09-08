@@ -1,8 +1,10 @@
 """Additional utilities that fit nowhere else"""
+from __future__ import annotations
+
 from collections.abc import Callable
 from copy import deepcopy
 from functools import wraps
-from typing import Any, TypeAlias, TypeVar, Generic, ClassVar, Iterable
+from typing import Any, TypeAlias, TypeVar, Generic, ClassVar, TYPE_CHECKING
 from uuid import UUID
 
 import numpy as np
@@ -10,7 +12,10 @@ from notion_client.errors import APIResponseError
 from polling2 import poll
 
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.blocks import DataObject
+
+if TYPE_CHECKING:
+    from ultimate_notion.blocks import DataObject
+
 
 T = TypeVar('T')
 KT = TypeVar('KT')

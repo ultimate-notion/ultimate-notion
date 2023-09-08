@@ -69,8 +69,7 @@ class PageProperties:
         return {prop_name: self[prop_name] for prop_name in self}
 
 
-class Page(DataObject):
-    obj_ref: obj_blocks.Page
+class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     props: PageProperties | None = None
 
     def __init__(self, obj_ref):

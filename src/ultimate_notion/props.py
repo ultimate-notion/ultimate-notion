@@ -6,65 +6,46 @@ The names of the properties reflect the name in the Notion UI.
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import ClassVar, Any, TYPE_CHECKING
+from typing import ClassVar, Any, TYPE_CHECKING, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion.objects import RichText, Option, User
 from ultimate_notion.text import rich_text
+from ultimate_notion.utils import Wrapper
 
 if TYPE_CHECKING:
     from ultimate_notion.objects import File
     from ultimate_notion.page import Page
 
+T = TypeVar("T")
 
-# ToDo: This can be the Wrapper I guess
-class PropertyValue:
+
+class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
     """Base class for Notion property values.
 
     Used to map high-level objects to low-level Notion-API objects
     """
 
-    obj_ref: obj_props.PropertyValue
     readonly: bool = False  # value of property can not be set by us
-
-    _param_type: ClassVar[type[RichText] | type[Option] | type[User] | None] = None
-    _obj_api_map: ClassVar[dict[type[obj_props.PropertyValue], type[PropertyValue]]] = {}
     _type_value_map: ClassVar[dict[str, type[PropertyValue]]] = {}
 
-    def __new__(cls, *args, **kwargs) -> PropertyValue:
-        # Needed for wrap_obj_ref and its call to __new__ to work!
-        return super().__new__(cls)
-
-    def __init_subclass__(cls, type: type[obj_props.PropertyValue], **kwargs: Any):  # noqa: A002
-        super().__init_subclass__(**kwargs)
-        cls._obj_api_map[type] = cls
-        cls._type_value_map[type.type] = cls
-
-    @classmethod
-    def wrap_obj_ref(cls, obj_ref: obj_props.PropertyValue) -> PropertyValue:
-        prop_type_cls = cls._obj_api_map[type(obj_ref)]
-        prop_type = prop_type_cls.__new__(prop_type_cls)
-        prop_type.obj_ref = obj_ref
-        return prop_type
-
-    @property
-    def _obj_api_map_inv(self) -> dict[type[PropertyValue], type[obj_props.PropertyValue]]:
-        return {v: k for k, v in self._obj_api_map.items()}
+    def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
+        super().__init_subclass__(wraps=wraps, **kwargs)
+        cls._type_value_map[wraps.type] = cls
 
     @property
     def _obj_api_type(self) -> type[obj_props.PropertyValue]:
         return self._obj_api_map_inv[self.__class__]
 
     def __init__(self, values):
-        obj_api_type = self._obj_api_map_inv[self.__class__]
         if isinstance(values, list):
-            values = [value.obj_ref if hasattr(value, "obj_ref") else value for value in values]
+            values = [value.obj_ref if isinstance(value, Wrapper) else value for value in values]
         else:
-            values = values.obj_ref if hasattr(values, "obj_ref") else values
+            values = values.obj_ref if isinstance(values, Wrapper) else values
 
-        self.obj_ref = obj_api_type.build(values)
+        super().__init__(values)
 
-    def __eq__(self, other: PropertyValue):
+    def __eq__(self, other: T) -> bool:
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref() == self.obj_ref()
 
     # ToDo: Make this abstract and implement in every subclass -> Generics
@@ -78,7 +59,7 @@ class PropertyValue:
         return self.obj_ref.id
 
 
-class Title(PropertyValue, type=obj_props.Title):
+class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     """Title property value"""
 
     def __init__(self, text: str | RichText):
@@ -91,7 +72,7 @@ class Title(PropertyValue, type=obj_props.Title):
         return "".join(text.plain_text for text in self.obj_ref.value)
 
 
-class Text(PropertyValue, type=obj_props.RichText):
+class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
     """Rich text property value"""
 
     def __init__(self, text: str | RichText):
@@ -100,7 +81,7 @@ class Text(PropertyValue, type=obj_props.RichText):
         super().__init__(text)
 
 
-class Number(PropertyValue, type=obj_props.Number):
+class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
     """Simple number property value"""
 
     def __float__(self):
@@ -217,11 +198,11 @@ class Number(PropertyValue, type=obj_props.Number):
         return self.value == other_value
 
 
-class Checkbox(PropertyValue, type=obj_props.Checkbox):
+class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
     """Simple checkbox type; represented as a boolean."""
 
 
-class Date(PropertyValue, type=obj_props.Date):
+class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
     """Date(-time) property value"""
 
     def __init__(self, start: datetime | date, end: datetime | date | None = None):
@@ -238,7 +219,7 @@ class Date(PropertyValue, type=obj_props.Date):
             return date.start, date.end
 
 
-class Status(PropertyValue, type=obj_props.Status):
+class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
     """Status property value"""
 
     def __init__(self, option: str | Option):
@@ -252,7 +233,7 @@ class Status(PropertyValue, type=obj_props.Status):
         return self.obj_ref.status.name
 
 
-class Select(PropertyValue, type=obj_props.Select):
+class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
     """Single select property value"""
 
     def __init__(self, option: str | Option):
@@ -262,7 +243,7 @@ class Select(PropertyValue, type=obj_props.Select):
         super().__init__(option)
 
 
-class MultiSelect(PropertyValue, type=obj_props.MultiSelect):
+class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSelect):
     """Notion multi-select type."""
 
     def __init__(self, options: str | Option | list[str] | list[Option]):
@@ -272,7 +253,7 @@ class MultiSelect(PropertyValue, type=obj_props.MultiSelect):
         super().__init__(options)
 
 
-class People(PropertyValue, type=obj_props.People):
+class People(PropertyValue[obj_props.People], wraps=obj_props.People):
     """Notion people type."""
 
     def __init__(self, users: User | list[User]):
@@ -281,19 +262,19 @@ class People(PropertyValue, type=obj_props.People):
         super().__init__(users)
 
 
-class URL(PropertyValue, type=obj_props.URL):
+class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
     """Notion URL type."""
 
 
-class Email(PropertyValue, type=obj_props.Email):
+class Email(PropertyValue[obj_props.Email], wraps=obj_props.Email):
     """Notion email type."""
 
 
-class PhoneNumber(PropertyValue, type=obj_props.PhoneNumber):
+class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
     """Notion phone type."""
 
 
-class Files(PropertyValue, type=obj_props.Files):
+class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
     """Notion files type."""
 
     def __init__(self, files: File | list[File]):
@@ -303,7 +284,7 @@ class Files(PropertyValue, type=obj_props.Files):
         super().__init__(files)
 
 
-class Formula(PropertyValue, type=obj_props.Formula):
+class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     """A Notion formula property value."""
 
     readonly = True
@@ -313,7 +294,7 @@ class Formula(PropertyValue, type=obj_props.Formula):
         return self.obj_ref.formula.value
 
 
-class Relations(PropertyValue, type=obj_props.Relation):
+class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
     """A Notion relation property value."""
 
     def __init__(self, pages: Page | list[Page]):
@@ -322,7 +303,7 @@ class Relations(PropertyValue, type=obj_props.Relation):
         super().__init__(pages)
 
 
-class Rollup(PropertyValue, type=obj_props.Rollup):
+class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     """A Notion rollup property value."""
 
     readonly = True
@@ -332,37 +313,37 @@ class Rollup(PropertyValue, type=obj_props.Rollup):
         return self.obj_ref.rollup.value
 
 
-class CreatedTime(PropertyValue, type=obj_props.CreatedTime):
+class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):
     """A Notion created-time property value."""
 
     readonly = True
 
 
-class CreatedBy(PropertyValue, type=obj_props.CreatedBy):
+class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
     """A Notion created-by property value."""
 
     readonly = True
 
 
-class LastEditedTime(PropertyValue, type=obj_props.LastEditedTime):
+class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.LastEditedTime):
     """A Notion last-edited-time property value."""
 
     readonly = True
 
 
-class LastEditedBy(PropertyValue, type=obj_props.LastEditedBy):
+class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEditedBy):
     """A Notion last-edited-by property value."""
 
     readonly = True
 
 
-class ID(PropertyValue, type=obj_props.UniqueID):
+class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
     """A Notion unique ID property value"""
 
     readonly = True
 
 
-class Verification(PropertyValue, type=obj_props.Verification):
+class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
     """A verification property value of pages in wiki databases"""
 
     readonly = True

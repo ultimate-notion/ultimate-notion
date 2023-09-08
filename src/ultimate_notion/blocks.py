@@ -2,24 +2,25 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 from uuid import UUID
 
 from notion_client.helpers import get_url
 
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.utils import Wrapper
 
 if TYPE_CHECKING:
     from ultimate_notion.session import Session
 
+T = TypeVar("T")
 
-class DataObject:
+
+class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     """The base type for all data-related types, i.e, pages, databases and blocks"""
 
-    obj_ref: obj_blocks.DataObject
-
-    def __init__(self, obj_ref):
+    def __init__(self, obj_ref: T):
         """Notional object reference for dispatch"""
         self.obj_ref = obj_ref
 
@@ -112,5 +113,5 @@ class DataObject:
         }
 
 
-class Block(DataObject):
+class Block(DataObject[obj_blocks.Block], wraps=obj_blocks.Block):
     pass
