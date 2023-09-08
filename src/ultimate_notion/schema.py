@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from ultimate_notion.objects import Option
     from ultimate_notion.page import Page
 
-# Todo: Move the functionality from the PyDantic types in here and elimate the __compose__
+# Todo: Move the functionality from the PyDantic types in here
 
 
 class SchemaError(Exception):
@@ -193,7 +193,6 @@ class PropertyType:
     def __init_subclass__(cls, type: type[obj_schema.PropertyObject], **kwargs: Any):  # noqa: A002
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[type] = cls
-        cls._has_compose[type] = hasattr(type, '__compose__')
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_schema.PropertyObject) -> PropertyType:
@@ -218,10 +217,7 @@ class PropertyType:
 
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
-        if hasattr(obj_api_type, "__compose__"):
-            self.obj_ref = obj_api_type.__compose__(*args, **kwargs)
-        else:
-            self.obj_ref = obj_api_type(*args, **kwargs)
+        self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     def __eq__(self, other: PropertyType):
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref() == self.obj_ref()

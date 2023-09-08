@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 # Todo: Move the functionality from the PyDantic types in here
 
 
+# ToDo: This can be the Wrapper I guess
 class PropertyValue:
     """Base class for Notion property values.
 

@@ -46,7 +46,7 @@ class Number(PropertyObject, type="number"):
     number: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, format):
+    def build(cls, format):
         """Create a `Number` object with the expected format."""
         return cls(number=cls._NestedData(format=format))
 
@@ -60,7 +60,7 @@ class Select(PropertyObject, type="select"):
     select: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, options):
+    def build(cls, options):
         """Create a `Select` object from the list of `SelectOption`'s."""
         return cls(select=cls._NestedData(options=options))
 
@@ -74,7 +74,7 @@ class MultiSelect(PropertyObject, type="multi_select"):
     multi_select: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, options):
+    def build(cls, options):
         """Create a `Select` object from the list of `SelectOption`'s."""
         return cls(multi_select=cls._NestedData(options=options))
 
@@ -136,7 +136,7 @@ class Formula(PropertyObject, type="formula"):
     formula: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, expression):
+    def build(cls, expression):
         return cls(formula=cls._NestedData(expression=expression))
 
 
@@ -209,7 +209,7 @@ class Rollup(PropertyObject, type="rollup"):
     rollup: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, relation, property, function):
+    def build(cls, relation, property, function):
         return Rollup(
             rollup=cls._NestedData(function=function, relation_property_name=relation, rollup_property_name=property)
         )

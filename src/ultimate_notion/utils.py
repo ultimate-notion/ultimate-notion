@@ -228,12 +228,10 @@ class Wrapper(Generic[T]):
     obj_ref: T
 
     _obj_api_map: ClassVar[dict[type[T], type[SelfT]]] = {}
-    _has_compose: ClassVar[dict[type[T], bool]] = {}
 
     def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[wraps] = cls
-        cls._has_compose[wraps] = hasattr(type, '__compose__')
 
     def __new__(cls, *args, **kwargs) -> SelfT:
         # Needed for wrap_obj_ref and its call to __new__ to work!

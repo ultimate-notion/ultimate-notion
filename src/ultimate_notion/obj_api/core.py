@@ -119,6 +119,11 @@ class GenericObject(BaseModel):
 
         return serialize_to_api(obj)
 
+    @classmethod
+    def build(cls, *args, **kwargs):
+        """Use the standard constructur to build the instance. Will be overridden for more complex types"""
+        return cls(*args, **kwargs)
+
 
 class NotionObject(GenericObject):
     """A top-level Notion API resource."""
