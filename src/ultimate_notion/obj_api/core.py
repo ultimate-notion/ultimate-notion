@@ -188,26 +188,6 @@ class TypedObject(GenericObject):
         cls = self.__class__
         return getattr(self, cls.type)
 
-    # todo: Rename this or rather remove it! .value above does the same.
-    def __call__(self, field=None):
-        """Return the nested data object contained by this `TypedObject`.
-
-        If a field is provided, the contents of that field in the nested data will be
-        returned.  Otherwise, the full contents of the NestedData will be returned.
-        """
-
-        type = getattr(self, "type", None)
-
-        if type is None:
-            raise AttributeError("type not specified")
-
-        nested = getattr(self, type)
-
-        if field is not None:
-            nested = getattr(nested, field)
-
-        return nested
-
     @classmethod
     def __get_validators__(cls):
         """Provide `BaseModel` with the means to convert `TypedObject`'s."""

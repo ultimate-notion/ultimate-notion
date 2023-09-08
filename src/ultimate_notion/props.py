@@ -46,7 +46,7 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
         super().__init__(values)
 
     def __eq__(self, other: T) -> bool:
-        return self.obj_ref.type == other.obj_ref.type and self.obj_ref() == self.obj_ref()
+        return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
     # ToDo: Make this abstract and implement in every subclass -> Generics
     @property

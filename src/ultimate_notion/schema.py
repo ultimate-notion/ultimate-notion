@@ -199,7 +199,7 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyObject):
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     def __eq__(self, other: PropertyType):
-        return self.obj_ref.type == other.obj_ref.type and self.obj_ref() == self.obj_ref()
+        return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
 
 class Column:
@@ -278,7 +278,7 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
     """Defines a status column in a database"""
 
-    allowed_at_creation = False
+    allowed_at_creation = False  # ToDo: Recheck if this holds really true when the default options are passed!
 
 
 class Date(PropertyType[obj_schema.Date], wraps=obj_schema.Date):
