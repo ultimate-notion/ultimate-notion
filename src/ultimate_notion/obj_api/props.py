@@ -1,7 +1,6 @@
 """Wrapper for property values of pages"""
 from abc import ABC, abstractmethod
 from datetime import datetime, date as dt_date
-from typing import Any
 
 import pydantic
 

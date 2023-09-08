@@ -392,9 +392,9 @@ class Relation(PropertyType, type=obj_schema.Relation):
 
         if self.schema:
             if self.two_way_prop:
-                self.obj_ref = obj_schema.DualPropertyRelation[db.id]
+                self.obj_ref = obj_schema.DualPropertyRelation.build(db.id)
             else:
-                self.obj_ref = obj_schema.SinglePropertyRelation[db.id]
+                self.obj_ref = obj_schema.SinglePropertyRelation.build(db.id)
 
     def _init_backward_relation(self):
         if not isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):

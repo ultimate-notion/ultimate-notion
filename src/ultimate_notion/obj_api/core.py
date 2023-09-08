@@ -9,7 +9,7 @@ from uuid import UUID
 from typing import get_origin
 
 from pydantic import BaseModel, validator
-from pydantic.main import ModelMetaclass, validate_model
+from pydantic.main import validate_model
 
 logger = logging.getLogger(__name__)
 
@@ -41,59 +41,7 @@ def serialize_to_api(data):
     return data
 
 
-class ComposableObjectMeta(ModelMetaclass):
-    """Presents a metaclass that composes objects using simple values.
-
-    This is primarily to allow easy definition of data objects without disrupting the
-    `BaseModel` constructor.  e.g. rather than requiring a caller to understand how
-    nested data works in the data objects, they can compose objects from simple values.
-
-    Compare the following code for declaring a Paragraph:
-
-    ```python
-    # using nested data objects:
-    text = "hello world"
-    nested = TextObject._NestedData(content=text)
-    rtf = text.TextObject(text=nested, plain_text=text)
-    content = blocks.Paragraph._NestedData(text=[rtf])
-    para = blocks.Paragraph(paragraph=content)
-
-    # using a composable object:
-    para = blocks.Paragraph["hello world"]
-    ```
-
-    Classes that support composition in this way must define and implement the internal
-    `__compose__` method.  This method takes an arbitrary number of parameters, based
-    on the needs of the implementation.  It is up to the implementing class to ensure
-    that the parameters are specified correctly.
-    """
-
-    def __getitem__(self, params):
-        """Return the requested class by composing using the given param.
-
-        Types found in `params` will be compared to expected types in the `__compose__`
-        method.
-
-        If the requested class does not expose the `__compose__` method, this will raise
-        an exception.
-        """
-
-        if not hasattr(self, "__compose__"):
-            raise NotImplementedError(f"{self} does not support object composition")
-
-        compose_func = self.__compose__
-
-        # __getitem__ only accepts a single parameter...  if the caller provides
-        # multiple params, they will be converted and passed as a tuple.  this method
-        # also accepts a list for readability when composing from ORM properties
-
-        if params and type(params) in (list, tuple):
-            return compose_func(*params)
-
-        return compose_func(params)
-
-
-class GenericObject(BaseModel, metaclass=ComposableObjectMeta):
+class GenericObject(BaseModel):
     """The base for all API objects.
 
     As a general convention, data fields in lower case are defined by the

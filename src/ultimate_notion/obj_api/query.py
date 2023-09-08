@@ -169,7 +169,7 @@ class CreatedTimeFilter(TimestampFilter):
     timestamp: TimestampKind = TimestampKind.CREATED_TIME
 
     @classmethod
-    def __compose__(cls, value):
+    def build(cls, value):
         """Create a new `CreatedTimeFilter` using the given constraint."""
         return CreatedTimeFilter(created_time=value)
 
@@ -181,7 +181,7 @@ class LastEditedTimeFilter(TimestampFilter):
     timestamp: TimestampKind = TimestampKind.LAST_EDITED_TIME
 
     @classmethod
-    def __compose__(cls, value):
+    def build(cls, value):
         """Create a new `LastEditedTimeFilter` using the given constraint."""
         return LastEditedTimeFilter(last_edited_time=value)
 

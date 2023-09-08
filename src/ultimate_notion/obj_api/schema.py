@@ -152,7 +152,7 @@ class SinglePropertyRelation(PropertyRelation, type="single_property"):
     single_property: Any = {}
 
     @classmethod
-    def __compose__(cls, dbref):
+    def build(cls, dbref):
         """Create a `single_property` relation using the target database reference.
 
         `dbref` must be either a string or UUID.
@@ -174,7 +174,7 @@ class DualPropertyRelation(PropertyRelation, type="dual_property"):
     dual_property: _NestedData = _NestedData()
 
     @classmethod
-    def __compose__(cls, dbref):
+    def build(cls, dbref):
         """Create a `dual_property` relation using the target database reference.
 
         `dbref` must be either a string or UUID.

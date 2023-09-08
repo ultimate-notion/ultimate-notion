@@ -77,8 +77,8 @@ class UnsupportedBlock(Block, type="unsupported"):
     unsupported: Optional[_NestedData] = None
 
 
-class TextBlock(Block, ABC):  # ToDo: Why do we inherit from ABC here?
-    """A standard text block object in Notion."""
+class TextBlock(Block, ABC):
+    """A standard abstract text block object in Notion."""
 
     # text blocks have a nested object with 'type' name and a 'rich_text' child
 
@@ -88,14 +88,14 @@ class TextBlock(Block, ABC):  # ToDo: Why do we inherit from ABC here?
 
     #     return self("rich_text")
 
-    @classmethod
-    def __compose__(cls, *text):
-        """Compose a `TextBlock` from the given text items."""
+    # @classmethod
+    # def build(cls, *text):
+    #     """Compose a `TextBlock` from the given text items."""
 
-        obj = cls()
-        obj.concat(*text)
+    #     obj = cls()
+    #     obj.concat(*text)
 
-        return obj
+    #     return obj
 
     # def concat(self, *text):
     #     """Concatenate text (either `RichTextObject` or `str` items) to this block."""
@@ -253,12 +253,12 @@ class Code(TextBlock, type="code"):
 
     code: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, text, lang=CodingLanguage.PLAIN_TEXT):
-        """Compose a `Code` block from the given text and language."""
-        block = super().__compose__(text)
-        block.code.language = lang
-        return block
+    # @classmethod
+    # def build(cls, text, lang=CodingLanguage.PLAIN_TEXT):
+    #     """Compose a `Code` block from the given text and language."""
+    #     block = super().build(text)
+    #     block.code.language = lang
+    #     return block
 
     # @property
     # def Markdown(self):
@@ -285,19 +285,19 @@ class Callout(TextBlock, WithChildrenMixin, type="callout"):
 
     callout: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, text, emoji=None, color=FullColor.GRAY_BACKGROUND):
-        """Compose a `Callout` block from the given text, emoji and color."""
+    # @classmethod
+    # def build(cls, text, emoji=None, color=FullColor.GRAY_BACKGROUND):
+    #     """Compose a `Callout` block from the given text, emoji and color."""
 
-        if emoji is not None:
-            emoji = EmojiObject[emoji]
+    #     if emoji is not None:
+    #         emoji = EmojiObject[emoji]
 
-        nested = Callout._NestedData(icon=emoji, color=color)
+    #     nested = Callout._NestedData(icon=emoji, color=color)
 
-        callout = cls(callout=nested)
-        callout.concat(text)
+    #     callout = cls(callout=nested)
+    #     callout.concat(text)
 
-        return callout
+    #     return callout
 
 
 class BulletedListItem(TextBlock, WithChildrenMixin, type="bulleted_list_item"):
@@ -351,15 +351,15 @@ class ToDo(TextBlock, WithChildrenMixin, type="to_do"):
 
     to_do: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, text, checked=False, href=None):
-        """Compose a ToDo block from the given text and checked state."""
-        return ToDo(
-            to_do=ToDo._NestedData(
-                rich_text=[TextObject[text, href]],
-                checked=checked,
-            )
-        )
+    # @classmethod
+    # def build(cls, text, checked=False, href=None):
+    #     """Compose a ToDo block from the given text and checked state."""
+    #     return ToDo(
+    #         to_do=ToDo._NestedData(
+    #             rich_text=[TextObject[text, href]],
+    #             checked=checked,
+    #         )
+    #     )
 
     # @property
     # def IsChecked(self):
@@ -398,10 +398,10 @@ class Divider(Block, type="divider"):
 
     divider: Any = {}
 
-    @property
-    def Markdown(self):
-        """Return the contents of this block as markdown text."""
-        return "---"
+    # @property
+    # def Markdown(self):
+    #     """Return the contents of this block as markdown text."""
+    #     return "---"
 
 
 class TableOfContents(Block, type="table_of_contents"):
@@ -430,10 +430,10 @@ class Embed(Block, type="embed"):
 
     embed: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, url):
-        """Create a new `Embed` block from the given URL."""
-        return Embed(embed=Embed._NestedData(url=url))
+    # @classmethod
+    # def build(cls, url):
+    #     """Create a new `Embed` block from the given URL."""
+    #     return Embed(embed=Embed._NestedData(url=url))
 
     # @property
     # def URL(self):
@@ -459,10 +459,10 @@ class Bookmark(Block, type="bookmark"):
 
     bookmark: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, url):
-        """Compose a new `Bookmark` block from a specific URL."""
-        return Bookmark(bookmark=Bookmark._NestedData(url=url))
+    # @classmethod
+    # def build(cls, url):
+    #     """Compose a new `Bookmark` block from a specific URL."""
+    #     return Bookmark(bookmark=Bookmark._NestedData(url=url))
 
     # @property
     # def URL(self):
@@ -487,10 +487,10 @@ class LinkPreview(Block, type="link_preview"):
 
     link_preview: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, url):
-        """Create a new `LinkPreview` block from the given URL."""
-        return LinkPreview(link_preview=LinkPreview._NestedData(url=url))
+    # @classmethod
+    # def build(cls, url):
+    #     """Create a new `LinkPreview` block from the given URL."""
+    #     return LinkPreview(link_preview=LinkPreview._NestedData(url=url))
 
     # @property
     # def URL(self):
@@ -515,10 +515,10 @@ class Equation(Block, type="equation"):
 
     equation: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, expr):
-        """Create a new `Equation` block from the given expression."""
-        return LinkPreview(equation=Equation._NestedData(expression=expr))
+    # @classmethod
+    # def build(cls, expr):
+    #     """Create a new `Equation` block from the given expression."""
+    #     return LinkPreview(equation=Equation._NestedData(expression=expr))
 
 
 class File(Block, type="file"):
@@ -573,15 +573,15 @@ class Column(Block, WithChildrenMixin, type="column"):
 
     column: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, *blocks):
-        """Create a new `Column` block with the given blocks as children."""
-        col = cls()
+    # @classmethod
+    # def build(cls, *blocks):
+    #     """Create a new `Column` block with the given blocks as children."""
+    #     col = cls()
 
-        for block in blocks:
-            col.append(block)
+    #     for block in blocks:
+    #         col.append(block)
 
-        return col
+    #     return col
 
 
 class ColumnList(Block, WithChildrenMixin, type="column_list"):
@@ -594,15 +594,15 @@ class ColumnList(Block, WithChildrenMixin, type="column_list"):
 
     column_list: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, *columns):
-        """Create a new `Column` block with the given blocks as children."""
-        cols = cls()
+    # @classmethod
+    # def build(cls, *columns):
+    #     """Create a new `Column` block with the given blocks as children."""
+    #     cols = cls()
 
-        for col in columns:
-            cols.append(col)
+    #     for col in columns:
+    #         cols.append(col)
 
-        return cols
+    #     return cols
 
 
 class TableRow(Block, type="table_row"):
@@ -627,15 +627,15 @@ class TableRow(Block, type="table_row"):
     #     """Return the cell content for the requested column."""
     #     return self.table_row[cell_num]
 
-    @classmethod
-    def __compose__(cls, *cells):
-        """Create a new `TableRow` block with the given cell contents."""
-        row = cls()
+    # @classmethod
+    # def build(cls, *cells):
+    #     """Create a new `TableRow` block with the given cell contents."""
+    #     row = cls()
 
-        for cell in cells:
-            row.append(cell)
+    #     for cell in cells:
+    #         row.append(cell)
 
-        return row
+    #     return row
 
     # def append(self, text):
     #     """Append the given text as a new cell in this `TableRow`.
@@ -677,15 +677,15 @@ class Table(Block, WithChildrenMixin, type="table"):
 
     table: _NestedData = _NestedData()
 
-    @classmethod
-    def __compose__(cls, *rows):
-        """Create a new `Table` block with the given rows."""
-        table = cls()
+    # @classmethod
+    # def build(cls, *rows):
+    #     """Create a new `Table` block with the given rows."""
+    #     table = cls()
 
-        for row in rows:
-            table.append(row)
+    #     for row in rows:
+    #         table.append(row)
 
-        return table
+    #     return table
 
     # def append(self, block: TableRow):
     #     """Append the given row to this table.
