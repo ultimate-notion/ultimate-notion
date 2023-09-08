@@ -16,8 +16,6 @@ if TYPE_CHECKING:
     from ultimate_notion.objects import File
     from ultimate_notion.page import Page
 
-# Todo: Move the functionality from the PyDantic types in here
-
 
 # ToDo: This can be the Wrapper I guess
 class PropertyValue:

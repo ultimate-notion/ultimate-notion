@@ -10,9 +10,7 @@ in a custom Schema when creating the database.
 ### Design Principles
 
 A schema is a subclass of `PageShema` that holds `Column` objects with a name and an
-actual `PropertyType`, e.g. `Text`, `Number`. A `PropertyType` is a thin wrapper for the
-actual `PropertyObject` of the Notion API, which is referenced by `obj_ref`, to allow
-more user-friendly definition of a data model, especially if it has relations.
+actual `PropertyType`, e.g. `Text`, `Number`.
 
 The source of truth is always the `obj_ref` and a `PropertyType` holds only auxilliary
 information if actually needed. Since the object references `obj_ref` must always point
@@ -21,13 +19,12 @@ the method `_remap_obj_refs` rewires this when a schema is used to create a data
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion.obj_api.schema import NumberFormat, Function
-from ultimate_notion.utils import SList
+from ultimate_notion.utils import SList, Wrapper
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.blocks import DataObject
 
 
 if TYPE_CHECKING:
@@ -36,6 +33,7 @@ if TYPE_CHECKING:
     from ultimate_notion.page import Page
 
 # Todo: Move the functionality from the PyDantic types in here
+T = TypeVar('T')
 
 
 class SchemaError(Exception):
@@ -173,33 +171,14 @@ class PageSchema:
                 prop_type.obj_ref = obj_ref
 
 
-class PropertyType:
+class PropertyType(Wrapper[T], wraps=obj_schema.PropertyObject):
     """Base class for Notion property objects.
 
     Used to map high-level objects to low-level Notion-API objects
     """
 
     allowed_at_creation = True  # wether the Notion API allows new database with a column of that type
-    obj_ref: obj_schema.PropertyObject
     prop_ref: Column
-
-    _obj_api_map: ClassVar[dict[type[obj_schema.PropertyObject], type[PropertyType]]] = {}
-    _has_compose: ClassVar[dict[type[obj_schema.PropertyObject], bool]] = {}
-
-    def __new__(cls, *args, **kwargs) -> PropertyType:
-        # Needed for wrap_obj_ref and its call to __new__ to work!
-        return super().__new__(cls)
-
-    def __init_subclass__(cls, type: type[obj_schema.PropertyObject], **kwargs: Any):  # noqa: A002
-        super().__init_subclass__(**kwargs)
-        cls._obj_api_map[type] = cls
-
-    @classmethod
-    def wrap_obj_ref(cls, obj_ref: obj_schema.PropertyObject) -> PropertyType:
-        prop_type_cls = cls._obj_api_map[type(obj_ref)]
-        prop_type = prop_type_cls.__new__(prop_type_cls)
-        prop_type.obj_ref = obj_ref
-        return prop_type
 
     @property
     def prop_value(self) -> type[PropertyValue]:
@@ -265,22 +244,22 @@ class Column:
         return self._attr_name
 
 
-class Title(PropertyType, type=obj_schema.Title):
+class Title(PropertyType[obj_schema.Title], wraps=obj_schema.Title):
     """Defines the mandatory title column in a database"""
 
 
-class Text(PropertyType, type=obj_schema.RichText):
+class Text(PropertyType[obj_schema.RichText], wraps=obj_schema.RichText):
     """Defines a text column in a database"""
 
 
-class Number(PropertyType, type=obj_schema.Number):
+class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
     """Defines a number column in a database"""
 
     def __init__(self, number_format: NumberFormat):
         super().__init__(number_format)
 
 
-class Select(PropertyType, type=obj_schema.Select):
+class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
     """Defines a select column in a database"""
 
     def __init__(self, options: list[Option]):
@@ -288,7 +267,7 @@ class Select(PropertyType, type=obj_schema.Select):
         super().__init__(options)
 
 
-class MultiSelect(PropertyType, type=obj_schema.MultiSelect):
+class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
     """Defines a multi-select column in a database"""
 
     def __init__(self, options: list[Option]):
@@ -296,41 +275,41 @@ class MultiSelect(PropertyType, type=obj_schema.MultiSelect):
         super().__init__(options)
 
 
-class Status(PropertyType, type=obj_schema.Status):
+class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
     """Defines a status column in a database"""
 
     allowed_at_creation = False
 
 
-class Date(PropertyType, type=obj_schema.Date):
+class Date(PropertyType[obj_schema.Date], wraps=obj_schema.Date):
     """Defines a date column in a database"""
 
 
-class People(PropertyType, type=obj_schema.People):
+class People(PropertyType[obj_schema.People], wraps=obj_schema.People):
     """Defines a people column in a database"""
 
 
-class Files(PropertyType, type=obj_schema.Files):
+class Files(PropertyType[obj_schema.Files], wraps=obj_schema.Files):
     """Defines a files column in a database"""
 
 
-class Checkbox(PropertyType, type=obj_schema.Checkbox):
+class Checkbox(PropertyType[obj_schema.Checkbox], wraps=obj_schema.Checkbox):
     """Defines a checkbox column in database"""
 
 
-class Email(PropertyType, type=obj_schema.Email):
+class Email(PropertyType[obj_schema.Email], wraps=obj_schema.Email):
     """Defines an e-mail column in a database"""
 
 
-class URL(PropertyType, type=obj_schema.URL):
+class URL(PropertyType[obj_schema.URL], wraps=obj_schema.URL):
     """Defines a URL column in a database"""
 
 
-class PhoneNumber(PropertyType, type=obj_schema.PhoneNumber):
+class PhoneNumber(PropertyType[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNumber):
     """Defines a phone number column in a database"""
 
 
-class Formula(PropertyType, type=obj_schema.Formula):
+class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
     """Defines a formula column in a database"""
 
     def __init__(self, expression: str):
@@ -342,7 +321,7 @@ class RelationError(SchemaError):
     """Error if a Relation cannot be initialised"""
 
 
-class Relation(PropertyType, type=obj_schema.Relation):
+class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
     """Relation to another database"""
 
     obj_ref: obj_schema.Relation | None = None
@@ -416,7 +395,7 @@ class RollupError(SchemaError):
     """Error if definition of rollup is wrong"""
 
 
-class Rollup(PropertyType, type=obj_schema.Rollup):
+class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
     """Defines the rollup column in a database"""
 
     def __init__(self, relation: Column, property: Column, calculate: Function):
@@ -427,29 +406,29 @@ class Rollup(PropertyType, type=obj_schema.Rollup):
         super().__init__(relation.name, property.name, calculate)
 
 
-class CreatedTime(PropertyType, type=obj_schema.CreatedTime):
+class CreatedTime(PropertyType[obj_schema.CreatedTime], wraps=obj_schema.CreatedTime):
     """Defines the created-time column in a database"""
 
 
-class CreatedBy(PropertyType, type=obj_schema.CreatedBy):
+class CreatedBy(PropertyType[obj_schema.CreatedBy], wraps=obj_schema.CreatedBy):
     """Defines the created-by column in a database"""
 
 
-class LastEditedBy(PropertyType, type=obj_schema.LastEditedBy):
+class LastEditedBy(PropertyType[obj_schema.LastEditedBy], wraps=obj_schema.LastEditedBy):
     """Defines the last-edited-by column in a database"""
 
 
-class LastEditedTime(PropertyType, type=obj_schema.LastEditedTime):
+class LastEditedTime(PropertyType[obj_schema.LastEditedTime], wraps=obj_schema.LastEditedTime):
     """Defines the last-edited-time column in a database"""
 
 
-class ID(PropertyType, type=obj_schema.UniqueID):
+class ID(PropertyType[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
     """Defines a unique ID column in a database"""
 
     allowed_at_creation = False
 
 
-class Verification(PropertyType, type=obj_schema.Verification):
+class Verification(PropertyType[obj_schema.Verification], wraps=obj_schema.Verification):
     """Defines a unique ID column in a database"""
 
     allowed_at_creation = False
