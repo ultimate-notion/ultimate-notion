@@ -22,7 +22,7 @@
 <span class=linenos data-linenos="69 "></span><span class=sd>    `parent` may be any suitable `ObjectReference` type.</span>
 <span class=linenos data-linenos="70 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="71 "></span>
-<span class=linenos data-linenos="72 "></span>    <span class=n>parent_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=p>[</span><span class=n>parent</span><span class=p>]</span><span class=o>.</span><span class=n>id</span>
+<span class=linenos data-linenos="72 "></span>    <span class=n>parent_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>parent</span><span class=p>)</span><span class=o>.</span><span class=n>id</span>
 <span class=linenos data-linenos="73 "></span>
 <span class=linenos data-linenos="74 "></span>    <span class=n>children</span> <span class=o>=</span> <span class=p>[</span><span class=n>block</span><span class=o>.</span><span class=n>dict</span><span class=p>()</span> <span class=k>for</span> <span class=n>block</span> <span class=ow>in</span> <span class=n>blocks</span> <span class=k>if</span> <span class=n>block</span> <span class=ow>is</span> <span class=ow>not</span> <span class=kc>None</span><span class=p>]</span>
 <span class=linenos data-linenos="75 "></span>
@@ -50,7 +50,7 @@
 <span class=linenos data-linenos=" 99 "></span><span class=sd>    `parent` may be any suitable `ObjectReference` type.</span>
 <span class=linenos data-linenos="100 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="101 "></span>
-<span class=linenos data-linenos="102 "></span>    <span class=n>parent_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=p>[</span><span class=n>parent</span><span class=p>]</span><span class=o>.</span><span class=n>id</span>
+<span class=linenos data-linenos="102 "></span>    <span class=n>parent_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>parent</span><span class=p>)</span><span class=o>.</span><span class=n>id</span>
 <span class=linenos data-linenos="103 "></span>
 <span class=linenos data-linenos="104 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Listing blocks for </span><span class=si>%s</span><span class=s2>...&quot;</span><span class=p>,</span> <span class=n>parent_id</span><span class=p>)</span>
 <span class=linenos data-linenos="105 "></span>
@@ -63,7 +63,7 @@
 <span class=linenos data-linenos="125 "></span><span class=sd>    `block` may be any suitable `ObjectReference` type.</span>
 <span class=linenos data-linenos="126 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="127 "></span>
-<span class=linenos data-linenos="128 "></span>    <span class=n>block_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=p>[</span><span class=n>block</span><span class=p>]</span><span class=o>.</span><span class=n>id</span>
+<span class=linenos data-linenos="128 "></span>    <span class=n>block_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>block</span><span class=p>)</span><span class=o>.</span><span class=n>id</span>
 <span class=linenos data-linenos="129 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Deleting block :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>block_id</span><span class=p>)</span>
 <span class=linenos data-linenos="130 "></span>
 <span class=linenos data-linenos="131 "></span>    <span class=n>data</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>raw_api</span><span class=o>.</span><span class=n>delete</span><span class=p>(</span><span class=n>block_id</span><span class=p>)</span>
@@ -75,7 +75,7 @@
 <span class=linenos data-linenos="138 "></span><span class=sd>    `block` may be any suitable `ObjectReference` type.</span>
 <span class=linenos data-linenos="139 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="140 "></span>
-<span class=linenos data-linenos="141 "></span>    <span class=n>block_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=p>[</span><span class=n>block</span><span class=p>]</span><span class=o>.</span><span class=n>id</span>
+<span class=linenos data-linenos="141 "></span>    <span class=n>block_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>block</span><span class=p>)</span><span class=o>.</span><span class=n>id</span>
 <span class=linenos data-linenos="142 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Restoring block :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>block_id</span><span class=p>)</span>
 <span class=linenos data-linenos="143 "></span>
 <span class=linenos data-linenos="144 "></span>    <span class=n>data</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>raw_api</span><span class=o>.</span><span class=n>update</span><span class=p>(</span><span class=n>block_id</span><span class=p>,</span> <span class=n>archived</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
@@ -87,7 +87,7 @@
 <span class=linenos data-linenos="152 "></span><span class=sd>    `block` may be any suitable `ObjectReference` type.</span>
 <span class=linenos data-linenos="153 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="154 "></span>
-<span class=linenos data-linenos="155 "></span>    <span class=n>block_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=p>[</span><span class=n>block</span><span class=p>]</span><span class=o>.</span><span class=n>id</span>
+<span class=linenos data-linenos="155 "></span>    <span class=n>block_id</span> <span class=o>=</span> <span class=n>ObjectReference</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>block</span><span class=p>)</span><span class=o>.</span><span class=n>id</span>
 <span class=linenos data-linenos="156 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Retrieving block :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>block_id</span><span class=p>)</span>
 <span class=linenos data-linenos="157 "></span>
 <span class=linenos data-linenos="158 "></span>    <span class=n>data</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>raw_api</span><span class=o>.</span><span class=n>retrieve</span><span class=p>(</span><span class=n>block_id</span><span class=p>)</span>
@@ -110,7 +110,7 @@
 <span class=linenos data-linenos="215 "></span><span class=sd>    `parent` may be any suitable `PageRef` type.</span>
 <span class=linenos data-linenos="216 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="217 "></span>
-<span class=linenos data-linenos="218 "></span>    <span class=n>parent_ref</span> <span class=o>=</span> <span class=n>PageRef</span><span class=p>[</span><span class=n>parent</span><span class=p>]</span>
+<span class=linenos data-linenos="218 "></span>    <span class=n>parent_ref</span> <span class=o>=</span> <span class=n>PageRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>parent</span><span class=p>)</span>
 <span class=linenos data-linenos="219 "></span>
 <span class=linenos data-linenos="220 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Creating database @ </span><span class=si>%s</span><span class=s2> - </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>parent_ref</span><span class=o>.</span><span class=n>page_id</span><span class=p>,</span> <span class=n>title</span><span class=p>)</span>
 <span class=linenos data-linenos="221 "></span>
@@ -125,7 +125,7 @@
 <span class=linenos data-linenos="267 "></span><span class=sd>    `dbref` may be any suitable `DatabaseRef` type.</span>
 <span class=linenos data-linenos="268 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="269 "></span>
-<span class=linenos data-linenos="270 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=p>[</span><span class=n>dbref</span><span class=p>]</span><span class=o>.</span><span class=n>database_id</span>
+<span class=linenos data-linenos="270 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>dbref</span><span class=p>)</span><span class=o>.</span><span class=n>database_id</span>
 <span class=linenos data-linenos="271 "></span>
 <span class=linenos data-linenos="272 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Deleting database :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>dbid</span><span class=p>)</span>
 <span class=linenos data-linenos="273 "></span>
@@ -136,7 +136,7 @@
 <span class=linenos data-linenos="292 "></span><span class=sd>    :param target: either a `DatabaseRef` type or an ORM class</span>
 <span class=linenos data-linenos="293 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="294 "></span>    <span class=bp>cls</span> <span class=o>=</span> <span class=kc>None</span>
-<span class=linenos data-linenos="295 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=p>[</span><span class=n>target</span><span class=p>]</span><span class=o>.</span><span class=n>database_id</span>
+<span class=linenos data-linenos="295 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>target</span><span class=p>)</span><span class=o>.</span><span class=n>database_id</span>
 <span class=linenos data-linenos="296 "></span>
 <span class=linenos data-linenos="297 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Initializing database query :: {</span><span class=si>%s</span><span class=s2>} [</span><span class=si>%s</span><span class=s2>]&quot;</span><span class=p>,</span> <span class=n>dbid</span><span class=p>,</span> <span class=bp>cls</span><span class=p>)</span>
 <span class=linenos data-linenos="298 "></span>
@@ -147,7 +147,7 @@
 <span class=linenos data-linenos="279 "></span><span class=sd>    `dbref` may be any suitable `DatabaseRef` type.</span>
 <span class=linenos data-linenos="280 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="281 "></span>
-<span class=linenos data-linenos="282 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=p>[</span><span class=n>dbref</span><span class=p>]</span><span class=o>.</span><span class=n>database_id</span>
+<span class=linenos data-linenos="282 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>dbref</span><span class=p>)</span><span class=o>.</span><span class=n>database_id</span>
 <span class=linenos data-linenos="283 "></span>
 <span class=linenos data-linenos="284 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Restoring database :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>dbid</span><span class=p>)</span>
 <span class=linenos data-linenos="285 "></span>
@@ -158,7 +158,7 @@
 <span class=linenos data-linenos="232 "></span><span class=sd>    `dbref` may be any suitable `DatabaseRef` type.</span>
 <span class=linenos data-linenos="233 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="234 "></span>
-<span class=linenos data-linenos="235 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=p>[</span><span class=n>dbref</span><span class=p>]</span><span class=o>.</span><span class=n>database_id</span>
+<span class=linenos data-linenos="235 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>dbref</span><span class=p>)</span><span class=o>.</span><span class=n>database_id</span>
 <span class=linenos data-linenos="236 "></span>
 <span class=linenos data-linenos="237 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Retrieving database :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>dbid</span><span class=p>)</span>
 <span class=linenos data-linenos="238 "></span>
@@ -173,7 +173,7 @@
 <span class=linenos data-linenos="249 "></span><span class=sd>    `dbref` may be any suitable `DatabaseRef` type.</span>
 <span class=linenos data-linenos="250 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="251 "></span>
-<span class=linenos data-linenos="252 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=p>[</span><span class=n>dbref</span><span class=p>]</span><span class=o>.</span><span class=n>database_id</span>
+<span class=linenos data-linenos="252 "></span>    <span class=n>dbid</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>dbref</span><span class=p>)</span><span class=o>.</span><span class=n>database_id</span>
 <span class=linenos data-linenos="253 "></span>
 <span class=linenos data-linenos="254 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Updating database info :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>dbid</span><span class=p>)</span>
 <span class=linenos data-linenos="255 "></span>
@@ -219,9 +219,9 @@
 <span class=linenos data-linenos="343 "></span>        <span class=k>raise</span> <span class=ne>ValueError</span><span class=p>(</span><span class=s2>&quot;&#39;parent&#39; must be provided&quot;</span><span class=p>)</span>
 <span class=linenos data-linenos="344 "></span>
 <span class=linenos data-linenos="345 "></span>    <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>parent</span><span class=p>,</span> <span class=n>Page</span><span class=p>):</span>
-<span class=linenos data-linenos="346 "></span>        <span class=n>parent</span> <span class=o>=</span> <span class=n>PageRef</span><span class=p>[</span><span class=n>parent</span><span class=p>]</span>
+<span class=linenos data-linenos="346 "></span>        <span class=n>parent</span> <span class=o>=</span> <span class=n>PageRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>parent</span><span class=p>)</span>
 <span class=linenos data-linenos="347 "></span>    <span class=k>elif</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>parent</span><span class=p>,</span> <span class=n>Database</span><span class=p>):</span>
-<span class=linenos data-linenos="348 "></span>        <span class=n>parent</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=p>[</span><span class=n>parent</span><span class=p>]</span>
+<span class=linenos data-linenos="348 "></span>        <span class=n>parent</span> <span class=o>=</span> <span class=n>DatabaseRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>parent</span><span class=p>)</span>
 <span class=linenos data-linenos="349 "></span>    <span class=k>elif</span> <span class=ow>not</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>parent</span><span class=p>,</span> <span class=n>ParentRef</span><span class=p>):</span>
 <span class=linenos data-linenos="350 "></span>        <span class=k>raise</span> <span class=ne>ValueError</span><span class=p>(</span><span class=s2>&quot;Unsupported &#39;parent&#39;&quot;</span><span class=p>)</span>
 <span class=linenos data-linenos="351 "></span>
@@ -264,7 +264,7 @@
 <span class=linenos data-linenos="392 "></span><span class=sd>    `page` may be any suitable `PageRef` type.</span>
 <span class=linenos data-linenos="393 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="394 "></span>
-<span class=linenos data-linenos="395 "></span>    <span class=n>page_id</span> <span class=o>=</span> <span class=n>PageRef</span><span class=p>[</span><span class=n>page</span><span class=p>]</span><span class=o>.</span><span class=n>page_id</span>
+<span class=linenos data-linenos="395 "></span>    <span class=n>page_id</span> <span class=o>=</span> <span class=n>PageRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>page</span><span class=p>)</span><span class=o>.</span><span class=n>page_id</span>
 <span class=linenos data-linenos="396 "></span>
 <span class=linenos data-linenos="397 "></span>    <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Retrieving page :: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>page_id</span><span class=p>)</span>
 <span class=linenos data-linenos="398 "></span>
@@ -282,7 +282,7 @@
 <span class=linenos data-linenos="434 "></span><span class=sd>    To remove an attribute, set its value to None.</span>
 <span class=linenos data-linenos="435 "></span><span class=sd>    &quot;&quot;&quot;</span>
 <span class=linenos data-linenos="436 "></span>
-<span class=linenos data-linenos="437 "></span>    <span class=n>page_id</span> <span class=o>=</span> <span class=n>PageRef</span><span class=p>[</span><span class=n>page</span><span class=p>]</span><span class=o>.</span><span class=n>page_id</span>
+<span class=linenos data-linenos="437 "></span>    <span class=n>page_id</span> <span class=o>=</span> <span class=n>PageRef</span><span class=o>.</span><span class=n>build</span><span class=p>(</span><span class=n>page</span><span class=p>)</span><span class=o>.</span><span class=n>page_id</span>
 <span class=linenos data-linenos="438 "></span>
 <span class=linenos data-linenos="439 "></span>    <span class=n>props</span> <span class=o>=</span> <span class=p>{}</span>
 <span class=linenos data-linenos="440 "></span>
