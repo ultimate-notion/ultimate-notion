@@ -1,15 +1,14 @@
 """Page object"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, overload, cast
+from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 from notion2md.exporter.block import StringExporter
 
-from ultimate_notion.props import PropertyValue, Title
-from ultimate_notion.schema import Column, PropertyType
-from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.blocks import DataObject
+from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.utils import is_notebook
 
 if TYPE_CHECKING:
@@ -25,7 +24,7 @@ class PageProperty:
     def __init__(self, prop_name: str):
         self._prop_name = prop_name
 
-    def __get__(self, obj: PageProperties, type=None) -> PropertyValue:
+    def __get__(self, obj: PageProperties, type=None) -> PropertyValue:  # noqa: A002
         return obj[self._prop_name]
 
     def __set__(self, obj: PageProperties, value):
@@ -46,7 +45,7 @@ class PageProperties:
     def __getitem__(self, prop_name: str) -> PropertyValue:
         prop = self._properties.get(prop_name)
         if prop is None:
-            msg = f"No such property: {prop_name}"
+            msg = f'No such property: {prop_name}'
             raise AttributeError(msg)
 
         return PropertyValue.wrap_obj_ref(obj_ref=prop)
@@ -80,7 +79,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Create the attributes for the database properties of this page"""
         # We have to subclass in order to populate it with the descriptor `PageProperty``
         # as this only works on the class level and we want a unique class for each property.
-        page_props_cls = type("_PageProperties", (PageProperties,), {})
+        page_props_cls = type('_PageProperties', (PageProperties,), {})
         for col in self.database.schema.get_cols():
             setattr(page_props_cls, col.attr_name, PageProperty(col.name))
         return page_props_cls(page=self)
@@ -113,15 +112,18 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Title of the page"""
         # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
         for prop in self.obj_ref.properties.values():
-            if prop.id == "title":
+            if prop.id == 'title':
                 return cast(Title, PropertyValue.wrap_obj_ref(prop))
-        raise RuntimeError("Encountered a page without title property")
+        msg = 'Encountered a page without title property'
+        raise RuntimeError(msg)
 
     @property
     def icon(self) -> str:
         icon = self.obj_ref.icon
+        raise NotImplementedError()
+        # ToDo: Fix me
         if isinstance(icon, objs.FileObject):
-            return icon.URL
+            return icon.URL  # or helpers.get_url(self.id)
         elif isinstance(icon, objs.EmojiObject):
             return icon.emoji
         else:

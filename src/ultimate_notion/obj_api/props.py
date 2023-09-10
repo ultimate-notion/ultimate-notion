@@ -1,19 +1,22 @@
 """Wrapper for property values of pages"""
 from abc import ABC, abstractmethod
-from datetime import datetime, date as dt_date
+from datetime import date as dt_date
+from datetime import datetime
 
 import pydantic
+from pydantic import Field
 
 from ultimate_notion.obj_api import objects
-from ultimate_notion.obj_api.core import NotionObject, GenericObject
-from ultimate_notion.obj_api.schema import Function, VerificationState, SelectOption
+from ultimate_notion.obj_api.core import GenericObject, NotionObject
+from ultimate_notion.obj_api.enums import VerificationState
 from ultimate_notion.obj_api.objects import User
+from ultimate_notion.obj_api.schema import Function, SelectOption
 
 
 class PropertyValue(objects.TypedObject):
     """Base class for Notion property values."""
 
-    id: str | None = None
+    id: str | None = None  # noqa: A003
 
     @classmethod
     def build(cls, value):
@@ -24,19 +27,19 @@ class PropertyValue(objects.TypedObject):
         return cls(**{cls.type: value})
 
 
-class Title(PropertyValue, type="title"):
+class Title(PropertyValue, type='title'):
     """Notion title type."""
 
-    title: list[objects.RichTextObject] = []
+    title: list[objects.RichTextObject] = Field(default_factory=list)
 
 
-class RichText(PropertyValue, type="rich_text"):
+class RichText(PropertyValue, type='rich_text'):
     """Notion rich text type."""
 
-    rich_text: list[objects.RichTextObject] = []
+    rich_text: list[objects.RichTextObject] = Field(default_factory=list)
 
 
-class Number(PropertyValue, type="number"):
+class Number(PropertyValue, type='number'):
     """Simple number type."""
 
     number: float | int | None = None
@@ -45,13 +48,13 @@ class Number(PropertyValue, type="number"):
         smart_union = True  # assures that int is not coerced to a float!
 
 
-class Checkbox(PropertyValue, type="checkbox"):
+class Checkbox(PropertyValue, type='checkbox'):
     """Simple checkbox type; represented as a boolean."""
 
     checkbox: bool | None = None
 
 
-class Date(PropertyValue, type="date"):
+class Date(PropertyValue, type='date'):
     """Notion complex date type - may include timestamp and/or be a date range."""
 
     date: objects.DateRange | None = None
@@ -62,52 +65,52 @@ class Date(PropertyValue, type="date"):
         return cls(date=objects.DateRange(start=start, end=end))
 
 
-class Status(PropertyValue, type="status"):
+class Status(PropertyValue, type='status'):
     """Notion status property."""
 
     status: objects.SelectOption | None = None
 
 
-class Select(PropertyValue, type="select"):
+class Select(PropertyValue, type='select'):
     """Notion select type."""
 
     select: SelectOption | None = None
 
 
-class MultiSelect(PropertyValue, type="multi_select"):
+class MultiSelect(PropertyValue, type='multi_select'):
     """Notion multi-select type."""
 
-    multi_select: list[SelectOption] = []
+    multi_select: list[SelectOption] = Field(default_factory=list)
 
 
-class People(PropertyValue, type="people"):
+class People(PropertyValue, type='people'):
     """Notion people type."""
 
-    people: list[objects.User] = []
+    people: list[objects.User] = Field(default_factory=list)
 
 
-class URL(PropertyValue, type="url"):
+class URL(PropertyValue, type='url'):
     """Notion URL type."""
 
     url: str | None = None
 
 
-class Email(PropertyValue, type="email"):
+class Email(PropertyValue, type='email'):
     """Notion email type."""
 
     email: str | None = None
 
 
-class PhoneNumber(PropertyValue, type="phone_number"):
+class PhoneNumber(PropertyValue, type='phone_number'):
     """Notion phone type."""
 
     phone_number: str | None = None
 
 
-class Files(PropertyValue, type="files"):
+class Files(PropertyValue, type='files'):
     """Notion files type."""
 
-    files: list[objects.FileObject] = []
+    files: list[objects.FileObject] = Field(default_factory=list)
 
 
 class FormulaResult(objects.TypedObject, ABC):
@@ -122,7 +125,7 @@ class FormulaResult(objects.TypedObject, ABC):
         """Return the result of this FormulaResult."""
 
 
-class StringFormula(FormulaResult, type="string"):
+class StringFormula(FormulaResult, type='string'):
     """A Notion string formula result."""
 
     string: str | None = None
@@ -132,7 +135,7 @@ class StringFormula(FormulaResult, type="string"):
         return self.string
 
 
-class NumberFormula(FormulaResult, type="number"):
+class NumberFormula(FormulaResult, type='number'):
     """A Notion number formula result."""
 
     number: float | int | None = None
@@ -142,7 +145,7 @@ class NumberFormula(FormulaResult, type="number"):
         return self.number
 
 
-class DateFormula(FormulaResult, type="date"):
+class DateFormula(FormulaResult, type='date'):
     """A Notion date formula result."""
 
     date: objects.DateRange | None = None
@@ -157,7 +160,7 @@ class DateFormula(FormulaResult, type="date"):
             return self.date.start, self.date.end
 
 
-class BooleanFormula(FormulaResult, type="boolean"):
+class BooleanFormula(FormulaResult, type='boolean'):
     """A Notion boolean formula result."""
 
     boolean: bool | None = None
@@ -167,16 +170,16 @@ class BooleanFormula(FormulaResult, type="boolean"):
         return self.boolean
 
 
-class Formula(PropertyValue, type="formula"):
+class Formula(PropertyValue, type='formula'):
     """A Notion formula property value."""
 
     formula: FormulaResult | None = None
 
 
-class Relation(PropertyValue, type="relation"):
+class Relation(PropertyValue, type='relation'):
     """A Notion relation property value."""
 
-    relation: list[objects.ObjectReference] = []
+    relation: list[objects.ObjectReference] = Field(default_factory=list)
     has_more: bool = False
 
     @classmethod
@@ -196,7 +199,7 @@ class RollupObject(objects.TypedObject, ABC):
         """Return the native representation of this Rollup object."""
 
 
-class RollupNumber(RollupObject, type="number"):
+class RollupNumber(RollupObject, type='number'):
     """A Notion rollup number property value."""
 
     number: float | int | None = None
@@ -207,7 +210,7 @@ class RollupNumber(RollupObject, type="number"):
         return self.number
 
 
-class RollupDate(RollupObject, type="date"):
+class RollupDate(RollupObject, type='date'):
     """A Notion rollup date property value."""
 
     date: objects.DateRange | None = None
@@ -222,7 +225,7 @@ class RollupDate(RollupObject, type="date"):
             return self.date.start, self.date.end
 
 
-class RollupArray(RollupObject, type="array"):
+class RollupArray(RollupObject, type='array'):
     """A Notion rollup array property value."""
 
     array: list[PropertyValue]
@@ -233,37 +236,37 @@ class RollupArray(RollupObject, type="array"):
         return self.array
 
 
-class Rollup(PropertyValue, type="rollup"):
+class Rollup(PropertyValue, type='rollup'):
     """A Notion rollup property value."""
 
     rollup: RollupObject | None = None
 
 
-class CreatedTime(PropertyValue, type="created_time"):
+class CreatedTime(PropertyValue, type='created_time'):
     """A Notion created-time property value."""
 
     created_time: datetime
 
 
-class CreatedBy(PropertyValue, type="created_by"):
+class CreatedBy(PropertyValue, type='created_by'):
     """A Notion created-by property value."""
 
     created_by: objects.User
 
 
-class LastEditedTime(PropertyValue, type="last_edited_time"):
+class LastEditedTime(PropertyValue, type='last_edited_time'):
     """A Notion last-edited-time property value."""
 
     last_edited_time: datetime
 
 
-class LastEditedBy(PropertyValue, type="last_edited_by"):
+class LastEditedBy(PropertyValue, type='last_edited_by'):
     """A Notion last-edited-by property value."""
 
     last_edited_by: objects.User
 
 
-class UniqueID(PropertyValue, type="unique_id"):
+class UniqueID(PropertyValue, type='unique_id'):
     """A Notion unique-id property value."""
 
     class _NestedData(GenericObject):
@@ -273,7 +276,7 @@ class UniqueID(PropertyValue, type="unique_id"):
     unique_id: _NestedData = _NestedData()
 
 
-class Verification(PropertyValue, type="verification"):
+class Verification(PropertyValue, type='verification'):
     """A Notion verification property value"""
 
     class _NestedData(GenericObject):
@@ -283,7 +286,8 @@ class Verification(PropertyValue, type="verification"):
 
         # leads to better error messages, see
         # https://github.com/pydantic/pydantic/issues/355
-        @pydantic.validator("state", pre=True)
+        @pydantic.validator('state', pre=True)
+        @classmethod
         def validate_enum_field(cls, field: str):
             return VerificationState(field)
 
@@ -291,7 +295,7 @@ class Verification(PropertyValue, type="verification"):
 
 
 # https://developers.notion.com/reference/property-item-object
-class PropertyItem(PropertyValue, NotionObject, object="property_item"):
+class PropertyItem(PropertyValue, NotionObject, object='property_item'):
     """A `PropertyItem` returned by the Notion API.
 
     Basic property items have a similar schema to corresponding property values.  As a

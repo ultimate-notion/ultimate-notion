@@ -22,10 +22,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import ultimate_notion.obj_api.schema as obj_schema
-from ultimate_notion.obj_api.schema import NumberFormat, Function
-from ultimate_notion.utils import SList, Wrapper
+from ultimate_notion.obj_api.schema import Function, NumberFormat
 from ultimate_notion.props import PropertyValue
-
+from ultimate_notion.utils import SList, Wrapper
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -49,7 +48,7 @@ class SchemaNotBoundError(SchemaError):
 
     def __init__(self, schema: type[PageSchema]):
         self.schema = schema
-        msg = f"Schema {schema.__name__} is not bound to any database"
+        msg = f'Schema {schema.__name__} is not bound to any database'
         super().__init__(msg)
 
 
@@ -70,7 +69,7 @@ class PageSchema:
     custom_schema: bool = True
     _database: Database | None = None
 
-    def __init_subclass__(cls, db_title: str, **kwargs: Any):  # noqa: A002
+    def __init_subclass__(cls, db_title: str, **kwargs: Any):
         cls.db_title = db_title
         super().__init_subclass__(**kwargs)
 
@@ -209,12 +208,12 @@ class Column:
     """
 
     _name: str
-    _type: PropertyType  # noqa: A003
+    _type: PropertyType
     # properties below are set by __set_name__
     _schema: type[PageSchema]
     _attr_name: str  # Python attribute name of the property in the schema
 
-    def __init__(self, name: str, type: PropertyType) -> None:
+    def __init__(self, name: str, type: PropertyType) -> None:  # noqa: A002
         self._name = name
         self._type = type
 
@@ -232,11 +231,11 @@ class Column:
         raise NotImplementedError
 
     @property
-    def type(self) -> PropertyType:
+    def type(self) -> PropertyType:  # noqa: A003
         return self._type
 
     @type.setter
-    def type(self, new_type: PropertyType):
+    def type(self, new_type: PropertyType):  # noqa: A003
         raise NotImplementedError
 
     @property
@@ -330,7 +329,8 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
 
     def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Column | None = None):
         if two_way_prop and not schema:
-            raise RuntimeError("`schema` needs to be provided if `two_way_prop` is set")
+            msg = '`schema` needs to be provided if `two_way_prop` is set'
+            raise RuntimeError(msg)
         if isinstance(schema, type):
             schema = schema()
         self._schema = schema
@@ -373,7 +373,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
 
     def _init_backward_relation(self):
         if not isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
-            msg = f"Trying to inialize backward relation for forward relation {self.prop_ref.name}"
+            msg = f'Trying to inialize backward relation for forward relation {self.prop_ref.name}'
             raise SchemaError(msg)
 
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
@@ -398,9 +398,9 @@ class RollupError(SchemaError):
 class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
     """Defines the rollup column in a database"""
 
-    def __init__(self, relation: Column, property: Column, calculate: Function):
+    def __init__(self, relation: Column, property: Column, calculate: Function):  # noqa: A002
         if not isinstance(relation.type, Relation):
-            msg = f"Relation {relation} must be of type Relation"
+            msg = f'Relation {relation} must be of type Relation'
             raise RollupError(msg)
         # ToDo: One could check here if property really is a property in the database where relation points to
         super().__init__(relation.name, property.name, calculate)

@@ -3,23 +3,21 @@
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
 """
-from datetime import date, datetime
-from uuid import UUID
-from enum import Enum
 from copy import deepcopy
-
-from notion_client import helpers
+from datetime import date, datetime
+from enum import Enum
+from uuid import UUID
 
 from ultimate_notion.obj_api import util
-from ultimate_notion.obj_api.core import GenericObject, TypedObject, NotionObject
-from ultimate_notion.obj_api.enums import FullColor, Color
+from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
+from ultimate_notion.obj_api.enums import Color, FullColor
 
 
 class SelectOption(GenericObject):
     """Options for select & multi-select objects."""
 
     name: str
-    id: str | None = None  # According to docs: "These are sometimes, but not always, UUIDs."
+    id: str | None = None  # According to docs: "These are sometimes, but not always, UUIDs."  # noqa: A003
     color: Color = Color.DEFAULT
 
     @classmethod
@@ -31,7 +29,7 @@ class SelectOption(GenericObject):
 class ObjectReference(GenericObject):
     """A general-purpose object reference in the Notion API."""
 
-    id: UUID
+    id: UUID  # noqa: A003
 
     @classmethod
     def build(cls, ref):
@@ -49,7 +47,7 @@ class ObjectReference(GenericObject):
             # ParentRef's are typed-objects with a nested UUID
             return ObjectReference(id=ref())
 
-        if isinstance(ref, GenericObject) and hasattr(ref, "id"):
+        if isinstance(ref, GenericObject) and hasattr(ref, 'id'):
             # re-compose the ObjectReference from the internal ID
             return ObjectReference.build(ref.id)
 
@@ -62,16 +60,8 @@ class ObjectReference(GenericObject):
             if ref is not None:
                 return ObjectReference(id=UUID(ref))
 
-        raise ValueError("Unrecognized 'ref' attribute")
-
-    @property
-    def URL(self):
-        """Return the Notion URL for this object reference.
-
-        Note: this is a convenience property only.  It does not guarantee that the
-        URL exists or that it is accessible by the integration.
-        """
-        return helpers.get_url(self.id)
+        msg = "Unrecognized 'ref' attribute"
+        raise ValueError(msg)
 
 
 def make_obj_ref():
@@ -87,7 +77,7 @@ class ParentRef(TypedObject):
     # callers should always instantiate the intended concrete versions
 
 
-class DatabaseRef(ParentRef, type="database_id"):
+class DatabaseRef(ParentRef, type='database_id'):
     """Reference a database."""
 
     database_id: UUID
@@ -102,7 +92,7 @@ class DatabaseRef(ParentRef, type="database_id"):
         return DatabaseRef(database_id=ref.id)
 
 
-class PageRef(ParentRef, type="page_id"):
+class PageRef(ParentRef, type='page_id'):
     """Reference a page."""
 
     page_id: UUID
@@ -117,7 +107,7 @@ class PageRef(ParentRef, type="page_id"):
         return PageRef(page_id=ref.id)
 
 
-class BlockRef(ParentRef, type="block_id"):
+class BlockRef(ParentRef, type='block_id'):
     """Reference a block."""
 
     block_id: UUID
@@ -132,21 +122,21 @@ class BlockRef(ParentRef, type="block_id"):
         return BlockRef(block_id=ref.id)
 
 
-class WorkspaceRef(ParentRef, type="workspace"):
+class WorkspaceRef(ParentRef, type='workspace'):
     """Reference the workspace."""
 
     workspace: bool = True
 
 
-class UserRef(NotionObject, object="user"):
+class UserRef(NotionObject, object='user'):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
 
 
 class UserType(str, Enum):
     """Available user types."""
 
-    PERSON = "person"
-    BOT = "bot"
+    PERSON = 'person'
+    BOT = 'bot'
 
 
 class User(UserRef, TypedObject):
@@ -156,7 +146,7 @@ class User(UserRef, TypedObject):
     avatar_url: str | None = None
 
 
-class Person(User, type="person"):
+class Person(User, type='person'):
     """Represents a Person in Notion."""
 
     class _NestedData(GenericObject):
@@ -165,7 +155,7 @@ class Person(User, type="person"):
     person: _NestedData = None
 
 
-class Bot(User, type="bot"):
+class Bot(User, type='bot'):
     """Represents a Bot in Notion."""
 
     class _NestedData(GenericObject):
@@ -174,7 +164,7 @@ class Bot(User, type="bot"):
     bot: _NestedData = None
 
 
-class EmojiObject(TypedObject, type="emoji"):
+class EmojiObject(TypedObject, type='emoji'):
     """A Notion emoji object."""
 
     emoji: str
@@ -198,7 +188,7 @@ class FileObject(TypedObject):
     name: str | None = None
 
 
-class HostedFile(FileObject, type="file"):
+class HostedFile(FileObject, type='file'):
     """A Notion file object."""
 
     class _NestedData(GenericObject):
@@ -208,7 +198,7 @@ class HostedFile(FileObject, type="file"):
     file: _NestedData
 
 
-class ExternalFile(FileObject, type="external"):
+class ExternalFile(FileObject, type='external'):
     """An external file object."""
 
     class _NestedData(GenericObject):
@@ -221,7 +211,7 @@ class ExternalFile(FileObject, type="external"):
         name = super().__str__()
 
         if self.external and self.external.url:
-            return f"![{name}]({self.external.url})"
+            return f'![{name}]({self.external.url})'
 
         return name
 
@@ -325,11 +315,11 @@ class RichTextObject(TypedObject):
 class LinkObject(GenericObject):
     """Reference a URL."""
 
-    type: str = "url"
+    type: str = 'url'  # noqa: A003
     url: str = None
 
 
-class TextObject(RichTextObject, type="text"):
+class TextObject(RichTextObject, type='text'):
     """Notion text element."""
 
     class _NestedData(GenericObject):
@@ -362,7 +352,7 @@ class TextObject(RichTextObject, type="text"):
         )
 
 
-class EquationObject(RichTextObject, type="equation"):
+class EquationObject(RichTextObject, type='equation'):
     """Notion equation element."""
 
     class _NestedData(GenericObject):
@@ -375,13 +365,13 @@ class MentionData(TypedObject):
     """Base class for typed `Mention` data objects."""
 
 
-class MentionObject(RichTextObject, type="mention"):
+class MentionObject(RichTextObject, type='mention'):
     """Notion mention element."""
 
     mention: MentionData
 
 
-class MentionUser(MentionData, type="user"):
+class MentionUser(MentionData, type='user'):
     """Nested user data for `Mention` properties."""
 
     user: UserRef
@@ -397,7 +387,7 @@ class MentionUser(MentionData, type="user"):
         return MentionObject(plain_text=str(user), mention=MentionUser(user=user))
 
 
-class MentionPage(MentionData, type="page"):
+class MentionPage(MentionData, type='page'):
     """Nested page data for `Mention` properties."""
 
     page: ObjectReference
@@ -411,7 +401,7 @@ class MentionPage(MentionData, type="page"):
         return MentionObject(plain_text=str(ref), mention=MentionPage(page=ref))
 
 
-class MentionDatabase(MentionData, type="database"):
+class MentionDatabase(MentionData, type='database'):
     """Nested database information for `Mention` properties."""
 
     database: ObjectReference
@@ -425,7 +415,7 @@ class MentionDatabase(MentionData, type="database"):
         return MentionObject(plain_text=str(ref), mention=MentionDatabase(database=ref))
 
 
-class MentionDate(MentionData, type="date"):
+class MentionDate(MentionData, type='date'):
     """Nested date data for `Mention` properties."""
 
     date: DateRange
@@ -439,7 +429,7 @@ class MentionDate(MentionData, type="date"):
         return MentionObject(plain_text=str(date_obj), mention=MentionDate(date=date_obj))
 
 
-class MentionLinkPreview(MentionData, type="link_preview"):
+class MentionLinkPreview(MentionData, type='link_preview'):
     """Nested url data for `Mention` properties.
 
     These objects cannot be created via the API.
@@ -455,19 +445,19 @@ class MentionTemplateData(TypedObject):
     """Nested template data for `Mention` properties."""
 
 
-class MentionTemplate(MentionData, type="template_mention"):
+class MentionTemplate(MentionData, type='template_mention'):
     """Nested template data for `Mention` properties."""
 
     template_mention: MentionTemplateData
 
 
-class MentionTemplateDate(MentionTemplateData, type="template_mention_date"):
+class MentionTemplateDate(MentionTemplateData, type='template_mention_date'):
     """Nested date template data for `Mention` properties."""
 
     template_mention_date: str
 
 
-class MentionTemplateUser(MentionTemplateData, type="template_mention_user"):
+class MentionTemplateUser(MentionTemplateData, type='template_mention_user'):
     """Nested user template data for `Mention` properties."""
 
     template_mention_user: str

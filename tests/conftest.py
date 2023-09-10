@@ -8,10 +8,8 @@ import os
 import pytest
 
 import ultimate_notion
-from ultimate_notion import schema
-from ultimate_notion.database import Database
+from ultimate_notion import Session, schema
 from ultimate_notion.page import Page
-from ultimate_notion import Session
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 
 # Manually created DB in Notion with all possible columns including AI columns!
@@ -37,7 +35,7 @@ def vcr_config():
     }
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def notion():
     """Return the notion session used for live testing.
 
@@ -52,13 +50,13 @@ def notion():
         yield notion
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def contacts_db(notion: Session):
     """Return a test database"""
     return notion.search_db('Contacts').item()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def root_page(notion: Session):
     """Return the page reference used as parent page for live testing"""
     return notion.search_page('Tests', exact=True).item()
@@ -68,7 +66,7 @@ def root_page(notion: Session):
 def simple_db(notion: Session, root_page: Page):
     """Simple database of articles"""
 
-    class Article(schema.PageSchema, db_title="Articles"):
+    class Article(schema.PageSchema, db_title='Articles'):
         name = schema.Column('Name', schema.Title())
         cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Column('Description', schema.Text())
@@ -78,7 +76,7 @@ def simple_db(notion: Session, root_page: Page):
     db.delete()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def page_hierarchy(notion: Session, root_page: Page):
     """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2"""
     l1_page = notion.create_page(parent=root_page, title='level_1')
@@ -88,13 +86,13 @@ def page_hierarchy(notion: Session, root_page: Page):
     l1_page.delete()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def all_cols_db(notion: Session):
     """Return manually created database with all columns, also AI columns"""
     return notion.search_db(ALL_COL_DB).item()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def wiki_db(notion: Session):
     """Return manually created wiki db"""
     return notion.search_db(WIKI_DB).item()

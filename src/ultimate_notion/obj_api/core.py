@@ -4,9 +4,7 @@ import inspect
 import logging
 from datetime import date, datetime
 from enum import Enum
-from typing import Optional
 from uuid import UUID
-from typing import get_origin
 
 from pydantic import BaseModel, validator
 from pydantic.main import validate_model
@@ -23,7 +21,7 @@ def serialize_to_api(data):
     # https://github.com/samuelcolvin/pydantic/issues/1409
     # ToDo: Seems to be fixed in pydantic v2, remove this workaround
 
-    if isinstance(data, (date, datetime)):
+    if isinstance(data, date | datetime):
         return data.isoformat()
 
     if isinstance(data, UUID):
@@ -32,7 +30,7 @@ def serialize_to_api(data):
     if isinstance(data, Enum):
         return data.value
 
-    if isinstance(data, (list, tuple)):
+    if isinstance(data, list | tuple):
         return [serialize_to_api(value) for value in data]
 
     if isinstance(data, dict):
@@ -100,19 +98,19 @@ class GenericObject(BaseModel):
 
         for name in fields:
             value = values[name]
-            logger.debug("set object data -- %s => %s", name, value)
+            logger.debug('set object data -- %s => %s', name, value)
             setattr(self, name, value)
 
         return self
 
-    def dict(self, **kwargs):
+    def dict(self, **kwargs):  # noqa: A003, rename to model_dump when using pydantic v2
         """Convert to a suitable representation for the Notion API."""
 
         # the API doesn't like "undefined" values...
-        kwargs["exclude_none"] = True
-        kwargs["by_alias"] = True
+        kwargs['exclude_none'] = True
+        kwargs['by_alias'] = True
 
-        obj = super().dict(**kwargs)
+        obj = super().dict(**kwargs)  # model_dump in pydantic v2
 
         # TODO read-only fields should not be sent to the API
         # https://github.com/jheddings/notional/issues/9
@@ -128,22 +126,24 @@ class GenericObject(BaseModel):
 class NotionObject(GenericObject):
     """A top-level Notion API resource."""
 
-    object: str
-    id: Optional[UUID] = None
+    object: str  # noqa: A003
+    id: UUID | None = None  # noqa: A003
 
-    def __init_subclass__(cls, object=None, **kwargs):
+    def __init_subclass__(cls, object=None, **kwargs):  # noqa: A002
         """Update `GenericObject` defaults for the named object."""
         super().__init_subclass__(**kwargs)
 
         if object is not None:
-            cls._set_field_default("object", default=object)
+            cls._set_field_default('object', default=object)
 
-    @validator("object", always=True, pre=False)
+    @validator('object', always=True, pre=False)
+    @classmethod
     def _verify_object_matches_expected(cls, val):
         """Make sure that the deserialzied object matches the name in this class."""
 
         if val != cls.object:
-            raise ValueError(f"Invalid object for {cls.object} - {val}")
+            msg = f'Invalid object for {cls.object} - {val}'
+            raise ValueError(msg)
 
         return val
 
@@ -168,12 +168,12 @@ class TypedObject(GenericObject):
     Calling the object provides direct access to the data stored in `{type}`.
     """
 
-    type: str
+    type: str  # noqa: A003
 
     # modified from the methods described in this discussion:
     # - https://github.com/samuelcolvin/pydantic/discussions/3091
 
-    def __init_subclass__(cls, type=None, **kwargs):
+    def __init_subclass__(cls, type=None, **kwargs):  # noqa: A002
         """Register the subtypes of the TypedObject subclass."""
         super().__init_subclass__(**kwargs)
 
@@ -205,7 +205,7 @@ class TypedObject(GenericObject):
     def _register_type(cls, name):
         """Register a specific class for the given 'type' name."""
 
-        cls._set_field_default("type", default=name)
+        cls._set_field_default('type', default=name)
 
         # initialize a _typemap map for each direct child of TypedObject
 
@@ -213,13 +213,14 @@ class TypedObject(GenericObject):
         # but point to a different object (e.g. the 'date' type may have
         # different implementations depending where it is used in the API)
 
-        if not hasattr(cls, "_typemap"):
+        if not hasattr(cls, '_typemap'):
             cls._typemap = {}
 
         if name in cls._typemap:
-            raise ValueError(f"Duplicate subtype for class - {name} :: {cls}")
+            msg = f'Duplicate subtype for class - {name} :: {cls}'
+            raise ValueError(msg)
 
-        logger.debug("registered new subtype: %s => %s", name, cls)
+        logger.debug('registered new subtype: %s => %s', name, cls)
 
         cls._typemap[name] = cls
 
@@ -231,21 +232,25 @@ class TypedObject(GenericObject):
             return data
 
         if not isinstance(data, dict):
-            raise ValueError("Invalid 'data' object")
+            msg = "Invalid 'data' object"
+            raise ValueError(msg)
 
-        if not hasattr(cls, "_typemap"):
-            raise TypeError(f"Missing '_typemap' in {cls}")
+        if not hasattr(cls, '_typemap'):
+            msg = f"Missing '_typemap' in {cls}"
+            raise TypeError(msg)
 
-        type_name = data.get("type")
+        type_name = data.get('type')
 
         if type_name is None:
-            raise ValueError("Missing 'type' in data")
+            msg = "Missing 'type' in data"
+            raise ValueError(msg)
 
         sub = cls._typemap.get(type_name)
 
         if sub is None:
-            raise TypeError(f"Unsupported sub-type: {type_name}")
+            msg = f'Unsupported sub-type: {type_name}'
+            raise TypeError(msg)
 
-        logger.debug("initializing typed object %s :: %s => %s -- %s", cls, type_name, sub, data)
+        logger.debug('initializing typed object %s :: %s => %s -- %s', cls, type_name, sub, data)
 
         return sub(**data)

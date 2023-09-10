@@ -3,16 +3,15 @@ from __future__ import annotations
 
 from textwrap import dedent
 
+from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.text import make_safe_python_name
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
-from ultimate_notion.blocks import DataObject
-from ultimate_notion.schema import PageSchema, Column, PropertyType, SchemaError, PropertyValue, ReadOnlyColumnError
+from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
+from ultimate_notion.text import make_safe_python_name, plain_text
 from ultimate_notion.utils import decapitalize, dict_diff_str
 from ultimate_notion.view import View
-from ultimate_notion.text import plain_text
 
 
 # ToDo: This could also inherit from DataObject[objs.Database], wraps=.... and DataObject is a Generic!
@@ -41,7 +40,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Reload the metadata of the database and update the schema if necessary"""
         new_db = self.session._get_db(self.id)  # circumvent session cache
         if check_consistency and not self.schema.is_consistent_with(new_db.schema):
-            msg = f"Schema of database {self.title} no longer consistent with schema after refresh!"
+            msg = f'Schema of database {self.title} no longer consistent with schema after refresh!'
             raise SchemaError(msg)
 
         self.schema._enrich(new_db.schema)
@@ -148,10 +147,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             if prop_value_cls.readonly:
                 raise ReadOnlyColumnError(col)
 
-            if isinstance(value, PropertyValue):
-                prop_value = value
-            else:
-                prop_value = prop_value_cls(value)
+            prop_value = value if isinstance(value, PropertyValue) else prop_value_cls(value)
 
             schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
 

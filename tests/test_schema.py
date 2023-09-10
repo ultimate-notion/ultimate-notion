@@ -1,26 +1,24 @@
-from datetime import datetime, date
+from datetime import datetime, timezone
 
 import pytest
 
-from ultimate_notion import schema
-from ultimate_notion import props
-from ultimate_notion.schema import PageSchema, Column, Function, SchemaError, ReadOnlyColumnError
-from ultimate_notion import Session
-from ultimate_notion.page import Page
+from ultimate_notion import Session, props, schema
 from ultimate_notion.database import Database
-from ultimate_notion.objects import Option, File
+from ultimate_notion.objects import File, Option
+from ultimate_notion.page import Page
+from ultimate_notion.schema import Column, Function, PageSchema, ReadOnlyColumnError, SchemaError
 
 
 def test_all_createable_cols_schema(notion: Session, root_page: Page):
-    class SchemaA(PageSchema, db_title="Schema A"):
+    class SchemaA(PageSchema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
         name = Column('Name', schema.Title())
         relation = Column('Relation', schema.Relation())
 
-    options = [Option(name="Option1"), Option(name="Option2", color="red")]
+    options = [Option(name='Option1'), Option(name='Option2', color='red')]
 
-    class SchemaB(PageSchema, db_title="Schema B"):
+    class SchemaB(PageSchema, db_title='Schema B'):
         """Only used to create relations in Schema B"""
 
         checkbox = Column('Checkbox', schema.Checkbox())
@@ -32,7 +30,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
         formula = Column('Formula', schema.Formula('prop("Number") * 2'))
         last_edited_by = Column('Last edited by', schema.LastEditedBy())
         last_edited_time = Column('Last edited time', schema.LastEditedTime())
-        multi_select = Column("Multi-select", schema.MultiSelect(options))
+        multi_select = Column('Multi-select', schema.MultiSelect(options))
         number = Column('Number', schema.Number(schema.NumberFormat.DOLLAR))
         people = Column('People', schema.People())
         phone_number = Column('Phone number', schema.PhoneNumber())
@@ -53,12 +51,12 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
         SchemaB.create(non_existent_attr_name=None)
 
     with pytest.raises(ReadOnlyColumnError):
-        SchemaB.create(created_time=datetime.now())
+        SchemaB.create(created_time=datetime.now(tz=timezone.utc))
 
     with pytest.raises(ReadOnlyColumnError):
-        SchemaB.create(last_edited_time=datetime.now())
+        SchemaB.create(last_edited_time=datetime.now(tz=timezone.utc))
 
-    user = [user for user in notion.all_users() if user.is_person][0]
+    user = next(user for user in notion.all_users() if user.is_person)
     with pytest.raises(ReadOnlyColumnError):
         SchemaB.create(created_by=user)
 
@@ -71,25 +69,25 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     with pytest.raises(ReadOnlyColumnError):
         SchemaB.create(rollup=3)
 
-    a_item1 = db_a.create_page(name="Item 1")
-    a_item2 = db_a.create_page(name="Item 2")
+    a_item1 = db_a.create_page(name='Item 1')
+    a_item2 = db_a.create_page(name='Item 2')
 
-    kwargs = dict(
-        checkbox=props.Checkbox(True),
-        date=props.Date(date.today()),
-        email=props.Email("email@provider.com"),
-        files=props.Files([File("https://...")]),
-        multi_select=props.MultiSelect(options[0]),
-        number=props.Number(42),
-        people=props.People(user),
-        phone_number=props.PhoneNumber("+1 234 567 890"),
-        relation=props.Relations([a_item1, a_item2]),
-        relation_twoway=props.Relations([a_item1, a_item2]),
-        select=props.Select(options[0]),
-        text=props.Text("Text"),
-        title=props.Title("Title"),
-        url=props.URL("https://ultimate-notion.com/"),
-    )
+    kwargs = {
+        'checkbox': props.Checkbox(True),
+        'date': props.Date(datetime.now(tz=timezone.utc).date()),
+        'email': props.Email('email@provider.com'),
+        'files': props.Files([File('https://...')]),
+        'multi_select': props.MultiSelect(options[0]),
+        'number': props.Number(42),
+        'people': props.People(user),
+        'phone_number': props.PhoneNumber('+1 234 567 890'),
+        'relation': props.Relations([a_item1, a_item2]),
+        'relation_twoway': props.Relations([a_item1, a_item2]),
+        'select': props.Select(options[0]),
+        'text': props.Text('Text'),
+        'title': props.Title('Title'),
+        'url': props.URL('https://ultimate-notion.com/'),
+    }
 
     b_item0 = SchemaB.create()  # empty page with not even a title
     writeable_props = [prop_name for prop_name, prop_type in SchemaB.to_dict().items() if not prop_type.readonly]

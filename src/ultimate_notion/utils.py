@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from copy import deepcopy
 from functools import wraps
-from typing import Any, TypeAlias, TypeVar, Generic, ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar
 from uuid import UUID
 
 import numpy as np
@@ -212,9 +212,9 @@ def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT
 def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str]:
     """Returns the added keys, removed keys and keys of changed values of both dictionaries as strings for printing"""
     keys_added, keys_removed, values_changed = dict_diff(dct1, dct2)
-    keys_added_str = ", ".join(keys_added) or 'None'
-    keys_removed_str = ", ".join(keys_removed) or 'None'
-    keys_changed_str = ", ".join(f"{k}: {v[0]} -> {v[1]}" for k, v in values_changed.items()) or 'None'
+    keys_added_str = ', '.join(keys_added) or 'None'
+    keys_removed_str = ', '.join(keys_removed) or 'None'
+    keys_changed_str = ', '.join(f'{k}: {v[0]} -> {v[1]}' for k, v in values_changed.items()) or 'None'
     return keys_added_str, keys_removed_str, keys_changed_str
 
 

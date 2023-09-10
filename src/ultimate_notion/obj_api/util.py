@@ -2,10 +2,10 @@
 
 import re
 
-_base_url_pattern = r"https://(www)?.notion.so/"
-_uuid_pattern = r"[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}"
+_base_url_pattern = r'https://(www)?.notion.so/'
+_uuid_pattern = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
 
-uuid_re = re.compile(rf"^(?P<id>{_uuid_pattern})$")
+uuid_re = re.compile(rf'^(?P<id>{_uuid_pattern})$')
 
 page_url_short_re = re.compile(
     rf"""^
@@ -42,18 +42,18 @@ def extract_id_from_string(string):
 
     m = uuid_re.match(string)
     if m is not None:
-        return m.group("id")
+        return m.group('id')
 
     m = page_url_long_re.match(string)
     if m is not None:
-        return m.group("page_id")
+        return m.group('page_id')
 
     m = page_url_short_re.match(string)
     if m is not None:
-        return m.group("page_id")
+        return m.group('page_id')
 
     m = block_url_long_re.match(string)
     if m is not None:
-        return m.group("block_id")
+        return m.group('block_id')
 
     return None

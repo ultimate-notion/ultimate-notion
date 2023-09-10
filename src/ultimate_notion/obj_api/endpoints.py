@@ -6,16 +6,15 @@ is just referred to as `raw_api`.
 """
 
 import logging
-from typing import Dict, Union
 
 from pydantic import parse_obj_as
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
+from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, TextObject, User
+from ultimate_notion.obj_api.props import PropertyItem, Title
 from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.obj_api.schema import PropertyObject
-from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, User, TextObject
-from ultimate_notion.obj_api.props import PropertyItem, Title
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,7 @@ class SessionError(Exception):
         super().__init__(message)
 
 
-class NotionAPI(object):
+class NotionAPI:
     """Object-based Notion API (pydantic) with all endpoints"""
 
     def __init__(self, client):
@@ -41,7 +40,7 @@ class NotionAPI(object):
         self.users = UsersEndpoint(self)
 
 
-class Endpoint(object):
+class Endpoint:
     """Notional wrapper for the API endpoints."""
 
     def __init__(self, api: NotionAPI):
@@ -73,27 +72,27 @@ class BlocksEndpoint(Endpoint):
 
             children = [block.dict() for block in blocks if block is not None]
 
-            logger.info("Appending %d blocks to %s ...", len(children), parent_id)
+            logger.info('Appending %d blocks to %s ...', len(children), parent_id)
 
             data = self.raw_api.append(block_id=parent_id, children=children)
 
-            if "results" in data:
-                if len(blocks) == len(data["results"]):
+            if 'results' in data:
+                if len(blocks) == len(data['results']):
                     for idx in range(len(blocks)):
                         block = blocks[idx]
-                        result = data["results"][idx]
+                        result = data['results'][idx]
                         block.refresh(**result)
 
                 else:
-                    logger.warning("Unable to refresh results; size mismatch")
+                    logger.warning('Unable to refresh results; size mismatch')
 
             else:
-                logger.warning("Unable to refresh results; not provided")
+                logger.warning('Unable to refresh results; not provided')
 
             return parent
 
         # https://developers.notion.com/reference/get-block-children
-        def list(self, parent):
+        def as_list(self, parent):
             """Return all Blocks contained by the specified parent.
 
             `parent` may be any suitable `ObjectReference` type.
@@ -101,7 +100,7 @@ class BlocksEndpoint(Endpoint):
 
             parent_id = ObjectReference.build(parent).id
 
-            logger.info("Listing blocks for %s...", parent_id)
+            logger.info('Listing blocks for %s...', parent_id)
 
             blocks = EndpointIterator(endpoint=self.raw_api.list)
 
@@ -126,7 +125,7 @@ class BlocksEndpoint(Endpoint):
         """
 
         block_id = ObjectReference.build(block).id
-        logger.info("Deleting block :: %s", block_id)
+        logger.info('Deleting block :: %s', block_id)
 
         data = self.raw_api.delete(block_id)
 
@@ -139,7 +138,7 @@ class BlocksEndpoint(Endpoint):
         """
 
         block_id = ObjectReference.build(block).id
-        logger.info("Restoring block :: %s", block_id)
+        logger.info('Restoring block :: %s', block_id)
 
         data = self.raw_api.update(block_id, archived=False)
 
@@ -153,7 +152,7 @@ class BlocksEndpoint(Endpoint):
         """
 
         block_id = ObjectReference.build(block).id
-        logger.info("Retrieving block :: %s", block_id)
+        logger.info('Retrieving block :: %s', block_id)
 
         data = self.raw_api.retrieve(block_id)
 
@@ -166,7 +165,7 @@ class BlocksEndpoint(Endpoint):
         The block info will be refreshed to the latest version from the server.
         """
 
-        logger.info("Updating block :: %s", block.id)
+        logger.info('Updating block :: %s', block.id)
 
         data = self.raw_api.update(block.id.hex, **block.dict())
 
@@ -183,8 +182,8 @@ class DatabasesEndpoint(Endpoint):
 
     def _build_request(
         self,
-        parent: ParentRef = None,
-        schema: Dict[str, PropertyObject] = None,
+        parent: ParentRef | None = None,
+        schema: dict[str, PropertyObject] | None = None,
         title=None,
     ):
         """Build a request payload from the given items.
@@ -195,21 +194,21 @@ class DatabasesEndpoint(Endpoint):
         request = {}
 
         if parent is not None:
-            request["parent"] = parent.dict()
+            request['parent'] = parent.dict()
 
         if title is not None:
             prop = TextObject.build(title)
-            request["title"] = [prop.dict()]
+            request['title'] = [prop.dict()]
 
         if schema is not None:
-            request["properties"] = {
+            request['properties'] = {
                 name: value.dict() if value is not None else None for name, value in schema.items()
             }
 
         return request
 
     # https://developers.notion.com/reference/create-a-database
-    def create(self, parent, schema: Dict[str, PropertyObject], title=None):
+    def create(self, parent, schema: dict[str, PropertyObject], title=None):
         """Add a database to the given Page parent.
 
         `parent` may be any suitable `PageRef` type.
@@ -217,7 +216,7 @@ class DatabasesEndpoint(Endpoint):
 
         parent_ref = PageRef.build(parent)
 
-        logger.info("Creating database @ %s - %s", parent_ref.page_id, title)
+        logger.info('Creating database @ %s - %s', parent_ref.page_id, title)
 
         request = self._build_request(parent_ref, schema, title)
 
@@ -234,14 +233,14 @@ class DatabasesEndpoint(Endpoint):
 
         dbid = DatabaseRef.build(dbref).database_id
 
-        logger.info("Retrieving database :: %s", dbid)
+        logger.info('Retrieving database :: %s', dbid)
 
         data = self.raw_api.retrieve(dbid)
 
         return Database.parse_obj(data)
 
     # https://developers.notion.com/reference/update-a-database
-    def update(self, dbref, title=None, schema: Dict[str, PropertyObject] = None):
+    def update(self, dbref, title=None, schema: dict[str, PropertyObject] | None = None):
         """Update the Database object on the server.
 
         The database info will be refreshed to the latest version from the server.
@@ -251,7 +250,7 @@ class DatabasesEndpoint(Endpoint):
 
         dbid = DatabaseRef.build(dbref).database_id
 
-        logger.info("Updating database info :: %s", dbid)
+        logger.info('Updating database info :: %s', dbid)
 
         request = self._build_request(schema=schema, title=title)
 
@@ -269,7 +268,7 @@ class DatabasesEndpoint(Endpoint):
 
         dbid = DatabaseRef.build(dbref).database_id
 
-        logger.info("Deleting database :: %s", dbid)
+        logger.info('Deleting database :: %s', dbid)
 
         return self.api.blocks.delete(dbid)
 
@@ -281,7 +280,7 @@ class DatabasesEndpoint(Endpoint):
 
         dbid = DatabaseRef.build(dbref).database_id
 
-        logger.info("Restoring database :: %s", dbid)
+        logger.info('Restoring database :: %s', dbid)
 
         return self.api.blocks.restore(dbid)
 
@@ -294,7 +293,7 @@ class DatabasesEndpoint(Endpoint):
         cls = None
         dbid = DatabaseRef.build(target).database_id
 
-        logger.info("Initializing database query :: {%s} [%s]", dbid, cls)
+        logger.info('Initializing database query :: {%s} [%s]', dbid, cls)
 
         return QueryBuilder(endpoint=self.raw_api.query, datatype=cls, database_id=dbid)
 
@@ -314,12 +313,12 @@ class PagesEndpoint(Endpoint):
         def retrieve(self, page_id, property_id):
             """Return the Property on a specific Page with the given ID."""
 
-            logger.info("Retrieving property :: %s [%s]", property_id, page_id)
+            logger.info('Retrieving property :: %s [%s]', property_id, page_id)
 
             data = self.raw_api.retrieve(page_id, property_id)
 
             # TODO should PropertyListItem return an iterator instead?
-            return parse_obj_as(Union[PropertyItem, PropertyItemList], obj=data)
+            return parse_obj_as(PropertyItem | PropertyItemList, obj=data)
 
     def __init__(self, *args, **kwargs):
         """Initialize the `pages` endpoint for the Notion API."""
@@ -340,30 +339,32 @@ class PagesEndpoint(Endpoint):
         """
 
         if parent is None:
-            raise ValueError("'parent' must be provided")
+            msg = "'parent' must be provided"
+            raise ValueError(msg)
 
         if isinstance(parent, Page):
             parent = PageRef.build(parent)
         elif isinstance(parent, Database):
             parent = DatabaseRef.build(parent)
         elif not isinstance(parent, ParentRef):
-            raise ValueError("Unsupported 'parent'")
+            msg = "Unsupported 'parent'"
+            raise ValueError(msg)
 
-        request = {"parent": parent.dict()}
+        request = {'parent': parent.dict()}
 
         # the API requires a properties object, even if empty
         if properties is None:
             properties = {}
 
         if title is not None:
-            properties["title"] = title
+            properties['title'] = title
 
-        request["properties"] = {name: prop.dict() if prop is not None else None for name, prop in properties.items()}
+        request['properties'] = {name: prop.dict() if prop is not None else None for name, prop in properties.items()}
 
         if children is not None:
-            request["children"] = [child.dict() for child in children if child is not None]
+            request['children'] = [child.dict() for child in children if child is not None]
 
-        logger.info("Creating page :: %s => %s", parent, title)
+        logger.info('Creating page :: %s => %s', parent, title)
 
         data = self.raw_api.create(**request)
 
@@ -375,7 +376,7 @@ class PagesEndpoint(Endpoint):
         `page` may be any suitable `PageRef` type.
         """
 
-        return self.set(page, archived=True)
+        return self.set_attr(page, archived=True)
 
     def restore(self, page):
         """Restore (unarchive) the specified Page.
@@ -383,7 +384,7 @@ class PagesEndpoint(Endpoint):
         `page` may be any suitable `PageRef` type.
         """
 
-        return self.set(page, archived=False)
+        return self.set_attr(page, archived=False)
 
     # https://developers.notion.com/reference/retrieve-a-page
     def retrieve(self, page):
@@ -394,7 +395,7 @@ class PagesEndpoint(Endpoint):
 
         page_id = PageRef.build(page).page_id
 
-        logger.info("Retrieving page :: %s", page_id)
+        logger.info('Retrieving page :: %s', page_id)
 
         data = self.raw_api.retrieve(page_id)
 
@@ -415,7 +416,7 @@ class PagesEndpoint(Endpoint):
         The page info will be refreshed to the latest version from the server.
         """
 
-        logger.info("Updating page info :: %s", page.id)
+        logger.info('Updating page info :: %s', page.id)
 
         if not properties:
             properties = page.properties
@@ -426,7 +427,7 @@ class PagesEndpoint(Endpoint):
 
         return page.refresh(**data)
 
-    def set(self, page, cover=False, icon=False, archived=None):
+    def set_attr(self, page, *, cover=False, icon=False, archived=None):
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
         `page` may be any suitable `PageRef` type.
@@ -439,25 +440,25 @@ class PagesEndpoint(Endpoint):
         props = {}
 
         if cover is None:
-            logger.info("Removing page cover :: %s", page_id)
-            props["cover"] = {}
+            logger.info('Removing page cover :: %s', page_id)
+            props['cover'] = {}
         elif cover is not False:
-            logger.info("Setting page cover :: %s => %s", page_id, cover)
-            props["cover"] = cover.dict()
+            logger.info('Setting page cover :: %s => %s', page_id, cover)
+            props['cover'] = cover.dict()
 
         if icon is None:
-            logger.info("Removing page icon :: %s", page_id)
-            props["icon"] = {}
+            logger.info('Removing page icon :: %s', page_id)
+            props['icon'] = {}
         elif icon is not False:
-            logger.info("Setting page icon :: %s => %s", page_id, icon)
-            props["icon"] = icon.dict()
+            logger.info('Setting page icon :: %s => %s', page_id, icon)
+            props['icon'] = icon.dict()
 
         if archived is False:
-            logger.info("Restoring page :: %s", page_id)
-            props["archived"] = False
+            logger.info('Restoring page :: %s', page_id)
+            props['archived'] = False
         elif archived is True:
-            logger.info("Archiving page :: %s", page_id)
-            props["archived"] = True
+            logger.info('Archiving page :: %s', page_id)
+            props['archived'] = True
 
         data = self.raw_api.update(page_id.hex, **props)
 
@@ -480,7 +481,7 @@ class SearchEndpoint(Endpoint):
         params = {}
 
         if text is not None:
-            params["query"] = text
+            params['query'] = text
 
         return QueryBuilder(endpoint=self.api.client.search, **params)
 
@@ -494,10 +495,10 @@ class UsersEndpoint(Endpoint):
         return self.api.client.users
 
     # https://developers.notion.com/reference/get-users
-    def list(self):
+    def as_list(self):
         """Return an iterator for all users in the workspace."""
 
-        logger.info("Listing known users...")
+        logger.info('Listing known users...')
 
         users = EndpointIterator(endpoint=self.raw_api.list)
 
@@ -507,7 +508,7 @@ class UsersEndpoint(Endpoint):
     def retrieve(self, user_id):
         """Return the User with the given ID."""
 
-        logger.info("Retrieving user :: %s", user_id)
+        logger.info('Retrieving user :: %s', user_id)
 
         data = self.raw_api.retrieve(user_id)
 
@@ -517,7 +518,7 @@ class UsersEndpoint(Endpoint):
     def me(self):
         """Return the current bot User."""
 
-        logger.info("Retrieving current integration bot")
+        logger.info('Retrieving current integration bot')
 
         data = self.raw_api.me()
 

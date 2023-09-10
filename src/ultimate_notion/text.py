@@ -1,9 +1,9 @@
 """Utilities for working text, markdown & Rich Text in Notion."""
 
 import re
-from typing import Iterator
+from collections.abc import Iterator
 
-from ultimate_notion.objects import RichText, Text, RichTextElem
+from ultimate_notion.objects import RichText, RichTextElem, Text
 
 # this might be a place to capture other utilities for working with markdown, text
 # rich text, etc...  the challenge is not importing types due to a circular ref.
@@ -46,14 +46,14 @@ def make_safe_python_name(name: str) -> str:
     invalid interior sequences to underscore.
     """
 
-    s = re.sub(r"[^0-9a-zA-Z_]+", "_", name)
-    s = re.sub(r"^[^a-zA-Z]+", "", s)
+    s = re.sub(r'[^0-9a-zA-Z_]+', '_', name)
+    s = re.sub(r'^[^a-zA-Z]+', '', s)
 
     # remove trailing underscores
-    return s.rstrip("_")
+    return s.rstrip('_')
 
 
 # ToDo: Get rid of that and make this available in RichTextList.
 def plain_text(*rtf):
     """Return the combined plain text from the list of RichText objects."""
-    return "".join(text.plain_text for text in rtf if text)
+    return ''.join(text.plain_text for text in rtf if text)

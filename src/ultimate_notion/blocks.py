@@ -14,7 +14,7 @@ from ultimate_notion.utils import Wrapper
 if TYPE_CHECKING:
     from ultimate_notion.session import Session
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
@@ -28,7 +28,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         if other is None:
             return False
         elif not isinstance(other, DataObject):
-            msg = f"Cannot compare {self.__class__.__name__} with {type(other).__name__}"
+            msg = f'Cannot compare {self.__class__.__name__} with {type(other).__name__}'
             raise RuntimeError(msg)
         else:
             return self.id == other.id
@@ -85,7 +85,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
             case None:
                 return ()
             case _:
-                return parent.parents + (parent,)
+                return (*parent.parents, parent)
 
     @property
     def has_children(self) -> bool:

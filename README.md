@@ -40,8 +40,8 @@ Ultimate Notion is distributed under the terms of the [MIT license](LICENSE.txt)
 
 ## Credits
 
-To start this project off a lot of inspiration and code was taken from [hatch] and [notional]. Ultimate Notion makes
-also have use of [notion-sdk-py].
+To start this project off a lot of inspiration and code was taken from [hatch] and [notional].
+Ultimate Notion uses internally [notion-sdk-py].
 
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/

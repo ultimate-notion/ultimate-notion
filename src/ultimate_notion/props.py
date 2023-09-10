@@ -6,10 +6,10 @@ The names of the properties reflect the name in the Notion UI.
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import ClassVar, Any, TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
-from ultimate_notion.objects import RichText, Option, User
+from ultimate_notion.objects import Option, RichText, User
 from ultimate_notion.text import rich_text
 from ultimate_notion.utils import Wrapper
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from ultimate_notion.objects import File
     from ultimate_notion.page import Page
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
@@ -55,7 +55,7 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
         return self.obj_ref.value
 
     @property
-    def id(self) -> str | None:
+    def id(self) -> str | None:  # noqa: A003
         return self.obj_ref.id
 
 
@@ -69,7 +69,7 @@ class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
 
     @property
     def value(self) -> str:
-        return "".join(text.plain_text for text in self.obj_ref.value)
+        return ''.join(text.plain_text for text in self.obj_ref.value)
 
 
 class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
@@ -88,7 +88,8 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
         """Return the Number as a `float`."""
 
         if self.obj_ref.number is None:
-            raise ValueError("Cannot convert 'None' to float")
+            msg = "Cannot convert 'None' to float"
+            raise ValueError(msg)
 
         return float(self.obj_ref.number)
 
@@ -96,7 +97,8 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
         """Return the Number as an `int`."""
 
         if self.obj_ref.number is None:
-            raise ValueError("Cannot convert 'None' to int")
+            msg = "Cannot convert 'None' to int"
+            raise ValueError(msg)
 
         return int(self.obj_ref.number)
 

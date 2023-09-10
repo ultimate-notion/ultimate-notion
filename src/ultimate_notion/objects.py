@@ -46,7 +46,7 @@ class RichText(list[RichTextElem]):
         return [elem.obj_ref for elem in self]
 
     @classmethod
-    def from_markdown(self, text: str) -> RichText:
+    def from_markdown(cls, text: str) -> RichText:
         """Create RichTextList by parsing the markdown"""
         # ToDo: Fix this cyclic import.
         # Rather have the rich_text logic here and provide convenience Func in `functions.py`

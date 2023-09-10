@@ -5,22 +5,21 @@ import logging
 import os
 from threading import RLock
 from types import TracebackType
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID
 
-from httpx import ConnectError
 import notion_client
+from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
-from ultimate_notion.obj_api.endpoints import NotionAPI
-from ultimate_notion.blocks import DataObject, Block
-from ultimate_notion.props import Title
+from ultimate_notion.blocks import Block, DataObject
 from ultimate_notion.database import Database
+from ultimate_notion.obj_api.endpoints import NotionAPI
+from ultimate_notion.objects import RichText, User
 from ultimate_notion.page import Page
+from ultimate_notion.props import Title
 from ultimate_notion.schema import PageSchema, Relation
-from ultimate_notion.objects import User, RichText
 from ultimate_notion.utils import ObjRef, SList, get_uuid
-from ultimate_notion.text import rich_text
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api import objects as objs
@@ -41,7 +40,8 @@ class SessionError(Exception):
 class Session:
     """A session for the Notion API
 
-    The session keeps tracks of all objects, e.g. pages, databases, etc. in an object store to avoid unnecessary calls to the API.
+    The session keeps tracks of all objects, e.g. pages, databases, etc.
+    in an object store to avoid unnecessary calls to the API.
     Use an explicit `.refresh()` to update an object.
     """
 
@@ -49,7 +49,7 @@ class Session:
     api: NotionAPI
     _active_session: Session | None = None
     _lock = RLock()
-    cache: dict[UUID, DataObject | User] = {}
+    cache: ClassVar[dict[UUID, DataObject | User]] = {}
 
     def __init__(self, auth: str | None = None, **kwargs: Any):
         """Initialize the `Session` object and the Notional endpoints.
@@ -235,7 +235,7 @@ class Session:
 
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace"""
-        return [self.cache.setdefault(user.id, User.wrap_obj_ref(user)) for user in self.api.users.list()]
+        return [self.cache.setdefault(user.id, User.wrap_obj_ref(user)) for user in self.api.users.as_list()]
 
     # ToDo: Also put blocks in the cache
     def get_block(self, block_ref: ObjRef):
