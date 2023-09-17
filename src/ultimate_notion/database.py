@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from textwrap import dedent
+from typing import cast
 
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -14,7 +15,6 @@ from ultimate_notion.utils import decapitalize, dict_diff_str
 from ultimate_notion.view import View
 
 
-# ToDo: This could also inherit from DataObject[objs.Database], wraps=.... and DataObject is a Generic!
 class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     """A Notion database object, not a linked databases
 
@@ -36,18 +36,8 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         cls_name = self.__class__.__name__
         return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
 
-    def reload(self, *, check_consistency: bool = False):
-        """Reload the metadata of the database and update the schema if necessary"""
-        new_db = self.session._get_db(self.id)  # circumvent session cache
-        if check_consistency and not self.schema.is_consistent_with(new_db.schema):
-            msg = f'Schema of database {self.title} no longer consistent with schema after refresh!'
-            raise SchemaError(msg)
-
-        self.schema._enrich(new_db.schema)
-        # self.obj_ref = new_db.obj_ref
-
     @property
-    def title(self) -> None | str:
+    def title(self) -> str | None:
         """Return the title of this database as plain text."""
         title = self.obj_ref.title
         if title is None or len(title) == 0:
@@ -71,17 +61,18 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def is_wiki(self) -> bool:
         """Is this database a wiki database"""
         # ToDo: Implement using the verification property
+        raise NotImplementedError
 
     def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[PageSchema]:
         """Reflection about the database schema"""
-        cls_name = f'{make_safe_python_name(self.title).capitalize()}Schema'
+        title = self.title if self.title else 'Untitled'
+        cls_name = f'{make_safe_python_name(title).capitalize()}Schema'
         attrs = {
-            decapitalize(make_safe_python_name(k)): Column(k, PropertyType.wrap_obj_ref(v))
+            decapitalize(make_safe_python_name(k)): Column(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
             for k, v in obj_ref.properties.items()
         }
-        schema = type(cls_name, (PageSchema,), attrs, db_title=self.title)
+        schema: type[PageSchema] = type(cls_name, (PageSchema,), attrs, db_title=title)
         schema.bind_db(self)
-        schema.custom_schema = False
         return schema
 
     @property

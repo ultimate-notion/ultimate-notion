@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from ultimate_notion.objects import File
     from ultimate_notion.page import Page
 
-T = TypeVar('T')
+T = TypeVar('T', bound=obj_props.PropertyValue)
 
 
 class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
@@ -45,7 +45,9 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
 
         super().__init__(values)
 
-    def __eq__(self, other: T) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, PropertyValue):
+            return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
     # ToDo: Make this abstract and implement in every subclass -> Generics
@@ -231,8 +233,11 @@ class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
         super().__init__(option)
 
     @property
-    def value(self) -> str:
-        return self.obj_ref.status.name
+    def value(self) -> str | None:
+        if self.obj_ref.status:
+            return self.obj_ref.status.name
+        else:
+            return None
 
 
 class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
@@ -248,7 +253,7 @@ class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
 class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSelect):
     """Notion multi-select type."""
 
-    def __init__(self, options: str | Option | list[str] | list[Option]):
+    def __init__(self, options: str | Option | list[str | Option]):
         if not isinstance(options, list):
             options = [options]
         options = [Option(option) if isinstance(option, str) else option for option in options]

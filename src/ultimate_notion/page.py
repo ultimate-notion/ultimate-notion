@@ -38,8 +38,10 @@ class PageProperties:
     """
 
     def __init__(self, page: Page):
+        if not page.database:
+            msg = f'Trying to set properties but page {page} is not bound to any database'
+            raise RuntimeError(msg)
         self._page = page
-        self._schema = page.database.schema
         self._properties = page.obj_ref.properties
 
     def __getitem__(self, prop_name: str) -> PropertyValue:
@@ -48,12 +50,17 @@ class PageProperties:
             msg = f'No such property: {prop_name}'
             raise AttributeError(msg)
 
-        return PropertyValue.wrap_obj_ref(obj_ref=prop)
+        return cast(PropertyValue, PropertyValue.wrap_obj_ref(obj_ref=prop))
 
     def __setitem__(self, prop_name: str, value: Any):
+        db = self._page.database
+        if db is None:
+            msg = f'Trying to set a property but page {self._page} is not bound to any database'
+            raise RuntimeError(msg)
+
         if not isinstance(value, PropertyValue):
             # construct concrete PropertyValue using the schema
-            prop_type = self._schema.to_dict()[prop_name]
+            prop_type = db.schema.to_dict()[prop_name]
             value = prop_type.prop_value(value)
 
         # update the property on the server (which will refresh the local data)
@@ -69,19 +76,20 @@ class PageProperties:
 
 
 class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
-    props: PageProperties | None = None
+    props: PageProperties
 
     def __init__(self, obj_ref):
         super().__init__(obj_ref)
-        self.props = self._create_prop_attrs() if self.database else None
+        self.props = self._create_prop_attrs()
 
     def _create_prop_attrs(self) -> PageProperties:
         """Create the attributes for the database properties of this page"""
         # We have to subclass in order to populate it with the descriptor `PageProperty``
         # as this only works on the class level and we want a unique class for each property.
         page_props_cls = type('_PageProperties', (PageProperties,), {})
-        for col in self.database.schema.get_cols():
-            setattr(page_props_cls, col.attr_name, PageProperty(col.name))
+        if self.database:
+            for col in self.database.schema.get_cols():
+                setattr(page_props_cls, col.attr_name, PageProperty(col.name))
         return page_props_cls(page=self)
 
     def __str__(self) -> str:

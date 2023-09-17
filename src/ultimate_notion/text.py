@@ -46,6 +46,8 @@ def make_safe_python_name(name: str) -> str:
     invalid interior sequences to underscore.
     """
 
+    # ToDo: Replace this function with `stringcase`
+
     s = re.sub(r'[^0-9a-zA-Z_]+', '_', name)
     s = re.sub(r'^[^a-zA-Z]+', '', s)
 

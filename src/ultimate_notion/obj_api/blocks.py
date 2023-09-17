@@ -21,7 +21,7 @@ from ultimate_notion.obj_api.objects import (
     UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyValue
-from ultimate_notion.obj_api.schema import PropertyObject
+from ultimate_notion.obj_api.schema import PropertyType
 
 
 class DataObject(NotionObject):
@@ -48,7 +48,7 @@ class Database(DataObject, object='database'):
     url: str = None
     icon: FileObject | EmojiObject | None = None
     cover: FileObject | None = None
-    properties: dict[str, PropertyObject] = Field(default_factory=dict)
+    properties: dict[str, PropertyType] = Field(default_factory=dict)
     description: list[RichTextObject] | None = None
     is_inline: bool = False
 

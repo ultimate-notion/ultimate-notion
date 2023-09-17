@@ -19,7 +19,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     options = [Option(name='Option1'), Option(name='Option2', color='red')]
 
     class SchemaB(PageSchema, db_title='Schema B'):
-        """Only used to create relations in Schema B"""
+        """Acutal interesting schema/db"""
 
         checkbox = Column('Checkbox', schema.Checkbox())
         created_by = Column('Created by', schema.CreatedBy())
@@ -119,3 +119,23 @@ def test_wiki_db_schema(wiki_db: Database):
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
     wiki_db.view()
+
+
+def test_two_way_prop(notion: Session, root_page: Page):
+    class SchemaA(PageSchema, db_title='Schema A'):
+        """Only used to create relations in Schema B"""
+
+        name = Column('Name', schema.Title())
+        relation = Column('Relation', schema.Relation())
+
+    class SchemaB(PageSchema, db_title='Schema B'):
+        """Only used to create relations in Schema B"""
+
+        relation_twoway = Column('Relation two-way', schema.Relation(SchemaA, two_way_prop=SchemaA.relation))
+        title = Column('Title', schema.Title())
+
+    db_a = notion.create_db(parent=root_page, schema=SchemaA)
+    db_b = notion.create_db(parent=root_page, schema=SchemaB)
+
+    assert db_b.schema.relation_twoway.type.two_way_prop is SchemaA.relation  # type: ignore
+    assert db_a.schema.relation.type.two_way_prop is SchemaB.relation_twoway  # type: ignore

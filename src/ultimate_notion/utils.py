@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 KT = TypeVar('KT')
 VT = TypeVar('VT')
-SelfT = TypeVar('SelfT', bound='Wrapper')  # Todo: Newer Python versions provide `Self` directly!
 ObjRef: TypeAlias = UUID | str
 
 
@@ -212,33 +211,24 @@ def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT
 def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str]:
     """Returns the added keys, removed keys and keys of changed values of both dictionaries as strings for printing"""
     keys_added, keys_removed, values_changed = dict_diff(dct1, dct2)
-    keys_added_str = ', '.join(keys_added) or 'None'
-    keys_removed_str = ', '.join(keys_removed) or 'None'
+    keys_added_str = ', '.join([str(k) for k in keys_added]) or 'None'
+    keys_removed_str = ', '.join([str(k) for k in keys_removed]) or 'None'
     keys_changed_str = ', '.join(f'{k}: {v[0]} -> {v[1]}' for k, v in values_changed.items()) or 'None'
     return keys_added_str, keys_removed_str, keys_changed_str
 
 
-# ToDo: Check if this is needed actually
-# def ensure_list_of_type(data: Any | list[Any], required_type: type[T]) -> list[T]:
-#     if not isinstance(data, list):
-#         data = [data]
-
-#     return [item if isinstance(item, required_type) else required_type(item) for item in data]
-
-
-# ToDo: Use this generic wrapper everywhere possible and reduce code!
 class Wrapper(Generic[T]):
     """Convert objects from the obj-based API to the high-level API and vice versa"""
 
     obj_ref: T
 
-    _obj_api_map: ClassVar[dict[type[T], type[SelfT]]] = {}
+    _obj_api_map: ClassVar[dict[type[T], type[Wrapper]]] = {}  # type: ignore[misc]
 
     def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[wraps] = cls
 
-    def __new__(cls, *args, **kwargs) -> SelfT:
+    def __new__(cls: type[Wrapper], *args, **kwargs) -> Wrapper:
         # Needed for wrap_obj_ref and its call to __new__ to work!
         return super().__new__(cls)
 
@@ -247,12 +237,12 @@ class Wrapper(Generic[T]):
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: T) -> SelfT:
+    def wrap_obj_ref(cls, obj_ref: T) -> Wrapper[T]:
         hl_cls = cls._obj_api_map[type(obj_ref)]
         hl_obj = hl_cls.__new__(hl_cls)
         hl_obj.obj_ref = obj_ref
         return hl_obj
 
     @property
-    def _obj_api_map_inv(self) -> dict[type[SelfT], type[T]]:
+    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[T]]:
         return {v: k for k, v in self._obj_api_map.items()}

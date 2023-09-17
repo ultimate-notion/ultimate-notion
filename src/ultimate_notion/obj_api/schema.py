@@ -12,26 +12,26 @@ from ultimate_notion.obj_api.enums import Function, NumberFormat
 from ultimate_notion.obj_api.objects import SelectOption
 
 
-class PropertyObject(TypedObject):
+class PropertyType(TypedObject):
     """Base class for Notion property objects."""
 
     id: str | None = None  # noqa: A003
     name: str | None = None
 
 
-class Title(PropertyObject, type='title'):
+class Title(PropertyType, type='title'):
     """Defines the title configuration for a database property."""
 
     title: Any = Field(default_factory=dict)
 
 
-class RichText(PropertyObject, type='rich_text'):
+class RichText(PropertyType, type='rich_text'):
     """Defines the rich text configuration for a database property."""
 
     rich_text: Any = Field(default_factory=dict)
 
 
-class Number(PropertyObject, type='number'):
+class Number(PropertyType, type='number'):
     """Defines the number configuration for a database property."""
 
     class _NestedData(GenericObject):
@@ -52,7 +52,7 @@ class Number(PropertyObject, type='number'):
         return cls(number=cls._NestedData(format=format))
 
 
-class Select(PropertyObject, type='select'):
+class Select(PropertyType, type='select'):
     """Defines the select configuration for a database property."""
 
     class _NestedData(GenericObject):
@@ -66,7 +66,7 @@ class Select(PropertyObject, type='select'):
         return cls(select=cls._NestedData(options=options))
 
 
-class MultiSelect(PropertyObject, type='multi_select'):
+class MultiSelect(PropertyType, type='multi_select'):
     """Defines the multi-select configuration for a database property."""
 
     class _NestedData(GenericObject):
@@ -80,55 +80,55 @@ class MultiSelect(PropertyObject, type='multi_select'):
         return cls(multi_select=cls._NestedData(options=options))
 
 
-class Status(PropertyObject, type='status'):
+class Status(PropertyType, type='status'):
     """Defines the status configuration for a database property."""
 
     status: Any = Field(default_factory=dict)
 
 
-class Date(PropertyObject, type='date'):
+class Date(PropertyType, type='date'):
     """Defines the date configuration for a database property."""
 
     date: Any = Field(default_factory=dict)
 
 
-class People(PropertyObject, type='people'):
+class People(PropertyType, type='people'):
     """Defines the people configuration for a database property."""
 
     people: Any = Field(default_factory=dict)
 
 
-class Files(PropertyObject, type='files'):
+class Files(PropertyType, type='files'):
     """Defines the files configuration for a database property."""
 
     files: Any = Field(default_factory=dict)
 
 
-class Checkbox(PropertyObject, type='checkbox'):
+class Checkbox(PropertyType, type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
     checkbox: Any = Field(default_factory=dict)
 
 
-class Email(PropertyObject, type='email'):
+class Email(PropertyType, type='email'):
     """Defines the email configuration for a database property."""
 
     email: Any = Field(default_factory=dict)
 
 
-class URL(PropertyObject, type='url'):
+class URL(PropertyType, type='url'):
     """Defines the URL configuration for a database property."""
 
     url: Any = Field(default_factory=dict)
 
 
-class PhoneNumber(PropertyObject, type='phone_number'):
+class PhoneNumber(PropertyType, type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
     phone_number: Any = Field(default_factory=dict)
 
 
-class Formula(PropertyObject, type='formula'):
+class Formula(PropertyType, type='formula'):
     """Defines the formula configuration for a database property."""
 
     class _NestedData(GenericObject):
@@ -183,13 +183,13 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
         return Relation(relation=DualPropertyRelation(database_id=dbref))
 
 
-class Relation(PropertyObject, type='relation'):
+class Relation(PropertyType, type='relation'):
     """Defines the relation configuration for a database property."""
 
     relation: PropertyRelation = PropertyRelation()
 
 
-class Rollup(PropertyObject, type='rollup'):
+class Rollup(PropertyType, type='rollup'):
     """Defines the rollup configuration for a database property."""
 
     class _NestedData(GenericObject):
@@ -217,37 +217,37 @@ class Rollup(PropertyObject, type='rollup'):
         )
 
 
-class CreatedTime(PropertyObject, type='created_time'):
+class CreatedTime(PropertyType, type='created_time'):
     """Defines the created-time configuration for a database property."""
 
     created_time: Any = Field(default_factory=dict)
 
 
-class CreatedBy(PropertyObject, type='created_by'):
+class CreatedBy(PropertyType, type='created_by'):
     """Defines the created-by configuration for a database property."""
 
     created_by: Any = Field(default_factory=dict)
 
 
-class LastEditedBy(PropertyObject, type='last_edited_by'):
+class LastEditedBy(PropertyType, type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
     last_edited_by: Any = Field(default_factory=dict)
 
 
-class LastEditedTime(PropertyObject, type='last_edited_time'):
+class LastEditedTime(PropertyType, type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
     last_edited_time: Any = Field(default_factory=dict)
 
 
-class UniqueID(PropertyObject, type='unique_id'):
+class UniqueID(PropertyType, type='unique_id'):
     """Unique ID database property"""
 
     unique_id: Any = Field(default_factory=dict)
 
 
-class Verification(PropertyObject, type='verification'):
+class Verification(PropertyType, type='verification'):
     """Verfication database property of Wiki databases"""
 
     verification: Any = Field(default_factory=dict)

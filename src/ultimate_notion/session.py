@@ -5,7 +5,7 @@ import logging
 import os
 from threading import RLock
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 from uuid import UUID
 
 import notion_client
@@ -136,10 +136,11 @@ class Session:
                 if not (isinstance(prop_type, Relation) and not prop_type.schema)
             }
             schema_dct = {k: v.obj_ref for k, v in schema_no_backrels_dct.items()}
+            db_obj = self.api.databases.create(parent=parent.obj_ref, title=schema.db_title, schema=schema_dct)
         else:
             schema_dct = {}
+            db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
 
-        db_obj = self.api.databases.create(parent=parent.obj_ref, title=schema.db_title, schema=schema_dct)
         db = Database(obj_ref=db_obj)
 
         if schema:
@@ -167,7 +168,7 @@ class Session:
             exact: perform an exact search, not only a substring match
         """
         query = self.api.search(db_name).filter(property='object', value='database')
-        dbs = SList(self.cache.get(db.id, Database(obj_ref=db)) for db in query.execute())
+        dbs = SList(cast(Database, self.cache.setdefault(db.id, Database(obj_ref=db))) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
         return dbs
@@ -180,7 +181,7 @@ class Session:
         """Retrieve Notion database by uuid"""
         db_uuid = get_uuid(db_ref)
         if db_uuid in self.cache:
-            return self.cache[db_uuid]
+            return cast(Database, self.cache[db_uuid])
         else:
             db = Database(obj_ref=self.api.databases.retrieve(db_uuid))
             self.cache[db.id] = db
@@ -194,7 +195,7 @@ class Session:
             exact: perform an exact search, not only a substring match
         """
         query = self.api.search(title).filter(property='object', value='page')
-        pages = SList(self.cache.setdefault(page.id, Page(obj_ref=page)) for page in query.execute())
+        pages = SList(cast(Page, self.cache.setdefault(page.id, Page(obj_ref=page))) for page in query.execute())
         if exact and title is not None:
             pages = SList(page for page in pages if page.title.value == title)
         return pages
@@ -202,7 +203,7 @@ class Session:
     def get_page(self, page_ref: ObjRef) -> Page:
         page_uuid = get_uuid(page_ref)
         if page_uuid in self.cache:
-            return self.cache[page_uuid]
+            return cast(Page, self.cache[page_uuid])
         else:
             page = Page(obj_ref=self.api.pages.retrieve(page_uuid))
             self.cache[page.id] = page
@@ -222,7 +223,7 @@ class Session:
     def get_user(self, user_ref: ObjRef) -> User:
         user_uuid = get_uuid(user_ref)
         if user_uuid in self.cache:
-            return self.cache[user_uuid]
+            return cast(User, self.cache[user_uuid])
         else:
             user = User.wrap_obj_ref(self._get_user(user_uuid))
             self.cache[user.id] = user
@@ -231,11 +232,13 @@ class Session:
     def whoami(self) -> User:
         """Return the user object of this bot"""
         user = self.api.users.me()
-        return self.cache.setdefault(user.id, User.wrap_obj_ref(user))
+        return cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user)))
 
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace"""
-        return [self.cache.setdefault(user.id, User.wrap_obj_ref(user)) for user in self.api.users.as_list()]
+        return [
+            cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.as_list()
+        ]
 
     # ToDo: Also put blocks in the cache
     def get_block(self, block_ref: ObjRef):

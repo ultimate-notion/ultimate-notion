@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 from uuid import UUID
 
 from notion_client.helpers import get_url
@@ -14,7 +14,7 @@ from ultimate_notion.utils import Wrapper
 if TYPE_CHECKING:
     from ultimate_notion.session import Session
 
-T = TypeVar('T')
+T = TypeVar('T', bound=obj_blocks.DataObject)
 
 
 class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
@@ -98,19 +98,6 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     @property
     def url(self) -> str:
         return get_url(str(self.id))
-
-    @property
-    def properties(self) -> dict[str, Any]:
-        return {
-            'id': self.id,
-            'created_time': self.created_time,
-            'created_by': self.created_by,
-            'last_edited_time': self.last_edited_time,
-            'last_edited_by': self.last_edited_by,
-            'parent': self.parent,
-            'has_children': self.has_children,
-            'archived': self.archived,
-        }
 
 
 class Block(DataObject[obj_blocks.Block], wraps=obj_blocks.Block):

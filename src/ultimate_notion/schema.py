@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from ultimate_notion.page import Page
 
 # Todo: Move the functionality from the PyDantic types in here
-T = TypeVar('T')
+T = TypeVar('T', bound=obj_schema.PropertyType)
 
 
 class SchemaError(Exception):
@@ -65,8 +65,6 @@ class PageSchema:
     """Base class for the schema of a database."""
 
     db_title: str
-    # ToDo: if custom_schema is True don't allow changing the schema otherwise it's fine
-    custom_schema: bool = True
     _database: Database | None = None
 
     def __init_subclass__(cls, db_title: str, **kwargs: Any):
@@ -77,6 +75,7 @@ class PageSchema:
     def from_dict(cls, schema_dct: dict[str, PropertyType], db_title: str | None = None) -> PageSchema:
         """Creation of a schema from a dictionary for easy support of dynamically created schemas"""
         # ToDo: Implement
+        raise NotImplementedError
 
     @classmethod
     def create(cls, **kwargs) -> Page:
@@ -84,14 +83,13 @@ class PageSchema:
         return cls.get_db().create_page(**kwargs)
 
     @classmethod
-    def reload(cls, *, check_consistency: bool = False):
-        db = cls.get_db()
-        db.reload(check_consistency=check_consistency)
-
-    @classmethod
     def get_cols(cls) -> list[Column]:
         """Return all columns of this schema"""
         return [col for col in cls.__dict__.values() if isinstance(col, Column)]
+
+    @classmethod
+    def get_col(cls, col_name: str) -> Column:
+        return SList([col for col in cls.get_cols() if col.name == col_name]).item()
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
@@ -126,7 +124,7 @@ class PageSchema:
 
     @classmethod
     def get_db(cls) -> Database:
-        if cls.is_bound():
+        if cls.is_bound() and cls._database:
             return cls._database
         else:
             raise SchemaNotBoundError(cls)
@@ -170,7 +168,7 @@ class PageSchema:
                 prop_type.obj_ref = obj_ref
 
 
-class PropertyType(Wrapper[T], wraps=obj_schema.PropertyObject):
+class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     """Base class for Notion property objects.
 
     Used to map high-level objects to low-level Notion-API objects
@@ -189,15 +187,13 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyObject):
         """Return if this property type is read-only"""
         return self.prop_value.readonly
 
-    @property
-    def _obj_api_map_inv(self) -> dict[type[PropertyType], type[obj_schema.PropertyObject]]:
-        return {v: k for k, v in self._obj_api_map.items()}
-
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
-    def __eq__(self, other: PropertyType):
+    def __eq__(self, other: object):
+        if not isinstance(other, PropertyType):
+            return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
 
@@ -323,40 +319,44 @@ class RelationError(SchemaError):
 class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
     """Relation to another database"""
 
-    obj_ref: obj_schema.Relation | None = None
-    _schema: PageSchema | None = None
+    _schema: type[PageSchema] | None = None
     _two_way_prop: Column | None = None
 
     def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Column | None = None):
         if two_way_prop and not schema:
             msg = '`schema` needs to be provided if `two_way_prop` is set'
             raise RuntimeError(msg)
-        if isinstance(schema, type):
-            schema = schema()
         self._schema = schema
         self._two_way_prop = two_way_prop
 
     @property
     def schema(self) -> type[PageSchema] | None:
+        """Schema of the relation database"""
         if self._schema:
             return self._schema
         elif self.prop_ref._schema.is_bound():
             db = self.prop_ref._schema._database
-            return db.session.get_db(self.obj_ref.relation.database_id).schema
+            return db.session.get_db(self.obj_ref.relation.database_id).schema if db else None
         else:
-            return self._schema
+            return None
 
     @property
     def is_two_way(self) -> bool:
         return self.two_way_prop is not None
 
     @property
-    def two_way_prop(self) -> Column:
-        if self.obj_ref and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
-            # ToDo: This should actually return a property! We might have to resolve things here.
-            return self.obj_ref.relation.dual_property.synced_property_name
-        else:
+    def two_way_prop(self) -> Column | None:
+        if self._two_way_prop:
             return self._two_way_prop
+        elif (
+            hasattr(self, 'obj_ref')
+            and self.schema
+            and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation)
+        ):
+            prop_name = self.obj_ref.relation.dual_property.synced_property_name
+            return self.schema.get_col(prop_name) if prop_name else None
+        else:
+            return None
 
     def make_obj_ref(self):
         try:

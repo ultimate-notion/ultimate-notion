@@ -273,7 +273,7 @@ dependencies = [
     "ruff>=0.0.259",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive"
+typing = "mypy --install-types --non-interactive {args}"
 style = [
     "ruff {args:.}",
     "black --check --diff .",

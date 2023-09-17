@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.utils import Wrapper
 
@@ -66,7 +68,7 @@ class RichText(list[RichTextElem]):
 class User(Wrapper[objs.User], wraps=objs.User):
     @classmethod
     def wrap_obj_ref(cls, obj_ref: objs.User) -> User:
-        self = cls.__new__(cls)
+        self = cast(User, cls.__new__(cls))
         self.obj_ref = obj_ref
         return self
 

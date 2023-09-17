@@ -248,7 +248,7 @@ class QueryBuilder:
         """Initialize a new `QueryBuilder` for the given endpoint."""
 
         self.endpoint = endpoint
-        self.datatype = datatype
+        self.datatype = datatype  # ToDo: See if this is really needed or if we can get rid of it!
         self.params = params
 
         self.query = Query()
@@ -289,10 +289,6 @@ class QueryBuilder:
 
     def sort(self, sort=None, **kwargs):
         """Add the given sort elements to the query."""
-
-        # XXX should this support ORM properties also?
-        # e.g. - query.sort(property=Task.Title)
-        # but users won't always use ORM for queries...
 
         if sort is None:
             sort = PropertySort(**kwargs)

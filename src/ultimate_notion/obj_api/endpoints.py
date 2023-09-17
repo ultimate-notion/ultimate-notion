@@ -14,7 +14,7 @@ from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, TextObject, User
 from ultimate_notion.obj_api.props import PropertyItem, Title
 from ultimate_notion.obj_api.query import QueryBuilder
-from ultimate_notion.obj_api.schema import PropertyObject
+from ultimate_notion.obj_api.schema import PropertyType
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +183,7 @@ class DatabasesEndpoint(Endpoint):
     def _build_request(
         self,
         parent: ParentRef | None = None,
-        schema: dict[str, PropertyObject] | None = None,
+        schema: dict[str, PropertyType] | None = None,
         title=None,
     ):
         """Build a request payload from the given items.
@@ -208,7 +208,7 @@ class DatabasesEndpoint(Endpoint):
         return request
 
     # https://developers.notion.com/reference/create-a-database
-    def create(self, parent, schema: dict[str, PropertyObject], title=None):
+    def create(self, parent, schema: dict[str, PropertyType], title=None):
         """Add a database to the given Page parent.
 
         `parent` may be any suitable `PageRef` type.
@@ -240,7 +240,7 @@ class DatabasesEndpoint(Endpoint):
         return Database.parse_obj(data)
 
     # https://developers.notion.com/reference/update-a-database
-    def update(self, dbref, title=None, schema: dict[str, PropertyObject] | None = None):
+    def update(self, dbref, title=None, schema: dict[str, PropertyType] | None = None):
         """Update the Database object on the server.
 
         The database info will be refreshed to the latest version from the server.
