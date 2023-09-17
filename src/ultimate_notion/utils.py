@@ -167,11 +167,6 @@ def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject) -> UUID:
     return objs.ObjectReference.build(obj).id
 
 
-def decapitalize(string: str) -> str:
-    """Inverse of capitalize"""
-    return string[0].lower() + string[1:]
-
-
 def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
     """Returns the added keys, removed keys and keys of changed values of both dictionaries"""
     set1, set2 = set(dct1.keys()), set(dct2.keys())

@@ -12,12 +12,6 @@ from ultimate_notion.objects import RichText, RichTextElem, Text
 MAX_TEXT_OBJECT_SIZE = 2000
 
 
-# ToDo: Check where this is needed and reimplement in the highest-level
-# def plain_text(*rtf):
-#     """Return the combined plain text from the list of RichText objects."""
-#     return "".join(text.plain_text for text in rtf if text)
-
-
 def chunky(text: str, length: int = MAX_TEXT_OBJECT_SIZE) -> Iterator[str]:
     """Break the given `text` into chunks of at most `length` size."""
     return (text[idx : idx + length] for idx in range(0, len(text), length))
@@ -39,20 +33,40 @@ def rich_text(text: str) -> RichText:
     return RichText(rich_texts)
 
 
-def make_safe_python_name(name: str) -> str:
-    """Make the given string safe for use as a Python identifier.
+def python_identifier(string: str) -> str:
+    """Make a valid Python identifier
 
     This will remove any leading characters that are not valid and change all
     invalid interior sequences to underscore.
+
+    Attention: This may result in an empty string!
     """
-
-    # ToDo: Replace this function with `stringcase`
-
-    s = re.sub(r'[^0-9a-zA-Z_]+', '_', name)
+    s = re.sub(r'[^0-9a-zA-Z_]+', '_', string)
     s = re.sub(r'^[^a-zA-Z]+', '', s)
-
-    # remove trailing underscores
     return s.rstrip('_')
+
+
+def snake_case(string: str) -> str:
+    """Make a Python identifier in snake_case.
+
+    Attention: This may result in an empty string!
+    """
+    return python_identifier(string).lower()
+
+
+def camel_case(string: str) -> str:
+    """Make a Python identifier in CamelCase.
+
+    Attention: This may result in an empty string!
+    """
+    return ''.join([elem.capitalize() for elem in snake_case(string).split('_')])
+
+
+def decapitalize(string: str) -> str:
+    """Inverse of capitalize"""
+    if not string:
+        return string
+    return string[0].lower() + string[1:]
 
 
 # ToDo: Get rid of that and make this available in RichTextList.

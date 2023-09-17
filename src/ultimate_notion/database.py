@@ -10,8 +10,8 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
 from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
-from ultimate_notion.text import make_safe_python_name, plain_text
-from ultimate_notion.utils import decapitalize, dict_diff_str
+from ultimate_notion.text import camel_case, plain_text, snake_case
+from ultimate_notion.utils import dict_diff_str
 from ultimate_notion.view import View
 
 
@@ -66,9 +66,9 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[PageSchema]:
         """Reflection about the database schema"""
         title = self.title if self.title else 'Untitled'
-        cls_name = f'{make_safe_python_name(title).capitalize()}Schema'
+        cls_name = f'{camel_case(title)}Schema'
         attrs = {
-            decapitalize(make_safe_python_name(k)): Column(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
+            snake_case(k): Column(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
             for k, v in obj_ref.properties.items()
         }
         schema: type[PageSchema] = type(cls_name, (PageSchema,), attrs, db_title=title)
