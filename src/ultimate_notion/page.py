@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
-from notion2md.exporter.block import StringExporter
-
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -38,9 +36,6 @@ class PageProperties:
     """
 
     def __init__(self, page: Page):
-        if not page.database:
-            msg = f'Trying to set properties but page {page} is not bound to any database'
-            raise RuntimeError(msg)
         self._page = page
         self._properties = page.obj_ref.properties
 
@@ -93,7 +88,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return page_props_cls(page=self)
 
     def __str__(self) -> str:
-        return self.show(display=False)
+        return repr(self)
 
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
@@ -140,11 +135,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def markdown(self) -> str:
         """Return the content of the page as Markdown"""
-        md = f'# {self.title}\n'
-        # ToDo: This retrieves the content again, could be done internally.
-        #       Also notion2md is quiet buggy in generating MD and notion2markdown is better but hard to use.
-        md += StringExporter(block_id=str(self.id)).export()
-        return md
+        raise NotImplementedError
 
     @overload
     def show(self, *, display: Literal[False]) -> str:

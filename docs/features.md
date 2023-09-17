@@ -35,7 +35,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [ ] navigating  pages using references of parent and children
 - [ ] reading the blocks within a page
 - [ ] adding/removing and modifying the blocks within a page
-- [x] viewing the page content as [Markdown]
+- [ ] viewing the page content as [Markdown]
 
 ## Blocks
 
