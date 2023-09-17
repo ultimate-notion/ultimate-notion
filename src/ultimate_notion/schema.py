@@ -64,10 +64,10 @@ class ReadOnlyColumnError(SchemaError):
 class PageSchema:
     """Base class for the schema of a database."""
 
-    db_title: str
+    db_title: str | None
     _database: Database | None = None
 
-    def __init_subclass__(cls, db_title: str, **kwargs: Any):
+    def __init_subclass__(cls, db_title: str | None, **kwargs: Any):
         cls.db_title = db_title
         super().__init_subclass__(**kwargs)
 

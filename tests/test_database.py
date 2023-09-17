@@ -1,6 +1,6 @@
 import pytest
 
-from ultimate_notion import database, schema
+from ultimate_notion import Page, Session, database, schema
 
 
 def test_schema(article_db: database.Database):
@@ -29,3 +29,16 @@ def test_schema(article_db: database.Database):
 
     with pytest.raises(schema.SchemaError):
         article_db.schema = WrongSchema
+
+
+def test_db_without_title(notion: Session, root_page: Page):
+    """Simple database of articles"""
+
+    class Article(schema.PageSchema, db_title=None):
+        name = schema.Column('Name', schema.Title())
+        cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
+        desc = schema.Column('Description', schema.Text())
+
+    db = notion.create_db(parent=root_page, schema=Article)
+    assert db.title is None
+    db.delete()
