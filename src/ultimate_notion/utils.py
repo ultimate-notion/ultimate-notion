@@ -1,21 +1,14 @@
 """Additional utilities that fit nowhere else"""
 from __future__ import annotations
 
-from collections.abc import Callable
 from copy import deepcopy
 from functools import wraps
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar
+from typing import Any, ClassVar, Generic, TypeAlias, TypeVar
 from uuid import UUID
 
 import numpy as np
-from notion_client.errors import APIResponseError
-from polling2 import poll
 
 from ultimate_notion.obj_api import objects as objs
-
-if TYPE_CHECKING:
-    from ultimate_notion.blocks import DataObject
-
 
 T = TypeVar('T')
 KT = TypeVar('KT')
@@ -172,26 +165,6 @@ def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject) -> UUID:
     Only meant for internal use.
     """
     return objs.ObjectReference.build(obj).id
-
-
-def wait_until_exists(record: DataObject, step: int = 1, timeout: int = 10):
-    """Wait until object exists after creation
-
-    In most cases, this is not really necessary to use.
-    """
-    from ultimate_notion.database import Database
-    from ultimate_notion.page import Page
-
-    poll_func: Callable[[UUID | str], DataObject]
-    if isinstance(record, Database):
-        poll_func = record.session.get_db
-    elif isinstance(record, Page):
-        poll_func = record.session.get_page
-    else:  # Todo: Should we handle blocks here too?
-        msg = f'Unknown object type: {type(record)}'
-        raise RuntimeError(msg)
-
-    poll(lambda: poll_func(record.id), step=step, timeout=timeout, ignore_exceptions=(APIResponseError,))
 
 
 def decapitalize(string: str) -> str:
