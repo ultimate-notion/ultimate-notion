@@ -63,7 +63,7 @@ def root_page(notion: Session):
 
 
 @pytest.fixture
-def simple_db(notion: Session, root_page: Page):
+def article_db(notion: Session, root_page: Page):
     """Simple database of articles"""
 
     class Article(schema.PageSchema, db_title='Articles'):

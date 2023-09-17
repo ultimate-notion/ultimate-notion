@@ -3,8 +3,9 @@ import pytest
 from ultimate_notion import database, schema
 
 
-def test_schema(simple_db: database.Database):
-    ref_schema = simple_db.schema
+def test_schema(article_db: database.Database):
+    ref_schema = article_db.schema
+    assert article_db.title == 'Articles'
 
     assert issubclass(ref_schema, schema.PageSchema)
     db_schema = {
@@ -19,7 +20,7 @@ def test_schema(simple_db: database.Database):
         cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Column('Description', schema.Text())
 
-    simple_db.schema = MySchema
+    article_db.schema = MySchema
 
     class WrongSchema(schema.PageSchema, db_title='My Wrong Schema'):
         name = schema.Column('Name', schema.Title())
@@ -27,4 +28,4 @@ def test_schema(simple_db: database.Database):
         desc = schema.Column('Description', schema.Text())
 
     with pytest.raises(schema.SchemaError):
-        simple_db.schema = WrongSchema
+        article_db.schema = WrongSchema

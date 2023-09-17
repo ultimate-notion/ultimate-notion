@@ -44,12 +44,13 @@ class DataObject(NotionObject):
 class Database(DataObject, object='database'):
     """A database record type."""
 
-    title: list[RichTextObject] = None
+    title: list[RichTextObject] = Field(default_factory=list)
     url: str = None
+    public_url: str | None = None
     icon: FileObject | EmojiObject | None = None
     cover: FileObject | None = None
     properties: dict[str, PropertyType] = Field(default_factory=dict)
-    description: list[RichTextObject] | None = None
+    description: list[RichTextObject] = Field(default_factory=list)
     is_inline: bool = False
 
 
@@ -57,6 +58,7 @@ class Page(DataObject, object='page'):
     """A standard Notion page object."""
 
     url: str = None
+    public_url: str | None = None
     icon: FileObject | EmojiObject | None = None
     cover: FileObject | None = None
     properties: dict[str, PropertyValue] = Field(default_factory=dict)

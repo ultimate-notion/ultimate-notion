@@ -3,11 +3,6 @@
 import re
 from collections.abc import Iterator
 
-from ultimate_notion.objects import RichText, RichTextElem, Text
-
-# this might be a place to capture other utilities for working with markdown, text
-# rich text, etc...  the challenge is not importing types due to a circular ref.
-
 # the max text size according to the Notion API is 2000 characters.
 MAX_TEXT_OBJECT_SIZE = 2000
 
@@ -15,22 +10,6 @@ MAX_TEXT_OBJECT_SIZE = 2000
 def chunky(text: str, length: int = MAX_TEXT_OBJECT_SIZE) -> Iterator[str]:
     """Break the given `text` into chunks of at most `length` size."""
     return (text[idx : idx + length] for idx in range(0, len(text), length))
-
-
-def rich_text(text: str) -> RichText:
-    """Convert markdown text to rich text objects"""
-
-    # ToDo: Actual markdown parsing and interpretation not implemented!
-    # This is just a dummy that respects the MAX_TEXT_OBJECT_SIZE
-    # No handling of mentions, formula, etc. yet done as well as proper styling with annotations
-    # Idea: Markdown parser that creates for each token like "**bold**" or "[link](https://...)"
-    # the corresponding RichText Object.
-
-    rich_texts: list[RichTextElem] = []
-    for part in chunky(text):
-        rich_texts.append(Text(part))
-
-    return RichText(rich_texts)
 
 
 def python_identifier(string: str) -> str:
@@ -57,7 +36,7 @@ def snake_case(string: str) -> str:
 def camel_case(string: str) -> str:
     """Make a Python identifier in CamelCase.
 
-    Attention: This may result in an empty string!
+    Attention: This may result in an empty string and a CamelCase sting will be capitalized!
     """
     return ''.join([elem.capitalize() for elem in snake_case(string).split('_')])
 
@@ -67,9 +46,3 @@ def decapitalize(string: str) -> str:
     if not string:
         return string
     return string[0].lower() + string[1:]
-
-
-# ToDo: Get rid of that and make this available in RichTextList.
-def plain_text(*rtf):
-    """Return the combined plain text from the list of RichText objects."""
-    return ''.join(text.plain_text for text in rtf if text)

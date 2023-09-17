@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion.objects import Option, RichText, User
-from ultimate_notion.text import rich_text
 from ultimate_notion.utils import Wrapper
 
 if TYPE_CHECKING:
@@ -66,7 +65,7 @@ class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
 
     def __init__(self, text: str | RichText):
         if isinstance(text, str):
-            text = rich_text(text)
+            text = RichText.from_plain_text(text)
         super().__init__(text)
 
     @property
@@ -79,7 +78,7 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
 
     def __init__(self, text: str | RichText):
         if isinstance(text, str):
-            text = rich_text(text)
+            text = RichText.from_plain_text(text)
         super().__init__(text)
 
 
