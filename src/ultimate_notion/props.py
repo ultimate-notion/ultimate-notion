@@ -208,11 +208,13 @@ class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
 class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
     """Date(-time) property value"""
 
+    # ToDo: Also use `time_zone` here defined in obj_api props or objects
     def __init__(self, start: datetime | date, end: datetime | date | None = None):
         self.obj_ref = obj_props.Date.build(start, end)
 
     @property
     def value(self) -> None | datetime | date | tuple[datetime | date, datetime | date]:
+        # ToDo: Set `time_zone` accordingly if provided
         date = self.obj_ref.date
         if date is None:
             return None

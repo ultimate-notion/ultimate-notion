@@ -159,7 +159,8 @@ class Bot(User, type='bot'):
     """Represents a Bot in Notion."""
 
     class _NestedData(GenericObject):
-        pass
+        owner: WorkspaceRef = None
+        workspace_name: str = None
 
     bot: _NestedData = None
 
@@ -226,6 +227,7 @@ class DateRange(GenericObject):
 
     start: date | datetime
     end: date | datetime | None = None
+    time_zone: str | None = None
 
 
 class Annotations(GenericObject):

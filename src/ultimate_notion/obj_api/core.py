@@ -39,7 +39,7 @@ def serialize_to_api(data):
     return data
 
 
-class GenericObject(BaseModel):
+class GenericObject(BaseModel, extra='forbid'):
     """The base for all API objects.
 
     As a general convention, data fields in lower case are defined by the
