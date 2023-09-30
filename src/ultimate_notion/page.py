@@ -58,7 +58,7 @@ class PageProperties:
             prop_type = db.schema.to_dict()[prop_name]
             value = prop_type.prop_value(value)
 
-        # update the property on the server (which will refresh the local data)
+        # update the property on the server (which will update the local data)
         self._page.session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
 
     def __iter__(self):

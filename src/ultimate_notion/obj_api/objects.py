@@ -3,14 +3,20 @@
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
 """
+from __future__ import annotations
+
 from copy import deepcopy
 from datetime import date, datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from ultimate_notion.obj_api import util
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import Color, FullColor
+
+if TYPE_CHECKING:
+    from ultimate_notion.obj_api.blocks import Page
 
 
 class SelectOption(GenericObject):
@@ -23,7 +29,7 @@ class SelectOption(GenericObject):
     @classmethod
     def build(cls, name, color=Color.DEFAULT):
         """Create a `SelectOption` object from the given name and color."""
-        return cls(name=name, color=color)
+        return cls.model_construct(name=name, color=color)
 
 
 class ObjectReference(GenericObject):
@@ -45,32 +51,27 @@ class ObjectReference(GenericObject):
 
         if isinstance(ref, ParentRef):
             # ParentRef's are typed-objects with a nested UUID
-            return ObjectReference(id=ref())
+            return ObjectReference.model_construct(id=ref())
 
         if isinstance(ref, GenericObject) and hasattr(ref, 'id'):
             # re-compose the ObjectReference from the internal ID
             return ObjectReference.build(ref.id)
 
         if isinstance(ref, UUID):
-            return ObjectReference(id=ref)
+            return ObjectReference.model_construct(id=ref)
 
         if isinstance(ref, str):
             ref = util.extract_id_from_string(ref)
 
             if ref is not None:
-                return ObjectReference(id=UUID(ref))
+                return ObjectReference.model_construct(id=UUID(ref))
 
         msg = "Unrecognized 'ref' attribute"
         raise ValueError(msg)
 
 
-def make_obj_ref():
-    """make an object referene"""
-    # ToDo: Implement using code above
-
-
 # https://developers.notion.com/reference/parent-object
-class ParentRef(TypedObject):
+class ParentRef(TypedObject, polymorphic_base=True):
     """Reference another block as a parent."""
 
     # note that this class is simply a placeholder for the typed concrete *Ref classes
@@ -89,7 +90,7 @@ class DatabaseRef(ParentRef, type='database_id'):
         `db_ref` can be either a string, UUID, or database.
         """
         ref = ObjectReference.build(db_ref)
-        return DatabaseRef(database_id=ref.id)
+        return DatabaseRef.model_construct(database_id=ref.id)
 
 
 class PageRef(ParentRef, type='page_id'):
@@ -98,13 +99,10 @@ class PageRef(ParentRef, type='page_id'):
     page_id: UUID
 
     @classmethod
-    def build(cls, page_ref):
-        """Compose a PageRef from the given reference object.
-
-        `page_ref` can be either a string, UUID, or page.
-        """
+    def build(cls, page_ref: Page | str | UUID):
+        """Compose a PageRef from the given reference object."""
         ref = ObjectReference.build(page_ref)
-        return PageRef(page_id=ref.id)
+        return PageRef.model_construct(page_id=ref.id)
 
 
 class BlockRef(ParentRef, type='block_id'):
@@ -119,7 +117,7 @@ class BlockRef(ParentRef, type='block_id'):
         `block_ref` can be either a string, UUID, or block.
         """
         ref = ObjectReference[block_ref]
-        return BlockRef(block_id=ref.id)
+        return BlockRef.model_construct(block_id=ref.id)
 
 
 class WorkspaceRef(ParentRef, type='workspace'):
@@ -139,7 +137,7 @@ class UserType(str, Enum):
     BOT = 'bot'
 
 
-class User(UserRef, TypedObject):
+class User(TypedObject, UserRef, polymorphic_base=True):
     """Represents a User in Notion."""
 
     name: str | None = None
@@ -174,10 +172,10 @@ class EmojiObject(TypedObject, type='emoji'):
     def build(cls, emoji):
         """Compose an EmojiObject from the given emoji string."""
         # Todo: convert string-based emoji to unicode here!
-        return EmojiObject(emoji=emoji)
+        return EmojiObject.model_construct(emoji=emoji)
 
 
-class FileObject(TypedObject):
+class FileObject(TypedObject, polymorphic_base=True):
     """A Notion file object.
 
     Depending on the context, a FileObject may require a name (such as in the `Files`
@@ -219,7 +217,7 @@ class ExternalFile(FileObject, type='external'):
     @classmethod
     def build(cls, url, name=None):
         """Create a new `ExternalFile` from the given URL."""
-        return cls(name=name, external=cls._NestedData(url=url))
+        return cls.model_construct(name=name, external=cls._NestedData(url=url))
 
 
 class DateRange(GenericObject):
@@ -264,7 +262,7 @@ class Annotations(GenericObject):
         return True
 
 
-class RichTextObject(TypedObject):
+class RichTextObject(TypedObject, polymorphic_base=True):
     """Base class for Notion rich text elements."""
 
     plain_text: str
@@ -311,7 +309,7 @@ class RichTextObject(TypedObject):
 
         style = deepcopy(style)
 
-        return cls(plain_text=text, href=href, annotations=style)
+        return cls.model_construct(plain_text=text, href=href, annotations=style)
 
 
 class LinkObject(GenericObject):
@@ -346,7 +344,7 @@ class TextObject(RichTextObject, type='text'):
         nested = TextObject._NestedData(content=text, link=link)
         style = deepcopy(style)
 
-        return cls(
+        return cls.model_construct(
             plain_text=text,
             text=nested,
             href=href,
@@ -363,7 +361,7 @@ class EquationObject(RichTextObject, type='equation'):
     equation: _NestedData
 
 
-class MentionData(TypedObject):
+class MentionData(TypedObject, polymorphic_base=True):
     """Base class for typed `Mention` data objects."""
 
 
@@ -386,7 +384,7 @@ class MentionUser(MentionData, type='user'):
         if they do not match the specific type returned from the API.
         """
 
-        return MentionObject(plain_text=str(user), mention=MentionUser(user=user))
+        return MentionObject.model_construct(plain_text=str(user), mention=MentionUser(user=user))
 
 
 class MentionPage(MentionData, type='page'):
@@ -400,7 +398,7 @@ class MentionPage(MentionData, type='page'):
 
         ref = ObjectReference[page_ref]
 
-        return MentionObject(plain_text=str(ref), mention=MentionPage(page=ref))
+        return MentionObject.model_construct(plain_text=str(ref), mention=MentionPage(page=ref))
 
 
 class MentionDatabase(MentionData, type='database'):
@@ -414,7 +412,7 @@ class MentionDatabase(MentionData, type='database'):
 
         ref = ObjectReference[page]
 
-        return MentionObject(plain_text=str(ref), mention=MentionDatabase(database=ref))
+        return MentionObject.model_construct(plain_text=str(ref), mention=MentionDatabase(database=ref))
 
 
 class MentionDate(MentionData, type='date'):
@@ -428,7 +426,7 @@ class MentionDate(MentionData, type='date'):
 
         date_obj = DateRange(start=start, end=end)
 
-        return MentionObject(plain_text=str(date_obj), mention=MentionDate(date=date_obj))
+        return MentionObject.model_construct(plain_text=str(date_obj), mention=MentionDate(date=date_obj))
 
 
 class MentionLinkPreview(MentionData, type='link_preview'):

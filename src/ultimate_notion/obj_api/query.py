@@ -7,7 +7,7 @@ from typing import Any
 from uuid import UUID
 
 from notion_client.api_endpoints import SearchEndpoint
-from pydantic import Field, validator
+from pydantic import field_validator, Field, SerializeAsAny
 
 from ultimate_notion.obj_api.core import GenericObject
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
@@ -186,13 +186,8 @@ class LastEditedTimeFilter(TimestampFilter):
         return LastEditedTimeFilter(last_edited_time=value)
 
 
-class CompoundFilter(QueryFilter):
+class CompoundFilter(QueryFilter, populate_by_name=True):
     """Represents a compound filter in Notion."""
-
-    class Config:
-        """Pydantic configuration class to support keyword fields."""
-
-        allow_population_by_field_name = True
 
     and_: list[QueryFilter] | None = Field(None, alias='and')
     or_: list[QueryFilter] | None = Field(None, alias='or')
@@ -217,11 +212,12 @@ class Query(GenericObject):
     """Represents a query object in Notion."""
 
     sorts: list[PropertySort] | None = None
-    filter: QueryFilter | None = None  # noqa: A003
+    filter: SerializeAsAny[QueryFilter] | None = None  # noqa: A003
     start_cursor: UUID | None = None
     page_size: int = MAX_PAGE_SIZE
 
-    @validator('page_size')
+    @field_validator('page_size')
+    @classmethod
     @classmethod
     def valid_page_size(cls, value):
         """Validate that the given page size meets the Notion API requirements."""
@@ -258,13 +254,13 @@ class QueryBuilder:
 
         if query_filter is None:
             if isinstance(self.endpoint, SearchEndpoint):
-                query_filter = SearchFilter.parse_obj(kwargs)
+                query_filter = SearchFilter.model_validate(kwargs)
             elif 'property' in kwargs:
-                query_filter = PropertyFilter.parse_obj(kwargs)
+                query_filter = PropertyFilter.model_validate(kwargs)
             elif 'timestamp' in kwargs and kwargs['timestamp'] == 'created_time':
-                query_filter = CreatedTimeFilter.parse_obj(kwargs)
+                query_filter = CreatedTimeFilter.model_validate(kwargs)
             elif 'timestamp' in kwargs and kwargs['timestamp'] == 'last_edited_time':
-                query_filter = LastEditedTimeFilter.parse_obj(kwargs)
+                query_filter = LastEditedTimeFilter.model_validate(kwargs)
             else:
                 msg = 'unrecognized filter'
                 raise ValueError(msg)
@@ -330,7 +326,7 @@ class QueryBuilder:
 
         logger.debug('executing query - %s', self.query)
 
-        query = self.query.dict()
+        query = self.query.model_dump()
 
         if self.params:
             query.update(self.params)

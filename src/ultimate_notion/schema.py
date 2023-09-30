@@ -365,11 +365,10 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             msg = f"A database with schema '{self.schema.__name__}' needs to be created first!"
             raise RelationError(msg) from e
 
-        if self.schema:
-            if self.two_way_prop:
-                self.obj_ref = obj_schema.DualPropertyRelation.build(db.id)
-            else:
-                self.obj_ref = obj_schema.SinglePropertyRelation.build(db.id)
+        if self.two_way_prop:
+            self.obj_ref = obj_schema.DualPropertyRelation.build(db.id)
+        else:
+            self.obj_ref = obj_schema.SinglePropertyRelation.build(db.id)
 
     def _init_backward_relation(self):
         if not isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
@@ -379,7 +378,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
         two_wap_prop_name = self._two_way_prop.name
         if obj_synced_property_name != two_wap_prop_name:
-            # change the old default name in the target schema what was passed during initialization
+            # change the old default name in the target schema to what was passed during initialization
             other_db = self.schema.get_db()
             prop_id = self.obj_ref.relation.dual_property.synced_property_id
             schema_dct = {prop_id: obj_schema.RenameProp(name=two_wap_prop_name)}

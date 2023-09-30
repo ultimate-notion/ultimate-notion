@@ -3,17 +3,15 @@ from abc import ABC, abstractmethod
 from datetime import date as dt_date
 from datetime import datetime
 
-import pydantic
-from pydantic import Field
+from pydantic import Field, SerializeAsAny, field_validator
 
-from ultimate_notion.obj_api import objects
 from ultimate_notion.obj_api.core import GenericObject, NotionObject
 from ultimate_notion.obj_api.enums import VerificationState
-from ultimate_notion.obj_api.objects import User
+from ultimate_notion.obj_api.objects import DateRange, FileObject, ObjectReference, RichTextObject, TypedObject, User
 from ultimate_notion.obj_api.schema import Function, SelectOption
 
 
-class PropertyValue(objects.TypedObject):
+class PropertyValue(TypedObject, polymorphic_base=True):
     """Base class for Notion property values."""
 
     id: str | None = None  # noqa: A003
@@ -24,28 +22,25 @@ class PropertyValue(objects.TypedObject):
 
         In practice, this is like calling __init__ with the corresponding keyword.
         """
-        return cls(**{cls.type: value})
+        return cls.model_construct(**{cls.type: value})
 
 
 class Title(PropertyValue, type='title'):
     """Notion title type."""
 
-    title: list[objects.RichTextObject] = Field(default_factory=list)
+    title: list[SerializeAsAny[RichTextObject]] = Field(default_factory=list)
 
 
 class RichText(PropertyValue, type='rich_text'):
     """Notion rich text type."""
 
-    rich_text: list[objects.RichTextObject] = Field(default_factory=list)
+    rich_text: list[SerializeAsAny[RichTextObject]] = Field(default_factory=list)
 
 
 class Number(PropertyValue, type='number'):
     """Simple number type."""
 
-    number: float | int | None = None
-
-    class Config:
-        smart_union = True  # assures that int is not coerced to a float!
+    number: float | int | None = None  # ToDo: Recheck if it should be int | float | None instead
 
 
 class Checkbox(PropertyValue, type='checkbox'):
@@ -57,18 +52,18 @@ class Checkbox(PropertyValue, type='checkbox'):
 class Date(PropertyValue, type='date'):
     """Notion complex date type - may include timestamp and/or be a date range."""
 
-    date: objects.DateRange | None = None
+    date: DateRange | None = None
 
     @classmethod
     def build(cls, start: datetime | dt_date, end: datetime | dt_date | None = None):
         """Create a new Date from the native values."""
-        return cls(date=objects.DateRange(start=start, end=end))
+        return cls.model_construct(date=DateRange(start=start, end=end))
 
 
 class Status(PropertyValue, type='status'):
     """Notion status property."""
 
-    status: objects.SelectOption | None = None
+    status: SelectOption | None = None
 
 
 class Select(PropertyValue, type='select'):
@@ -86,7 +81,7 @@ class MultiSelect(PropertyValue, type='multi_select'):
 class People(PropertyValue, type='people'):
     """Notion people type."""
 
-    people: list[objects.User] = Field(default_factory=list)
+    people: list[SerializeAsAny[User]] = Field(default_factory=list)
 
 
 class URL(PropertyValue, type='url'):
@@ -110,10 +105,10 @@ class PhoneNumber(PropertyValue, type='phone_number'):
 class Files(PropertyValue, type='files'):
     """Notion files type."""
 
-    files: list[objects.FileObject] = Field(default_factory=list)
+    files: list[SerializeAsAny[FileObject]] = Field(default_factory=list)
 
 
-class FormulaResult(objects.TypedObject, ABC):
+class FormulaResult(TypedObject, ABC, polymorphic_base=True):
     """A Notion formula result.
 
     This object contains the result of the expression in the database properties.
@@ -148,7 +143,7 @@ class NumberFormula(FormulaResult, type='number'):
 class DateFormula(FormulaResult, type='date'):
     """A Notion date formula result."""
 
-    date: objects.DateRange | None = None
+    date: DateRange | None = None
 
     @property
     def value(self) -> None | datetime | date | tuple[datetime | date, datetime | date]:
@@ -179,16 +174,16 @@ class Formula(PropertyValue, type='formula'):
 class Relation(PropertyValue, type='relation'):
     """A Notion relation property value."""
 
-    relation: list[objects.ObjectReference] = Field(default_factory=list)
+    relation: list[ObjectReference] = Field(default_factory=list)
     has_more: bool = False
 
     @classmethod
     def build(cls, pages):
         """Return a `Relation` property with the specified pages."""
-        return cls(relation=[objects.ObjectReference.build(page) for page in pages])
+        return cls.model_construct(relation=[ObjectReference.build(page) for page in pages])
 
 
-class RollupObject(objects.TypedObject, ABC):
+class RollupObject(TypedObject, ABC, polymorphic_base=True):
     """A Notion rollup property value."""
 
     function: Function | None = None
@@ -213,7 +208,7 @@ class RollupNumber(RollupObject, type='number'):
 class RollupDate(RollupObject, type='date'):
     """A Notion rollup date property value."""
 
-    date: objects.DateRange | None = None
+    date: DateRange | None = None
 
     @property
     def value(self) -> None | datetime | date | tuple[datetime | date, datetime | date]:
@@ -251,7 +246,7 @@ class CreatedTime(PropertyValue, type='created_time'):
 class CreatedBy(PropertyValue, type='created_by'):
     """A Notion created-by property value."""
 
-    created_by: objects.User
+    created_by: SerializeAsAny[User]
 
 
 class LastEditedTime(PropertyValue, type='last_edited_time'):
@@ -263,7 +258,7 @@ class LastEditedTime(PropertyValue, type='last_edited_time'):
 class LastEditedBy(PropertyValue, type='last_edited_by'):
     """A Notion last-edited-by property value."""
 
-    last_edited_by: objects.User
+    last_edited_by: SerializeAsAny[User]
 
 
 class UniqueID(PropertyValue, type='unique_id'):
@@ -281,12 +276,12 @@ class Verification(PropertyValue, type='verification'):
 
     class _NestedData(GenericObject):
         state: VerificationState = VerificationState.UNVERIFIED
-        verified_by: User | None = None
+        verified_by: SerializeAsAny[User] | None = None
         date: datetime | None = None
 
         # leads to better error messages, see
         # https://github.com/pydantic/pydantic/issues/355
-        @pydantic.validator('state', pre=True)
+        @field_validator('state')
         @classmethod
         def validate_enum_field(cls, field: str):
             return VerificationState(field)
@@ -295,7 +290,7 @@ class Verification(PropertyValue, type='verification'):
 
 
 # https://developers.notion.com/reference/property-item-object
-class PropertyItem(PropertyValue, NotionObject, object='property_item'):
+class PropertyItem(NotionObject, PropertyValue, object='property_item'):
     """A `PropertyItem` returned by the Notion API.
 
     Basic property items have a similar schema to corresponding property values.  As a

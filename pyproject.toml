@@ -30,7 +30,7 @@ dependencies = [
     "pandas",
     "emoji",
     "pandas",
-    "pydantic<2",
+    "pydantic>=2",
 #    "google-api-python-client",
 #    "google-auth-httplib2",
 #    "google-auth-oauthlib",
@@ -127,6 +127,7 @@ exclude_lines = [
 [tool.ruff]
 target-version = "py310"
 line-length = 120
+preview = true
 #include = ["src/**/*.py", "src/**/*.pyi", "**/pyproject.toml"]
 exclude = ["examples/*\\.py"] # ToDo: remove & fix later
 select = [
@@ -204,6 +205,7 @@ dependencies = [
     "pytest-cov",
     "pytest-mock",
     "pytest-vcr",
+    "pytest-env",
     "hypothesis",
     "jupyterlab",
     "pre-commit",
@@ -212,6 +214,7 @@ dependencies = [
     "seaborn",
     "scipy",
     "pandas",
+    "ipython",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"

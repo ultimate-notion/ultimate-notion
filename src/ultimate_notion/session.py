@@ -42,7 +42,6 @@ class Session:
 
     The session keeps tracks of all objects, e.g. pages, databases, etc.
     in an object store to avoid unnecessary calls to the API.
-    Use an explicit `.refresh()` to update an object.
     """
 
     client: notion_client.Client

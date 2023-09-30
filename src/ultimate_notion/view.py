@@ -21,7 +21,7 @@ ColType = str | list[str]
 T = TypeVar('T')
 
 
-class View:
+class View:  # noqa: PLR0904
     def __init__(self, database: Database, pages: list[Page], query: QueryBuilder):
         self.database = database
         self._query = query

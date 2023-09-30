@@ -7,7 +7,7 @@ is just referred to as `raw_api`.
 
 import logging
 
-from pydantic import parse_obj_as
+from pydantic import SerializeAsAny, parse_obj_as
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
@@ -63,7 +63,7 @@ class BlocksEndpoint(Endpoint):
         def append(self, parent, *blocks: Block):
             """Add the given blocks as children of the specified parent.
 
-            The blocks info will be refreshed based on returned data.
+            The blocks info will be updated based on returned data.
 
             `parent` may be any suitable `ObjectReference` type.
             """
@@ -81,13 +81,13 @@ class BlocksEndpoint(Endpoint):
                     for idx in range(len(blocks)):
                         block = blocks[idx]
                         result = data['results'][idx]
-                        block.refresh(**result)
+                        block.update(**result)
 
                 else:
-                    logger.warning('Unable to refresh results; size mismatch')
+                    logger.warning('Unable to update results; size mismatch')
 
             else:
-                logger.warning('Unable to refresh results; not provided')
+                logger.warning('Unable to update results; not provided')
 
             return parent
 
@@ -129,7 +129,7 @@ class BlocksEndpoint(Endpoint):
 
         data = self.raw_api.delete(block_id)
 
-        return Block.parse_obj(data)
+        return Block.model_validate(data)
 
     def restore(self, block):
         """Restore (unarchive) the specified Block.
@@ -142,7 +142,7 @@ class BlocksEndpoint(Endpoint):
 
         data = self.raw_api.update(block_id, archived=False)
 
-        return Block.parse_obj(data)
+        return Block.model_validate(data)
 
     # https://developers.notion.com/reference/retrieve-a-block
     def retrieve(self, block):
@@ -156,20 +156,20 @@ class BlocksEndpoint(Endpoint):
 
         data = self.raw_api.retrieve(block_id)
 
-        return Block.parse_obj(data)
+        return Block.model_validate(data)
 
     # https://developers.notion.com/reference/update-a-block
     def update(self, block: Block):
         """Update the block content on the server.
 
-        The block info will be refreshed to the latest version from the server.
+        The block info will be updated to the latest version from the server.
         """
 
         logger.info('Updating block :: %s', block.id)
 
         data = self.raw_api.update(block.id.hex, **block.dict())
 
-        return block.refresh(**data)
+        return block.update(**data)
 
 
 class DatabasesEndpoint(Endpoint):
@@ -182,7 +182,7 @@ class DatabasesEndpoint(Endpoint):
 
     def _build_request(
         self,
-        parent: ParentRef | None = None,
+        parent: SerializeAsAny[ParentRef] | None = None,
         schema: dict[str, PropertyType] | None = None,
         title=None,
     ):
@@ -222,7 +222,7 @@ class DatabasesEndpoint(Endpoint):
 
         data = self.raw_api.create(**request)
 
-        return Database.parse_obj(data)
+        return Database.model_validate(data)
 
     # https://developers.notion.com/reference/retrieve-a-database
     def retrieve(self, dbref):
@@ -237,13 +237,13 @@ class DatabasesEndpoint(Endpoint):
 
         data = self.raw_api.retrieve(dbid)
 
-        return Database.parse_obj(data)
+        return Database.model_validate(data)
 
     # https://developers.notion.com/reference/update-a-database
     def update(self, dbref, title=None, schema: dict[str, PropertyType] | None = None):
         """Update the Database object on the server.
 
-        The database info will be refreshed to the latest version from the server.
+        The database info will be updated to the latest version from the server.
 
         `dbref` may be any suitable `DatabaseRef` type.
         """
@@ -256,7 +256,9 @@ class DatabasesEndpoint(Endpoint):
 
         if request:
             data = self.raw_api.update(dbid, **request)
-            dbref = dbref.refresh(**data)
+
+        if isinstance(dbref, Database):
+            dbref = dbref.update(**data)
 
         return dbref
 
@@ -368,7 +370,7 @@ class PagesEndpoint(Endpoint):
 
         data = self.raw_api.create(**request)
 
-        return Page.parse_obj(data)
+        return Page.model_validate(data)
 
     def delete(self, page):
         """Delete (archive) the specified Page.
@@ -399,10 +401,10 @@ class PagesEndpoint(Endpoint):
 
         data = self.raw_api.retrieve(page_id)
 
-        # XXX would it make sense to (optionally) expand the full properties here?
+        # ToDo: would it make sense to (optionally) expand the full properties here?
         # e.g. call the PropertiesEndpoint to make sure all data is retrieved
 
-        return Page.parse_obj(data)
+        return Page.model_validate(data)
 
     # https://developers.notion.com/reference/patch-page
     def update(self, page: Page, **properties):
@@ -413,7 +415,7 @@ class PagesEndpoint(Endpoint):
         If `properties` are provided, only those values will be updated.
         If `properties` is empty, all page properties will be updated.
 
-        The page info will be refreshed to the latest version from the server.
+        The page info will be updated to the latest version from the server.
         """
 
         logger.info('Updating page info :: %s', page.id)
@@ -425,7 +427,7 @@ class PagesEndpoint(Endpoint):
 
         data = self.raw_api.update(page.id.hex, properties=props)
 
-        return page.refresh(**data)
+        return page.update(**data)
 
     def set_attr(self, page, *, cover=False, icon=False, archived=None):
         """Set specific page attributes (such as cover, icon, etc.) on the server.
@@ -462,7 +464,7 @@ class PagesEndpoint(Endpoint):
 
         data = self.raw_api.update(page_id.hex, **props)
 
-        return page.refresh(**data)
+        return page.update(**data)
 
 
 class SearchEndpoint(Endpoint):
@@ -512,7 +514,7 @@ class UsersEndpoint(Endpoint):
 
         data = self.raw_api.retrieve(user_id)
 
-        return User.parse_obj(data)
+        return User.model_validate(data)
 
     # https://developers.notion.com/reference/get-self
     def me(self):
@@ -522,4 +524,4 @@ class UsersEndpoint(Endpoint):
 
         data = self.raw_api.me()
 
-        return User.parse_obj(data)
+        return User.model_validate(data)

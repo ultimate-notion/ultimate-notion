@@ -20,26 +20,26 @@ repos:
 
 # Ruff replaces flake8, autoflake and isort
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.0.275'
+  rev: 'v0.0.290'
   hooks:
     - id: ruff
 
 - repo: https://github.com/psf/black
-  rev: 23.3.0
+  rev: 23.9.1
   hooks:
   - id: black
     language_version: python3
 
 # black style for code in the docs:
 - repo: https://github.com/asottile/blacken-docs
-  rev: 1.14.0
+  rev: 1.16.0
   hooks:
   - id: blacken-docs
     additional_dependencies: [black]
     exclude: docs/examples  # Exclude since blacken-docs cannot handle the >>> needed for doctests
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.4.0'  # Use the sha / tag you want to point at
+  rev: 'v1.5.1'  # Use the sha / tag you want to point at
   hooks:
     - id: mypy
       additional_dependencies: [types-tabulate, types-cachetools]

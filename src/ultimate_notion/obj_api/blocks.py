@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, SerializeAsAny
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import CodingLanguage, FullColor
@@ -29,7 +29,7 @@ class DataObject(NotionObject):
 
     id: UUID = None  # noqa: A003
 
-    parent: ParentRef = None
+    parent: SerializeAsAny[ParentRef] = None
     has_children: bool = False
 
     archived: bool = False
@@ -47,7 +47,7 @@ class Database(DataObject, object='database'):
     title: list[RichTextObject] = Field(default_factory=list)
     url: str = None
     public_url: str | None = None
-    icon: FileObject | EmojiObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | None = None
     cover: FileObject | None = None
     properties: dict[str, PropertyType] = Field(default_factory=dict)
     description: list[RichTextObject] = Field(default_factory=list)
@@ -59,12 +59,12 @@ class Page(DataObject, object='page'):
 
     url: str = None
     public_url: str | None = None
-    icon: FileObject | EmojiObject | None = None
-    cover: FileObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | None = None
+    cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyValue] = Field(default_factory=dict)
 
 
-class Block(DataObject, TypedObject, object='block'):
+class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
     """A standard block object in Notion.
 
     Calling the block will expose the nested data in the object.
@@ -283,7 +283,7 @@ class Callout(TextBlock, WithChildrenMixin, type='callout'):
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = Field(default_factory=list)
         children: list[Block] | None = None
-        icon: FileObject | EmojiObject | None = None
+        icon: SerializeAsAny[FileObject] | EmojiObject | None = None
         color: FullColor = FullColor.GRAY_BACKGROUND
 
     callout: _NestedData = _NestedData()
@@ -527,25 +527,25 @@ class Equation(Block, type='equation'):
 class File(Block, type='file'):
     """A file block in Notion."""
 
-    file: FileObject = None
+    file: SerializeAsAny[FileObject] = None
 
 
 class Image(Block, type='image'):
     """An image block in Notion."""
 
-    image: FileObject = None
+    image: SerializeAsAny[FileObject] = None
 
 
 class Video(Block, type='video'):
     """A video block in Notion."""
 
-    video: FileObject = None
+    video: SerializeAsAny[FileObject] = None
 
 
 class PDF(Block, type='pdf'):
     """A pdf block in Notion."""
 
-    pdf: FileObject = None
+    pdf: SerializeAsAny[FileObject] = None
 
 
 class ChildPage(Block, type='child_page'):
@@ -722,7 +722,7 @@ class Table(Block, WithChildrenMixin, type='table'):
 class LinkToPage(Block, type='link_to_page'):
     """A link_to_page block in Notion."""
 
-    link_to_page: ParentRef
+    link_to_page: SerializeAsAny[ParentRef]
 
 
 class SyncedBlock(Block, WithChildrenMixin, type='synced_block'):

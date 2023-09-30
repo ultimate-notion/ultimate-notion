@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 T = TypeVar('T', bound=obj_props.PropertyValue)
 
 
-class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
+class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
     """Base class for Notion property values.
 
     Used to map high-level objects to low-level Notion-API objects
@@ -49,9 +49,7 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):
             return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
-    # ToDo: Make this abstract and implement in every subclass -> Generics
     @property
-    # @abstractmethod
     def value(self) -> Any:
         return self.obj_ref.value
 

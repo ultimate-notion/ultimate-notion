@@ -15,38 +15,40 @@ MAX_PAGE_SIZE = 100
 logger = logging.getLogger(__name__)
 
 
-class ObjectList(NotionObject, TypedObject, object='list'):
+class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True):
     """A paginated list of objects returned by the Notion API."""
 
     results: list[NotionObject] = Field(default_factory=list)
     has_more: bool = False
     next_cursor: str | None = None
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator('results', pre=True, each_item=True)
     @classmethod
     def _convert_results_list(cls, val):
-        """Convert the results list to specifc objects."""
+        """Convert the results list to specific objects."""
 
         if 'object' not in val:
             msg = 'Unknown object in results'
             raise ValueError(msg)
 
         if val['object'] == BlockList.type:
-            return Block.parse_obj(val)
+            return Block.model_validate(val)
 
         if val['object'] == PageList.type:
-            return Page.parse_obj(val)
+            return Page.model_validate(val)
 
         if val['object'] == DatabaseList.type:
-            return Database.parse_obj(val)
+            return Database.model_validate(val)
 
         if val['object'] == PropertyItemList.type:
-            return PropertyItem.parse_obj(val)
+            return PropertyItem.model_validate(val)
 
         if val['object'] == UserList.type:
-            return User.parse_obj(val)
+            return User.model_validate(val)
 
-        return GenericObject.parse_obj(val)
+        return GenericObject.model_validate(val)
 
 
 class BlockList(ObjectList, type='block'):
@@ -146,9 +148,9 @@ class EndpointIterator:
         while self.has_more:
             self.page_num += 1
 
-            page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
+            result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
 
-            api_list = ObjectList.parse_obj(page)
+            api_list = ObjectList.model_validate(result_page)
 
             for obj in api_list.results:
                 self.total_items += 1

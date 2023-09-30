@@ -4,19 +4,26 @@
 from typing import Any
 from uuid import UUID
 
-import pydantic
-from pydantic import Field
+from pydantic import Field, field_validator, SerializeAsAny
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
 from ultimate_notion.obj_api.enums import Function, NumberFormat
 from ultimate_notion.obj_api.objects import SelectOption
 
 
-class PropertyType(TypedObject):
+class PropertyType(TypedObject, polymorphic_base=True):
     """Base class for Notion property objects."""
 
     id: str | None = None  # noqa: A003
     name: str | None = None
+
+    @classmethod
+    def build(cls):
+        """Build the property value from given value, e.g. native Python or nested type.
+
+        In practice, this is like calling __init__ with the corresponding keyword.
+        """
+        return cls.model_construct()
 
 
 class Title(PropertyType, type='title'):
@@ -39,7 +46,7 @@ class Number(PropertyType, type='number'):
 
         # leads to better error messages, see
         # https://github.com/pydantic/pydantic/issues/355
-        @pydantic.validator('format', pre=True)
+        @field_validator('format')
         @classmethod
         def validate_enum_field(cls, field: str):
             return NumberFormat(field)
@@ -49,7 +56,7 @@ class Number(PropertyType, type='number'):
     @classmethod
     def build(cls, format):  # noqa: A002
         """Create a `Number` object with the expected format."""
-        return cls(number=cls._NestedData(format=format))
+        return cls.model_construct(number=cls._NestedData(format=format))
 
 
 class Select(PropertyType, type='select'):
@@ -63,7 +70,7 @@ class Select(PropertyType, type='select'):
     @classmethod
     def build(cls, options):
         """Create a `Select` object from the list of `SelectOption`'s."""
-        return cls(select=cls._NestedData(options=options))
+        return cls.model_construct(select=cls._NestedData(options=options))
 
 
 class MultiSelect(PropertyType, type='multi_select'):
@@ -77,7 +84,7 @@ class MultiSelect(PropertyType, type='multi_select'):
     @classmethod
     def build(cls, options):
         """Create a `Select` object from the list of `SelectOption`'s."""
-        return cls(multi_select=cls._NestedData(options=options))
+        return cls.model_construct(multi_select=cls._NestedData(options=options))
 
 
 class Status(PropertyType, type='status'):
@@ -138,10 +145,10 @@ class Formula(PropertyType, type='formula'):
 
     @classmethod
     def build(cls, expression):
-        return cls(formula=cls._NestedData(expression=expression))
+        return cls.model_construct(formula=cls._NestedData(expression=expression))
 
 
-class PropertyRelation(TypedObject):
+class PropertyRelation(TypedObject, polymorphic_base=True):
     """Defines common configuration for a property relation."""
 
     database_id: UUID = None
@@ -158,8 +165,8 @@ class SinglePropertyRelation(PropertyRelation, type='single_property'):
 
         `dbref` must be either a string or UUID.
         """
-
-        return Relation(relation=SinglePropertyRelation(database_id=dbref))
+        rel = SinglePropertyRelation.model_construct(database_id=dbref)
+        return Relation.model_construct(relation=rel)
 
 
 class DualPropertyRelation(PropertyRelation, type='dual_property'):
@@ -180,13 +187,14 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
 
         `dbref` must be either a string or UUID.
         """
-        return Relation(relation=DualPropertyRelation(database_id=dbref))
+        rel = DualPropertyRelation.model_construct(database_id=dbref)
+        return Relation.model_construct(relation=rel)
 
 
 class Relation(PropertyType, type='relation'):
     """Defines the relation configuration for a database property."""
 
-    relation: PropertyRelation = PropertyRelation()
+    relation: SerializeAsAny[PropertyRelation]
 
 
 class Rollup(PropertyType, type='rollup'):
@@ -203,7 +211,7 @@ class Rollup(PropertyType, type='rollup'):
 
         # leads to better error messages, see
         # https://github.com/pydantic/pydantic/issues/355
-        @pydantic.validator('function', pre=True)
+        @field_validator('function')
         @classmethod
         def validate_enum_field(cls, field: str):
             return Function(field)
@@ -212,7 +220,7 @@ class Rollup(PropertyType, type='rollup'):
 
     @classmethod
     def build(cls, relation, property, function):  # noqa: A002
-        return Rollup(
+        return Rollup.model_construct(
             rollup=cls._NestedData(function=function, relation_property_name=relation, rollup_property_name=property)
         )
 
