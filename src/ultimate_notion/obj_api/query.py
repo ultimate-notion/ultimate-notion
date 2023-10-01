@@ -7,7 +7,7 @@ from typing import Any
 from uuid import UUID
 
 from notion_client.api_endpoints import SearchEndpoint
-from pydantic import field_validator, Field, SerializeAsAny
+from pydantic import Field, SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator

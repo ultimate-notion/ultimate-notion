@@ -22,7 +22,7 @@ class PropertyValue(TypedObject, polymorphic_base=True):
 
         In practice, this is like calling __init__ with the corresponding keyword.
         """
-        return cls.model_construct(**{cls.type: value})
+        return cls.model_construct(**{cls.model_fields['type'].get_default(): value})
 
 
 class Title(PropertyValue, type='title'):

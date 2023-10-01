@@ -30,7 +30,9 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
 
     def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
         super().__init_subclass__(wraps=wraps, **kwargs)
-        cls._type_value_map[wraps.type] = cls
+        # at that time the model is not yet constructed, thus no direct field acces with .type.
+        type_name = wraps.model_fields['type'].get_default()
+        cls._type_value_map[type_name] = cls
 
     @property
     def _obj_api_type(self) -> type[obj_props.PropertyValue]:

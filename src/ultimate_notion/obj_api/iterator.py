@@ -1,9 +1,10 @@
 """Iterator classes for working with paginated API responses."""
 
 import logging
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import Field, validator
+from pydantic import Field
+from pydantic.functional_validators import BeforeValidator
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
@@ -15,40 +16,40 @@ MAX_PAGE_SIZE = 100
 logger = logging.getLogger(__name__)
 
 
+def convert_notion_object(obj: NotionObject) -> Block | Page | Database | PropertyItem | User | GenericObject:
+    """Convert a Notion Object to a corresponding subtype.
+
+    Used in the ObjectList below the convert the results from the Notion API.
+    """
+
+    if 'object' not in obj:
+        msg = 'Unknown object in results'
+        raise ValueError(msg)
+
+    if obj['object'] == BlockList.build().type:  # .build() as the model is not constructed at that point.
+        return Block.model_validate(obj)
+
+    if obj['object'] == PageList.build().type:
+        return Page.model_validate(obj)
+
+    if obj['object'] == DatabaseList.build().type:
+        return Database.model_validate(obj)
+
+    if obj['object'] == PropertyItemList.build().type:
+        return PropertyItem.model_validate(obj)
+
+    if obj['object'] == UserList.build().type:
+        return User.model_validate(obj)
+
+    return GenericObject.model_validate(obj)
+
+
 class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True):
     """A paginated list of objects returned by the Notion API."""
 
-    results: list[NotionObject] = Field(default_factory=list)
+    results: list[Annotated[NotionObject, BeforeValidator(convert_notion_object)]] = Field(default_factory=list)
     has_more: bool = False
     next_cursor: str | None = None
-
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator('results', pre=True, each_item=True)
-    @classmethod
-    def _convert_results_list(cls, val):
-        """Convert the results list to specific objects."""
-
-        if 'object' not in val:
-            msg = 'Unknown object in results'
-            raise ValueError(msg)
-
-        if val['object'] == BlockList.type:
-            return Block.model_validate(val)
-
-        if val['object'] == PageList.type:
-            return Page.model_validate(val)
-
-        if val['object'] == DatabaseList.type:
-            return Database.model_validate(val)
-
-        if val['object'] == PropertyItemList.type:
-            return PropertyItem.model_validate(val)
-
-        if val['object'] == UserList.type:
-            return User.model_validate(val)
-
-        return GenericObject.model_validate(val)
 
 
 class BlockList(ObjectList, type='block'):

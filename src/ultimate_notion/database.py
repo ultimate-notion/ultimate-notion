@@ -110,7 +110,8 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Delete this database"""
         self.session.api.blocks.delete(self.id)
 
-    def _pages_from_query(self, *, query) -> list[Page]:
+    @staticmethod
+    def _pages_from_query(query) -> list[Page]:
         # ToDo: Remove when self.query is implemented!
         return [Page(page_obj) for page_obj in query.execute()]
 
@@ -142,8 +143,6 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
         page = Page(obj_ref=self.session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
         return page
-
-        return self.schema.create(**kwargs)
 
     def query(self) -> QueryBuilder:
         """Query a (large) database for pages in a more specific way"""

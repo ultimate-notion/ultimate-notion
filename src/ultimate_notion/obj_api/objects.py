@@ -5,6 +5,7 @@ used in the Notion API as well as higher-level methods.
 """
 from __future__ import annotations
 
+from abc import ABC
 from copy import deepcopy
 from datetime import date, datetime
 from enum import Enum
@@ -23,7 +24,7 @@ class SelectOption(GenericObject):
     """Options for select & multi-select objects."""
 
     name: str
-    id: str | None = None  # According to docs: "These are sometimes, but not always, UUIDs."  # noqa: A003
+    id: str = None  # According to docs: "These are sometimes, but not always, UUIDs."  # noqa: A003
     color: Color = Color.DEFAULT
 
     @classmethod
@@ -47,7 +48,7 @@ class ObjectReference(GenericObject):
         """
 
         if isinstance(ref, cls):
-            return ref.copy(deep=True)
+            return ref.model_copy(deep=True)
 
         if isinstance(ref, ParentRef):
             # ParentRef's are typed-objects with a nested UUID
@@ -71,11 +72,12 @@ class ObjectReference(GenericObject):
 
 
 # https://developers.notion.com/reference/parent-object
-class ParentRef(TypedObject, polymorphic_base=True):
-    """Reference another block as a parent."""
+class ParentRef(TypedObject, ABC, polymorphic_base=True):
+    """Reference another block as a parent.
 
-    # note that this class is simply a placeholder for the typed concrete *Ref classes
-    # callers should always instantiate the intended concrete versions
+    Note: This class is simply a placeholder for the typed concrete *Ref classes.
+          Callers should always instantiate the intended concrete versions.
+    """
 
 
 class DatabaseRef(ParentRef, type='database_id'):

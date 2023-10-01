@@ -7,7 +7,7 @@ is just referred to as `raw_api`.
 
 import logging
 
-from pydantic import SerializeAsAny, parse_obj_as
+from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
@@ -70,7 +70,7 @@ class BlocksEndpoint(Endpoint):
 
             parent_id = ObjectReference.build(parent).id
 
-            children = [block.dict() for block in blocks if block is not None]
+            children = [block.model_dump() for block in blocks if block is not None]
 
             logger.info('Appending %d blocks to %s ...', len(children), parent_id)
 
@@ -167,7 +167,7 @@ class BlocksEndpoint(Endpoint):
 
         logger.info('Updating block :: %s', block.id)
 
-        data = self.raw_api.update(block.id.hex, **block.dict())
+        data = self.raw_api.update(block.id.hex, **block.model_dump())
 
         return block.update(**data)
 
@@ -180,8 +180,8 @@ class DatabasesEndpoint(Endpoint):
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.databases
 
+    @staticmethod
     def _build_request(
-        self,
         parent: SerializeAsAny[ParentRef] | None = None,
         schema: dict[str, PropertyType] | None = None,
         title=None,
@@ -194,15 +194,15 @@ class DatabasesEndpoint(Endpoint):
         request = {}
 
         if parent is not None:
-            request['parent'] = parent.dict()
+            request['parent'] = parent.model_dump()
 
         if title is not None:
             prop = TextObject.build(title)
-            request['title'] = [prop.dict()]
+            request['title'] = [prop.model_dump()]
 
         if schema is not None:
             request['properties'] = {
-                name: value.dict() if value is not None else None for name, value in schema.items()
+                name: value.model_dump() if value is not None else None for name, value in schema.items()
             }
 
         return request
@@ -320,7 +320,7 @@ class PagesEndpoint(Endpoint):
             data = self.raw_api.retrieve(page_id, property_id)
 
             # TODO should PropertyListItem return an iterator instead?
-            return parse_obj_as(PropertyItem | PropertyItemList, obj=data)
+            return TypeAdapter(PropertyItem | PropertyItemList).validate_python(data)
 
     def __init__(self, *args, **kwargs):
         """Initialize the `pages` endpoint for the Notion API."""
@@ -352,7 +352,7 @@ class PagesEndpoint(Endpoint):
             msg = "Unsupported 'parent'"
             raise ValueError(msg)
 
-        request = {'parent': parent.dict()}
+        request = {'parent': parent.model_dump()}
 
         # the API requires a properties object, even if empty
         if properties is None:
@@ -361,10 +361,12 @@ class PagesEndpoint(Endpoint):
         if title is not None:
             properties['title'] = title
 
-        request['properties'] = {name: prop.dict() if prop is not None else None for name, prop in properties.items()}
+        request['properties'] = {
+            name: prop.model_dump() if prop is not None else None for name, prop in properties.items()
+        }
 
         if children is not None:
-            request['children'] = [child.dict() for child in children if child is not None]
+            request['children'] = [child.model_dump() for child in children if child is not None]
 
         logger.info('Creating page :: %s => %s', parent, title)
 
@@ -423,7 +425,7 @@ class PagesEndpoint(Endpoint):
         if not properties:
             properties = page.properties
 
-        props = {name: value.dict() if value is not None else None for name, value in properties.items()}
+        props = {name: value.model_dump() if value is not None else None for name, value in properties.items()}
 
         data = self.raw_api.update(page.id.hex, properties=props)
 
@@ -446,14 +448,14 @@ class PagesEndpoint(Endpoint):
             props['cover'] = {}
         elif cover is not False:
             logger.info('Setting page cover :: %s => %s', page_id, cover)
-            props['cover'] = cover.dict()
+            props['cover'] = cover.model_dump()
 
         if icon is None:
             logger.info('Removing page icon :: %s', page_id)
             props['icon'] = {}
         elif icon is not False:
             logger.info('Setting page icon :: %s => %s', page_id, icon)
-            props['icon'] = icon.dict()
+            props['icon'] = icon.model_dump()
 
         if archived is False:
             logger.info('Restoring page :: %s', page_id)

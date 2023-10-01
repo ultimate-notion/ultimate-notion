@@ -4,7 +4,7 @@
 from typing import Any
 from uuid import UUID
 
-from pydantic import Field, field_validator, SerializeAsAny
+from pydantic import Field, SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
 from ultimate_notion.obj_api.enums import Function, NumberFormat
