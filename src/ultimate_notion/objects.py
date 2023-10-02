@@ -99,6 +99,9 @@ class User(Wrapper[objs.User], wraps=objs.User):
     def __eq__(self, other):
         return self.id == other.id
 
+    def __hash__(self) -> int:
+        return hash(self.id)
+
     @property
     def id(self):  # noqa: A003
         return self.obj_ref.id

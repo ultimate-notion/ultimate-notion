@@ -33,6 +33,9 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         else:
             return self.id == other.id
 
+    def __hash__(self) -> int:
+        return hash(self.id)
+
     @property
     def session(self) -> Session:
         """Return the currently active session"""

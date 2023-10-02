@@ -196,6 +196,9 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
             return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
+    def __hash__(self) -> int:
+        return hash(self.obj_ref.type) + hash(self.obj_ref.value)
+
 
 class Column:
     """Column with a name and a certain Property Type for defining a Notion database schema

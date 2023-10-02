@@ -200,6 +200,9 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
         other_value = other.value if isinstance(other, Number) else other
         return self.value == other_value
 
+    def __hash__(self) -> int:
+        return hash(self.value)
+
 
 class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
     """Simple checkbox type; represented as a boolean."""
