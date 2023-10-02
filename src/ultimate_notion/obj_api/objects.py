@@ -2,6 +2,15 @@
 
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
+
+For validation the Pydantic model fields specify if a field is optional or not.
+Some fields are always set, e.g. `id`, when retrieving an object but must not be set
+when sending the object to the Notion API in order to create the object.
+To model this behavior, the default value `None` is used for those objects, e.g.
+```
+class SelectOption(GenericObject)
+    id: str = None
+````
 """
 from __future__ import annotations
 

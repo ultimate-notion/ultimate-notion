@@ -326,7 +326,8 @@ class QueryBuilder:
 
         logger.debug('executing query - %s', self.query)
 
-        query = self.query.model_dump()
+        # the API doesn't like "undefined" values...
+        query = self.query.serialize_for_api()
 
         if self.params:
             query.update(self.params)

@@ -3,42 +3,12 @@ from __future__ import annotations
 
 import inspect
 import logging
-from datetime import date, datetime
-from enum import Enum
 from typing import Any, ClassVar
 from uuid import UUID
 
 from pydantic import BaseModel, ValidatorFunctionWrapHandler, field_validator, model_validator
 
 logger = logging.getLogger(__name__)
-
-
-# ToDo: APPLY https://docs.pydantic.dev/latest/usage/serialization/#serializing-with-duck-typing
-def serialize_to_api(data):
-    """Recursively convert the given data to an API-safe form.
-
-    This is mostly to handle data types that will not directly serialize to JSON.
-    """
-
-    # https://github.com/samuelcolvin/pydantic/issues/1409
-    # ToDo: Seems to be fixed in pydantic v2, remove this workaround
-
-    if isinstance(data, date | datetime):
-        return data.isoformat()
-
-    if isinstance(data, UUID):
-        return str(data)
-
-    if isinstance(data, Enum):
-        return data.value
-
-    if isinstance(data, list | tuple):
-        return [serialize_to_api(value) for value in data]
-
-    if isinstance(data, dict):
-        return {name: serialize_to_api(value) for name, value in data.items()}
-
-    return data
 
 
 class GenericObject(BaseModel, extra='forbid'):
@@ -101,19 +71,13 @@ class GenericObject(BaseModel, extra='forbid'):
 
         return self
 
-    def model_dump(self, **kwargs):  # noqa: PLR6301
-        """Convert to a suitable representation for the Notion API."""
-
-        # the API doesn't like "undefined" values...
-        kwargs['exclude_none'] = True
-        kwargs['by_alias'] = True
-
-        obj = super().model_dump(**kwargs)
-
+    def serialize_for_api(self):
+        """Serialize the object for sending it to the Notion API"""
         # TODO: read-only fields should not be sent to the API
         # https://github.com/jheddings/notional/issues/9
 
-        return serialize_to_api(obj)
+        # the API doesn't like "undefined" values...
+        return self.model_dump(mode='json', exclude_none=True, by_alias=True)
 
     @classmethod
     def build(cls, *args, **kwargs):

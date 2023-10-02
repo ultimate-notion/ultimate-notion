@@ -70,7 +70,7 @@ class BlocksEndpoint(Endpoint):
 
             parent_id = ObjectReference.build(parent).id
 
-            children = [block.model_dump() for block in blocks if block is not None]
+            children = [block.serialize_for_api() for block in blocks if block is not None]
 
             logger.info('Appending %d blocks to %s ...', len(children), parent_id)
 
@@ -167,7 +167,7 @@ class BlocksEndpoint(Endpoint):
 
         logger.info('Updating block :: %s', block.id)
 
-        data = self.raw_api.update(block.id.hex, **block.model_dump())
+        data = self.raw_api.update(block.id.hex, **block.serialize_for_api())
 
         return block.update(**data)
 
@@ -194,15 +194,15 @@ class DatabasesEndpoint(Endpoint):
         request = {}
 
         if parent is not None:
-            request['parent'] = parent.model_dump()
+            request['parent'] = parent.serialize_for_api()
 
         if title is not None:
             prop = TextObject.build(title)
-            request['title'] = [prop.model_dump()]
+            request['title'] = [prop.serialize_for_api()]
 
         if schema is not None:
             request['properties'] = {
-                name: value.model_dump() if value is not None else None for name, value in schema.items()
+                name: value.serialize_for_api() if value is not None else None for name, value in schema.items()
             }
 
         return request
@@ -352,7 +352,7 @@ class PagesEndpoint(Endpoint):
             msg = "Unsupported 'parent'"
             raise ValueError(msg)
 
-        request = {'parent': parent.model_dump()}
+        request = {'parent': parent.serialize_for_api()}
 
         # the API requires a properties object, even if empty
         if properties is None:
@@ -362,11 +362,11 @@ class PagesEndpoint(Endpoint):
             properties['title'] = title
 
         request['properties'] = {
-            name: prop.model_dump() if prop is not None else None for name, prop in properties.items()
+            name: prop.serialize_for_api() if prop is not None else None for name, prop in properties.items()
         }
 
         if children is not None:
-            request['children'] = [child.model_dump() for child in children if child is not None]
+            request['children'] = [child.serialize_for_api() for child in children if child is not None]
 
         logger.info('Creating page :: %s => %s', parent, title)
 
@@ -425,7 +425,7 @@ class PagesEndpoint(Endpoint):
         if not properties:
             properties = page.properties
 
-        props = {name: value.model_dump() if value is not None else None for name, value in properties.items()}
+        props = {name: value.serialize_for_api() if value is not None else None for name, value in properties.items()}
 
         data = self.raw_api.update(page.id.hex, properties=props)
 
@@ -448,14 +448,14 @@ class PagesEndpoint(Endpoint):
             props['cover'] = {}
         elif cover is not False:
             logger.info('Setting page cover :: %s => %s', page_id, cover)
-            props['cover'] = cover.model_dump()
+            props['cover'] = cover.serialize_for_api()
 
         if icon is None:
             logger.info('Removing page icon :: %s', page_id)
             props['icon'] = {}
         elif icon is not False:
             logger.info('Setting page icon :: %s => %s', page_id, icon)
-            props['icon'] = icon.model_dump()
+            props['icon'] = icon.serialize_for_api()
 
         if archived is False:
             logger.info('Restoring page :: %s', page_id)
