@@ -96,6 +96,9 @@ class RichText(list[RichTextBase]):
         else:
             return NotImplemented
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class User(Wrapper[objs.User], wraps=objs.User):
     @classmethod

@@ -62,21 +62,19 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def parent(self) -> DataObject | None:
         """Return the parent record or None if the workspace is the parent"""
         session = get_active_session()
-        parent_obj = self.obj_ref.parent
+        parent = self.obj_ref.parent
 
-        if isinstance(parent_obj, objs.WorkspaceRef):
-            parent = None
-        elif isinstance(parent_obj, objs.PageRef):
-            parent = session.get_page(page_ref=parent_obj.page_id)
-        elif isinstance(parent_obj, objs.DatabaseRef):
-            parent = session.get_db(db_ref=parent_obj.database_id)
-        elif isinstance(parent_obj, objs.BlockRef):
-            parent = session.get_block(block_ref=parent_obj.block_id)
+        if isinstance(parent, objs.WorkspaceRef):
+            return None
+        elif isinstance(parent, objs.PageRef):
+            return session.get_page(page_ref=parent.page_id)
+        elif isinstance(parent, objs.DatabaseRef):
+            return session.get_db(db_ref=parent.database_id)
+        elif isinstance(parent, objs.BlockRef):
+            return session.get_block(block_ref=parent.block_id)
         else:
-            msg = f'Unknown parent reference {type(parent_obj)}'
+            msg = f'Unknown parent reference {type(parent)}'
             raise RuntimeError(msg)
-
-        return parent
 
     @property
     def parents(self) -> tuple[DataObject, ...]:

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from functools import wraps
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar, cast
 from uuid import UUID
 
 import numpy as np
@@ -189,6 +189,9 @@ def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str
     return keys_added_str, keys_removed_str, keys_changed_str
 
 
+Self = TypeVar('Self', bound='Wrapper[Any]')
+
+
 class Wrapper(Generic[T]):
     """Convert objects from the obj-based API to the high-level API and vice versa"""
 
@@ -209,11 +212,11 @@ class Wrapper(Generic[T]):
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: T) -> Wrapper[T]:
+    def wrap_obj_ref(cls: type[Self], obj_ref: T) -> Self:
         hl_cls = cls._obj_api_map[type(obj_ref)]
         hl_obj = hl_cls.__new__(hl_cls)
         hl_obj.obj_ref = obj_ref
-        return hl_obj
+        return cast(Self, hl_obj)
 
     @property
     def _obj_api_map_inv(self) -> dict[type[Wrapper], type[T]]:

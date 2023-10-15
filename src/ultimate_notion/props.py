@@ -69,10 +69,7 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
             return str(self.value) if self.value else ''
         elif isinstance(self.value, list):
             # workaround as `str` on lists calls `repr` instead of `str`
-            if self.value:
-                return f'[{", ".join(str(val) for val in self.value)}]'
-            else:
-                return ''
+            return ', '.join(str(val) for val in self.value)
         else:
             return str(self.value) if self.value else ''
 
@@ -337,7 +334,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 
     @property
     def value(self) -> str | float | int | DateType | None:  # all values of subclasses of `FormulaResult`
-        return self.obj_ref.formula.value
+        return self.obj_ref.formula.value if self.obj_ref.formula else None
 
 
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
@@ -362,6 +359,9 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     @property
     def value(self) -> str | float | int | DateType | list[PropertyValue] | None:
         # ToDo: Write a unit test for this!
+        if self.obj_ref.rollup is None:
+            return None
+
         rollup_val = self.obj_ref.rollup.value
         if isinstance(rollup_val, obj_props.RollupArray):
             return [PropertyValue.wrap_obj_ref(prop) for prop in rollup_val]

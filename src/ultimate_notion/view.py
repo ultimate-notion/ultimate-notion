@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ from ultimate_notion.utils import deepcopy_with_sharing, find_index, find_indice
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
 
-ColType = str | list[str]
+ColType: TypeAlias = str | list[str]
 T = TypeVar('T')
 
 
