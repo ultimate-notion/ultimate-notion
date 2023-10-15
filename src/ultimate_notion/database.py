@@ -1,4 +1,4 @@
-"""Database object"""
+"""Functionality for working with Notion databases"""
 from __future__ import annotations
 
 from textwrap import dedent
@@ -7,29 +7,27 @@ from typing import cast
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.objects import RichText
+from ultimate_notion.objects import File, RichText
 from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
 from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
 from ultimate_notion.text import camel_case, snake_case
-from ultimate_notion.utils import dict_diff_str
+from ultimate_notion.utils import dict_diff_str, get_active_session
 from ultimate_notion.view import View
 
 
 class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
-    """A Notion database object, not a linked databases
+    """A Notion database
 
-    If a custom schema is provided, i.e. specified during creating are the `schema` was set
-    then the schemy is verified.
-
-    https://developers.notion.com/docs/working-with-databases
+    This object always represents an original database, not a linked database.
+    Find out more under: https://developers.notion.com/docs/working-with-databases
     """
 
     _schema: type[PageSchema] | None = None
 
     def __str__(self):
         if self.title:
-            return self.title
+            return str(self.title)
         else:
             return 'Untitled'
 
@@ -38,22 +36,30 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
 
     @property
-    def title(self) -> str | None:
+    def title(self) -> RichText | None:
         """Return the title of this database as plain text."""
-        title_text = RichText.wrap_obj_ref(self.obj_ref.title)
-        return title_text.to_plain_text()
+        title = self.obj_ref.title
+        return RichText.wrap_obj_ref(title) if title else None
 
     @property
-    def description(self) -> list[objs.RichTextObject] | None:
-        return self.obj_ref.description
+    def description(self) -> RichText | None:
+        desc = self.obj_ref.description
+        return RichText.wrap_obj_ref(desc) if desc else None
 
     @property
-    def icon(self) -> objs.FileObject | objs.EmojiObject | None:
-        return self.obj_ref.icon
+    def icon(self) -> File | str | None:
+        icon = self.obj_ref.icon
+        if isinstance(icon, objs.FileObject):
+            return File.wrap_obj_ref(icon)
+        elif isinstance(icon, objs.EmojiObject):
+            return icon.emoji
+        else:
+            return None
 
     @property
-    def cover(self) -> objs.FileObject | None:
-        return self.obj_ref.cover
+    def cover(self) -> File | None:
+        cover = self.obj_ref.cover
+        return File.wrap_obj_ref(cover) if cover is not None else None
 
     @property
     def is_wiki(self) -> bool:
@@ -63,7 +69,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[PageSchema]:
         """Reflection about the database schema"""
-        title = self.title if self.title else 'Untitled'
+        title = str(self)
         cls_name = f'{camel_case(title)}Schema'
         attrs = {
             snake_case(k): Column(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
@@ -99,7 +105,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return self.obj_ref.url
 
     @property
-    def archived(self) -> bool:
+    def is_archived(self) -> bool:
         return self.obj_ref.archived
 
     @property
@@ -108,15 +114,19 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     def delete(self):
         """Delete this database"""
-        self.session.api.blocks.delete(self.id)
+        session = get_active_session()
+        session.api.blocks.delete(self.id)
 
     @staticmethod
     def _pages_from_query(query) -> list[Page]:
         # ToDo: Remove when self.query is implemented!
         return [Page(page_obj) for page_obj in query.execute()]
 
-    def view(self) -> View:
-        query = self.session.api.databases.query(self.id)  # ToDo: use self.query when implemented
+    def pages(self) -> View:
+        """Return a view of all pages in the database"""
+        # ToDo: Decide on also caching the view? or at least the pages within the view?
+        session = get_active_session()
+        query = session.api.databases.query(self.id)  # ToDo: use self.query when implemented
         pages = [Page(page_obj) for page_obj in query.execute()]
         return View(database=self, pages=pages, query=query)
 
@@ -141,7 +151,8 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
             schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
 
-        page = Page(obj_ref=self.session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
+        session = get_active_session()
+        page = Page(obj_ref=session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
         return page
 
     def query(self) -> QueryBuilder:

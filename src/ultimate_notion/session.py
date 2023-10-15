@@ -80,14 +80,23 @@ class Session:
                 Session._active_session = instance
 
     @classmethod
-    def get_active(cls):
-        """Return the current active session or raise"""
+    def get_active(cls) -> Session:
+        """Return the current active session or None"""
         with Session._lock:
             if Session._active_session:
                 return Session._active_session
             else:
                 msg = 'There is no activate Session'
                 raise ValueError(msg)
+
+    @classmethod
+    def get_or_create(cls, *args, **kwargs) -> Session:
+        """Return the current active session or create a new session"""
+        with Session._lock:
+            if Session._active_session:
+                return Session._active_session
+            else:
+                return cls(*args, **kwargs)
 
     def __enter__(self) -> Session:
         _log.debug('Connecting to Notion...')

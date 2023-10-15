@@ -15,6 +15,13 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         """Name of the option"""
         return self.obj_ref.name
 
+    def __repr__(self) -> str:
+        cls_name = self.__class__.__name__
+        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+
+    def __str__(self) -> str:
+        return self.name
+
 
 class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
     """A web resource e.g. for the files property"""
@@ -25,28 +32,28 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref = objs.ExternalFile.build(url=url, name=url)
 
 
-class RichTextElem(Wrapper[objs.RichTextObject], wraps=objs.RichTextObject):
-    """Super class for text, equation, mentions of various kinds"""
+class RichTextBase(Wrapper[objs.RichTextObject], wraps=objs.RichTextObject):
+    """Super class for text, equation and mentions of various kinds"""
 
 
-class Text(RichTextElem, wraps=objs.TextObject):
+class Text(RichTextBase, wraps=objs.TextObject):
     """A Text object"""
 
 
-class Equation(RichTextElem, wraps=objs.EquationObject):
+class Equation(RichTextBase, wraps=objs.EquationObject):
     """An Equation object"""
 
 
-class Mention(RichTextElem, wraps=objs.MentionObject):
+class Mention(RichTextBase, wraps=objs.MentionObject):
     """A Mention object"""
 
 
-class RichText(list[RichTextElem]):
-    """User-facing class holding several RichText's"""
+class RichText(list[RichTextBase]):
+    """User-facing class holding several RichTexts"""
 
     @classmethod
     def wrap_obj_ref(cls, obj_refs: list[objs.RichTextObject]) -> RichText:
-        return cls([cast(RichTextElem, RichTextElem.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs])
+        return cls([cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs])
 
     @property
     def obj_ref(self) -> list[objs.RichTextObject]:
@@ -65,7 +72,7 @@ class RichText(list[RichTextElem]):
     @classmethod
     def from_plain_text(cls, text: str) -> RichText:
         """Create RichTextList from plain text"""
-        rich_texts: list[RichTextElem] = []
+        rich_texts: list[RichTextBase] = []
         for part in chunky(text):
             rich_texts.append(Text(part))
 
@@ -79,7 +86,15 @@ class RichText(list[RichTextElem]):
 
     def __str__(self) -> str:
         plain_text = self.to_plain_text()
-        return plain_text if plain_text else ''
+        return plain_text if plain_text is not None else ''
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return str(self) == other
+        elif isinstance(other, RichText):
+            return str(self) == str(other)
+        else:
+            return NotImplemented
 
 
 class User(Wrapper[objs.User], wraps=objs.User):

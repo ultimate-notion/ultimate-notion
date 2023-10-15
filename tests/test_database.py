@@ -1,6 +1,10 @@
+from __future__ import annotations
+
 import pytest
 
-from ultimate_notion import Page, Session, database, schema
+from ultimate_notion import Page, RichText, Session, database, schema
+
+from .conftest import CONTACTS_DB
 
 
 def test_schema(article_db: database.Database):
@@ -42,3 +46,22 @@ def test_db_without_title(notion: Session, root_page: Page):
     db = notion.create_db(parent=root_page, schema=Article)
     assert db.title is None
     db.delete()
+
+
+def test_db_attributes(contacts_db):
+    assert isinstance(contacts_db.title, RichText)
+    assert contacts_db.title == CONTACTS_DB
+
+    assert isinstance(contacts_db.description, RichText)
+    assert contacts_db.description == 'Database of all my contacts!'
+
+    assert isinstance(contacts_db.icon, str)
+    assert contacts_db.icon == '🤝'
+
+    assert contacts_db.cover is None
+
+    assert contacts_db.url.startswith('https://www.notion.so/d')
+
+    assert not contacts_db.is_archived
+
+    assert not contacts_db.is_inline

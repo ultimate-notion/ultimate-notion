@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ultimate_notion.text import camel_case, decapitalize, snake_case
 
 

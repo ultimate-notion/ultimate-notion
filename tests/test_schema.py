@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timezone
 
 import pytest
@@ -118,7 +120,7 @@ def test_all_cols_schema(all_cols_db: Database):
 def test_wiki_db_schema(wiki_db: Database):
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
-    wiki_db.view()
+    wiki_db.pages()
 
 
 def test_two_way_prop(notion: Session, root_page: Page):

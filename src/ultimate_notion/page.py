@@ -7,7 +7,7 @@ from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.props import PropertyValue, Title
-from ultimate_notion.utils import is_notebook
+from ultimate_notion.utils import get_active_session, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -59,7 +59,8 @@ class PageProperties:
             value = prop_type.prop_value(value)
 
         # update the property on the server (which will update the local data)
-        self._page.session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
+        session = get_active_session()
+        session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
 
     def __iter__(self):
         """Iterator of property names"""
@@ -88,11 +89,16 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return page_props_cls(page=self)
 
     def __str__(self) -> str:
-        return repr(self)
+        return str(self.title)
 
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
         return f"<{cls_name}: '{self.title.value}' at {hex(id(self))}>"
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this page"""
+        # ToDo: Show the page as html.
+        raise NotImplementedError
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     # @property
@@ -163,4 +169,5 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             return md
 
     def delete(self):
-        self.session.api.pages.delete(self.obj_ref)
+        session = get_active_session()
+        session.api.pages.delete(self.obj_ref)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ultimate_notion.page import Page
 
 

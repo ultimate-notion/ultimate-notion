@@ -1,5 +1,9 @@
 """Unit tests for the Notion Session"""
+from __future__ import annotations
+
 import pytest
+
+from .conftest import CONTACTS_DB
 
 
 @pytest.mark.webtest
@@ -9,8 +13,8 @@ def test_raise_for_status(notion):
 
 @pytest.mark.webtest
 def test_search_get_db(notion):
-    db_by_name = notion.search_db('Contacts').item()
-    assert db_by_name.title == 'Contacts'
+    db_by_name = notion.search_db(CONTACTS_DB).item()
+    assert db_by_name.title == CONTACTS_DB
 
     db_by_id = notion.get_db(db_by_name.id)
     assert db_by_id.id == db_by_name.id

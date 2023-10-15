@@ -9,10 +9,10 @@ from notion_client.helpers import get_url
 
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.utils import Wrapper
+from ultimate_notion.utils import Wrapper, get_active_session
 
 if TYPE_CHECKING:
-    from ultimate_notion.session import Session
+    pass
 
 T = TypeVar('T', bound=obj_blocks.DataObject)
 
@@ -35,13 +35,6 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
     def __hash__(self) -> int:
         return hash(self.id)
-
-    @property
-    def session(self) -> Session:
-        """Return the currently active session"""
-        from ultimate_notion.session import Session
-
-        return Session.get_active()
 
     @property
     def id(self) -> UUID:  # noqa: A003
@@ -68,18 +61,22 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     @property
     def parent(self) -> DataObject | None:
         """Return the parent record or None if the workspace is the parent"""
-        match (parent := self.obj_ref.parent):
-            case objs.WorkspaceRef():
-                return None
-            case objs.PageRef():
-                return self.session.get_page(page_ref=parent.page_id)
-            case objs.DatabaseRef():
-                return self.session.get_db(db_ref=parent.database_id)
-            case objs.BlockRef():
-                return self.session.get_block(block_ref=parent.block_id)
-            case _:
-                msg = f'Unknown parent reference {type(parent)}'
-                raise RuntimeError(msg)
+        session = get_active_session()
+        parent_obj = self.obj_ref.parent
+
+        if isinstance(parent_obj, objs.WorkspaceRef):
+            parent = None
+        elif isinstance(parent_obj, objs.PageRef):
+            parent = session.get_page(page_ref=parent_obj.page_id)
+        elif isinstance(parent_obj, objs.DatabaseRef):
+            parent = session.get_db(db_ref=parent_obj.database_id)
+        elif isinstance(parent_obj, objs.BlockRef):
+            parent = session.get_block(block_ref=parent_obj.block_id)
+        else:
+            msg = f'Unknown parent reference {type(parent_obj)}'
+            raise RuntimeError(msg)
+
+        return parent
 
     @property
     def parents(self) -> tuple[DataObject, ...]:

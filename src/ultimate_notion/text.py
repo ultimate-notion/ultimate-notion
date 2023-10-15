@@ -1,4 +1,5 @@
 """Utilities for working text, markdown & Rich Text in Notion."""
+from __future__ import annotations
 
 import re
 from collections.abc import Iterator
@@ -9,7 +10,7 @@ MAX_TEXT_OBJECT_SIZE = 2000
 
 def chunky(text: str, length: int = MAX_TEXT_OBJECT_SIZE) -> Iterator[str]:
     """Break the given `text` into chunks of at most `length` size."""
-    return (text[idx: idx + length] for idx in range(0, len(text), length))
+    return (text[idx : idx + length] for idx in range(0, len(text), length))
 
 
 def python_identifier(string: str) -> str:

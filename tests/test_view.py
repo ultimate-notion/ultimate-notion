@@ -1,10 +1,17 @@
 """Unit test for a View"""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
+
+if TYPE_CHECKING:
+    from ultimate_notion.database import Database
 
 
 @pytest.mark.webtest
-def test_select(contacts_db):
-    view = contacts_db.view()
+def test_select(contacts_db: Database):
+    view = contacts_db.pages()
     sub_view = view.select('Name', 'Role')
     assert sub_view.columns == ['Name', 'Role']
     sub_view = view.select(['Name', 'Role'])
@@ -20,8 +27,8 @@ def test_select(contacts_db):
 
 
 @pytest.mark.webtest
-def test_rows(contacts_db):
-    view = contacts_db.view()
+def test_rows(contacts_db: Database):
+    view = contacts_db.pages()
     rows = view.rows()
     assert len(rows) == len(view)
     view = view.select('Name', 'Role')
@@ -32,8 +39,8 @@ def test_rows(contacts_db):
 
 
 @pytest.mark.webtest
-def test_index(contacts_db):
-    view = contacts_db.view()
+def test_index(contacts_db: Database):
+    view = contacts_db.pages()
     assert not view.has_index
     view = view.with_index('my_index')
     assert view.has_index

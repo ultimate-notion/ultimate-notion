@@ -1,6 +1,6 @@
 """Objects representing a database schema."""
-# ToDo: Following line creates a forward reference error in pydantic. Is this fixed in Pydantic 2?
-# from __future__ import annotations
+from __future__ import annotations
+
 from typing import Any
 from uuid import UUID
 

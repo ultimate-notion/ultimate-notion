@@ -4,6 +4,7 @@ This pydantic based API is often referred to as just `api` while the low-level
 API of the [Notion Client SDK library](https://github.com/ramnes/notion-sdk-py)
 is just referred to as `raw_api`.
 """
+from __future__ import annotations
 
 import logging
 

@@ -2,6 +2,7 @@
 
 Blocks are the base for all Notion content.
 """
+from __future__ import annotations
 
 from abc import ABC
 from datetime import datetime

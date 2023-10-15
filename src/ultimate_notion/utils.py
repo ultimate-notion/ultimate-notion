@@ -3,12 +3,16 @@ from __future__ import annotations
 
 from copy import deepcopy
 from functools import wraps
-from typing import Any, ClassVar, Generic, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar
 from uuid import UUID
 
 import numpy as np
 
 from ultimate_notion.obj_api import objects as objs
+
+if TYPE_CHECKING:
+    from ultimate_notion.session import Session
+
 
 T = TypeVar('T')
 KT = TypeVar('KT')
@@ -214,3 +218,14 @@ class Wrapper(Generic[T]):
     @property
     def _obj_api_map_inv(self) -> dict[type[Wrapper], type[T]]:
         return {v: k for k, v in self._obj_api_map.items()}
+
+
+def get_active_session() -> Session:
+    """Return the current active session or raise an exception
+
+    Avoids cyclic imports when used within the package itself.
+    For internal use mostly.
+    """
+    from ultimate_notion.session import Session
+
+    return Session.get_active()

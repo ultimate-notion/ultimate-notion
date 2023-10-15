@@ -105,40 +105,44 @@ class View:  # noqa: PLR0904
                 row[title_idx] = f'<img src="{page.icon}" style="height:1.2em">'
         return rows
 
-    def show(self, *, html: bool | None = None):
-        """Show the view
+    def show(self, tablefmt: str | None = None) -> str:
+        """Display the view in a given table format
 
-        Args:
-            html: output in html or not, or determine automatically based on context, e.g. Jupyter lab.
+        Some table formats:
+        - plain: no pseudographics
+        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
+        - github: GitHub flavored Markdown
+        - simple_grid: uses dashes & pipes to separate cells
+        - html: standard html markup
+
+        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
         """
         rows = self.rows()
         cols = self.columns
 
-        if html is None:
-            html = is_notebook()
+        if tablefmt is None:
+            tablefmt = 'html' if is_notebook() else 'simple'
 
-        if html:
+        if tablefmt == 'html':
             if self.has_icon:
                 rows = self._html_for_icon(rows, cols)
-                html_str = tabulate(rows, headers=cols, tablefmt='unsafehtml')
+                html_str = str(tabulate(rows, headers=cols, tablefmt='unsafehtml'))  # str() as tabulate wraps the str
             else:
-                html_str = tabulate(rows, headers=cols, tablefmt='html')
+                html_str = str(tabulate(rows, headers=cols, tablefmt='html'))  # str() as tabulate wraps the str
             return html_str
         else:
-            return tabulate(rows, headers=cols)
+            return tabulate(rows, headers=cols, tablefmt=tablefmt)
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this view"""
+        return self.show(tablefmt='html')
 
     def __repr__(self) -> str:
-        repr_str = self.show()
-        if is_notebook():
-            from IPython.core.display import display_html
-
-            display_html(repr_str)
-            return ''
-        else:
-            return repr_str
+        cls_name = self.__class__.__name__
+        return f"<{cls_name}: '{self.database.title!s}' at {hex(id(self))}>"
 
     def __str__(self) -> str:
-        return self.show(html=False)
+        return self.show()
 
     @property
     def has_index(self) -> bool:

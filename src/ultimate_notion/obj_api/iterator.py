@@ -1,4 +1,5 @@
 """Iterator classes for working with paginated API responses."""
+from __future__ import annotations
 
 import logging
 from typing import Annotated, Any
@@ -45,7 +46,10 @@ def convert_notion_object(obj: NotionObject) -> Block | Page | Database | Proper
 
 
 class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True):
-    """A paginated list of objects returned by the Notion API."""
+    """A paginated list of objects returned by the Notion API.
+
+    More details in the [Notion API](https://developers.notion.com/reference/intro#responses).
+    """
 
     results: list[Annotated[NotionObject, BeforeValidator(convert_notion_object)]] = Field(default_factory=list)
     has_more: bool = False

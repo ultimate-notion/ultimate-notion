@@ -1,7 +1,8 @@
 """Fixtures for Ultimate-Notion unit tests.
 
-Set `ENV_NOTION_AUTH_TOKEN` for tests intracting with the Notion API.
+Set `ENV_NOTION_AUTH_TOKEN` for tests interacting with the Notion API.
 """
+from __future__ import annotations
 
 import os
 
@@ -12,9 +13,9 @@ from ultimate_notion import Session, schema
 from ultimate_notion.page import Page
 from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
 
-# Manually created DB in Notion with all possible columns including AI columns!
-ALL_COL_DB = 'All Columns DB'
+ALL_COL_DB = 'All Columns DB'  # Manually created DB in Notion with all possible columns including AI columns!
 WIKI_DB = 'Wiki DB'
+CONTACTS_DB = 'Contacts DB'
 
 
 @pytest.fixture(scope='module')
@@ -53,7 +54,7 @@ def notion():
 @pytest.fixture(scope='session')
 def contacts_db(notion: Session):
     """Return a test database"""
-    return notion.search_db('Contacts').item()
+    return notion.search_db(CONTACTS_DB).item()
 
 
 @pytest.fixture(scope='session')
@@ -100,10 +101,10 @@ def wiki_db(notion: Session):
 
 # ToDo: Activate me later!
 # @pytest.fixture(scope="session", autouse=True)
-# def test_cleanups(notion: Session, root_page: Page, all_cols_db: Database, wiki_db: Database):
+# def test_cleanups(notion: Session, root_page: Page, all_cols_db: Database, wiki_db: Database, contacts_db: Database):
 #     """Delete all databases and pages in the root_page before we start except of some special dbs and their content"""
 #     for db in notion.search_db():
-#         if db.parents[0] == root_page and db not in (all_cols_db, wiki_db):
+#         if db.parents[0] == root_page and db not in (all_cols_db, wiki_db, contacts_db):
 #             db.delete()
 #     for page in notion.search_page():
 #         if page.parents and page.parents[0] == root_page and page.database not in (all_cols_db, wiki_db):

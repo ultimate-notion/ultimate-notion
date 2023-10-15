@@ -1,4 +1,5 @@
 """Functionality for use by end users"""
+from __future__ import annotations
 
 from ultimate_notion.text import rich_text
 

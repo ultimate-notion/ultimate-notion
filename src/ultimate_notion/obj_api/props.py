@@ -1,7 +1,9 @@
 """Wrapper for property values of pages"""
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from datetime import date as dt_date
-from datetime import datetime
+from datetime import date, datetime
+from typing import TypeAlias
 
 from pydantic import Field, SerializeAsAny, field_validator
 
@@ -9,6 +11,9 @@ from ultimate_notion.obj_api.core import GenericObject, NotionObject
 from ultimate_notion.obj_api.enums import VerificationState
 from ultimate_notion.obj_api.objects import DateRange, FileObject, ObjectReference, RichTextObject, TypedObject, User
 from ultimate_notion.obj_api.schema import Function, SelectOption
+
+#: Notion's complex `Date` type, which is either a date or without time or a date range of the former.
+DateType: TypeAlias = datetime | date | tuple[datetime | date, datetime | date]
 
 
 class PropertyValue(TypedObject, polymorphic_base=True):
@@ -55,7 +60,7 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, start: datetime | dt_date, end: datetime | dt_date | None = None):
+    def build(cls, start: datetime | date, end: datetime | date | None = None):
         """Create a new Date from the native values."""
         return cls.model_construct(date=DateRange(start=start, end=end))
 
@@ -146,7 +151,7 @@ class DateFormula(FormulaResult, type='date'):
     date: DateRange | None = None
 
     @property
-    def value(self) -> None | datetime | date | tuple[datetime | date, datetime | date]:
+    def value(self) -> None | DateType:
         if self.date is None:
             return None
         elif self.date.end is None:
@@ -211,7 +216,7 @@ class RollupDate(RollupObject, type='date'):
     date: DateRange | None = None
 
     @property
-    def value(self) -> None | datetime | date | tuple[datetime | date, datetime | date]:
+    def value(self) -> DateType | None:
         if self.date is None:
             return None
         elif self.date.end is None:

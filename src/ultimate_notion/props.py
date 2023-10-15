@@ -9,8 +9,9 @@ from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
+from ultimate_notion.obj_api.props import DateType
 from ultimate_notion.objects import Option, RichText, User
-from ultimate_notion.utils import Wrapper
+from ultimate_notion.utils import Wrapper, get_active_session
 
 if TYPE_CHECKING:
     from ultimate_notion.objects import File
@@ -59,6 +60,22 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
     def id(self) -> str | None:  # noqa: A003
         return self.obj_ref.id
 
+    def __repr__(self) -> str:
+        cls_name = self.__class__.__name__
+        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+
+    def __str__(self) -> str:
+        if isinstance(self.value, RichText):  # note that `RichText` is also a list but implements it's own __str__
+            return str(self.value) if self.value else ''
+        elif isinstance(self.value, list):
+            # workaround as `str` on lists calls `repr` instead of `str`
+            if self.value:
+                return f'[{", ".join(str(val) for val in self.value)}]'
+            else:
+                return ''
+        else:
+            return str(self.value) if self.value else ''
+
 
 class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     """Title property value"""
@@ -69,8 +86,8 @@ class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
         super().__init__(text)
 
     @property
-    def value(self) -> str:
-        return ''.join(text.plain_text for text in self.obj_ref.value)
+    def value(self) -> RichText:
+        return RichText.wrap_obj_ref(self.obj_ref.title)
 
 
 class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
@@ -80,6 +97,10 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
         if isinstance(text, str):
             text = RichText.from_plain_text(text)
         super().__init__(text)
+
+    @property
+    def value(self) -> RichText:
+        return RichText.wrap_obj_ref(self.obj_ref.rich_text)
 
 
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
@@ -216,7 +237,7 @@ class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
         self.obj_ref = obj_props.Date.build(start, end)
 
     @property
-    def value(self) -> None | datetime | date | tuple[datetime | date, datetime | date]:
+    def value(self) -> DateType | None:
         # ToDo: Set `time_zone` accordingly if provided
         date = self.obj_ref.date
         if date is None:
@@ -253,6 +274,13 @@ class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
 
         super().__init__(option)
 
+    @property
+    def value(self) -> Option | None:
+        if self.obj_ref.select:
+            return Option.wrap_obj_ref(self.obj_ref.select)
+        else:
+            return None
+
 
 class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSelect):
     """Notion multi-select type."""
@@ -262,6 +290,13 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
             options = [options]
         options = [Option(option) if isinstance(option, str) else option for option in options]
         super().__init__(options)
+
+    @property
+    def value(self) -> list[Option] | None:
+        if self.obj_ref.multi_select:
+            return [Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select]
+        else:
+            return None
 
 
 class People(PropertyValue[obj_props.People], wraps=obj_props.People):
@@ -301,7 +336,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     readonly = True
 
     @property
-    def value(self):
+    def value(self) -> str | float | int | DateType | None:  # all values of subclasses of `FormulaResult`
         return self.obj_ref.formula.value
 
 
@@ -313,6 +348,11 @@ class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
             pages = [pages]
         super().__init__(pages)
 
+    @property
+    def value(self) -> list[Page]:
+        session = get_active_session()
+        return [session.get_page(ref_obj.id) for ref_obj in self.obj_ref.relation]
+
 
 class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     """A Notion rollup property value."""
@@ -320,8 +360,13 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     readonly = True
 
     @property
-    def value(self):
-        return self.obj_ref.rollup.value
+    def value(self) -> str | float | int | DateType | list[PropertyValue] | None:
+        # ToDo: Write a unit test for this!
+        rollup_val = self.obj_ref.rollup.value
+        if isinstance(rollup_val, obj_props.RollupArray):
+            return [PropertyValue.wrap_obj_ref(prop) for prop in rollup_val]
+        else:
+            return rollup_val
 
 
 class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):

@@ -21,10 +21,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from tabulate import tabulate
+
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion.obj_api.schema import Function, NumberFormat
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.utils import SList, Wrapper
+from ultimate_notion.utils import SList, Wrapper, get_active_session, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -94,6 +96,34 @@ class PageSchema:
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
         return {col.name: col.type for col in cls.get_cols()}
+
+    @classmethod
+    def show(cls, tablefmt: str | None) -> str:
+        """Display the schema in a given table format
+
+        Some table formats:
+        - plain: no pseudographics
+        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
+        - github: GitHub flavored Markdown
+        - simple_grid: uses dashes & pipes to separate cells
+        - html: standard html markup
+
+        Find more tables formats under: https://github.com/astanin/python-tabulate#table-format
+        """
+        if tablefmt is None:
+            tablefmt = 'html' if is_notebook() else 'simple'
+
+        headers = ['Name', 'Property', 'Attribute']
+        rows = []
+        for col in cls.get_cols():
+            rows.append((col.name, col.type, col.attr_name))
+
+        return tabulate(rows, headers=headers, tablefmt=tablefmt)
+
+    @classmethod
+    def _repr_html_(cls) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this schema"""
+        return cls.show(tablefmt='html')
 
     @classmethod
     def get_title_prop(cls) -> Column:
@@ -198,6 +228,13 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
 
     def __hash__(self) -> int:
         return hash(self.obj_ref.type) + hash(self.obj_ref.value)
+
+    def __repr__(self) -> str:
+        cls_name = self.__class__.__name__
+        return f"<PropertyType: '{cls_name}' at {hex(id(self))}>"
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
 
 
 class Column:
@@ -339,7 +376,8 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             return self._schema
         elif self.prop_ref._schema.is_bound():
             db = self.prop_ref._schema._database
-            return db.session.get_db(self.obj_ref.relation.database_id).schema if db else None
+            session = get_active_session()
+            return session.get_db(self.obj_ref.relation.database_id).schema if db else None
         else:
             return None
 
@@ -381,15 +419,17 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
         two_wap_prop_name = self._two_way_prop.name
         if obj_synced_property_name != two_wap_prop_name:
+            session = get_active_session()
+
             # change the old default name in the target schema to what was passed during initialization
             other_db = self.schema.get_db()
             prop_id = self.obj_ref.relation.dual_property.synced_property_id
             schema_dct = {prop_id: obj_schema.RenameProp(name=two_wap_prop_name)}
-            other_db.session.api.databases.update(dbref=other_db.obj_ref, schema=schema_dct)
+            session.api.databases.update(dbref=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
             our_db = self.prop_ref._schema.get_db()
-            our_db.session.api.databases.update(dbref=our_db.obj_ref, schema={})  # sync obj_ref
+            session.api.databases.update(dbref=our_db.obj_ref, schema={})  # sync obj_ref
             our_db.schema._set_obj_refs()
 
 

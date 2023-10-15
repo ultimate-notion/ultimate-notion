@@ -89,7 +89,8 @@ class NotionObject(GenericObject):
     """A top-level Notion API resource."""
 
     object: str  # noqa: A003
-    id: UUID | None = None  # noqa: A003
+    request_id: UUID = None
+    id: UUID = None  # noqa: A003
 
     def __init_subclass__(cls, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)
