@@ -22,7 +22,7 @@ jobs:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 2  # avoids time-outs
+      max-parallel: 1  # avoids time-outs
       fail-fast: true # kill everything after first error to save resources
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -47,10 +47,10 @@ jobs:
       run: hatch run ci
 
     - name: Coveralls Parallel
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.github_token }}
-        flag-name: run-${{ matrix.test_number }}
+        flag-name: run-${{ join(matrix.*, '-') }}
         parallel: true
         path-to-lcov: coverage.lcov
 
@@ -60,7 +60,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - name: Coveralls finished
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
