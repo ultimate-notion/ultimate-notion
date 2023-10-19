@@ -1,3 +1,7 @@
+"""
+`# type: ignore` are mostly do to mypy's too strict way of handling the type of property getters and setters.
+More details here: https://github.com/python/mypy/issues/3004
+"""
 from __future__ import annotations
 
 import pytest
@@ -44,7 +48,7 @@ def test_db_without_title(notion: Session, root_page: Page):
         desc = schema.Column('Description', schema.Text())
 
     db = notion.create_db(parent=root_page, schema=Article)
-    assert db.title is None
+    assert db.title == ''
     db.delete()
 
 
@@ -71,7 +75,7 @@ def test_title_setter(notion: Session, article_db: Database):
     old_title = 'Articles'
     assert article_db.title == old_title
     new_title = 'My most favorite articles'
-    article_db.title = new_title
+    article_db.title = new_title  # type: ignore
     assert article_db.title == new_title
     # clear cache and retrieve the database again to be sure it was udpated on the server side
     notion.cache.clear()
@@ -79,18 +83,18 @@ def test_title_setter(notion: Session, article_db: Database):
     assert article_db.title == new_title
     article_db.title = RichText(old_title)
     assert article_db.title == old_title
-    article_db.title = None
-    assert article_db.title is None
+    article_db.title = ''  # type: ignore
+    assert article_db.title == ''
 
 
 def test_description_setter(notion: Session, article_db: Database):
-    assert article_db.description is None
+    assert article_db.description == ''
     new_description = 'My most favorite articles'
-    article_db.description = new_description
+    article_db.description = new_description  # type: ignore
     assert article_db.description == new_description
     # clear cache and retrieve the database again to be sure it was udpated on the server side
     notion.cache.clear()
     article_db = notion.get_db(article_db.id)
     assert article_db.description == new_description
-    article_db.description = None
-    assert article_db.description is None
+    article_db.description = ''  # type: ignore
+    assert article_db.description == ''

@@ -84,12 +84,11 @@ class RichText(list[RichTextBase]):
         raise NotImplementedError
 
     @classmethod
-    def from_plain_text(cls, text: str | None) -> RichText:
+    def from_plain_text(cls, text: str) -> RichText:
         """Create RichTextList from plain text"""
         rich_texts: list[RichTextBase] = []
-        if text is not None:
-            for part in chunky(text):
-                rich_texts.append(Text(part))
+        for part in chunky(text):
+            rich_texts.append(Text(part))
 
         return cls(rich_texts, _factory_method=True)
 

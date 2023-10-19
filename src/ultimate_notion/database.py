@@ -36,13 +36,13 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
 
     @property
-    def title(self) -> RichText | None:
+    def title(self) -> RichText:
         """Return the title of this database as rich text."""
         title = self.obj_ref.title
-        return RichText.wrap_obj_ref(title) if title else None
+        return RichText.wrap_obj_ref(title)
 
     @title.setter
-    def title(self, text: str | RichText | None):
+    def title(self, text: str | RichText):
         """Set the title of this database"""
         if not isinstance(text, RichText):
             text = RichText.from_plain_text(text)
@@ -50,13 +50,13 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session.api.databases.update(self.obj_ref, title=text.obj_ref)
 
     @property
-    def description(self) -> RichText | None:
+    def description(self) -> RichText:
         """Return the description of this database as rich text."""
         desc = self.obj_ref.description
-        return RichText.wrap_obj_ref(desc) if desc else None
+        return RichText.wrap_obj_ref(desc)
 
     @description.setter
-    def description(self, text: str | RichText | None):
+    def description(self, text: str | RichText):
         """Set the description of this database"""
         if not isinstance(text, RichText):
             text = RichText.from_plain_text(text)
