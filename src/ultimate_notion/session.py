@@ -144,12 +144,13 @@ class Session:
                 if not (isinstance(prop_type, Relation) and not prop_type.schema)
             }
             schema_dct = {k: v.obj_ref for k, v in schema_no_backrels_dct.items()}
-            db_obj = self.api.databases.create(parent=parent.obj_ref, title=schema.db_title, schema=schema_dct)
+            title = schema.db_title.obj_ref if schema.db_title is not None else None
+            db_obj = self.api.databases.create(parent=parent.obj_ref, title=title, schema=schema_dct)
         else:
             schema_dct = {}
             db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
 
-        db = Database(obj_ref=db_obj)
+        db: Database = Database(obj_ref=db_obj)
 
         if schema:
             db.schema = schema
@@ -161,12 +162,12 @@ class Session:
     def create_dbs(self, parents: Page | list[Page], schemas: list[type[PageSchema]]) -> list[Database]:
         """Create new databases in the right order if there a relations between them"""
         # ToDo: Implement
-        raise NotImplementedError()
+        raise NotImplementedError
 
-    def ensure_db(self, parent: Page, schema: type[PageSchema], title: str | None = None):
+    def get_or_create_db(self, parent: Page, schema: type[PageSchema], title: str | None = None):
         """Get or create the database"""
         # ToDo: Implement
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def search_db(self, db_name: str | None = None, *, exact: bool = True) -> SList[Database]:
         """Search a database by name

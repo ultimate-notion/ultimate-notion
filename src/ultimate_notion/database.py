@@ -20,7 +20,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     """A Notion database
 
     This object always represents an original database, not a linked database.
-    Find out more under: https://developers.notion.com/docs/working-with-databases
+    API reference: https://developers.notion.com/docs/working-with-databases
     """
 
     _schema: type[PageSchema] | None = None
@@ -37,14 +37,31 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def title(self) -> RichText | None:
-        """Return the title of this database as plain text."""
+        """Return the title of this database as rich text."""
         title = self.obj_ref.title
         return RichText.wrap_obj_ref(title) if title else None
 
+    @title.setter
+    def title(self, text: str | RichText | None):
+        """Set the title of this database"""
+        if not isinstance(text, RichText):
+            text = RichText.from_plain_text(text)
+        session = get_active_session()
+        session.api.databases.update(self.obj_ref, title=text.obj_ref)
+
     @property
     def description(self) -> RichText | None:
+        """Return the description of this database as rich text."""
         desc = self.obj_ref.description
         return RichText.wrap_obj_ref(desc) if desc else None
+
+    @description.setter
+    def description(self, text: str | RichText | None):
+        """Set the description of this database"""
+        if not isinstance(text, RichText):
+            text = RichText.from_plain_text(text)
+        session = get_active_session()
+        session.api.databases.update(self.obj_ref, description=text.obj_ref)
 
     @property
     def icon(self) -> File | str | None:

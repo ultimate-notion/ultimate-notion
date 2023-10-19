@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from datetime import date, datetime
 from typing import TypeAlias
 
-from pydantic import Field, SerializeAsAny, field_validator
+from pydantic import SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject
 from ultimate_notion.obj_api.enums import VerificationState
@@ -33,13 +33,13 @@ class PropertyValue(TypedObject, polymorphic_base=True):
 class Title(PropertyValue, type='title'):
     """Notion title type."""
 
-    title: list[SerializeAsAny[RichTextObject]] = Field(default_factory=list)
+    title: list[SerializeAsAny[RichTextObject]] = None
 
 
 class RichText(PropertyValue, type='rich_text'):
     """Notion rich text type."""
 
-    rich_text: list[SerializeAsAny[RichTextObject]] = Field(default_factory=list)
+    rich_text: list[SerializeAsAny[RichTextObject]] = None
 
 
 class Number(PropertyValue, type='number'):
@@ -80,13 +80,13 @@ class Select(PropertyValue, type='select'):
 class MultiSelect(PropertyValue, type='multi_select'):
     """Notion multi-select type."""
 
-    multi_select: list[SelectOption] = Field(default_factory=list)
+    multi_select: list[SelectOption] = None
 
 
 class People(PropertyValue, type='people'):
     """Notion people type."""
 
-    people: list[SerializeAsAny[User]] = Field(default_factory=list)
+    people: list[SerializeAsAny[User]] = None
 
 
 class URL(PropertyValue, type='url'):
@@ -110,7 +110,7 @@ class PhoneNumber(PropertyValue, type='phone_number'):
 class Files(PropertyValue, type='files'):
     """Notion files type."""
 
-    files: list[SerializeAsAny[FileObject]] = Field(default_factory=list)
+    files: list[SerializeAsAny[FileObject]] = None
 
 
 class FormulaResult(TypedObject, ABC, polymorphic_base=True):
@@ -179,7 +179,7 @@ class Formula(PropertyValue, type='formula'):
 class Relation(PropertyValue, type='relation'):
     """A Notion relation property value."""
 
-    relation: list[ObjectReference] = Field(default_factory=list)
+    relation: list[ObjectReference] = None
     has_more: bool = False
 
     @classmethod

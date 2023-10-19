@@ -21,7 +21,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     """The base type for all data-related types, i.e, pages, databases and blocks"""
 
     def __init__(self, obj_ref: T):
-        """Notional object reference for dispatch"""
+        """Reference to API object from the `obj_api` subpackage"""
         self.obj_ref = obj_ref
 
     def __eq__(self, other: object) -> bool:

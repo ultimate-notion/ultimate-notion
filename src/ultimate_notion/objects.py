@@ -51,9 +51,21 @@ class Mention(RichTextBase, wraps=objs.MentionObject):
 class RichText(list[RichTextBase]):
     """User-facing class holding several RichTexts"""
 
+    def __new__(cls, plain_text: str, *, _factory_method: bool = False) -> RichText:
+        """Default constructor creates RichText object from a single plain text string argument"""
+        if _factory_method:
+            return super().__new__(cls)
+        else:
+            return cls.from_plain_text(plain_text)
+
+    def __init__(self, *args, _factory_method: bool = False):
+        if _factory_method:  # avoids the automatic call after the implicit __new__ when calling default constructor
+            super().__init__(*args)
+
     @classmethod
     def wrap_obj_ref(cls, obj_refs: list[objs.RichTextObject]) -> RichText:
-        return cls([cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs])
+        rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
+        return cls(rich_texts, _factory_method=True)
 
     @property
     def obj_ref(self) -> list[objs.RichTextObject]:
@@ -62,21 +74,24 @@ class RichText(list[RichTextBase]):
     @classmethod
     def from_markdown(cls, text: str) -> RichText:
         """Create RichTextList by parsing the markdown"""
+        # ToDo: Implement
+        # ToDo: Handle Equations and Mentions here accordingly
         raise NotImplementedError
 
     def to_markdown(self) -> str | None:
         """Convert the list of RichText objects to markdown"""
         # ToDo: Implement
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @classmethod
-    def from_plain_text(cls, text: str) -> RichText:
+    def from_plain_text(cls, text: str | None) -> RichText:
         """Create RichTextList from plain text"""
         rich_texts: list[RichTextBase] = []
-        for part in chunky(text):
-            rich_texts.append(Text(part))
+        if text is not None:
+            for part in chunky(text):
+                rich_texts.append(Text(part))
 
-        return cls(rich_texts)
+        return cls(rich_texts, _factory_method=True)
 
     def to_plain_text(self) -> str | None:
         """Return rich text as plaintext"""

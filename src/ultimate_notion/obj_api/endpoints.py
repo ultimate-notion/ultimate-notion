@@ -7,12 +7,13 @@ is just referred to as `raw_api`.
 from __future__ import annotations
 
 import logging
+from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
-from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, TextObject, User
+from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, RichTextObject, User
 from ultimate_notion.obj_api.props import PropertyItem, Title
 from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.obj_api.schema import PropertyType
@@ -185,7 +186,8 @@ class DatabasesEndpoint(Endpoint):
     def _build_request(
         parent: SerializeAsAny[ParentRef] | None = None,
         schema: dict[str, PropertyType] | None = None,
-        title=None,
+        title: list[RichTextObject] | None = None,
+        description: list[RichTextObject] | None = None,
     ):
         """Build a request payload from the given items.
 
@@ -198,8 +200,10 @@ class DatabasesEndpoint(Endpoint):
             request['parent'] = parent.serialize_for_api()
 
         if title is not None:
-            prop = TextObject.build(title)
-            request['title'] = [prop.serialize_for_api()]
+            request['title'] = [rt_obj.serialize_for_api() for rt_obj in title]
+
+        if description is not None:
+            request['description'] = [rt_obj.serialize_for_api() for rt_obj in description]
 
         if schema is not None:
             request['properties'] = {
@@ -240,28 +244,34 @@ class DatabasesEndpoint(Endpoint):
 
         return Database.model_validate(data)
 
-    # https://developers.notion.com/reference/update-a-database
-    def update(self, dbref, title=None, schema: dict[str, PropertyType] | None = None):
+    def update(
+        self,
+        db_ref: Database | str | UUID,
+        title: list[RichTextObject] | None = None,
+        description: list[RichTextObject] | None = None,
+        schema: dict[str, PropertyType] | None = None,
+    ):
         """Update the Database object on the server.
 
         The database info will be updated to the latest version from the server.
 
-        `dbref` may be any suitable `DatabaseRef` type.
+        API reference: https://developers.notion.com/reference/update-a-database
         """
 
-        dbid = DatabaseRef.build(dbref).database_id
+        dbid = DatabaseRef.build(db_ref).database_id
 
         logger.info('Updating database info :: %s', dbid)
 
-        request = self._build_request(schema=schema, title=title)
+        request = self._build_request(schema=schema, title=title, description=description)
 
         if request:
+            # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
             data = self.raw_api.update(dbid, **request)
 
-        if isinstance(dbref, Database):
-            dbref = dbref.update(**data)
+        if isinstance(db_ref, Database):
+            db_ref = db_ref.update(**data)
 
-        return dbref
+        return db_ref
 
     def delete(self, dbref):
         """Delete (archive) the specified Database.

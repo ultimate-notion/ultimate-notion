@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import Field, SerializeAsAny
+from pydantic import SerializeAsAny
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import CodingLanguage, FullColor
@@ -45,13 +45,13 @@ class DataObject(NotionObject):
 class Database(DataObject, object='database'):
     """A database record type."""
 
-    title: list[RichTextObject] = Field(default_factory=list)
+    title: list[RichTextObject] = None
     url: str = None
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | None = None
     cover: FileObject | None = None
-    properties: dict[str, PropertyType] = Field(default_factory=dict)
-    description: list[RichTextObject] = Field(default_factory=list)
+    properties: dict[str, PropertyType] = None
+    description: list[RichTextObject] = None
     is_inline: bool = False
 
 
@@ -62,7 +62,7 @@ class Page(DataObject, object='page'):
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, PropertyValue] = Field(default_factory=dict)
+    properties: dict[str, PropertyValue] = None
 
 
 class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
@@ -154,7 +154,7 @@ class Paragraph(TextBlock, WithChildrenMixin, type='paragraph'):
     """A paragraph block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -174,7 +174,7 @@ class Heading1(TextBlock, type='heading_1'):
     """A heading_1 block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         color: FullColor = FullColor.DEFAULT
 
     heading_1: _NestedData = _NestedData()
@@ -193,7 +193,7 @@ class Heading2(TextBlock, type='heading_2'):
     """A heading_2 block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         color: FullColor = FullColor.DEFAULT
 
     heading_2: _NestedData = _NestedData()
@@ -212,7 +212,7 @@ class Heading3(TextBlock, type='heading_3'):
     """A heading_3 block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         color: FullColor = FullColor.DEFAULT
 
     heading_3: _NestedData = _NestedData()
@@ -231,7 +231,7 @@ class Quote(TextBlock, WithChildrenMixin, type='quote'):
     """A quote block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -251,8 +251,8 @@ class Code(TextBlock, type='code'):
     """A code block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
-        caption: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
+        caption: list[RichTextObject] = None
         language: CodingLanguage = CodingLanguage.PLAIN_TEXT
 
     code: _NestedData = _NestedData()
@@ -282,7 +282,7 @@ class Callout(TextBlock, WithChildrenMixin, type='callout'):
     """A callout block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         children: list[Block] | None = None
         icon: SerializeAsAny[FileObject] | EmojiObject | None = None
         color: FullColor = FullColor.GRAY_BACKGROUND
@@ -308,7 +308,7 @@ class BulletedListItem(TextBlock, WithChildrenMixin, type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -328,7 +328,7 @@ class NumberedListItem(TextBlock, WithChildrenMixin, type='numbered_list_item'):
     """A numbered list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -348,7 +348,7 @@ class ToDo(TextBlock, WithChildrenMixin, type='to_do'):
     """A todo list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         checked: bool = False
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
@@ -390,7 +390,7 @@ class Toggle(TextBlock, WithChildrenMixin, type='toggle'):
     """A toggle list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = Field(default_factory=list)
+        rich_text: list[RichTextObject] = None
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -400,7 +400,7 @@ class Toggle(TextBlock, WithChildrenMixin, type='toggle'):
 class Divider(Block, type='divider'):
     """A divider block in Notion."""
 
-    divider: Any = Field(default_factory=dict)
+    divider: Any = None
 
     # @property
     # def Markdown(self):

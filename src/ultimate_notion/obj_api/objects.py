@@ -26,7 +26,7 @@ from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObjec
 from ultimate_notion.obj_api.enums import Color, FullColor
 
 if TYPE_CHECKING:
-    from ultimate_notion.obj_api.blocks import Page
+    from ultimate_notion.obj_api.blocks import Database, Page
 
 
 class SelectOption(GenericObject):
@@ -95,11 +95,8 @@ class DatabaseRef(ParentRef, type='database_id'):
     database_id: UUID
 
     @classmethod
-    def build(cls, db_ref):
-        """Compose a DatabaseRef from the given reference object.
-
-        `db_ref` can be either a string, UUID, or database.
-        """
+    def build(cls, db_ref: Database | str | UUID):
+        """Compose a DatabaseRef from the given reference object."""
         ref = ObjectReference.build(db_ref)
         return DatabaseRef.model_construct(database_id=ref.id)
 
@@ -340,12 +337,13 @@ class TextObject(RichTextObject, type='text'):
     text: _NestedData = _NestedData()
 
     @classmethod
-    def build(cls, text, href=None, style=None):
+    def build(cls, text: str, href: str | None = None, style: Annotations | None = None):
         """Compose a TextObject from the given properties.
 
-        :param text: the plain text of this object
-        :param href: an optional link for this object
-        :param style: an optional Annotations object for this text
+        Args:
+            text: the plain text of this object
+            href: optional link for this object
+            style: optional annotations for styling this text
         """
 
         if text is None:

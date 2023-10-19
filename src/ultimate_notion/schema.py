@@ -25,6 +25,7 @@ from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion.obj_api.schema import Function, NumberFormat
+from ultimate_notion.objects import RichText
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, Wrapper, get_active_session, is_notebook
 
@@ -66,10 +67,11 @@ class ReadOnlyColumnError(SchemaError):
 class PageSchema:
     """Base class for the schema of a database."""
 
-    db_title: str | None
+    db_title: RichText | None
     _database: Database | None = None
 
-    def __init_subclass__(cls, db_title: str | None, **kwargs: Any):
+    def __init_subclass__(cls, db_title: RichText | str | None, **kwargs: Any):
+        db_title = RichText.from_plain_text(db_title) if db_title is not None else None
         cls.db_title = db_title
         super().__init_subclass__(**kwargs)
 
@@ -425,11 +427,11 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             other_db = self.schema.get_db()
             prop_id = self.obj_ref.relation.dual_property.synced_property_id
             schema_dct = {prop_id: obj_schema.RenameProp(name=two_wap_prop_name)}
-            session.api.databases.update(dbref=other_db.obj_ref, schema=schema_dct)
+            session.api.databases.update(db_ref=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
             our_db = self.prop_ref._schema.get_db()
-            session.api.databases.update(dbref=our_db.obj_ref, schema={})  # sync obj_ref
+            session.api.databases.update(db_ref=our_db.obj_ref, schema={})  # sync obj_ref
             our_db.schema._set_obj_refs()
 
 

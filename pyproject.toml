@@ -24,7 +24,8 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
 ]
 dependencies = [
-    "notion-client",
+    # ToDo: Remove direct reference when new version is released
+    "notion-client @ git+https://github.com/FlorianWilhelm/notion-sdk-py@description_param",
     "tabulate",
     "numpy",
     "pandas",
@@ -46,6 +47,9 @@ Source = "https://github.com/ultimate-notion/ultimate-notion"
 ######################
 # Build & Versioning #
 ######################
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.version]
 source = "vcs"
