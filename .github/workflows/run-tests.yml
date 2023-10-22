@@ -22,7 +22,7 @@ jobs:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 1  # avoids time-outs
+      max-parallel: 1  # avoids time-outs and conflicts
       fail-fast: true # kill everything after first error to save resources
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -65,21 +65,3 @@ jobs:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
           path-to-lcov: coverage.lcov
-
-  run-hatch-test-matrix:
-    name: Hatch matrix on Linux
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.10'
-
-    - name: Install Hatch
-      run: pip install --upgrade --pre hatch hatch-containers
-
-    - name: Run tests in virtualenv matrix
-      run: hatch run test:no-cov
