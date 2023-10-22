@@ -32,7 +32,7 @@ class PageProperty:
 class PageProperties:
     """Properties of a page as defined in the schema of the database
 
-    Access with the properties with `.property_name` or `["Property Name"]`.
+    Access the properties with `.property_name` or `["Property Name"]`.
     """
 
     def __init__(self, page: Page):
@@ -117,7 +117,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             return None
 
     @property
-    def title(self) -> Title:
+    def title(self) -> Title:  # Todo: Rather return Text here!
         """Title of the page"""
         # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
         for prop in self.obj_ref.properties.values():

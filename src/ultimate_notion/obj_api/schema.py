@@ -139,7 +139,7 @@ class Formula(PropertyType, type='formula'):
     """Defines the formula configuration for a database property."""
 
     class _NestedData(GenericObject):
-        expression: str = None
+        expression: str = None  # type: ignore
 
     formula: _NestedData = _NestedData()
 
@@ -151,7 +151,7 @@ class Formula(PropertyType, type='formula'):
 class PropertyRelation(TypedObject, polymorphic_base=True):
     """Defines common configuration for a property relation."""
 
-    database_id: UUID = None
+    database_id: UUID = None  # type: ignore
 
 
 class SinglePropertyRelation(PropertyRelation, type='single_property'):

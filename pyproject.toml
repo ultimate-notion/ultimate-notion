@@ -69,9 +69,8 @@ exclude = [
 
 [tool.mypy]
 files = ["src/ultimate_notion", "tests"]
-exclude = ["src/ultimate_notion/obj_api/.*"]  # ToDo: Remove this later on
 disallow_untyped_defs = false
-follow_imports = "silent"  # ToDo: make "normal" after obj_api is consistent
+follow_imports = "normal"
 ignore_missing_imports = true
 pretty = true
 show_column_numbers = true

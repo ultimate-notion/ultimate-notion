@@ -9,8 +9,10 @@ when sending the object to the Notion API in order to create the object.
 To model this behavior, the default value `None` is used for those objects, e.g.
 ```
 class SelectOption(GenericObject)
-    id: str = None
-````
+    id: str = None  # type: ignore  # to make sure mypy doesn't complain
+```
+Also be aware that this is import when updating to differentiate actual set values
+from default/unset values.
 """
 from __future__ import annotations
 
@@ -33,7 +35,7 @@ class SelectOption(GenericObject):
     """Options for select & multi-select objects."""
 
     name: str
-    id: str = None  # According to docs: "These are sometimes, but not always, UUIDs."  # noqa: A003
+    id: str = None  # type: ignore  # noqa: A003  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color = Color.DEFAULT
 
     @classmethod
@@ -145,7 +147,7 @@ class UserType(str, Enum):
     BOT = 'bot'
 
 
-class User(TypedObject, UserRef, polymorphic_base=True):
+class User(UserRef, TypedObject, polymorphic_base=True):
     """Represents a User in Notion."""
 
     name: str | None = None
@@ -156,19 +158,19 @@ class Person(User, type='person'):
     """Represents a Person in Notion."""
 
     class _NestedData(GenericObject):
-        email: str
+        email: str = None  # type: ignore
 
-    person: _NestedData = None
+    person: _NestedData = _NestedData()
 
 
 class Bot(User, type='bot'):
     """Represents a Bot in Notion."""
 
     class _NestedData(GenericObject):
-        owner: WorkspaceRef = None
-        workspace_name: str = None
+        owner: WorkspaceRef = None  # type: ignore
+        workspace_name: str = None  # type: ignore
 
-    bot: _NestedData = None
+    bot: _NestedData = _NestedData()
 
 
 class EmojiObject(TypedObject, type='emoji'):
@@ -244,7 +246,7 @@ class Annotations(GenericObject):
     strikethrough: bool = False
     underline: bool = False
     code: bool = False
-    color: FullColor = None
+    color: FullColor = None  # type: ignore
 
     @property
     def is_plain(self):
@@ -324,14 +326,14 @@ class LinkObject(GenericObject):
     """Reference a URL."""
 
     type: str = 'url'  # noqa: A003
-    url: str = None
+    url: str = None  # type: ignore
 
 
 class TextObject(RichTextObject, type='text'):
     """Notion text element."""
 
     class _NestedData(GenericObject):
-        content: str = None
+        content: str = None  # type: ignore
         link: LinkObject | None = None
 
     text: _NestedData = _NestedData()

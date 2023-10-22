@@ -6,17 +6,19 @@ import logging
 from typing import Any, ClassVar
 from uuid import UUID
 
-from pydantic import BaseModel, ValidatorFunctionWrapHandler, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, ValidatorFunctionWrapHandler, field_validator, model_validator
 
 logger = logging.getLogger(__name__)
 
 
-class GenericObject(BaseModel, extra='forbid'):
+class GenericObject(BaseModel):
     """The base for all API objects.
 
     As a general convention, data fields in lower case are defined by the
     Notion API.  Properties in Title Case are provided for convenience.
     """
+
+    model_config = ConfigDict(extra='forbid')
 
     def __setattr__(self, name, value):
         """Set the attribute of this object to a given value.
@@ -89,20 +91,20 @@ class NotionObject(GenericObject):
     """A top-level Notion API resource."""
 
     object: str  # noqa: A003
-    request_id: UUID = None
-    id: UUID = None  # noqa: A003
+    request_id: UUID = None  # type: ignore
+    id: UUID | str = None  # type: ignore  # noqa: A003
 
-    def __init_subclass__(cls, object=None, **kwargs):  # noqa: A002
+    def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def __pydantic_init_subclass__(cls, object=None, **kwargs):  # noqa: A002, PLW3201
+    def __pydantic_init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002, PLW3201
         """Update `GenericObject` defaults for the named object.
 
         Needed since `model_fields` are not available during __init_subclass__
         See: https://github.com/pydantic/pydantic/issues/5369
         """
-        super().__pydantic_init_subclass__(**kwargs)
+        super().__pydantic_init_subclass__(object=object, **kwargs)
 
         if object is not None:  # if None we inherit 'object' from the base class
             cls._set_field_default('object', default=object)
@@ -148,15 +150,15 @@ class TypedObject(GenericObject):
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def __pydantic_init_subclass__(cls, type: str | None = None, **kwargs):  # noqa: A002, PLW3201
+    def __pydantic_init_subclass__(cls, *, type: str | None = None, **kwargs):  # noqa: A002, PLW3201
         """Register the subtypes of the TypedObject subclass.
 
         Needed since `model_fields` are not available during __init_subclass__.
         See: https://github.com/pydantic/pydantic/issues/5369
         """
-        super().__pydantic_init_subclass__(**kwargs)
         type_name = cls.__name__ if type is None else type
         cls._register_type(type_name)
+        super().__pydantic_init_subclass__(**kwargs)
 
     @classmethod
     def _register_type(cls, name):

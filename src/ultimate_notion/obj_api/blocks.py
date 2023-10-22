@@ -28,41 +28,41 @@ from ultimate_notion.obj_api.schema import PropertyType
 class DataObject(NotionObject):
     """The base type for all Notion API records."""
 
-    id: UUID = None  # noqa: A003
+    id: UUID = None  # type: ignore  # noqa: A003
 
     parent: SerializeAsAny[ParentRef] = None
     has_children: bool = False
 
     archived: bool = False
 
-    created_time: datetime = None
-    created_by: UserRef = None
+    created_time: datetime = None  # type: ignore
+    created_by: UserRef = None  # type: ignore
 
-    last_edited_time: datetime = None
-    last_edited_by: UserRef = None
+    last_edited_time: datetime = None  # type: ignore
+    last_edited_by: UserRef = None  # type: ignore
 
 
 class Database(DataObject, object='database'):
     """A database record type."""
 
-    title: list[RichTextObject] = None
-    url: str = None
+    title: list[RichTextObject] = None  # type: ignore
+    url: str = None  # type: ignore
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | None = None
     cover: FileObject | None = None
-    properties: dict[str, PropertyType] = None
-    description: list[RichTextObject] = None
+    properties: dict[str, PropertyType] = None  # type: ignore
+    description: list[RichTextObject] = None  # type: ignore
     is_inline: bool = False
 
 
 class Page(DataObject, object='page'):
     """A standard Notion page object."""
 
-    url: str = None
+    url: str = None  # type: ignore
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, PropertyValue] = None
+    properties: dict[str, PropertyValue] = None  # type: ignore
 
 
 class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
@@ -154,7 +154,7 @@ class Paragraph(TextBlock, WithChildrenMixin, type='paragraph'):
     """A paragraph block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -174,7 +174,7 @@ class Heading1(TextBlock, type='heading_1'):
     """A heading_1 block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         color: FullColor = FullColor.DEFAULT
 
     heading_1: _NestedData = _NestedData()
@@ -193,7 +193,7 @@ class Heading2(TextBlock, type='heading_2'):
     """A heading_2 block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         color: FullColor = FullColor.DEFAULT
 
     heading_2: _NestedData = _NestedData()
@@ -212,7 +212,7 @@ class Heading3(TextBlock, type='heading_3'):
     """A heading_3 block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         color: FullColor = FullColor.DEFAULT
 
     heading_3: _NestedData = _NestedData()
@@ -231,7 +231,7 @@ class Quote(TextBlock, WithChildrenMixin, type='quote'):
     """A quote block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -251,8 +251,8 @@ class Code(TextBlock, type='code'):
     """A code block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
-        caption: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
+        caption: list[RichTextObject] = None  # type: ignore
         language: CodingLanguage = CodingLanguage.PLAIN_TEXT
 
     code: _NestedData = _NestedData()
@@ -282,7 +282,7 @@ class Callout(TextBlock, WithChildrenMixin, type='callout'):
     """A callout block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
         icon: SerializeAsAny[FileObject] | EmojiObject | None = None
         color: FullColor = FullColor.GRAY_BACKGROUND
@@ -308,7 +308,7 @@ class BulletedListItem(TextBlock, WithChildrenMixin, type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -328,7 +328,7 @@ class NumberedListItem(TextBlock, WithChildrenMixin, type='numbered_list_item'):
     """A numbered list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -348,7 +348,7 @@ class ToDo(TextBlock, WithChildrenMixin, type='to_do'):
     """A todo list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         checked: bool = False
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
@@ -390,7 +390,7 @@ class Toggle(TextBlock, WithChildrenMixin, type='toggle'):
     """A toggle list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None
+        rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
         color: FullColor = FullColor.DEFAULT
 
@@ -430,7 +430,7 @@ class Embed(Block, type='embed'):
     """An embed block in Notion."""
 
     class _NestedData(GenericObject):
-        url: str = None
+        url: str = None  # type: ignore
 
     embed: _NestedData = _NestedData()
 
@@ -458,7 +458,7 @@ class Bookmark(Block, type='bookmark'):
     """A bookmark block in Notion."""
 
     class _NestedData(GenericObject):
-        url: str = None
+        url: str = None  # type: ignore
         caption: list[RichTextObject] | None = None
 
     bookmark: _NestedData = _NestedData()
@@ -487,7 +487,7 @@ class LinkPreview(Block, type='link_preview'):
     """A link_preview block in Notion."""
 
     class _NestedData(GenericObject):
-        url: str = None
+        url: str = None  # type: ignore
 
     link_preview: _NestedData = _NestedData()
 
@@ -515,7 +515,7 @@ class Equation(Block, type='equation'):
     """An equation block in Notion."""
 
     class _NestedData(GenericObject):
-        expression: str = None
+        expression: str = None  # type: ignore
 
     equation: _NestedData = _NestedData()
 
@@ -553,7 +553,7 @@ class ChildPage(Block, type='child_page'):
     """A child page block in Notion."""
 
     class _NestedData(GenericObject):
-        title: str = None
+        title: str = None  # type: ignore
 
     child_page: _NestedData = _NestedData()
 
@@ -562,7 +562,7 @@ class ChildDatabase(Block, type='child_database'):
     """A child database block in Notion."""
 
     class _NestedData(GenericObject):
-        title: str = None
+        title: str = None  # type: ignore
 
     child_database: _NestedData = _NestedData()
 

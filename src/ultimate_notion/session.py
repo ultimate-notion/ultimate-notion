@@ -219,7 +219,7 @@ class Session:
             return page
 
     def create_page(self, parent: Page, title: RichText | str | None = None) -> Page:
-        if title:
+        if title is not None:
             title = Title(title).obj_ref
         page = Page(obj_ref=self.api.pages.create(parent=parent.obj_ref, title=title))
         self.cache[page.id] = page

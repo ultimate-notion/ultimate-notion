@@ -8,7 +8,7 @@ from typing import Any
 from uuid import UUID
 
 from notion_client.api_endpoints import SearchEndpoint
-from pydantic import Field, SerializeAsAny, field_validator
+from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
@@ -187,8 +187,10 @@ class LastEditedTimeFilter(TimestampFilter):
         return LastEditedTimeFilter(last_edited_time=value)
 
 
-class CompoundFilter(QueryFilter, populate_by_name=True):
+class CompoundFilter(QueryFilter):
     """Represents a compound filter in Notion."""
+
+    model_config = ConfigDict(populate_by_name=True)
 
     and_: list[QueryFilter] | None = Field(None, alias='and')
     or_: list[QueryFilter] | None = Field(None, alias='or')

@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import date, datetime
+from datetime import date as dt_date
+from datetime import datetime
 from typing import TypeAlias
 
 from pydantic import SerializeAsAny, field_validator
@@ -13,13 +14,13 @@ from ultimate_notion.obj_api.objects import DateRange, FileObject, ObjectReferen
 from ultimate_notion.obj_api.schema import Function, SelectOption
 
 #: Notion's complex `Date` type, which is either a date or without time or a date range of the former.
-DateType: TypeAlias = datetime | date | tuple[datetime | date, datetime | date]
+DateType: TypeAlias = dt_date | tuple[dt_date, dt_date]  # Note that date is the superclass of datetime!
 
 
 class PropertyValue(TypedObject, polymorphic_base=True):
     """Base class for Notion property values."""
 
-    id: str | None = None  # noqa: A003
+    id: str = None  # type: ignore  # noqa: A003
 
     @classmethod
     def build(cls, value):
@@ -33,13 +34,13 @@ class PropertyValue(TypedObject, polymorphic_base=True):
 class Title(PropertyValue, type='title'):
     """Notion title type."""
 
-    title: list[SerializeAsAny[RichTextObject]] = None
+    title: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
 
 
 class RichText(PropertyValue, type='rich_text'):
     """Notion rich text type."""
 
-    rich_text: list[SerializeAsAny[RichTextObject]] = None
+    rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
 
 
 class Number(PropertyValue, type='number'):
@@ -60,7 +61,7 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, start: datetime | date, end: datetime | date | None = None):
+    def build(cls, start: dt_date, end: dt_date | None = None):
         """Create a new Date from the native values."""
         return cls.model_construct(date=DateRange(start=start, end=end))
 
@@ -80,13 +81,13 @@ class Select(PropertyValue, type='select'):
 class MultiSelect(PropertyValue, type='multi_select'):
     """Notion multi-select type."""
 
-    multi_select: list[SelectOption] = None
+    multi_select: list[SelectOption] = None  # type: ignore
 
 
 class People(PropertyValue, type='people'):
     """Notion people type."""
 
-    people: list[SerializeAsAny[User]] = None
+    people: list[SerializeAsAny[User]] = None  # type: ignore
 
 
 class URL(PropertyValue, type='url'):
@@ -110,7 +111,7 @@ class PhoneNumber(PropertyValue, type='phone_number'):
 class Files(PropertyValue, type='files'):
     """Notion files type."""
 
-    files: list[SerializeAsAny[FileObject]] = None
+    files: list[SerializeAsAny[FileObject]] = None  # type: ignore
 
 
 class FormulaResult(TypedObject, ABC, polymorphic_base=True):
@@ -179,7 +180,7 @@ class Formula(PropertyValue, type='formula'):
 class Relation(PropertyValue, type='relation'):
     """A Notion relation property value."""
 
-    relation: list[ObjectReference] = None
+    relation: list[ObjectReference] = None  # type: ignore
     has_more: bool = False
 
     @classmethod
@@ -294,7 +295,6 @@ class Verification(PropertyValue, type='verification'):
     verification: _NestedData = _NestedData()
 
 
-# https://developers.notion.com/reference/property-item-object
 class PropertyItem(NotionObject, PropertyValue, object='property_item'):
     """A `PropertyItem` returned by the Notion API.
 
@@ -303,4 +303,8 @@ class PropertyItem(NotionObject, PropertyValue, object='property_item'):
 
     This class provides a placeholder for parsing property items, however objects
     parse by this class will likely be `PropertyValue`'s instead.
+
+    Notion-API: https://developers.notion.com/reference/property-item-object
     """
+
+    id: str  # noqa: A003

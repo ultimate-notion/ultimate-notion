@@ -7,6 +7,7 @@ is just referred to as `raw_api`.
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
@@ -17,6 +18,12 @@ from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRe
 from ultimate_notion.obj_api.props import PropertyItem, Title
 from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.obj_api.schema import PropertyType
+
+if TYPE_CHECKING:
+    from notion_client import Client as NCClient
+    from notion_client.api_endpoints import BlocksChildrenEndpoint as NCBlocksChildrenEndpoint
+    from notion_client.api_endpoints import BlocksEndpoint as NCBlocksEndpoint
+    from notion_client.api_endpoints import DatabasesEndpoint as NCDatabasesEndpoint
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +39,7 @@ class SessionError(Exception):
 class NotionAPI:
     """Object-based Notion API (pydantic) with all endpoints"""
 
-    def __init__(self, client):
+    def __init__(self, client: NCClient):
         self.client = client
 
         self.blocks = BlocksEndpoint(self)
@@ -43,21 +50,20 @@ class NotionAPI:
 
 
 class Endpoint:
-    """Notional wrapper for the API endpoints."""
+    """Baseclass of the Notion API endpoints."""
 
     def __init__(self, api: NotionAPI):
-        """Initialize the `Endpoint` for the supplied session."""
         self.api = api
 
 
 class BlocksEndpoint(Endpoint):
-    """Notional interface to the API 'blocks' endpoint."""
+    """Interface to the 'blocks' endpoint of the Notion API"""
 
     class ChildrenEndpoint(Endpoint):
         """Notional interface to the API 'blocks/children' endpoint."""
 
         @property
-        def raw_api(self):
+        def raw_api(self) -> NCBlocksChildrenEndpoint:
             """Return the underlying endpoint in the Notion SDK."""
             return self.api.client.blocks.children
 
@@ -115,7 +121,7 @@ class BlocksEndpoint(Endpoint):
         self.children = BlocksEndpoint.ChildrenEndpoint(*args, **kwargs)
 
     @property
-    def raw_api(self):
+    def raw_api(self) -> NCBlocksEndpoint:
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.blocks
 
@@ -175,10 +181,10 @@ class BlocksEndpoint(Endpoint):
 
 
 class DatabasesEndpoint(Endpoint):
-    """Notional interface to the API 'databases' endpoint."""
+    """Interface to the 'databases' endpoint of the Notion API"""
 
     @property
-    def raw_api(self):
+    def raw_api(self) -> NCDatabasesEndpoint:
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.databases
 
@@ -188,7 +194,7 @@ class DatabasesEndpoint(Endpoint):
         schema: dict[str, PropertyType] | None = None,
         title: list[RichTextObject] | None = None,
         description: list[RichTextObject] | None = None,
-    ):
+    ) -> dict[str, Any]:
         """Build a request payload from the given items.
 
         *NOTE* this method does not anticipate what the request will be used for and as
@@ -213,65 +219,57 @@ class DatabasesEndpoint(Endpoint):
         return request
 
     # https://developers.notion.com/reference/create-a-database
-    def create(self, parent, schema: dict[str, PropertyType], title=None):
+    def create(
+        self, parent: Page, schema: dict[str, PropertyType], title: list[RichTextObject] | None = None
+    ) -> Database:
         """Add a database to the given Page parent.
 
         `parent` may be any suitable `PageRef` type.
         """
 
         parent_ref = PageRef.build(parent)
-
-        logger.info('Creating database @ %s - %s', parent_ref.page_id, title)
+        logger.info(f'Creating database `{title!s}` at `{parent_ref.page_id}`')
 
         request = self._build_request(parent_ref, schema, title)
-
         data = self.raw_api.create(**request)
 
         return Database.model_validate(data)
 
     # https://developers.notion.com/reference/retrieve-a-database
-    def retrieve(self, dbref):
+    def retrieve(self, dbref: Database | str | UUID) -> Database:
         """Return the Database with the given ID.
 
         `dbref` may be any suitable `DatabaseRef` type.
         """
 
         dbid = DatabaseRef.build(dbref).database_id
-
-        logger.info('Retrieving database :: %s', dbid)
-
+        logger.info(f'Retrieving database with id `{dbid}`')
         data = self.raw_api.retrieve(dbid)
 
         return Database.model_validate(data)
 
     def update(
         self,
-        db_ref: Database | str | UUID,
+        db: Database,
         title: list[RichTextObject] | None = None,
         description: list[RichTextObject] | None = None,
         schema: dict[str, PropertyType] | None = None,
-    ):
+    ) -> Database:
         """Update the Database object on the server.
 
         The database info will be updated to the latest version from the server.
 
         API reference: https://developers.notion.com/reference/update-a-database
         """
-
-        dbid = DatabaseRef.build(db_ref).database_id
-
-        logger.info('Updating database info :: %s', dbid)
+        logger.info(f'Updating database info of `{db.title}`')
 
         request = self._build_request(schema=schema, title=title, description=description)
 
         if request:
             # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
-            data = self.raw_api.update(dbid, **request)
+            data = self.raw_api.update(db.id, **request)
 
-        if isinstance(db_ref, Database):
-            db_ref = db_ref.update(**data)
-
-        return db_ref
+        return db.update(**data)
 
     def delete(self, dbref):
         """Delete (archive) the specified Database.

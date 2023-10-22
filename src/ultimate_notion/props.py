@@ -57,7 +57,7 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
         return self.obj_ref.value
 
     @property
-    def id(self) -> str | None:  # noqa: A003
+    def id(self) -> str:  # noqa: A003
         return self.obj_ref.id
 
     def __repr__(self) -> str:
