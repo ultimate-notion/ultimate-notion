@@ -9,7 +9,10 @@ from hypothesis import strategies as st
 from ultimate_notion.props import Date, Number
 
 
-@given(st.floats(allow_nan=False, allow_infinity=False), st.floats(allow_nan=False, allow_infinity=False))
+@given(
+    st.floats(allow_nan=False, allow_infinity=False),
+    st.floats(allow_nan=False, allow_infinity=False),
+)
 def test_number_add(a, b):
     num1 = Number(a)
     num2 = Number(b)
@@ -26,7 +29,10 @@ def test_number_add(a, b):
     assert num2.value == pytest.approx(a + b)
 
 
-@given(st.floats(allow_nan=False, allow_infinity=False), st.floats(allow_nan=False, allow_infinity=False))
+@given(
+    st.floats(allow_nan=False, allow_infinity=False),
+    st.floats(allow_nan=False, allow_infinity=False),
+)
 def test_number_sub(a, b):
     num1 = Number(a)
     num2 = Number(b)
@@ -43,7 +49,10 @@ def test_number_sub(a, b):
     assert num2.value == pytest.approx(b - a)
 
 
-@given(st.floats(allow_nan=False, allow_infinity=False), st.floats(min_value=0.001, max_value=10000.0))
+@given(
+    st.floats(allow_nan=False, allow_infinity=False),
+    st.floats(min_value=0.001, max_value=10000.0),
+)
 def test_number_truediv(a, b):
     num1 = Number(a)
     num2 = Number(b)
@@ -61,7 +70,10 @@ def test_number_truediv(a, b):
     assert num1.value == pytest.approx(a / b)
 
 
-@given(st.floats(allow_nan=False, allow_infinity=False), st.floats(min_value=0.001, max_value=10000.0))
+@given(
+    st.floats(allow_nan=False, allow_infinity=False),
+    st.floats(min_value=0.001, max_value=10000.0),
+)
 def test_number_floordiv(a, b):
     num1 = Number(a)
     num2 = Number(b)
@@ -116,10 +128,12 @@ def test_number_cmp(a, b):
 
 @given(
     st.datetimes(
-        min_value=datetime(2000, 1, 1), max_value=datetime(2099, 12, 31)  # noqa: DTZ001, hypothesis doesn't want tzinfo
+        min_value=datetime(2000, 1, 1),  # noqa: DTZ001, hypothesis doesn't want tzinfo
+        max_value=datetime(2099, 12, 31),  # noqa: DTZ001, hypothesis doesn't want tzinfo
     ),
     st.datetimes(
-        min_value=datetime(3000, 1, 1), max_value=datetime(3099, 12, 31)  # noqa: DTZ001, hypothesis doesn't want tzinfo
+        min_value=datetime(3000, 1, 1),  # noqa: DTZ001, hypothesis doesn't want tzinfo
+        max_value=datetime(3099, 12, 31),  # noqa: DTZ001, hypothesis doesn't want tzinfo
     ),
 )
 def test_date_with_datetime(d1, d2):

@@ -79,7 +79,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     @property
     def parents(self) -> tuple[DataObject, ...]:
         """Return all parents from the workspace to the actual record (excluding)"""
-        match (parent := self.parent):
+        match parent := self.parent:
             case None:
                 return ()
             case _:

@@ -77,12 +77,6 @@ show_column_numbers = true
 warn_no_return = false
 warn_unused_ignores = true
 
-[tool.black]
-include = '\.pyi?$'
-line-length = 120
-skip-string-normalization = true
-target-version = ["py310"]
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q --doctest-glob='*.md'"
@@ -173,11 +167,15 @@ ignore = [
   "PLC1901", # empty string comparisons
   "PLW2901", # `for` loop variable overwritten
   "SIM114", # Combine `if` branches using logical `or` operator
-  "E203", # Whitespace before :, needed for black compatability
+  "E203", # Whitespace before :, needed for black compatability and also `ruff format`
+  "ISC001", # causes unexpected behaviour with formatter
 ]
 unfixable = [
   # "F401",  # Don't touch unused imports
 ]
+
+[tool.ruff.format]
+quote-style = 'single'
 
 [tool.ruff.isort]
 known-first-party = ["ultimate_notion"]
@@ -273,18 +271,17 @@ build-check = [
 [tool.hatch.envs.lint]
 skip-install = true
 dependencies = [
-    "black>=23.1.0",
     "mypy>=1.0.0",
-    "ruff>=0.0.259",
+    "ruff>=0.1.3",
 ]
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args}"
 style = [
     "ruff {args:.}",
-    "black --check --diff .",
+    "ruff format --check .",
 ]
-fmt = [
-    "black {args:.}",
+fix = [
+    "ruff format {args:.}",
     "ruff --fix {args:.}",
     "style",
 ]

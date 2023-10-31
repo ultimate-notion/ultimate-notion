@@ -144,16 +144,13 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         raise NotImplementedError
 
     @overload
-    def show(self, *, display: Literal[False]) -> str:
-        ...
+    def show(self, *, display: Literal[False]) -> str: ...
 
     @overload
-    def show(self, *, display: Literal[True]) -> None:
-        ...
+    def show(self, *, display: Literal[True]) -> None: ...
 
     @overload
-    def show(self) -> str | None:
-        ...
+    def show(self) -> str | None: ...
 
     def show(self, *, display=None):
         """Show the content of the page as markdown, rendered in Jupyter Lab"""
