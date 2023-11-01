@@ -21,6 +21,13 @@ ColType: TypeAlias = str | list[str]
 T = TypeVar('T')
 
 
+class Col(str):
+    """Column in a view, behaving like a string with some special attributes"""
+
+    # ToDo Implement me
+    pass
+
+
 class View:  # noqa: PLR0904
     def __init__(self, database: Database, pages: list[Page], query: QueryBuilder):
         self.database = database
@@ -73,7 +80,7 @@ class View:  # noqa: PLR0904
         """Retrieve all pages in view"""
         return [self.page(idx) for idx in range(len(self))]
 
-    def row(self, idx: int) -> list[Any]:
+    def row(self, idx: int) -> tuple[Any, ...]:
         page = self.page(idx)
         row: list[Any] = []
         for col in self.columns:
@@ -87,9 +94,10 @@ class View:  # noqa: PLR0904
                 row.append(page.icon)
             else:
                 row.append(page.props[col])
-        return row
+        return tuple(row)
 
-    def rows(self) -> list[list[Any]]:
+    @property
+    def rows(self) -> list[tuple[Any, ...]]:
         return [self.row(idx) for idx in range(len(self))]
 
     def _html_for_icon(self, rows: list[Any], cols: list[str]) -> list[Any]:
@@ -117,7 +125,7 @@ class View:  # noqa: PLR0904
 
         Find more table formats under: https://github.com/astanin/python-tabulate#table-format
         """
-        rows = self.rows()
+        rows = self.rows
         cols = self.columns
 
         if tablefmt is None:
@@ -231,16 +239,13 @@ class View:  # noqa: PLR0904
         return view
 
     def to_pandas(self) -> pd.DataFrame:
+        """Convert the view to a pandas dataframe"""
         # remove index as pandas uses its own
         view = self.without_index() if self.has_index else self
-        return pd.DataFrame(view.rows(), columns=view.columns)
+        return pd.DataFrame(view.rows, columns=view.columns)
 
-    def select(self, cols: ColType, *more_cols: str) -> View:
-        if isinstance(cols, str):
-            cols = [cols]
-        if more_cols:
-            cols += more_cols
-
+    def select(self, *cols: str) -> View:
+        """Select columns for the view"""
         curr_cols = self._columns  # we only consider non-meta columns, e.g. no index, etc.
         if not_included := set(cols) - set(curr_cols):
             msg = f"Some columns, i.e. {', '.join(not_included)}, are not in view"

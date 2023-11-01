@@ -12,11 +12,8 @@ if TYPE_CHECKING:
 @pytest.mark.webtest
 def test_select(contacts_db: Database):
     view = contacts_db.pages()
+
     sub_view = view.select('Name', 'Role')
-    assert sub_view.columns == ['Name', 'Role']
-    sub_view = view.select(['Name', 'Role'])
-    assert sub_view.columns == ['Name', 'Role']
-    sub_view = view.select(['Name'], 'Role')
     assert sub_view.columns == ['Name', 'Role']
 
     sub_view = view.select('Role')
@@ -29,7 +26,7 @@ def test_select(contacts_db: Database):
 @pytest.mark.webtest
 def test_rows(contacts_db: Database):
     view = contacts_db.pages()
-    rows = view.rows()
+    rows = view.rows
     assert len(rows) == len(view)
     view = view.select('Name', 'Role')
     row = view.row(0)

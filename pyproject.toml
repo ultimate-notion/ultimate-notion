@@ -125,7 +125,7 @@ exclude_lines = [
 target-version = "py310"
 line-length = 120
 preview = true
-#include = ["src/**/*.py", "src/**/*.pyi", "**/pyproject.toml"]
+include = ["src/**/*.py", "src/**/*.pyi", "**/pyproject.toml"]
 exclude = ["examples/*\\.py"] # ToDo: remove & fix later
 select = [
   "A",
@@ -193,12 +193,13 @@ ban-relative-imports = "all"
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
 
-#####################
-# Environment Setup #
-#####################
+###########################
+# Hatch Environment Setup #
+###########################
 
 # Default environment
 [tool.hatch.envs.default]
+type = "virtual"
 dependencies = [
     "hatch",
     "hatch-vcs", # to make `hatch version` available
