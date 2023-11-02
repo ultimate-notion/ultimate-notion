@@ -49,6 +49,23 @@ def test_db_without_title(notion: Session, root_page: Page):
 
     db = notion.create_db(parent=root_page, schema=Article)
     assert db.title == ''
+    assert db.description == ''
+    db.delete()
+
+
+def test_db_with_docstring(notion: Session, root_page: Page):
+    """Simple database of articles"""
+
+    class Article(schema.PageSchema, db_title=None):
+        """My articles"""
+
+        name = schema.Column('Name', schema.Title())
+        cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
+        desc = schema.Column('Description', schema.Text())
+
+    db = notion.create_db(parent=root_page, schema=Article)
+    assert db.title == ''
+    assert db.description == 'My articles'
     db.delete()
 
 

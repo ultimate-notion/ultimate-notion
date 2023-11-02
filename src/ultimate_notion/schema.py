@@ -68,16 +68,21 @@ class PageSchema:
     """Base class for the schema of a database."""
 
     db_title: RichText | None
+    db_desc: RichText | None
     _database: Database | None = None
 
     def __init_subclass__(cls, db_title: RichText | str | None, **kwargs: Any):
         if isinstance(db_title, str):
             db_title = RichText.from_plain_text(db_title)
         cls.db_title = db_title
+
+        cls.db_desc = RichText.from_plain_text(cls.__doc__) if cls.__doc__ is not None else None
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def from_dict(cls, schema_dct: dict[str, PropertyType], db_title: str | None = None) -> PageSchema:
+    def from_dict(
+        cls, schema_dct: dict[str, PropertyType], db_title: str | None = None, db_desc: str | None = None
+    ) -> PageSchema:
         """Creation of a schema from a dictionary for easy support of dynamically created schemas"""
         # ToDo: Implement
         raise NotImplementedError

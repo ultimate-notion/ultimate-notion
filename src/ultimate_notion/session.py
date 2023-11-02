@@ -146,6 +146,8 @@ class Session:
             schema_dct = {k: v.obj_ref for k, v in schema_no_backrels_dct.items()}
             title = schema.db_title.obj_ref if schema.db_title is not None else None
             db_obj = self.api.databases.create(parent=parent.obj_ref, title=title, schema=schema_dct)
+            if schema.db_desc:
+                db_obj = self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
         else:
             schema_dct = {}
             db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
