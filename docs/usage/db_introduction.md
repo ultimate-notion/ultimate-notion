@@ -12,7 +12,7 @@ Assume we have a database called `Contacts DB`.
 ```python
 from ultimate_notion import Session
 
-notion = Session.get_or_create()
+notion = Session.get_or_create()  # assuming NOTION_AUTH_TOKEN is set in environment
 
 contacts_dbs = notion.search_db("Contacts DB")
 

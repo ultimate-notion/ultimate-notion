@@ -92,11 +92,14 @@ class RichText(list[RichTextBase]):
 
         return cls(rich_texts, _factory_method=True)
 
-    def to_plain_text(self) -> str | None:
+    def to_plain_text(self) -> str:
         """Return rich text as plaintext"""
-        if not self:  # empty list
-            return None
         return ''.join(text.plain_text for text in self.obj_ref if text)
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this text"""
+        # ToDo: Later use Markdown output.
+        return self.to_plain_text()
 
     def __str__(self) -> str:
         plain_text = self.to_plain_text()

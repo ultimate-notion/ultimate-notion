@@ -99,8 +99,8 @@ class Session:
                 return cls(*args, **kwargs)
 
     def __enter__(self) -> Session:
-        _log.debug('Connecting to Notion...')
-        self.client.__enter__()
+        # Do nothing here as `__init__` created a client already and calling
+        # `self.client.__enter__()` would initialize another client internally
         return self
 
     def __exit__(
@@ -109,13 +109,14 @@ class Session:
         exc_value: BaseException,
         traceback: TracebackType,
     ) -> None:
-        _log.debug('Closing connection to Notion...')
+        _log.info('Closing connection to Notion...')
         self.client.__exit__(exc_type, exc_value, traceback)
         Session._active_session = None
         Session.cache.clear()
 
     def close(self):
         """Close the session and release resources."""
+        _log.info('Closing connection to Notion...')
         self.client.close()
         Session._active_session = None
         Session.cache.clear()

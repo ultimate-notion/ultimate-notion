@@ -31,6 +31,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         else:
             return 'Untitled'
 
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically"""
+        return str(self)
+
     def __repr__(self) -> str:
         cls_name = self.__class__.__name__
         return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
