@@ -5,14 +5,14 @@ Working programmatically with your databases extends Notion's functionality to i
 Ultimate Notion unleashes the full power of Python for use with Notion's databases.
 So let's see what we can do.
 
-## Reading a Database
+## Reading a database
 
-Assume we have a database called `Contacts DB`.
+Assume we have a database called "Contacts DB".
 
 ```python
 from ultimate_notion import Session
 
-notion = Session.get_or_create()  # assuming NOTION_AUTH_TOKEN is set in environment
+notion = Session.get_or_create()  # if NOTION_AUTH_TOKEN is set in environment
 
 contacts_dbs = notion.search_db("Contacts DB")
 
