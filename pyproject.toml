@@ -90,10 +90,10 @@ markers = [
 [tool.coverage.run]
 branch = true
 source = ["src/ultimate_notion"]
-# omit = [
-#   "bad_file.py",
-# ]
-#
+omit = [
+  "_version.py",  # automatically created by hatch-vcs, not in repo
+]
+
 
 [tool.coverage.paths]
 source = [

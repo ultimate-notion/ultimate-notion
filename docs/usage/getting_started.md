@@ -41,7 +41,7 @@ of `TOKEN` with the Internal Integration Token you saved and the content of `PAG
 access for your integration.
 
 ``` py
---8<-- "../../examples/getting_started.py"
+--8<--"../../examples/getting_started.py"
 ```
 
 Run the code and you should see in Jupyter Lab following rendered Markdown code or just the plain output if you run the
