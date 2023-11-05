@@ -2,7 +2,7 @@ exclude: '^docs/conf.py'
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.5.0
   hooks:
   - id: trailing-whitespace
   - id: check-added-large-files
@@ -35,7 +35,8 @@ repos:
     exclude: docs/examples  # Exclude since blacken-docs cannot handle the >>> needed for doctests
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.6.1'  # Use the sha / tag you want to point at
+  rev: 'v1.6.1'  # make sure this is consistent with hatch configs
   hooks:
     - id: mypy
+      args: ["--install-types", "--non-interactive"]
       additional_dependencies: [types-tabulate, types-cachetools]

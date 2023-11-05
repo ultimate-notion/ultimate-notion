@@ -12,7 +12,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] retrieve a database by ID
 - [x] search for a database by its title
 - [x] create a new database with a given schema, i.e. columns and their types
-- [x] delete/archive a database
+- [x] delete/archive and restore/unarchive a database
 - [ ] update a database schema, i.e. adding/removing columns or changing their types
 - [ ] change the properties of database columns, e.g. name, formula of formula column, etc.
 - [x] read the database attributes like title, icon, etc.
@@ -25,10 +25,10 @@ icon, last edited by/time, etc., are called *page attributes*.
 ## Pages
 
 - [x] retrieve a page by ID
-- [ ] search for a page by its title
-- [ ] create a new page
-- [x] delete/archive a page
-- [ ] reade page attributes like title, icon, etc.
+- [x] search for a page by its title
+- [x] create a new page
+- [x] delete/archive and restore/unarchive a page
+- [ ] read page attributes like title, icon, etc.
 - [ ] change page attributes like title, icon, etc.
 - [ ] read page properties defined by a database schema
 - [ ] change page properties

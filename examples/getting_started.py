@@ -9,7 +9,7 @@ with Session(auth=TOKEN) as notion:
 
 # alternatively, without a context manager
 notion = Session.get_or_create(auth=TOKEN)
-# or if NOTION_AUTH_TOKEN is set in environment, just
+# or if NOTION_AUTH_TOKEN is set in environment, just type:
 # notion = Session.get_or_create()
 page = notion.search_page(PAGE_TITLE).item()
 print(page.show())

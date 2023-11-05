@@ -96,7 +96,7 @@ def test_title_setter(notion: Session, article_db: Database):
     article_db.title = new_title  # type: ignore
     assert article_db.title == new_title
     # clear cache and retrieve the database again to be sure it was udpated on the server side
-    notion.cache.clear()
+    del notion.cache[article_db.id]
     article_db = notion.get_db(article_db.id)
     assert article_db.title == new_title
     article_db.title = RichText(old_title)
@@ -111,7 +111,7 @@ def test_description_setter(notion: Session, article_db: Database):
     article_db.description = new_description  # type: ignore
     assert article_db.description == new_description
     # clear cache and retrieve the database again to be sure it was udpated on the server side
-    notion.cache.clear()
+    del notion.cache[article_db.id]
     article_db = notion.get_db(article_db.id)
     assert article_db.description == new_description
     article_db.description = ''  # type: ignore
