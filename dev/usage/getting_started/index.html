@@ -21,7 +21,7 @@
 
 <span class=c1># alternatively, without a context manager</span>
 <span class=n>notion</span> <span class=o>=</span> <span class=n>Session</span><span class=o>.</span><span class=n>get_or_create</span><span class=p>(</span><span class=n>auth</span><span class=o>=</span><span class=n>TOKEN</span><span class=p>)</span>
-<span class=c1># or if NOTION_AUTH_TOKEN is set in environment, just</span>
+<span class=c1># or if NOTION_AUTH_TOKEN is set in environment, just type:</span>
 <span class=c1># notion = Session.get_or_create()</span>
 <span class=n>page</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>search_page</span><span class=p>(</span><span class=n>PAGE_TITLE</span><span class=p>)</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
 <span class=nb>print</span><span class=p>(</span><span class=n>page</span><span class=o>.</span><span class=n>show</span><span class=p>())</span>
