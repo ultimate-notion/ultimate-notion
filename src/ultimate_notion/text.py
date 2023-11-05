@@ -1,4 +1,5 @@
 """Utilities for working text, markdown & rich text in Notion."""
+
 from __future__ import annotations
 
 import re

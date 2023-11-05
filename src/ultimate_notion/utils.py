@@ -1,4 +1,5 @@
 """Additional utilities that fit nowhere else"""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -35,7 +36,7 @@ class SList(list[T]):
 
 def is_notebook() -> bool:
     try:
-        from IPython import get_ipython
+        from IPython import get_ipython  # noqa: PLC0415
 
         shell = get_ipython().__class__.__name__
         if shell == 'ZMQInteractiveShell':
@@ -229,6 +230,6 @@ def get_active_session() -> Session:
     Avoids cyclic imports when used within the package itself.
     For internal use mostly.
     """
-    from ultimate_notion.session import Session
+    from ultimate_notion.session import Session  # noqa: PLC0415
 
     return Session.get_active()

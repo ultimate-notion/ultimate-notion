@@ -1,4 +1,5 @@
 """Functionality for working with Notion databases"""
+
 from __future__ import annotations
 
 from textwrap import dedent
@@ -126,17 +127,20 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return self.obj_ref.url
 
     @property
-    def is_archived(self) -> bool:
-        return self.obj_ref.archived
-
-    @property
     def is_inline(self) -> bool:
         return self.obj_ref.is_inline
 
     def delete(self):
-        """Delete this database"""
-        session = get_active_session()
-        session.api.blocks.delete(self.id)
+        """Delete/archive this database"""
+        if not self.is_archived:
+            session = get_active_session()
+            session.api.databases.delete(self.obj_ref)
+
+    def restore(self):
+        """Restore/unarchive this database"""
+        if self.is_archived:
+            session = get_active_session()
+            session.api.databases.restore(self.obj_ref)
 
     @staticmethod
     def _pages_from_query(query) -> list[Page]:

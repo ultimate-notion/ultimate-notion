@@ -1,4 +1,5 @@
 """View representing the result of a Query"""
+
 from __future__ import annotations
 
 from collections.abc import Callable

@@ -1,4 +1,5 @@
 """Provides an interactive query builder for Notion databases."""
+
 from __future__ import annotations
 
 import logging

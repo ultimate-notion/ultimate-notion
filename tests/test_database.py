@@ -2,6 +2,7 @@
 `# type: ignore` are mostly do to mypy's too strict way of handling the type of property getters and setters.
 More details here: https://github.com/python/mypy/issues/3004
 """
+
 from __future__ import annotations
 
 import pytest
@@ -115,3 +116,12 @@ def test_description_setter(notion: Session, article_db: Database):
     assert article_db.description == new_description
     article_db.description = ''  # type: ignore
     assert article_db.description == ''
+
+
+def test_delete_restore_db(notion: Session, root_page: Page):
+    db = notion.create_db(root_page)
+    assert not db.is_archived
+    db.delete()
+    assert db.is_archived
+    db.restore()
+    assert not db.is_archived

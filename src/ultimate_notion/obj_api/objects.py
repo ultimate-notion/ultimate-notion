@@ -14,6 +14,7 @@ class SelectOption(GenericObject)
 Also be aware that this is import when updating to differentiate actual set values
 from default/unset values.
 """
+
 from __future__ import annotations
 
 from abc import ABC

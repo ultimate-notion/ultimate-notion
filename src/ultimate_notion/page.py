@@ -1,4 +1,5 @@
 """Page object"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
@@ -109,7 +110,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     @property
     def database(self) -> Database | None:
         """If this page is located in a database return the database or None otherwise"""
-        from ultimate_notion.database import Database
+        from ultimate_notion.database import Database  # noqa: PLC0415
 
         if isinstance(self.parent, Database):
             return self.parent
@@ -159,12 +160,20 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
         md = self.markdown()
         if display:
-            from IPython.core.display import display_markdown
+            from IPython.core.display import display_markdown  # noqa: PLC0415
 
             display_markdown(md, raw=True)
         else:
             return md
 
     def delete(self):
-        session = get_active_session()
-        session.api.pages.delete(self.obj_ref)
+        """Delete/archive this page"""
+        if not self.is_archived:
+            session = get_active_session()
+            session.api.pages.delete(self.obj_ref)
+
+    def restore(self):
+        """Restore/unarchive this page"""
+        if self.is_archived:
+            session = get_active_session()
+            session.api.pages.restore(self.obj_ref)

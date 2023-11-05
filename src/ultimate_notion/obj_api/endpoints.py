@@ -4,6 +4,7 @@ This pydantic based API is often referred to as just `api` while the low-level
 API of the [Notion Client SDK library](https://github.com/ramnes/notion-sdk-py)
 is just referred to as `raw_api`.
 """
+
 from __future__ import annotations
 
 import logging
@@ -126,7 +127,7 @@ class BlocksEndpoint(Endpoint):
         return self.api.client.blocks
 
     # https://developers.notion.com/reference/delete-a-block
-    def delete(self, block):
+    def delete(self, block: Block) -> Block:
         """Delete (archive) the specified Block.
 
         `block` may be any suitable `ObjectReference` type.
@@ -139,7 +140,7 @@ class BlocksEndpoint(Endpoint):
 
         return Block.model_validate(data)
 
-    def restore(self, block):
+    def restore(self, block: Block) -> Block:
         """Restore (unarchive) the specified Block.
 
         `block` may be any suitable `ObjectReference` type.
@@ -153,7 +154,7 @@ class BlocksEndpoint(Endpoint):
         return Block.model_validate(data)
 
     # https://developers.notion.com/reference/retrieve-a-block
-    def retrieve(self, block):
+    def retrieve(self, block) -> Block:
         """Return the requested Block.
 
         `block` may be any suitable `ObjectReference` type.
@@ -167,7 +168,7 @@ class BlocksEndpoint(Endpoint):
         return Block.model_validate(data)
 
     # https://developers.notion.com/reference/update-a-block
-    def update(self, block: Block):
+    def update(self, block: Block) -> Block:
         """Update the block content on the server.
 
         The block info will be updated to the latest version from the server.
@@ -271,29 +272,29 @@ class DatabasesEndpoint(Endpoint):
 
         return db.update(**data)
 
-    def delete(self, dbref):
-        """Delete (archive) the specified Database.
+    def delete(self, db: Database) -> Database:
+        """Delete (archive) the specified Database"""
 
-        `dbref` may be any suitable `DatabaseRef` type.
-        """
+        dbid = DatabaseRef.build(db).database_id
 
-        dbid = DatabaseRef.build(dbref).database_id
+        logger.info(f'Deleting database `{db}` with id {dbid}')
 
-        logger.info('Deleting database :: %s', dbid)
+        block_obj = self.api.blocks.delete(dbid)
+        # block.update(**data) is not possible as the API returns a block, not a database
+        db.archived = block_obj.archived
+        return db
 
-        return self.api.blocks.delete(dbid)
+    def restore(self, db: Database) -> Database:
+        """Restore (unarchive) the specified Database"""
 
-    def restore(self, dbref):
-        """Restore (unarchive) the specified Database.
+        dbid = DatabaseRef.build(db).database_id
 
-        `dbref` may be any suitable `DatabaseRef` type.
-        """
+        logger.info(f'Restoring database `{db}` with id {dbid}')
 
-        dbid = DatabaseRef.build(dbref).database_id
-
-        logger.info('Restoring database :: %s', dbid)
-
-        return self.api.blocks.restore(dbid)
+        block_obj = self.api.blocks.restore(dbid)
+        # block.update(**data) is not possible as the API returns a block, not a database
+        db.archived = block_obj.archived
+        return db
 
     # https://developers.notion.com/reference/post-database-query
     def query(self, target):
@@ -343,7 +344,7 @@ class PagesEndpoint(Endpoint):
         return self.api.client.pages
 
     # https://developers.notion.com/reference/post-page
-    def create(self, parent, title: Title | None = None, properties=None, children=None):
+    def create(self, parent, title: Title | None = None, properties=None, children=None) -> Page:
         """Add a page to the given parent (Page or Database).
 
         `parent` may be a `ParentRef`, `Page`, or `Database` object.
@@ -383,7 +384,7 @@ class PagesEndpoint(Endpoint):
 
         return Page.model_validate(data)
 
-    def delete(self, page):
+    def delete(self, page: Page) -> Page:
         """Delete (archive) the specified Page.
 
         `page` may be any suitable `PageRef` type.
@@ -391,7 +392,7 @@ class PagesEndpoint(Endpoint):
 
         return self.set_attr(page, archived=True)
 
-    def restore(self, page):
+    def restore(self, page: Page) -> Page:
         """Restore (unarchive) the specified Page.
 
         `page` may be any suitable `PageRef` type.
@@ -400,7 +401,7 @@ class PagesEndpoint(Endpoint):
         return self.set_attr(page, archived=False)
 
     # https://developers.notion.com/reference/retrieve-a-page
-    def retrieve(self, page):
+    def retrieve(self, page) -> Page:
         """Return the requested Page.
 
         `page` may be any suitable `PageRef` type.
@@ -440,7 +441,7 @@ class PagesEndpoint(Endpoint):
 
         return page.update(**data)
 
-    def set_attr(self, page, *, cover=False, icon=False, archived=None):
+    def set_attr(self, page: Page, *, cover=False, icon=False, archived=None):
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
         `page` may be any suitable `PageRef` type.
@@ -450,7 +451,7 @@ class PagesEndpoint(Endpoint):
 
         page_id = PageRef.build(page).page_id
 
-        props = {}
+        props: dict[str, Any] = {}
 
         if cover is None:
             logger.info('Removing page cover :: %s', page_id)

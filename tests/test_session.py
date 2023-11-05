@@ -1,4 +1,5 @@
 """Unit tests for the Notion Session"""
+
 from __future__ import annotations
 
 import pytest

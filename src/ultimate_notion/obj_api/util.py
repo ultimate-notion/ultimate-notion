@@ -1,4 +1,5 @@
 """Utility methods for Notional."""
+
 from __future__ import annotations
 
 import re

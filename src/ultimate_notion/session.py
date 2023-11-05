@@ -1,4 +1,5 @@
 """Session object"""
+
 from __future__ import annotations
 
 import logging
@@ -18,7 +19,7 @@ from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.objects import RichText, User
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
-from ultimate_notion.schema import PageSchema, Relation
+from ultimate_notion.schema import DefaultSchema, PageSchema, Relation
 from ultimate_notion.utils import ObjRef, SList, get_uuid
 
 if TYPE_CHECKING:
@@ -64,11 +65,10 @@ class Session:
                 msg = f'Either pass `auth` or set {ENV_NOTION_AUTH_TOKEN}'
                 raise RuntimeError(msg)
 
-        _log.debug('Initializing Notion session...')
+        _log.info('Initializing Notion session...')
         Session._initialize_once(self)
         self.client = notion_client.Client(auth=auth, **kwargs)
         self.api = NotionAPI(self.client)
-        _log.info('Initialized Notion session')
 
     @classmethod
     def _initialize_once(cls, instance: Session):
@@ -121,6 +121,15 @@ class Session:
         Session._active_session = None
         Session.cache.clear()
 
+    def is_closed(self) -> bool:
+        """ "Return if the session is closed or not"""
+        try:
+            self.raise_for_status()
+        except RuntimeError:  # used by httpx client in case of closed connection
+            return True
+        else:
+            return False
+
     def raise_for_status(self):
         """Confirm that the session is active and raise otherwise.
 
@@ -135,8 +144,8 @@ class Session:
             msg = 'Invalid API reponse'
             raise SessionError(msg) from err
 
-    def create_db(self, parent: Page, schema: type[PageSchema] | None) -> Database:
-        """Create a new database"""
+    def create_db(self, parent: Page, schema: type[PageSchema] | None = None) -> Database:
+        """Create a new database within a page."""
         if schema:
             schema._init_fwd_rels()
             schema_no_backrels_dct = {
@@ -150,7 +159,7 @@ class Session:
             if schema.db_desc:
                 db_obj = self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
         else:
-            schema_dct = {}
+            schema_dct = {k: v.obj_ref for k, v in DefaultSchema.to_dict().items()}
             db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
 
         db: Database = Database(obj_ref=db_obj)
@@ -163,7 +172,7 @@ class Session:
         return db
 
     def create_dbs(self, parents: Page | list[Page], schemas: list[type[PageSchema]]) -> list[Database]:
-        """Create new databases in the right order if there a relations between them"""
+        """Create new databases in the right order in case there a relations between them"""
         # ToDo: Implement
         raise NotImplementedError
 

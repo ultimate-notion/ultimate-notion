@@ -1,4 +1,5 @@
 """Base classes for working with the Notion API."""
+
 from __future__ import annotations
 
 import inspect
@@ -67,7 +68,8 @@ class GenericObject(BaseModel):
         new_obj_dct.update(data)
         new_obj = self.model_validate(new_obj_dct)
 
-        for k, v in new_obj.model_dump(exclude_defaults=True).items():
+        for k, v in new_obj.model_dump().items():
+            # model_dump(exclude_defaults=True) was used before, but that prevented restoring pages
             logger.debug('updating object data -- %s => %s', k, v)
             setattr(self, k, getattr(new_obj, k))
 

@@ -1,4 +1,5 @@
 """Core building blocks for pages and databases"""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -90,7 +91,8 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         return self.obj_ref.has_children
 
     @property
-    def archived(self) -> bool:
+    def is_archived(self) -> bool:
+        """Return wether the object is deleted/archived"""
         return self.obj_ref.archived
 
     @property

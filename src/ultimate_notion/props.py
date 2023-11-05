@@ -3,6 +3,7 @@ Page properties especially for pages within databases
 
 The names of the properties reflect the name in the Notion UI.
 """
+
 from __future__ import annotations
 
 from datetime import date, datetime

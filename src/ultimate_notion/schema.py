@@ -17,6 +17,7 @@ information if actually needed. Since the object references `obj_ref` must alway
 to the actual `obj_api.blocks.Database.properties` value if the schema is bound to an database,
 the method `_remap_obj_refs` rewires this when a schema is used to create a database.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -27,6 +28,7 @@ import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion.obj_api.schema import Function, NumberFormat
 from ultimate_notion.objects import RichText
 from ultimate_notion.props import PropertyValue
+from ultimate_notion.text import snake_case
 from ultimate_notion.utils import SList, Wrapper, get_active_session, is_notebook
 
 if TYPE_CHECKING:
@@ -82,10 +84,21 @@ class PageSchema:
     @classmethod
     def from_dict(
         cls, schema_dct: dict[str, PropertyType], db_title: str | None = None, db_desc: str | None = None
-    ) -> PageSchema:
+    ) -> type[PageSchema]:
         """Creation of a schema from a dictionary for easy support of dynamically created schemas"""
-        # ToDo: Implement
-        raise NotImplementedError
+        title_cols = [k for k, v in schema_dct.items() if isinstance(v, Title)]
+        if not title_cols:
+            msg = 'Missing an item with property type `Title` as value'
+            raise SchemaError(msg)
+        elif len(title_cols) > 1:
+            msg = f'More than one item with property type `Title` as value found: {", ".join(title_cols)}'
+            raise SchemaError(msg)
+
+        cls_name = f'{cls.__name__}FromDct'
+        attrs: dict[str, Any] = {'db_desc': db_desc}
+        for col_name, prop_type in schema_dct.items():
+            attrs[snake_case(col_name)] = Column(col_name, prop_type)
+        return type(cls_name, (PageSchema,), attrs, db_title=db_title)
 
     @classmethod
     def create(cls, **kwargs) -> Page:
@@ -229,7 +242,7 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
         obj_api_type = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
-    def __eq__(self, other: object):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PropertyType):
             return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
@@ -482,3 +495,13 @@ class Verification(PropertyType[obj_schema.Verification], wraps=obj_schema.Verif
     """Defines a unique ID column in a database"""
 
     allowed_at_creation = False
+
+
+class DefaultSchema(PageSchema, db_title=None):
+    """Default database schema of Notion
+
+    As inferred by just creating an empty database in the Notion UI.
+    """
+
+    name = Column('Name', Title())
+    tags = Column('Tags', MultiSelect([]))

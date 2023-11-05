@@ -1,4 +1,5 @@
 """Iterator classes for working with paginated API responses."""
+
 from __future__ import annotations
 
 import logging

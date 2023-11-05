@@ -1,4 +1,5 @@
 """Unit test for a View"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

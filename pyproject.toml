@@ -272,19 +272,23 @@ build-check = [
 [tool.hatch.envs.lint]
 skip-install = true
 dependencies = [
-    "mypy>=1.0.0",
-    "ruff>=0.1.3",
+    "mypy~=1.6",
+    "ruff==0.1.4",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args}"
+typing = [
+    "echo \"VERSION: `mypy --version`\"",
+    "mypy --install-types --non-interactive {args}"
+]
 style = [
+    "echo \"VERSION: `ruff --version`\"",
     "ruff {args:.}",
     "ruff format --check .",
 ]
 fix = [
     "ruff format {args:.}",
     "ruff --fix {args:.}",
-    "style",
+    "style",  # feedback on what is not fixable
 ]
 all = [
     "style",

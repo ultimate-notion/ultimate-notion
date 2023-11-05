@@ -20,7 +20,7 @@ repos:
 
 # Ruff replaces flake8, autoflake and isort
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.1.3'
+  rev: 'v0.1.4'
   hooks:
     - id: ruff
     - id: ruff-format
@@ -35,7 +35,7 @@ repos:
     exclude: docs/examples  # Exclude since blacken-docs cannot handle the >>> needed for doctests
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.5.1'  # Use the sha / tag you want to point at
+  rev: 'v1.6.1'  # Use the sha / tag you want to point at
   hooks:
     - id: mypy
       additional_dependencies: [types-tabulate, types-cachetools]

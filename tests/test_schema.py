@@ -141,3 +141,29 @@ def test_two_way_prop(notion: Session, root_page: Page):
 
     assert db_b.schema.relation_twoway.type.two_way_prop is SchemaA.relation  # type: ignore
     assert db_a.schema.relation.type.two_way_prop is SchemaB.relation_twoway  # type: ignore
+
+
+def test_schema_from_dict():
+    class ClassStyleSchema(PageSchema, db_title='Class Style'):
+        name = Column('Name', schema.Title())
+        tags = Column('Tags', schema.MultiSelect([]))
+
+    dict_style_schema = {'Name': schema.Title(), 'Tags': schema.MultiSelect([])}
+    DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+    assert DictStyleSchema.is_consistent_with(ClassStyleSchema)
+
+    dict_style_schema = {'Name': schema.Title(), 'Tags': schema.Select([])}  # Wrong PropertyType here!
+    DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+    assert not DictStyleSchema.is_consistent_with(ClassStyleSchema)
+
+    dict_style_schema = {'Name': schema.Title(), 'My Tags': schema.MultiSelect([])}  # Wrong column name here!
+    DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+    assert not DictStyleSchema.is_consistent_with(ClassStyleSchema)
+
+    with pytest.raises(SchemaError):
+        dict_style_schema = {'Tags': schema.MultiSelect([])}
+        DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+
+    with pytest.raises(SchemaError):
+        dict_style_schema = {'Name1': schema.Title(), 'Name2': schema.Title()}
+        DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
