@@ -1,6 +1,6 @@
 """Fixtures for Ultimate-Notion unit tests.
 
-Set `ENV_NOTION_AUTH_TOKEN` for tests interacting with the Notion API.
+Set `NOTION_TOKEN` environment variable for tests interacting with the Notion API.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import ultimate_notion
 from ultimate_notion import Session, schema
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
-from ultimate_notion.session import ENV_NOTION_AUTH_TOKEN
+from ultimate_notion.session import ENV_NOTION_TOKEN
 
 ALL_COL_DB = 'All Columns DB'  # Manually created DB in Notion with all possible columns including AI columns!
 WIKI_DB = 'Wiki DB'
@@ -49,11 +49,11 @@ def vcr_config():
 def notion() -> Yield[Session]:
     """Return the notion session used for live testing.
 
-    This fixture depends on the `NOTION_AUTH_TOKEN` environment variable. If it is not
+    This fixture depends on the `NOTION_TOKEN` environment variable. If it is not
     present, this fixture will skip the current test.
     """
-    if os.getenv(ENV_NOTION_AUTH_TOKEN) is None:
-        msg = f'{ENV_NOTION_AUTH_TOKEN} not defined! Use `export {ENV_NOTION_AUTH_TOKEN}=secret_...`'
+    if os.getenv(ENV_NOTION_TOKEN) is None:
+        msg = f'{ENV_NOTION_TOKEN} not defined! Use `export {ENV_NOTION_TOKEN}=secret_...`'
         raise RuntimeError(msg)
 
     with ultimate_notion.Session() as notion:

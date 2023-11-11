@@ -24,14 +24,14 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
 ]
 dependencies = [
-    # ToDo: Remove direct reference when new version is released
-    "notion-client @ git+https://github.com/FlorianWilhelm/notion-sdk-py@description_param",
+    "notion-client>=2.1",
     "tabulate",
     "numpy",
     "pandas",
     "emoji",
     "pandas",
     "pydantic>=2",
+    "notion2md",
 #    "google-api-python-client",
 #    "google-auth-httplib2",
 #    "google-auth-oauthlib",
@@ -57,6 +57,9 @@ raw-options = { version_scheme = "no-guess-dev" }
 
 [tool.hatch.build.hooks.vcs]
 version-file = "src/ultimate_notion/_version.py"
+
+[tool.hatch.build]
+packages = ["src/ultimate_notion"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -125,53 +128,56 @@ exclude_lines = [
 target-version = "py310"
 line-length = 120
 preview = true
+extend-select = [ # features in preview
+    "W292", # missing-newline-at-end-of-file
+]
 include = ["src/**/*.py", "src/**/*.pyi", "tests/**/*.py", "tests/**/*.pyi"]
 exclude = ["examples/*\\.py"] # ToDo: remove & fix later
 select = [
-  "A",
-  "B",
-  "C",
-  "DTZ",
-  "E",
-  "EM",
-  "F",
-  "FBT", # Boolean trap
-  "I",
-  "ICN",
-  "ISC",
-  "N",
-  "PLC",
-  "PLE",
-  "PLR",
-  "PLW",
-  "Q",
-  "RUF",
-  "S",
-  "SIM",
-  "T",
-  "TID",
-  "UP",
-  "W",
-  "YTT",
-  "RUF100", # Automatically remove unused # noqa directives
+    "A",
+    "B",
+    "C",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "FBT", # Boolean trap
+    "I",
+    "ICN",
+    "ISC",
+    "N",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "Q",
+    "RUF",
+    "S",
+    "SIM",
+    "T",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+    "RUF100", # Automatically remove unused # noqa directives
 ]
 ignore = [
-  # Allow non-abstract empty methods in abstract base classes
-  "B027",
-  # Allow boolean positional values in function calls, like `dict.get(... True)`
-  "FBT003",
-  # Ignore checks for possible passwords
-  "S105", "S106", "S107",
-  # Ignore complexity
-  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
-  "PLC1901", # empty string comparisons
-  "PLW2901", # `for` loop variable overwritten
-  "SIM114", # Combine `if` branches using logical `or` operator
-  "E203", # Whitespace before :, needed for black compatability and also `ruff format`
-  "ISC001", # causes unexpected behaviour with formatter
+    # Allow non-abstract empty methods in abstract base classes
+    "B027",
+    # Allow boolean positional values in function calls, like `dict.get(... True)`
+    "FBT003",
+    # Ignore checks for possible passwords
+    "S105", "S106", "S107",
+    # Ignore complexity
+    "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+    "PLC1901", # empty string comparisons
+    "PLW2901", # `for` loop variable overwritten
+    "SIM114", # Combine `if` branches using logical `or` operator
+    "E203", # Whitespace before :, needed for black compatability and also `ruff format`
+    "ISC001", # causes unexpected behaviour with formatter
 ]
 unfixable = [
-  # "F401",  # Don't touch unused imports
+    # "F401",  # Don't touch unused imports
 ]
 
 [tool.ruff.format]
@@ -218,6 +224,8 @@ dependencies = [
     "ipython",
     "mktestdocs",
     "packaging",
+    "matplotlib",
+    "numpy",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
@@ -283,7 +291,7 @@ typing = [
 style = [
     "echo \"VERSION: `ruff --version`\"",
     "ruff {args:.}",
-    "ruff format --check .",
+    "ruff format --check {args:.}",
 ]
 fix = [
     "ruff format {args:.}",
@@ -297,4 +305,4 @@ all = [
 
 # Test matrix replacing the functionality of tox
 [[tool.hatch.envs.test.matrix]]
-python = ["310", "311"]
+python = ["310", "311", "312"]

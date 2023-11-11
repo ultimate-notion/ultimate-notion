@@ -142,7 +142,16 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def markdown(self) -> str:
         """Return the content of the page as Markdown"""
-        raise NotImplementedError
+        # ToDo: Use an own implementation here using Mistune!
+        import os  # noqa: PLC0415
+
+        from notion2md.exporter.block import StringExporter  # noqa: PLC0415
+
+        from ultimate_notion.session import ENV_NOTION_TOKEN, Session  # noqa: PLC0415
+
+        auth_token = Session.get_or_create().client.options.auth
+        os.environ[ENV_NOTION_TOKEN] = auth_token  # used internally by notion_client used by notion2md
+        return StringExporter(block_id=self.id).export()
 
     @overload
     def show(self, *, display: Literal[False]) -> str: ...

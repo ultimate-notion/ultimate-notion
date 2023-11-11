@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 
 _log = logging.getLogger(__name__)
-ENV_NOTION_AUTH_TOKEN = 'NOTION_AUTH_TOKEN'
+ENV_NOTION_TOKEN = 'NOTION_TOKEN'  # same as in `notion-sdk-py` package
 
 
 class SessionError(Exception):
@@ -59,10 +59,10 @@ class Session:
             **kwargs: Arguments for the [Notion SDK Client][https://ramnes.github.io/notion-sdk-py/reference/client/]
         """
         if auth is None:
-            if (env_token := os.getenv(ENV_NOTION_AUTH_TOKEN)) is not None:
+            if (env_token := os.getenv(ENV_NOTION_TOKEN)) is not None:
                 auth = env_token
             else:
-                msg = f'Either pass `auth` or set {ENV_NOTION_AUTH_TOKEN}'
+                msg = f'Either pass `auth` or set {ENV_NOTION_TOKEN}'
                 raise RuntimeError(msg)
 
         _log.info('Initializing Notion session...')

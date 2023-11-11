@@ -105,10 +105,10 @@ class PropertyItemList(ObjectList, type='property_item'):
 class EndpointIterator:
     """Iterates over results from a paginated API response.
 
-    These objects may be reused, however they are not thread safe.  For example,
+    These objects may be reused, however they are not thread safe. For example,
     after creating the following iterator:
 
-        notion = notional.connect(auth=NOTION_AUTH_TOKEN)
+        notion = notional.connect(auth=NOTION_TOKEN)
         query = EndpointIterator(notion.databases().query)
 
     The iterator may be reused with different database ID's:
