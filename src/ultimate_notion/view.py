@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 import numpy as np
 import pandas as pd
-from emoji import is_emoji
 from tabulate import tabulate
 
 from ultimate_notion.obj_api.query import QueryBuilder
+from ultimate_notion.objects import File
 from ultimate_notion.page import Page
 from ultimate_notion.utils import deepcopy_with_sharing, find_index, find_indices, is_notebook
 
@@ -25,8 +25,7 @@ T = TypeVar('T')
 class Col(str):
     """Column in a view, behaving like a string with some special attributes"""
 
-    # ToDo Implement me
-    pass
+    # ToDo: Implement me, in order to allow Spark-like sorting/filtering, e.g. `Col(Name) == "Florian"` in View
 
 
 class View:  # noqa: PLR0904
@@ -38,12 +37,6 @@ class View:  # noqa: PLR0904
         self._pages = np.array(pages)
 
         self.reset()
-
-    def _get_columns(self, title_col: str) -> np.ndarray:
-        """Make sure title column is the first columns"""
-        cols = list(self.database.schema.to_dict().keys())
-        cols.insert(0, cols.pop(cols.index(title_col)))
-        return np.array(cols)
 
     def reset(self) -> View:
         """Reset the view, i.e. remove filtering, index and sorting"""
@@ -58,8 +51,11 @@ class View:  # noqa: PLR0904
         """Clone the current view"""
         return deepcopy_with_sharing(self, shared_attributes=['database', '_pages', '_query'])
 
-    def __len__(self):
-        return len(self._row_indices)
+    def _get_columns(self, title_col: str) -> np.ndarray:
+        """Make sure title column is the first columns"""
+        cols = list(self.database.schema.to_dict().keys())
+        cols.insert(0, cols.pop(cols.index(title_col)))
+        return np.array(cols)
 
     @property
     def columns(self) -> list[str]:
@@ -73,16 +69,12 @@ class View:  # noqa: PLR0904
             cols.insert(0, self._index_name)
         return cols
 
-    def page(self, idx: int) -> Page:
+    def get_page(self, idx: int) -> Page:
         """Retrieve a page by index of the view"""
         return self._pages[self._row_indices[idx]]
 
-    def pages(self) -> list[Page]:
-        """Retrieve all pages in view"""
-        return [self.page(idx) for idx in range(len(self))]
-
-    def row(self, idx: int) -> tuple[Any, ...]:
-        page = self.page(idx)
+    def get_row(self, idx: int) -> tuple[Any, ...]:
+        page = self.get_page(idx)
         row: list[Any] = []
         for col in self.columns:
             if col == self._title_col:
@@ -97,9 +89,18 @@ class View:  # noqa: PLR0904
                 row.append(page.props[col])
         return tuple(row)
 
-    @property
-    def rows(self) -> list[tuple[Any, ...]]:
-        return [self.row(idx) for idx in range(len(self))]
+    def to_pages(self) -> list[Page]:
+        """Convert the view to a simple list of pages"""
+        return [self.get_page(idx) for idx in range(len(self))]
+
+    def to_rows(self) -> list[tuple[Any, ...]]:
+        return [self.get_row(idx) for idx in range(len(self))]
+
+    def to_pandas(self) -> pd.DataFrame:
+        """Convert the view to a pandas dataframe"""
+        # remove index as pandas uses its own
+        view = self.without_index() if self.has_index else self
+        return pd.DataFrame(view.to_rows(), columns=view.columns)
 
     def _html_for_icon(self, rows: list[Any], cols: list[str]) -> list[Any]:
         # escape everything as we ask tabulate not to do it
@@ -107,11 +108,9 @@ class View:  # noqa: PLR0904
         if (title_idx := find_index(self._icon_name, cols)) is None:
             return rows
         for idx, row in enumerate(rows):
-            page = self.page(idx)
-            if is_emoji(page.icon):
-                row[title_idx] = f'{page.icon}'
-            else:  # assume it's an external image resource that html can load directly
-                row[title_idx] = f'<img src="{page.icon}" style="height:1.2em">'
+            page = self.get_page(idx)
+            icon = f'<img src="{page.icon}" style="height:1.2em">' if isinstance(page.icon, File) else page.icon
+            row[title_idx] = icon
         return rows
 
     def show(self, tablefmt: str | None = None) -> str:
@@ -126,7 +125,7 @@ class View:  # noqa: PLR0904
 
         Find more table formats under: https://github.com/astanin/python-tabulate#table-format
         """
-        rows = self.rows
+        rows = self.to_rows()
         cols = self.columns
 
         if tablefmt is None:
@@ -152,6 +151,9 @@ class View:  # noqa: PLR0904
 
     def __str__(self) -> str:
         return self.show()
+
+    def __len__(self):
+        return len(self._row_indices)
 
     @property
     def has_index(self) -> bool:
@@ -239,12 +241,6 @@ class View:  # noqa: PLR0904
         view._row_indices = view._row_indices[-num:]
         return view
 
-    def to_pandas(self) -> pd.DataFrame:
-        """Convert the view to a pandas dataframe"""
-        # remove index as pandas uses its own
-        view = self.without_index() if self.has_index else self
-        return pd.DataFrame(view.rows, columns=view.columns)
-
     def select(self, *cols: str) -> View:
         """Select columns for the view"""
         curr_cols = self._columns  # we only consider non-meta columns, e.g. no index, etc.
@@ -263,7 +259,7 @@ class View:  # noqa: PLR0904
         Args:
             func: function taking a Page as input
         """
-        return [func(page) for page in self.pages()]
+        return [func(page) for page in self.to_pages()]
 
     def reverse(self) -> View:
         """Reverse the order of the rows"""

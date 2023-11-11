@@ -225,6 +225,6 @@ class TypedObject(GenericObject):
         return sub_cls(**value)
 
     @property
-    def value(self):
+    def value(self) -> Any:
         """Return the nested object"""
         return getattr(self, self.type)

@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
+from markdown2 import markdown as md2html
+
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.objects import File
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.utils import get_active_session, is_notebook
 
@@ -98,8 +101,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this page"""
-        # ToDo: Show the page as html.
-        raise NotImplementedError
+        return md2html(self.markdown(), extras=['strike', 'task_list'])
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     # @property
@@ -128,12 +130,11 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         raise RuntimeError(msg)
 
     @property
-    def icon(self) -> str:
+    def icon(self) -> File | str:
+        """Icon of page, i.e. emojis, Notion's icons, or custom images"""
         icon = self.obj_ref.icon
-        raise NotImplementedError()
-        # ToDo: Fix me
-        if isinstance(icon, objs.FileObject):
-            return icon.URL  # or helpers.get_url(self.id)
+        if isinstance(icon, objs.ExternalFile):
+            return File.wrap_obj_ref(icon)
         elif isinstance(icon, objs.EmojiObject):
             return icon.emoji
         else:

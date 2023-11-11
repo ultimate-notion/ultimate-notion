@@ -103,6 +103,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def schema(self) -> type[PageSchema]:
+        """Schema of the database"""
         if not self._schema:
             self._schema = self._reflect_schema(self.obj_ref)
         return self._schema
@@ -147,8 +148,8 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         # ToDo: Remove when self.query is implemented!
         return [Page(page_obj) for page_obj in query.execute()]
 
-    def pages(self) -> View:
-        """Return a view of all pages in the database"""
+    def fetch_all(self) -> View:
+        """Fetch all pages and return a view"""
         # ToDo: Decide on also caching the view? or at least the pages within the view?
         session = get_active_session()
         query = session.api.databases.query(self.id)  # ToDo: use self.query when implemented

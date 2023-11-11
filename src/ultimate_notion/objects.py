@@ -28,8 +28,39 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
 
     obj_ref: objs.FileObject
 
+    @classmethod
+    def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> File:
+        self = cast(File, cls.__new__(cls))
+        self.obj_ref = obj_ref
+        return self
+
     def __init__(self, url: str) -> None:
         self.obj_ref = objs.ExternalFile.build(url=url, name=url)
+
+    def __repr__(self) -> str:
+        cls_name = self.__class__.__name__
+        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+
+    def __str__(self) -> str:
+        return self.url
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this file"""
+        return f'<img src="{self.url}" style="height:2em">'
+
+    @property
+    def name(self) -> str | None:
+        return self.obj_ref.name
+
+    @property
+    def url(self) -> str:
+        if isinstance(self.obj_ref, objs.HostedFile):
+            return self.obj_ref.file.url
+        elif isinstance(self.obj_ref, objs.ExternalFile):
+            return self.obj_ref.external.url
+        else:
+            msg = f'Unknown file type {type(self.obj_ref)}'
+            raise RuntimeError(msg)
 
 
 class RichTextBase(Wrapper[objs.RichTextObject], wraps=objs.RichTextObject):

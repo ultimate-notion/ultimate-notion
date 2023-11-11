@@ -101,4 +101,6 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
 
 class Block(DataObject[obj_blocks.Block], wraps=obj_blocks.Block):
-    pass
+    """Notion block object"""
+
+    # ToDo: Implement me!
