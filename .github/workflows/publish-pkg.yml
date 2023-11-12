@@ -28,6 +28,9 @@ jobs:
           # Fetch all tags
           fetch-depth: 0
 
+      - name: Install Hatch
+        run: pip install --upgrade --pre hatch
+
       - name: Build distributions
         run: hatch build
 
