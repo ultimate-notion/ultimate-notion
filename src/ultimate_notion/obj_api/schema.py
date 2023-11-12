@@ -101,43 +101,57 @@ class Status(PropertyType, type='status'):
 class Date(PropertyType, type='date'):
     """Defines the date configuration for a database property."""
 
-    date: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    date: _NestedData = _NestedData()
 
 
 class People(PropertyType, type='people'):
     """Defines the people configuration for a database property."""
 
-    people: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    people: _NestedData = _NestedData()
 
 
 class Files(PropertyType, type='files'):
     """Defines the files configuration for a database property."""
 
-    files: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    files: _NestedData = _NestedData()
 
 
 class Checkbox(PropertyType, type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
-    checkbox: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    checkbox: _NestedData = _NestedData()
 
 
 class Email(PropertyType, type='email'):
     """Defines the email configuration for a database property."""
 
-    email: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    email: _NestedData = _NestedData()
 
 
 class URL(PropertyType, type='url'):
     """Defines the URL configuration for a database property."""
 
-    url: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    url: _NestedData = _NestedData()
 
 
 class PhoneNumber(PropertyType, type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
-    phone_number: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    phone_number: _NestedData = _NestedData()
 
 
 class Formula(PropertyType, type='formula'):
@@ -233,25 +247,33 @@ class Rollup(PropertyType, type='rollup'):
 class CreatedTime(PropertyType, type='created_time'):
     """Defines the created-time configuration for a database property."""
 
-    created_time: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    created_time: _NestedData = _NestedData()
 
 
 class CreatedBy(PropertyType, type='created_by'):
     """Defines the created-by configuration for a database property."""
 
-    created_by: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    created_by: _NestedData = _NestedData()
 
 
 class LastEditedBy(PropertyType, type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
-    last_edited_by: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    last_edited_by: _NestedData = _NestedData()
 
 
 class LastEditedTime(PropertyType, type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
-    last_edited_time: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    last_edited_time: _NestedData = _NestedData()
 
 
 class UniqueID(PropertyType, type='unique_id'):
@@ -266,7 +288,9 @@ class UniqueID(PropertyType, type='unique_id'):
 class Verification(PropertyType, type='verification'):
     """Verfication database property of Wiki databases"""
 
-    verification: Any = Field(default_factory=dict)  # No useful data in here
+    class _NestedData(GenericObject): ...
+
+    verification: _NestedData = _NestedData()
 
 
 class RenameProp(GenericObject):
