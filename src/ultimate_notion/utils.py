@@ -214,7 +214,7 @@ class Wrapper(Generic[T]):
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: T) -> Self:
+    def wrap_obj_ref(cls: type[Self], obj_ref: T, /) -> Self:
         """Wraps `obj_ref` into a high-level object for the API of Ultimate Notion"""
         hl_cls = cls._obj_api_map[type(obj_ref)]
         hl_obj = hl_cls.__new__(hl_cls)

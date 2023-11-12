@@ -87,7 +87,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         return self.obj_ref.has_children
 
     @property
-    def is_archived(self) -> bool:
+    def is_deleted(self) -> bool:
         """Return wether the object is deleted/archived"""
         return self.obj_ref.archived
 

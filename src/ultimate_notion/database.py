@@ -132,14 +132,14 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     def delete(self) -> Database:
         """Delete/archive this database"""
-        if not self.is_archived:
+        if not self.is_deleted:
             session = get_active_session()
             session.api.databases.delete(self.obj_ref)
         return self
 
     def restore(self) -> Database:
         """Restore/unarchive this database"""
-        if self.is_archived:
+        if self.is_deleted:
             session = get_active_session()
             session.api.databases.restore(self.obj_ref)
         return self

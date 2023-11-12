@@ -49,7 +49,7 @@ class PageProperties:
             msg = f'No such property: {prop_name}'
             raise AttributeError(msg)
 
-        return cast(PropertyValue, PropertyValue.wrap_obj_ref(obj_ref=prop))
+        return cast(PropertyValue, PropertyValue.wrap_obj_ref(prop))
 
     def __setitem__(self, prop_name: str, value: Any):
         db = self._page.database
@@ -179,14 +179,14 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def delete(self) -> Page:
         """Delete/archive this page"""
-        if not self.is_archived:
+        if not self.is_deleted:
             session = get_active_session()
             session.api.pages.delete(self.obj_ref)
         return self
 
     def restore(self) -> Page:
         """Restore/unarchive this page"""
-        if self.is_archived:
+        if self.is_deleted:
             session = get_active_session()
             session.api.pages.restore(self.obj_ref)
         return self

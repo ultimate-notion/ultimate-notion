@@ -22,11 +22,11 @@ def test_parents(page_hierarchy):
 
 def test_delete_restore_page(notion: Session, root_page: Page):
     page = notion.create_page(root_page)
-    assert not page.is_archived
+    assert not page.is_deleted
     page.delete()
-    assert page.is_archived
+    assert page.is_deleted
     page.restore()
-    assert not page.is_archived
+    assert not page.is_deleted
 
 
 def test_reload_page(notion: Session, root_page: Page):

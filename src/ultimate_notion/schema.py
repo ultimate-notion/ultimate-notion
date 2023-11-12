@@ -26,14 +26,13 @@ from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion.obj_api.schema import Function, NumberFormat
-from ultimate_notion.objects import RichText
+from ultimate_notion.objects import Option, OptionGroup, RichText
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.text import snake_case
 from ultimate_notion.utils import SList, Wrapper, get_active_session, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-    from ultimate_notion.objects import Option
     from ultimate_notion.page import Page
 
 # Todo: Move the functionality from the PyDantic types in here
@@ -278,6 +277,9 @@ class Column:
         self._attr_name = name
         self._type.prop_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
 
+    def __repr__(self) -> str:
+        return get_repr(self, name='Column', desc=self.type)
+
     @property
     def name(self) -> str:
         return self._name
@@ -321,6 +323,10 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
         options = [option.obj_ref for option in options]
         super().__init__(options)
 
+    @property
+    def options(self) -> list[Option]:
+        return [Option.wrap_obj_ref(option) for option in self.obj_ref.select.options]
+
 
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
     """Defines a multi-select column in a database"""
@@ -329,11 +335,23 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
         options = [option.obj_ref for option in options]
         super().__init__(options)
 
+    @property
+    def options(self) -> list[Option]:
+        return [Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options]
+
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
     """Defines a status column in a database"""
 
     allowed_at_creation = False  # ToDo: Recheck if this holds really true when the default options are passed!
+
+    @property
+    def options(self) -> list[Option]:
+        return [Option.wrap_obj_ref(option) for option in self.obj_ref.status.options]
+
+    @property
+    def groups(self) -> list[OptionGroup]:
+        return [OptionGroup.wrap_obj_ref(group, options=self.options) for group in self.obj_ref.status.groups]
 
 
 class Date(PropertyType[obj_schema.Date], wraps=obj_schema.Date):

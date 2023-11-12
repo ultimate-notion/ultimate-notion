@@ -84,7 +84,7 @@ def test_db_attributes(contacts_db: Database):
 
     assert contacts_db.url.startswith('https://www.notion.so/d')
 
-    assert not contacts_db.is_archived
+    assert not contacts_db.is_deleted
 
     assert not contacts_db.is_inline
 
@@ -120,11 +120,11 @@ def test_description_setter(notion: Session, article_db: Database):
 
 def test_delete_restore_db(notion: Session, root_page: Page):
     db = notion.create_db(root_page)
-    assert not db.is_archived
+    assert not db.is_deleted
     db.delete()
-    assert db.is_archived
+    assert db.is_deleted
     db.restore()
-    assert not db.is_archived
+    assert not db.is_deleted
 
 
 def test_reload_db(notion: Session, root_page: Page):

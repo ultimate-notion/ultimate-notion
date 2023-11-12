@@ -9,7 +9,7 @@ from pydantic import Field, SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
 from ultimate_notion.obj_api.enums import Function, NumberFormat
-from ultimate_notion.obj_api.objects import SelectOption
+from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 
 
 class PropertyType(TypedObject, polymorphic_base=True):
@@ -91,48 +91,59 @@ class MultiSelect(PropertyType, type='multi_select'):
 class Status(PropertyType, type='status'):
     """Defines the status configuration for a database property."""
 
-    status: Any = Field(default_factory=dict)
+    class _NestedData(GenericObject):
+        options: list[SelectOption] = Field(default_factory=list)
+        groups: list[SelectGroup] = Field(default_factory=list)
+
+    status: _NestedData = _NestedData()
 
 
 class Date(PropertyType, type='date'):
     """Defines the date configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     date: Any = Field(default_factory=dict)
 
 
 class People(PropertyType, type='people'):
     """Defines the people configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     people: Any = Field(default_factory=dict)
 
 
 class Files(PropertyType, type='files'):
     """Defines the files configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     files: Any = Field(default_factory=dict)
 
 
 class Checkbox(PropertyType, type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     checkbox: Any = Field(default_factory=dict)
 
 
 class Email(PropertyType, type='email'):
     """Defines the email configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     email: Any = Field(default_factory=dict)
 
 
 class URL(PropertyType, type='url'):
     """Defines the URL configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     url: Any = Field(default_factory=dict)
 
 
 class PhoneNumber(PropertyType, type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     phone_number: Any = Field(default_factory=dict)
 
 
@@ -229,36 +240,42 @@ class Rollup(PropertyType, type='rollup'):
 class CreatedTime(PropertyType, type='created_time'):
     """Defines the created-time configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     created_time: Any = Field(default_factory=dict)
 
 
 class CreatedBy(PropertyType, type='created_by'):
     """Defines the created-by configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     created_by: Any = Field(default_factory=dict)
 
 
 class LastEditedBy(PropertyType, type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     last_edited_by: Any = Field(default_factory=dict)
 
 
 class LastEditedTime(PropertyType, type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     last_edited_time: Any = Field(default_factory=dict)
 
 
 class UniqueID(PropertyType, type='unique_id'):
     """Unique ID database property"""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     unique_id: Any = Field(default_factory=dict)
 
 
 class Verification(PropertyType, type='verification'):
     """Verfication database property of Wiki databases"""
 
+    # ToDo: Recheck if this definition cannot be a bit more specific
     verification: Any = Field(default_factory=dict)
 
 

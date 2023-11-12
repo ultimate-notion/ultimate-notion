@@ -24,6 +24,8 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
+from pydantic import Field
+
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import Color, FullColor
 from ultimate_notion.text import extract_id_from_string
@@ -43,6 +45,15 @@ class SelectOption(GenericObject):
     def build(cls, name, color=Color.DEFAULT):
         """Create a `SelectOption` object from the given name and color."""
         return cls.model_construct(name=name, color=color)
+
+
+class SelectGroup(GenericObject):
+    """Group of options for status objects."""
+
+    name: str
+    id: str = None  # type: ignore  # noqa: A003  # According to docs: "These are sometimes, but not always, UUIDs."
+    color: Color = Color.DEFAULT
+    option_ids: list[str] = Field(default_factory=list)
 
 
 class ObjectReference(GenericObject):

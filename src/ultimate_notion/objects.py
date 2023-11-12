@@ -11,9 +11,44 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     """Option for select & multi-select property"""
 
     @property
+    def id(self) -> str:  # noqa: A003
+        """Name of the option"""
+        return self.obj_ref.id
+
+    @property
     def name(self) -> str:
         """Name of the option"""
         return self.obj_ref.name
+
+    def __repr__(self) -> str:
+        return get_repr(self)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
+    """Group of options for status property"""
+
+    _options: dict[str, Option]  # holds all possible options
+
+    @classmethod
+    def wrap_obj_ref(cls, obj_ref, /, *, options: list[Option] | None = None) -> OptionGroup:
+        """Convienence constructor for the group of options"""
+        obj = super().wrap_obj_ref(obj_ref)
+        options = [] if options is None else options
+        obj._options = {option.id: option for option in options}
+        return obj
+
+    @property
+    def name(self) -> str:
+        """Name of the option group"""
+        return self.obj_ref.name
+
+    @property
+    def options(self) -> list[Option]:
+        """Options within this option group"""
+        return [self._options[opt_id] for opt_id in self.obj_ref.option_ids]
 
     def __repr__(self) -> str:
         return get_repr(self)
