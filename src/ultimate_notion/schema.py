@@ -507,6 +507,11 @@ class ID(PropertyType[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
 
     allowed_at_creation = False
 
+    @property
+    def prefix(self) -> str:
+        opt_prefix = self.obj_ref.unique_id.prefix
+        return '' if opt_prefix is None else opt_prefix
+
 
 class Verification(PropertyType[obj_schema.Verification], wraps=obj_schema.Verification):
     """Defines a unique ID column in a database"""

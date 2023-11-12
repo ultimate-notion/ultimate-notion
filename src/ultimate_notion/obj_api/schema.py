@@ -101,50 +101,43 @@ class Status(PropertyType, type='status'):
 class Date(PropertyType, type='date'):
     """Defines the date configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    date: Any = Field(default_factory=dict)
+    date: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class People(PropertyType, type='people'):
     """Defines the people configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    people: Any = Field(default_factory=dict)
+    people: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class Files(PropertyType, type='files'):
     """Defines the files configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    files: Any = Field(default_factory=dict)
+    files: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class Checkbox(PropertyType, type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    checkbox: Any = Field(default_factory=dict)
+    checkbox: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class Email(PropertyType, type='email'):
     """Defines the email configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    email: Any = Field(default_factory=dict)
+    email: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class URL(PropertyType, type='url'):
     """Defines the URL configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    url: Any = Field(default_factory=dict)
+    url: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class PhoneNumber(PropertyType, type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    phone_number: Any = Field(default_factory=dict)
+    phone_number: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class Formula(PropertyType, type='formula'):
@@ -240,43 +233,40 @@ class Rollup(PropertyType, type='rollup'):
 class CreatedTime(PropertyType, type='created_time'):
     """Defines the created-time configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    created_time: Any = Field(default_factory=dict)
+    created_time: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class CreatedBy(PropertyType, type='created_by'):
     """Defines the created-by configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    created_by: Any = Field(default_factory=dict)
+    created_by: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class LastEditedBy(PropertyType, type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    last_edited_by: Any = Field(default_factory=dict)
+    last_edited_by: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class LastEditedTime(PropertyType, type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    last_edited_time: Any = Field(default_factory=dict)
+    last_edited_time: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class UniqueID(PropertyType, type='unique_id'):
     """Unique ID database property"""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    unique_id: Any = Field(default_factory=dict)
+    class _NestedData(GenericObject):
+        prefix: str | None = None
+
+    unique_id: _NestedData = _NestedData()
 
 
 class Verification(PropertyType, type='verification'):
     """Verfication database property of Wiki databases"""
 
-    # ToDo: Recheck if this definition cannot be a bit more specific
-    verification: Any = Field(default_factory=dict)
+    verification: Any = Field(default_factory=dict)  # No useful data in here
 
 
 class RenameProp(GenericObject):
