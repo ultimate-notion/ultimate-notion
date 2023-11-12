@@ -78,9 +78,11 @@ class PageProperties:
 class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     props: PageProperties
 
-    def __init__(self, obj_ref):
-        super().__init__(obj_ref)
-        self.props = self._create_prop_attrs()
+    @classmethod
+    def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Page:
+        obj = super().wrap_obj_ref(obj_ref)
+        obj.props = obj._create_prop_attrs()
+        return obj
 
     def _create_prop_attrs(self) -> PageProperties:
         """Create the attributes for the database properties of this page"""

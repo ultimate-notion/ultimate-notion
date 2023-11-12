@@ -6,7 +6,7 @@ import logging
 import os
 from threading import RLock
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import Any, ClassVar, cast
 from uuid import UUID
 
 import notion_client
@@ -21,10 +21,6 @@ from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.schema import DefaultSchema, PageSchema, Relation
 from ultimate_notion.utils import ObjRef, SList, get_uuid
-
-if TYPE_CHECKING:
-    from ultimate_notion.obj_api import objects as objs
-
 
 _log = logging.getLogger(__name__)
 ENV_NOTION_TOKEN = 'NOTION_TOKEN'  # same as in `notion-sdk-py` package
@@ -162,7 +158,7 @@ class Session:
             schema_dct = {k: v.obj_ref for k, v in DefaultSchema.to_dict().items()}
             db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
 
-        db: Database = Database(obj_ref=db_obj)
+        db: Database = Database.wrap_obj_ref(db_obj)
 
         if schema:
             db.schema = schema
@@ -189,22 +185,18 @@ class Session:
             exact: perform an exact search, not only a substring match
         """
         query = self.api.search(db_name).filter(property='object', value='database')
-        dbs = SList(cast(Database, self.cache.setdefault(db.id, Database(obj_ref=db))) for db in query.execute())
+        dbs = SList(cast(Database, self.cache.setdefault(db.id, Database.wrap_obj_ref(db))) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
         return dbs
 
-    def _get_db(self, db_uuid: UUID) -> Database:
-        """Retrieve obj_api database object circumenventing the session cache"""
-        return Database(obj_ref=self.api.databases.retrieve(db_uuid))
-
-    def get_db(self, db_ref: ObjRef) -> Database:
+    def get_db(self, db_ref: ObjRef, *, use_cache: bool = True) -> Database:
         """Retrieve Notion database by uuid"""
         db_uuid = get_uuid(db_ref)
-        if db_uuid in self.cache:
+        if use_cache and db_uuid in self.cache:
             return cast(Database, self.cache[db_uuid])
         else:
-            db = Database(obj_ref=self.api.databases.retrieve(db_uuid))
+            db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
             self.cache[db.id] = db
             return db
 
@@ -216,37 +208,35 @@ class Session:
             exact: perform an exact search, not only a substring match
         """
         query = self.api.search(title).filter(property='object', value='page')
-        pages = SList(cast(Page, self.cache.setdefault(page.id, Page(obj_ref=page))) for page in query.execute())
+        pages = SList(
+            cast(Page, self.cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj))) for page_obj in query.execute()
+        )
         if exact and title is not None:
             pages = SList(page for page in pages if page.title.value == title)
         return pages
 
-    def get_page(self, page_ref: ObjRef) -> Page:
+    def get_page(self, page_ref: ObjRef, *, use_cache: bool = True) -> Page:
         page_uuid = get_uuid(page_ref)
-        if page_uuid in self.cache:
+        if use_cache and page_uuid in self.cache:
             return cast(Page, self.cache[page_uuid])
         else:
-            page = Page(obj_ref=self.api.pages.retrieve(page_uuid))
+            page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
             self.cache[page.id] = page
             return page
 
     def create_page(self, parent: Page, title: RichText | str | None = None) -> Page:
         if title is not None:
             title = Title(title).obj_ref
-        page = Page(obj_ref=self.api.pages.create(parent=parent.obj_ref, title=title))
+        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title))
         self.cache[page.id] = page
         return page
 
-    def _get_user(self, uuid: UUID) -> objs.User:
-        """Retrieve obj_api user object circumventing the cache"""
-        return self.api.users.retrieve(uuid)
-
-    def get_user(self, user_ref: ObjRef) -> User:
+    def get_user(self, user_ref: ObjRef, *, use_cache: bool = True) -> User:
         user_uuid = get_uuid(user_ref)
-        if user_uuid in self.cache:
+        if use_cache and user_uuid in self.cache:
             return cast(User, self.cache[user_uuid])
         else:
-            user = User.wrap_obj_ref(self._get_user(user_uuid))
+            user = User.wrap_obj_ref(self.api.users.retrieve(user_uuid))
             self.cache[user.id] = user
             return user
 

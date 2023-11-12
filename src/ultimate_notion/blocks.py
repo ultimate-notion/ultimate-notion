@@ -21,10 +21,6 @@ T = TypeVar('T', bound=obj_blocks.DataObject)
 class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     """The base type for all data-related types, i.e, pages, databases and blocks"""
 
-    def __init__(self, obj_ref: T):
-        """Reference to API object from the `obj_api` subpackage"""
-        self.obj_ref = obj_ref
-
     def __eq__(self, other: object) -> bool:
         if other is None:
             return False

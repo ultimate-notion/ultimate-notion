@@ -82,6 +82,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         cover = self.obj_ref.cover
         return File.wrap_obj_ref(cover) if cover is not None else None
 
+    # def reload(self) -> Database:
+    #     """Reload the database"""
+    #     # ToDo: Implement me!
+
     @property
     def is_wiki(self) -> bool:
         """Is this database a wiki database"""
@@ -145,14 +149,14 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @staticmethod
     def _pages_from_query(query) -> list[Page]:
         # ToDo: Remove when self.query is implemented!
-        return [Page(page_obj) for page_obj in query.execute()]
+        return [Page.wrap_obj_ref(page_obj) for page_obj in query.execute()]
 
     def fetch_all(self) -> View:
         """Fetch all pages and return a view"""
         # ToDo: Decide on also caching the view? or at least the pages within the view?
         session = get_active_session()
         query = session.api.databases.query(self.id)  # ToDo: use self.query when implemented
-        pages = [Page(page_obj) for page_obj in query.execute()]
+        pages = [Page.wrap_obj_ref(page_obj) for page_obj in query.execute()]
         return View(database=self, pages=pages, query=query)
 
     def create_page(self, **kwargs) -> Page:
@@ -177,7 +181,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
 
         session = get_active_session()
-        page = Page(obj_ref=session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
+        page = Page.wrap_obj_ref(session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
         return page
 
     def query(self) -> QueryBuilder:
