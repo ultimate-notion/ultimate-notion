@@ -352,7 +352,7 @@ class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
     [Property Schema Object])https://developers.notion.com/reference/property-schema-object).
     """
 
-    allowed_at_creation = False  # Sending a Status property complains about the existence of options and groups
+    allowed_at_creation = False
 
     @property
     def options(self) -> list[Option]:
