@@ -144,7 +144,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def markdown(self) -> str:
         """Return the content of the page as Markdown"""
-        # ToDo: Use an own implementation here using Mistune!
+        # ToDo: Since notion2md is also quite buggy, use an own implementation here using Mistune!
         import os  # noqa: PLC0415
 
         from notion2md.exporter.block import StringExporter  # noqa: PLC0415
@@ -177,14 +177,22 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         else:
             return md
 
-    def delete(self):
+    def delete(self) -> Page:
         """Delete/archive this page"""
         if not self.is_archived:
             session = get_active_session()
             session.api.pages.delete(self.obj_ref)
+        return self
 
-    def restore(self):
+    def restore(self) -> Page:
         """Restore/unarchive this page"""
         if self.is_archived:
             session = get_active_session()
             session.api.pages.restore(self.obj_ref)
+        return self
+
+    def reload(self) -> Page:
+        """Reload this page"""
+        session = get_active_session()
+        self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
+        return self

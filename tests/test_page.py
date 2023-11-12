@@ -27,3 +27,10 @@ def test_delete_restore_page(notion: Session, root_page: Page):
     assert page.is_archived
     page.restore()
     assert not page.is_archived
+
+
+def test_reload_page(notion: Session, root_page: Page):
+    page = notion.create_page(root_page)
+    old_obj_id = id(page.obj_ref)
+    page.reload()
+    assert old_obj_id != id(page.obj_ref)

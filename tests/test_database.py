@@ -125,3 +125,10 @@ def test_delete_restore_db(notion: Session, root_page: Page):
     assert db.is_archived
     db.restore()
     assert not db.is_archived
+
+
+def test_reload_db(notion: Session, root_page: Page):
+    db = notion.create_db(root_page)
+    old_obj_id = id(db.obj_ref)
+    db.reload()
+    assert old_obj_id != id(db.obj_ref)

@@ -82,10 +82,6 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         cover = self.obj_ref.cover
         return File.wrap_obj_ref(cover) if cover is not None else None
 
-    # def reload(self) -> Database:
-    #     """Reload the database"""
-    #     # ToDo: Implement me!
-
     @property
     def is_wiki(self) -> bool:
         """Is this database a wiki database"""
@@ -134,17 +130,25 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def is_inline(self) -> bool:
         return self.obj_ref.is_inline
 
-    def delete(self):
+    def delete(self) -> Database:
         """Delete/archive this database"""
         if not self.is_archived:
             session = get_active_session()
             session.api.databases.delete(self.obj_ref)
+        return self
 
-    def restore(self):
+    def restore(self) -> Database:
         """Restore/unarchive this database"""
         if self.is_archived:
             session = get_active_session()
             session.api.databases.restore(self.obj_ref)
+        return self
+
+    def reload(self) -> Database:
+        """Reload this database"""
+        session = get_active_session()
+        self.obj_ref = session.api.databases.retrieve(self.obj_ref.id)
+        return self
 
     @staticmethod
     def _pages_from_query(query) -> list[Page]:
