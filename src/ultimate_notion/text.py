@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterator
 
-# the max text size according to the Notion API is 2000 characters.
+#: the max text size according to the Notion API is 2000 characters.
 MAX_TEXT_OBJECT_SIZE = 2000
 
 BASE_URL_PATTERN = r'https://(www)?.notion.so/'
