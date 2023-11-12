@@ -13,7 +13,7 @@ from ultimate_notion.page import Page
 from ultimate_notion.query import QueryBuilder
 from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
 from ultimate_notion.text import camel_case, snake_case
-from ultimate_notion.utils import dict_diff_str, get_active_session
+from ultimate_notion.utils import dict_diff_str, get_active_session, get_repr
 from ultimate_notion.view import View
 
 
@@ -37,8 +37,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return str(self)
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+        return get_repr(self)
 
     @property
     def title(self) -> RichText:

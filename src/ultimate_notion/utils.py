@@ -233,3 +233,10 @@ def get_active_session() -> Session:
     from ultimate_notion.session import Session  # noqa: PLC0415
 
     return Session.get_active()
+
+
+def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
+    """Default representation, i.e. `repr(...)`, used by ultime-notion for conistency"""
+    type_str = str(name) if name is not None else obj.__class__.__name__
+    desc_str = str(desc) if desc is not None else str(obj)
+    return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"

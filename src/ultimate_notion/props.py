@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion.obj_api.props import DateType
 from ultimate_notion.objects import Option, RichText, User
-from ultimate_notion.utils import Wrapper, get_active_session
+from ultimate_notion.utils import Wrapper, get_active_session, get_repr
 
 if TYPE_CHECKING:
     from ultimate_notion.objects import File
@@ -62,8 +62,7 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
         return self.obj_ref.id
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+        return get_repr(self)
 
     def __str__(self) -> str:
         if isinstance(self.value, RichText):  # note that `RichText` is also a list but implements it's own __str__

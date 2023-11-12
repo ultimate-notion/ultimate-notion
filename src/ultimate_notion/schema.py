@@ -29,7 +29,7 @@ from ultimate_notion.obj_api.schema import Function, NumberFormat
 from ultimate_notion.objects import RichText
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.text import snake_case
-from ultimate_notion.utils import SList, Wrapper, get_active_session, is_notebook
+from ultimate_notion.utils import SList, Wrapper, get_active_session, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -251,8 +251,7 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
         return hash(self.obj_ref.type) + hash(self.obj_ref.value)
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<PropertyType: '{cls_name}' at {hex(id(self))}>"
+        return get_repr(self, name='PropertyType', desc=self.__class__.__name__)
 
     def __str__(self) -> str:
         return self.__class__.__name__

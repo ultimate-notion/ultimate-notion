@@ -11,7 +11,7 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.objects import File
 from ultimate_notion.props import PropertyValue, Title
-from ultimate_notion.utils import get_active_session, is_notebook
+from ultimate_notion.utils import get_active_session, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -96,8 +96,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return str(self.title)
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self.title.value}' at {hex(id(self))}>"
+        return get_repr(self, desc=self.title.value)
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this page"""

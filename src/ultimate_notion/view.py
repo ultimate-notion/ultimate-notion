@@ -13,7 +13,8 @@ from tabulate import tabulate
 from ultimate_notion.obj_api.query import QueryBuilder
 from ultimate_notion.objects import File
 from ultimate_notion.page import Page
-from ultimate_notion.utils import deepcopy_with_sharing, find_index, find_indices, is_notebook
+from ultimate_notion.text import html_img
+from ultimate_notion.utils import deepcopy_with_sharing, find_index, find_indices, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -109,7 +110,7 @@ class View:  # noqa: PLR0904
             return rows
         for idx, row in enumerate(rows):
             page = self.get_page(idx)
-            icon = f'<img src="{page.icon}" style="height:1.2em">' if isinstance(page.icon, File) else page.icon
+            icon = html_img(page.icon.url, size=1.2) if isinstance(page.icon, File) else page.icon
             row[title_idx] = icon
         return rows
 
@@ -146,8 +147,7 @@ class View:  # noqa: PLR0904
         return self.show(tablefmt='html')
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self.database.title!s}' at {hex(id(self))}>"
+        return get_repr(self, desc=self.database.title)
 
     def __str__(self) -> str:
         return self.show()

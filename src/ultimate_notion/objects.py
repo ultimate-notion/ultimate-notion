@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import cast
 
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.text import chunky
-from ultimate_notion.utils import Wrapper
+from ultimate_notion.text import chunky, html_img
+from ultimate_notion.utils import Wrapper, get_repr
 
 
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
@@ -16,8 +16,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         return self.obj_ref.name
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+        return get_repr(self)
 
     def __str__(self) -> str:
         return self.name
@@ -38,15 +37,14 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref = objs.ExternalFile.build(url=url, name=url)
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+        return get_repr(self)
 
     def __str__(self) -> str:
         return self.url
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this file"""
-        return f'<img src="{self.url}" style="height:2em">'
+        return html_img(self.url, size=2)
 
     @property
     def name(self) -> str | None:
@@ -159,10 +157,11 @@ class User(Wrapper[objs.User], wraps=objs.User):
         return self.name
 
     def __repr__(self) -> str:
-        cls_name = self.__class__.__name__
-        return f"<{cls_name}: '{self!s}' at {hex(id(self))}>"
+        return get_repr(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, User):
+            return NotImplemented
         return self.id == other.id
 
     def __hash__(self) -> int:

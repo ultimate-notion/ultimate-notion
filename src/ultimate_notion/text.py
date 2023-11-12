@@ -48,3 +48,8 @@ def decapitalize(string: str) -> str:
     if not string:
         return string
     return string[0].lower() + string[1:]
+
+
+def html_img(url: str, size: float) -> str:
+    """Create a img tag in HTML"""
+    return f'<img src="{url}" style="height:{size:.2f}em">'
