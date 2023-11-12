@@ -28,7 +28,7 @@ from pydantic import Field
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import Color, FullColor
-from ultimate_notion.text import extract_id_from_string
+from ultimate_notion.text import extract_id
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Database, Page
@@ -85,7 +85,7 @@ class ObjectReference(GenericObject):
             return ObjectReference.model_construct(id=ref)
 
         if isinstance(ref, str):
-            ref = extract_id_from_string(ref)
+            ref = extract_id(ref)
 
             if ref is not None:
                 return ObjectReference.model_construct(id=UUID(ref))

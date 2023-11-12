@@ -42,22 +42,22 @@ BLOCK_URL_LONG_RE = re.compile(
 )
 
 
-def extract_id_from_string(string):
-    """Examine the given string to find a valid Notion object ID."""
+def extract_id(text: str) -> str | None:
+    """Examine the given text to find a valid Notion object ID"""
 
-    m = UUID_RE.match(string)
+    m = UUID_RE.match(text)
     if m is not None:
         return m.group('id')
 
-    m = PAGE_URL_LONG_RE.match(string)
+    m = PAGE_URL_LONG_RE.match(text)
     if m is not None:
         return m.group('page_id')
 
-    m = PAGE_URL_SHORT_RE.match(string)
+    m = PAGE_URL_SHORT_RE.match(text)
     if m is not None:
         return m.group('page_id')
 
-    m = BLOCK_URL_LONG_RE.match(string)
+    m = BLOCK_URL_LONG_RE.match(text)
     if m is not None:
         return m.group('block_id')
 
