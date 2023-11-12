@@ -24,9 +24,9 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from ultimate_notion.obj_api import util
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import Color, FullColor
+from ultimate_notion.text import extract_id_from_string
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Database, Page
@@ -74,7 +74,7 @@ class ObjectReference(GenericObject):
             return ObjectReference.model_construct(id=ref)
 
         if isinstance(ref, str):
-            ref = util.extract_id_from_string(ref)
+            ref = extract_id_from_string(ref)
 
             if ref is not None:
                 return ObjectReference.model_construct(id=UUID(ref))

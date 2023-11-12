@@ -8,6 +8,61 @@ from collections.abc import Iterator
 # the max text size according to the Notion API is 2000 characters.
 MAX_TEXT_OBJECT_SIZE = 2000
 
+BASE_URL_PATTERN = r'https://(www)?.notion.so/'
+UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
+
+UUID_RE = re.compile(rf'^(?P<id>{UUID_PATTERN})$')
+
+PAGE_URL_SHORT_RE = re.compile(
+    rf"""^
+      {BASE_URL_PATTERN}
+      (?P<page_id>{UUID_PATTERN})
+    $""",
+    flags=re.IGNORECASE | re.VERBOSE,
+)
+
+PAGE_URL_LONG_RE = re.compile(
+    rf"""^
+      {BASE_URL_PATTERN}
+      (?P<title>.*)-
+      (?P<page_id>{UUID_PATTERN})
+    $""",
+    flags=re.IGNORECASE | re.VERBOSE,
+)
+
+BLOCK_URL_LONG_RE = re.compile(
+    rf"""^
+      {BASE_URL_PATTERN}
+      (?P<username>.*)/
+      (?P<title>.*)-
+      (?P<page_id>{UUID_PATTERN})
+      \#(?P<block_id>{UUID_PATTERN})
+    $""",
+    flags=re.IGNORECASE | re.VERBOSE,
+)
+
+
+def extract_id_from_string(string):
+    """Examine the given string to find a valid Notion object ID."""
+
+    m = UUID_RE.match(string)
+    if m is not None:
+        return m.group('id')
+
+    m = PAGE_URL_LONG_RE.match(string)
+    if m is not None:
+        return m.group('page_id')
+
+    m = PAGE_URL_SHORT_RE.match(string)
+    if m is not None:
+        return m.group('page_id')
+
+    m = BLOCK_URL_LONG_RE.match(string)
+    if m is not None:
+        return m.group('block_id')
+
+    return None
+
 
 def chunky(text: str, length: int = MAX_TEXT_OBJECT_SIZE) -> Iterator[str]:
     """Break the given `text` into chunks of at most `length` size."""
