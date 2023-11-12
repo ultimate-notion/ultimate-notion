@@ -341,9 +341,18 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
 
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
-    """Defines a status column in a database"""
+    """Defines a status column in a database
 
-    allowed_at_creation = False  # ToDo: Recheck if this holds really true when the default options are passed!
+    The Notion API doesn't allow to create a column of this type.
+    Sending it to the API with options and option groups defined results in an error
+    about the existence of the keys `options` and `groups` and removing them
+    creates a database with the column missing... ignorance is bliss.
+
+    Also the Status configuration is not mentioned as a
+    [Property Schema Object])https://developers.notion.com/reference/property-schema-object).
+    """
+
+    allowed_at_creation = False  # Sending a Status property complains about the existence of options and groups
 
     @property
     def options(self) -> list[Option]:
