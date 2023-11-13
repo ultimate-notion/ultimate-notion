@@ -15,11 +15,11 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] delete/archive and restore/unarchive a database
 - [ ] update a database schema, i.e. adding/removing columns or changing their types
 - [ ] change the properties of database columns, e.g. name, formula of formula column, etc.
-- [x] read the database attributes like title, icon, etc.
-- [ ] change database attributes like title, icon, etc.
-- [x] retrieve all containing pages of a database
+- [x] read the database attributes like title, description, cover, icon, etc.
+- [ ] change database attributes like title, description, cover, icon, etc.
+- [x] retrieve all pages of a database
 - [ ] query with filters and sortings to retrieve only specific pages
-- [ ] display the content of a database as a table, e.g. in [Jupyter Lab]
+- [x] display the content of a database as a table, e.g. in [Jupyter Lab]
 - [x] create new pages with properties within the database respecting the schema
 
 ## Pages
@@ -28,8 +28,8 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] search for a page by its title
 - [x] create a new page
 - [x] delete/archive and restore/unarchive a page
-- [ ] read page attributes like title, icon, etc.
-- [ ] change page attributes like title, icon, etc.
+- [ ] read page attributes like title, cover, icon, etc.
+- [ ] change page attributes like title, cover, icon, etc.
 - [ ] read page properties defined by a database schema
 - [ ] change page properties
 - [ ] navigate  pages using references of parent and children

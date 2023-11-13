@@ -8,7 +8,7 @@ from collections.abc import Iterator
 #: the max text size according to the Notion API is 2000 characters.
 MAX_TEXT_OBJECT_SIZE = 2000
 
-BASE_URL_PATTERN = r'https://(www)?.notion.so/'
+BASE_URL_PATTERN = r'https://(www.)?notion.so/'
 UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
 
 UUID_RE = re.compile(rf'^(?P<id>{UUID_PATTERN})$')
