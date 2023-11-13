@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
-from marko.ext.gfm import gfm
+import mistune
 
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -77,6 +77,7 @@ class PageProperties:
 
 class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     props: PageProperties
+    _render_md = mistune.create_markdown(plugins=['strikethrough', 'url', 'task_lists', 'math'], escape=False)
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Page:
@@ -102,7 +103,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this page"""
-        return gfm(self.markdown())  # Github flavored markdown
+        return self._render_md(self.markdown())  # Github flavored markdown
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     # @property
@@ -144,7 +145,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def markdown(self) -> str:
         """Return the content of the page as Markdown"""
-        # ToDo: Since notion2md is also quite buggy, use an own implementation here using Marko!
+        # ToDo: Since notion2md is also quite buggy, use an own implementation here using Mistune!
         import os  # noqa: PLC0415
 
         from notion2md.exporter.block import StringExporter  # noqa: PLC0415
