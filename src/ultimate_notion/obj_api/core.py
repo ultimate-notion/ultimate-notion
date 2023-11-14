@@ -206,7 +206,7 @@ class TypedObject(GenericObject):
 
         if not hasattr(cls, '_typemap'):
             msg = f"Missing '_typemap' in {cls}"
-            raise TypeError(msg)
+            raise ValueError(msg)
 
         type_name = value.get('type')
 
@@ -218,7 +218,7 @@ class TypedObject(GenericObject):
 
         if sub_cls is None:
             msg = f'Unsupported sub-type: {type_name}'
-            raise TypeError(msg)
+            raise ValueError(msg)
 
         logger.debug('initializing typed object %s :: %s => %s -- %s', cls, type_name, sub_cls, value)
 
