@@ -27,6 +27,13 @@ and then you are already set up to start hacking. Use `hatch run cov` or `hatch 
 the unitest with or without coverage reports, respectively. Check out the environment setup of
 hatch in [pyproject.toml](pyproject.toml) for many more commands.
 
+If you are using [VSC], then it's quite convenient to add a file `.env` in your checkout with:
+```toml
+[pytest]
+env =
+    NOTION_AUTH_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+```
+
 ## Documentation
 
 The [Ultimate Notion documentation] is made with [Material for MkDocs] and is hosted on [GitHub Pages].
