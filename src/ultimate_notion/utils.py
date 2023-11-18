@@ -10,15 +10,16 @@ from uuid import UUID
 import numpy as np
 
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import GenericObject
 
 if TYPE_CHECKING:
     from ultimate_notion.session import Session
 
 
-T = TypeVar('T')
-KT = TypeVar('KT')
-VT = TypeVar('VT')
 ObjRef: TypeAlias = UUID | str
+
+
+T = TypeVar('T')
 
 
 class SList(list[T]):
@@ -35,9 +36,12 @@ class SList(list[T]):
 
 
 def is_notebook() -> bool:
+    """Determine if we are running within a Jupyter notebook"""
     try:
         from IPython import get_ipython  # noqa: PLC0415
-
+    except ModuleNotFoundError:
+        return False  # Probably standard Python interpreter
+    else:
         shell = get_ipython().__class__.__name__
         if shell == 'ZMQInteractiveShell':
             return True  # Jupyter notebook or qtconsole
@@ -45,8 +49,6 @@ def is_notebook() -> bool:
             return False  # Terminal running IPython
         else:
             return False  # Other type (?)
-    except NameError:
-        return False  # Probably standard Python interpreter
 
 
 def store_retvals(func):
@@ -172,6 +174,10 @@ def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject) -> UUID:
     return objs.ObjectReference.build(obj).id
 
 
+KT = TypeVar('KT')
+VT = TypeVar('VT')
+
+
 def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
     """Returns the added keys, removed keys and keys of changed values of both dictionaries"""
     set1, set2 = set(dct1.keys()), set(dct2.keys())
@@ -190,17 +196,18 @@ def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str
     return keys_added_str, keys_removed_str, keys_changed_str
 
 
-Self = TypeVar('Self', bound='Wrapper[Any]')
+Self = TypeVar('Self', bound='Wrapper[Any]')  # ToDo: Replace when requires-python >= 3.11
+GT = TypeVar('GT', bound=GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Wrapper(Generic[T]):
+class Wrapper(Generic[GT]):
     """Convert objects from the obj-based API to the high-level API and vice versa"""
 
-    obj_ref: T
+    obj_ref: GT
 
-    _obj_api_map: ClassVar[dict[type[T], type[Wrapper]]] = {}  # type: ignore[misc]
+    _obj_api_map: ClassVar[dict[type[GT], type[Wrapper]]] = {}  # type: ignore[misc]
 
-    def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
+    def __init_subclass__(cls, wraps: type[GT], **kwargs: Any):
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[wraps] = cls
 
@@ -208,13 +215,13 @@ class Wrapper(Generic[T]):
         # Needed for wrap_obj_ref and its call to __new__ to work!
         return super().__new__(cls)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         """Default constructor that also builds `obj_ref`"""
-        obj_api_type = self._obj_api_map_inv[self.__class__]
+        obj_api_type: type[GenericObject] = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: T, /) -> Self:
+    def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
         """Wraps `obj_ref` into a high-level object for the API of Ultimate Notion"""
         hl_cls = cls._obj_api_map[type(obj_ref)]
         hl_obj = hl_cls.__new__(hl_cls)
@@ -222,7 +229,7 @@ class Wrapper(Generic[T]):
         return cast(Self, hl_obj)
 
     @property
-    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[T]]:
+    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT]]:
         return {v: k for k, v in self._obj_api_map.items()}
 
 

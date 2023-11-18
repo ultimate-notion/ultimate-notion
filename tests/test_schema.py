@@ -4,11 +4,11 @@ from datetime import datetime, timezone
 
 import pytest
 
-from ultimate_notion import Session, props, schema
+from ultimate_notion import Color, Session, props, schema
 from ultimate_notion.database import Database
 from ultimate_notion.objects import File, Option
 from ultimate_notion.page import Page
-from ultimate_notion.schema import Column, Function, PageSchema, ReadOnlyColumnError, SchemaError
+from ultimate_notion.schema import AggFunc, Column, PageSchema, ReadOnlyColumnError, SchemaError
 
 
 def test_all_createable_cols_schema(notion: Session, root_page: Page):
@@ -18,7 +18,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
         name = Column('Name', schema.Title())
         relation = Column('Relation', schema.Relation())
 
-    options = [Option(name='Option1'), Option(name='Option2', color='red')]
+    options = [Option(name='Option1'), Option(name='Option2', color=Color.RED)]
 
     class SchemaB(PageSchema, db_title='Schema B'):
         """Acutal interesting schema/db"""
@@ -38,7 +38,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
         phone_number = Column('Phone number', schema.PhoneNumber())
         relation = Column('Relation', schema.Relation(SchemaA))
         relation_twoway = Column('Relation two-way', schema.Relation(SchemaA, two_way_prop=SchemaA.relation))
-        rollup = Column('Rollup', schema.Rollup(relation, SchemaA.name, Function.COUNT))
+        rollup = Column('Rollup', schema.Rollup(relation, SchemaA.name, AggFunc.COUNT))
         select = Column('Select', schema.Select(options))
         # status = Column('Status', schema.Status()) # 2023-08-11: is not yet supported by Notion API
         text = Column('Text', schema.Text())

@@ -8,7 +8,7 @@ from uuid import UUID
 from pydantic import Field, SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
-from ultimate_notion.obj_api.enums import Function, NumberFormat
+from ultimate_notion.obj_api.enums import AggFunc, NumberFormat
 from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 
 
@@ -220,7 +220,7 @@ class Rollup(PropertyType, type='rollup'):
     """Defines the rollup configuration for a database property."""
 
     class _NestedData(GenericObject):
-        function: Function = Function.COUNT
+        function: AggFunc = AggFunc.COUNT
 
         relation_property_name: str | None = None
         relation_property_id: str | None = None
@@ -233,7 +233,7 @@ class Rollup(PropertyType, type='rollup'):
         @field_validator('function')
         @classmethod
         def validate_enum_field(cls, field: str):
-            return Function(field)
+            return AggFunc(field)
 
     rollup: _NestedData = _NestedData()
 

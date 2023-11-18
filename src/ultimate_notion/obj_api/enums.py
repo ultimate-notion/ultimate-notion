@@ -5,15 +5,15 @@ from __future__ import annotations
 from enum import Enum
 
 
-class VerificationState(str, Enum):
-    """Available verification states for pages in wiki databases"""
+class VState(str, Enum):
+    """Verification states for pages in wiki databases"""
 
     VERIFIED = 'verified'
     UNVERIFIED = 'unverified'
 
 
 class Color(str, Enum):
-    """Basic color values."""
+    """Basic colors"""
 
     DEFAULT = 'default'
     GRAY = 'gray'
@@ -27,36 +27,23 @@ class Color(str, Enum):
     RED = 'red'
 
 
-# ToDo: Rename this BGColor and have only the backbround colors easily available.
-# Use in the pydantic models then : Color | BGColor instead.
-class FullColor(str, Enum):
-    """Extended color values, including backgrounds."""
+class BGColor(str, Enum):
+    """Background colors for most textual blocks, e.g. paragraphs, callouts, etc."""
 
-    # Note: It's impossible to just inherit from Color, thus we repeat it here.
     DEFAULT = 'default'
-    GRAY = 'gray'
-    BROWN = 'brown'
-    ORANGE = 'orange'
-    YELLOW = 'yellow'
-    GREEN = 'green'
-    BLUE = 'blue'
-    PURPLE = 'purple'
-    PINK = 'pink'
-    RED = 'red'
-
-    GRAY_BACKGROUND = 'gray_background'
-    BROWN_BACKGROUND = 'brown_background'
-    ORANGE_BACKGROUND = 'orange_background'
-    YELLOW_BACKGROUND = 'yellow_background'
-    GREEN_BACKGROUND = 'green_background'
-    BLUE_BACKGROUND = 'blue_background'
-    PURPLE_BACKGROUND = 'purple_background'
-    PINK_BACKGROUND = 'pink_background'
-    RED_BACKGROUND = 'red_background'
+    GRAY = 'gray_background'
+    BROWN = 'brown_background'
+    ORANGE = 'orange_background'
+    YELLOW = 'yellow_background'
+    GREEN = 'green_background'
+    BLUE = 'blue_background'
+    PURPLE = 'purple_background'
+    PINK = 'pink_background'
+    RED = 'red_background'
 
 
-class CodingLanguage(str, Enum):
-    """Available coding languages."""
+class CodeLang(str, Enum):
+    """Coding languages for code blocks"""
 
     ABAP = 'abap'
     ARDUINO = 'arduino'
@@ -132,8 +119,8 @@ class CodingLanguage(str, Enum):
     MISC = 'java/c/c++/c#'
 
 
-class Function(str, Enum):
-    """Standard aggregation functions."""
+class AggFunc(str, Enum):
+    """Aggregation functions for formulas"""
 
     COUNT = 'count'
     COUNT_VALUES = 'count_values'
@@ -167,7 +154,7 @@ class Function(str, Enum):
 
 
 class NumberFormat(str, Enum):
-    """Available number formats in Notion."""
+    """Number formats for numbers"""
 
     NUMBER = 'number'
     NUMBER_WITH_COMMAS = 'number_with_commas'

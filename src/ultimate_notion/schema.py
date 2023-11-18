@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
-from ultimate_notion.obj_api.schema import Function, NumberFormat
+from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.objects import Option, OptionGroup, RichText
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.text import snake_case
@@ -487,7 +487,7 @@ class RollupError(SchemaError):
 class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
     """Defines the rollup column in a database"""
 
-    def __init__(self, relation: Column, property: Column, calculate: Function):  # noqa: A002
+    def __init__(self, relation: Column, property: Column, calculate: AggFunc):  # noqa: A002
         if not isinstance(relation.type, Relation):
             msg = f'Relation {relation} must be of type Relation'
             raise RollupError(msg)

@@ -27,7 +27,7 @@ from uuid import UUID
 from pydantic import Field
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
-from ultimate_notion.obj_api.enums import Color, FullColor
+from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.text import extract_id
 
 if TYPE_CHECKING:
@@ -258,7 +258,7 @@ class Annotations(GenericObject):
     strikethrough: bool = False
     underline: bool = False
     code: bool = False
-    color: FullColor = None  # type: ignore
+    color: BGColor = None  # type: ignore
 
     @property
     def is_plain(self):

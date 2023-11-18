@@ -13,7 +13,7 @@ from uuid import UUID
 from pydantic import SerializeAsAny
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
-from ultimate_notion.obj_api.enums import CodingLanguage, FullColor
+from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     BlockRef,
     EmojiObject,
@@ -157,7 +157,7 @@ class Paragraph(TextBlock, WithChildrenMixin, type='paragraph'):
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     paragraph: _NestedData = _NestedData()
 
@@ -176,7 +176,7 @@ class Heading1(TextBlock, type='heading_1'):
 
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     heading_1: _NestedData = _NestedData()
 
@@ -195,7 +195,7 @@ class Heading2(TextBlock, type='heading_2'):
 
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     heading_2: _NestedData = _NestedData()
 
@@ -214,7 +214,7 @@ class Heading3(TextBlock, type='heading_3'):
 
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     heading_3: _NestedData = _NestedData()
 
@@ -234,7 +234,7 @@ class Quote(TextBlock, WithChildrenMixin, type='quote'):
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
-        color: FullColor = FullColor.DEFAULT
+        color: Color | Color = Color.DEFAULT
 
     quote: _NestedData = _NestedData()
 
@@ -254,7 +254,7 @@ class Code(TextBlock, type='code'):
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
         caption: list[RichTextObject] = None  # type: ignore
-        language: CodingLanguage = CodingLanguage.PLAIN_TEXT
+        language: CodeLang = CodeLang.PLAIN_TEXT
 
     code: _NestedData = _NestedData()
 
@@ -286,7 +286,7 @@ class Callout(TextBlock, WithChildrenMixin, type='callout'):
         rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
         icon: SerializeAsAny[FileObject] | EmojiObject | None = None
-        color: FullColor = FullColor.GRAY_BACKGROUND
+        color: Color | BGColor = BGColor.GRAY
 
     callout: _NestedData = _NestedData()
 
@@ -311,7 +311,7 @@ class BulletedListItem(TextBlock, WithChildrenMixin, type='bulleted_list_item'):
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     bulleted_list_item: _NestedData = _NestedData()
 
@@ -331,7 +331,7 @@ class NumberedListItem(TextBlock, WithChildrenMixin, type='numbered_list_item'):
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     numbered_list_item: _NestedData = _NestedData()
 
@@ -352,7 +352,7 @@ class ToDo(TextBlock, WithChildrenMixin, type='to_do'):
         rich_text: list[RichTextObject] = None  # type: ignore
         checked: bool = False
         children: list[Block] | None = None
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     to_do: _NestedData = _NestedData()
 
@@ -393,7 +393,7 @@ class Toggle(TextBlock, WithChildrenMixin, type='toggle'):
     class _NestedData(GenericObject):
         rich_text: list[RichTextObject] = None  # type: ignore
         children: list[Block] | None = None
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     toggle: _NestedData = _NestedData()
 
@@ -413,7 +413,7 @@ class TableOfContents(Block, type='table_of_contents'):
     """A table_of_contents block in Notion."""
 
     class _NestedData(GenericObject):
-        color: FullColor = FullColor.DEFAULT
+        color: Color | BGColor = Color.DEFAULT
 
     table_of_contents: _NestedData = _NestedData()
 

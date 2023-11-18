@@ -10,9 +10,9 @@ from typing import TypeAlias
 from pydantic import SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject
-from ultimate_notion.obj_api.enums import VerificationState
+from ultimate_notion.obj_api.enums import VState
 from ultimate_notion.obj_api.objects import DateRange, FileObject, ObjectReference, RichTextObject, TypedObject, User
-from ultimate_notion.obj_api.schema import Function, SelectOption
+from ultimate_notion.obj_api.schema import AggFunc, SelectOption
 
 #: Notion's complex `Date` type, which is either a date or without time or a date range of the former.
 DateType: TypeAlias = dt_date | tuple[dt_date, dt_date]  # Note that date is the superclass of datetime!
@@ -193,7 +193,7 @@ class Relation(PropertyValue, type='relation'):
 class RollupObject(TypedObject, ABC, polymorphic_base=True):
     """A Notion rollup property value."""
 
-    function: Function | None = None
+    function: AggFunc | None = None
 
     @property
     @abstractmethod
@@ -282,7 +282,7 @@ class Verification(PropertyValue, type='verification'):
     """A Notion verification property value"""
 
     class _NestedData(GenericObject):
-        state: VerificationState = VerificationState.UNVERIFIED
+        state: VState = VState.UNVERIFIED
         verified_by: SerializeAsAny[User] | None = None
         date: datetime | None = None
 
@@ -291,7 +291,7 @@ class Verification(PropertyValue, type='verification'):
         @field_validator('state')
         @classmethod
         def validate_enum_field(cls, field: str):
-            return VerificationState(field)
+            return VState(field)
 
     verification: _NestedData = _NestedData()
 
