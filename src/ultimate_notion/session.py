@@ -19,7 +19,7 @@ from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.objects import RichText, User
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
-from ultimate_notion.schema import DefaultSchema, PageSchema, Relation
+from ultimate_notion.schema import DefaultSchema, PageSchema
 from ultimate_notion.utils import ObjRef, SList, get_uuid
 
 _log = logging.getLogger(__name__)
@@ -27,10 +27,10 @@ ENV_NOTION_TOKEN = 'NOTION_TOKEN'  # same as in `notion-sdk-py` package
 
 
 class SessionError(Exception):
-    """Raised when there are issues with the Notion session."""
+    """Raised when there are issues with the Notion session"""
 
     def __init__(self, message):
-        """Initialize the `SessionError` with a supplied message."""
+        """Initialize the `SessionError` with a supplied message"""
         super().__init__(message)
 
 
@@ -48,7 +48,7 @@ class Session:
     cache: ClassVar[dict[UUID, DataObject | User]] = {}
 
     def __init__(self, auth: str | None = None, **kwargs: Any):
-        """Initialize the `Session` object and the Notional endpoints.
+        """Initialize the `Session` object and the Notional endpoints
 
         Args:
             auth: secret token from the Notion integration
@@ -111,14 +111,14 @@ class Session:
         Session.cache.clear()
 
     def close(self):
-        """Close the session and release resources."""
+        """Close the session and release resources"""
         _log.info('Closing connection to Notion...')
         self.client.close()
         Session._active_session = None
         Session.cache.clear()
 
     def is_closed(self) -> bool:
-        """ "Return if the session is closed or not"""
+        """Determine if the session is closed or not"""
         try:
             self.raise_for_status()
         except RuntimeError:  # used by httpx client in case of closed connection
@@ -127,7 +127,7 @@ class Session:
             return False
 
     def raise_for_status(self):
-        """Confirm that the session is active and raise otherwise.
+        """Confirm that the session is active and raise otherwise
 
         Raises SessionError if there is a problem, otherwise returns None.
         """
@@ -141,15 +141,19 @@ class Session:
             raise SessionError(msg) from err
 
     def create_db(self, parent: Page, schema: type[PageSchema] | None = None) -> Database:
-        """Create a new database within a page."""
+        """Create a new database within a page
+
+        Implementation:
+
+            1. initialize external forward relations, i.e. relations pointing to other databases
+            2. create the database using a Notion API call and potential external forward relations
+            3. initialize self-referencing forward relations
+            4. create columns with self-referencing forward relations using an update call
+            5. update the backward references, i.e. two-way relations, using an update call
+        """
         if schema:
             schema._init_fwd_rels()
-            schema_no_backrels_dct = {
-                name: prop_type
-                for name, prop_type in schema.to_dict().items()
-                if not (isinstance(prop_type, Relation) and not prop_type.schema)
-            }
-            schema_dct = {k: v.obj_ref for k, v in schema_no_backrels_dct.items()}
+            schema_dct = {col.name: col.type.obj_ref for col in schema._get_init_cols()}
             title = schema.db_title.obj_ref if schema.db_title is not None else None
             db_obj = self.api.databases.create(parent=parent.obj_ref, title=title, schema=schema_dct)
             if schema.db_desc:
@@ -161,8 +165,9 @@ class Session:
         db: Database = Database.wrap_obj_ref(db_obj)
 
         if schema:
-            db.schema = schema
-            schema._init_bwd_rels()
+            db.schema = schema  # schema is thus bound
+            schema._init_self_refs()
+            schema._update_bwd_rels()
 
         self.cache[db.id] = db
         return db

@@ -27,7 +27,8 @@ and then you are already set up to start hacking. Use `hatch run cov` or `hatch 
 the unitest with or without coverage reports, respectively. Check out the environment setup of
 hatch in [pyproject.toml](pyproject.toml) for many more commands.
 
-If you are using [VSC], then it's quite convenient to add a file `.env` in your checkout with:
+If you are using [VS Code], then it's quite convenient to add a file `.env` in your checkout with:
+
 ```toml
 [pytest]
 env =
@@ -55,6 +56,7 @@ Ultimate Notion uses internally [notion-sdk-py].
 [Material for MkDocs]: https://github.com/squidfunk/mkdocs-material
 [GitHub Pages]: https://docs.github.com/en/pages
 [Ultimate Notion documentation]: https://ultimate-notion.com/
+[VS Code]: https://code.visualstudio.com/
 
 [Tests-image]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml/badge.svg
 [Tests-link]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml

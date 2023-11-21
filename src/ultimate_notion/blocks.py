@@ -15,6 +15,7 @@ from ultimate_notion.utils import Wrapper, get_active_session
 if TYPE_CHECKING:
     pass
 
+# Todo: Move the functionality from the PyDantic types in here, i.e. the currenctly commented code
 T = TypeVar('T', bound=obj_blocks.DataObject)
 
 

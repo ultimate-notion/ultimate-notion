@@ -11,8 +11,8 @@ from typing import TypeAlias, TypeVar
 
 import pytest
 
-import ultimate_notion
-from ultimate_notion import Session, schema
+import ultimate_notion as uno
+from ultimate_notion import Option, Session, schema
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
 from ultimate_notion.session import ENV_NOTION_TOKEN
@@ -56,7 +56,7 @@ def notion() -> Yield[Session]:
         msg = f'{ENV_NOTION_TOKEN} not defined! Use `export {ENV_NOTION_TOKEN}=secret_...`'
         raise RuntimeError(msg)
 
-    with ultimate_notion.Session() as notion:
+    with uno.Session() as notion:
         yield notion
 
 
@@ -124,6 +124,125 @@ def static_pages(root_page: Page, intro_page: Page) -> set[Page]:
 def static_dbs(all_cols_db: Database, wiki_db: Database, contacts_db: Database) -> set[Database]:
     """Return all static pages for the unit tests"""
     return {all_cols_db, wiki_db, contacts_db}
+
+
+@pytest.fixture
+def task_db(notion: Session) -> Yield[Database]:
+    status_options = [
+        Option('Backlog', color=uno.Color.GRAY),
+        Option('In Progres', color=uno.Color.BLUE),
+        Option('Blocked', color=uno.Color.RED),
+        Option('Done', color=uno.Color.GREEN),
+        Option('Rejected', color=uno.Color.BROWN),
+    ]
+    priority_options = [
+        Option('✹ High', color=uno.Color.RED),
+        Option('✷ Medium', color=uno.Color.YELLOW),
+        Option('✶ Low', color=uno.Color.GRAY),
+    ]
+    repeats_options = [
+        Option('Daily', color=uno.Color.GRAY),
+        Option('Weekly', color=uno.Color.PINK),
+        Option('Bi-weekly', color=uno.Color.BROWN),
+        Option('Monthly', color=uno.Color.ORANGE),
+        Option('Bi-monthly', color=uno.Color.YELLOW),
+        Option('Tri-monthly', color=uno.Color.GREEN),
+        Option('Quarterly', color=uno.Color.BLUE),
+        Option('Bi-annually', color=uno.Color.PURPLE),
+        Option('Yearly', color=uno.Color.RED),
+    ]
+    urgency_formula = (
+        'if(prop("Done"), "✅ Done", (if(empty(prop("Due Date")), "", '
+        '(if((formatDate(now(), "YWD") == formatDate(prop("Due by"), "YWD")), "🔹 Today", '
+        '(if((now() > prop("Due by")), ("🔥 " + prop("Time Left")), '
+        '("🕐 " + prop("Time Left")))))))))'
+    )
+    due_formula = (
+        'if(or(prop("Due Date") >= dateSubtract(dateSubtract(now(), hour(now()), "hours"), minute(now()), "minutes"), '
+        'empty(prop("Repeats"))), prop("Due Date"), (if((prop("Repeats") == "Daily"), '
+        'dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract(prop("Due Date"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, "days"), '
+        'dateBetween(now(), dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), '
+        'minute(prop("Due Date")), "minutes"), 1, "days"), "days") + 1, "days"), 1, "days"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), (if((prop("Repeats") == "Weekly"), '
+        'dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract(prop("Due Date"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, "days"), '
+        'dateBetween(now(), dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), '
+        'minute(prop("Due Date")), "minutes"), 1, "days"), "weeks") + 1, "weeks"), 1, "days"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), '
+        '(if((prop("Repeats") == "Bi-weekly"), dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract('
+        'dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, '
+        '"days"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), '
+        '"hours"), minute(prop("Due Date")), "minutes"), 1, "days"), "weeks") - (dateBetween(now(), '
+        'dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), '
+        'minute(prop("Due Date")), "minutes"), 1, "days"), "weeks") % 2)) + 2, "weeks"), 1, "days"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), (if((prop("Repeats") == "Monthly"), '
+        'dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract(prop("Due Date"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, "days"), dateBetween(now(), '
+        'dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), '
+        'minute(prop("Due Date")), "minutes"), 1, "days"), "months") + 1, "months"), 1, "days"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), '
+        '(if((prop("Repeats") == "Bi-monthly"), dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract('
+        'dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, '
+        '"days"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), '
+        '"hours"), minute(prop("Due Date")), "minutes"), 1, "days"), "months") - (dateBetween(now(), '
+        'prop("Due Date"), "months") % 2)) + 2, "months"), 1, "days"), hour(prop("Due Date")), "hours"), '
+        'minute(prop("Due Date")), "minutes"), (if((prop("Repeats") == "Tri-monthly"), dateAdd(dateAdd(dateSubtract('
+        'dateAdd(dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), '
+        'minute(prop("Due Date")), "minutes"), 1, "days"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract('
+        'prop("Due Date"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, "days"), '
+        '"months") - (dateBetween(now(), prop("Due Date"), "months") % 3)) + 3, "months"), 1, "days"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), (if((prop("Repeats") == '
+        '"Quarterly"), dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract(prop("Due Date"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, "days"), (dateBetween(now(), '
+        'dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), minute('
+        'prop("Due Date")), "minutes"), 1, "days"), "months") - (dateBetween(now(), prop("Due Date"), "months") % 4)) '
+        '+ 4, "months"), 1, "days"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), '
+        '(if((prop("Repeats") == "Bi-annually"), dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd('
+        'dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), '
+        '"minutes"), 1, "days"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract(prop("Due Date"), '
+        'hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, "days"), "months") - '
+        '(dateBetween(now(), prop("Due Date"), "months") % 6)) + 6, "months"), 1, "months"), hour(prop("Due Date")), '
+        '"hours"), minute(prop("Due Date")), "minutes"), 1, "days"), (if((prop("Repeats") == "Yearly"), dateAdd('
+        'dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract(prop("Due Date"), hour(prop("Due Date")), '
+        '"hours"), minute(prop("Due Date")), "minutes"), 1, "days"), dateBetween(now(), dateAdd(dateSubtract('
+        'dateSubtract(prop("Due Date"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), "minutes"), 1, '
+        '"days"), "years") + 1, "years"), 1, "days"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), '
+        '"minutes"), fromTimestamp(toNumber("")))))))))))))))))))))'
+    )
+    w_left_formula = '(if((prop("Days Left") < 0), -1, 1)) * floor(abs(prop("Days Left") / 7))'
+    d_left_formula = (
+        'if(empty(prop("Due by")), toNumber(""), '
+        '(if((prop("Due by") > now()), (dateBetween(prop("Due by"), now(), "days") + 1), '
+        'dateBetween(prop("Due by"), now(), "days"))))'
+    )
+    t_left_formula = (
+        'if(empty(prop("Days Left")), "", (((if((prop("Days Left") < 0), "-", "")) + '
+        '(if((prop("Weeks Left") == 0), "", (format(abs(prop("Weeks Left"))) + "w")))) + '
+        '(if(((prop("Days Left") % 7) == 0), "", (format(abs(prop("Days Left")) % 7) + "d")))))'
+    )
+
+    class Tasklist(schema.PageSchema, db_title='My Tasks'):
+        """My personal task list"""
+
+        task = schema.Column('Task', schema.Title())
+        status = schema.Column('Status', schema.Select(status_options))
+        priority = schema.Column('Priority', schema.Select(priority_options))
+        urgency = schema.Column('Urgency', schema.Formula(urgency_formula))
+        started = schema.Column('Started', schema.Date())
+        due = schema.Column('Due by', schema.Formula(due_formula))
+        done = schema.Column('Done', schema.Formula('prop("Status") == "Done"'))
+        repeats = schema.Column('Repeats', schema.Select(repeats_options))
+        w_left = schema.Column('Weeks Left', schema.Formula(w_left_formula))
+        d_left = schema.Column('Days Left', schema.Formula(d_left_formula))
+        t_left = schema.Column('Time Left', schema.Formula(t_left_formula))
+        url = schema.Column('URL', schema.URL())
+        parent = schema.Column('Parent Task', schema.Relation(schema.SelfRef))
+        subs = schema.Column('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_prop=parent))
+
+    db = notion.create_db(parent=root_page, schema=Tasklist)
+    yield db
+    db.delete()
 
 
 @pytest.fixture(scope='session', autouse=True)

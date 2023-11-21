@@ -143,6 +143,38 @@ def test_two_way_prop(notion: Session, root_page: Page):
     assert db_a.schema.relation.type.two_way_prop is SchemaB.relation_twoway  # type: ignore
 
 
+def test_self_ref_relation(notion: Session, root_page: Page):
+    class SchemaA(PageSchema, db_title='Schema A'):
+        """Schema A description"""
+
+        name = Column('Name', schema.Title())
+        relation = Column('Relation', schema.Relation(schema.SelfRef))
+
+    db_a = notion.create_db(parent=root_page, schema=SchemaA)
+
+    assert db_a.schema.relation._schema is db_a._schema  # type: ignore
+
+
+def test_self_ref_two_way_prop(notion: Session, root_page: Page):
+    class SchemaA(PageSchema, db_title='Schema A'):
+        """Schema A description"""
+
+        name = Column('Name', schema.Title())
+        fwd_rel = Column('Forward Relation', schema.Relation(schema.SelfRef))
+        bwd_rel = Column('Backward Relation', schema.Relation(schema.SelfRef, two_way_prop=fwd_rel))
+
+    db_a = notion.create_db(parent=root_page, schema=SchemaA)
+
+    assert db_a.schema.fwd_rel._schema is db_a._schema  # type: ignore
+    assert db_a.schema.bwd_rel._schema is db_a._schema  # type: ignore
+
+    assert db_a.schema.fwd_rel.type.name == 'Forward Relation'  # type: ignore
+    assert db_a.schema.bwd_rel.type.name == 'Backward Relation'  # type: ignore
+
+    assert db_a.schema.fwd_rel.type.two_way_prop is SchemaA.bwd_rel  # type: ignore
+    assert db_a.schema.bwd_rel.type.two_way_prop is SchemaA.fwd_rel  # type: ignore
+
+
 def test_schema_from_dict():
     class ClassStyleSchema(PageSchema, db_title='Class Style'):
         name = Column('Name', schema.Title())

@@ -3,12 +3,16 @@ from __future__ import annotations
 from typing import cast
 
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.text import chunky, html_img
 from ultimate_notion.utils import Wrapper, get_repr
 
 
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     """Option for select & multi-select property"""
+
+    def __init__(self, name: str, *, color: Color = Color.DEFAULT):
+        super().__init__(name, color=color)
 
     @property
     def id(self) -> str:  # noqa: A003

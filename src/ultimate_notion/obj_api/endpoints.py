@@ -269,8 +269,9 @@ class DatabasesEndpoint(Endpoint):
         if request:
             # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
             data = self.raw_api.update(db.id, **request)
-
-        return db.update(**data)
+            return db.update(**data)
+        else:
+            return db
 
     def delete(self, db: Database) -> Database:
         """Delete (archive) the specified Database"""
