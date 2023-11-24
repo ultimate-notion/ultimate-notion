@@ -101,7 +101,7 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
 
 
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
-    """Simple number property value"""
+    """Number property value"""
 
     def __float__(self):
         """Return the Number as a `float`."""
@@ -280,7 +280,7 @@ class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
 
 
 class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSelect):
-    """Notion multi-select type."""
+    """Multi-select property value"""
 
     def __init__(self, options: str | Option | list[str | Option]):
         if not isinstance(options, list):
@@ -297,7 +297,7 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
 
 
 class People(PropertyValue[obj_props.People], wraps=obj_props.People):
-    """Notion people type."""
+    """People property value"""
 
     def __init__(self, users: User | list[User]):
         if not isinstance(users, list):
@@ -306,19 +306,19 @@ class People(PropertyValue[obj_props.People], wraps=obj_props.People):
 
 
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
-    """Notion URL type."""
+    """URL property value"""
 
 
 class Email(PropertyValue[obj_props.Email], wraps=obj_props.Email):
-    """Notion email type."""
+    """Email property value"""
 
 
 class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
-    """Notion phone type."""
+    """Phone property value"""
 
 
 class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
-    """Notion files type."""
+    """Files property value"""
 
     def __init__(self, files: File | list[File]):
         if not isinstance(files, list):
@@ -328,7 +328,7 @@ class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
 
 
 class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
-    """A Notion formula property value."""
+    """Formula property value"""
 
     readonly = True
 
@@ -338,7 +338,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 
 
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
-    """A Notion relation property value."""
+    """Relation property value"""
 
     def __init__(self, pages: Page | list[Page]):
         if not isinstance(pages, list):
@@ -352,7 +352,7 @@ class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
 
 
 class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
-    """A Notion rollup property value."""
+    """Rollup property value"""
 
     readonly = True
 
@@ -370,37 +370,37 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 
 
 class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):
-    """A Notion created-time property value."""
+    """Created-time property value"""
 
     readonly = True
 
 
 class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
-    """A Notion created-by property value."""
+    """Created-by property value"""
 
     readonly = True
 
 
 class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.LastEditedTime):
-    """A Notion last-edited-time property value."""
+    """Last-edited-time property value"""
 
     readonly = True
 
 
 class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEditedBy):
-    """A Notion last-edited-by property value."""
+    """Last-edited-by property value"""
 
     readonly = True
 
 
 class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
-    """A Notion unique ID property value"""
+    """Unique ID property value"""
 
     readonly = True
 
 
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
-    """A verification property value of pages in wiki databases"""
+    """Verification property value of pages in wiki databases"""
 
     readonly = True
     # ToDo: Implement properties to retrieve user, etc. and convert user to actual high-level User object

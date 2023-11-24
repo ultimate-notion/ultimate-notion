@@ -37,7 +37,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
         people = Column('People', schema.People())
         phone_number = Column('Phone number', schema.PhoneNumber())
         relation = Column('Relation', schema.Relation(SchemaA))
-        relation_twoway = Column('Relation two-way', schema.Relation(SchemaA, two_way_prop=SchemaA.relation))
+        relation_twoway = Column('Relation two-way', schema.Relation(SchemaA, two_way_col=SchemaA.relation))
         rollup = Column('Rollup', schema.Rollup(relation, SchemaA.name, AggFunc.COUNT))
         select = Column('Select', schema.Select(options))
         # status = Column('Status', schema.Status()) # 2023-08-11: is not yet supported by Notion API
@@ -123,7 +123,7 @@ def test_wiki_db_schema(wiki_db: Database):
     wiki_db.fetch_all()
 
 
-def test_two_way_prop(notion: Session, root_page: Page):
+def test_two_way_col(notion: Session, root_page: Page):
     class SchemaA(PageSchema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -133,14 +133,14 @@ def test_two_way_prop(notion: Session, root_page: Page):
     class SchemaB(PageSchema, db_title='Schema B'):
         """Only used to create relations in Schema B"""
 
-        relation_twoway = Column('Relation two-way', schema.Relation(SchemaA, two_way_prop=SchemaA.relation))
+        relation_twoway = Column('Relation two-way', schema.Relation(SchemaA, two_way_col=SchemaA.relation))
         title = Column('Title', schema.Title())
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
 
-    assert db_b.schema.relation_twoway.type.two_way_prop is SchemaA.relation  # type: ignore
-    assert db_a.schema.relation.type.two_way_prop is SchemaB.relation_twoway  # type: ignore
+    assert db_b.schema.relation_twoway.type.two_way_col is SchemaA.relation  # type: ignore
+    assert db_a.schema.relation.type.two_way_col is SchemaB.relation_twoway  # type: ignore
 
 
 def test_self_ref_relation(notion: Session, root_page: Page):
@@ -155,24 +155,26 @@ def test_self_ref_relation(notion: Session, root_page: Page):
     assert db_a.schema.relation._schema is db_a._schema  # type: ignore
 
 
-def test_self_ref_two_way_prop(notion: Session, root_page: Page):
-    class SchemaA(PageSchema, db_title='Schema A'):
-        """Schema A description"""
+# ToDo: Reactivate after the bug on the Notion API side is fixd that adding a two-way relation column with update
+#       actually generates a one-way relation column.
+# def test_self_ref_two_way_col(notion: Session, root_page: Page):
+#     class SchemaA(PageSchema, db_title='Schema A'):
+#         """Schema A description"""
 
-        name = Column('Name', schema.Title())
-        fwd_rel = Column('Forward Relation', schema.Relation(schema.SelfRef))
-        bwd_rel = Column('Backward Relation', schema.Relation(schema.SelfRef, two_way_prop=fwd_rel))
+#         name = Column('Name', schema.Title())
+#         fwd_rel = Column('Forward Relation', schema.Relation())
+#         bwd_rel = Column('Backward Relation', schema.Relation(schema.SelfRef, two_way_col=fwd_rel))
 
-    db_a = notion.create_db(parent=root_page, schema=SchemaA)
+#     db_a = notion.create_db(parent=root_page, schema=SchemaA)
 
-    assert db_a.schema.fwd_rel._schema is db_a._schema  # type: ignore
-    assert db_a.schema.bwd_rel._schema is db_a._schema  # type: ignore
+#     assert db_a.schema.fwd_rel._schema is db_a._schema  # type: ignore
+#     assert db_a.schema.bwd_rel._schema is db_a._schema  # type: ignore
 
-    assert db_a.schema.fwd_rel.type.name == 'Forward Relation'  # type: ignore
-    assert db_a.schema.bwd_rel.type.name == 'Backward Relation'  # type: ignore
+#     assert db_a.schema.fwd_rel.type.name == 'Forward Relation'  # type: ignore
+#     assert db_a.schema.bwd_rel.type.name == 'Backward Relation'  # type: ignore
 
-    assert db_a.schema.fwd_rel.type.two_way_prop is SchemaA.bwd_rel  # type: ignore
-    assert db_a.schema.bwd_rel.type.two_way_prop is SchemaA.fwd_rel  # type: ignore
+#     assert db_a.schema.fwd_rel.type.two_way_col is SchemaA.bwd_rel  # type: ignore
+#     assert db_a.schema.bwd_rel.type.two_way_col is SchemaA.fwd_rel  # type: ignore
 
 
 def test_schema_from_dict():

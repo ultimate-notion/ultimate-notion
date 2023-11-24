@@ -127,7 +127,7 @@ def static_dbs(all_cols_db: Database, wiki_db: Database, contacts_db: Database) 
 
 
 @pytest.fixture
-def task_db(notion: Session) -> Yield[Database]:
+def task_db(notion: Session, root_page: Page) -> Yield[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
         Option('In Progres', color=uno.Color.BLUE),
@@ -151,12 +151,7 @@ def task_db(notion: Session) -> Yield[Database]:
         Option('Bi-annually', color=uno.Color.PURPLE),
         Option('Yearly', color=uno.Color.RED),
     ]
-    urgency_formula = (
-        'if(prop("Done"), "✅ Done", (if(empty(prop("Due Date")), "", '
-        '(if((formatDate(now(), "YWD") == formatDate(prop("Due by"), "YWD")), "🔹 Today", '
-        '(if((now() > prop("Due by")), ("🔥 " + prop("Time Left")), '
-        '("🕐 " + prop("Time Left")))))))))'
-    )
+    done_formula = 'prop("Status") == "Done"'
     due_formula = (
         'if(or(prop("Due Date") >= dateSubtract(dateSubtract(now(), hour(now()), "hours"), minute(now()), "minutes"), '
         'empty(prop("Repeats"))), prop("Due Date"), (if((prop("Repeats") == "Daily"), '
@@ -210,16 +205,22 @@ def task_db(notion: Session) -> Yield[Database]:
         '"days"), "years") + 1, "years"), 1, "days"), hour(prop("Due Date")), "hours"), minute(prop("Due Date")), '
         '"minutes"), fromTimestamp(toNumber("")))))))))))))))))))))'
     )
-    w_left_formula = '(if((prop("Days Left") < 0), -1, 1)) * floor(abs(prop("Days Left") / 7))'
     d_left_formula = (
-        'if(empty(prop("Due by")), toNumber(""), '
-        '(if((prop("Due by") > now()), (dateBetween(prop("Due by"), now(), "days") + 1), '
-        'dateBetween(prop("Due by"), now(), "days"))))'
+        f'if(empty(({due_formula})), toNumber(""), '
+        f'(if((({due_formula}) > now()), (dateBetween(({due_formula}), now(), "days") + 1), '
+        f'dateBetween(({due_formula}), now(), "days"))))'
     )
+    w_left_formula = f'(if((({d_left_formula}) < 0), -1, 1)) * floor(abs(({d_left_formula}) / 7))'
     t_left_formula = (
-        'if(empty(prop("Days Left")), "", (((if((prop("Days Left") < 0), "-", "")) + '
-        '(if((prop("Weeks Left") == 0), "", (format(abs(prop("Weeks Left"))) + "w")))) + '
-        '(if(((prop("Days Left") % 7) == 0), "", (format(abs(prop("Days Left")) % 7) + "d")))))'
+        f'if(empty(({d_left_formula})), "", (((if((({d_left_formula}) < 0), "-", "")) + '
+        f'(if((({w_left_formula}) == 0), "", (format(abs(({w_left_formula}))) + "w")))) + '
+        f'(if(((({d_left_formula}) % 7) == 0), "", (format(abs(({d_left_formula})) % 7) + "d")))))'
+    )
+    urgency_formula = (
+        f'if(({done_formula}), "✅ Done", (if(empty(prop("Due Date")), "", '
+        f'(if((formatDate(now(), "YWD") == formatDate(({due_formula}), "YWD")), "🔹 Today", '
+        f'(if((now() > ({due_formula})), ("🔥 " + ({t_left_formula})), '
+        f'("🕐 " + ({t_left_formula})))))))))'
     )
 
     class Tasklist(schema.PageSchema, db_title='My Tasks'):
@@ -230,15 +231,14 @@ def task_db(notion: Session) -> Yield[Database]:
         priority = schema.Column('Priority', schema.Select(priority_options))
         urgency = schema.Column('Urgency', schema.Formula(urgency_formula))
         started = schema.Column('Started', schema.Date())
-        due = schema.Column('Due by', schema.Formula(due_formula))
-        done = schema.Column('Done', schema.Formula('prop("Status") == "Done"'))
+        due_date = schema.Column('Due Date', schema.Date())
+        due_by = schema.Column('Due by', schema.Formula(due_formula))
+        done = schema.Column('Done', schema.Formula(done_formula))
         repeats = schema.Column('Repeats', schema.Select(repeats_options))
-        w_left = schema.Column('Weeks Left', schema.Formula(w_left_formula))
-        d_left = schema.Column('Days Left', schema.Formula(d_left_formula))
-        t_left = schema.Column('Time Left', schema.Formula(t_left_formula))
         url = schema.Column('URL', schema.URL())
-        parent = schema.Column('Parent Task', schema.Relation(schema.SelfRef))
-        subs = schema.Column('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_prop=parent))
+        # ToDo: Reintroduce after the problem with adding a two-way relation column is fixed in the Notion API
+        # parent = schema.Column('Parent Task', schema.Relation(schema.SelfRef))
+        # subs = schema.Column('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_col=parent))
 
     db = notion.create_db(parent=root_page, schema=Tasklist)
     yield db

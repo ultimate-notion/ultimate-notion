@@ -132,3 +132,7 @@ def test_reload_db(notion: Session, root_page: Page):
     old_obj_id = id(db.obj_ref)
     db.reload()
     assert old_obj_id != id(db.obj_ref)
+
+
+def test_task_db(task_db: Database):
+    pass

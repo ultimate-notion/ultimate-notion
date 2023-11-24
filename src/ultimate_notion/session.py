@@ -63,6 +63,10 @@ class Session:
 
         _log.info('Initializing Notion session...')
         Session._initialize_once(self)
+
+        # Same sane default as notion_client defines its own logger
+        kwargs.setdefault('logger', logging.getLogger(f'{__name__}.client'))
+        kwargs.setdefault('log_level', logging.NOTSET)
         self.client = notion_client.Client(auth=auth, **kwargs)
         self.api = NotionAPI(self.client)
 
@@ -159,7 +163,7 @@ class Session:
             if schema.db_desc:
                 db_obj = self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
         else:
-            schema_dct = {k: v.obj_ref for k, v in DefaultSchema.to_dict().items()}
+            schema_dct = {col.name: col.type.obj_ref for col in DefaultSchema._get_init_cols()}
             db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
 
         db: Database = Database.wrap_obj_ref(db_obj)

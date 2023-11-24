@@ -55,3 +55,25 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 - [ ] create a comment within a block or page
 - [ ] retrieve comments of a block or page
+
+## Notion API Limitations
+
+Some features that the Notion UI provides are not possible to implement due to limitations in the API itself.
+
+- creating a [Status] column or updating the options as well as option groups
+- creating a [Unique ID] column or updating its properties like the prefix. This column type is not even mentioned
+  as one of the [database properties]
+- creating a [Wiki database] which has a special [Verification] column
+- [updating the database schema] with respect to the options of a select/multi-select column, the formula of a
+  formula column, and synced content
+- referencing in a formula expression another formula column, e.g. `prop("other formula")`. Use substitution instead.
+- uploading files
+
+If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆.
+
+[Status]: https://developers.notion.com/reference/property-object#status
+[Unique ID]: https://developers.notion.com/reference/page-property-values#unique-id
+[database properties]: https://developers.notion.com/reference/property-object
+[Verification]: https://developers.notion.com/reference/page-property-values#verification
+[Wiki database]: https://developers.notion.com/docs/working-with-databases#wiki-databases
+[updating the database schema]: https://developers.notion.com/reference/update-a-database#errors

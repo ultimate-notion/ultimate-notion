@@ -194,11 +194,15 @@ class PageSchema:
 
     @classmethod
     def _get_fwd_rels(cls) -> list[Column]:
-        return [col for col in cls.get_cols() if isinstance(col.type, Relation) and col.type.schema is not None]
+        return [
+            col
+            for col in cls.get_cols()
+            if isinstance(col.type, Relation) and not (col.type._is_two_way_target or col.type.is_self_ref)
+        ]
 
     @classmethod
     def _init_fwd_rels(cls):
-        """Initialise all forward relations assuming that the databases of related schemas were created"""
+        """Initialise all non-self-referencing forward relations assuming that the target schemas exist"""
         for col in cls._get_fwd_rels():
             col_type = cast(Relation, col.type)
             col_type._make_obj_ref()
@@ -220,9 +224,9 @@ class PageSchema:
             return
         db = cls.get_db()  # raises if not bound!
         for col in cls._get_self_refs():
-            self_ref = cast(Relation, col.type)
-            self_ref._schema = cls  # replace placeholder `SelfRef` with this schema
-            self_ref._make_obj_ref()
+            col_type = cast(Relation, col.type)
+            col_type._schema = cls  # replace placeholder `SelfRef` with this schema
+            col_type._make_obj_ref()
 
         self_refs_dct = {col.name: col.type.obj_ref for col in cls._get_self_refs()} or None
         session = get_active_session()
@@ -261,7 +265,7 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     Property types define the value types of columns in a database, e.g. number, date, text, etc.
     """
 
-    obj_ref: obj_schema.PropertyType
+    obj_ref: T
     #: If the Notion API allows to create a new database with a column of this type
     allowed_at_creation = True
     #: Back reference to the column having this type
@@ -442,7 +446,11 @@ class PhoneNumber(PropertyType[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNu
 
 
 class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
-    """Defines a formula column in a database"""
+    """Defines a formula column in a database
+
+    Currently the formula expression cannot reference other formula columns, e.g. `prop("other formula")`
+    This is a limitation of the API.
+    """
 
     def __init__(self, expression: str):
         super().__init__(expression)
@@ -460,17 +468,29 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
     """Relation to another database"""
 
     _schema: type[PageSchema] | None = None  # other schema, i.e. of the target database
-    _two_way_prop: Column | None = None  # other column, i.e. of the target database
+    _two_way_col: Column | None = None  # other column, i.e. of the target database
 
-    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Column | None = None):
-        if two_way_prop and not schema:
-            msg = '`schema` needs to be provided if `two_way_prop` is set'
+    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_col: Column | None = None):
+        if two_way_col and not schema:
+            msg = '`schema` needs to be provided if `two_way_col` is set'
             raise RuntimeError(msg)
+
         if isinstance(schema, Column):
-            msg = 'Please provide a schema, not a column! Use `two_way_prop` to specify a column.'
+            msg = 'Please provide a schema, not a column! Use `two_way_col` to specify a column.'
             raise ValueError(msg)
+
         self._schema = schema
-        self._two_way_prop = two_way_prop
+
+        if two_way_col is not None:
+            if not isinstance(two_way_col.type, Relation):
+                msg = f'The two-way column {two_way_col.name} needs to be of type Relation!'
+                raise ValueError(msg)
+
+            if two_way_col.type.schema is not None:
+                msg = f'The two-way column {two_way_col.name} must not reference a schema itself'
+                raise ValueError(msg)
+
+            self._two_way_col = two_way_col
 
     @property
     def schema(self) -> type[PageSchema] | None:
@@ -485,15 +505,15 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             return None
 
     @property
-    def is_two_way(self) -> bool:
-        """Determine if this relation is a two-way relation"""
-        return self.two_way_prop is not None
+    def _is_two_way_target(self) -> bool:
+        """Determines if relation is meant as target for a two-way relation"""
+        return self._schema is None
 
     @property
-    def two_way_prop(self) -> Column | None:
+    def two_way_col(self) -> Column | None:
         """Return the target column object of a two-way relation"""
-        if self._two_way_prop:
-            return self._two_way_prop
+        if self._two_way_col:
+            return self._two_way_col
         elif (
             hasattr(self, 'obj_ref')
             and self.schema
@@ -503,6 +523,11 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             return self.schema.get_col(prop_name) if prop_name else None
         else:
             return None
+
+    @property
+    def is_two_way(self) -> bool:
+        """Determine if this relation is a two-way relation"""
+        return self.two_way_col is not None
 
     @property
     def is_self_ref(self) -> bool:
@@ -520,7 +545,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             msg = f"A database with schema '{self.schema.__name__}' needs to be created first!"
             raise RelationError(msg) from e
 
-        if self.two_way_prop:
+        if self.two_way_col:
             self.obj_ref = obj_schema.DualPropertyRelation.build(db.id)
         else:
             self.obj_ref = obj_schema.SinglePropertyRelation.build(db.id)
@@ -531,33 +556,25 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             msg = 'Trying to inialize a backward relation for one-way relation that is not bound to a column'
             raise SchemaError(msg)
 
-        if not (isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation) or self.is_self_ref):
+        if not (isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation)):
             msg = f'Trying to inialize backward relation for one-way relation {self.col_ref.name}'
             raise SchemaError(msg)
 
-        if self.is_self_ref:  # set two_way_prop correctly
-            if self.two_way_prop is None:
-                msg = 'We assume this is a two-way relation but two_way_prop is not set!'
-                raise RuntimeError(msg)
-            else:
-                other_rel = cast(Relation, self.two_way_prop.type)
-                other_rel._two_way_prop = self.col_ref
-        else:  # call the Notion API to update the target column name
-            obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
-            two_wap_prop_name = self._two_way_prop.name
-            if obj_synced_property_name != two_wap_prop_name:
-                session = get_active_session()
+        obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
+        two_way_col_name = self._two_way_col.name
+        if obj_synced_property_name != two_way_col_name:
+            session = get_active_session()
 
-                # change the old default name in the target schema to what was passed during initialization
-                other_db = self.schema.get_db()
-                prop_id = self.obj_ref.relation.dual_property.synced_property_id
-                schema_dct = {prop_id: obj_schema.RenameProp(name=two_wap_prop_name)}
-                session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
-                other_db.schema._set_obj_refs()
+            # change the old default name in the target schema to what was passed during initialization
+            other_db = self.schema.get_db()
+            prop_id = self.obj_ref.relation.dual_property.synced_property_id
+            schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_col_name)}
+            session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
+            other_db.schema._set_obj_refs()
 
-                our_db = self.col_ref._schema.get_db()
-                session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
-                our_db.schema._set_obj_refs()
+            our_db = self.col_ref._schema.get_db()
+            session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
+            our_db.schema._set_obj_refs()
 
 
 class RollupError(SchemaError):

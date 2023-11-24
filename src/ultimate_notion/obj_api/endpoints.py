@@ -264,14 +264,12 @@ class DatabasesEndpoint(Endpoint):
         """
         logger.info(f'Updating database info of `{db.title}`')
 
-        request = self._build_request(schema=schema, title=title, description=description)
-
-        if request:
+        if request := self._build_request(schema=schema, title=title, description=description):
             # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
             data = self.raw_api.update(db.id, **request)
-            return db.update(**data)
-        else:
-            return db
+            db = db.update(**data)
+
+        return db
 
     def delete(self, db: Database) -> Database:
         """Delete (archive) the specified Database"""
