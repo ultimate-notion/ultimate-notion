@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from tabulate import tabulate
 
-from ultimate_notion.obj_api.query import QueryBuilder
+from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.objects import File
 from ultimate_notion.page import Page
 from ultimate_notion.text import html_img
@@ -30,7 +30,7 @@ class Col(str):
 
 
 class View:  # noqa: PLR0904
-    def __init__(self, database: Database, pages: list[Page], query: QueryBuilder):
+    def __init__(self, database: Database, pages: list[Page], query: DBQueryBuilder):
         self.database = database
         self._query = query
         self._title_col = database.schema.get_title_prop().name

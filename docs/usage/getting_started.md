@@ -36,9 +36,10 @@ will have access to the selected page as well as all its children.
 
 ## Loading a Notion page
 
-To try out if your integration works, just copy&paste the following code into your favorite editor or better [Jupyter Lab]. Replace the content
-of `TOKEN` with the Internal Integration Token you saved and the content of `PAGE_TITLE` with the title of the page, you granted
-access for your integration.
+To try out if your integration works, just copy&paste the following code into your favorite editor or better [Jupyter Lab].
+Replace the content of `TOKEN` with the *Internal Integration Token* you saved and the content of `PAGE_TITLE` with the title
+of the page, you granted access for your integration. Another, maybe safer way, is to set your token as environment variable
+`NOTION_TOKEN`. Here is an example to illustrate:
 
 ``` py
 --8<--"../../examples/getting_started.py"

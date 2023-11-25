@@ -211,14 +211,13 @@ ban-relative-imports = "all"
 [tool.hatch.envs.default]
 type = "virtual"
 dependencies = [
-    "hatch",
-    "hatch-vcs", # to make `hatch version` available
     "coverage[toml]>=6.2",
     "pytest",
     "pytest-cov",
     "pytest-mock",
     "pytest-vcr",
     "pytest-env",
+    "pytest-sugar",
     "hypothesis",
     "jupyterlab",
     "pre-commit",

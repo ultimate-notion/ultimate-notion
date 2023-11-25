@@ -17,7 +17,7 @@ from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, RichTextObject, User
 from ultimate_notion.obj_api.props import PropertyItem, Title
-from ultimate_notion.obj_api.query import QueryBuilder
+from ultimate_notion.obj_api.query import DBQueryBuilder, SearchQueryBuilder
 from ultimate_notion.obj_api.schema import PropertyType
 
 if TYPE_CHECKING:
@@ -296,33 +296,31 @@ class DatabasesEndpoint(Endpoint):
         return db
 
     # https://developers.notion.com/reference/post-database-query
-    def query(self, target):
+    def query(self, db: Database) -> DBQueryBuilder:
         """Initialize a new Query object with the target data class.
 
         :param target: either a `DatabaseRef` type or an ORM class
         """
-        cls = None
-        dbid = DatabaseRef.build(target).database_id
+        db_id = DatabaseRef.build(db).database_id
+        logger.info('Initializing database query :: {%s}', db_id)
 
-        logger.info('Initializing database query :: {%s} [%s]', dbid, cls)
-
-        return QueryBuilder(endpoint=self.raw_api.query, datatype=cls, database_id=dbid)
+        return DBQueryBuilder(endpoint=self.raw_api.query, db_id=db_id)
 
 
 class PagesEndpoint(Endpoint):
-    """Notional interface to the API 'pages' endpoint."""
+    """Notional interface to the API 'pages' endpoint"""
 
     class PropertiesEndpoint(Endpoint):
-        """Notional interface to the API 'pages/properties' endpoint."""
+        """Notional interface to the API 'pages/properties' endpoint"""
 
         @property
         def raw_api(self):
-            """Return the underlying endpoint in the Notion SDK."""
+            """Return the underlying endpoint in the Notion SDK"""
             return self.api.client.pages.properties
 
         # https://developers.notion.com/reference/retrieve-a-page-property
         def retrieve(self, page_id, property_id):
-            """Return the Property on a specific Page with the given ID."""
+            """Return the Property on a specific Page with the given ID"""
 
             logger.info('Retrieving property :: %s [%s]', property_id, page_id)
 
@@ -332,19 +330,19 @@ class PagesEndpoint(Endpoint):
             return TypeAdapter(PropertyItem | PropertyItemList).validate_python(data)
 
     def __init__(self, *args, **kwargs):
-        """Initialize the `pages` endpoint for the Notion API."""
+        """Initialize the `pages` endpoint for the Notion API"""
         super().__init__(*args, **kwargs)
 
         self.properties = PagesEndpoint.PropertiesEndpoint(*args, **kwargs)
 
     @property
     def raw_api(self):
-        """Return the underlying endpoint in the Notion SDK."""
+        """Return the underlying endpoint in the Notion SDK"""
         return self.api.client.pages
 
     # https://developers.notion.com/reference/post-page
     def create(self, parent, title: Title | None = None, properties=None, children=None) -> Page:
-        """Add a page to the given parent (Page or Database).
+        """Add a page to the given parent (Page or Database)
 
         `parent` may be a `ParentRef`, `Page`, or `Database` object.
         """
@@ -384,7 +382,7 @@ class PagesEndpoint(Endpoint):
         return Page.model_validate(data)
 
     def delete(self, page: Page) -> Page:
-        """Delete (archive) the specified Page.
+        """Delete (archive) the specified Page
 
         `page` may be any suitable `PageRef` type.
         """
@@ -392,7 +390,7 @@ class PagesEndpoint(Endpoint):
         return self.set_attr(page, archived=True)
 
     def restore(self, page: Page) -> Page:
-        """Restore (unarchive) the specified Page.
+        """Restore (unarchive) the specified Page
 
         `page` may be any suitable `PageRef` type.
         """
@@ -401,7 +399,7 @@ class PagesEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/retrieve-a-page
     def retrieve(self, page) -> Page:
-        """Return the requested Page.
+        """Return the requested Page
 
         `page` may be any suitable `PageRef` type.
         """
@@ -419,7 +417,7 @@ class PagesEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/patch-page
     def update(self, page: Page, **properties):
-        """Update the Page object properties on the server.
+        """Update the Page object properties on the server
 
         An optional `properties` may be specified as `"name"`: `PropertyValue` pairs.
 
@@ -441,7 +439,7 @@ class PagesEndpoint(Endpoint):
         return page.update(**data)
 
     def set_attr(self, page: Page, *, cover=False, icon=False, archived=None):
-        """Set specific page attributes (such as cover, icon, etc.) on the server.
+        """Set specific page attributes (such as cover, icon, etc.) on the server
 
         `page` may be any suitable `PageRef` type.
 
@@ -479,37 +477,25 @@ class PagesEndpoint(Endpoint):
 
 
 class SearchEndpoint(Endpoint):
-    """Notional interface to the API 'search' endpoint."""
+    """Notional interface to the API 'search' endpoint"""
 
     # https://developers.notion.com/reference/post-search
-    def __call__(self, text=None):
-        """Perform a search with the optional text.
-
-        If specified, the call will perform a search with the given text.
-
-        :return: a `QueryBuilder` with the requested search
-        :rtype: query.QueryBuilder
-        """
-
-        params = {}
-
-        if text is not None:
-            params['query'] = text
-
-        return QueryBuilder(endpoint=self.api.client.search, **params)
+    def __call__(self, text=None) -> SearchQueryBuilder:
+        """Perform a search with the optional text"""
+        return SearchQueryBuilder(endpoint=self.api.client.search, text=text)
 
 
 class UsersEndpoint(Endpoint):
-    """Notional interface to the API 'users' endpoint."""
+    """Notional interface to the API 'users' endpoint"""
 
     @property
     def raw_api(self):
-        """Return the underlying endpoint in the Notion SDK."""
+        """Return the underlying endpoint in the Notion SDK"""
         return self.api.client.users
 
     # https://developers.notion.com/reference/get-users
     def as_list(self):
-        """Return an iterator for all users in the workspace."""
+        """Return an iterator for all users in the workspace"""
 
         logger.info('Listing known users...')
 
@@ -519,7 +505,7 @@ class UsersEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/get-user
     def retrieve(self, user_id):
-        """Return the User with the given ID."""
+        """Return the User with the given ID"""
 
         logger.info('Retrieving user :: %s', user_id)
 
@@ -529,7 +515,7 @@ class UsersEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/get-self
     def me(self):
-        """Return the current bot User."""
+        """Return the current bot User"""
 
         logger.info('Retrieving current integration bot')
 

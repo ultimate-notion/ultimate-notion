@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import logging
+from abc import ABC
 from datetime import date, datetime
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
-from notion_client.api_endpoints import SearchEndpoint
 from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
+
+if TYPE_CHECKING:
+    from notion_client.api_endpoints import Endpoint as NCEndpoint
 
 logger = logging.getLogger(__name__)
 
@@ -191,6 +194,8 @@ class LastEditedTimeFilter(TimestampFilter):
 class CompoundFilter(QueryFilter):
     """Represents a compound filter in Notion."""
 
+    # ToDo: Split this up in a And and Or Filter
+
     model_config = ConfigDict(populate_by_name=True)
 
     and_: list[QueryFilter] | None = Field(None, alias='and')
@@ -204,27 +209,31 @@ class SortDirection(str, Enum):
     DESCENDING = 'descending'
 
 
-class PropertySort(GenericObject):
-    """Represents a sort instruction in Notion."""
+class DBSort(GenericObject):
+    """Sort instruction when querying a database"""
 
-    property: str | None = None  # noqa: A003
-    timestamp: TimestampKind | None = None
-    direction: SortDirection | None = None
+    property: str  # noqa: A003
+    direction: SortDirection
 
 
-class Query(GenericObject):
-    """Represents a query object in Notion."""
+class SearchSort(GenericObject):
+    """Sort instruction when searching for pages and databases"""
 
-    sorts: list[PropertySort] | None = None
+    timestamp: Literal[TimestampKind.LAST_EDITED_TIME]
+    direction: SortDirection
+
+
+class Query(GenericObject, ABC):
+    """Abstract query object in Notion for searching pages/databases and querying databases"""
+
     filter: SerializeAsAny[QueryFilter] | None = None  # noqa: A003
     start_cursor: UUID | None = None
     page_size: int = MAX_PAGE_SIZE
 
     @field_validator('page_size')
     @classmethod
-    @classmethod
-    def valid_page_size(cls, value):
-        """Validate that the given page size meets the Notion API requirements."""
+    def valid_page_size(cls, value: int) -> int:
+        """Validate that the given page size meets the Notion API requirements"""
 
         if value <= 0:
             msg = 'page size must be greater than zero'
@@ -236,98 +245,43 @@ class Query(GenericObject):
         return value
 
 
-class QueryBuilder:
-    """A query builder for the Notion API.
+class SearchQuery(Query):
+    """Query object in Notion for searching pages & databases"""
 
-    :param endpoint: the session endpoint used to execute the query
-    :param datatype: an optional class to capture results
-    :param params: optional params that will be passed to the query
-    """
+    sort: SearchSort | None = None
 
-    def __init__(self, endpoint, datatype=None, **params):
-        """Initialize a new `QueryBuilder` for the given endpoint."""
 
+class DBQuery(Query):
+    """Query object in Notion for querying a database"""
+
+    sorts: list[DBSort] | None = None
+
+
+class QueryBuilder(ABC):
+    """General query builder for the Notion search & database query API"""
+
+    query: Query
+    endpoint: NCEndpoint
+    params: dict[str, str]
+
+    def __init__(self, endpoint: NCEndpoint, **params: str | None):
         self.endpoint = endpoint
-        self.datatype = datatype  # ToDo: See if this is really needed or if we can get rid of it!
-        self.params = params
+        self.params = {param: value for param, value in params.items() if value is not None}
 
-        self.query = Query()
-
-    def filter(self, query_filter=None, **kwargs):  # noqa: A003
-        """Add the given filter to the query."""
-
-        if query_filter is None:
-            if isinstance(self.endpoint, SearchEndpoint):
-                query_filter = SearchFilter.model_validate(kwargs)
-            elif 'property' in kwargs:
-                query_filter = PropertyFilter.model_validate(kwargs)
-            elif 'timestamp' in kwargs and kwargs['timestamp'] == 'created_time':
-                query_filter = CreatedTimeFilter.model_validate(kwargs)
-            elif 'timestamp' in kwargs and kwargs['timestamp'] == 'last_edited_time':
-                query_filter = LastEditedTimeFilter.model_validate(kwargs)
-            else:
-                msg = 'unrecognized filter'
-                raise ValueError(msg)
-
-        elif not isinstance(query_filter, QueryFilter):
-            msg = 'filter must be of type QueryFilter'
-            raise ValueError(msg)
-
-        # use CompoundFilter when necessary...
-
-        if self.query.filter is None:
-            self.query.filter = query_filter
-
-        elif isinstance(self.query.filter, CompoundFilter):
-            self.query.filter.and_.append(query_filter)
-
-        else:
-            old_filter = self.query.filter
-            self.query.filter = CompoundFilter(and_=[old_filter, query_filter])
-
-        return self
-
-    def sort(self, sort=None, **kwargs):
-        """Add the given sort elements to the query."""
-
-        if sort is None:
-            sort = PropertySort(**kwargs)
-
-        elif not isinstance(filter, PropertySort):
-            msg = 'sort must be of type PropertySort'
-            raise ValueError(msg)
-
-        # use multiple sorts when necessary
-
-        if self.query.sorts is None:
-            self.query.sorts = [sort]
-
-        else:
-            self.query.sorts.append(sort)
-
-        return self
-
-    def start_at(self, page_id):
+    def start_at(self, cursor_id: UUID):
         """Set the start cursor to a specific page ID."""
 
-        self.query.start_cursor = page_id
-
+        self.query.start_cursor = cursor_id
         return self
 
-    def limit(self, count):
+    def limit(self, count: int):
         """Limit the number of results to the given count."""
 
         self.query.page_size = count
-
         return self
 
     def execute(self):
         """Execute the current query and return an iterator for the results."""
-
-        if self.endpoint is None:
-            msg = 'cannot execute query; no endpoint provided'
-            raise ValueError(msg)
-
         logger.debug('executing query - %s', self.query)
 
         # the API doesn't like "undefined" values...
@@ -336,7 +290,7 @@ class QueryBuilder:
         if self.params:
             query.update(self.params)
 
-        return EndpointIterator(self.endpoint, datatype=self.datatype)(**query)
+        return EndpointIterator(self.endpoint)(**query)
 
     def first(self):
         """Execute the current query and return the first result only."""
@@ -346,4 +300,62 @@ class QueryBuilder:
         except StopIteration:
             logger.debug('iterator returned empty result set')
 
-        return None
+
+class SearchQueryBuilder(QueryBuilder):
+    """Search query builder to search for pages and databases
+
+    By default and not changed by `sort`, then the most recently edited results are returned first.
+
+    Notion API: https://developers.notion.com/reference/post-search
+    """
+
+    query: SearchQuery
+
+    def __init__(self, endpoint, text: str | None = None):
+        self.query = SearchQuery()
+        super().__init__(endpoint=endpoint, query=text)
+
+    def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder:  # noqa: A003
+        """Filter for pages or databases only"""
+        if not (page_only ^ db_only):
+            msg = 'Either `page_only` or `db_only` must be true, not both.'
+            raise ValueError(msg)
+        elif page_only:
+            value = 'page'
+        else:  # db_only
+            value = 'database'
+
+        self.query.filter = SearchFilter(property='object', value=value)
+        return self
+
+    def sort(self, *, ascending: bool) -> SearchQueryBuilder:
+        """Add the given sort elements to the query."""
+        direction = SortDirection.ASCENDING if ascending else SortDirection.DESCENDING
+        self.query.sort = SearchSort(timestamp=TimestampKind.LAST_EDITED_TIME, direction=direction)
+        return self
+
+
+class DBQueryBuilder(QueryBuilder):
+    """Query builder to query a database
+
+    Notion API: https://developers.notion.com/reference/post-search
+    """
+
+    query: DBQuery
+
+    def __init__(self, endpoint, db_id: str):
+        self.query = DBQuery()
+        super().__init__(endpoint=endpoint, database_id=db_id)
+
+    def filter(self, condition: QueryFilter) -> DBQueryBuilder:  # noqa: A003
+        """Add the given filter to the query."""
+        self.query.filter = condition
+        return self
+
+    def sort(self, sort_orders: DBSort | list[DBSort]) -> DBQueryBuilder:
+        """Add the given sort elements to the query."""
+        if isinstance(sort_orders, DBSort):
+            sort_orders = [sort_orders]
+
+        self.query.sorts = sort_orders
+        return self

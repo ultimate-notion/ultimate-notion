@@ -186,14 +186,17 @@ class Session:
         # ToDo: Implement
         raise NotImplementedError
 
-    def search_db(self, db_name: str | None = None, *, exact: bool = True) -> SList[Database]:
+    def search_db(self, db_name: str | None = None, *, exact: bool = True, reverse: bool = False) -> SList[Database]:
         """Search a database by name
 
         Args:
             db_name: name/title of the database, return all if `None`
             exact: perform an exact search, not only a substring match
+            reverse: search in the reverse order, i.e. the least recently edited results first
         """
-        query = self.api.search(db_name).filter(property='object', value='database')
+        query = self.api.search(db_name).filter(db_only=True)
+        if reverse:
+            query.sort(ascending=True)
         dbs = SList(cast(Database, self.cache.setdefault(db.id, Database.wrap_obj_ref(db))) for db in query.execute())
         if exact and db_name is not None:
             dbs = SList(db for db in dbs if db.title == db_name)
@@ -209,14 +212,17 @@ class Session:
             self.cache[db.id] = db
             return db
 
-    def search_page(self, title: str | None = None, *, exact: bool = True) -> SList[Page]:
+    def search_page(self, title: str | None = None, *, exact: bool = True, reverse: bool = False) -> SList[Page]:
         """Search a page by name
 
         Args:
             title: title of the page, return all if `None`
             exact: perform an exact search, not only a substring match
+            reverse: search in the reverse order, i.e. the least recently edited results first
         """
-        query = self.api.search(title).filter(property='object', value='page')
+        query = self.api.search(title).filter(page_only=True)
+        if reverse:
+            query.sort(ascending=True)
         pages = SList(
             cast(Page, self.cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj))) for page_obj in query.execute()
         )

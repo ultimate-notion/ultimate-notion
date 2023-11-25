@@ -124,7 +124,7 @@ class EndpointIterator:
     types).
     """
 
-    def __init__(self, endpoint, datatype=None):
+    def __init__(self, endpoint):
         """Initialize an object list iterator for the specified endpoint.
 
         If a class is provided, it will be constructued for each result returned by
@@ -132,7 +132,6 @@ class EndpointIterator:
         `NotionObject` contained in the `ObjectList`.
         """
         self._endpoint = endpoint
-        self._datatype = datatype
 
         self.has_more = None
         self.page_num = -1
@@ -160,11 +159,7 @@ class EndpointIterator:
 
             for obj in api_list.results:
                 self.total_items += 1
-
-                if self._datatype is None:
-                    yield obj
-                else:
-                    yield self._datatype(obj)
+                yield obj
 
             self.next_cursor = api_list.next_cursor
             self.has_more = api_list.has_more and self.next_cursor is not None

@@ -1,7 +1,8 @@
 # Introduction to databases
 
 Databases are one of the most versatile and powerful features of Notion.
-Working programmatically with your databases extends Notion's functionality to infinity.
+Working programmatically with your databases extends Notion's functionality to infinity
+as you can use Python for all kinds of transformations, use external data services and what not.
 Ultimate Notion unleashes the full power of Python for use with Notion's databases.
 So let's see what we can do.
 

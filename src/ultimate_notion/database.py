@@ -8,9 +8,9 @@ from typing import cast
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.objects import File, RichText
 from ultimate_notion.page import Page
-from ultimate_notion.query import QueryBuilder
 from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
 from ultimate_notion.text import camel_case, snake_case
 from ultimate_notion.utils import dict_diff_str, get_active_session, get_repr
@@ -152,17 +152,16 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return self
 
     @staticmethod
-    def _pages_from_query(query) -> list[Page]:
+    def _pages_from_query(query: DBQueryBuilder) -> list[Page]:
         # ToDo: Remove when self.query is implemented!
-        return [Page.wrap_obj_ref(page_obj) for page_obj in query.execute()]
+        cache = get_active_session().cache
+        return [cast(Page, cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj))) for page_obj in query.execute()]
 
     def fetch_all(self) -> View:
         """Fetch all pages and return a view"""
-        # ToDo: Decide on also caching the view? or at least the pages within the view?
         session = get_active_session()
-        query = session.api.databases.query(self.id)  # ToDo: use self.query when implemented
-        pages = [Page.wrap_obj_ref(page_obj) for page_obj in query.execute()]
-        return View(database=self, pages=pages, query=query)
+        query = session.api.databases.query(self.obj_ref)  # ToDo: use self.query when implemented
+        return View(database=self, pages=self._pages_from_query(query), query=query)
 
     def create_page(self, **kwargs) -> Page:
         """Create a page with properties according to the schema within the corresponding database"""
@@ -189,6 +188,6 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         page = Page.wrap_obj_ref(session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
         return page
 
-    def query(self) -> QueryBuilder:
+    def query(self):
         """Query a (large) database for pages in a more specific way"""
-        return QueryBuilder(self)
+        raise NotImplementedError

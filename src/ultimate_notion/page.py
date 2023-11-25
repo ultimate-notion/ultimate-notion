@@ -16,9 +16,6 @@ from ultimate_notion.utils import get_active_session, get_repr, is_notebook
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
 
-# ToDo:
-#   * use the schema of the database to see which properties are writeable at all.
-
 
 class PageProperty:
     """Property of a page implementing the descriptor protocol"""
@@ -52,6 +49,7 @@ class PageProperties:
         return cast(PropertyValue, PropertyValue.wrap_obj_ref(prop))
 
     def __setitem__(self, prop_name: str, value: Any):
+        # Todo: use the schema of the database to see which properties are writeable at all.
         db = self._page.database
         if db is None:
             msg = f'Trying to set a property but page {self._page} is not bound to any database'
