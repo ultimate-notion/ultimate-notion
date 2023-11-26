@@ -154,10 +154,9 @@ markdown_extensions:
   - pymdownx.snippets:
       check_paths: true
       base_path:
-        - !relative $config_dir
+        - "." # !relative $config_dir doesn't work with mike
       auto_append:
         - docs/snippets/links.txt
-        # - abbrs.txt
   - pymdownx.superfences:
   - pymdownx.tabbed:
       alternate_style: true
