@@ -29,7 +29,7 @@ hatch in [pyproject.toml](pyproject.toml) for many more commands.
 
 If you are using [VS Code], then it's quite convenient to add a file `.env` in your checkout with:
 
-```toml
+```ini
 [pytest]
 env =
     NOTION_AUTH_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
