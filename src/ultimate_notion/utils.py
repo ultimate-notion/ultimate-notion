@@ -13,6 +13,7 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import GenericObject
 
 if TYPE_CHECKING:
+    from ultimate_notion.schema import Option
     from ultimate_notion.session import Session
 
 
@@ -249,3 +250,14 @@ def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
     type_str = str(name) if name is not None else obj.__class__.__name__
     desc_str = str(desc) if desc is not None else str(obj)
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
+
+
+class OptionNS:
+    """Option namespace to simplify working with (Multi-)Select options"""
+
+    @classmethod
+    def to_list(cls) -> list[Option]:
+        """Convert the enum to a list as needed by the (Multi)Select column types"""
+        return [
+            getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
+        ]

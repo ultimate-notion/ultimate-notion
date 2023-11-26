@@ -75,7 +75,7 @@ exclude = [
 ##################
 
 [tool.mypy]
-files = ["src/ultimate_notion", "tests"]
+files = ["src/ultimate_notion", "tests", "examples"]
 disallow_untyped_defs = false
 follow_imports = "normal"
 ignore_missing_imports = true
@@ -135,8 +135,7 @@ preview = true
 extend-select = [ # features in preview
     "W292", # missing-newline-at-end-of-file
 ]
-include = ["src/**/*.py", "src/**/*.pyi", "tests/**/*.py", "tests/**/*.pyi"]
-exclude = ["examples/*\\.py"] # ToDo: remove & fix later
+include = ["src/**/*.py", "src/**/*.pyi", "tests/**/*.py", "tests/**/*.pyi", "examples/**/*.py"]
 select = [
     "A",
     "B",
@@ -241,27 +240,26 @@ doctest = "pytest docs/examples/"
 # Docs environment
 [tool.hatch.envs.docs]
 dependencies = [
-    "mkdocs~=1.4.0",
-    "mkdocs-material~=8.5.6",
+    "mkdocs~=1.5.3",
+    "mkdocs-material~=9.4.12",
     # Plugins
     "mkdocs-include-markdown-plugin",
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
-    "mkdocs-minify-plugin~=0.5.0",
+    "mkdocs-minify-plugin~=0.7.1",
     "mkdocs-section-index",
     "mkdocs-git-revision-date-localized-plugin~=1.1.0",
     "mkdocstrings[python]",
-    "mkdocs-redirects~=1.1.0",
+    "mkdocs-redirects~=1.2.1",
     "mkdocs-glightbox~=0.3.0",
     # https://github.com/jimporter/mike/issues/82#issuecomment-1172913929
     "mike @ https://github.com/jimporter/mike/archive/392d57b8bb9d14bcedf2451a0dc302709f8055eb.zip",
     # Extensions
-    "pymdown-extensions~=9.6.0",
+    "pymdown-extensions~=10.5.0",
     # Necessary for syntax highlighting in code blocks
-    "pygments~=2.13.0",
+    "pygments~=2.17.2",
     # Validation
-    # https://github.com/linkchecker/linkchecker/pull/669#issuecomment-1267236287
-    "linkchecker @ git+https://github.com/linkchecker/linkchecker.git@d9265bb71c2054bf57b8c5734a4825d62505c779",
+    "linkchecker~=10.3.0",
     ]
 [tool.hatch.envs.docs.env-vars]
 SOURCE_DATE_EPOCH = "1580601600"

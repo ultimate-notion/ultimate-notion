@@ -29,7 +29,7 @@ from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.objects import Option, OptionGroup, RichText
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.text import snake_case
-from ultimate_notion.utils import SList, Wrapper, get_active_session, get_repr, is_notebook
+from ultimate_notion.utils import OptionNS, SList, Wrapper, get_active_session, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -373,7 +373,10 @@ class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
 class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
     """Defines a select column in a database"""
 
-    def __init__(self, options: list[Option]):
+    def __init__(self, options: list[Option] | type[OptionNS]):
+        if isinstance(options, type) and issubclass(options, OptionNS):
+            options = options.to_list()
+
         options = [option.obj_ref for option in options]
         super().__init__(options)
 
@@ -385,7 +388,10 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
     """Defines a multi-select column in a database"""
 
-    def __init__(self, options: list[Option]):
+    def __init__(self, options: list[Option] | type[OptionNS]):
+        if isinstance(options, type) and issubclass(options, OptionNS):
+            options = options.to_list()
+
         options = [option.obj_ref for option in options]
         super().__init__(options)
 
@@ -633,3 +639,30 @@ class DefaultSchema(PageSchema, db_title=None):
 
     name = Column('Name', Title())
     tags = Column('Tags', MultiSelect([]))
+
+
+class ColType:
+    """Namespace class of all columns types for easier access"""
+
+    Title = Title
+    Text = Text
+    Number = Number
+    Select = Select
+    MultiSelect = MultiSelect
+    Status = Status
+    Date = Date
+    People = People
+    Files = Files
+    Checkbox = Checkbox
+    Email = Email
+    URL = URL
+    PhoneNumber = PhoneNumber
+    Formula = Formula
+    Relation = Relation
+    Rollup = Rollup
+    CreatedTime = CreatedTime
+    CreatedBy = CreatedBy
+    LastEditedTime = LastEditedTime
+    LastEditedBy = LastEditedBy
+    ID = ID
+    Verification = Verification

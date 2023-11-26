@@ -1,4 +1,4 @@
-"""This example demonstrated how to create a ultimate notion session"""
+"""This example demonstrates how to create an Ultimate Notion session"""
 
 from ultimate_notion import Session
 

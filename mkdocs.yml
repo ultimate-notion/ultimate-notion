@@ -26,6 +26,9 @@ nav:
       - Advanced: usage/db_advanced.md
     - Pages:
       - Introduction: usage/page_introduction.md
+  - Examples:
+    - "Start a session & show page": examples/notion_session.md
+    - "Simple task list": examples/task_list.md
   # defer to gen-files + literate-nav
   - Reference: reference/ultimate_notion/
 
@@ -127,8 +130,8 @@ markdown_extensions:
   - pymdownx.emoji:
       # https://github.com/twitter/twemoji
       # https://raw.githubusercontent.com/facelessuser/pymdown-extensions/master/pymdownx/twemoji_db.py
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       guess_lang: false
       linenums_style: pymdownx-inline
@@ -151,9 +154,9 @@ markdown_extensions:
   - pymdownx.snippets:
       check_paths: true
       base_path:
-        - docs/snippets
+        - !relative $config_dir
       auto_append:
-        - links.txt
+        - docs/snippets/links.txt
         # - abbrs.txt
   - pymdownx.superfences:
   - pymdownx.tabbed:

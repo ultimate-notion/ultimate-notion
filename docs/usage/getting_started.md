@@ -42,7 +42,7 @@ of the page, you granted access for your integration. Another, maybe safer way, 
 `NOTION_TOKEN`. Here is an example to illustrate:
 
 ``` py
---8<--"../../examples/getting_started.py"
+--8<-- "examples/getting_started.py"
 ```
 
 Run the code and you should see in Jupyter Lab following rendered Markdown code or just the plain output if you run the

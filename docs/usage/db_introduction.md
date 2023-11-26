@@ -42,7 +42,6 @@ assert contacts_db.description == "Database of all my contacts!"
 
 Describe a simple Tasklist here!
 
-
 [Database object]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
 [title]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.title
 [icon]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.icon
