@@ -134,5 +134,5 @@ def test_reload_db(notion: Session, root_page: Page):
     assert old_obj_id != id(db.obj_ref)
 
 
-def test_task_db(task_db: Database):
+def test_new_task_db(new_task_db: Database):
     pass

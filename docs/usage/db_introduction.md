@@ -6,18 +6,18 @@ as you can use Python for all kinds of transformations, use external data servic
 Ultimate Notion unleashes the full power of Python for use with Notion's databases.
 So let's see what we can do.
 
-## Reading a database
+## Searching for a database
 
-Assume we have a database called "Contacts DB".
+Assume we have a database called *Contacts DB*.
 
 ```python
-from ultimate_notion import Session
+import ultimate_notion as uno
 
-notion = Session.get_or_create()  # if NOTION_TOKEN is set in environment
+notion = uno.Session.get_or_create()  # if NOTION_TOKEN is set in environment
 
-contacts_dbs = notion.search_db("Contacts DB")
+contacts_dbs = notion.search_db('Contacts DB')
 
-assert [db.title for db in contacts_dbs] == ["Contacts DB"]
+assert [db.title for db in contacts_dbs] == ['Contacts DB']
 ```
 
 The method `search_db` will always return a list as Notion gives no guarantees that the
@@ -27,7 +27,7 @@ will return the item of a single-item list or raise an error otherwise. Another 
 would be to retrieve the database by its unqiue id.
 
 ```python
-contacts_db = notion.search_db("Contacts DB").item()
+contacts_db = notion.search_db('Contacts DB').item()
 # or in case the unique ID of the database is known
 contacts_db = notion.get_db(contacts_db.id)
 ```
@@ -35,14 +35,93 @@ contacts_db = notion.get_db(contacts_db.id)
 The [Database object] provides access to many attributes like [title], [icon], [description], etc.
 
 ```python
-assert contacts_db.description == "Database of all my contacts!"
+assert contacts_db.description == 'Database of all my contacts!'
 ```
 
-### Accessing the content of a database
+## Viewing the pages of a database
 
-Describe a simple Tasklist here!
+Assume we have a simple database listing tasks like this:
+
+![Notion task database](../assets/images/notion-task-db.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+
+To access the tasks, i.e. the pages within this database, we can use the [fetch_all] method to
+generate a [View]. It's as simple as:
+
+```python
+task_db = notion.search_db('Task DB').item()
+task_view = task_db.fetch_all()
+```
+
+To get a quick overview of our tasks, we can use [show]. On the console, this will print:
+
+```console
+Task                              Status       Priority    Urgency    Due Date
+--------------------------------  -----------  ----------  ---------  -------------------------
+Clearing out the cellar           In Progress  ✶ Low       🔥 -2w2d   2023-11-16 17:10:00+01:00
+Run first Marathon                Done         ✶ Low       ✅         2023-11-24 17:10:00+01:00
+Pay yearly utility bills          Blocked      ✹ High      🔥 -5d     2023-11-27 17:10:00+01:00
+Call family                       Done         ✶ Low       ✅         2023-12-01 17:10:00+01:00
+Complete project report for work  In Progress  ✷ Medium    🔹 Today   2023-12-02 17:10:00+01:00
+Build tool with Ultimate Notion   In Progress  ✶ Low       🕐 1d      2023-12-03 17:10:00+01:00
+Clean the house                   In Progress  ✶ Low       🕐 5d      2023-12-07 17:10:00+01:00
+Read book about procastination    Backlog      ✷ Medium    🕐 2w2d    2023-12-18 17:10:00+01:00
+Plan vacation                     Backlog      ✹ High      🕐 3w3d    2023-12-26 17:10:00+01:00
+```
+
+or in [Jupyter Lab] this will be shown as:
+
+![Notion task view](../assets/images/notion-task-view.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+
+Special columns, for the index, the page's id and its icon, can be activated using
+[with_index], [with_id], [with_icon], respectively.:
+
+```python
+task_view.with_index().with_id().with_icon()
+```
+
+![Notion task view extended](../assets/images/notion-task-view-ext.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+
+The index can now be used to retrieve a specific page with [get_page] or we could just
+convert the whole view to a [Pandas] dataframe with [to_pandas].
+
+## Working with views
+
+Views help you setting the stage for various operations like exporting with the help of the various `to_*` methods
+or applying a function to the contained pages using [apply]. With [select] the view can be restricted to
+certain columns whereas [head] (with alias [limit]) and [tail] can be used to restrict the number of rows in the view, e.g.:
+
+```python
+task_view.select('Task', 'Status').head(3).show('simple')
+```
+
+```console
+Task                      Status
+------------------------  -----------
+Clearing out the cellar   In Progress
+Run first Marathon        Done
+Pay yearly utility bills  Blocked
+```
+
+All methods return a new view without modifying the current one, which allows keeping
+different views at the same time. To reset the current view object, the [reset] method can be used.
+To reload the view, i.e. re-execute the query that led to the view, use [reload].
+
+Find out about more about the functionality of [View] by reading the API references but
+keep in mind that some methods are just stubs.
 
 [Database object]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
+[fetch_all]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.fetch_all
 [title]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.title
 [icon]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.icon
 [description]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.description
+[View]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View
+[show]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.show
+[with_index]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.with_index
+[with_id]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.with_id
+[with_icon]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.with_icon
+[get_page]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.get_page
+[to_pandas]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.to_pandas
+[apply]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.apply
+[select]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.select
+[reset]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.reset
+[reload]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.reload

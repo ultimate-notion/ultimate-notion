@@ -130,13 +130,15 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         raise RuntimeError(msg)
 
     @property
-    def icon(self) -> File | str:
+    def icon(self) -> File | str | None:
         """Icon of page, i.e. emojis, Notion's icons, or custom images"""
         icon = self.obj_ref.icon
         if isinstance(icon, objs.ExternalFile):
             return File.wrap_obj_ref(icon)
         elif isinstance(icon, objs.EmojiObject):
             return icon.emoji
+        elif icon is None:
+            return None
         else:
             msg = f'unknown icon object of {type(icon)}'
             raise RuntimeError(msg)

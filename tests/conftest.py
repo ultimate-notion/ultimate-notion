@@ -21,6 +21,7 @@ ALL_COL_DB = 'All Columns DB'  # Manually created DB in Notion with all possible
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
 GETTING_STARTED_PAGE = 'Getting Started'
+TASK_DB = 'Task DB'
 
 T = TypeVar('T')
 Yield: TypeAlias = Generator[T, None, None]
@@ -121,13 +122,19 @@ def static_pages(root_page: Page, intro_page: Page) -> set[Page]:
 
 
 @pytest.fixture(scope='session')
-def static_dbs(all_cols_db: Database, wiki_db: Database, contacts_db: Database) -> set[Database]:
+def task_db(notion: Session) -> Database:
+    """Return manually created wiki db"""
+    return notion.search_db(TASK_DB).item()
+
+
+@pytest.fixture(scope='session')
+def static_dbs(all_cols_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database) -> set[Database]:
     """Return all static pages for the unit tests"""
-    return {all_cols_db, wiki_db, contacts_db}
+    return {all_cols_db, wiki_db, contacts_db, task_db}
 
 
 @pytest.fixture
-def task_db(notion: Session, root_page: Page) -> Yield[Database]:
+def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
         Option('In Progres', color=uno.Color.BLUE),

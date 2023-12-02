@@ -36,6 +36,7 @@ class View:  # noqa: PLR0904
         self._title_col = database.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
         self._pages = np.array(pages)
+        self.default_limit = 10
 
         self.reset()
 
@@ -114,10 +115,11 @@ class View:  # noqa: PLR0904
             row[title_idx] = icon
         return rows
 
-    def show(self, tablefmt: str | None = None) -> str:
-        """Display the view in a given table format
+    def as_table(self, tablefmt: str | None = None) -> str:
+        """Return the view in a given string table format
 
         Some table formats:
+
         - plain: no pseudographics
         - simple: Pandoc's simple table, i.e. only dashes to separate header from content
         - github: GitHub flavored Markdown
@@ -142,15 +144,41 @@ class View:  # noqa: PLR0904
         else:
             return tabulate(rows, headers=cols, tablefmt=tablefmt)
 
+    def show(self, tablefmt: str | None = None):
+        """Show the database as human-readable table
+
+        Some table formats:
+
+        - plain: no pseudographics
+        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
+        - github: GitHub flavored Markdown
+        - simple_grid: uses dashes & pipes to separate cells
+        - html: standard html markup
+
+        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
+        """
+        table_str = self.as_table(tablefmt=tablefmt)
+        if is_notebook() and (tablefmt is None or tablefmt == 'html'):
+            from IPython.display import HTML, display  # noqa: PLC0415
+
+            display(HTML(table_str))
+        else:
+            print(table_str)  # noqa: T201
+
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this view"""
-        return self.show(tablefmt='html')
+        if len(self) > self.default_limit:
+            html_str = self.limit(self.default_limit).as_table(tablefmt='html')
+            html_str = f'<div style="display: inline-block;text-align: center;">{html_str}&#8942;</div></div>\n'
+            return html_str
+        else:
+            return self.as_table(tablefmt='html')
 
     def __repr__(self) -> str:
         return get_repr(self, desc=self.database.title)
 
     def __str__(self) -> str:
-        return self.show()
+        return self.as_table()
 
     def __len__(self):
         return len(self._row_indices)
@@ -268,9 +296,13 @@ class View:  # noqa: PLR0904
         return view
 
     def sort(self):
+        """Sort the view with respect to some columns"""
+        # ToDo: Implement me
         raise NotImplementedError
 
     def filter(self):  # noqa: A003
+        """Filter the view"""
+        # ToDo: Implement me
         raise NotImplementedError
 
     def reload(self) -> View:

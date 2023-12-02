@@ -33,9 +33,7 @@ class Priority(OptionNS):
 # assembling the formula to show the urgency of the task
 days_left = (
     'if(empty(prop("Due Date")), toNumber(""), '
-    '(if((prop("Due Date") > now()), '
-    '(dateBetween(prop("Due Date"), now(), "days") + 1), '
-    'dateBetween(prop("Due Date"), now(), "days"))))'
+    'dateBetween(prop("Due Date"), now(), "days"))'
 )
 weeks_left = f"(if((({days_left}) < 0), -1, 1)) * floor(abs(({days_left}) / 7))"
 time_left = (
@@ -64,8 +62,9 @@ class Task(PageSchema, db_title="My task list"):
 
 with Session() as notion:
     parent = notion.search_page(PARENT_PAGE).item()
-    notion.create_db(parent=parent, schema=Task)
+    task_db = notion.create_db(parent=parent, schema=Task)
 
+    # just create 10 random tasks for demonstration
     Task.create(
         task="Plan vacation",
         due_date=today + timedelta(weeks=3, days=3),
@@ -85,7 +84,7 @@ with Session() as notion:
         priority=Priority.low,
     )
     Task.create(
-        task="Clearing out the cellar",
+        task="Build tool with Ultimate Notion",
         due_date=today + timedelta(days=1),
         status=Status.in_progress,
         priority=Priority.low,
@@ -120,3 +119,5 @@ with Session() as notion:
         status=Status.in_progress,
         priority=Priority.low,
     )
+
+    task_db.fetch_all().show()

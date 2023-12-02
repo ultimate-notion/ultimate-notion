@@ -155,7 +155,15 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def _pages_from_query(query: DBQueryBuilder) -> list[Page]:
         # ToDo: Remove when self.query is implemented!
         cache = get_active_session().cache
-        return [cast(Page, cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj))) for page_obj in query.execute()]
+        pages = []
+        for page_obj in query.execute():
+            if page_obj.id in cache:
+                page = cast(Page, cache[page_obj.id])
+                page.obj_ref = page_obj  # updates the page content
+            else:
+                page = Page.wrap_obj_ref(page_obj)
+            pages.append(page)
+        return pages
 
     def fetch_all(self) -> View:
         """Fetch all pages and return a view"""

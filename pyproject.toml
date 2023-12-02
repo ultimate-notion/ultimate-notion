@@ -208,6 +208,7 @@ ban-relative-imports = "all"
 
 # Default environment
 [tool.hatch.envs.default]
+path = ".direnv"  # to have VSCode support
 type = "virtual"
 dependencies = [
     "coverage[toml]>=6.2",

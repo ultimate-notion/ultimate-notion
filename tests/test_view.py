@@ -68,3 +68,10 @@ def test_reverse(contacts_db: Database):
     rev_short_view = short_view.reverse()
     assert rev_short_view.get_row(0) == row_2
     assert rev_short_view.get_row(2) == row_0
+
+
+@pytest.mark.webtest
+def test_to_pandas(task_db: Database):
+    view = task_db.fetch_all()
+    df = view.to_pandas()
+    assert len(view) == len(df)
