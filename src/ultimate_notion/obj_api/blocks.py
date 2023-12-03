@@ -31,7 +31,7 @@ class DataObject(NotionObject):
 
     id: UUID = None  # type: ignore  # noqa: A003
 
-    parent: SerializeAsAny[ParentRef] = None
+    parent: SerializeAsAny[ParentRef] = None  # type: ignore
     has_children: bool = False
 
     archived: bool = False
@@ -529,25 +529,25 @@ class Equation(Block, type='equation'):
 class File(Block, type='file'):
     """A file block in Notion."""
 
-    file: SerializeAsAny[FileObject] = None
+    file: SerializeAsAny[FileObject] = None  # type: ignore
 
 
 class Image(Block, type='image'):
     """An image block in Notion."""
 
-    image: SerializeAsAny[FileObject] = None
+    image: SerializeAsAny[FileObject] = None  # type: ignore
 
 
 class Video(Block, type='video'):
     """A video block in Notion."""
 
-    video: SerializeAsAny[FileObject] = None
+    video: SerializeAsAny[FileObject] = None  # type: ignore
 
 
 class PDF(Block, type='pdf'):
     """A pdf block in Notion."""
 
-    pdf: SerializeAsAny[FileObject] = None
+    pdf: SerializeAsAny[FileObject] = None  # type: ignore
 
 
 class ChildPage(Block, type='child_page'):

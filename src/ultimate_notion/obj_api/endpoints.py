@@ -8,7 +8,7 @@ is just referred to as `raw_api`.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
@@ -83,7 +83,8 @@ class BlocksEndpoint(Endpoint):
 
             logger.info('Appending %d blocks to %s ...', len(children), parent_id)
 
-            data = self.raw_api.append(block_id=parent_id, children=children)
+            # Typing within notion_client sucks, so we cast
+            data = cast(dict[str, Any], self.raw_api.append(block_id=parent_id, children=children))
 
             if 'results' in data:
                 if len(blocks) == len(data['results']):
@@ -176,7 +177,8 @@ class BlocksEndpoint(Endpoint):
 
         logger.info('Updating block :: %s', block.id)
 
-        data = self.raw_api.update(block.id.hex, **block.serialize_for_api())
+        # Typing in notion_client sucks, so we cast
+        data = cast(dict[str, Any], self.raw_api.update(block.id.hex, **block.serialize_for_api()))
 
         return block.update(**data)
 
@@ -266,7 +268,8 @@ class DatabasesEndpoint(Endpoint):
 
         if request := self._build_request(schema=schema, title=title, description=description):
             # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
-            data = self.raw_api.update(db.id, **request)
+            # Typing in notion_client sucks, thus we cast
+            data = cast(dict[str, Any], self.raw_api.update(str(db.id), **request))
             db = db.update(**data)
 
         return db

@@ -153,6 +153,9 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         from ultimate_notion.session import ENV_NOTION_TOKEN, Session  # noqa: PLC0415
 
         auth_token = Session.get_or_create().client.options.auth
+        if auth_token is None:
+            msg = 'Impossible to pass the auth token to notion_client via an environment variable'
+            raise RuntimeError(msg)
         os.environ[ENV_NOTION_TOKEN] = auth_token  # used internally by notion_client used by notion2md
         return StringExporter(block_id=self.id).export()
 

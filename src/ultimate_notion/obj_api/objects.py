@@ -400,14 +400,14 @@ class MentionUser(MentionData, type='user'):
     user: UserRef
 
     @classmethod
-    def build(cls, user: User):
+    def build(cls, user: User) -> MentionObject:
         """Build a `Mention` object for the specified user.
 
         The `id` field must be set for the given User.  Other fields may cause errors
         if they do not match the specific type returned from the API.
         """
-
-        return MentionObject.model_construct(plain_text=str(user), mention=MentionUser(user=user))
+        mention = MentionUser.model_construct(user=user)
+        return MentionObject.model_construct(plain_text=str(user), mention=mention)
 
 
 class MentionPage(MentionData, type='page'):
@@ -416,12 +416,12 @@ class MentionPage(MentionData, type='page'):
     page: ObjectReference
 
     @classmethod
-    def build(cls, page_ref):
+    def build(cls, page_ref) -> MentionObject:
         """Build a `Mention` object for the specified page reference."""
 
-        ref = ObjectReference[page_ref]
-
-        return MentionObject.model_construct(plain_text=str(ref), mention=MentionPage(page=ref))
+        ref = ObjectReference.build(page_ref)
+        mention = MentionPage.model_construct(page=ref)
+        return MentionObject.model_construct(plain_text=str(ref), mention=mention)
 
 
 class MentionDatabase(MentionData, type='database'):
@@ -430,12 +430,12 @@ class MentionDatabase(MentionData, type='database'):
     database: ObjectReference
 
     @classmethod
-    def build(cls, page):
+    def build(cls, page) -> MentionObject:
         """Build a `Mention` object for the specified database reference."""
 
-        ref = ObjectReference[page]
-
-        return MentionObject.model_construct(plain_text=str(ref), mention=MentionDatabase(database=ref))
+        ref = ObjectReference.build(page)
+        mention = MentionDatabase.model_construct(database=ref)
+        return MentionObject.model_construct(plain_text=str(ref), mention=mention)
 
 
 class MentionDate(MentionData, type='date'):
@@ -444,12 +444,12 @@ class MentionDate(MentionData, type='date'):
     date: DateRange
 
     @classmethod
-    def build(cls, start, end=None):
+    def build(cls, start, end=None) -> MentionObject:
         """Build a `Mention` object for the specified URL."""
 
         date_obj = DateRange(start=start, end=end)
-
-        return MentionObject.model_construct(plain_text=str(date_obj), mention=MentionDate(date=date_obj))
+        mention = MentionDate.model_construct(date=date_obj)
+        return MentionObject.model_construct(plain_text=str(date_obj), mention=mention)
 
 
 class MentionLinkPreview(MentionData, type='link_preview'):

@@ -208,8 +208,8 @@ ban-relative-imports = "all"
 
 # Default environment
 [tool.hatch.envs.default]
-path = ".direnv"  # to have VSCode support
 type = "virtual"
+post-install-commands = ["pre-commit install"]
 dependencies = [
     "coverage[toml]>=6.2",
     "pytest",
@@ -221,8 +221,6 @@ dependencies = [
     "hypothesis",
     "jupyterlab",
     "pre-commit",
-    "mypy",
-    "ruff",
     "pandas",
     "ipython",
     "mktestdocs",
@@ -279,7 +277,7 @@ build-check = [
 
 # Lint environment
 [tool.hatch.envs.lint]
-skip-install = true
+# skip-install = true # mypy gives more feedback if project is installed locally, strange but true
 dependencies = [
     "mypy~=1.7.1",
     "ruff==0.1.4",

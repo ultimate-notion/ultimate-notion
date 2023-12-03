@@ -377,8 +377,8 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
         if isinstance(options, type) and issubclass(options, OptionNS):
             options = options.to_list()
 
-        options = [option.obj_ref for option in options]
-        super().__init__(options)
+        option_objs = [option.obj_ref for option in options]
+        super().__init__(option_objs)
 
     @property
     def options(self) -> list[Option]:
@@ -392,8 +392,8 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
         if isinstance(options, type) and issubclass(options, OptionNS):
             options = options.to_list()
 
-        options = [option.obj_ref for option in options]
-        super().__init__(options)
+        option_objs = [option.obj_ref for option in options]
+        super().__init__(option_objs)
 
     @property
     def options(self) -> list[Option]:

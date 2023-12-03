@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import cast
 
 import pytest
 
@@ -8,6 +9,7 @@ from ultimate_notion import Color, Session, props, schema
 from ultimate_notion.database import Database
 from ultimate_notion.objects import File, Option
 from ultimate_notion.page import Page
+from ultimate_notion.props import PropertyValue
 from ultimate_notion.schema import AggFunc, Column, PageSchema, ReadOnlyColumnError, SchemaError
 
 
@@ -100,7 +102,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     b_item1 = db_b.create_page(**kwargs)
 
     # creating a page using raw Python types using the Schema directly
-    b_item2 = SchemaB.create(**{kwarg: prop_value.value for kwarg, prop_value in kwargs.items()})
+    b_item2 = SchemaB.create(**{kwarg: cast(PropertyValue, prop_value).value for kwarg, prop_value in kwargs.items()})
 
     for item in (b_item1, b_item2):
         for kwarg, prop in kwargs.items():

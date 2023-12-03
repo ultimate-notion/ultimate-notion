@@ -88,7 +88,7 @@ def store_retvals(func):
     return wrapped
 
 
-def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[Any]) -> np.array:
+def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[Any]) -> np.ndarray:
     """Finds the indices of the elements in the total set"""
     if not isinstance(total_set, np.ndarray):
         total_set = np.array(total_set)

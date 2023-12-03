@@ -1,5 +1,3 @@
-exclude: '^docs/conf.py'
-
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.5.0
@@ -26,9 +24,11 @@ repos:
     - id: ruff-format
       args: [--check]
 
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.7.1'  # make sure this is consistent with hatch configs
-  hooks:
-    - id: mypy
-      args: ["--install-types", "--non-interactive", "--config-file", "pyproject.toml", "src/ultimate_notion"]
-      # additional_dependencies: [types-tabulate, types-cachetools]
+# Deactivate as mypy behaves differently if project is installed locally or not.
+# With hatch we checked when it is installed locally to get more feedback, here it is not possible
+# - repo: https://github.com/pre-commit/mirrors-mypy
+#   rev: 'v1.7.1'  # make sure this is consistent with hatch configs
+#   hooks:
+#     - id: mypy
+#       args: []
+#       additional_dependencies: [types-tabulate, types-cachetools]

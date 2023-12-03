@@ -18,8 +18,8 @@ MAX_PAGE_SIZE = 100
 logger = logging.getLogger(__name__)
 
 
-def convert_notion_object(obj: NotionObject) -> Block | Page | Database | PropertyItem | User | GenericObject:
-    """Convert a Notion Object to a corresponding subtype.
+def convert_to_notion_obj(obj: dict[str, Any]) -> Block | Page | Database | PropertyItem | User | GenericObject:
+    """Convert a dictionary to the corresponding subtype of Notion Object
 
     Used in the ObjectList below the convert the results from the Notion API.
     """
@@ -52,7 +52,7 @@ class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True
     More details in the [Notion API](https://developers.notion.com/reference/intro#responses).
     """
 
-    results: list[Annotated[NotionObject, BeforeValidator(convert_notion_object)]] = Field(default_factory=list)
+    results: list[Annotated[NotionObject, BeforeValidator(convert_to_notion_obj)]] = Field(default_factory=list)
     has_more: bool = False
     next_cursor: str | None = None
 

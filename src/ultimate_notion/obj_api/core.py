@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import inspect
 import logging
 from typing import Any, ClassVar
 from uuid import UUID
@@ -21,27 +20,6 @@ class GenericObject(BaseModel):
 
     model_config = ConfigDict(extra='forbid')
 
-    def __setattr__(self, name, value):
-        """Set the attribute of this object to a given value.
-
-        The implementation of `BaseModel.__setattr__` does not support property setters.
-
-        See https://github.com/samuelcolvin/pydantic/issues/1577
-        """
-        try:
-            super().__setattr__(name, value)
-        except ValueError as err:
-            setters = inspect.getmembers(
-                object=self.__class__,
-                predicate=lambda x: isinstance(x, property) and x.fset is not None,
-            )
-            for setter_name, _ in setters:
-                if setter_name == name:
-                    object.__setattr__(self, name, value)
-                    break
-            else:
-                raise err
-
     @classmethod
     def _set_field_default(cls, name: str, default: str):
         """Modify the `BaseModel` field information for a specific class instance.
@@ -56,6 +34,9 @@ class GenericObject(BaseModel):
         # Rebuild model to avoid UserWarning about shadowing an attribute in parent.
         # More details here: https://github.com/pydantic/pydantic/issues/6966
         field = cls.model_fields.get(name)
+        if field is None:
+            msg = f'No field of name {name} in {cls.__name__} found!'
+            raise ValueError(msg)
         field.default = default
         field.validate_default = False
         cls.model_rebuild(force=True)

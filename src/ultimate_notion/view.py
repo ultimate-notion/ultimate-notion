@@ -35,7 +35,7 @@ class View:  # noqa: PLR0904
         self._query = query
         self._title_col = database.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
-        self._pages = np.array(pages)
+        self._pages: np.ndarray = np.array(pages)
         self.default_limit = 10
 
         self.reset()
@@ -277,7 +277,7 @@ class View:  # noqa: PLR0904
             raise RuntimeError(msg)
 
         view = self.clone()
-        select_col_indices = find_indices(cols, curr_cols)
+        select_col_indices = find_indices(list(cols), curr_cols)
         view._col_indices = view._col_indices[select_col_indices]
         return view
 
@@ -308,5 +308,5 @@ class View:  # noqa: PLR0904
     def reload(self) -> View:
         """Reload all pages by re-executing the query that generated the view"""
         view = self.clone()
-        view._pages = self.database._pages_from_query(query=self._query)
+        view._pages = np.array(self.database._pages_from_query(query=self._query))
         return view

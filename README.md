@@ -21,7 +21,8 @@ pages in the most convenient and pythonic way.
 After having cloned this repository:
 
 1. make sure [hatch] in installed globally, e.g. `pipx install hatch`,
-2. run `pre-commit install` to install [pre-commit],
+2. optionally run `hatch config set dirs.env.virtual .direnv` to let [VS Code] find your virtual environments,
+3. make sure `pre-commit` is installed globally, e.g. with `pipx install pre-commit`,
 
 and then you are already set up to start hacking. Use `hatch run cov` or `hatch run no-cov` to run
 the unitest with or without coverage reports, respectively. Check out the environment setup of
