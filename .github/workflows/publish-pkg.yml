@@ -28,8 +28,8 @@ jobs:
           # Fetch all tags
           fetch-depth: 0
 
-      - name: Install Hatch
-        run: pip install --upgrade --pre hatch
+      - name: Install Hatch & pre-commit
+        run: pip install --upgrade hatch hatch-vcs pre-commit
 
       - name: Build distributions
         run: hatch build

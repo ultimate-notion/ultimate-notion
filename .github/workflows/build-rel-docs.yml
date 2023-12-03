@@ -32,11 +32,8 @@ jobs:
     - name: Ensure latest pip
       run: python -m pip install --upgrade pip
 
-    - name: Install Hatch
-      run: pip install --upgrade --pre hatch hatch-vcs
-
-    - name: Install ourself
-      run: pip install -e .
+    - name: Install Hatch & pre-commit
+      run: pip install --upgrade hatch hatch-vcs pre-commit
 
     - name: Set the version of docs to publish
       run: python docs/scripts/set_release_version.py
