@@ -21,6 +21,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     """A Notion database
 
     This object always represents an original database, not a linked database.
+
     API reference: https://developers.notion.com/docs/working-with-databases
     """
 

@@ -33,7 +33,6 @@ will have access to the selected page as well as all its children.
 
 ![Notion integration](../assets/images/notion-integration-add.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
 
-
 ## Loading a Notion page
 
 To try out if your integration works, just copy&paste the following code into your favorite editor or better [Jupyter Lab].

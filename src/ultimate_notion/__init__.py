@@ -12,9 +12,8 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from ultimate_notion import schema
 from ultimate_notion.database import Database
-from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, VState
+from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
 from ultimate_notion.objects import File, Option, RichText
 from ultimate_notion.page import Page
 from ultimate_notion.schema import ColType, Column, PageSchema, SelfRef
@@ -30,6 +29,7 @@ __all__ = [
     'Column',
     'Database',
     'File',
+    'NumberFormat',
     'Option',
     'OptionNS',
     'Page',
@@ -38,6 +38,5 @@ __all__ = [
     'SelfRef',
     'Session',
     'VState',
-    'schema',
     '__version__',
 ]

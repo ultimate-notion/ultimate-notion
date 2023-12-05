@@ -1,3 +1,3 @@
 # Introduction to pages
 
-Work in Progress
+Coming soon 🚀

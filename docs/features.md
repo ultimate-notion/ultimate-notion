@@ -58,18 +58,21 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Notion API Limitations
 
-Some features that the Notion UI provides are not possible to implement due to limitations in the API itself.
+Some features that the Notion UI provides are not possible to implement due to limitations of the API itself.
 
-- creating a [Status] column or updating the options as well as option groups
+- creating a [Status] column or updating the options as well as option groups. Sending an Status column within a create
+  database call is currently accepted but just ignored, i.e. a database without the column will show up.
 - creating a [Unique ID] column or updating its properties like the prefix. This column type is not even mentioned
-  as one of the [database properties]
-- creating a [Wiki database] which has a special [Verification] column
+  as one of the [database properties].
+- creating a [Wiki database] which has a special [Verification] column.
 - [updating the database schema] with respect to the options of a select/multi-select column, the formula of a
-  formula column, and synced content
+  formula column, and synced content.
 - referencing in a formula expression another formula column, e.g. `prop("other formula")`. Use substitution instead.
-- uploading files
+- creating a two-way relation with the same source and target database, i.e. self-referencing. The update database call
+  is currently accepted but only a one-way relation created, which seems to be a bug.
+- uploading files as icons or in general.
 
-If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆.
+If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
 [Status]: https://developers.notion.com/reference/property-object#status
 [Unique ID]: https://developers.notion.com/reference/page-property-values#unique-id

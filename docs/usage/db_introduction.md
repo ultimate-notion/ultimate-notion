@@ -42,7 +42,7 @@ assert contacts_db.description == 'Database of all my contacts!'
 
 Assume we have a simple database listing tasks like this:
 
-![Notion task database](../assets/images/notion-task-db.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion task database](../assets/images/notion-task-db.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 To access the tasks, i.e. the pages within this database, we can use the [fetch_all] method to
 generate a [View]. It's as simple as:
@@ -70,7 +70,7 @@ Plan vacation                     Backlog      ✹ High      🕐 3w3d    2023-1
 
 or in [Jupyter Lab] this will be shown as:
 
-![Notion task view](../assets/images/notion-task-view.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion task view](../assets/images/notion-task-view.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 Special columns, for the index, the page's id and its icon, can be activated using
 [with_index], [with_id], [with_icon], respectively.:
@@ -79,7 +79,7 @@ Special columns, for the index, the page's id and its icon, can be activated usi
 task_view.with_index().with_id().with_icon()
 ```
 
-![Notion task view extended](../assets/images/notion-task-view-ext.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion task view extended](../assets/images/notion-task-view-ext.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 The index can now be used to retrieve a specific page with [get_page] or we could just
 convert the whole view to a [Pandas] dataframe with [to_pandas].
