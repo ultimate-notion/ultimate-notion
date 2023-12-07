@@ -186,21 +186,26 @@ class Session:
         # ToDo: Implement
         raise NotImplementedError
 
-    def search_db(self, db_name: str | None = None, *, exact: bool = True, reverse: bool = False) -> SList[Database]:
-        """Search a database by name
+    def search_db(
+        self, db_name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
+    ) -> SList[Database]:
+        """Search a database by name or return all if `db_name` is None
 
         Args:
             db_name: name/title of the database, return all if `None`
             exact: perform an exact search, not only a substring match
             reverse: search in the reverse order, i.e. the least recently edited results first
+            deleted: include deleted databases in search
         """
         query = self.api.search(db_name).filter(db_only=True)
         if reverse:
             query.sort(ascending=True)
-        dbs = SList(cast(Database, self.cache.setdefault(db.id, Database.wrap_obj_ref(db))) for db in query.execute())
+        dbs = [cast(Database, self.cache.setdefault(db.id, Database.wrap_obj_ref(db))) for db in query.execute()]
         if exact and db_name is not None:
-            dbs = SList(db for db in dbs if db.title == db_name)
-        return dbs
+            dbs = [db for db in dbs if db.title == db_name]
+        if not deleted:
+            dbs = [db for db in dbs if not db.is_deleted]
+        return SList(dbs)
 
     def get_db(self, db_ref: ObjRef, *, use_cache: bool = True) -> Database:
         """Retrieve Notion database by uuid"""

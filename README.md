@@ -75,7 +75,7 @@ Ultimate Notion uses internally [notion-sdk-py].
 [PyPI_py-link]: https://pypi.org/project/ultimate-notion/
 [hatch-image]: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
 [hatch-link]: https://github.com/pypa/hatch
-[ruff-image]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json
+[ruff-image]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
 [ruff-link]: https://github.com/charliermarsh/ruff
 [black-image]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/psf/black
