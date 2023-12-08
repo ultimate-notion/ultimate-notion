@@ -9,7 +9,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Databases
 
-- [x] retrieve a database by ID
+- [x] retrieve a database by its ID
 - [x] search for a database by its title
 - [x] create a new database with a given schema, i.e. columns and their types
 - [x] delete/archive and restore/unarchive a database
@@ -24,7 +24,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Pages
 
-- [x] retrieve a page by ID
+- [x] retrieve a page by its ID
 - [x] search for a page by its title
 - [x] create a new page
 - [x] delete/archive and restore/unarchive a page
@@ -39,14 +39,14 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Blocks
 
-- [ ] retrieve a block by ID
+- [ ] retrieve a block by its ID
 - [ ] navigate blocks using references of parent and children
 - [ ] create blocks within a page or another block
 - [ ] modify blocks
 
 ## Users
 
-- [x] retrieve a user by ID
+- [x] retrieve a user by their ID
 - [x] retrieve own bot user, i.e. self-identify
 - [x] retrieve all users
 - [x] read the attributes of a user

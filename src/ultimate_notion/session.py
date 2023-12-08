@@ -217,23 +217,28 @@ class Session:
             self.cache[db.id] = db
             return db
 
-    def search_page(self, title: str | None = None, *, exact: bool = True, reverse: bool = False) -> SList[Page]:
+    def search_page(
+        self, title: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
+    ) -> SList[Page]:
         """Search a page by name
 
         Args:
             title: title of the page, return all if `None`
             exact: perform an exact search, not only a substring match
             reverse: search in the reverse order, i.e. the least recently edited results first
+            deleted: include deleted pages in search
         """
         query = self.api.search(title).filter(page_only=True)
         if reverse:
             query.sort(ascending=True)
-        pages = SList(
+        pages = [
             cast(Page, self.cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj))) for page_obj in query.execute()
-        )
+        ]
         if exact and title is not None:
-            pages = SList(page for page in pages if page.title.value == title)
-        return pages
+            pages = [page for page in pages if page.title.value == title]
+        if not deleted:
+            pages = [page for page in pages if not page.is_deleted]
+        return SList(pages)
 
     def get_page(self, page_ref: ObjRef, *, use_cache: bool = True) -> Page:
         page_uuid = get_uuid(page_ref)

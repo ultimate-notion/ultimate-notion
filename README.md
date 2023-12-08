@@ -10,7 +10,7 @@ pages in the most convenient and pythonic way.
 |---------|------------------------------------|
 | CI/CD   | [![Tests][Tests-image]][Tests-link] [![Coverage][Coverage-image]][Coverage-link] [![Publish Package][Publish-image]][Publish-link] [![Build Docs][Docs-image]][Docs-link] |
 | Package | [![PyPI - Version][PyPI_ver-image]][PyPI_ver-link] [![PyPI - Downloads][PyPI_down-image]][PyPI_down-link] [![PyPI - Python Version][PyPI_py-image]][PyPI_py-link] |
-| Details | [![Hatch project][hatch-image]][hatch-link] [![linting - Ruff][ruff-image]][ruff-link] [![types - Mypy][mypy-image]][mypy-link] [![License - MIT][MIT-image]][MIT-link] [![GitHub Sponsors][sponsor-image]][sponsor-link] |
+| Details | [![Hatch project][hatch-image]][hatch-link] [![linting - Ruff][ruff-image]][ruff-link] [![Types - Mypy][mypy-image]][mypy-link] [![License - MIT][MIT-image]][MIT-link] [![GitHub Sponsors][sponsor-image]][sponsor-link] |
 
 
 
@@ -77,9 +77,9 @@ Ultimate Notion uses internally [notion-sdk-py].
 [hatch-link]: https://github.com/pypa/hatch
 [ruff-image]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
 [ruff-link]: https://github.com/charliermarsh/ruff
-[mypy-image]: https://img.shields.io/badge/types-Mypy-blue.svg
+[mypy-image]: https://img.shields.io/badge/Types-Mypy-blue.svg
 [mypy-link]: https://mypy-lang.org/
-[MIT-image]: https://img.shields.io/badge/license-MIT-9400d3.svg
+[MIT-image]: https://img.shields.io/badge/License-MIT-9400d3.svg
 [MIT-link]: LICENSE.txt
 [sponsor-image]: https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4
 [sponsor-link]: https://github.com/sponsors/FlorianWilhelm
