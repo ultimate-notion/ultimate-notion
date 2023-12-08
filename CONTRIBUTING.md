@@ -44,7 +44,6 @@ that any documentation update is done in the same way was a code contribution.
       Please notice that the [GitHub web interface] provides a quick way for
       proposing changes. While this mechanism can  be tricky for normal code contributions,
       it works perfectly fine for contributing to the docs, and can be quite handy.
-
       If you are interested in trying this method out, please navigate to
       the `docs` folder in the source [repository], find which file you
       would like to propose changes and click in the little pencil icon at the
@@ -79,16 +78,11 @@ This often provides additional considerations and avoids unnecessary work.
    cd ultimate-notion
    ```
 
-4. Make sure [hatch] is installed using [pipx]:
+4. Make sure [hatch] and [pre-commit] is installed using [pipx]:
 
    ```console
    pipx install hatch
-   ```
-
-5. \[only once\] install [pre-commit] hooks in the default environment with:
-
-   ```console
-   hatch run pre-commit install
+   pipx install pre-commit
    ```
 
 ### Implement your changes
@@ -104,9 +98,16 @@ This often provides additional considerations and avoids unnecessary work.
 2. Start your work on this branch. Don't forget to add [docstrings] in [Google style]
    to new functions, modules and classes, especially if they are part of public APIs.
 
-3. Add yourself to the list of contributors in `AUTHORS.md`.
+3. Check that your changes don't break any unit tests with
+   `hatch run test:cov` or `hatch run test:no-cov` to run the unitest with
+   or without coverage reports, respectively.
 
-4. When you’re done editing, do:
+4. Run `hatch run lint:all` and `hatch run lint:fix` to check the code with [ruff] & [mypy]
+   and automatically fix [ruff] issues if possible.
+
+5. Add yourself to the list of contributors in `AUTHORS.md`.
+
+6. When you’re done editing, do:
 
    ```console
    git add <MODIFIED FILES>
@@ -115,10 +116,7 @@ This often provides additional considerations and avoids unnecessary work.
 
    to record your changes in [git].
 
-   Please make sure to see the validation messages from [pre-commit] and fix
-   any eventual issues.
-   This should automatically use [flake8]/[black] to check/fix the code style
-   in a way that is compatible with the project.
+   Please make sure you see the validation messages from [pre-commit] and fix and remaining issues.
 
     !!! info
         Don't forget to add unit tests and documentation in case your
@@ -130,10 +128,6 @@ This often provides additional considerations and avoids unnecessary work.
         git log --graph --decorate --pretty=oneline --abbrev-commit --all
         ```
         to look for recurring communication patterns.
-
-5. Please check that your changes don't break any unit tests with
-   `hatch run test:cov` or `hatch run test:no-cov` to run the unitest with
-   or without coverage reports, respectively.
 
 ### Submit your contribution
 
@@ -155,11 +149,11 @@ This often provides additional considerations and avoids unnecessary work.
     to collectively create software are general and can be applied to all sorts
     of environments, including private companies and proprietary code bases.
 
-[black]: https://pypi.org/project/black/
 [contribution-guide.org]: http://www.contribution-guide.org/
 [creating a PR]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
 [docstrings]: https://peps.python.org/pep-0257/
-[flake8]: https://flake8.pycqa.org/en/stable/
+[ruff]: https://docs.astral.sh/ruff/
+[mypy]: https://mypy-lang.org/
 [git]: https://git-scm.com
 [github web interface]: https://docs.github.com/en/github/managing-files-in-a-repository/managing-files-on-github/editing-files-in-your-repository
 [other kinds of contributions]: https://opensource.guide/how-to-contribute
@@ -168,3 +162,4 @@ This often provides additional considerations and avoids unnecessary work.
 [python software foundation's code of conduct]: https://www.python.org/psf/conduct/
 [Google style]: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 [guide created by FreeCodeCamp]: https://github.com/FreeCodeCamp/how-to-contribute-to-open-source
+[GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files
