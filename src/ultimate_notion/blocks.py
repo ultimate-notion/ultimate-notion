@@ -1,4 +1,4 @@
-"""Core building blocks for pages and databases"""
+"""Core building blocks for pages and databases."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ T = TypeVar('T', bound=obj_blocks.DataObject)
 
 
 class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
-    """The base type for all data-related types, i.e, pages, databases and blocks"""
+    """The base type for all data-related types, i.e, pages, databases and blocks."""
 
     def __eq__(self, other: object) -> bool:
         if other is None:
@@ -58,7 +58,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
     @property
     def parent(self) -> DataObject | None:
-        """Return the parent record or None if the workspace is the parent"""
+        """Return the parent record or None if the workspace is the parent."""
         session = get_active_session()
         parent = self.obj_ref.parent
 
@@ -76,7 +76,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
     @property
     def parents(self) -> tuple[DataObject, ...]:
-        """Return all parents from the workspace to the actual record (excluding)"""
+        """Return all parents from the workspace to the actual record (excluding)."""
         match parent := self.parent:
             case None:
                 return ()
@@ -89,7 +89,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
     @property
     def is_deleted(self) -> bool:
-        """Return wether the object is deleted/archived"""
+        """Return wether the object is deleted/archived."""
         return self.obj_ref.archived
 
     @property
@@ -98,6 +98,6 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
 
 class Block(DataObject[obj_blocks.Block], wraps=obj_blocks.Block):
-    """Notion block object"""
+    """Notion block object."""
 
     # ToDo: Implement me!

@@ -43,7 +43,7 @@ BLOCK_URL_LONG_RE = re.compile(
 
 
 def extract_id(text: str) -> str | None:
-    """Examine the given text to find a valid Notion object ID"""
+    """Examine the given text to find a valid Notion object ID."""
 
     m = UUID_RE.match(text)
     if m is not None:
@@ -70,7 +70,7 @@ def chunky(text: str, length: int = MAX_TEXT_OBJECT_SIZE) -> Iterator[str]:
 
 
 def python_identifier(string: str) -> str:
-    """Make a valid Python identifier
+    """Make a valid Python identifier.
 
     This will remove any leading characters that are not valid and change all
     invalid interior sequences to underscore.
@@ -99,12 +99,12 @@ def camel_case(string: str) -> str:
 
 
 def decapitalize(string: str) -> str:
-    """Inverse of capitalize"""
+    """Inverse of `capitalize`."""
     if not string:
         return string
     return string[0].lower() + string[1:]
 
 
 def html_img(url: str, size: float) -> str:
-    """Create a img tag in HTML"""
+    """Create a img tag in HTML."""
     return f'<img src="{url}" style="height:{size:.2f}em">'

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def convert_to_notion_obj(obj: dict[str, Any]) -> Block | Page | Database | PropertyItem | User | GenericObject:
-    """Convert a dictionary to the corresponding subtype of Notion Object
+    """Convert a dictionary to the corresponding subtype of Notion Object.
 
     Used in the ObjectList below the convert the results from the Notion API.
     """

@@ -85,6 +85,16 @@ This often provides additional considerations and avoids unnecessary work.
    pipx install pre-commit
    ```
 
+5. Optionally run `hatch config set dirs.env.virtual .direnv` to let
+   [VS Code] find your virtual environments. If you are using [VS Code],
+   then it's quite convenient to add a file `.env` in your checkout with:
+
+   ```ini
+   [pytest]
+   env =
+      NOTION_AUTH_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+   ```
+
 ### Implement your changes
 
 1. Create a branch to hold your changes:
@@ -162,4 +172,5 @@ This often provides additional considerations and avoids unnecessary work.
 [python software foundation's code of conduct]: https://www.python.org/psf/conduct/
 [Google style]: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 [guide created by FreeCodeCamp]: https://github.com/FreeCodeCamp/how-to-contribute-to-open-source
+[VS Code]: https://code.visualstudio.com/
 [GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files

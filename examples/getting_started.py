@@ -1,17 +1,18 @@
 """This example demonstrates how to create an Ultimate Notion session"""
 
-from ultimate_notion import Session
+import ultimate_notion as uno
 
 TOKEN = "secret_YOUR_TOKEN_HERE"
-PAGE_TITLE = "Getting Started"  # Change this to the title of your page
+# Change PAGE_TITLE to the title of your page
+PAGE_TITLE = "Getting Started"
 
-with Session(auth=TOKEN) as notion:
+with uno.Session(auth=TOKEN) as notion:
     page = notion.search_page(PAGE_TITLE).item()
     print(page.show())
 
-# alternatively, without a context manager
-notion = Session.get_or_create(auth=TOKEN)
-# or if `NOTION_TOKEN` is set, just type:
+# Alternatively, without a context manager:
+notion = uno.Session.get_or_create(auth=TOKEN)
+# `auth` can be omitted if `NOTION_TOKEN` is set in the environment, e.g.
 # notion = Session.get_or_create()
 # which also works for the context manager
 page = notion.search_page(PAGE_TITLE).item()

@@ -6,7 +6,7 @@ from enum import Enum
 
 
 class VState(str, Enum):
-    """Verification states for pages in wiki databases"""
+    """Verification states for pages in wiki databases."""
 
     VERIFIED = 'verified'
     UNVERIFIED = 'unverified'
@@ -43,7 +43,7 @@ class BGColor(str, Enum):
 
 
 class CodeLang(str, Enum):
-    """Coding languages for code blocks"""
+    """Coding languages for code blocks."""
 
     ABAP = 'abap'
     ARDUINO = 'arduino'
@@ -120,7 +120,7 @@ class CodeLang(str, Enum):
 
 
 class AggFunc(str, Enum):
-    """Aggregation functions for formulas"""
+    """Aggregation functions for formulas."""
 
     COUNT = 'count'
     COUNT_VALUES = 'count_values'
@@ -154,7 +154,7 @@ class AggFunc(str, Enum):
 
 
 class NumberFormat(str, Enum):
-    """Number formats for numbers"""
+    """Number formats for numbers."""
 
     NUMBER = 'number'
     NUMBER_WITH_COMMAS = 'number_with_commas'

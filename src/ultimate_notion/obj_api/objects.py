@@ -319,9 +319,10 @@ class RichTextObject(TypedObject, polymorphic_base=True):
     def build(cls, text, href=None, style=None):
         """Compose a TextObject from the given properties.
 
-        :param text: the plain text of this object
-        :param href: an optional link for this object
-        :param style: an optional Annotations object for this text
+        Args:
+            text: the plain text of this object
+            href: an optional link for this object
+            style: an optional Annotations object for this text
         """
 
         if text is None:

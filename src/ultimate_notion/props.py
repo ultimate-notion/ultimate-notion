@@ -1,6 +1,5 @@
 """
-Page properties especially for pages within databases
-
+Page properties especially for pages within databases.
 The names of the properties reflect the name in the Notion UI.
 """
 
@@ -75,7 +74,7 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
 
 
 class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
-    """Title property value"""
+    """Title property value."""
 
     def __init__(self, text: str | RichText):
         if isinstance(text, str):
@@ -88,7 +87,7 @@ class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
 
 
 class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
-    """Rich text property value"""
+    """Rich text property value."""
 
     def __init__(self, text: str | RichText):
         if isinstance(text, str):
@@ -101,7 +100,7 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
 
 
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
-    """Number property value"""
+    """Number property value."""
 
     def __float__(self):
         """Return the Number as a `float`."""
@@ -162,7 +161,7 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
         return self
 
     def __ifloordiv__(self, other):
-        """Divide the given value from this Number and floor"""
+        """Divide the given value from this Number and floor."""
 
         if isinstance(other, Number):
             self.obj_ref.number //= other.value
@@ -227,7 +226,7 @@ class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
 
 
 class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
-    """Date(-time) property value"""
+    """Date(-time) property value."""
 
     # ToDo: Also use `time_zone` here defined in obj_api props or objects
     def __init__(self, start: datetime | date, end: datetime | date | None = None):
@@ -246,7 +245,7 @@ class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
 
 
 class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
-    """Status property value"""
+    """Status property value."""
 
     def __init__(self, option: str | Option):
         if isinstance(option, str):
@@ -263,7 +262,7 @@ class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
 
 
 class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
-    """Single select property value"""
+    """Single select property value."""
 
     def __init__(self, option: str | Option):
         if isinstance(option, str):
@@ -280,7 +279,7 @@ class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
 
 
 class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSelect):
-    """Multi-select property value"""
+    """Multi-select property value."""
 
     def __init__(self, options: str | Option | list[str | Option]):
         if not isinstance(options, list):
@@ -297,7 +296,7 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
 
 
 class People(PropertyValue[obj_props.People], wraps=obj_props.People):
-    """People property value"""
+    """People property value."""
 
     def __init__(self, users: User | list[User]):
         if not isinstance(users, list):
@@ -306,19 +305,19 @@ class People(PropertyValue[obj_props.People], wraps=obj_props.People):
 
 
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
-    """URL property value"""
+    """URL property value."""
 
 
 class Email(PropertyValue[obj_props.Email], wraps=obj_props.Email):
-    """Email property value"""
+    """Email property value."""
 
 
 class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
-    """Phone property value"""
+    """Phone property value."""
 
 
 class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
-    """Files property value"""
+    """Files property value."""
 
     def __init__(self, files: File | list[File]):
         if not isinstance(files, list):
@@ -328,7 +327,7 @@ class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
 
 
 class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
-    """Formula property value"""
+    """Formula property value."""
 
     readonly = True
 
@@ -338,7 +337,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 
 
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
-    """Relation property value"""
+    """Relation property value."""
 
     def __init__(self, pages: Page | list[Page]):
         if not isinstance(pages, list):
@@ -352,7 +351,7 @@ class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
 
 
 class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
-    """Rollup property value"""
+    """Rollup property value."""
 
     readonly = True
 
@@ -370,37 +369,37 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 
 
 class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):
-    """Created-time property value"""
+    """Created-time property value."""
 
     readonly = True
 
 
 class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
-    """Created-by property value"""
+    """Created-by property value."""
 
     readonly = True
 
 
 class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.LastEditedTime):
-    """Last-edited-time property value"""
+    """Last-edited-time property value."""
 
     readonly = True
 
 
 class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEditedBy):
-    """Last-edited-by property value"""
+    """Last-edited-by property value."""
 
     readonly = True
 
 
 class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
-    """Unique ID property value"""
+    """Unique ID property value."""
 
     readonly = True
 
 
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
-    """Verification property value of pages in wiki databases"""
+    """Verification property value of pages in wiki databases."""
 
     readonly = True
     # ToDo: Implement properties to retrieve user, etc. and convert user to actual high-level User object

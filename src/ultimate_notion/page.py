@@ -1,4 +1,4 @@
-"""Page object"""
+"""Functionality around Notion pages."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class PageProperty:
-    """Property of a page implementing the descriptor protocol"""
+    """Property of a page implementing the descriptor protocol."""
 
     def __init__(self, prop_name: str):
         self._prop_name = prop_name
@@ -31,7 +31,7 @@ class PageProperty:
 
 
 class PageProperties:
-    """Properties of a page as defined in the schema of the database
+    """Properties of a page as defined in the schema of the database.
 
     Access the properties with `.property_name` or `["Property Name"]`.
     """
@@ -65,11 +65,11 @@ class PageProperties:
         session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
 
     def __iter__(self):
-        """Iterator of property names"""
+        """Iterator of property names."""
         yield from self._properties.keys()
 
     def to_dict(self) -> dict[str, PropertyValue]:
-        """All page properties as dictionary"""
+        """All page properties as dictionary."""
         return {prop_name: self[prop_name] for prop_name in self}
 
 
@@ -84,7 +84,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return obj
 
     def _create_prop_attrs(self) -> PageProperties:
-        """Create the attributes for the database properties of this page"""
+        """Create the attributes for the database properties of this page."""
         # We have to subclass in order to populate it with the descriptor `PageProperty``
         # as this only works on the class level and we want a unique class for each property.
         page_props_cls = type('_PageProperties', (PageProperties,), {})
@@ -100,7 +100,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return get_repr(self, desc=self.title.value)
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this page"""
+        """Called by Jupyter Lab automatically to display this page."""
         return self._render_md(self.markdown())  # Github flavored markdown
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
@@ -111,7 +111,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     @property
     def database(self) -> Database | None:
-        """If this page is located in a database return the database or None otherwise"""
+        """If this page is located in a database return the database or None otherwise."""
         from ultimate_notion.database import Database  # noqa: PLC0415
 
         if isinstance(self.parent, Database):
@@ -131,7 +131,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     @property
     def icon(self) -> File | str | None:
-        """Icon of page, i.e. emojis, Notion's icons, or custom images"""
+        """Icon of page, i.e. emojis, Notion's icons, or custom images."""
         icon = self.obj_ref.icon
         if isinstance(icon, objs.ExternalFile):
             return File.wrap_obj_ref(icon)
@@ -144,7 +144,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             raise RuntimeError(msg)
 
     def markdown(self) -> str:
-        """Return the content of the page as Markdown"""
+        """Return the content of the page as Markdown."""
         # ToDo: Since notion2md is also quite buggy, use an own implementation here using Mistune!
         import os  # noqa: PLC0415
 
@@ -182,21 +182,21 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             return md
 
     def delete(self) -> Page:
-        """Delete/archive this page"""
+        """Delete/archive this page."""
         if not self.is_deleted:
             session = get_active_session()
             session.api.pages.delete(self.obj_ref)
         return self
 
     def restore(self) -> Page:
-        """Restore/unarchive this page"""
+        """Restore/unarchive this page."""
         if self.is_deleted:
             session = get_active_session()
             session.api.pages.restore(self.obj_ref)
         return self
 
     def reload(self) -> Page:
-        """Reload this page"""
+        """Reload this page."""
         session = get_active_session()
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
         return self

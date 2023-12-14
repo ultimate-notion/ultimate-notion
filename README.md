@@ -3,7 +3,7 @@
 </div>
 <br/>
 
-Ultimate Notion is the ultimate Python library for [Notion]! It allows you to access and modify your Notion databases and
+Ultimate Notion is the ultimate Python library for [Notion] 🚀 It allows you to access and modify your Notion databases and
 pages in the most convenient and pythonic way.
 
 |         |                                    |
@@ -12,17 +12,54 @@ pages in the most convenient and pythonic way.
 | Package | [![PyPI - Version][PyPI_ver-image]][PyPI_ver-link] [![PyPI - Downloads][PyPI_down-image]][PyPI_down-link] [![PyPI - Python Version][PyPI_py-image]][PyPI_py-link] |
 | Details | [![Hatch project][hatch-image]][hatch-link] [![linting - Ruff][ruff-image]][ruff-link] [![Types - Mypy][mypy-image]][mypy-link] [![License - MIT][MIT-image]][MIT-link] [![GitHub Sponsors][sponsor-image]][sponsor-link] |
 
+## Installation
 
+Install the most recent release using [PyPI] with:
 
-**This is a pre-alpha version! Don't use it!**
+```console
+pip install ultimate-notion
+```
 
-## Development
+or to install all additional dependencies, use:
+
+```console
+pip install ultimate-notion[all]
+```
+
+## Usage
+
+```python
+import ultimate_notion as uno
+
+TOKEN = "secret_YOUR_TOKEN_HERE"
+# Change PAGE_TITLE to the title of your page
+PAGE_TITLE = "Getting Started"
+
+with uno.Session(auth=TOKEN) as notion:
+    page = notion.search_page(PAGE_TITLE).item()
+    print(page.show())
+
+# Alternatively, without a context manager:
+notion = uno.Session.get_or_create(auth=TOKEN)
+# `auth` can be omitted if `NOTION_TOKEN` is set in the environment, e.g.
+# notion = Session.get_or_create()
+# which also works for the context manager
+page = notion.search_page(PAGE_TITLE).item()
+print(page.show())
+notion.close()
+```
+
+Check out the official [Ultimate Notion documentation] for more details.
+Especially the page about [creating a Notion integration] to get the token.
+The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pages].
+
+## Contributing
 
 After having cloned this repository:
 
 1. make sure [hatch] in installed globally, e.g. `pipx install hatch`,
-2. optionally run `hatch config set dirs.env.virtual .direnv` to let [VS Code] find your virtual environments,
-3. make sure [pre-commit] is installed globally, e.g. with `pipx install pre-commit`,
+2. make sure [pre-commit] is installed globally, e.g. with `pipx install pre-commit`,
+3. optionally run `hatch config set dirs.env.virtual .direnv` to let [VS Code] find your virtual environments,
 
 and then you are already set up to start hacking. Use `hatch run cov` or `hatch run no-cov` to run
 the unitest with or without coverage reports, respectively. Check out the environment setup of
@@ -36,18 +73,13 @@ env =
     NOTION_AUTH_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
 ```
 
-## Documentation
+Check out this [page about contributing] for more details.
 
-The [Ultimate Notion documentation] is made with [Material for MkDocs] and is hosted on [GitHub Pages].
-
-## License
+## License & Credits
 
 Ultimate Notion is distributed under the terms of the [MIT license](LICENSE.txt).
-
-## Credits
-
 To start this project off a lot of inspiration and code was taken from [hatch] and [notional].
-Ultimate Notion uses internally [notion-sdk-py].
+Ultimate Notion highly depends on [notion-sdk-py].
 
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/
@@ -57,7 +89,10 @@ Ultimate Notion uses internally [notion-sdk-py].
 [Material for MkDocs]: https://github.com/squidfunk/mkdocs-material
 [GitHub Pages]: https://docs.github.com/en/pages
 [Ultimate Notion documentation]: https://ultimate-notion.com/
+[creating a Notion integration]: https://ultimate-notion.com/latest/usage/getting_started/
+[page about contributing]: https://ultimate-notion.com/latest/contributing/
 [VS Code]: https://code.visualstudio.com/
+[PyPI]: https://pypi.org/
 
 [Tests-image]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml/badge.svg
 [Tests-link]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml

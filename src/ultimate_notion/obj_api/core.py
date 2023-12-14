@@ -57,7 +57,7 @@ class GenericObject(BaseModel):
         return self
 
     def serialize_for_api(self):
-        """Serialize the object for sending it to the Notion API"""
+        """Serialize the object for sending it to the Notion API."""
         # TODO: read-only fields should not be sent to the API
         # https://github.com/jheddings/notional/issues/9
 
@@ -66,7 +66,7 @@ class GenericObject(BaseModel):
 
     @classmethod
     def build(cls, *args, **kwargs):
-        """Use the standard constructur to build the instance. Will be overridden for more complex types"""
+        """Use the standard constructur to build the instance. Will be overridden for more complex types."""
         return cls(*args, **kwargs)
 
 
@@ -207,5 +207,5 @@ class TypedObject(GenericObject):
 
     @property
     def value(self) -> Any:
-        """Return the nested object"""
+        """Return the nested object."""
         return getattr(self, self.type)

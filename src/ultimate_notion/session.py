@@ -1,4 +1,4 @@
-"""Session object"""
+"""Functionality to initialize a Notion Session."""
 
 from __future__ import annotations
 
@@ -27,15 +27,15 @@ ENV_NOTION_TOKEN = 'NOTION_TOKEN'  # same as in `notion-sdk-py` package
 
 
 class SessionError(Exception):
-    """Raised when there are issues with the Notion session"""
+    """Raised when there are issues with the Notion session."""
 
     def __init__(self, message):
-        """Initialize the `SessionError` with a supplied message"""
+        """Initialize the `SessionError` with a supplied message."""
         super().__init__(message)
 
 
 class Session:
-    """A session for the Notion API
+    """A session for the Notion API.
 
     The session keeps tracks of all objects, e.g. pages, databases, etc.
     in an object store to avoid unnecessary calls to the API.
@@ -48,7 +48,7 @@ class Session:
     cache: ClassVar[dict[UUID, DataObject | User]] = {}
 
     def __init__(self, auth: str | None = None, **kwargs: Any):
-        """Initialize the `Session` object and the Notional endpoints
+        """Initialize the `Session` object and the raw `api` endpoints.
 
         Args:
             auth: secret token from the Notion integration
@@ -81,7 +81,7 @@ class Session:
 
     @classmethod
     def get_active(cls) -> Session:
-        """Return the current active session or None"""
+        """Return the current active session or None."""
         with Session._lock:
             if Session._active_session:
                 return Session._active_session
@@ -91,7 +91,7 @@ class Session:
 
     @classmethod
     def get_or_create(cls, *args, **kwargs) -> Session:
-        """Return the current active session or create a new session"""
+        """Return the current active session or create a new session."""
         with Session._lock:
             if Session._active_session:
                 return Session._active_session
@@ -115,14 +115,14 @@ class Session:
         Session.cache.clear()
 
     def close(self):
-        """Close the session and release resources"""
+        """Close the session and release resources."""
         _log.info('Closing connection to Notion...')
         self.client.close()
         Session._active_session = None
         Session.cache.clear()
 
     def is_closed(self) -> bool:
-        """Determine if the session is closed or not"""
+        """Determine if the session is closed or not."""
         try:
             self.raise_for_status()
         except RuntimeError:  # used by httpx client in case of closed connection
@@ -131,7 +131,7 @@ class Session:
             return False
 
     def raise_for_status(self):
-        """Confirm that the session is active and raise otherwise
+        """Confirm that the session is active and raise otherwise.
 
         Raises SessionError if there is a problem, otherwise returns None.
         """
@@ -145,7 +145,7 @@ class Session:
             raise SessionError(msg) from err
 
     def create_db(self, parent: Page, schema: type[PageSchema] | None = None) -> Database:
-        """Create a new database within a page
+        """Create a new database within a page.
 
         Implementation:
 
@@ -177,19 +177,19 @@ class Session:
         return db
 
     def create_dbs(self, parents: Page | list[Page], schemas: list[type[PageSchema]]) -> list[Database]:
-        """Create new databases in the right order in case there a relations between them"""
+        """Create new databases in the right order in case there a relations between them."""
         # ToDo: Implement
         raise NotImplementedError
 
     def get_or_create_db(self, parent: Page, schema: type[PageSchema], title: str | None = None):
-        """Get or create the database"""
+        """Get or create the database."""
         # ToDo: Implement
         raise NotImplementedError
 
     def search_db(
         self, db_name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
     ) -> SList[Database]:
-        """Search a database by name or return all if `db_name` is None
+        """Search a database by name or return all if `db_name` is None.
 
         Args:
             db_name: name/title of the database, return all if `None`
@@ -220,7 +220,7 @@ class Session:
     def search_page(
         self, title: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
     ) -> SList[Page]:
-        """Search a page by name
+        """Search a page by name.
 
         Args:
             title: title of the page, return all if `None`
@@ -265,17 +265,17 @@ class Session:
             return user
 
     def whoami(self) -> User:
-        """Return the user object of this bot"""
+        """Return the user object of this bot."""
         user = self.api.users.me()
         return cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user)))
 
     def all_users(self) -> list[User]:
-        """Retrieve all users of this workspace"""
+        """Retrieve all users of this workspace."""
         return [
             cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.as_list()
         ]
 
     # ToDo: Also put blocks in the cache
     def get_block(self, block_ref: ObjRef):
-        """Retrieve a block"""
+        """Retrieve a block."""
         return Block(obj_ref=self.api.blocks.retrieve(block_ref))

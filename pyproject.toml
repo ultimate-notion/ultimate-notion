@@ -17,11 +17,17 @@ authors = [
     { name = "Florian Wilhelm", email = "Florian.Wilhelm@gmail.com" },
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Office/Business",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "notion-client~=2.1",
@@ -41,6 +47,7 @@ google = [
    "google-auth-httplib2",
    "google-auth-oauthlib",
 ]
+all = ["ultimate-notion[google]"]
 
 [project.urls]
 Documentation = "https://ultimate-notion.com/"

@@ -1,4 +1,4 @@
-"""Functionality for working with Notion databases"""
+"""Functionality for working with Notion databases."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from ultimate_notion.view import View
 
 
 class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
-    """A Notion database
+    """A Notion database.
 
     This object always represents an original database, not a linked database.
 
@@ -62,7 +62,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @description.setter
     def description(self, text: str | RichText):
-        """Set the description of this database"""
+        """Set the description of this database."""
         if not isinstance(text, RichText):
             text = RichText.from_plain_text(text)
         session = get_active_session()
@@ -85,12 +85,12 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def is_wiki(self) -> bool:
-        """Is this database a wiki database"""
+        """Is this database a wiki database."""
         # ToDo: Implement using the verification property
         raise NotImplementedError
 
     def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[PageSchema]:
-        """Reflection about the database schema"""
+        """Reflection about the database schema."""
         title = str(self)
         cls_name = f'{camel_case(title)}Schema'
         attrs = {
@@ -103,14 +103,14 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def schema(self) -> type[PageSchema]:
-        """Schema of the database"""
+        """Schema of the database."""
         if not self._schema:
             self._schema = self._reflect_schema(self.obj_ref)
         return self._schema
 
     @schema.setter
     def schema(self, schema: type[PageSchema]):
-        """Set a custom schema in order to change the Python variables names"""
+        """Set a custom schema in order to change the Python variables names."""
         if self.schema.is_consistent_with(schema):
             schema.bind_db(self)
             self._schema = schema
@@ -132,21 +132,21 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return self.obj_ref.is_inline
 
     def delete(self) -> Database:
-        """Delete/archive this database"""
+        """Delete/archive this database."""
         if not self.is_deleted:
             session = get_active_session()
             session.api.databases.delete(self.obj_ref)
         return self
 
     def restore(self) -> Database:
-        """Restore/unarchive this database"""
+        """Restore/unarchive this database."""
         if self.is_deleted:
             session = get_active_session()
             session.api.databases.restore(self.obj_ref)
         return self
 
     def reload(self) -> Database:
-        """Reload this database"""
+        """Reload this database."""
         session = get_active_session()
         self.obj_ref = session.api.databases.retrieve(self.obj_ref.id)
         self.schema._set_obj_refs()
@@ -167,13 +167,13 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return pages
 
     def fetch_all(self) -> View:
-        """Fetch all pages and return a view"""
+        """Fetch all pages and return a view."""
         session = get_active_session()
         query = session.api.databases.query(self.obj_ref)  # ToDo: use self.query when implemented
         return View(database=self, pages=self._pages_from_query(query), query=query)
 
     def create_page(self, **kwargs) -> Page:
-        """Create a page with properties according to the schema within the corresponding database"""
+        """Create a page with properties according to the schema within the corresponding database."""
         schema_kwargs = {col.attr_name: col for col in self.schema.get_cols()}
         if not set(kwargs).issubset(set(schema_kwargs)):
             add_kwargs = set(kwargs) - set(schema_kwargs)
@@ -198,5 +198,5 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return page
 
     def query(self):
-        """Query a (large) database for pages in a more specific way"""
+        """Query a (large) database for pages in a more specific way."""
         raise NotImplementedError

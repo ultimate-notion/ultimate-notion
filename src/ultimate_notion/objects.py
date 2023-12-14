@@ -1,3 +1,5 @@
+"""Functionality for general Notion objects like texts, files, options, etc."""
+
 from __future__ import annotations
 
 from typing import cast
@@ -9,19 +11,19 @@ from ultimate_notion.utils import Wrapper, get_repr
 
 
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
-    """Option for select & multi-select property"""
+    """Option for select & multi-select property."""
 
     def __init__(self, name: str, *, color: Color = Color.DEFAULT):
         super().__init__(name, color=color)
 
     @property
     def id(self) -> str:  # noqa: A003
-        """Name of the option"""
+        """ID of the option."""
         return self.obj_ref.id
 
     @property
     def name(self) -> str:
-        """Name of the option"""
+        """Name of the option."""
         return self.obj_ref.name
 
     def __repr__(self) -> str:
@@ -32,13 +34,13 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
 
 
 class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
-    """Group of options for status property"""
+    """Group of options for status property."""
 
     _options: dict[str, Option]  # holds all possible options
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref, /, *, options: list[Option] | None = None) -> OptionGroup:
-        """Convienence constructor for the group of options"""
+        """Convienence constructor for the group of options."""
         obj = super().wrap_obj_ref(obj_ref)
         options = [] if options is None else options
         obj._options = {option.id: option for option in options}
@@ -46,12 +48,12 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
 
     @property
     def name(self) -> str:
-        """Name of the option group"""
+        """Name of the option group."""
         return self.obj_ref.name
 
     @property
     def options(self) -> list[Option]:
-        """Options within this option group"""
+        """Options within this option group."""
         return [self._options[opt_id] for opt_id in self.obj_ref.option_ids]
 
     def __repr__(self) -> str:
@@ -62,7 +64,7 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
 
 
 class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
-    """A web resource e.g. for the files property"""
+    """A web resource e.g. for the files property."""
 
     obj_ref: objs.FileObject
 
@@ -82,7 +84,7 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
         return self.url
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this file"""
+        """Called by Jupyter Lab automatically to display this file."""
         return html_img(self.url, size=2)
 
     @property
@@ -101,26 +103,26 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
 
 
 class RichTextBase(Wrapper[objs.RichTextObject], wraps=objs.RichTextObject):
-    """Super class for text, equation and mentions of various kinds"""
+    """Super class for text, equation and mentions of various kinds."""
 
 
 class Text(RichTextBase, wraps=objs.TextObject):
-    """A Text object"""
+    """A Text object."""
 
 
 class Equation(RichTextBase, wraps=objs.EquationObject):
-    """An Equation object"""
+    """An Equation object."""
 
 
 class Mention(RichTextBase, wraps=objs.MentionObject):
-    """A Mention object"""
+    """A Mention object."""
 
 
 class RichText(list[RichTextBase]):
-    """User-facing class holding several RichTexts"""
+    """User-facing class holding several RichTexts."""
 
     def __new__(cls, plain_text: str, *, _factory_method: bool = False) -> RichText:
-        """Default constructor creates RichText object from a single plain text string argument"""
+        """Default constructor creates RichText object from a single plain text string argument."""
         if _factory_method:
             return super().__new__(cls)
         else:
@@ -141,19 +143,19 @@ class RichText(list[RichTextBase]):
 
     @classmethod
     def from_markdown(cls, text: str) -> RichText:
-        """Create RichTextList by parsing the markdown"""
+        """Create RichTextList by parsing the markdown."""
         # ToDo: Implement
         # ToDo: Handle Equations and Mentions here accordingly
         raise NotImplementedError
 
     def to_markdown(self) -> str | None:
-        """Convert the list of RichText objects to markdown"""
+        """Convert the list of RichText objects to markdown."""
         # ToDo: Implement
         raise NotImplementedError
 
     @classmethod
     def from_plain_text(cls, text: str) -> RichText:
-        """Create RichTextList from plain text"""
+        """Create RichTextList from plain text."""
         rich_texts: list[RichTextBase] = []
         for part in chunky(text):
             rich_texts.append(Text(part))
@@ -165,7 +167,7 @@ class RichText(list[RichTextBase]):
         return ''.join(text.plain_text for text in self.obj_ref if text)
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this text"""
+        """Called by Jupyter Lab automatically to display this text."""
         # ToDo: Later use Markdown output.
         return self.to_plain_text()
 

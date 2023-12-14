@@ -1,4 +1,4 @@
-"""Additional utilities that fit nowhere else"""
+"""Additional utilities that fit nowhere else."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ T = TypeVar('T')
 
 
 class SList(list[T]):
-    """A list that holds often only a single element"""
+    """A list that holds often only a single element."""
 
     def item(self) -> T:
         if len(self) == 1:
@@ -37,7 +37,7 @@ class SList(list[T]):
 
 
 def is_notebook() -> bool:
-    """Determine if we are running within a Jupyter notebook"""
+    """Determine if we are running within a Jupyter notebook."""
     try:
         from IPython import get_ipython  # noqa: PLC0415
     except ModuleNotFoundError:
@@ -53,7 +53,7 @@ def is_notebook() -> bool:
 
 
 def store_retvals(func):
-    """Decorator storing the return values as function attribute for later cleanups
+    """Decorator storing the return values as function attribute for later cleanups.
 
     This can be used for instance in a generator like this:
     ```
@@ -89,7 +89,7 @@ def store_retvals(func):
 
 
 def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[Any]) -> np.ndarray:
-    """Finds the indices of the elements in the total set"""
+    """Finds the indices of the elements in the total set."""
     if not isinstance(total_set, np.ndarray):
         total_set = np.array(total_set)
     mask = np.isin(total_set, elements)
@@ -100,7 +100,7 @@ def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[
 
 
 def find_index(elem: Any, lst: list[Any]) -> int | None:
-    """Find the index of the element in the list or return `None`"""
+    """Find the index of the element in the list or return `None`."""
     if elem not in lst:
         return None
     else:
@@ -108,7 +108,8 @@ def find_index(elem: Any, lst: list[Any]) -> int | None:
 
 
 def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int, Any] | None = None):
-    """
+    """Like `deepcoyp` but specified attributes are shared.
+
     Deepcopy an object, except for a given list of attributes, which should
     be shared between the original object and its copy.
 
@@ -168,7 +169,7 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int
 
 
 def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject) -> UUID:
-    """Retrieves a UUID from an object reference using Notional
+    """Retrieves a UUID from an object reference.
 
     Only meant for internal use.
     """
@@ -180,7 +181,7 @@ VT = TypeVar('VT')
 
 
 def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
-    """Returns the added keys, removed keys and keys of changed values of both dictionaries"""
+    """Returns the added keys, removed keys and keys of changed values of both dictionaries."""
     set1, set2 = set(dct1.keys()), set(dct2.keys())
     keys_added = list(set2 - set1)
     keys_removed = list(set1 - set2)
@@ -189,7 +190,7 @@ def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT
 
 
 def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str]:
-    """Returns the added keys, removed keys and keys of changed values of both dictionaries as strings for printing"""
+    """Returns the added keys, removed keys and keys of changed values of both dictionaries as strings for printing."""
     keys_added, keys_removed, values_changed = dict_diff(dct1, dct2)
     keys_added_str = ', '.join([str(k) for k in keys_added]) or 'None'
     keys_removed_str = ', '.join([str(k) for k in keys_removed]) or 'None'
@@ -202,7 +203,7 @@ GT = TypeVar('GT', bound=GenericObject)  # ToDo: Use new syntax when requires-py
 
 
 class Wrapper(Generic[GT]):
-    """Convert objects from the obj-based API to the high-level API and vice versa"""
+    """Convert objects from the obj-based API to the high-level API and vice versa."""
 
     obj_ref: GT
 
@@ -217,13 +218,13 @@ class Wrapper(Generic[GT]):
         return super().__new__(cls)
 
     def __init__(self, *args: Any, **kwargs: Any):
-        """Default constructor that also builds `obj_ref`"""
+        """Default constructor that also builds `obj_ref`."""
         obj_api_type: type[GenericObject] = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
     @classmethod
     def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
-        """Wraps `obj_ref` into a high-level object for the API of Ultimate Notion"""
+        """Wraps `obj_ref` into a high-level object for the API of Ultimate Notion."""
         hl_cls = cls._obj_api_map[type(obj_ref)]
         hl_obj = hl_cls.__new__(hl_cls)
         hl_obj.obj_ref = obj_ref
@@ -235,7 +236,7 @@ class Wrapper(Generic[GT]):
 
 
 def get_active_session() -> Session:
-    """Return the current active session or raise an exception
+    """Return the current active session or raise an exception.
 
     Avoids cyclic imports when used within the package itself.
     For internal use mostly.
@@ -246,18 +247,18 @@ def get_active_session() -> Session:
 
 
 def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
-    """Default representation, i.e. `repr(...)`, used by ultime-notion for conistency"""
+    """Default representation, i.e. `repr(...)`, used by us for consistency."""
     type_str = str(name) if name is not None else obj.__class__.__name__
     desc_str = str(desc) if desc is not None else str(obj)
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
 
 
 class OptionNS:
-    """Option namespace to simplify working with (Multi-)Select options"""
+    """Option namespace to simplify working with (Multi-)Select options."""
 
     @classmethod
     def to_list(cls) -> list[Option]:
-        """Convert the enum to a list as needed by the (Multi)Select column types"""
+        """Convert the enum to a list as needed by the (Multi)Select column types."""
         return [
             getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
         ]

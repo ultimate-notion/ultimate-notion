@@ -279,7 +279,7 @@ class UniqueID(PropertyValue, type='unique_id'):
 
 
 class Verification(PropertyValue, type='verification'):
-    """A Notion verification property value"""
+    """A Notion verification property value."""
 
     class _NestedData(GenericObject):
         state: VState = VState.UNVERIFIED

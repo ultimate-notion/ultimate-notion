@@ -277,7 +277,7 @@ class LastEditedTime(PropertyType, type='last_edited_time'):
 
 
 class UniqueID(PropertyType, type='unique_id'):
-    """Unique ID database property"""
+    """Unique ID database property."""
 
     class _NestedData(GenericObject):
         prefix: str | None = None
@@ -286,7 +286,7 @@ class UniqueID(PropertyType, type='unique_id'):
 
 
 class Verification(PropertyType, type='verification'):
-    """Verfication database property of Wiki databases"""
+    """Verfication database property of Wiki databases."""
 
     class _NestedData(GenericObject): ...
 
@@ -294,6 +294,6 @@ class Verification(PropertyType, type='verification'):
 
 
 class RenameProp(GenericObject):
-    """Use to rename a property during a database update"""
+    """Use to rename a property during a database update."""
 
     name: str

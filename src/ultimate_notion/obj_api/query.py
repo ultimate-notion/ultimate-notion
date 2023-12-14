@@ -336,7 +336,7 @@ class SearchQueryBuilder(QueryBuilder):
 
 
 class DBQueryBuilder(QueryBuilder):
-    """Query builder to query a database
+    """Query builder to query a database.
 
     Notion API: https://developers.notion.com/reference/post-search
     """
