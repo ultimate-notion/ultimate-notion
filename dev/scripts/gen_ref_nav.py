@@ -21,6 +21,8 @@ for path in sorted(Path('src').glob('**/*.py')):
         parts = parts[:-1]
         doc_path = doc_path.with_name('index.md')
         full_doc_path = full_doc_path.with_name('index.md')
+    elif parts[-1] == '_version':
+        continue
     elif parts[-1] == '__main__':
         continue
     nav_parts = list(parts)
