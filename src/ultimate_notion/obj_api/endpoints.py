@@ -300,11 +300,7 @@ class DatabasesEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/post-database-query
     def query(self, db: Database) -> DBQueryBuilder:
-        """Initialize a new Query object with the target data class.
-
-        Args:
-            target: either a `DatabaseRef` type or an ORM class
-        """
+        """Initialize a new Query object with the target data class."""
         db_id = DatabaseRef.build(db).database_id
         logger.info('Initializing database query :: {%s}', db_id)
 

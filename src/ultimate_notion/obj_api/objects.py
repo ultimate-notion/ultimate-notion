@@ -267,7 +267,7 @@ class Annotations(GenericObject):
         If all flags match their defaults, this is considered a "plain" style.
         """
 
-        # XXX a better approach here would be to just compare all fields to defaults
+        # Todo: a better approach here would be to just compare all fields to defaults
 
         if self.bold:
             return False
@@ -316,7 +316,7 @@ class RichTextObject(TypedObject, polymorphic_base=True):
     #     return text
 
     @classmethod
-    def build(cls, text, href=None, style=None):
+    def build(cls, text: str, href: str | None = None, style: Annotations | None = None):
         """Compose a TextObject from the given properties.
 
         Args:
@@ -324,14 +324,7 @@ class RichTextObject(TypedObject, polymorphic_base=True):
             href: an optional link for this object
             style: an optional Annotations object for this text
         """
-
-        if text is None:
-            return None
-
-        # TODO convert markdown in text:str to RichText?
-
         style = deepcopy(style)
-
         return cls.model_construct(plain_text=text, href=href, annotations=style)
 
 
