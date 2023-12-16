@@ -223,6 +223,7 @@ ban-relative-imports = "all"
 # Default environment
 [tool.hatch.envs.default]
 type = "virtual"
+python = "3.10"
 post-install-commands = ["pre-commit install"]
 dependencies = [
     "coverage[toml]>=6.2",

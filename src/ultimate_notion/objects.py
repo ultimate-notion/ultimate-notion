@@ -102,6 +102,29 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
             raise RuntimeError(msg)
 
 
+class Emoji(Wrapper[objs.EmojiObject], wraps=objs.EmojiObject):
+    """Emoji object"""
+
+    def __repr__(self) -> str:
+        return get_repr(self)
+
+    def __str__(self) -> str:
+        return self.obj_ref.emoji
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this file."""
+        return str(self)
+
+    def to_code(self) -> str:
+        """Represent the emoji as :shortcode:, e.g. :smile:"""
+        raise NotImplementedError
+
+    @classmethod
+    def from_code(cls, shortcode: str) -> Emoji:
+        """Create an Emoji object from a :shortcode:, e.g. :smile:"""
+        raise NotImplementedError
+
+
 class RichTextBase(Wrapper[objs.RichTextObject], wraps=objs.RichTextObject):
     """Super class for text, equation and mentions of various kinds."""
 
@@ -118,9 +141,11 @@ class Mention(RichTextBase, wraps=objs.MentionObject):
     """A Mention object."""
 
 
+# ToDo: It would be much nicer and consistent if this class was a subclass of `str`
 class RichText(list[RichTextBase]):
     """User-facing class holding several RichTexts."""
 
+    # ToDo: Inhereting not from a list would also get rid of this madness
     def __new__(cls, plain_text: str, *, _factory_method: bool = False) -> RichText:
         """Default constructor creates RichText object from a single plain text string argument."""
         if _factory_method:

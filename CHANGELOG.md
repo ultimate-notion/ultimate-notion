@@ -1,5 +1,5 @@
 # Changelog
 
-## Version 0.0.1 (development)
+## Version 0.1
 
-- First pre-alpha to have a starting base
+- First official alpha release

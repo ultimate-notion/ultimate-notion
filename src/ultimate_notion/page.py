@@ -9,7 +9,8 @@ import mistune
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.objects import File
+from ultimate_notion.obj_api import props as obj_props
+from ultimate_notion.objects import Emoji, File, RichText
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.utils import get_active_session, get_repr, is_notebook
 
@@ -38,7 +39,11 @@ class PageProperties:
 
     def __init__(self, page: Page):
         self._page = page
-        self._properties = page.obj_ref.properties
+
+    @property
+    def _properties(self) -> dict[str, obj_props.PropertyValue]:
+        """Return the low-level page properties"""
+        return self._page.obj_ref.properties
 
     def __getitem__(self, prop_name: str) -> PropertyValue:
         prop = self._properties.get(prop_name)
@@ -74,6 +79,12 @@ class PageProperties:
 
 
 class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
+    """A Notion page.
+
+    Attributes:
+        props: accessor for all page properties
+    """
+
     props: PageProperties
     _render_md = mistune.create_markdown(plugins=['strikethrough', 'url', 'task_lists', 'math'], escape=False)
 
@@ -90,18 +101,18 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         page_props_cls = type('_PageProperties', (PageProperties,), {})
         if self.database:
             for col in self.database.schema.get_cols():
-                setattr(page_props_cls, col.attr_name, PageProperty(col.name))
+                setattr(page_props_cls, col.attr_name, PageProperty(prop_name=col.name))
         return page_props_cls(page=self)
 
     def __str__(self) -> str:
         return str(self.title)
 
     def __repr__(self) -> str:
-        return get_repr(self, desc=self.title.value)
+        return get_repr(self, desc=self.title)
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this page."""
-        return self._render_md(self.markdown())  # Github flavored markdown
+        return self._render_md(self.to_markdown())  # Github flavored markdown
 
     # ToDo: Build a real hierarchy of Pages and Blocks here
     # @property
@@ -120,30 +131,43 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             return None
 
     @property
-    def title(self) -> Title:  # Todo: Rather return Text here!
+    def title(self) -> RichText:
         """Title of the page"""
         # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
         for prop in self.obj_ref.properties.values():
             if prop.id == 'title':
-                return cast(Title, PropertyValue.wrap_obj_ref(prop))
+                title = cast(Title, PropertyValue.wrap_obj_ref(prop))
+                return title.value
         msg = 'Encountered a page without title property'
         raise RuntimeError(msg)
 
     @property
-    def icon(self) -> File | str | None:
-        """Icon of page, i.e. emojis, Notion's icons, or custom images."""
+    def icon(self) -> File | Emoji | None:
+        """Icon of the page, i.e. emojis, Notion's icons, or custom images."""
         icon = self.obj_ref.icon
         if isinstance(icon, objs.ExternalFile):
             return File.wrap_obj_ref(icon)
         elif isinstance(icon, objs.EmojiObject):
-            return icon.emoji
+            return Emoji.wrap_obj_ref(icon)
         elif icon is None:
             return None
         else:
             msg = f'unknown icon object of {type(icon)}'
             raise RuntimeError(msg)
 
-    def markdown(self) -> str:
+    @property
+    def cover(self) -> File | None:
+        """Cover of the page."""
+        cover = self.obj_ref.cover
+        if isinstance(cover, objs.ExternalFile):
+            return File.wrap_obj_ref(cover)
+        elif cover is None:
+            return None
+        else:
+            msg = f'unknown cover object of {type(cover)}'
+            raise RuntimeError(msg)
+
+    def to_markdown(self) -> str:
         """Return the content of the page as Markdown."""
         # ToDo: Since notion2md is also quite buggy, use an own implementation here using Mistune!
         import os  # noqa: PLC0415
@@ -157,7 +181,10 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             msg = 'Impossible to pass the auth token to notion_client via an environment variable'
             raise RuntimeError(msg)
         os.environ[ENV_NOTION_TOKEN] = auth_token  # used internally by notion_client used by notion2md
-        return StringExporter(block_id=self.id).export()
+
+        md = f'# {self.title}\n'
+        md += StringExporter(block_id=self.id).export()
+        return md
 
     @overload
     def show(self, *, display: Literal[False]) -> str: ...
@@ -173,7 +200,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         if display is None:
             display = is_notebook()
 
-        md = self.markdown()
+        md = self.to_markdown()
         if display:
             from IPython.core.display import display_markdown  # noqa: PLC0415
 

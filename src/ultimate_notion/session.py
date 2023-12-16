@@ -235,7 +235,7 @@ class Session:
             cast(Page, self.cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj))) for page_obj in query.execute()
         ]
         if exact and title is not None:
-            pages = [page for page in pages if page.title.value == title]
+            pages = [page for page in pages if page.title == title]
         if not deleted:
             pages = [page for page in pages if not page.is_deleted]
         return SList(pages)

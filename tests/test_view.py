@@ -46,7 +46,7 @@ def test_index(contacts_db: Database):
     row = view.get_row(idx)
     assert row[0] == idx
     row = view.without_index().get_row(idx)
-    assert row[0].value != idx  # this is the title at that point
+    assert row[0] != idx  # this is the title at that point
     view = view.with_index().with_index().without_index().without_index()
     assert not view.has_index
 

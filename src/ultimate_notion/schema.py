@@ -119,32 +119,36 @@ class PageSchema:
         return {col.name: col.type for col in cls.get_cols()}
 
     @classmethod
-    def show(cls, tablefmt: str | None) -> str:
-        """Display the schema in a given table format.
-
-        Some table formats:
-        - plain: no pseudographics
-        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
-        - github: GitHub flavored Markdown
-        - simple_grid: uses dashes & pipes to separate cells
-        - html: standard html markup
-
-        Find more tables formats under: https://github.com/astanin/python-tabulate#table-format
-        """
-        if tablefmt is None:
+    def show(cls, *, simple: bool | None = None, display: bool = True) -> str | None:
+        """Display the schema as html or as simple table."""
+        if simple:
+            tablefmt = 'simple'
+        elif simple is None:
             tablefmt = 'html' if is_notebook() else 'simple'
+        else:
+            tablefmt = 'html'
 
         headers = ['Name', 'Property', 'Attribute']
         rows = []
         for col in cls.get_cols():
             rows.append((col.name, col.type, col.attr_name))
 
-        return tabulate(rows, headers=headers, tablefmt=tablefmt)
+        schema_repr = tabulate(rows, headers=headers, tablefmt=tablefmt)
+
+        if display:
+            if simple:
+                print(schema_repr)  # noqa: T201
+            else:
+                from IPython.core.display import display_html  # noqa: PLC0415
+
+                display_html(schema_repr)
+        else:
+            return tabulate(rows, headers=headers, tablefmt=tablefmt)
 
     @classmethod
-    def _repr_html_(cls) -> str:  # noqa: PLW3201
+    def _repr_html_(cls) -> str | None:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this schema."""
-        return cls.show(tablefmt='html')
+        return cls.show(simple=False, display=False)
 
     @classmethod
     def get_title_prop(cls) -> Column:
@@ -381,8 +385,8 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
         super().__init__(option_objs)
 
     @property
-    def options(self) -> list[Option]:
-        return [Option.wrap_obj_ref(option) for option in self.obj_ref.select.options]
+    def options(self) -> dict[str, Option]:
+        return {option.name: Option.wrap_obj_ref(option) for option in self.obj_ref.select.options}
 
 
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
@@ -396,8 +400,8 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
         super().__init__(option_objs)
 
     @property
-    def options(self) -> list[Option]:
-        return [Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options]
+    def options(self) -> dict[str, Option]:
+        return {option.name: Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options}
 
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):

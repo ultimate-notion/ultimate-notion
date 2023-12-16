@@ -1,6 +1,7 @@
 """The Notion API mapped to Python objects by Pydantic
 
-Most of this code is taken from [Notional] by Jason Heddings and is MIT-licensed.
+The code was taken originally from [Notional] by Jason Heddings and is MIT-licensed.
+Due to the Pydantic v2 migration and several other design changes, it was refactored since then.
 
 [Notional]: https://github.com/jheddings/notional
 """

@@ -27,7 +27,7 @@ def test_search_get_db(notion: Session):
 def test_get_page_by_id(notion: Session, intro_page: Page):
     del notion.cache[intro_page.id]
     page_by_id = notion.get_page(intro_page.id)
-    assert page_by_id.title.value == 'Getting Started'
+    assert page_by_id.title == 'Getting Started'
     assert page_by_id == intro_page
 
 

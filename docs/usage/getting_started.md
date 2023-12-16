@@ -31,7 +31,7 @@ select the <kbd>···</kbd> on the upper right. In the drop-down menu, scroll d
 search and select your created integration. A pop-up that you need to confirm will inform you that your integration
 will have access to the selected page as well as all its children.
 
-![Notion integration](../assets/images/notion-integration-add.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion integration](../assets/images/notion-integration-add.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 ## Loading a Notion page
 
@@ -47,7 +47,7 @@ of the page, you granted access for your integration. Another, maybe safer way, 
 Run the code and you should see in Jupyter Lab following rendered Markdown code or just the plain output if you run the
 code in a terminal.
 
-![Notion integration](../assets/images/notion-getting-started-page.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Getting started page](../assets/images/notion-getting-started-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 ## Notion concepts in a nutshell
 

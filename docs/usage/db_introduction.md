@@ -125,3 +125,6 @@ keep in mind that some methods are just stubs.
 [select]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.select
 [reset]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.reset
 [reload]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.reload
+[head]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.head
+[limit]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.limit
+[tail]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.tail

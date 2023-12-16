@@ -52,9 +52,10 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
             return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
+    # ToDo: Check if this should rather be abstract.
     @property
     def value(self) -> Any:
-        return self.obj_ref.value
+        return self.obj_ref.value  # Todo: We are breaking the abstraction here! Fix this!
 
     @property
     def id(self) -> str:  # noqa: A003
@@ -102,7 +103,7 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
     """Number property value."""
 
-    def __float__(self):
+    def __float__(self) -> float:
         """Return the Number as a `float`."""
 
         if self.obj_ref.number is None:
@@ -111,7 +112,7 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 
         return float(self.obj_ref.number)
 
-    def __int__(self):
+    def __int__(self) -> int:
         """Return the Number as an `int`."""
 
         if self.obj_ref.number is None:
@@ -120,7 +121,7 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 
         return int(self.obj_ref.number)
 
-    def __iadd__(self, other):
+    def __iadd__(self, other) -> Number:
         """Add the given value to this Number."""
 
         if isinstance(other, Number):
@@ -130,7 +131,7 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 
         return self
 
-    def __isub__(self, other):
+    def __isub__(self, other) -> Number:
         """Subtract the given value from this Number."""
 
         if isinstance(other, Number):
@@ -140,7 +141,7 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 
         return self
 
-    def __imul__(self, other):
+    def __imul__(self, other) -> Number:
         """Multiply the given value from this Number."""
 
         if isinstance(other, Number):
@@ -150,7 +151,7 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 
         return self
 
-    def __itruediv__(self, other):
+    def __itruediv__(self, other) -> Number:
         """Divide the given value from this Number."""
 
         if isinstance(other, Number):
@@ -160,7 +161,7 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 
         return self
 
-    def __ifloordiv__(self, other):
+    def __ifloordiv__(self, other) -> Number:
         """Divide the given value from this Number and floor."""
 
         if isinstance(other, Number):
@@ -170,50 +171,50 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 
         return self
 
-    def __add__(self, other):
+    def __add__(self, other) -> Number:
         """Add the value of `other` and returns the result as a Number."""
         other_value = other.value if isinstance(other, Number) else other
         return Number(self.value + other_value)
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> Number:
         """Subtract the value of `other` and returns the result as a Number."""
         other_value = other.value if isinstance(other, Number) else other
         return Number(self.value - other_value)
 
-    def __mul__(self, other):
+    def __mul__(self, other) -> Number:
         """Multiply the value of `other` and returns the result as a Number."""
         other_value = other.value if isinstance(other, Number) else other
         return Number(self.value * other_value)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other) -> Number:
         other_value = other.value if isinstance(other, Number) else other
         return Number(self.value / other_value)
 
-    def __floordiv__(self, other):
+    def __floordiv__(self, other) -> Number:
         other_value = other.value if isinstance(other, Number) else other
         return Number(self.value // other_value)
 
-    def __le__(self, other):
+    def __le__(self, other) -> bool:
         """Return `True` if this `Number` is less-than-or-equal-to `other`."""
         other_value = other.value if isinstance(other, Number) else other
         return self.value <= other_value
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         """Return `True` if this `Number` is less-than `other`."""
         other_value = other.value if isinstance(other, Number) else other
         return self.value < other_value
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> bool:
         """Return `True` if this `Number` is greater-than-or-equal-to `other`."""
         other_value = other.value if isinstance(other, Number) else other
         return self.value >= other_value
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         """Return `True` if this `Number` is greater-than `other`."""
         other_value = other.value if isinstance(other, Number) else other
         return self.value > other_value
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         other_value = other.value if isinstance(other, Number) else other
         return self.value == other_value
 

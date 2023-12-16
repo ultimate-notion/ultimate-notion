@@ -11,10 +11,10 @@ import pandas as pd
 from tabulate import tabulate
 
 from ultimate_notion.obj_api.query import DBQueryBuilder
-from ultimate_notion.objects import File
+from ultimate_notion.objects import File, RichText
 from ultimate_notion.page import Page
 from ultimate_notion.text import html_img
-from ultimate_notion.utils import deepcopy_with_sharing, find_index, find_indices, get_repr, is_notebook
+from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -74,6 +74,11 @@ class View:  # noqa: PLR0904
     def get_page(self, idx: int) -> Page:
         """Retrieve a page by index of the view."""
         return self._pages[self._row_indices[idx]]
+
+    def search_page(self, name: str | RichText) -> SList[Page]:
+        """Retrieve a page from this view by name"""
+        pages = [page for page in self.to_pages() if page.title == name]
+        return SList(pages)
 
     def get_row(self, idx: int) -> tuple[Any, ...]:
         page = self.get_page(idx)

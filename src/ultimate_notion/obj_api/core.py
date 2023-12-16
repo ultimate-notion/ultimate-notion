@@ -205,6 +205,7 @@ class TypedObject(GenericObject):
 
         return sub_cls(**value)
 
+    # ToDo: Check if we shouldn't make this rather abstract
     @property
     def value(self) -> Any:
         """Return the nested object."""
