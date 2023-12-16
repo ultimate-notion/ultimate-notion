@@ -147,7 +147,7 @@ task.props.status = options['In Progress']
     the future to make the expderience more user-friendly.
 
 [Page object]: ../../reference/ultimate_notion/page/#ultimate_notion.page.Page
-[Task List example]: ../../usage/db_advanced/#two-way-self-relations
+[Task List example]: ../../examples/simple_taskdb/
 [View]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View
 [SList]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList
 [item]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList.item
