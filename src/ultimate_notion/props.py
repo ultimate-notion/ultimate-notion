@@ -163,7 +163,7 @@ class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
         super().__init__(option)
 
     @property
-    def value(self) -> str | None:
+    def value(self) -> Option | None:
         if self.obj_ref.status:
             return Option.wrap_obj_ref(self.obj_ref.status)
         else:
