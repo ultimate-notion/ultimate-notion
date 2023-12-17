@@ -149,24 +149,21 @@ class View:  # noqa: PLR0904
         else:
             return tabulate(rows, headers=cols, tablefmt=tablefmt)
 
-    def show(self, tablefmt: str | None = None):
-        """Show the database as human-readable table.
+    def show(self, *, simple: bool | None = None):
+        """Show the database as human-readable table."""
+        if simple:
+            tablefmt = 'simple'
+        elif simple is None:
+            tablefmt = 'html' if is_notebook() else 'simple'
+        else:
+            tablefmt = 'html'
 
-        Some table formats:
-
-        - plain: no pseudographics
-        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
-        - github: GitHub flavored Markdown
-        - simple_grid: uses dashes & pipes to separate cells
-        - html: standard html markup
-
-        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
-        """
         table_str = self.as_table(tablefmt=tablefmt)
-        if is_notebook() and (tablefmt is None or tablefmt == 'html'):
-            from IPython.display import HTML, display  # noqa: PLC0415
 
-            display(HTML(table_str))
+        if is_notebook() and (tablefmt == 'html'):
+            from IPython.display import display_html  # noqa: PLC0415
+
+            display_html(table_str)
         else:
             print(table_str)  # noqa: T201
 

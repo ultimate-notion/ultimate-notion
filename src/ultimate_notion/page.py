@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, cast, overload
+from typing import TYPE_CHECKING, Any, cast
 
 import mistune
 
@@ -186,27 +186,17 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         md += StringExporter(block_id=self.id).export()
         return md
 
-    @overload
-    def show(self, *, display: Literal[False]) -> str: ...
-
-    @overload
-    def show(self, *, display: Literal[True]) -> None: ...
-
-    @overload
-    def show(self) -> str | None: ...
-
-    def show(self, *, display=None):
-        """Show the content of the page as markdown, rendered in Jupyter Lab"""
-        if display is None:
-            display = is_notebook()
-
+    def show(self, *, simple: bool | None = None):
+        """Show the content of the page, rendered in Jupyter Lab"""
+        simple = simple if simple is not None else is_notebook()
         md = self.to_markdown()
-        if display:
+
+        if simple:
+            print(md)  # noqa: T201
+        else:
             from IPython.core.display import display_markdown  # noqa: PLC0415
 
             display_markdown(md, raw=True)
-        else:
-            return md
 
     def delete(self) -> Page:
         """Delete/archive this page."""

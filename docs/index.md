@@ -8,8 +8,6 @@ Ultimate Notion is the ultimate Python library for [Notion]! It allows you to ac
 pages in the most convenient and pythonic way. Under [Features](features.md) you will find the current status of the
 implemented functionality. Ultimate Notion is distributed under the terms of the [MIT] license.
 
-**This is a pre-alpha version! Don't use it!**
-
 ## Navigation
 
 Documentation for specific `MAJOR.MINOR` versions can be chosen by using the dropdown on the top of every page.

@@ -119,8 +119,32 @@ class PageSchema:
         return {col.name: col.type for col in cls.get_cols()}
 
     @classmethod
-    def show(cls, *, simple: bool | None = None, display: bool = True) -> str | None:
-        """Display the schema as html or as simple table."""
+    def as_table(cls, tablefmt: str | None = None) -> str:
+        """Return the schema in a given string table format.
+
+        Some table formats:
+
+        - plain: no pseudographics
+        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
+        - github: GitHub flavored Markdown
+        - simple_grid: uses dashes & pipes to separate cells
+        - html: standard html markup
+
+        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
+        """
+        if tablefmt is None:
+            tablefmt = 'html' if is_notebook() else 'simple'
+
+        headers = ['Name', 'Property', 'Attribute']
+        rows = []
+        for col in cls.get_cols():
+            rows.append((col.name, col.type, col.attr_name))
+
+        return tabulate(rows, headers=headers, tablefmt=tablefmt)
+
+    @classmethod
+    def show(cls, *, simple: bool | None = None):
+        """Show the schema as html or as simple table."""
         if simple:
             tablefmt = 'simple'
         elif simple is None:
@@ -128,27 +152,19 @@ class PageSchema:
         else:
             tablefmt = 'html'
 
-        headers = ['Name', 'Property', 'Attribute']
-        rows = []
-        for col in cls.get_cols():
-            rows.append((col.name, col.type, col.attr_name))
+        table_str = cls.as_table(tablefmt)
 
-        schema_repr = tabulate(rows, headers=headers, tablefmt=tablefmt)
+        if is_notebook() and (tablefmt == 'html'):
+            from IPython.display import display_html  # noqa: PLC0415
 
-        if display:
-            if simple:
-                print(schema_repr)  # noqa: T201
-            else:
-                from IPython.core.display import display_html  # noqa: PLC0415
-
-                display_html(schema_repr)
+            display_html(table_str)
         else:
-            return tabulate(rows, headers=headers, tablefmt=tablefmt)
+            print(table_str)  # noqa: T201
 
     @classmethod
-    def _repr_html_(cls) -> str | None:  # noqa: PLW3201
+    def _repr_html_(cls) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this schema."""
-        return cls.show(simple=False, display=False)
+        return cls.as_table(tablefmt='html')
 
     @classmethod
     def get_title_prop(cls) -> Column:

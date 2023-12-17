@@ -5,22 +5,22 @@ The names of the properties reflect the name in the Notion UI.
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion.obj_api.props import DateType
-from ultimate_notion.objects import Option, RichText, User
+from ultimate_notion.objects import File, Option, RichText, User
 from ultimate_notion.utils import Wrapper, get_active_session, get_repr
 
 if TYPE_CHECKING:
-    from ultimate_notion.objects import File
     from ultimate_notion.page import Page
 
 T = TypeVar('T', bound=obj_props.PropertyValue)
 
 
-class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
+class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PLW1641
     """Base class for Notion property values.
 
     Used to map high-level objects to low-level Notion-API objects
@@ -52,10 +52,10 @@ class PropertyValue(Wrapper[T], wraps=obj_props.PropertyValue):  # noqa: PLW1641
             return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
-    # ToDo: Check if this should rather be abstract.
     @property
+    @abstractmethod
     def value(self) -> Any:
-        return self.obj_ref.value  # Todo: We are breaking the abstraction here! Fix this!
+        """Return the actual Python value object of this property."""
 
     @property
     def id(self) -> str:  # noqa: A003
@@ -103,127 +103,35 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
     """Number property value."""
 
+    @property
+    def value(self) -> int | float | None:
+        return self.obj_ref.number
+
     def __float__(self) -> float:
         """Return the Number as a `float`."""
 
-        if self.obj_ref.number is None:
+        if self.value is None:
             msg = "Cannot convert 'None' to float"
             raise ValueError(msg)
 
-        return float(self.obj_ref.number)
+        return float(self.value)
 
     def __int__(self) -> int:
         """Return the Number as an `int`."""
 
-        if self.obj_ref.number is None:
+        if self.value is None:
             msg = "Cannot convert 'None' to int"
             raise ValueError(msg)
 
-        return int(self.obj_ref.number)
-
-    def __iadd__(self, other) -> Number:
-        """Add the given value to this Number."""
-
-        if isinstance(other, Number):
-            self.obj_ref.number += other.value
-        else:
-            self.obj_ref.number += other
-
-        return self
-
-    def __isub__(self, other) -> Number:
-        """Subtract the given value from this Number."""
-
-        if isinstance(other, Number):
-            self.obj_ref.number -= other.value
-        else:
-            self.obj_ref.number -= other
-
-        return self
-
-    def __imul__(self, other) -> Number:
-        """Multiply the given value from this Number."""
-
-        if isinstance(other, Number):
-            self.obj_ref.number *= other.value
-        else:
-            self.obj_ref.number *= other
-
-        return self
-
-    def __itruediv__(self, other) -> Number:
-        """Divide the given value from this Number."""
-
-        if isinstance(other, Number):
-            self.obj_ref.number /= other.value
-        else:
-            self.obj_ref.number /= other
-
-        return self
-
-    def __ifloordiv__(self, other) -> Number:
-        """Divide the given value from this Number and floor."""
-
-        if isinstance(other, Number):
-            self.obj_ref.number //= other.value
-        else:
-            self.obj_ref.number //= other
-
-        return self
-
-    def __add__(self, other) -> Number:
-        """Add the value of `other` and returns the result as a Number."""
-        other_value = other.value if isinstance(other, Number) else other
-        return Number(self.value + other_value)
-
-    def __sub__(self, other) -> Number:
-        """Subtract the value of `other` and returns the result as a Number."""
-        other_value = other.value if isinstance(other, Number) else other
-        return Number(self.value - other_value)
-
-    def __mul__(self, other) -> Number:
-        """Multiply the value of `other` and returns the result as a Number."""
-        other_value = other.value if isinstance(other, Number) else other
-        return Number(self.value * other_value)
-
-    def __truediv__(self, other) -> Number:
-        other_value = other.value if isinstance(other, Number) else other
-        return Number(self.value / other_value)
-
-    def __floordiv__(self, other) -> Number:
-        other_value = other.value if isinstance(other, Number) else other
-        return Number(self.value // other_value)
-
-    def __le__(self, other) -> bool:
-        """Return `True` if this `Number` is less-than-or-equal-to `other`."""
-        other_value = other.value if isinstance(other, Number) else other
-        return self.value <= other_value
-
-    def __lt__(self, other) -> bool:
-        """Return `True` if this `Number` is less-than `other`."""
-        other_value = other.value if isinstance(other, Number) else other
-        return self.value < other_value
-
-    def __ge__(self, other) -> bool:
-        """Return `True` if this `Number` is greater-than-or-equal-to `other`."""
-        other_value = other.value if isinstance(other, Number) else other
-        return self.value >= other_value
-
-    def __gt__(self, other) -> bool:
-        """Return `True` if this `Number` is greater-than `other`."""
-        other_value = other.value if isinstance(other, Number) else other
-        return self.value > other_value
-
-    def __eq__(self, other) -> bool:
-        other_value = other.value if isinstance(other, Number) else other
-        return self.value == other_value
-
-    def __hash__(self) -> int:
-        return hash(self.value)
+        return int(self.value)
 
 
 class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
     """Simple checkbox type; represented as a boolean."""
+
+    @property
+    def value(self) -> bool | None:
+        return self.obj_ref.checkbox
 
 
 class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
@@ -304,17 +212,33 @@ class People(PropertyValue[obj_props.People], wraps=obj_props.People):
             users = [users]
         super().__init__(users)
 
+    @property
+    def value(self) -> list[User]:
+        return [User.wrap_obj_ref(user) for user in self.obj_ref.people]
+
 
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
     """URL property value."""
+
+    @property
+    def value(self) -> str | None:
+        return self.obj_ref.url
 
 
 class Email(PropertyValue[obj_props.Email], wraps=obj_props.Email):
     """Email property value."""
 
+    @property
+    def value(self) -> str | None:
+        return self.obj_ref.email
+
 
 class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
     """Phone property value."""
+
+    @property
+    def value(self) -> str | None:
+        return self.obj_ref.phone_number
 
 
 class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
@@ -325,6 +249,10 @@ class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
             files = [files]
 
         super().__init__(files)
+
+    @property
+    def value(self) -> list[File]:
+        return [File.wrap_obj_ref(file) for file in self.obj_ref.files]
 
 
 class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):

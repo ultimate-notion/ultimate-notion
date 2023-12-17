@@ -91,7 +91,7 @@ or applying a function to the contained pages using [apply]. With [select] the v
 certain columns whereas [head] (with alias [limit]) and [tail] can be used to restrict the number of rows in the view, e.g.:
 
 ```python
-task_view.select('Task', 'Status').head(3).show('simple')
+task_view.select('Task', 'Status').head(3).show(simple=True)
 ```
 
 ```console
