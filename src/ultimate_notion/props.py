@@ -165,7 +165,7 @@ class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
     @property
     def value(self) -> str | None:
         if self.obj_ref.status:
-            return self.obj_ref.status.name
+            return Option.wrap_obj_ref(self.obj_ref.status)
         else:
             return None
 

@@ -2,6 +2,7 @@
 
 ## Version 0.2
 
+- Fix: Wrong return value of PropertyType `Status.value`
 - Chg: Make `show` consistent for Page, View, PageSchema
 - Ref: Refactor `value` in `PropertyValue`
 - Ref: Reduce unnecessary funtionality of `Number`, use `value` instead
