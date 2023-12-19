@@ -266,6 +266,6 @@ def test_cleanups(notion: Session, root_page: Page, static_pages: set[Page], sta
             ancestors
             and ancestors[0] == root_page
             and page.database not in static_dbs
-            and any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
+            and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
         ):
             page.delete()

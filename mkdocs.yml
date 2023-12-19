@@ -75,6 +75,7 @@ watch:
 plugins:
   # Built-in
   search: {}
+  autorefs: {}
   # Extra
   include-markdown: {}
   glightbox: {}
@@ -96,9 +97,8 @@ plugins:
           - src
         selection:
           new_path_syntax: yes
-        rendering:
-            show_source: false  # it's not really useful in our case
         options:
+          show_source: false  # it's not really useful in our case
           docstring_style: google
           docstring_options:
             ignore_init_summary: yes
