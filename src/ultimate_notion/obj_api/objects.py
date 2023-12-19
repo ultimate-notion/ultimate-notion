@@ -40,6 +40,7 @@ class SelectOption(GenericObject):
     name: str
     id: str = None  # type: ignore  # noqa: A003  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color = Color.DEFAULT
+    description: str | None = None  # ToDo: Undocumented, could also be [RichTextObject]
 
     @classmethod
     def build(cls, name, color=Color.DEFAULT):

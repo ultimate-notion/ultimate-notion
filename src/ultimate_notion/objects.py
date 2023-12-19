@@ -26,6 +26,10 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         """Name of the option."""
         return self.obj_ref.name
 
+    def description(self) -> str:
+        """Description of the option."""
+        return self.obj_ref.description
+
     def __repr__(self) -> str:
         return get_repr(self)
 

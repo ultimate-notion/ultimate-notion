@@ -2,6 +2,7 @@
 
 ## Version 0.2
 
+- Fix: Notion API's undocumented `description` of `SelectOption` added
 - New: Navigate pages using `parent` and `children`
 - Chg: Rename `parents` to `ancestors`
 - Fix: Wrong return value of PropertyType `Status.value`
