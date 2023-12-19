@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.2
+## Version 0.2, 2023-12-19
 
 - Fix: Notion API's undocumented `description` of `SelectOption` added
 - New: Navigate pages using `parent` and `children`
@@ -10,6 +10,6 @@
 - Ref: Refactor `value` in `PropertyValue`
 - Ref: Reduce unnecessary funtionality of `Number`, use `value` instead
 
-## Version 0.1, 2023-11-16
+## Version 0.1, 2023-12-16
 
 - First official alpha release
