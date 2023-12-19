@@ -275,7 +275,12 @@ class Session:
             cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.as_list()
         ]
 
-    # ToDo: Also put blocks in the cache
-    def get_block(self, block_ref: ObjRef):
-        """Retrieve a block."""
-        return Block(obj_ref=self.api.blocks.retrieve(block_ref))
+    def _get_block(self, block_ref: ObjRef) -> Block:
+        """Retrieve a single block by an object reference."""
+        block_uuid = get_uuid(block_ref)
+        return Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
+
+    def _get_blocks(self, parent_ref: ObjRef) -> list[Block]:
+        """Retrieve all blocks of a parent block"""
+        parent_uuid = get_uuid(parent_ref)
+        return [Block.wrap_obj_ref(block) for block in self.api.blocks.children.list(parent=parent_uuid)]

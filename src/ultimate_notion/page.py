@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 import mistune
 
-from ultimate_notion.blocks import DataObject
+from ultimate_notion.blocks import Block, ChildDatabase, ChildPage, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
@@ -34,7 +34,9 @@ class PageProperty:
 class PageProperties:
     """Properties of a page as defined in the schema of the database.
 
-    Access the properties with `.property_name` or `["Property Name"]`.
+    This defines the `.props` namespace of a page `page` and updates the content
+    on the Notion server side in case of an assignment.
+    Access the properties with `page.props.property_name` or `page.props["Property Name"]`.
     """
 
     def __init__(self, page: Page):
@@ -87,6 +89,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     props: PageProperties
     _render_md = mistune.create_markdown(plugins=['strikethrough', 'url', 'task_lists', 'math'], escape=False)
+    _content: list[Block] | None = None
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Page:
@@ -114,11 +117,26 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Called by Jupyter Lab automatically to display this page."""
         return self._render_md(self.to_markdown())  # Github flavored markdown
 
-    # ToDo: Build a real hierarchy of Pages and Blocks here
-    # @property
-    # def children(self) -> List[blocks.Block]:
-    #     """Return all blocks belonging to this page"""
-    #     return list(self.session.api.blocks.children.list(parent=self.obj_ref))
+    @property
+    def content(self) -> list[Block]:
+        """Return the content of this page, i.e. all blocks belonging to this page"""
+        if self._content is None:  # generate cache
+            session = get_active_session()
+            self._content = session._get_blocks(self.id)
+
+        return self._content
+
+    @property
+    def children(self) -> list[Page | Database]:
+        """Return all contained databases and pages within this page"""
+        session = get_active_session()
+        children: list[Page | Database] = []
+        for block in self.content:
+            if isinstance(block, ChildPage):
+                children.append(session.get_page(block.id))
+            elif isinstance(block, ChildDatabase):
+                children.append(session.get_db(block.id))
+        return children
 
     @property
     def database(self) -> Database | None:
@@ -216,4 +234,5 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Reload this page."""
         session = get_active_session()
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
+        self._content = None  # this forces a new retrieval next time
         return self

@@ -8,6 +8,12 @@ To install Ultimate Notion simple run:
 pip install ultimate-notion
 ```
 
+or to install all additional dependencies, use:
+
+```console
+pip install 'ultimate-notion[all]'
+```
+
 Ultimate Notion needs at least Pyton 3.10. Depending on your system, you might need to use [pyenv], [conda], etc. to
 install a more recent version.
 

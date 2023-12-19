@@ -15,9 +15,9 @@ def test_parent(page_hierarchy):
     assert l2_page.parent.parent == root_page
 
 
-def test_parents(page_hierarchy):
+def test_ancestors(page_hierarchy: tuple[Page, ...]):
     root_page, l1_page, l2_page = page_hierarchy
-    assert l2_page.parents == (root_page, l1_page)
+    assert l2_page.ancestors == (root_page, l1_page)
 
 
 def test_delete_restore_page(notion: Session, root_page: Page):
@@ -34,3 +34,15 @@ def test_reload_page(notion: Session, root_page: Page):
     old_obj_id = id(page.obj_ref)
     page.reload()
     assert old_obj_id != id(page.obj_ref)
+
+
+def test_parent_children(notion: Session, root_page: Page):
+    parent = notion.create_page(root_page, title='Parent')
+    child1 = notion.create_page(parent, title='Child 1')
+    child2 = notion.create_page(parent, title='Child 2')
+
+    assert child1.parent == parent
+    assert child2.parent == parent
+    assert parent.children == [child1, child2]
+    assert all(isinstance(child, Page) for child in parent.children)
+    assert child1.ancestors == (root_page, parent)

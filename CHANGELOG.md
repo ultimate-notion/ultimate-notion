@@ -2,6 +2,8 @@
 
 ## Version 0.2
 
+- New: Navigate pages using `parent` and `children`
+- Chg: Rename `parents` to `ancestors`
 - Fix: Wrong return value of PropertyType `Status.value`
 - Chg: Make `show` consistent for Page, View, PageSchema
 - Ref: Refactor `value` in `PropertyValue`

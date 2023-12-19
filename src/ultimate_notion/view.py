@@ -29,7 +29,7 @@ class Col(str):
     # ToDo: Implement me, in order to allow Spark-like sorting/filtering, e.g. `Col(Name) == "Florian"` in View
 
 
-class View:  # noqa: PLR0904
+class View:
     def __init__(self, database: Database, pages: list[Page], query: DBQueryBuilder):
         self.database = database
         self._query = query

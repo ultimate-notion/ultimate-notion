@@ -107,24 +107,6 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
     def value(self) -> int | float | None:
         return self.obj_ref.number
 
-    def __float__(self) -> float:
-        """Return the Number as a `float`."""
-
-        if self.value is None:
-            msg = "Cannot convert 'None' to float"
-            raise ValueError(msg)
-
-        return float(self.value)
-
-    def __int__(self) -> int:
-        """Return the Number as an `int`."""
-
-        if self.value is None:
-            msg = "Cannot convert 'None' to int"
-            raise ValueError(msg)
-
-        return int(self.value)
-
 
 class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
     """Simple checkbox type; represented as a boolean."""

@@ -32,7 +32,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [ ] change page attributes like title, cover, icon, etc.
 - [ ] read page properties defined by a database schema
 - [ ] change page properties
-- [ ] navigate  pages using references of parent and children
+- [x] navigate pages using parent and children links
 - [ ] read the blocks within a page
 - [ ] add/remove and modify the blocks within a page
 - [x] view the content of a page as [Markdown]

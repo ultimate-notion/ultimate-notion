@@ -3,6 +3,8 @@
 Blocks are the base for all Notion content.
 """
 
+# ToDo: Clean up all the comments in here
+
 from __future__ import annotations
 
 from abc import ABC
@@ -121,37 +123,7 @@ class TextBlock(Block, ABC):
     #     return None if content is None else plain_text(*content)
 
 
-class WithChildrenMixin:
-    """Mixin for blocks that support children blocks."""
-
-    # @property
-    # def __children__(self):
-    #     """Provide short-hand access to the children in this block."""
-
-    #     return self("children")
-
-    # def __iadd__(self, block):
-    #     """Append the given block to the children of this parent in place."""
-    #     self.append(block)
-    #     return self
-
-    # def append(self, block):
-    #     """Append the given block to the children of this parent."""
-
-    #     if block is None:
-    #         raise ValueError("block cannot be None")
-
-    #     nested = self()
-
-    #     if nested.children is None:
-    #         nested.children = []
-
-    #     nested.children.append(block)
-
-    #     self.has_children = True
-
-
-class Paragraph(TextBlock, WithChildrenMixin, type='paragraph'):
+class Paragraph(TextBlock, type='paragraph'):
     """A paragraph block in Notion."""
 
     class _NestedData(GenericObject):
@@ -228,7 +200,7 @@ class Heading3(TextBlock, type='heading_3'):
     #     return ""
 
 
-class Quote(TextBlock, WithChildrenMixin, type='quote'):
+class Quote(TextBlock, type='quote'):
     """A quote block in Notion."""
 
     class _NestedData(GenericObject):
@@ -279,7 +251,7 @@ class Code(TextBlock, type='code'):
     #     return ""
 
 
-class Callout(TextBlock, WithChildrenMixin, type='callout'):
+class Callout(TextBlock, type='callout'):
     """A callout block in Notion."""
 
     class _NestedData(GenericObject):
@@ -305,7 +277,7 @@ class Callout(TextBlock, WithChildrenMixin, type='callout'):
     #     return callout
 
 
-class BulletedListItem(TextBlock, WithChildrenMixin, type='bulleted_list_item'):
+class BulletedListItem(TextBlock, type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
     class _NestedData(GenericObject):
@@ -325,7 +297,7 @@ class BulletedListItem(TextBlock, WithChildrenMixin, type='bulleted_list_item'):
     #     return ""
 
 
-class NumberedListItem(TextBlock, WithChildrenMixin, type='numbered_list_item'):
+class NumberedListItem(TextBlock, type='numbered_list_item'):
     """A numbered list item in Notion."""
 
     class _NestedData(GenericObject):
@@ -345,7 +317,7 @@ class NumberedListItem(TextBlock, WithChildrenMixin, type='numbered_list_item'):
     #     return ""
 
 
-class ToDo(TextBlock, WithChildrenMixin, type='to_do'):
+class ToDo(TextBlock, type='to_do'):
     """A todo list item in Notion."""
 
     class _NestedData(GenericObject):
@@ -387,7 +359,7 @@ class ToDo(TextBlock, WithChildrenMixin, type='to_do'):
     #     return ""
 
 
-class Toggle(TextBlock, WithChildrenMixin, type='toggle'):
+class Toggle(TextBlock, type='toggle'):
     """A toggle list item in Notion."""
 
     class _NestedData(GenericObject):
@@ -568,7 +540,7 @@ class ChildDatabase(Block, type='child_database'):
     child_database: _NestedData = _NestedData()
 
 
-class Column(Block, WithChildrenMixin, type='column'):
+class Column(Block, type='column'):
     """A column block in Notion."""
 
     class _NestedData(GenericObject):
@@ -589,7 +561,7 @@ class Column(Block, WithChildrenMixin, type='column'):
     #     return col
 
 
-class ColumnList(Block, WithChildrenMixin, type='column_list'):
+class ColumnList(Block, type='column_list'):
     """A column list block in Notion."""
 
     class _NestedData(GenericObject):
@@ -668,7 +640,7 @@ class TableRow(Block, type='table_row'):
     #     return len(self.table_row.cells) if self.table_row.cells else 0
 
 
-class Table(Block, WithChildrenMixin, type='table'):
+class Table(Block, type='table'):
     """A table block in Notion."""
 
     class _NestedData(GenericObject):
@@ -727,7 +699,7 @@ class LinkToPage(Block, type='link_to_page'):
     link_to_page: SerializeAsAny[ParentRef]
 
 
-class SyncedBlock(Block, WithChildrenMixin, type='synced_block'):
+class SyncedBlock(Block, type='synced_block'):
     """A synced_block block in Notion - either original or synced."""
 
     class _NestedData(GenericObject):
@@ -736,16 +708,8 @@ class SyncedBlock(Block, WithChildrenMixin, type='synced_block'):
 
     synced_block: _NestedData = _NestedData()
 
-    # @property
-    # def IsOriginal(self):
-    #     """Determine if this block represents the original content.
 
-    #     If this method returns `False`, the block represents the sync'ed block.
-    #     """
-    #     return self.synced_block.synced_from is None
-
-
-class Template(Block, WithChildrenMixin, type='template'):
+class Template(Block, type='template'):
     """A template block in Notion."""
 
     class _NestedData(GenericObject):

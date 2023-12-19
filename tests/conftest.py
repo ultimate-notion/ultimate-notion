@@ -256,10 +256,16 @@ def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
 def test_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]):
     """Delete all databases and pages in the root_page before we start except of some special dbs and their content"""
     for db in notion.search_db():
-        if db.parents[0] == root_page and db not in static_dbs:
+        if db.ancestors[0] == root_page and db not in static_dbs:
             db.delete()
     for page in notion.search_page():
         if page in static_pages:
             continue
-        if page.parents and page.parents[0] == root_page and page.database not in static_dbs:
+        ancestors = page.ancestors
+        if (
+            ancestors
+            and ancestors[0] == root_page
+            and page.database not in static_dbs
+            and any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
+        ):
             page.delete()

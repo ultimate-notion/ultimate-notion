@@ -23,7 +23,7 @@ pip install ultimate-notion
 or to install all additional dependencies, use:
 
 ```console
-pip install ultimate-notion[all]
+pip install 'ultimate-notion[all]'
 ```
 
 ## Usage
