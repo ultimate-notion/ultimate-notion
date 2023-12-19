@@ -28,7 +28,10 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
 
     def description(self) -> str:
         """Description of the option."""
-        return self.obj_ref.description
+        if desc := self.obj_ref.description:
+            return desc
+        else:
+            return ''
 
     def __repr__(self) -> str:
         return get_repr(self)
