@@ -148,30 +148,30 @@ class Mention(RichTextBase, wraps=objs.MentionObject):
     """A Mention object."""
 
 
-# ToDo: It would be much nicer and consistent if this class was a subclass of `str`
-class RichText(list[RichTextBase]):
+class RichText(str):
     """User-facing class holding several RichTexts."""
 
-    # ToDo: Inhereting not from a list would also get rid of this madness
-    def __new__(cls, plain_text: str, *, _factory_method: bool = False) -> RichText:
-        """Default constructor creates RichText object from a single plain text string argument."""
-        if _factory_method:
-            return super().__new__(cls)
-        else:
-            return cls.from_plain_text(plain_text)
+    rich_texts: list[RichTextBase]
 
-    def __init__(self, *args, _factory_method: bool = False):
-        if _factory_method:  # avoids the automatic call after the implicit __new__ when calling default constructor
-            super().__init__(*args)
+    def __init__(self, plain_text: str):
+        super().__init__()
+
+        rich_texts: list[RichTextBase] = []
+        for part in chunky(plain_text):
+            rich_texts.append(Text(part))
+        self.rich_texts = rich_texts
 
     @classmethod
     def wrap_obj_ref(cls, obj_refs: list[objs.RichTextObject]) -> RichText:
         rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
-        return cls(rich_texts, _factory_method=True)
+        plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
+        obj = cls(plain_text)
+        obj.rich_texts = rich_texts
+        return obj
 
     @property
     def obj_ref(self) -> list[objs.RichTextObject]:
-        return [elem.obj_ref for elem in self]
+        return [elem.obj_ref for elem in self.rich_texts]
 
     @classmethod
     def from_markdown(cls, text: str) -> RichText:
@@ -187,25 +187,23 @@ class RichText(list[RichTextBase]):
 
     @classmethod
     def from_plain_text(cls, text: str) -> RichText:
-        """Create RichTextList from plain text."""
-        rich_texts: list[RichTextBase] = []
-        for part in chunky(text):
-            rich_texts.append(Text(part))
+        """Create RichTextList from plain text.
 
-        return cls(rich_texts, _factory_method=True)
+        This method is a more explicit alias for the default constructor
+        """
+        return cls(text)
 
     def to_plain_text(self) -> str:
-        """Return rich text as plaintext"""
-        return ''.join(text.plain_text for text in self.obj_ref if text)
+        """Return rich text as plaintext
+
+        This method is a more explicit variant then just using the object.
+        """
+        return str(self)
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this text."""
         # ToDo: Later use Markdown output.
         return self.to_plain_text()
-
-    def __str__(self) -> str:
-        plain_text = self.to_plain_text()
-        return plain_text if plain_text is not None else ''
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, str):

@@ -1,4 +1,4 @@
-"""Ultimate Notion provides a pythonic, high-level API for Notion
+"""Ultimate Notion provides a pythonic, high-level API for Notion.
 
 Notion-API: https://developers.notion.com/reference/intro
 """

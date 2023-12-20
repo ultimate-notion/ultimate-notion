@@ -65,7 +65,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
         return get_repr(self)
 
     def __str__(self) -> str:
-        if isinstance(self.value, RichText):  # note that `RichText` is also a list but implements it's own __str__
+        if isinstance(self.value, RichText):
             return str(self.value) if self.value else ''
         elif isinstance(self.value, list):
             # workaround as `str` on lists calls `repr` instead of `str`
@@ -80,7 +80,7 @@ class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     def __init__(self, text: str | RichText):
         if isinstance(text, str):
             text = RichText.from_plain_text(text)
-        super().__init__(text)
+        super().__init__(text.obj_ref)
 
     @property
     def value(self) -> RichText:
@@ -93,7 +93,7 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
     def __init__(self, text: str | RichText):
         if isinstance(text, str):
             text = RichText.from_plain_text(text)
-        super().__init__(text)
+        super().__init__(text.obj_ref)
 
     @property
     def value(self) -> RichText:

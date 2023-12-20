@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.3
+
+- Chg: `RichText` is now a subtype of `str` for more convenient & consistent usage
+
 ## Version 0.2, 2023-12-19
 
 - Fix: Notion API's undocumented `description` of `SelectOption` added

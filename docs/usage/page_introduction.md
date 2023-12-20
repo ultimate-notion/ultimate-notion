@@ -94,9 +94,9 @@ f'Task "{task.title}" was {task.props["Status"]} on {task.props["Due Date"]}'
 ## Working with properties
 
 The properties of a page are all subclasses of [PropertyValue] and each provides a `value` attribute to
-access the actual low-level Python object. The only exception to this rule are textual column types
-and thus page properties like [Title], [Text], etc. as those will return a [RichText] object, which
-can be converted to a sring using the `str()` function or the `to_plain_text()` method.
+access the actual low-level Python object like `int`, `float`, `datetime`, the `str` subtype [RichText]
+and so on. There are a few excpetions though like [Select], [MultiSelect] and [Status] where value will
+return an [Option] object given you access to its name, color and description.
 
 To change a page property, we can just assign a new value to the corresponding [PropertyValue]. This
 is possible with the corresponding property value from the `value` attribute but also using the
@@ -152,7 +152,8 @@ task.props.status = options['In Progress']
 [SList]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList
 [item]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList.item
 [PropertyValue]: ../../reference/ultimate_notion/props/#ultimate_notion.props.PropertyValue
-[Title]: ../../reference/ultimate_notion/props/#ultimate_notion.props.Title
-[Text]: ../../reference/ultimate_notion/props/#ultimate_notion.props.Text
 [RichText]: ../../reference/ultimate_notion/objects/#ultimate_notion.objects.RichText
 [Option]: ../../reference/ultimate_notion/objects/#ultimate_notion.objects.Option
+[Select]: ../../reference/ultimate_notion/props/#ultimate_notion.props.Select
+[MultiSelect]: ../../reference/ultimate_notion/props/#ultimate_notion.props.MultiSelect
+[Status]: ../../reference/ultimate_notion/props/#ultimate_notion.props.Status
