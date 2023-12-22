@@ -80,9 +80,7 @@ def test_icon_attr(notion: Session, root_page: Page):
 
     new_page.icon = None
     new_page.reload()
-    # ToDo: Fix as the icon is not deleted, bug in the API?
-    # https://github.com/ramnes/notion-sdk-py/discussions/128
-    # assert new_page.icon is None
+    assert new_page.icon is None
 
 
 def test_cover_attr(notion: Session, root_page: Page):
@@ -94,15 +92,13 @@ def test_cover_attr(notion: Session, root_page: Page):
     assert isinstance(new_page.cover, File)
     assert new_page.cover == cover_file
 
-    new_page.icon = File(url=cover_file)
-    assert isinstance(new_page.icon, File)
-    assert new_page.icon == cover_file
+    new_page.cover = File(url=cover_file)
+    assert isinstance(new_page.cover, File)
+    assert new_page.cover == cover_file
 
     new_page.reload()
     assert new_page.cover == File(url=cover_file)
 
     new_page.cover = None
     new_page.reload()
-    # ToDo: Fix as the cover is not deleted, bug in the API?
-    # https://github.com/ramnes/notion-sdk-py/discussions/128
-    # assert new_page.cover is None
+    assert new_page.cover is None

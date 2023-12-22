@@ -70,7 +70,7 @@ new_page.cover = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
 
 This is how *My DB* looks right now.
 
-![Notion My DB](../assets/images/notion-my-db.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion My DB](../assets/images/notion-my-db.png){: style="width:500px; display:block; margin-left:auto; margin-right:auto;"}
 
 But how can I figure out which keyword arguments to pass to [create_page]? For this we can take a look at the [schema]
 of the database, which also allows us to create new pages in a neat way. As our database holds *tools*, we can express

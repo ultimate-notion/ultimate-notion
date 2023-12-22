@@ -71,7 +71,6 @@ Some features that the Notion UI provides are not possible to implement due to l
   is currently accepted but only a one-way relation created, which seems to be a bug.
 - uploading files as icons or in general uploading files.
 - setting the icon and cover of a database.
-- removing the icon and cover of a page as sending a `null` is just ignored as shown [here].
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
