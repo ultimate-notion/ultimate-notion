@@ -1,6 +1,6 @@
 ---
 name: "💡 Feature Request"
-about: Suggest a feature for Ultimate Notion
+about: Suggest a feature for Ultimate Notion.
 title: "💡 [REQUEST] - <title>"
 labels: ["enhancement"]
 ---
