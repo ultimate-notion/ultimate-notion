@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, cast
 
 import mistune
+from emoji import is_emoji
 
 from ultimate_notion.blocks import Block, ChildDatabase, ChildPage, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -173,6 +174,15 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             msg = f'unknown icon object of {type(icon)}'
             raise RuntimeError(msg)
 
+    @icon.setter
+    def icon(self, icon: File | Emoji | str | None):
+        """Set the icon of this page."""
+        if isinstance(icon, str) and not isinstance(icon, Emoji):
+            icon = Emoji(icon) if is_emoji(icon) else File(url=icon, name=None)
+        icon_obj = None if icon is None else icon.obj_ref
+        session = get_active_session()
+        session.api.pages.set_attr(self.obj_ref, icon=icon_obj)
+
     @property
     def cover(self) -> File | None:
         """Cover of the page."""
@@ -184,6 +194,15 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         else:
             msg = f'unknown cover object of {type(cover)}'
             raise RuntimeError(msg)
+
+    @cover.setter
+    def cover(self, cover: File | str | None):
+        """Set the cover fo this page."""
+        if isinstance(cover, str):
+            cover = File(url=cover, name=None)
+        cover_obj = None if cover is None else cover.obj_ref
+        session = get_active_session()
+        session.api.pages.set_attr(self.obj_ref, cover=cover_obj)
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown."""

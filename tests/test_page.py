@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ultimate_notion import Page, Session
+from ultimate_notion import Emoji, File, Page, Session
 
 
 def test_parent(page_hierarchy):
@@ -46,3 +46,63 @@ def test_parent_children(notion: Session, root_page: Page):
     assert parent.children == [child1, child2]
     assert all(isinstance(child, Page) for child in parent.children)
     assert child1.ancestors == (root_page, parent)
+
+
+def test_icon_attr(notion: Session, root_page: Page):
+    new_page = notion.create_page(parent=root_page, title='My new page with icon')
+
+    assert new_page.icon is None
+    emoji_icon = '🐍'
+    new_page.icon = emoji_icon  # type: ignore[assignment] # test automatic conversation
+    assert isinstance(new_page.icon, Emoji)
+    assert new_page.icon == emoji_icon
+
+    new_page.icon = Emoji(emoji_icon)
+    assert isinstance(new_page.icon, Emoji)
+    assert new_page.icon == emoji_icon
+
+    # clear cache and retrieve the database again to be sure it was udpated on the server side
+    del notion.cache[new_page.id]
+    new_page = notion.get_page(new_page.id)
+    assert new_page.icon == Emoji(emoji_icon)
+
+    notion_icon = 'https://www.notion.so/icons/snake_purple.svg'
+    new_page.icon = notion_icon  # test automatic conversation
+    assert isinstance(new_page.icon, File)
+    assert new_page.icon == notion_icon
+
+    new_page.icon = File(url=notion_icon)
+    assert isinstance(new_page.icon, File)
+    assert new_page.icon == notion_icon
+
+    new_page.reload()
+    assert new_page.icon == File(url=notion_icon)
+
+    new_page.icon = None
+    new_page.reload()
+    # ToDo: Fix as the icon is not deleted, bug in the API?
+    # https://github.com/ramnes/notion-sdk-py/discussions/128
+    # assert new_page.icon is None
+
+
+def test_cover_attr(notion: Session, root_page: Page):
+    new_page = notion.create_page(parent=root_page, title='My new page with cover')
+
+    assert new_page.cover is None
+    cover_file = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
+    new_page.cover = cover_file  # type: ignore[assignment] # test automatic conversation
+    assert isinstance(new_page.cover, File)
+    assert new_page.cover == cover_file
+
+    new_page.icon = File(url=cover_file)
+    assert isinstance(new_page.icon, File)
+    assert new_page.icon == cover_file
+
+    new_page.reload()
+    assert new_page.cover == File(url=cover_file)
+
+    new_page.cover = None
+    new_page.reload()
+    # ToDo: Fix as the cover is not deleted, bug in the API?
+    # https://github.com/ramnes/notion-sdk-py/discussions/128
+    # assert new_page.cover is None

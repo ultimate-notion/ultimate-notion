@@ -42,7 +42,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def created_time(self) -> datetime:
         return self.obj_ref.created_time
 
-    # ToDo: Resolve here
+    # ToDo: Resolve here and convert to high-level object
     @property
     def created_by(self):
         return self.obj_ref.created_by
@@ -51,7 +51,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def last_edited_time(self) -> datetime:
         return self.obj_ref.last_edited_time
 
-    # ToDo: Resolve here
+    # ToDo: Resolve here and convert to high-level object
     @property
     def last_edited_by(self):
         return self.obj_ref.last_edited_by

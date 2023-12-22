@@ -38,6 +38,66 @@ The [Database object] provides access to many attributes like [title], [icon], [
 assert contacts_db.description == 'Database of all my contacts!'
 ```
 
+## Creating a database and adding pages
+
+A simple database with the default columns `Name` for the title of pages and the Multi-select column `Tags`,
+can be created using [create_db]. To tell Notion where to put the database, we have to provide an existing page.
+Let's assume we have a page called `Tests`, which is shared with our integration:
+
+```python
+root_page = notion.search_page('Tests').item()
+my_db = notion.create_db(parent=root_page)
+```
+
+Using the `my_db` object, we can now set its attributes, e.g.:
+
+```python
+my_db.title = 'My DB'
+my_db.description = 'This is my database for cool Python libraries!'
+```
+
+!!! info
+    Unfortunately, the Notion API does not support setting the *icon* or the *cover* of a database.
+
+We can now simple add a new page to this database and set some attributes:
+
+```python
+new_page = my_db.create_page(name='Ultimate Notion')
+new_page.description = 'Notes about Ultimate Notion'
+new_page.icon = '🚀'
+new_page.cover = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
+```
+
+This is how *My DB* looks right now.
+
+![Notion My DB](../assets/images/notion-my-db.png){: style="width:400px; display:block; margin-left:auto; margin-right:auto;"}
+
+But how can I figure out which keyword arguments to pass to [create_page]? For this we can take a look at the [schema]
+of the database, which also allows us to create new pages in a neat way. As our database holds *tools*, we can express
+this by naming the variable for the schema accordingly. An example illustrates this:
+
+```python
+Tool = my_db.schema
+Tool.show()
+```
+
+This shows us that our database has two columns `Name` and `Tags` as well as the name of the arguments for [create_page].
+
+```console
+Name    Property     Attribute
+------  -----------  -----------
+Tags    MultiSelect  tags
+Name    Title        name
+```
+
+A new page can now also be created using `Tool`, i.e.
+
+```python
+new_tool = Tool.create(name='Ultimate Notion')
+```
+
+This is basically just an alias for [create_page] but can make your code much more expressive.
+
 ## Viewing the pages of a database
 
 Assume we have a simple database listing tasks like this:
@@ -128,3 +188,5 @@ keep in mind that some methods are just stubs.
 [head]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.head
 [limit]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.limit
 [tail]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.tail
+[create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
+[create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page

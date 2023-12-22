@@ -107,9 +107,11 @@ def test_title_setter(notion: Session, article_db: Database):
 
 def test_description_setter(notion: Session, article_db: Database):
     assert article_db.description == ''
+
     new_description = 'My most favorite articles'
     article_db.description = new_description  # type: ignore
     assert article_db.description == new_description
+
     # clear cache and retrieve the database again to be sure it was udpated on the server side
     del notion.cache[article_db.id]
     article_db = notion.get_db(article_db.id)
@@ -135,4 +137,5 @@ def test_reload_db(notion: Session, root_page: Page):
 
 
 def test_new_task_db(new_task_db: Database):
+    # ToDo: Implement a proper test
     pass

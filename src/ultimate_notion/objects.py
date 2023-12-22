@@ -81,8 +81,19 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref = obj_ref
         return self
 
-    def __init__(self, url: str) -> None:
-        self.obj_ref = objs.ExternalFile.build(url=url, name=url)
+    def __init__(self, *, url: str, name: str | None = None) -> None:
+        self.obj_ref = objs.ExternalFile.build(url=url, name=name)
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return str(self) == other
+        elif isinstance(other, File):
+            return str(self) == str(other)
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(str(self))
 
     def __repr__(self) -> str:
         return get_repr(self)
@@ -109,14 +120,28 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
             raise RuntimeError(msg)
 
 
-class Emoji(Wrapper[objs.EmojiObject], wraps=objs.EmojiObject):
-    """Emoji object"""
+class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
+    """Emoji object which behaves like str."""
+
+    def __init__(self, emoji: str) -> None:
+        self.obj_ref = objs.EmojiObject.build(emoji)
 
     def __repr__(self) -> str:
         return get_repr(self)
 
     def __str__(self) -> str:
         return self.obj_ref.emoji
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return str(self) == other
+        elif isinstance(other, Emoji):
+            return str(self) == str(other)
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(str(self))
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this file."""

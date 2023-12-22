@@ -438,13 +438,14 @@ class PagesEndpoint(Endpoint):
 
         return page.update(**data)
 
-    def set_attr(self, page: Page, *, cover=False, icon=False, archived=None):
+    def set_attr(self, page: Page, *, cover=False, icon=False, archived: bool | None = None):
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
         `page` may be any suitable `PageRef` type.
 
         To remove an attribute, set its value to None.
         """
+        # ToDo: Misusing `False` here as an UNSET is just bad style. Do it differently. Have a `del_attr` additionally?
 
         page_id = PageRef.build(page).page_id
 
@@ -452,14 +453,14 @@ class PagesEndpoint(Endpoint):
 
         if cover is None:
             logger.info('Removing page cover :: %s', page_id)
-            props['cover'] = {}
+            props['cover'] = None
         elif cover is not False:
             logger.info('Setting page cover :: %s => %s', page_id, cover)
             props['cover'] = cover.serialize_for_api()
 
         if icon is None:
             logger.info('Removing page icon :: %s', page_id)
-            props['icon'] = {}
+            props['icon'] = None
         elif icon is not False:
             logger.info('Setting page icon :: %s => %s', page_id, icon)
             props['icon'] = icon.serialize_for_api()

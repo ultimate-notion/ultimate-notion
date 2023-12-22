@@ -9,7 +9,7 @@ from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.query import DBQueryBuilder
-from ultimate_notion.objects import File, RichText
+from ultimate_notion.objects import Emoji, File, RichText
 from ultimate_notion.page import Page
 from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
 from ultimate_notion.text import camel_case, snake_case
@@ -69,14 +69,17 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session.api.databases.update(self.obj_ref, description=text.obj_ref)
 
     @property
-    def icon(self) -> File | str | None:
+    def icon(self) -> File | Emoji | None:
         icon = self.obj_ref.icon
         if isinstance(icon, objs.FileObject):
             return File.wrap_obj_ref(icon)
         elif isinstance(icon, objs.EmojiObject):
-            return icon.emoji
-        else:
+            return Emoji.wrap_obj_ref(icon)
+        elif icon is None:
             return None
+        else:
+            msg = f'unknown icon object of {type(icon)}'
+            raise RuntimeError(msg)
 
     @property
     def cover(self) -> File | None:

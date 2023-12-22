@@ -14,9 +14,9 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] create a new database with a given schema, i.e. columns and their types
 - [x] delete/archive and restore/unarchive a database
 - [ ] update a database schema, i.e. adding/removing columns or changing their types
-- [ ] change the properties of database columns, e.g. name, formula of formula column, etc.
+- [ ] change the properties of database columns, e.g. name, formula of formula column, options, etc.
 - [x] read the database attributes like title, description, cover, icon, etc.
-- [ ] change database attributes like title, description, cover, icon, etc.
+- [x] change database attributes like title, description, etc.
 - [x] retrieve all pages of a database
 - [ ] query with filters and sortings to retrieve only specific pages
 - [x] display the content of a database as a table, e.g. in [Jupyter Lab]
@@ -28,10 +28,10 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] search for a page by its title
 - [x] create a new page
 - [x] delete/archive and restore/unarchive a page
-- [ ] read page attributes like title, cover, icon, etc.
-- [ ] change page attributes like title, cover, icon, etc.
-- [ ] read page properties defined by a database schema
-- [ ] change page properties
+- [x] read page attributes like title, cover, icon, etc.
+- [x] change page attributes like title, cover, icon, etc.
+- [x] read page properties defined by a database schema
+- [x] change page properties
 - [x] navigate pages using parent and children links
 - [ ] read the blocks within a page
 - [ ] add/remove and modify the blocks within a page
@@ -39,7 +39,6 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Blocks
 
-- [ ] retrieve a block by its ID
 - [ ] navigate blocks using references of parent and children
 - [ ] create blocks within a page or another block
 - [ ] modify blocks
@@ -70,7 +69,9 @@ Some features that the Notion UI provides are not possible to implement due to l
 - referencing in a formula expression another formula column, e.g. `prop("other formula")`. Use substitution instead.
 - creating a two-way relation with the same source and target database, i.e. self-referencing. The update database call
   is currently accepted but only a one-way relation created, which seems to be a bug.
-- uploading files as icons or in general.
+- uploading files as icons or in general uploading files.
+- setting the icon and cover of a database.
+- removing the icon and cover of a page as sending a `null` is just ignored as shown [here].
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
@@ -80,3 +81,4 @@ If you think those limitations should be fixed, [let the developers of Notion kn
 [Verification]: https://developers.notion.com/reference/page-property-values#verification
 [Wiki database]: https://developers.notion.com/docs/working-with-databases#wiki-databases
 [updating the database schema]: https://developers.notion.com/reference/update-a-database#errors
+[here]: https://github.com/ramnes/notion-sdk-py/discussions/128

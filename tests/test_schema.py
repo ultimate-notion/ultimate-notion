@@ -80,7 +80,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
         'checkbox': props.Checkbox(True),
         'date': props.Date(datetime.now(tz=timezone.utc).date()),
         'email': props.Email('email@provider.com'),
-        'files': props.Files([File('https://...')]),
+        'files': props.Files([File(name='My File', url='https://...')]),
         'multi_select': props.MultiSelect(options[0]),
         'number': props.Number(42),
         'people': props.People(user),
