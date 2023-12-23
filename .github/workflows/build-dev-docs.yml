@@ -36,7 +36,9 @@ jobs:
       run: python -m pip install --upgrade pip
 
     - name: Install Hatch & pre-commit
-      run: pip install --upgrade hatch hatch-vcs pre-commit
+      run: |
+        pip install --upgrade hatch hatch-vcs pre-commit
+        pip list
 
     - name: Configure Git for GitHub Actions bot
       run: |

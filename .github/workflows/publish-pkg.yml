@@ -29,7 +29,9 @@ jobs:
           fetch-depth: 0
 
       - name: Install Hatch & pre-commit
-        run: pip install --upgrade hatch hatch-vcs pre-commit
+        run: |
+          pip install --upgrade hatch hatch-vcs pre-commit
+          pip list
 
       - name: Build distributions
         run: hatch build

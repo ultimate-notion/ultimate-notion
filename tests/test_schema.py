@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import cast
 
 import pytest
 
@@ -60,12 +59,14 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     with pytest.raises(ReadOnlyColumnError):
         SchemaB.create(last_edited_time=datetime.now(tz=timezone.utc))
 
-    user = next(user for user in notion.all_users() if user.is_person)
-    with pytest.raises(ReadOnlyColumnError):
-        SchemaB.create(created_by=user)
+    florian = notion.search_user('Florian Wilhelm').item()
+    myself = notion.whoami()
 
     with pytest.raises(ReadOnlyColumnError):
-        SchemaB.create(last_edited_by=user)
+        SchemaB.create(created_by=myself)
+
+    with pytest.raises(ReadOnlyColumnError):
+        SchemaB.create(last_edited_by=myself)
 
     with pytest.raises(ReadOnlyColumnError):
         SchemaB.create(formula=3)
@@ -76,14 +77,14 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     a_item1 = db_a.create_page(name='Item 1')
     a_item2 = db_a.create_page(name='Item 2')
 
-    kwargs = {
+    kwargs: dict[str, PropertyValue] = {
         'checkbox': props.Checkbox(True),
         'date': props.Date(datetime.now(tz=timezone.utc).date()),
         'email': props.Email('email@provider.com'),
         'files': props.Files([File(name='My File', url='https://...')]),
         'multi_select': props.MultiSelect(options[0]),
         'number': props.Number(42),
-        'people': props.People(user),
+        'people': props.People(florian),
         'phone_number': props.PhoneNumber('+1 234 567 890'),
         'relation': props.Relations([a_item1, a_item2]),
         'relation_twoway': props.Relations([a_item1, a_item2]),
@@ -102,7 +103,7 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     b_item1 = db_b.create_page(**kwargs)
 
     # creating a page using raw Python types using the Schema directly
-    b_item2 = SchemaB.create(**{kwarg: cast(PropertyValue, prop_value).value for kwarg, prop_value in kwargs.items()})
+    b_item2 = SchemaB.create(**{kwarg: prop_value.value for kwarg, prop_value in kwargs.items()})
 
     for item in (b_item1, b_item2):
         for kwarg, prop in kwargs.items():

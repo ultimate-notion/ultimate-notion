@@ -196,7 +196,8 @@ class People(PropertyValue[obj_props.People], wraps=obj_props.People):
 
     @property
     def value(self) -> list[User]:
-        return [User.wrap_obj_ref(user) for user in self.obj_ref.people]
+        session = get_active_session()
+        return [session.get_user(user.id) for user in self.obj_ref.people]
 
 
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):

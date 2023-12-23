@@ -5,13 +5,20 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import date as dt_date
 from datetime import datetime
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
-from pydantic import SerializeAsAny, field_validator
+from pydantic import SerializeAsAny, field_validator, model_serializer
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject
 from ultimate_notion.obj_api.enums import VState
-from ultimate_notion.obj_api.objects import DateRange, FileObject, ObjectReference, RichTextObject, TypedObject, User
+from ultimate_notion.obj_api.objects import (
+    DateRange,
+    FileObject,
+    ObjectReference,
+    RichTextObject,
+    TypedObject,
+    User,
+)
 from ultimate_notion.obj_api.schema import AggFunc, SelectOption
 
 #: Notion's complex `Date` type, which is either a date or without time or a date range of the former.
@@ -88,7 +95,13 @@ class MultiSelect(PropertyValue, type='multi_select'):
 class People(PropertyValue, type='people'):
     """Notion people type."""
 
-    people: list[SerializeAsAny[User]] = None  # type: ignore
+    people: list[User] = None  # type: ignore
+
+    # Custom serializer as we receive various UserRef subtypes but need to pass
+    # a proper UserRef to the Notion API. It's just so inconsistent!
+    @model_serializer
+    def serialize(self) -> dict[str, Any]:
+        return {'people': [{'id': user.id, 'object': user.object} for user in self.people]}
 
 
 class URL(PropertyValue, type='url'):
