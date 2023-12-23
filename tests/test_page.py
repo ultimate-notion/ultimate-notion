@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ultimate_notion import Emoji, File, Page, Session
+from ultimate_notion import Emoji, File, Page, RichText, Session
 
 
 def test_parent(page_hierarchy):
@@ -102,3 +102,29 @@ def test_cover_attr(notion: Session, root_page: Page):
     new_page.cover = None
     new_page.reload()
     assert new_page.cover is None
+
+
+def test_title_attr(notion: Session, root_page: Page):
+    new_page = notion.create_page(parent=root_page)
+
+    assert new_page.title == ''
+
+    title = 'My new title'
+    new_page.title = title  # type: ignore[assignment] # test automatic conversation
+    assert isinstance(new_page.title, RichText)
+    assert new_page.title == title
+
+    new_page.title = RichText(title)
+    assert isinstance(new_page.title, RichText)
+    assert new_page.title == title
+
+    new_page.reload()
+    assert new_page.title == RichText(title)
+
+    new_page.title = None  # type: ignore[assignment]
+    new_page.reload()
+    assert new_page.title == ''
+
+    new_page.title = ''  # type: ignore[assignment]
+    new_page.reload()
+    assert new_page.title == ''

@@ -6,6 +6,7 @@
 - Docs: Added more documentation about using databases.
 - Chg: `icon` attribute of database now returns `Emoji` instead of `str`.
 - New: Allow setting the `icon` and `cover` attribute of a page.
+- New: Allow setting the `title` of a non-database page.
 
 ## Version 0.2, 2023-12-19
 

@@ -149,16 +149,32 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         else:
             return None
 
-    @property
-    def title(self) -> RichText:
-        """Title of the page"""
+    def _get_title_col_name(self) -> str:
+        """Get the name of the title property."""
         # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
-        for prop in self.obj_ref.properties.values():
+        for name, prop in self.obj_ref.properties.items():
             if prop.id == 'title':
-                title = cast(Title, PropertyValue.wrap_obj_ref(prop))
-                return title.value
+                return name
         msg = 'Encountered a page without title property'
         raise RuntimeError(msg)
+
+    @property
+    def title(self) -> RichText:
+        """Title of the page."""
+        title_prop_name = self._get_title_col_name()
+        title_prop = self.obj_ref.properties[title_prop_name]
+        title = cast(Title, PropertyValue.wrap_obj_ref(title_prop))
+        return title.value
+
+    @title.setter
+    def title(self, text: RichText | str | None):
+        """Set the title of the page."""
+        if text is None:
+            text = ''
+        title = Title(text)
+        title_prop_name = self._get_title_col_name()
+        session = get_active_session()
+        session.api.pages.update(self.obj_ref, **{title_prop_name: title.obj_ref})
 
     @property
     def icon(self) -> File | Emoji | None:
