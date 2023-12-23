@@ -8,14 +8,23 @@ is just referred to as `raw_api`.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias, cast
 from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
-from ultimate_notion.obj_api.objects import DatabaseRef, ObjectReference, PageRef, ParentRef, RichTextObject, User
+from ultimate_notion.obj_api.objects import (
+    DatabaseRef,
+    EmojiObject,
+    FileObject,
+    ObjectReference,
+    PageRef,
+    ParentRef,
+    RichTextObject,
+    User,
+)
 from ultimate_notion.obj_api.props import PropertyItem, Title
 from ultimate_notion.obj_api.query import DBQueryBuilder, SearchQueryBuilder
 from ultimate_notion.obj_api.schema import PropertyType
@@ -27,6 +36,8 @@ if TYPE_CHECKING:
     from notion_client.api_endpoints import DatabasesEndpoint as NCDatabasesEndpoint
 
 logger = logging.getLogger(__name__)
+T_UNSET: TypeAlias = Literal['UNSET']
+UNSET: T_UNSET = 'UNSET'
 
 
 class SessionError(Exception):
@@ -438,39 +449,48 @@ class PagesEndpoint(Endpoint):
 
         return page.update(**data)
 
-    def set_attr(self, page: Page, *, cover=False, icon=False, archived: bool | None = None):
+    def set_attr(
+        self,
+        page: Page,
+        *,
+        cover: FileObject | None | T_UNSET = UNSET,
+        icon: FileObject | EmojiObject | None | T_UNSET = UNSET,
+        archived: bool | T_UNSET = UNSET,
+    ):
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
         `page` may be any suitable `PageRef` type.
 
         To remove an attribute, set its value to None.
         """
-        # ToDo: Misusing `False` here as an UNSET is just bad style. Do it differently. Have a `del_attr` additionally?
 
         page_id = PageRef.build(page).page_id
 
         props: dict[str, Any] = {}
 
-        if cover is None:
-            logger.info('Removing page cover :: %s', page_id)
-            props['cover'] = None
-        elif cover is not False:
-            logger.info('Setting page cover :: %s => %s', page_id, cover)
-            props['cover'] = cover.serialize_for_api()
+        if cover is not UNSET:
+            if cover is None:
+                logger.info('Removing page cover :: %s', page_id)
+                props['cover'] = None
+            else:
+                logger.info('Setting page cover :: %s => %s', page_id, cover)
+                props['cover'] = cover.serialize_for_api()  # type: ignore[union-attr]
 
-        if icon is None:
-            logger.info('Removing page icon :: %s', page_id)
-            props['icon'] = None
-        elif icon is not False:
-            logger.info('Setting page icon :: %s => %s', page_id, icon)
-            props['icon'] = icon.serialize_for_api()
+        if icon is not UNSET:
+            if icon is None:
+                logger.info('Removing page icon :: %s', page_id)
+                props['icon'] = None
+            else:
+                logger.info('Setting page icon :: %s => %s', page_id, icon)
+                props['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
 
-        if archived is False:
-            logger.info('Restoring page :: %s', page_id)
-            props['archived'] = False
-        elif archived is True:
-            logger.info('Archiving page :: %s', page_id)
-            props['archived'] = True
+        if archived is not UNSET:
+            if archived:
+                logger.info('Archiving page :: %s', page_id)
+                props['archived'] = True
+            else:
+                logger.info('Restoring page :: %s', page_id)
+                props['archived'] = False
 
         data = self.raw_api.update(page_id.hex, **props)
 
