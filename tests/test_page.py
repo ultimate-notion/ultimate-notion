@@ -128,3 +128,10 @@ def test_title_attr(notion: Session, root_page: Page):
     new_page.title = ''  # type: ignore[assignment]
     new_page.reload()
     assert new_page.title == ''
+
+
+def test_created_edited_by(notion: Session, root_page: Page):
+    myself = notion.whoami()
+    florian = notion.search_user('Florian Wilhelm').item()
+    assert root_page.created_by == florian
+    assert myself == root_page.last_edited_by

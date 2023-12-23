@@ -3,17 +3,15 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, TypeVar
+from typing import TypeVar
 from uuid import UUID
 
 from notion_client.helpers import get_url
 
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.objects import User
 from ultimate_notion.utils import Wrapper, get_active_session
-
-if TYPE_CHECKING:
-    pass
 
 # Todo: Move the functionality from the PyDantic types in here, i.e. the currenctly commented code
 T = TypeVar('T', bound=obj_blocks.DataObject)
@@ -42,19 +40,19 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def created_time(self) -> datetime:
         return self.obj_ref.created_time
 
-    # ToDo: Resolve here and convert to high-level object
     @property
-    def created_by(self):
-        return self.obj_ref.created_by
+    def created_by(self) -> User:
+        session = get_active_session()
+        return session.get_user(self.obj_ref.created_by.id)
 
     @property
     def last_edited_time(self) -> datetime:
         return self.obj_ref.last_edited_time
 
-    # ToDo: Resolve here and convert to high-level object
     @property
-    def last_edited_by(self):
-        return self.obj_ref.last_edited_by
+    def last_edited_by(self) -> User:
+        session = get_active_session()
+        return session.get_user(self.obj_ref.last_edited_by.id)
 
     @property
     def parent(self) -> DataObject | None:

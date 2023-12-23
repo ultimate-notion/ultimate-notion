@@ -7,6 +7,7 @@
 - Chg: `icon` attribute of database now returns `Emoji` instead of `str`.
 - New: Allow setting the `icon` and `cover` attribute of a page.
 - New: Allow setting the `title` of a non-database page.
+- Fix: `created_by` and `last_edited_by` return proper `User` object.
 
 ## Version 0.2, 2023-12-19
 

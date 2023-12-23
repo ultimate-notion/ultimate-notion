@@ -256,6 +256,7 @@ class Session:
         return page
 
     def get_user(self, user_ref: ObjRef, *, use_cache: bool = True) -> User:
+        """Get a user by id"""
         user_uuid = get_uuid(user_ref)
         if use_cache and user_uuid in self.cache:
             return cast(User, self.cache[user_uuid])
@@ -263,6 +264,10 @@ class Session:
             user = User.wrap_obj_ref(self.api.users.retrieve(user_uuid))
             self.cache[user.id] = user
             return user
+
+    def search_user(self, name: str) -> SList[User]:
+        """Search a user by name"""
+        return SList(user for user in self.all_users() if user.name == name)
 
     def whoami(self) -> User:
         """Return the user object of this bot."""

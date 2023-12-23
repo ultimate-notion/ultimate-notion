@@ -95,7 +95,7 @@ def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[
     mask = np.isin(total_set, elements)
     indices = np.where(mask)[0]
     lookup = dict(zip(total_set[mask], indices, strict=True))
-    result = np.array([lookup.get(x, None) for x in elements])
+    result = np.array([lookup.get(x) for x in elements])
     return result
 
 
