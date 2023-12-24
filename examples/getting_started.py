@@ -8,7 +8,7 @@ PAGE_TITLE = "Getting Started"
 
 with uno.Session(auth=TOKEN) as notion:
     page = notion.search_page(PAGE_TITLE).item()
-    print(page.show())
+    page.show()
 
 # Alternatively, without a context manager:
 notion = uno.Session.get_or_create(auth=TOKEN)
@@ -16,5 +16,5 @@ notion = uno.Session.get_or_create(auth=TOKEN)
 # notion = Session.get_or_create()
 # which also works for the context manager
 page = notion.search_page(PAGE_TITLE).item()
-print(page.show())
+page.show()
 notion.close()

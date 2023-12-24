@@ -30,6 +30,23 @@ T = TypeVar('T')
 Yield: TypeAlias = Generator[T, None, None]
 
 
+class VCRManager:
+    """Singelton for the VCR instance"""
+
+    _vcr_instance: VCR = None
+
+    @classmethod
+    def set_vcr(cls, vcr_instance: VCR):
+        cls._vcr_instance = vcr_instance
+
+    @classmethod
+    def get_vcr(cls) -> VCR:
+        if cls._vcr_instance is None:
+            msg = 'VCR instance not set. Please call set_vcr first.'
+            raise ValueError(msg)
+        return cls._vcr_instance
+
+
 @pytest.fixture(scope='session')
 def vcr_config():
     """Configure pytest-recording."""
@@ -48,7 +65,7 @@ def vcr_config():
 
 
 @pytest.fixture(scope='session')
-def my_vcr(vcr_config) -> VCR:
+def my_vcr(vcr_config) -> VCRManager:
     """My VCR for fixtures"""
     cfg = vcr_config | {'cassette_library_dir': 'tests/cassettes/conftest'}
     my_vcr = VCR(**cfg)
@@ -62,7 +79,9 @@ def remove_page_id_for_matches(r1, r2):
 
 
 def pytest_recording_configure(config, vcr):
+    """This hook is only called when @pytest.mark.vcr is used"""
     vcr.register_matcher('remove_page_id_for_matches', remove_page_id_for_matches)
+    VCRManager.set_vcr(vcr)  # register the vcr instance of pytest-recording globally
 
 
 @pytest.fixture(scope='session')
