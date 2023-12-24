@@ -232,7 +232,7 @@ dependencies = [
     "pytest",
     "pytest-cov",
     "pytest-mock",
-    "pytest-vcr",
+    "pytest-recording",
     "pytest-env",
     "pytest-sugar",
     "hypothesis",
@@ -244,13 +244,14 @@ dependencies = [
     "packaging",
     "matplotlib",
     "numpy",
+    "vcrpy>=2.0.1", # also required by pytest-recording
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
 no-cov = "cov --no-cov {args}"
+record = "cov --record-mode=rewrite {args}"
 debug =  "cov --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
-ci = "cov --vcr-record=none --cov-report lcov {args}"
-record = "cov --vcr-record=all {args}" # re-record all vcr cassettes
+ci = "cov --record-mode=none --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
 
 # Environment for testing features that need optional dependencies

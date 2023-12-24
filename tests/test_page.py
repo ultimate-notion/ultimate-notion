@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import pytest
+
 from ultimate_notion import Emoji, File, Page, RichText, Session
 
 
+@pytest.mark.vcr()
 def test_parent(page_hierarchy):
     root_page, l1_page, l2_page = page_hierarchy
     assert isinstance(root_page, Page)
@@ -15,11 +18,13 @@ def test_parent(page_hierarchy):
     assert l2_page.parent.parent == root_page
 
 
+@pytest.mark.vcr()
 def test_ancestors(page_hierarchy: tuple[Page, ...]):
     root_page, l1_page, l2_page = page_hierarchy
     assert l2_page.ancestors == (root_page, l1_page)
 
 
+@pytest.mark.vcr()
 def test_delete_restore_page(notion: Session, root_page: Page):
     page = notion.create_page(root_page)
     assert not page.is_deleted
@@ -29,6 +34,7 @@ def test_delete_restore_page(notion: Session, root_page: Page):
     assert not page.is_deleted
 
 
+@pytest.mark.vcr()
 def test_reload_page(notion: Session, root_page: Page):
     page = notion.create_page(root_page)
     old_obj_id = id(page.obj_ref)
@@ -36,6 +42,7 @@ def test_reload_page(notion: Session, root_page: Page):
     assert old_obj_id != id(page.obj_ref)
 
 
+@pytest.mark.vcr()
 def test_parent_children(notion: Session, root_page: Page):
     parent = notion.create_page(root_page, title='Parent')
     child1 = notion.create_page(parent, title='Child 1')
@@ -48,6 +55,7 @@ def test_parent_children(notion: Session, root_page: Page):
     assert child1.ancestors == (root_page, parent)
 
 
+@pytest.mark.vcr()
 def test_icon_attr(notion: Session, root_page: Page):
     new_page = notion.create_page(parent=root_page, title='My new page with icon')
 
@@ -83,6 +91,7 @@ def test_icon_attr(notion: Session, root_page: Page):
     assert new_page.icon is None
 
 
+@pytest.mark.vcr()
 def test_cover_attr(notion: Session, root_page: Page):
     new_page = notion.create_page(parent=root_page, title='My new page with cover')
 
@@ -104,6 +113,7 @@ def test_cover_attr(notion: Session, root_page: Page):
     assert new_page.cover is None
 
 
+@pytest.mark.vcr()
 def test_title_attr(notion: Session, root_page: Page):
     new_page = notion.create_page(parent=root_page)
 
@@ -130,6 +140,7 @@ def test_title_attr(notion: Session, root_page: Page):
     assert new_page.title == ''
 
 
+@pytest.mark.vcr()
 def test_created_edited_by(notion: Session, root_page: Page):
     myself = notion.whoami()
     florian = notion.search_user('Florian Wilhelm').item()

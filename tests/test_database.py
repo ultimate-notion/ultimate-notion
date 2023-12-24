@@ -14,6 +14,7 @@ from ultimate_notion import Database, Page, RichText, Session, schema
 from .conftest import CONTACTS_DB
 
 
+@pytest.mark.vcr()
 def test_schema(article_db: Database):
     ref_schema = article_db.schema
     assert article_db.title == 'Articles'
@@ -42,6 +43,7 @@ def test_schema(article_db: Database):
         article_db.schema = WrongSchema
 
 
+@pytest.mark.vcr()
 def test_db_without_title(notion: Session, root_page: Page):
     """Simple database of articles"""
 
@@ -56,6 +58,7 @@ def test_db_without_title(notion: Session, root_page: Page):
     db.delete()
 
 
+@pytest.mark.vcr()
 def test_db_with_docstring(notion: Session, root_page: Page):
     """Simple database of articles"""
 
@@ -72,6 +75,7 @@ def test_db_with_docstring(notion: Session, root_page: Page):
     db.delete()
 
 
+@pytest.mark.vcr()
 def test_db_attributes(contacts_db: Database):
     assert isinstance(contacts_db.title, RichText)
     assert contacts_db.title == CONTACTS_DB
@@ -91,6 +95,7 @@ def test_db_attributes(contacts_db: Database):
     assert not contacts_db.is_inline
 
 
+@pytest.mark.vcr()
 def test_title_setter(notion: Session, article_db: Database):
     old_title = 'Articles'
     assert article_db.title == old_title
@@ -107,6 +112,7 @@ def test_title_setter(notion: Session, article_db: Database):
     assert article_db.title == ''
 
 
+@pytest.mark.vcr()
 def test_description_setter(notion: Session, article_db: Database):
     assert article_db.description == ''
 
@@ -122,6 +128,7 @@ def test_description_setter(notion: Session, article_db: Database):
     assert article_db.description == ''
 
 
+@pytest.mark.vcr()
 def test_delete_restore_db(notion: Session, root_page: Page):
     db = notion.create_db(root_page)
     assert not db.is_deleted
@@ -131,6 +138,7 @@ def test_delete_restore_db(notion: Session, root_page: Page):
     assert not db.is_deleted
 
 
+@pytest.mark.vcr()
 def test_reload_db(notion: Session, root_page: Page):
     db = notion.create_db(root_page)
     old_obj_id = id(db.obj_ref)
@@ -138,6 +146,7 @@ def test_reload_db(notion: Session, root_page: Page):
     assert old_obj_id != id(db.obj_ref)
 
 
+@pytest.mark.vcr()
 def test_new_task_db(new_task_db: Database):
     # ToDo: Implement a proper test
     pass

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ultimate_notion.database import Database
 
 
-@pytest.mark.webtest
+@pytest.mark.vcr()
 def test_select(contacts_db: Database):
     view = contacts_db.fetch_all()
 
@@ -24,7 +24,7 @@ def test_select(contacts_db: Database):
         view.select('Not included')
 
 
-@pytest.mark.webtest
+@pytest.mark.vcr()
 def test_rows(contacts_db: Database):
     view = contacts_db.fetch_all()
     rows = view.to_rows()
@@ -36,7 +36,7 @@ def test_rows(contacts_db: Database):
     assert len(row) == 3
 
 
-@pytest.mark.webtest
+@pytest.mark.vcr()
 def test_index(contacts_db: Database):
     view = contacts_db.fetch_all()
     assert not view.has_index
@@ -51,7 +51,7 @@ def test_index(contacts_db: Database):
     assert not view.has_index
 
 
-@pytest.mark.webtest
+@pytest.mark.vcr()
 def test_clone(contacts_db: Database):
     view = contacts_db.fetch_all()
     assert len(view) == 10
@@ -60,7 +60,7 @@ def test_clone(contacts_db: Database):
     assert len(view) == 10
 
 
-@pytest.mark.webtest
+@pytest.mark.vcr()
 def test_reverse(contacts_db: Database):
     short_view = contacts_db.fetch_all().limit(3)
     row_0 = short_view.get_row(0)
@@ -70,7 +70,7 @@ def test_reverse(contacts_db: Database):
     assert rev_short_view.get_row(2) == row_0
 
 
-@pytest.mark.webtest
+@pytest.mark.vcr()
 def test_to_pandas(task_db: Database):
     view = task_db.fetch_all()
     df = view.to_pandas()

@@ -12,6 +12,7 @@ from ultimate_notion.props import PropertyValue
 from ultimate_notion.schema import AggFunc, Column, PageSchema, ReadOnlyColumnError, SchemaError
 
 
+@pytest.mark.vcr()
 def test_all_createable_cols_schema(notion: Session, root_page: Page):
     class SchemaA(PageSchema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
@@ -115,17 +116,20 @@ def test_all_createable_cols_schema(notion: Session, root_page: Page):
     db_b.delete()
 
 
+@pytest.mark.vcr()
 def test_all_cols_schema(all_cols_db: Database):
     schema_dct = all_cols_db.schema.to_dict()
     assert len(schema_dct) == 25
 
 
+@pytest.mark.vcr()
 def test_wiki_db_schema(wiki_db: Database):
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
     wiki_db.fetch_all()
 
 
+@pytest.mark.vcr()
 def test_two_way_col(notion: Session, root_page: Page):
     class SchemaA(PageSchema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
@@ -146,6 +150,7 @@ def test_two_way_col(notion: Session, root_page: Page):
     assert db_a.schema.relation.type.two_way_col is SchemaB.relation_twoway  # type: ignore
 
 
+@pytest.mark.vcr()
 def test_self_ref_relation(notion: Session, root_page: Page):
     class SchemaA(PageSchema, db_title='Schema A'):
         """Schema A description"""
@@ -160,6 +165,7 @@ def test_self_ref_relation(notion: Session, root_page: Page):
 
 # ToDo: Reactivate after the bug on the Notion API side is fixd that adding a two-way relation column with update
 #       actually generates a one-way relation column.
+# @pytest.mark.vcr()
 # def test_self_ref_two_way_col(notion: Session, root_page: Page):
 #     class SchemaA(PageSchema, db_title='Schema A'):
 #         """Schema A description"""
@@ -180,6 +186,7 @@ def test_self_ref_relation(notion: Session, root_page: Page):
 #     assert db_a.schema.bwd_rel.type.two_way_col is SchemaA.fwd_rel  # type: ignore
 
 
+@pytest.mark.vcr()
 def test_schema_from_dict():
     class ClassStyleSchema(PageSchema, db_title='Class Style'):
         name = Column('Name', schema.Title())

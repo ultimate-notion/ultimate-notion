@@ -7,6 +7,7 @@ import sys
 import pytest
 
 
+@pytest.mark.vcr()
 @pytest.mark.skipif(sys.platform == 'win32', reason='Does not run on Windows')
 def test_getting_started():
     with open('examples/getting_started.py', encoding='utf8') as file:
@@ -18,6 +19,7 @@ def test_getting_started():
     assert result.returncode == 0
 
 
+@pytest.mark.vcr()
 @pytest.mark.skipif(sys.platform == 'win32', reason='Does not run on Windows')
 def test_simple_taskdb():
     with open('examples/simple_taskdb.py', encoding='utf8') as file:

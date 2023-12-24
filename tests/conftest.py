@@ -6,10 +6,13 @@ Set `NOTION_TOKEN` environment variable for tests interacting with the Notion AP
 from __future__ import annotations
 
 import os
+import re
 from collections.abc import Generator
 from typing import TypeAlias, TypeVar
 
 import pytest
+from vcr import VCR
+from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
 from ultimate_notion import Option, Session, schema
@@ -27,11 +30,9 @@ T = TypeVar('T')
 Yield: TypeAlias = Generator[T, None, None]
 
 
-# ToDo: See if we still need pytest-vcr
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def vcr_config():
-    """Configure pytest-vcr."""
-    # ToDo: See if this is still important
+    """Configure pytest-recording."""
 
     def remove_headers(response):
         response['headers'] = {}
@@ -47,34 +48,57 @@ def vcr_config():
 
 
 @pytest.fixture(scope='session')
-def notion() -> Yield[Session]:
+def my_vcr(vcr_config) -> VCR:
+    """My VCR for fixtures"""
+    cfg = vcr_config | {'cassette_library_dir': 'tests/cassettes/conftest'}
+    my_vcr = VCR(**cfg)
+    my_vcr.register_matcher('remove_page_id_for_matches', remove_page_id_for_matches)
+    return my_vcr
+
+
+def remove_page_id_for_matches(r1, r2):
+    re_page_id = r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}'
+    return re.sub(re_page_id, r1.uri, '') == re.sub(re_page_id, r2.uri, '')
+
+
+def pytest_recording_configure(config, vcr):
+    vcr.register_matcher('remove_page_id_for_matches', remove_page_id_for_matches)
+
+
+@pytest.fixture(scope='session')
+def notion(my_vcr: VCR) -> Yield[Session]:
     """Return the notion session used for live testing.
 
     This fixture depends on the `NOTION_TOKEN` environment variable. If it is not
     present, this fixture will skip the current test.
     """
-    if os.getenv(ENV_NOTION_TOKEN) is None:
-        msg = f'{ENV_NOTION_TOKEN} not defined! Use `export {ENV_NOTION_TOKEN}=secret_...`'
+    if my_vcr.record_mode != vcr_mode.NONE and os.getenv(ENV_NOTION_TOKEN) is None:
+        msg = (
+            f'{ENV_NOTION_TOKEN} not defined and record mode is not `none`!\n'
+            'Use `export {ENV_NOTION_TOKEN}=secret_...` or `--record-mode=none`'
+        )
         raise RuntimeError(msg)
 
-    with uno.Session() as notion:
+    with my_vcr.use_cassette('notion.yaml'), uno.Session() as notion:
         yield notion
 
 
 @pytest.fixture(scope='session')
-def contacts_db(notion: Session) -> Database:
+def contacts_db(notion: Session, my_vcr: VCR) -> Database:
     """Return a test database"""
-    return notion.search_db(CONTACTS_DB).item()
+    with my_vcr.use_cassette('contacts_db.yaml'):
+        return notion.search_db(CONTACTS_DB).item()
 
 
 @pytest.fixture(scope='session')
-def root_page(notion: Session) -> Page:
+def root_page(notion: Session, my_vcr: VCR) -> Page:
     """Return the page reference used as parent page for live testing"""
-    return notion.search_page('Tests').item()
+    with my_vcr.use_cassette('root_page.yaml'):
+        return notion.search_page('Tests').item()
 
 
 @pytest.fixture
-def article_db(notion: Session, root_page: Page) -> Yield[Database]:
+def article_db(notion: Session, root_page: Page, my_vcr: VCR) -> Database:
     """Simple database of articles"""
 
     class Article(schema.PageSchema, db_title='Articles'):
@@ -82,59 +106,65 @@ def article_db(notion: Session, root_page: Page) -> Yield[Database]:
         cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Column('Description', schema.Text())
 
-    db = notion.create_db(parent=root_page, schema=Article)
-    yield db
-    db.delete()
+    with my_vcr.use_cassette('article_db.yaml'):
+        return notion.create_db(parent=root_page, schema=Article)
 
 
 @pytest.fixture(scope='session')
-def page_hierarchy(notion: Session, root_page: Page) -> Yield[tuple[Page, Page, Page]]:
+def page_hierarchy(notion: Session, root_page: Page, my_vcr: VCR) -> tuple[Page, Page, Page]:
     """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2"""
-    l1_page = notion.create_page(parent=root_page, title='level_1')
-    l2_page = notion.create_page(parent=l1_page, title='level_2')
-    yield root_page, l1_page, l2_page
-    l2_page.delete()
-    l1_page.delete()
+    with my_vcr.use_cassette('page_hierarchy.yaml'):
+        l1_page = notion.create_page(parent=root_page, title='level_1')
+        l2_page = notion.create_page(parent=l1_page, title='level_2')
+        return root_page, l1_page, l2_page
 
 
 @pytest.fixture(scope='session')
-def intro_page(notion: Session) -> Page:
+def intro_page(notion: Session, my_vcr: VCR) -> Page:
     """Return the default 'Getting Started' page"""
-    return notion.search_page(GETTING_STARTED_PAGE).item()
+    with my_vcr.use_cassette('intro_page.yaml'):
+        return notion.search_page(GETTING_STARTED_PAGE).item()
 
 
 @pytest.fixture(scope='session')
-def all_cols_db(notion: Session) -> Database:
+def all_cols_db(notion: Session, my_vcr: VCR) -> Database:
     """Return manually created database with all columns, also AI columns"""
-    return notion.search_db(ALL_COL_DB).item()
+    with my_vcr.use_cassette('all_cols_db.yaml'):
+        return notion.search_db(ALL_COL_DB).item()
 
 
 @pytest.fixture(scope='session')
-def wiki_db(notion: Session) -> Database:
+def wiki_db(notion: Session, my_vcr: VCR) -> Database:
     """Return manually created wiki db"""
-    return notion.search_db(WIKI_DB).item()
+    with my_vcr.use_cassette('wiki_db.yaml'):
+        return notion.search_db(WIKI_DB).item()
 
 
 @pytest.fixture(scope='session')
-def static_pages(root_page: Page, intro_page: Page) -> set[Page]:
+def static_pages(root_page: Page, intro_page: Page, my_vcr: VCR) -> set[Page]:
     """Return all static pages for the unit tests"""
-    return {intro_page, root_page}
+    with my_vcr.use_cassette('static_pages.yaml'):
+        return {intro_page, root_page}
 
 
 @pytest.fixture(scope='session')
-def task_db(notion: Session) -> Database:
+def task_db(notion: Session, my_vcr: VCR) -> Database:
     """Return manually created wiki db"""
-    return notion.search_db(TASK_DB).item()
+    with my_vcr.use_cassette('task_db.yaml'):
+        return notion.search_db(TASK_DB).item()
 
 
 @pytest.fixture(scope='session')
-def static_dbs(all_cols_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database) -> set[Database]:
+def static_dbs(
+    all_cols_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database, my_vcr: VCR
+) -> set[Database]:
     """Return all static pages for the unit tests"""
-    return {all_cols_db, wiki_db, contacts_db, task_db}
+    with my_vcr.use_cassette('static_dbs.yaml'):
+        return {all_cols_db, wiki_db, contacts_db, task_db}
 
 
 @pytest.fixture
-def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
+def new_task_db(notion: Session, root_page: Page, my_vcr: VCR) -> Yield[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
         Option('In Progres', color=uno.Color.BLUE),
@@ -247,25 +277,33 @@ def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
         # parent = schema.Column('Parent Task', schema.Relation(schema.SelfRef))
         # subs = schema.Column('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_col=parent))
 
-    db = notion.create_db(parent=root_page, schema=Tasklist)
-    yield db
-    db.delete()
+    with my_vcr.use_cassette('new_task_db.yaml'):
+        db = notion.create_db(parent=root_page, schema=Tasklist)
+        yield db
+        db.delete()
 
 
 @pytest.fixture(scope='session', autouse=True)
-def test_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]):
+def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database], my_vcr: VCR):
     """Delete all databases and pages in the root_page before we start except of some special dbs and their content"""
-    for db in notion.search_db():
-        if db.ancestors[0] == root_page and db not in static_dbs:
-            db.delete()
-    for page in notion.search_page():
-        if page in static_pages:
-            continue
-        ancestors = page.ancestors
-        if (
-            ancestors
-            and ancestors[0] == root_page
-            and page.database not in static_dbs
-            and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
-        ):
-            page.delete()
+
+    def clean():
+        for db in notion.search_db():
+            if db.ancestors[0] == root_page and db not in static_dbs:
+                db.delete()
+        for page in notion.search_page():
+            if page in static_pages:
+                continue
+            ancestors = page.ancestors
+            if (
+                ancestors
+                and ancestors[0] == root_page
+                and page.database not in static_dbs
+                and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
+            ):
+                page.delete()
+
+    with my_vcr.use_cassette('notion_cleanups.yaml'):
+        clean()
+        yield
+        clean()
