@@ -61,9 +61,9 @@ After having cloned this repository:
 2. make sure [pre-commit] is installed globally, e.g. with `pipx install pre-commit`,
 3. optionally run `hatch config set dirs.env.virtual .direnv` to let [VS Code] find your virtual environments,
 
-and then you are already set up to start hacking. Use `hatch run cov` or `hatch run no-cov` to run
-the unitest with or without coverage reports, respectively. Check out the environment setup of
-hatch in [pyproject.toml](pyproject.toml) for many more commands.
+and then you are already set up to start hacking. Use `hatch run test` to run the unit tests or `hatch run vcr-only`
+to run the offline unit tests using [VCR.py]. Regenerate the cassettes with `hatch run vcr-rewrite`.
+Check out the environment setup of hatch in [pyproject.toml](pyproject.toml) for many more commands.
 
 If you are using [VS Code], then it's quite convenient to add a file `.env` in your checkout with:
 
@@ -93,6 +93,7 @@ Ultimate Notion highly depends on [notion-sdk-py].
 [page about contributing]: https://ultimate-notion.com/latest/contributing/
 [VS Code]: https://code.visualstudio.com/
 [PyPI]: https://pypi.org/
+[VCR.py]: https://vcrpy.readthedocs.io/
 
 [Tests-image]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml/badge.svg
 [Tests-link]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml

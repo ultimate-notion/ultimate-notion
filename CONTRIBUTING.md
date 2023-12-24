@@ -108,9 +108,8 @@ This often provides additional considerations and avoids unnecessary work.
 2. Start your work on this branch. Don't forget to add [docstrings] in [Google style]
    to new functions, modules and classes, especially if they are part of public APIs.
 
-3. Check that your changes don't break any unit tests with
-   `hatch run test:cov` or `hatch run test:no-cov` to run the unitest with
-   or without coverage reports, respectively.
+3. Check that your changes don't break any unit tests with `hatch run vcr-only` for tests
+   that do not generate calls to the Notion API or  `hatch run test` for new tests generating API calls.
 
 4. Run `hatch run lint:all` and `hatch run lint:fix` to check the code with [ruff] & [mypy]
    and automatically fix [ruff] issues if possible.

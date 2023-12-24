@@ -247,11 +247,11 @@ dependencies = [
     "vcrpy>=2.0.1", # also required by pytest-recording
 ]
 [tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests {args}"
-no-cov = "cov --no-cov {args}"
-record = "cov --record-mode=rewrite {args}"
-debug =  "cov --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
-ci = "cov --record-mode=none --cov-report lcov {args}"
+test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
+debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
+vcr-only = "test --record-mode none {args}"
+vcr-rewrite = "cov --record-mode=rewrite {args}"
+ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
 
 # Environment for testing features that need optional dependencies
@@ -323,7 +323,3 @@ all = [
     "style",
     "typing",
 ]
-
-# Test matrix replacing the functionality of tox
-[[tool.hatch.envs.test.matrix]]
-python = ["310", "311", "312"]
