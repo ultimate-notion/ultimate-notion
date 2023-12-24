@@ -250,7 +250,7 @@ dependencies = [
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
 debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
 vcr-only = "test --record-mode none {args}"
-vcr-rewrite = "cov --record-mode=rewrite {args}"
+vcr-rewrite = ["rm -rf tests/cassettes", "test --record-mode=rewrite {args}"]
 ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
 
