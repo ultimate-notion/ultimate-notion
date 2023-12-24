@@ -22,7 +22,7 @@ jobs:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 1  # avoids time-outs and conflicts
+      max-parallel: 0  # set to 1 to avoid time-outs and conflicts when speaking to the Notion API
       fail-fast: true # kill everything after first error to save resources
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
