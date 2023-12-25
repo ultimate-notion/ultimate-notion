@@ -20,6 +20,8 @@ or new feature, or a change to the documentation? -->
 ## Checklist
 <!--- Before you submit the PR, go over this checklist and make sure you can
 tick off all the boxes. [] -> [x] -->
+- [ ] The "Allow edits from maintainers" checkbox is checked on this pull request.
+      This allows the maintainers to make minor adjustments or fixes and update the VCR cassettes.
 - [ ] I confirm that I have the right to submit this contribution under the project's MIT license.
-- [ ] I ran the tests, and all new and existing tests passed.
+- [ ] I ran the tests with at least `hatch run vcr-only`, and only the new & modified tests fail since they are not yet recorded.
 - [ ] My changes don't require a change to the documentation, or if they do, I've added all required information.
