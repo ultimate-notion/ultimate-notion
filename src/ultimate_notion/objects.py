@@ -40,6 +40,17 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         return self.name
 
 
+class OptionNS:
+    """Option namespace to simplify working with (Multi-)Select options."""
+
+    @classmethod
+    def to_list(cls) -> list[Option]:
+        """Convert the enum to a list as needed by the (Multi)Select column types."""
+        return [
+            getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
+        ]
+
+
 class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
     """Group of options for status property."""
 

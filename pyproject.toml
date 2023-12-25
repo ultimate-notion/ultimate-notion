@@ -253,6 +253,7 @@ vcr-only = "test --record-mode none {args}"
 vcr-rewrite = ["rm -rf tests/cassettes", "test --record-mode=rewrite {args}"]
 ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
+md2py = "python -c \"from ultimate_notion.utils import convert_md_to_py; convert_md_to_py('{args}')\""
 
 # Environment for testing features that need optional dependencies
 [tool.hatch.envs.optional]

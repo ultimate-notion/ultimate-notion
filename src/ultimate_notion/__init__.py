@@ -14,11 +14,10 @@ finally:
 
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
-from ultimate_notion.objects import Emoji, File, Option, RichText, User
+from ultimate_notion.objects import Emoji, File, Option, OptionNS, RichText, User
 from ultimate_notion.page import Page
 from ultimate_notion.schema import ColType, Column, PageSchema, SelfRef
 from ultimate_notion.session import Session
-from ultimate_notion.utils import OptionNS
 
 __all__ = [
     'AggFunc',

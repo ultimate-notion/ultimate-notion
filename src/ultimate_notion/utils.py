@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import textwrap
 from copy import deepcopy
 from functools import wraps
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar, cast
 from uuid import UUID
 
@@ -13,7 +15,6 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import GenericObject
 
 if TYPE_CHECKING:
-    from ultimate_notion.schema import Option
     from ultimate_notion.session import Session
 
 
@@ -253,12 +254,34 @@ def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
 
 
-class OptionNS:
-    """Option namespace to simplify working with (Multi-)Select options."""
+def convert_md_to_py(path: Path | str):
+    """Converts a Markdown file to a py file by extracting all python codeblocks"""
+    if isinstance(path, str):
+        path = Path(path)
+    if not path.is_file():
+        msg = f'{path} is no file!'
+        raise RuntimeError(msg)
 
-    @classmethod
-    def to_list(cls) -> list[Option]:
-        """Convert the enum to a list as needed by the (Multi)Select column types."""
-        return [
-            getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
-        ]
+    md_str = path.read_text()
+
+    def check_codeblock(block):
+        first_line = block.split('\n')[0]
+        if first_line[3:] != 'python':
+            return ''
+        return '\n'.join(block.split('\n')[1:])
+
+    docstring = textwrap.dedent(md_str)
+    in_block = False
+    block = ''
+    codeblocks = []
+    for line in docstring.split('\n'):
+        if line.startswith('```'):
+            if in_block:
+                codeblocks.append(check_codeblock(block))
+                block = ''
+            in_block = not in_block
+        if in_block:
+            block += line + '\n'
+    py_str = '\n'.join([c for c in codeblocks if c != ''])
+
+    path.with_suffix('.py').write_text(py_str)

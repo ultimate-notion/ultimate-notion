@@ -26,10 +26,10 @@ from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
-from ultimate_notion.objects import Option, OptionGroup, RichText
+from ultimate_notion.objects import Option, OptionGroup, OptionNS, RichText
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.text import snake_case
-from ultimate_notion.utils import OptionNS, SList, Wrapper, get_active_session, get_repr, is_notebook
+from ultimate_notion.utils import SList, Wrapper, get_active_session, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
