@@ -6,7 +6,6 @@ Set `NOTION_TOKEN` environment variable for tests interacting with the Notion AP
 from __future__ import annotations
 
 import os
-import re
 from collections.abc import Generator
 from typing import TypeAlias, TypeVar
 
@@ -69,18 +68,11 @@ def my_vcr(vcr_config) -> VCRManager:
     """My VCR for fixtures"""
     cfg = vcr_config | {'cassette_library_dir': 'tests/cassettes/conftest'}
     my_vcr = VCR(**cfg)
-    my_vcr.register_matcher('remove_page_id_for_matches', remove_page_id_for_matches)
     return my_vcr
-
-
-def remove_page_id_for_matches(r1, r2):
-    re_page_id = r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}'
-    return re.sub(re_page_id, r1.uri, '') == re.sub(re_page_id, r2.uri, '')
 
 
 def pytest_recording_configure(config, vcr):
     """This hook is only called when @pytest.mark.vcr is used"""
-    vcr.register_matcher('remove_page_id_for_matches', remove_page_id_for_matches)
     VCRManager.set_vcr(vcr)  # register the vcr instance of pytest-recording globally
 
 
