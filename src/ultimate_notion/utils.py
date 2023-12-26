@@ -109,7 +109,7 @@ def find_index(elem: Any, lst: list[Any]) -> int | None:
 
 
 def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int, Any] | None = None):
-    """Like `deepcoyp` but specified attributes are shared.
+    """Like `deepcopy` but specified attributes are shared.
 
     Deepcopy an object, except for a given list of attributes, which should
     be shared between the original object and its copy.

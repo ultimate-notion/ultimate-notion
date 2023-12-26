@@ -30,8 +30,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
-    # "notion-client~=2.1",
-    "notion-client @ git+https://github.com/FlorianWilhelm/notion-sdk-py@fix-del-icon-cover",
+    "notion-client~=2.2",
     "tabulate>=0.9",
     "numpy~=1.24",
     "emoji~=2.8",
@@ -255,9 +254,10 @@ ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
 md2py = "python -c \"from ultimate_notion.utils import convert_md_to_py; convert_md_to_py('{args}')\""
 
-# Environment for testing features that need optional dependencies
-[tool.hatch.envs.optional]
-features = ["all"]
+# Environment for testing features that need the google dependencies.
+[tool.hatch.envs.google]
+features = ["google"]
+
 
 # Docs environment
 [tool.hatch.envs.docs]
