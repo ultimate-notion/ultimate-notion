@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.3
+## Version 0.3, 2023-12-26
 
 - Chg: `RichText` is now a subtype of `str` for more convenient & consistent usage.
 - Docs: Added more documentation about using databases.
