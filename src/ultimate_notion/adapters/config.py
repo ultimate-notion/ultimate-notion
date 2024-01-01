@@ -28,15 +28,16 @@ class Config(BaseModel):
 
     @field_validator('Google')
     @classmethod
-    def convert_json_path(cls, v: GoogleCfg, info: ValidationInfo) -> GoogleCfg:
+    def convert_json_path(cls, v: GoogleCfg | None, info: ValidationInfo) -> GoogleCfg | None:
         def make_rel_path_abs(entry: FilePath):
             if entry is not None and not entry.is_absolute():
                 cfg_path: Path = info.data['cfg_path']
                 entry = cfg_path.parent / entry
             return entry
 
-        v.client_secret_json = make_rel_path_abs(v.client_secret_json)
-        v.token_json = make_rel_path_abs(v.token_json)
+        if v is not None:
+            v.client_secret_json = make_rel_path_abs(v.client_secret_json)
+            v.token_json = make_rel_path_abs(v.token_json)
 
         return v
 

@@ -37,32 +37,35 @@ class Link(BaseModel):
     type: str  # noqa: A003
 
 
-class GTask(BaseModel):
-    """Representation of a Google Task"""
+class Status(str, Enum):
+    NEEDS_ACTION = 'needsAction'
+    COMPLETED = 'completed'
+
+
+class Kind(str, Enum):
+    TASK = 'tasks#task'
+    TASK_LIST = 'tasks#taskList'
+
+
+class GObject(BaseModel):
+    """Representation of a general Google Object from the Tasks API"""
 
     model_config = ConfigDict(extra='forbid')
 
     id: str  # noqa: A003
-    title: str
+    title_: str = Field(..., alias='title')
+    kind: Kind
     etag: str
-    kind: Literal['tasks#task']
     updated: datetime
     self_link: HttpUrl = Field(..., alias='selfLink')
-    completed: datetime | None = None
-    deleted: bool = False
-    due: datetime | None = None
-    notes: str | None = None
-    parent: str | None = None
-    position: str
-    status: Literal['needsAction', 'completed'] = 'needsAction'
-    links: list[Link] | None = None
+    _resource: Resource
 
     def __init__(self, resource: Resource, **data: str):
         super().__init__(**data)
         self._resource = resource
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, GTask):
+        if isinstance(other, GObject):
             return self.id == other.id
         else:
             return NotImplemented
@@ -78,6 +81,22 @@ class GTask(BaseModel):
 
         for k in new_obj.model_dump(by_alias=False):
             setattr(self, k, getattr(new_obj, k))
+
+
+class GTask(GObject):
+    """Representation of a Google Task"""
+
+    model_config = ConfigDict(extra='forbid')
+
+    kind: Literal[Kind.TASK]
+    completed_at: datetime | None = Field(alias='completed', default=None)
+    deleted: bool = False
+    due: datetime | None = None
+    notes_: str | None = Field(alias='notes', default=None)
+    parent: str | None = None
+    position_: str = Field(alias='position')
+    status: Status = Status.NEEDS_ACTION
+    links: list[Link] | None = None
 
     @property
     def tasklist_id(self) -> str:
@@ -102,40 +121,72 @@ class GTask(BaseModel):
         self._update(resp)
         return self
 
+    @property
+    def notes(self) -> str | None:
+        """Returns the notes of this task"""
+        return self.notes_
 
-class GTaskList(BaseModel):
+    @notes.setter
+    def notes(self, new_notes: str | None):
+        """Sets the notes of this task"""
+        tasks_resource = self._resource.tasks()
+        resp = tasks_resource.patch(tasklist=self.tasklist_id, task=self.id, body={'notes': new_notes}).execute()
+        self._update(resp)
+
+    @property
+    def title(self) -> str:
+        """Returns the title of this task"""
+        return self.title_
+
+    @title.setter
+    def title(self, new_title: str):
+        """Sets the title of this task"""
+        tasks_resource = self._resource.tasks()
+        resp = tasks_resource.patch(tasklist=self.tasklist_id, task=self.id, body={'title': new_title}).execute()
+        self._update(resp)
+
+    @property
+    def completed(self) -> bool:
+        """Returns whether this task is completed"""
+        return self.status == Status.COMPLETED
+
+    @completed.setter
+    def completed(self, completed: bool):
+        """Sets the completed status of this task"""
+        tasks_resource = self._resource.tasks()
+        resp = tasks_resource.patch(
+            tasklist=self.tasklist_id,
+            task=self.id,
+            body={'status': Status.COMPLETED if completed else Status.NEEDS_ACTION},
+        ).execute()
+        self._update(resp)
+        return self
+
+    @property
+    def position(self) -> int:
+        """Returns the position of this task"""
+        return int(self.position_)
+
+    def move(self, *, parent: GTask | None = None, previous: GTask | None = None) -> GTask:
+        """Moves this task to the behind the given task or as the first child of the given task"""
+        if parent is None and previous is None:
+            msg = "Exactly one of 'parent' or 'previous' must be provided."
+            raise RuntimeError(msg)
+        if parent is not None and previous is not None:
+            msg = "Only one of 'parent' or 'previous' can be provided."
+            raise RuntimeError(msg)
+
+        position = {'parent': parent.id} if previous is None else {'previous': previous.id}
+        tasks_resource = self._resource.tasks()
+        resp = tasks_resource.move(tasklist=self.tasklist_id, task=self.id, **position).execute()
+        self._update(resp)
+        return self
+
+
+class GTaskList(GObject):
     """Representation of a Google Task List"""
 
-    model_config = ConfigDict(extra='forbid')
-
-    id: str  # noqa: A003
-    title: str
-    etag: str
-    kind: Literal['tasks#taskList']
-    updated: datetime
-    self_link: HttpUrl = Field(..., alias='selfLink')
-
-    def __init__(self, resource: Resource, **fields: str):
-        super().__init__(**fields)
-        self._resource = resource
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, GTaskList):
-            return self.id == other.id
-        else:
-            return NotImplemented
-
-    def __hash__(self) -> int:
-        return hash(self.id)
-
-    def _update(self, resp: dict[str, str]):
-        """Updates this object with the given response from the API"""
-        new_obj_dct = self.model_dump(by_alias=True)
-        new_obj_dct.update(resp, resource=self._resource)
-        new_obj = self.model_validate(new_obj_dct)
-
-        for k in new_obj.model_dump(by_alias=False):
-            setattr(self, k, getattr(new_obj, k))
+    kind: Literal[Kind.TASK_LIST]
 
     def all_tasks(self, max_results: int | None = None) -> list[GTask]:
         """Returns a list of all tasks in this task list"""
@@ -172,12 +223,17 @@ class GTaskList(BaseModel):
         tasks_resource.delete(tasklist=self.id).execute()
         # We return None as the object is deleted
 
-    def rename(self, new_title: str) -> GTaskList:
-        """Renames this task list"""
+    @property
+    def title(self) -> str:
+        """Returns the title of this task list"""
+        return self.title_
+
+    @title.setter
+    def title(self, new_title: str):
+        """Sets the title of this task list"""
         tasks_resource = self._resource.tasklists()
         resp = tasks_resource.patch(tasklist=self.id, body={'title': new_title}).execute()
         self._update(resp)
-        return self
 
 
 class GTasksClient:
