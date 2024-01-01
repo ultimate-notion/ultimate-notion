@@ -5,15 +5,15 @@ from pathlib import Path
 
 import tomli
 from pydantic import BaseModel, FilePath, field_validator
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic_core.core_schema import ValidationInfo
 
 ULTIMATE_NOTION_ENV: str = 'ULTIMATE_NOTION_CONFIG'
 """Name of the environment variable to look up the path for the config"""
-ULTIMATE_NOTION_CFG_PATH: str = '.ultimate_notion/config.toml'
+ULTIMATE_NOTION_CFG_PATH: str = '.ultimate-notion/config.toml'
 """Path within $HOME to the configuration file of Ultimate Notion"""
 
 
-class Google(BaseModel):
+class GoogleCfg(BaseModel):
     """Configuration related to the Google API"""
 
     client_secret_json: Path | None = None
@@ -24,15 +24,15 @@ class Config(BaseModel):
     """Main configuration object"""
 
     cfg_path: FilePath
-
-    Google: Google
+    Google: GoogleCfg | None = None
 
     @field_validator('Google')
     @classmethod
-    def convert_json_path(cls, v: Google, info: FieldValidationInfo) -> Google:
-        def make_rel_path_abs(entry):
+    def convert_json_path(cls, v: GoogleCfg, info: ValidationInfo) -> GoogleCfg:
+        def make_rel_path_abs(entry: FilePath):
             if entry is not None and not entry.is_absolute():
-                entry = info.data['cfg_path'].parent / entry
+                cfg_path: Path = info.data['cfg_path']
+                entry = cfg_path.parent / entry
             return entry
 
         v.client_secret_json = make_rel_path_abs(v.client_secret_json)

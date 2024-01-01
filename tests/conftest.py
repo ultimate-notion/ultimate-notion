@@ -294,9 +294,9 @@ def new_task_db(notion: Session, root_page: Page, my_vcr: VCR) -> Yield[Database
         db.delete()
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='session')
 def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database], my_vcr: VCR):
-    """Delete all databases and pages in the root_page before we start except of some special dbs and their content"""
+    """Delete all databases and pages in the root_page after we ran except of some special dbs and their content"""
 
     def clean():
         for db in notion.search_db():
@@ -315,6 +315,5 @@ def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], s
                 page.delete()
 
     with my_vcr.use_cassette('notion_cleanups.yaml'):
-        clean()
         yield
         clean()
