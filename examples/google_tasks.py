@@ -20,7 +20,9 @@ client = GTasksClient(read_only=False)
 
 all_tasklists = client.all_tasklists()
 tasklist = client.create_tasklist("My new tasklist")
-tasklist.rename("My renamed tasklist")
+assert tasklist.title == "My new tasklist"
+tasklist.title = "My renamed tasklist"
+assert tasklist.title == "My renamed tasklist"
 
 same_tasklist = client.get_tasklist(tasklist.id)
 task = tasklist.create_task("My new task")
@@ -32,13 +34,25 @@ assert tasklist not in client.all_tasklists()
 
 tasklist = client.create_tasklist("Personal tasklist")
 task = tasklist.create_task("My first task")
+assert task.title == "My first task"
+task.title = "My renamed task"
+assert task.title == "My renamed task"
 assert task in tasklist.all_tasks()
 same_task = tasklist.get_task(task.id)
 assert same_task == task
 
 same_task.delete()
+assert same_task.deleted is True
+
+task = tasklist.create_task("Task with notes")
+task.notes = "My notes"
+assert task.notes == "My notes"
+assert not task.completed
+task.completed = True
+assert task.completed
 
 
-from IPython import embed
+task2 = tasklist.create_task("Another task")
+task.completed = False
 
-embed()
+task2.move(parent=task)
