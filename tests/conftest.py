@@ -6,8 +6,11 @@ Set `NOTION_TOKEN` environment variable for tests interacting with the Notion AP
 from __future__ import annotations
 
 import os
+import tempfile
 from collections.abc import Generator
+from pathlib import Path
 from typing import TypeAlias, TypeVar
+from unittest.mock import patch
 
 import pytest
 from vcr import VCR
@@ -15,6 +18,7 @@ from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
 from ultimate_notion import Option, Session, schema
+from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
 from ultimate_notion.session import ENV_NOTION_TOKEN
@@ -74,6 +78,20 @@ def my_vcr(vcr_config) -> VCRManager:
 def pytest_recording_configure(config, vcr):
     """This hook is only called when @pytest.mark.vcr is used"""
     VCRManager.set_vcr(vcr)  # register the vcr instance of pytest-recording globally
+
+
+@pytest.fixture
+def custom_config():
+    # Create a temporary file
+    _, temp_file_path_str = tempfile.mkstemp()
+    temp_file_path = Path(temp_file_path_str)
+
+    with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: temp_file_path_str}):
+        temp_file_path.unlink()  # we only need the path, not the file itself!
+        yield temp_file_path_str
+
+        if temp_file_path.exists():
+            temp_file_path.unlink()
 
 
 @pytest.fixture(scope='session')

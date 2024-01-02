@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.4
+
+- New: Introduce a configuration file under `~/.ultimate-notion/config.toml`.
+
 ## Version 0.3, 2023-12-26
 
 - Chg: `RichText` is now a subtype of `str` for more convenient & consistent usage.

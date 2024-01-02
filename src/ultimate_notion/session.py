@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 from threading import RLock
 from types import TracebackType
 from typing import Any, ClassVar, cast
@@ -14,6 +13,7 @@ from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
 from ultimate_notion.blocks import Block, DataObject
+from ultimate_notion.config import ENV_NOTION_TOKEN, Config, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.objects import RichText, User
@@ -23,7 +23,6 @@ from ultimate_notion.schema import DefaultSchema, PageSchema
 from ultimate_notion.utils import ObjRef, SList, get_uuid
 
 _log = logging.getLogger(__name__)
-ENV_NOTION_TOKEN = 'NOTION_TOKEN'  # same as in `notion-sdk-py` package
 
 
 class SessionError(Exception):
@@ -47,19 +46,20 @@ class Session:
     _lock = RLock()
     cache: ClassVar[dict[UUID, DataObject | User]] = {}
 
-    def __init__(self, auth: str | None = None, **kwargs: Any):
+    def __init__(self, cfg: Config | None = None, **kwargs: Any):
         """Initialize the `Session` object and the raw `api` endpoints.
 
         Args:
-            auth: secret token from the Notion integration
+            cfg: configuration object
             **kwargs: Arguments for the [Notion SDK Client][https://ramnes.github.io/notion-sdk-py/reference/client/]
         """
+        if cfg is None:
+            cfg = get_or_create_cfg()
+        auth = cfg.ultimate_notion.token
+
         if auth is None:
-            if (env_token := os.getenv(ENV_NOTION_TOKEN)) is not None:
-                auth = env_token
-            else:
-                msg = f'Either pass `auth` or set {ENV_NOTION_TOKEN}'
-                raise RuntimeError(msg)
+            msg = f'No notion token found! Check {get_cfg_file()} or set the environment variable {ENV_NOTION_TOKEN}.'
+            raise RuntimeError(msg)
 
         _log.info('Initializing Notion session...')
         Session._initialize_once(self)
