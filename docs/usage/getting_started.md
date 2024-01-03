@@ -39,12 +39,19 @@ will have access to the selected page as well as all its children.
 
 ![Notion integration](../assets/images/notion-integration-add.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
+## Ultimate Notion configuration
+
+Ultimate Notion looks up the environment variable `ULTIMATE_NOTION_CONFIG` for a configuration [TOML]-file.
+If this variable is not set, it defaults to `~/.ultimate-notion/config.toml` under MacOS/Linux and
+`$HOME/.ultimate-notion/config.toml` under Windows systems. If no configuration file is found, a default one is created
+automatically that will set the Notion token to be looked up using the environment variable `NOTION_TOKEN`.
+Alternatively, you can set the your token directly in the configuration file.
+
 ## Loading a Notion page
 
 To try out if your integration works, just copy&paste the following code into your favorite editor or better [Jupyter Lab].
-Replace the content of `TOKEN` with the *Internal Integration Token* you saved and the content of `PAGE_TITLE` with the title
-of the page, you granted access for your integration. Another, maybe safer way, is to set your token as environment variable
-`NOTION_TOKEN`. Here is an example to illustrate:
+Replace the content of `PAGE_TITLE` with the title of the page, you granted access for your integration and make sure your
+token is set correctly as environment variable or in your configuration file.
 
 ``` py
 --8<-- "examples/getting_started.py"

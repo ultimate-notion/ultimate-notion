@@ -58,7 +58,7 @@ class Session:
         auth = cfg.ultimate_notion.token
 
         if auth is None:
-            msg = f'No notion token found! Check {get_cfg_file()} or set the environment variable {ENV_NOTION_TOKEN}.'
+            msg = f'No Notion token found! Check {get_cfg_file()} or set the environment variable {ENV_NOTION_TOKEN}.'
             raise RuntimeError(msg)
 
         _log.info('Initializing Notion session...')
@@ -110,7 +110,7 @@ class Session:
         traceback: TracebackType,
     ) -> None:
         _log.info('Closing connection to Notion...')
-        self.client.__exit__(exc_type, exc_value, traceback)
+        self.client.close()
         Session._active_session = None
         Session.cache.clear()
 
@@ -241,6 +241,7 @@ class Session:
         return SList(pages)
 
     def get_page(self, page_ref: ObjRef, *, use_cache: bool = True) -> Page:
+        """Retrieve a page by uuid."""
         page_uuid = get_uuid(page_ref)
         if use_cache and page_uuid in self.cache:
             return cast(Page, self.cache[page_uuid])
@@ -250,13 +251,14 @@ class Session:
             return page
 
     def create_page(self, parent: Page, title: RichText | str | None = None) -> Page:
+        """Create a new page in a parent page."""
         title_obj = title if title is None else Title(title).obj_ref
         page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
         self.cache[page.id] = page
         return page
 
     def get_user(self, user_ref: ObjRef, *, use_cache: bool = True) -> User:
-        """Get a user by id"""
+        """Get a user by uuid."""
         user_uuid = get_uuid(user_ref)
         if use_cache and user_uuid in self.cache:
             return cast(User, self.cache[user_uuid])
@@ -266,7 +268,7 @@ class Session:
             return user
 
     def search_user(self, name: str) -> SList[User]:
-        """Search a user by name"""
+        """Search a user by name."""
         return SList(user for user in self.all_users() if user.name == name)
 
     def whoami(self) -> User:
@@ -286,6 +288,6 @@ class Session:
         return Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
 
     def _get_blocks(self, parent_ref: ObjRef) -> list[Block]:
-        """Retrieve all blocks of a parent block"""
+        """Retrieve all blocks of a parent block."""
         parent_uuid = get_uuid(parent_ref)
         return [Block.wrap_obj_ref(block) for block in self.api.blocks.children.list(parent=parent_uuid)]
