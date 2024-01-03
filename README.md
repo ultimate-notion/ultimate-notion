@@ -28,22 +28,20 @@ pip install 'ultimate-notion[all]'
 
 ## Usage
 
+Make sure you have set the environment variable `NOTION_TOKEN` to your Notion
+integration token. Then it's as simple as:
+
 ```python
 import ultimate_notion as uno
 
-TOKEN = "secret_YOUR_TOKEN_HERE"
-# Change PAGE_TITLE to the title of your page
 PAGE_TITLE = "Getting Started"
 
-with uno.Session(auth=TOKEN) as notion:
+with uno.Session() as notion:
     page = notion.search_page(PAGE_TITLE).item()
     page.show()
 
 # Alternatively, without a context manager:
-notion = uno.Session.get_or_create(auth=TOKEN)
-# `auth` can be omitted if `NOTION_TOKEN` is set in the environment, i.e.
-# notion = uno.Session.get_or_create()
-# which also works for the context manager
+notion = uno.Session()
 page = notion.search_page(PAGE_TITLE).item()
 page.show()
 notion.close()
@@ -65,12 +63,11 @@ and then you are already set up to start hacking. Use `hatch run test` to run th
 to run the offline unit tests using [VCR.py]. Regenerate the cassettes with `hatch run vcr-rewrite`.
 Check out the environment setup of hatch in [pyproject.toml](pyproject.toml) for many more commands.
 
-If you are using [VS Code], then it's quite convenient to add a file `.env` in your checkout with:
+If you are using [VS Code], it's quite convenient to create a file  `.vscode/.env` with
 
 ```ini
-[pytest]
-env =
-    NOTION_AUTH_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+NOTION_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+ULTIMATE_NOTION_CONFIG=/path/to/repo/.ultimate-notion/config.toml
 ```
 
 Check out this [page about contributing] for more details.

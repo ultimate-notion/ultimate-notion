@@ -3,6 +3,7 @@
 ## Version 0.4
 
 - New: Introduce a configuration file under `~/.ultimate-notion/config.toml`.
+- New: Added a simple Google Tasks client.
 
 ## Version 0.3, 2023-12-26
 

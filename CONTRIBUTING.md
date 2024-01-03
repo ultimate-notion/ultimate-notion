@@ -87,13 +87,14 @@ This often provides additional considerations and avoids unnecessary work.
 
 5. Optionally run `hatch config set dirs.env.virtual .direnv` to let
    [VS Code] find your virtual environments. If you are using [VS Code],
-   then it's quite convenient to add a file `.env` in your checkout with:
+   then it's quite convenient to add a file `.vscode/.env` in your checkout with:
 
    ```ini
-   [pytest]
-   env =
-      NOTION_AUTH_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+   NOTION_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+   ULTIMATE_NOTION_CONFIG=/path/to/repo/.ultimate-notion/config.toml
    ```
+
+   These settings will also be respected by [pytest] using [pytest-dotenv].
 
 ### Implement your changes
 
@@ -168,6 +169,8 @@ This often provides additional considerations and avoids unnecessary work.
 [other kinds of contributions]: https://opensource.guide/how-to-contribute
 [pre-commit]: https://pre-commit.com/
 [pipx]: https://pypa.github.io/pipx/
+[pytest]: https://docs.pytest.org/
+[pytest-dotenv]: https://github.com/quiqua/pytest-dotenv
 [python software foundation's code of conduct]: https://www.python.org/psf/conduct/
 [Google style]: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 [guide created by FreeCodeCamp]: https://github.com/FreeCodeCamp/how-to-contribute-to-open-source

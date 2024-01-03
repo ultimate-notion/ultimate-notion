@@ -5,6 +5,7 @@ Set `NOTION_TOKEN` environment variable for tests interacting with the Notion AP
 
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 from collections.abc import Generator
@@ -54,8 +55,18 @@ class VCRManager:
 def vcr_config():
     """Configure pytest-recording."""
 
-    def remove_headers(response):
-        response['headers'] = {}
+    def remove_secrets(response):
+        response['headers'] = {}  # remove header completely
+        if 'body' in response and 'string' in response['body']:
+            try:
+                # remove secret tokens from body in Google API calls
+                dct = json.loads(response['body']['string'])
+                for secret in ('access_token', 'refresh_token'):
+                    if secret in dct:
+                        dct[secret] = 'secret...'
+                response['body']['string'] = json.dumps(dct)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                pass
         return response
 
     return {
@@ -63,7 +74,9 @@ def vcr_config():
             ('authorization', 'secret...'),
             ('user-agent', None),
         ],
-        'before_record_response': remove_headers,
+        'filter_query_parameters': ['client_id', 'client_secret', 'refresh_token'],
+        'filter_post_data_parameters': ['code'],
+        'before_record_response': remove_secrets,
     }
 
 

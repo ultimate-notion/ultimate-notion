@@ -25,15 +25,15 @@ DEFAULT_CFG = f"""\
 token = "${{env:{ENV_NOTION_TOKEN}}}"
 
 [gtasks]
-client_secret_json = 'client_secret.json'
-token_json = 'token.json'
+client_secret_json = "client_secret.json"
+token_json = "token.json"
 """
 
 
 class UNOCfg(BaseModel):
     """Configuration related to Ultimate Notion itself."""
 
-    token: str
+    token: str | None = None
     cfg_path: FilePath  # will be set automatically
 
 
@@ -104,6 +104,7 @@ def get_cfg() -> Config:
     if 'ultimate_notion' not in cfg_dict:
         msg = f'The configuration file {cfg_path} does not contain a section [ultimate-notion].'
         raise RuntimeError(msg)
+
     cfg_dict['ultimate_notion']['cfg_path'] = cfg_path
     return Config.model_validate(cfg_dict)
 

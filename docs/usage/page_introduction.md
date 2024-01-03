@@ -108,7 +108,7 @@ from datetime import datetime, timedelta
 
 old_due_date = task.props.due_date
 # assign a datetime Python object
-new_due_date_dt = datetime.now() + timedelta(days=7)
+new_due_date_dt = datetime(2024, 1, 1, 12, 0) + timedelta(days=7)
 task.props.due_date = new_due_date_dt
 assert task.props.due_date.value.date() == new_due_date_dt.date()
 
