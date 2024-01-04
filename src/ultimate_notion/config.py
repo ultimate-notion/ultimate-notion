@@ -53,7 +53,7 @@ class Config(BaseModel):
     @field_validator('google')
     @classmethod
     def convert_json_path(cls, v: GoogleCfg | None, info: ValidationInfo) -> GoogleCfg | None:
-        def make_rel_path_abs(entry: FilePath):
+        def make_rel_path_abs(entry: FilePath | None):
             if entry is not None and not entry.is_absolute():
                 cfg_path: Path = info.data['ultimate_notion'].cfg_path
                 entry = cfg_path.parent / entry
