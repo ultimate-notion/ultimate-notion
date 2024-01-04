@@ -254,7 +254,7 @@ test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/u
 debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
 vcr-off = "test --disable-recording {args}"
 vcr-only = "test --record-mode none {args}"
-vcr-rewrite = ["rm -rf tests/cassettes", "test --record-mode=rewrite {args}"]
+vcr-rewrite = ["rm -rf tests/**/cassettes", "test --record-mode=rewrite {args}"]
 ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
 md2py = "python -c \"from ultimate_notion.utils import convert_md_to_py; convert_md_to_py('{args}')\""

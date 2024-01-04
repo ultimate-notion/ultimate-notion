@@ -52,7 +52,7 @@ class VCRManager:
         return cls._vcr_instance
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def vcr_config():
     """Configure pytest-recording."""
 
@@ -81,7 +81,7 @@ def vcr_config():
     }
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCRManager:
     """My VCR for fixtures"""
     cfg = vcr_config | {'cassette_library_dir': 'tests/cassettes/conftest'}
@@ -113,7 +113,7 @@ def custom_config():
             temp_file_path.unlink()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def notion(my_vcr: VCR) -> Yield[Session]:
     """Return the notion session used for live testing.
 
@@ -131,14 +131,14 @@ def notion(my_vcr: VCR) -> Yield[Session]:
         yield notion
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def contacts_db(notion: Session, my_vcr: VCR) -> Database:
     """Return a test database"""
     with my_vcr.use_cassette('contacts_db.yaml'):
         return notion.search_db(CONTACTS_DB).item()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def root_page(notion: Session, my_vcr: VCR) -> Page:
     """Return the page reference used as parent page for live testing"""
     with my_vcr.use_cassette('root_page.yaml'):
@@ -158,7 +158,7 @@ def article_db(notion: Session, root_page: Page, my_vcr: VCR) -> Database:
         return notion.create_db(parent=root_page, schema=Article)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def page_hierarchy(notion: Session, root_page: Page, my_vcr: VCR) -> tuple[Page, Page, Page]:
     """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2"""
     with my_vcr.use_cassette('page_hierarchy.yaml'):
@@ -167,42 +167,42 @@ def page_hierarchy(notion: Session, root_page: Page, my_vcr: VCR) -> tuple[Page,
         return root_page, l1_page, l2_page
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def intro_page(notion: Session, my_vcr: VCR) -> Page:
     """Return the default 'Getting Started' page"""
     with my_vcr.use_cassette('intro_page.yaml'):
         return notion.search_page(GETTING_STARTED_PAGE).item()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def all_cols_db(notion: Session, my_vcr: VCR) -> Database:
     """Return manually created database with all columns, also AI columns"""
     with my_vcr.use_cassette('all_cols_db.yaml'):
         return notion.search_db(ALL_COL_DB).item()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def wiki_db(notion: Session, my_vcr: VCR) -> Database:
     """Return manually created wiki db"""
     with my_vcr.use_cassette('wiki_db.yaml'):
         return notion.search_db(WIKI_DB).item()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def static_pages(root_page: Page, intro_page: Page, my_vcr: VCR) -> set[Page]:
     """Return all static pages for the unit tests"""
     with my_vcr.use_cassette('static_pages.yaml'):
         return {intro_page, root_page}
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def task_db(notion: Session, my_vcr: VCR) -> Database:
     """Return manually created wiki db"""
     with my_vcr.use_cassette('task_db.yaml'):
         return notion.search_db(TASK_DB).item()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def static_dbs(
     all_cols_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database, my_vcr: VCR
 ) -> set[Database]:
@@ -332,26 +332,30 @@ def new_task_db(notion: Session, root_page: Page, my_vcr: VCR) -> Yield[Database
 
 
 # ToDo: https://stackoverflow.com/questions/38748257/disable-autouse-fixtures-on-specific-pytest-marks
-# @pytest.fixture(scope='session')
-# def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database], my_vcr: VCR):
-#     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content"""
+@pytest.fixture(scope='module', autouse=True)
+def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database], my_vcr: VCR):
+    """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
 
-#     def clean():
-#         for db in notion.search_db():
-#             if db.ancestors[0] == root_page and db not in static_dbs:
-#                 db.delete()
-#         for page in notion.search_page():
-#             if page in static_pages:
-#                 continue
-#             ancestors = page.ancestors
-#             if (
-#                 ancestors
-#                 and ancestors[0] == root_page
-#                 and page.database not in static_dbs
-#                 and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
-#             ):
-#                 page.delete()
+    Be careful! This fixture opens a Notion session, which might lead to problems if you run it in parallel with other.
+    Overwrite it in a a test module to avoid this behavior.
+    """
 
-#     with my_vcr.use_cassette('notion_cleanups.yaml'):
-#         yield
-#         clean()
+    def clean():
+        for db in notion.search_db():
+            if db.ancestors[0] == root_page and db not in static_dbs:
+                db.delete()
+        for page in notion.search_page():
+            if page in static_pages:
+                continue
+            ancestors = page.ancestors
+            if (
+                ancestors
+                and ancestors[0] == root_page
+                and page.database not in static_dbs
+                and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
+            ):
+                page.delete()
+
+    with my_vcr.use_cassette('notion_cleanups.yaml'):
+        yield
+        clean()
