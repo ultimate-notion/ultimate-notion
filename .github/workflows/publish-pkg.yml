@@ -9,9 +9,6 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
     branches:
       - main
-    pull_request:
-      branches:
-        - main
 
 concurrency:
   group: build-${{ github.head_ref || github.ref_name }}
