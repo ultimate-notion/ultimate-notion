@@ -3,10 +3,12 @@ name: Dev docs
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
+    types:
+      - closed
     branches:
-    - main
+      - main
 
   workflow_dispatch:
 
