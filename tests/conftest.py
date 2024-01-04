@@ -11,9 +11,10 @@ import tempfile
 from collections.abc import Generator
 from pathlib import Path
 from typing import TypeAlias, TypeVar
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
+from _pytest.fixtures import SubRequest
 from vcr import VCR
 from vcr import mode as vcr_mode
 
@@ -55,8 +56,8 @@ class VCRManager:
 def vcr_config():
     """Configure pytest-recording."""
 
-    def remove_secrets(response):
-        response['headers'] = {}  # remove header completely
+    def remove_secrets(response: dict[str, dict[str, str]]):
+        response['headers'].pop('cookie', None)
         if 'body' in response and 'string' in response['body']:
             try:
                 # remove secret tokens from body in Google API calls
@@ -75,16 +76,21 @@ def vcr_config():
             ('user-agent', None),
         ],
         'filter_query_parameters': ['client_id', 'client_secret', 'refresh_token'],
-        'filter_post_data_parameters': ['code'],
+        'filter_post_data_parameters': ['code', 'cookie', 'refresh_token'],
         'before_record_response': remove_secrets,
     }
 
 
 @pytest.fixture(scope='session')
-def my_vcr(vcr_config) -> VCRManager:
+def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCRManager:
     """My VCR for fixtures"""
     cfg = vcr_config | {'cassette_library_dir': 'tests/cassettes/conftest'}
-    my_vcr = VCR(**cfg)
+    disable_recording = request.config.getoption('--disable-recording')
+    if disable_recording:
+        my_vcr = MagicMock()
+        my_vcr.use_cassette.return_value.__enter__.return_value = None
+    else:
+        my_vcr = VCR(**cfg)
     return my_vcr
 
 
@@ -325,26 +331,27 @@ def new_task_db(notion: Session, root_page: Page, my_vcr: VCR) -> Yield[Database
         db.delete()
 
 
-@pytest.fixture(scope='session')
-def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database], my_vcr: VCR):
-    """Delete all databases and pages in the root_page after we ran except of some special dbs and their content"""
+# ToDo: https://stackoverflow.com/questions/38748257/disable-autouse-fixtures-on-specific-pytest-marks
+# @pytest.fixture(scope='session')
+# def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database], my_vcr: VCR):
+#     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content"""
 
-    def clean():
-        for db in notion.search_db():
-            if db.ancestors[0] == root_page and db not in static_dbs:
-                db.delete()
-        for page in notion.search_page():
-            if page in static_pages:
-                continue
-            ancestors = page.ancestors
-            if (
-                ancestors
-                and ancestors[0] == root_page
-                and page.database not in static_dbs
-                and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
-            ):
-                page.delete()
+#     def clean():
+#         for db in notion.search_db():
+#             if db.ancestors[0] == root_page and db not in static_dbs:
+#                 db.delete()
+#         for page in notion.search_page():
+#             if page in static_pages:
+#                 continue
+#             ancestors = page.ancestors
+#             if (
+#                 ancestors
+#                 and ancestors[0] == root_page
+#                 and page.database not in static_dbs
+#                 and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
+#             ):
+#                 page.delete()
 
-    with my_vcr.use_cassette('notion_cleanups.yaml'):
-        yield
-        clean()
+#     with my_vcr.use_cassette('notion_cleanups.yaml'):
+#         yield
+#         clean()

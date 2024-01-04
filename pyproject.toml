@@ -229,6 +229,7 @@ ban-relative-imports = "all"
 type = "virtual"
 python = "3.10"
 post-install-commands = ["pre-commit install"]
+features = ["all"]
 dependencies = [
     "coverage[toml]>=6.2",
     "pytest",
@@ -257,11 +258,6 @@ vcr-rewrite = ["rm -rf tests/cassettes", "test --record-mode=rewrite {args}"]
 ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
 md2py = "python -c \"from ultimate_notion.utils import convert_md_to_py; convert_md_to_py('{args}')\""
-
-# Environment for testing features that need the google dependencies.
-[tool.hatch.envs.google]
-features = ["google"]
-
 
 # Docs environment
 [tool.hatch.envs.docs]
