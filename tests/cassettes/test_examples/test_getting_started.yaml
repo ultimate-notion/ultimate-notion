@@ -1,0 +1,458 @@
+interactions:
+- request:
+    body: '{"query": "Getting Started", "filter": {"property": "object", "value":
+      "page"}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '97'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/search
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"6855b161-f63e-4683-b7c7-8ca6e97ee246","created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:36:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Getting
+      Started","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Getting
+      Started","href":null}]}},"url":"https://www.notion.so/Getting-Started-6855b161f63e4683b7c78ca6e97ee246","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"aa93d7ee-387b-40a5-84f3-bf7236fa7315"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=glkAoegqbCpxgiBTh.WV2Q0H5SfZNpZ4ZRDu0z.fxoo-1704385975-1-AY1RHJas+er5dbaG2dWvNyanYVdt2/ZYDoeNwVJkn+B6/E8KQsPczPxWQEOwoWXgqlgXE1HUE/yN+BFOkTqQ+po=;
+        path=/; expires=Thu, 04-Jan-24 17:02:55 GMT; domain=.notion.com; HttpOnly;
+        Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/pages/5f505199-b292-4713-920b-61d813bf72a3
+  response:
+    content: '{"object":"page","id":"5f505199-b292-4713-920b-61d813bf72a3","created_time":"2022-08-22T15:47:00.000Z","last_edited_time":"2024-01-04T16:32:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"archived":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-5f505199b2924713920b61d813bf72a3","public_url":null,"request_id":"55ec6d02-3eff-4c79-9489-482459271907"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/6855b161-f63e-4683-b7c7-8ca6e97ee246/children?page_size=100
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"block\",\"id\":\"ff24ab83-9f2f-4375-b8ab-bbb47aafe831\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"\U0001F44B
+      Welcome to Notion!\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"\U0001F44B
+      Welcome to Notion!\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"2aac2fe9-2749-49fd-89cd-f3a3b226a974\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"22e0c632-a847-4a7f-b485-b088826ac3d8\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Here
+      are the basics:\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Here
+      are the basics:\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"051d1278-f7f0-433e-a5dd-3e79a920304a\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Click
+      anywhere and just start typing\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      anywhere and just start typing\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"d7967064-54a7-41c8-8b05-4540d53c9161\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Hit
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Hit
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"/\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"/\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      to see all the types of content you can add - headers, videos, sub pages, etc.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      to see all the types of content you can add - headers, videos, sub pages, etc.\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"50f38242-ec91-42d6-9e9b-ff3ad92f8a09\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Highlight
+      any text, and use the menu that pops up to \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Highlight
+      any text, and use the menu that pops up to \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"style\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"style\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"your\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":true,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"your\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"writing\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":true,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"writing\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"however\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":true,\"color\":\"default\"},\"plain_text\":\"however\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"you\",\"link\":{\"url\":\"https://www.notion.so/product\"}},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"you\",\"href\":\"https://www.notion.so/product\"},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"like\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"yellow_background\"},\"plain_text\":\"like\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"91eed38e-ec42-4a5d-a7e8-66cf4e531f77\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"See
+      the \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"See
+      the \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"\u22EE\u22EE\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"\u22EE\u22EE\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      to the left of this checkbox on hover? Click and drag to move this line\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      to the left of this checkbox on hover? Click and drag to move this line\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"6d73f271-1824-473b-bf39-b183368b7d68\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Click
+      the \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      the \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"+ New Page\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"+
+      New Page\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\" button
+      at the bottom of your sidebar to add a new page\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      button at the bottom of your sidebar to add a new page\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"4db52454-d430-4f6c-9d37-53e0cd27bbe2\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Click
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"Templates\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Templates\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      in your sidebar to get started with pre-built pages\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      in your sidebar to get started with pre-built pages\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"1e891748-8bbd-4c30-a950-70e5eb9b6138\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":true,\"archived\":false,\"type\":\"toggle\",\"toggle\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is a toggle block. Click the little triangle to see more useful tips!\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
+      is a toggle block. Click the little triangle to see more useful tips!\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"8cd5012a-afcb-49fd-8fc8-89dde830ddec\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"ee9edebe-eb45-4e0a-ad34-b135867e400d\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"\U0001F449\_\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"\U0001F449\_\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"Have
+      a question? \",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Have
+      a question? \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"Click
+      the \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      the \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"?\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":true,\"color\":\"default\"},\"plain_text\":\"?\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      at the bottom right for more guides, or to send us a message.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      at the bottom right for more guides, or to send us a message.\",\"href\":null}],\"color\":\"gray\"}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"block\",\"block\":{},\"request_id\":\"871e89ee-10e8-475e-98e5-52606c601c53\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/1e891748-8bbd-4c30-a950-70e5eb9b6138/children?page_size=100
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"987be3f9-08d5-439a-92e4-3de3181bf39e","parent":{"type":"block_id","block_id":"1e891748-8bbd-4c30-a950-70e5eb9b6138"},"created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:35:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"has_children":false,"archived":false,"type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"notion.com/templates","link":{"url":"https://www.notion.so/templates"}},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"red"},"plain_text":"notion.com/templates","href":"https://www.notion.so/templates"},{"type":"text","text":{"content":":
+      More templates built by the Notion community","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":":
+      More templates built by the Notion community","href":null}],"color":"default"}},{"object":"block","id":"93053731-a029-44c8-ba32-b761433913ac","parent":{"type":"block_id","block_id":"1e891748-8bbd-4c30-a950-70e5eb9b6138"},"created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:35:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"has_children":false,"archived":false,"type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"notion.com/help","link":{"url":"https://www.notion.so/help"}},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"red"},"plain_text":"notion.com/help","href":"https://www.notion.so/help"},{"type":"text","text":{"content":":","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":":","href":null},{"type":"text","text":{"content":"
+      ","link":null},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"
+      ","href":null},{"type":"text","text":{"content":"Guides and FAQs for everything
+      in Notion","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Guides
+      and FAQs for everything in Notion","href":null}],"color":"default"}},{"object":"block","id":"16e65a2b-f373-44a6-a492-926170747319","parent":{"type":"block_id","block_id":"1e891748-8bbd-4c30-a950-70e5eb9b6138"},"created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:35:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"has_children":false,"archived":false,"type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"notion.com/guides","link":{"url":"http://notion.com/guides"}},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"red"},"plain_text":"notion.com/guides","href":"http://notion.com/guides"},{"type":"text","text":{"content":":
+      Watch videos and read tutorials to become a Notion expert","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":":
+      Watch videos and read tutorials to become a Notion expert","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"5f5256a1-de53-4e50-9e7f-40025e76b734"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"query": "Getting Started", "filter": {"property": "object", "value":
+      "page"}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '97'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/search
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"6855b161-f63e-4683-b7c7-8ca6e97ee246","created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:36:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Getting
+      Started","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Getting
+      Started","href":null}]}},"url":"https://www.notion.so/Getting-Started-6855b161f63e4683b7c78ca6e97ee246","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"ce05672e-7fbd-4a3c-949a-538e22fc8735"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=gIsXWy3kusoFIXNKl_MLMzYi99u8VnSuo4C0Z63GN5E-1704385976-1-Ac6l4BBBoJJAb3ljeMYhkmZ04SEzsfQSV9ptsDjHIKZb+pwb/ssubZ2MbW5UXa8zoy1gIN8IaJqpVQNtX+eH9ys=;
+        path=/; expires=Thu, 04-Jan-24 17:02:56 GMT; domain=.notion.com; HttpOnly;
+        Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/pages/5f505199-b292-4713-920b-61d813bf72a3
+  response:
+    content: '{"object":"page","id":"5f505199-b292-4713-920b-61d813bf72a3","created_time":"2022-08-22T15:47:00.000Z","last_edited_time":"2024-01-04T16:32:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"archived":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-5f505199b2924713920b61d813bf72a3","public_url":null,"request_id":"eaed7f5b-1c39-426f-b84b-92258acb980b"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/6855b161-f63e-4683-b7c7-8ca6e97ee246/children?page_size=100
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"block\",\"id\":\"ff24ab83-9f2f-4375-b8ab-bbb47aafe831\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"\U0001F44B
+      Welcome to Notion!\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"\U0001F44B
+      Welcome to Notion!\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"2aac2fe9-2749-49fd-89cd-f3a3b226a974\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"22e0c632-a847-4a7f-b485-b088826ac3d8\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Here
+      are the basics:\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Here
+      are the basics:\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"051d1278-f7f0-433e-a5dd-3e79a920304a\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Click
+      anywhere and just start typing\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      anywhere and just start typing\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"d7967064-54a7-41c8-8b05-4540d53c9161\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Hit
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Hit
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"/\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"/\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      to see all the types of content you can add - headers, videos, sub pages, etc.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      to see all the types of content you can add - headers, videos, sub pages, etc.\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"50f38242-ec91-42d6-9e9b-ff3ad92f8a09\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Highlight
+      any text, and use the menu that pops up to \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Highlight
+      any text, and use the menu that pops up to \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"style\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"style\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"your\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":true,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"your\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"writing\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":true,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"writing\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"however\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":true,\"color\":\"default\"},\"plain_text\":\"however\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"you\",\"link\":{\"url\":\"https://www.notion.so/product\"}},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"you\",\"href\":\"https://www.notion.so/product\"},{\"type\":\"text\",\"text\":{\"content\":\"
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"like\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"yellow_background\"},\"plain_text\":\"like\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"91eed38e-ec42-4a5d-a7e8-66cf4e531f77\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"See
+      the \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"See
+      the \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"\u22EE\u22EE\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"\u22EE\u22EE\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      to the left of this checkbox on hover? Click and drag to move this line\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      to the left of this checkbox on hover? Click and drag to move this line\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"6d73f271-1824-473b-bf39-b183368b7d68\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Click
+      the \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      the \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"+ New Page\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"+
+      New Page\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\" button
+      at the bottom of your sidebar to add a new page\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      button at the bottom of your sidebar to add a new page\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"4db52454-d430-4f6c-9d37-53e0cd27bbe2\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"to_do\",\"to_do\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"Click
+      \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"Templates\",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Templates\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      in your sidebar to get started with pre-built pages\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      in your sidebar to get started with pre-built pages\",\"href\":null}],\"checked\":false,\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"1e891748-8bbd-4c30-a950-70e5eb9b6138\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":true,\"archived\":false,\"type\":\"toggle\",\"toggle\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is a toggle block. Click the little triangle to see more useful tips!\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
+      is a toggle block. Click the little triangle to see more useful tips!\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"8cd5012a-afcb-49fd-8fc8-89dde830ddec\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"ee9edebe-eb45-4e0a-ad34-b135867e400d\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"6855b161-f63e-4683-b7c7-8ca6e97ee246\"},\"created_time\":\"2023-11-05T10:35:00.000Z\",\"last_edited_time\":\"2023-11-05T10:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"\U0001F449\_\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"\U0001F449\_\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"Have
+      a question? \",\"link\":null},\"annotations\":{\"bold\":true,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Have
+      a question? \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"Click
+      the \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Click
+      the \",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"?\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":true,\"color\":\"default\"},\"plain_text\":\"?\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
+      at the bottom right for more guides, or to send us a message.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
+      at the bottom right for more guides, or to send us a message.\",\"href\":null}],\"color\":\"gray\"}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"block\",\"block\":{},\"request_id\":\"edc141c0-059a-449c-a8fb-58d16eb40172\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/1e891748-8bbd-4c30-a950-70e5eb9b6138/children?page_size=100
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"987be3f9-08d5-439a-92e4-3de3181bf39e","parent":{"type":"block_id","block_id":"1e891748-8bbd-4c30-a950-70e5eb9b6138"},"created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:35:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"has_children":false,"archived":false,"type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"notion.com/templates","link":{"url":"https://www.notion.so/templates"}},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"red"},"plain_text":"notion.com/templates","href":"https://www.notion.so/templates"},{"type":"text","text":{"content":":
+      More templates built by the Notion community","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":":
+      More templates built by the Notion community","href":null}],"color":"default"}},{"object":"block","id":"93053731-a029-44c8-ba32-b761433913ac","parent":{"type":"block_id","block_id":"1e891748-8bbd-4c30-a950-70e5eb9b6138"},"created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:35:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"has_children":false,"archived":false,"type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"notion.com/help","link":{"url":"https://www.notion.so/help"}},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"red"},"plain_text":"notion.com/help","href":"https://www.notion.so/help"},{"type":"text","text":{"content":":","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":":","href":null},{"type":"text","text":{"content":"
+      ","link":null},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"
+      ","href":null},{"type":"text","text":{"content":"Guides and FAQs for everything
+      in Notion","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Guides
+      and FAQs for everything in Notion","href":null}],"color":"default"}},{"object":"block","id":"16e65a2b-f373-44a6-a492-926170747319","parent":{"type":"block_id","block_id":"1e891748-8bbd-4c30-a950-70e5eb9b6138"},"created_time":"2023-11-05T10:35:00.000Z","last_edited_time":"2023-11-05T10:35:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"has_children":false,"archived":false,"type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"notion.com/guides","link":{"url":"http://notion.com/guides"}},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"red"},"plain_text":"notion.com/guides","href":"http://notion.com/guides"},{"type":"text","text":{"content":":
+      Watch videos and read tutorials to become a Notion expert","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":":
+      Watch videos and read tutorials to become a Notion expert","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"f87251e5-1efb-474e-ad0e-cdddbe2d9594"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
