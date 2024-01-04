@@ -58,6 +58,7 @@ def vcr_config():
     secret_params = [
         'client_id',
         'client_secret',
+        'access_token',
         'refresh_token',
         'code',
         'cookie',
@@ -70,12 +71,13 @@ def vcr_config():
     ]
 
     def remove_secrets(response: dict[str, dict[str, str]]):
-        response['headers'].pop('cookie', None)
+        for secret in secret_params:
+            response['headers'].pop(secret, None)
         if 'body' in response and 'string' in response['body']:
             try:
                 # remove secret tokens from body in Google API calls
                 dct = json.loads(response['body']['string'])
-                for secret in ('access_token', 'refresh_token'):
+                for secret in secret_params:
                     if secret in dct:
                         dct[secret] = 'secret...'
                 response['body']['string'] = json.dumps(dct)
