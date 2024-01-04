@@ -24,7 +24,7 @@ DEFAULT_CFG = f"""\
 [ultimate_notion]
 token = "${{env:{ENV_NOTION_TOKEN}}}"
 
-[gtasks]
+[google]
 client_secret_json = "client_secret.json"
 token_json = "token.json"
 """
@@ -48,9 +48,9 @@ class Config(BaseModel):
     """Main configuration object."""
 
     ultimate_notion: UNOCfg
-    gtasks: GoogleCfg | None = None
+    google: GoogleCfg | None = None
 
-    @field_validator('gtasks')
+    @field_validator('google')
     @classmethod
     def convert_json_path(cls, v: GoogleCfg | None, info: ValidationInfo) -> GoogleCfg | None:
         def make_rel_path_abs(entry: FilePath):

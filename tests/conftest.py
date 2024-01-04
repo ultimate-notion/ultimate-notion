@@ -55,6 +55,19 @@ class VCRManager:
 @pytest.fixture(scope='module')
 def vcr_config():
     """Configure pytest-recording."""
+    secret_params = [
+        'client_id',
+        'client_secret',
+        'refresh_token',
+        'code',
+        'cookie',
+        'authorization',
+        'CF-RAY',
+        'Date',
+        'ETag',
+        'X-Notion-Request-Id',
+        'user-agent',
+    ]
 
     def remove_secrets(response: dict[str, dict[str, str]]):
         response['headers'].pop('cookie', None)
@@ -71,12 +84,9 @@ def vcr_config():
         return response
 
     return {
-        'filter_headers': [
-            ('authorization', 'secret...'),
-            ('user-agent', None),
-        ],
-        'filter_query_parameters': ['client_id', 'client_secret', 'refresh_token'],
-        'filter_post_data_parameters': ['code', 'cookie', 'refresh_token'],
+        'filter_headers': [(param, 'secret...') for param in secret_params],
+        'filter_query_parameters': secret_params,
+        'filter_post_data_parameters': secret_params,
         'before_record_response': remove_secrets,
     }
 
