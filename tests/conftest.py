@@ -111,34 +111,30 @@ def pytest_recording_configure(config, vcr):
     VCRManager.set_vcr(vcr)  # register the vcr instance of pytest-recording globally
 
 
-@pytest.fixture(autouse=True)
-def custom_config():
+@pytest.fixture(scope='module')
+def custom_config() -> Yield[str]:
     # Create a temporary file
-    _, temp_file_path_str = tempfile.mkstemp()
-    temp_file_path = Path(temp_file_path_str)
+    with tempfile.TemporaryDirectory() as tmp_dir_path:
+        cfg_path = tmp_dir_path / Path('config.cfg')
 
-    with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: temp_file_path_str}):
-        temp_file_path.unlink()  # we only need the path, not the file itself!
-        client_secret_path = temp_file_path.parent / Path('client_secret.json')
-        client_secret_path.write_text(
-            '{"installed":{"client_id":"secret","project_id":"ultimate-notion",'
-            '"auth_uri":"https://accounts.google.com/o/oauth2/auth",'
-            '"token_uri":"https://oauth2.googleapis.com/token",'
-            '"auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",'
-            '"client_secret":"secret...",'
-            '"redirect_uris":["http://localhost"]}}'
-        )
-        token_path = temp_file_path.parent / Path('token.json')
-        token_path.write_text(
-            '{"token": "secret...", "refresh_token": "secret...", "token_uri": "https://oauth2.googleapis.com/token",'
-            '"client_id": "secret.apps.googleusercontent.com", "client_secret": "secret...",'
-            '"scopes": ["https://www.googleapis.com/auth/tasks"], "universe_domain": "googleapis.com", '
-            '"expiry": "2099-01-04T17:33:08.600154Z"}'
-        )
-        yield temp_file_path_str
-
-        if temp_file_path.exists():
-            temp_file_path.unlink()
+        with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
+            client_secret_path = tmp_dir_path / Path('client_secret.json')
+            client_secret_path.write_text(
+                '{"installed":{"client_id":"secret","project_id":"ultimate-notion",'
+                '"auth_uri":"https://accounts.google.com/o/oauth2/auth",'
+                '"token_uri":"https://oauth2.googleapis.com/token",'
+                '"auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",'
+                '"client_secret":"secret...",'
+                '"redirect_uris":["http://localhost"]}}'
+            )
+            token_path = tmp_dir_path / Path('token.json')
+            token_path.write_text(
+                '{"token": "secret...", "refresh_token": "secret...", "token_uri": "https://oauth2.googleapis.com/token",'
+                '"client_id": "secret.apps.googleusercontent.com", "client_secret": "secret...",'
+                '"scopes": ["https://www.googleapis.com/auth/tasks"], "universe_domain": "googleapis.com", '
+                '"expiry": "2099-01-04T17:33:08.600154Z"}'
+            )
+            yield str(cfg_path)
 
 
 @pytest.fixture(scope='module')
