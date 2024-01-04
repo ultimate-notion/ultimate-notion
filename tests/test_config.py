@@ -20,8 +20,8 @@ def test_get_or_create_cfg(custom_config):
 
     assert cfg.ultimate_notion.token == 'my-token'
     assert cfg.ultimate_notion.cfg_path == Path(custom_config)
-    assert isinstance(cfg.gtasks.client_secret_json, Path)
-    assert isinstance(cfg.gtasks.token_json, Path)
+    assert isinstance(cfg.google.client_secret_json, Path)
+    assert isinstance(cfg.google.token_json, Path)
 
 
 def test_resolve_env_value():

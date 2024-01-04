@@ -290,14 +290,14 @@ class GTasksClient:
         self.resource = self._build_resource()
 
     def _build_resource(self) -> Resource:
-        if self._config.gtasks is None:
-            msg = 'Configurtion has no `gtasks` section!'
+        if self._config.google is None:
+            msg = 'Configurtion has no `google` section!'
             raise RuntimeError(msg)
-        if (secret_path := self._config.gtasks.client_secret_json) is None:
-            msg = 'You have to set gtasks.client_secret_json in your config.toml!'
+        if (secret_path := self._config.google.client_secret_json) is None:
+            msg = 'You have to set google.client_secret_json in your config.toml!'
             raise RuntimeError(msg)
-        if (token_path := self._config.gtasks.token_json) is None:
-            msg = 'You have to set gtasks.token_json in your config.toml!'
+        if (token_path := self._config.google.token_json) is None:
+            msg = 'You have to set google.token_json in your config.toml!'
             raise RuntimeError(msg)
         if not secret_path.exists():
             msg = f'File {secret_path} does not exist!'
@@ -318,7 +318,7 @@ class GTasksClient:
 
     def recreate_token(self):
         """Recreate the current token using the scopes given at initialization."""
-        self._config.gtasks.token_json.unlink(missing_ok=True)
+        self._config.google.token_json.unlink(missing_ok=True)
         self.resource = self._build_resource()
 
     def all_tasklists(self, max_results: int | None = None) -> list[GTaskList]:
