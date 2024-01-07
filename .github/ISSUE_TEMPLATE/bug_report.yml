@@ -1,0 +1,44 @@
+name: "🐛 Bug report"
+description: Create a bug report to help us improve.
+title: "🐛 [BUG] - <title>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug, it's much appreciated! Please also make sure to search our issues for similar bugs first. If bug has been reported already, react with a thumbs-up, and/or leave a comment providing further details.
+  - type: textarea
+    id: current
+    attributes:
+      label: Problem description
+      description: What problem you're running into?
+      placeholder: When trying to do ____, Ultimate Notion suddenly shows me an error saying "...".
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: Sometimes bugs are subtle and the expected behaviour may need some explanation. Leave empty if it's just "Don't be broken."
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Please provide a minimal, self-contained, and reproducible code example if possible.
+  - type: input
+    id: Version
+    attributes:
+      label: Version
+      description: Ultimate Notion version in use. (Leave empty if unknown).
+  - type: input
+    id: Installation
+    attributes:
+      label: Installation
+      description: Installation of Ultimate Notion, e.g. `pip`, `pipenv`, etc. (Leave empty if unknown).
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      description: Python version in use. (Leave empty if unknown).
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: Operating system in use. (Leave empty if unknown).
