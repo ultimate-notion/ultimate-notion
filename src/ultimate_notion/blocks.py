@@ -33,7 +33,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         return hash(self.id)
 
     @property
-    def id(self) -> UUID:  # noqa: A003
+    def id(self) -> UUID:
         return self.obj_ref.id
 
     @property

@@ -38,7 +38,7 @@ class SelectOption(GenericObject):
     """Options for select & multi-select objects."""
 
     name: str
-    id: str = None  # type: ignore  # noqa: A003  # According to docs: "These are sometimes, but not always, UUIDs."
+    id: str = None  # type: ignore  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color = Color.DEFAULT
     description: str | None = None  # ToDo: Undocumented, could also be [RichTextObject]
 
@@ -52,7 +52,7 @@ class SelectGroup(GenericObject):
     """Group of options for status objects."""
 
     name: str
-    id: str = None  # type: ignore  # noqa: A003  # According to docs: "These are sometimes, but not always, UUIDs."
+    id: str = None  # type: ignore  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color = Color.DEFAULT
     option_ids: list[str] = Field(default_factory=list)
 
@@ -60,7 +60,7 @@ class SelectGroup(GenericObject):
 class ObjectReference(GenericObject):
     """A general-purpose object reference in the Notion API."""
 
-    id: UUID  # noqa: A003
+    id: UUID
 
     @classmethod
     def build(cls, ref):
@@ -323,7 +323,7 @@ class RichTextObject(TypedObject, polymorphic_base=True):
 class LinkObject(GenericObject):
     """Reference a URL."""
 
-    type: str = 'url'  # noqa: A003
+    type: str = 'url'
     url: str = None  # type: ignore
 
 

@@ -181,11 +181,6 @@ class Session:
         # ToDo: Implement
         raise NotImplementedError
 
-    def get_or_create_db(self, parent: Page, schema: type[PageSchema], title: str | None = None):
-        """Get or create the database."""
-        # ToDo: Implement
-        raise NotImplementedError
-
     def search_db(
         self, db_name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
     ) -> SList[Database]:
@@ -215,6 +210,16 @@ class Session:
         else:
             db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
             self.cache[db.id] = db
+            return db
+
+    def get_or_create_db(self, parent: Page, schema: type[PageSchema]) -> Database:
+        """Get or create the database."""
+        dbs = SList(db for db in self.search_db(schema.db_title) if db.parent == parent)
+        if len(dbs) == 0:
+            return self.create_db(parent, schema)
+        else:
+            db = dbs.item()
+            db.schema = schema
             return db
 
     def search_page(

@@ -292,7 +292,7 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     col_ref: Column | None = None
 
     @property
-    def id(self) -> str | None:  # noqa: A003
+    def id(self) -> str | None:
         """Return identifier of this property type."""
         return self.obj_ref.id
 
@@ -363,11 +363,11 @@ class Column:
         raise NotImplementedError
 
     @property
-    def type(self) -> PropertyType:  # noqa: A003
+    def type(self) -> PropertyType:
         return self._type
 
     @type.setter
-    def type(self, new_type: PropertyType):  # noqa: A003
+    def type(self, new_type: PropertyType):
         raise NotImplementedError
 
     @property

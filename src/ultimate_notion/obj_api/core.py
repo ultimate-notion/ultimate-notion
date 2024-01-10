@@ -73,9 +73,9 @@ class GenericObject(BaseModel):
 class NotionObject(GenericObject):
     """A top-level Notion API resource."""
 
-    object: str  # noqa: A003
+    object: str
     request_id: UUID = None  # type: ignore
-    id: UUID | str = None  # type: ignore  # noqa: A003
+    id: UUID | str = None  # type: ignore
 
     def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)
@@ -125,7 +125,7 @@ class TypedObject(GenericObject):
     Calling the object provides direct access to the data stored in `{type}`.
     """
 
-    type: str  # noqa: A003
+    type: str
     _polymorphic_base: ClassVar[bool] = False
 
     def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs):  # noqa: A002

@@ -28,7 +28,7 @@ DateType: TypeAlias = dt_date | tuple[dt_date, dt_date]  # Note that date is the
 class PropertyValue(TypedObject, polymorphic_base=True):
     """Base class for Notion property values."""
 
-    id: str = None  # type: ignore  # noqa: A003
+    id: str = None  # type: ignore
 
     @classmethod
     def build(cls, value):
@@ -321,4 +321,4 @@ class PropertyItem(NotionObject, PropertyValue, object='property_item'):
     Notion-API: https://developers.notion.com/reference/property-item-object
     """
 
-    id: str  # noqa: A003
+    id: str

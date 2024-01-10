@@ -31,7 +31,7 @@ from ultimate_notion.obj_api.schema import PropertyType
 class DataObject(NotionObject):
     """The base type for all Notion API records."""
 
-    id: UUID = None  # type: ignore  # noqa: A003
+    id: UUID = None  # type: ignore
 
     parent: SerializeAsAny[ParentRef] = None  # type: ignore
     has_children: bool = False
