@@ -17,7 +17,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         super().__init__(name, color=color)
 
     @property
-    def id(self) -> str:  # noqa: A003
+    def id(self) -> str:
         """ID of the option."""
         return self.obj_ref.id
 
@@ -275,7 +275,7 @@ class User(Wrapper[objs.User], wraps=objs.User):
         return hash(self.id)
 
     @property
-    def id(self):  # noqa: A003
+    def id(self):
         return self.obj_ref.id
 
     @property

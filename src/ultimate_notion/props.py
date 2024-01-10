@@ -58,7 +58,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
         """Return the actual Python value object of this property."""
 
     @property
-    def id(self) -> str:  # noqa: A003
+    def id(self) -> str:
         return self.obj_ref.id
 
     def __repr__(self) -> str:

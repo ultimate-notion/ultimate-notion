@@ -8,6 +8,7 @@ Official API documentation: https://googleapis.github.io/google-api-python-clien
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from datetime import datetime
 from enum import Enum
 from typing import Literal
@@ -19,6 +20,7 @@ from googleapiclient.discovery import Resource, build
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from ultimate_notion.config import Config, get_or_create_cfg
+from ultimate_notion.utils import SList
 
 
 class Scope(str, Enum):
@@ -34,7 +36,7 @@ class Link(BaseModel):
     model_config = ConfigDict(extra='forbid')
     description: str
     Link: HttpUrl
-    type: str  # noqa: A003
+    type: str
 
 
 class Status(str, Enum):
@@ -56,7 +58,7 @@ class GObject(BaseModel):
 
     model_config = ConfigDict(extra='forbid')
 
-    id: str  # noqa: A003
+    id: str  # A003
     title_: str = Field(..., alias='title')
     kind: Kind
     etag: str
@@ -235,16 +237,32 @@ class GTaskList(GObject):
 
         return tasks
 
+    def __iter__(self) -> Iterator[GTask]:
+        """Returns an iterator over all tasks in this task list."""
+        yield from self.all_tasks()
+
+    def __len__(self) -> int:
+        """Return the number of tasks in this task list."""
+        return len(self.all_tasks())
+
+    @property
+    def is_empty(self) -> bool:
+        """Is this task list empty?"""
+        return len(self) == 0
+
     def get_task(self, task_id: str) -> GTask:
         """Returns the task with the given ID."""
         resource = self._resource.tasks()
         task = resource.get(tasklist=self.id, task=task_id).execute()
         return GTask(_resource=self._resource, **task)
 
-    def create_task(self, title: str) -> GTask:
+    def create_task(self, title: str, due: datetime | None = None) -> GTask:
         """Creates a new task."""
         resource = self._resource.tasks()
-        task = resource.insert(tasklist=self.id, body={'title': title}).execute()
+        body = {'title': title}
+        if due is not None:
+            body['due'] = due.isoformat()
+        task = resource.insert(tasklist=self.id, body=body).execute()
         return GTask(_resource=self._resource, **task)
 
     def delete(self):
@@ -280,12 +298,9 @@ class GTaskList(GObject):
 
 
 class GTasksClient:
-    """Google API to easily handle Google Tasks.
+    """Google API to easily handle Google Tasks."""
 
-    By default, only the least permissive scope `TASKS_RO` in case of `read_only = True` is used.
-    """
-
-    def __init__(self, config: Config | None = None, *, read_only: bool = True):
+    def __init__(self, config: Config | None = None, *, read_only: bool = False):
         self.read_only = read_only
         self._scopes = [Scope.TASKS_RO.value] if read_only else [Scope.TASKS_RW.value]
         if config is None:
@@ -346,7 +361,30 @@ class GTasksClient:
         tasklist = self.resource.tasklists().get(tasklist=tasklist_id).execute()
         return GTaskList(_resource=self.resource, **tasklist)
 
+    def search_tasklist(self, title: str) -> SList[GTaskList]:
+        """Returns the task list with the given title."""
+        tasklists = self.all_tasklists()
+        return SList(tasklist for tasklist in tasklists if tasklist.title == title)
+
     def create_tasklist(self, title: str) -> GTaskList:
         """Creates a new task list."""
         tasklist = self.resource.tasklists().insert(body={'title': title}).execute()
         return GTaskList(_resource=self.resource, **tasklist)
+
+    def get_or_create_tasklist(self, title: str) -> GTaskList:
+        """Returns the task list with the given title or creates it if it doesn't exist yet."""
+        tasklists = self.search_tasklist(title)
+        if len(tasklists) == 0:
+            return self.create_tasklist(title)
+        else:
+            return tasklists.item()
+
+    def close(self):
+        """Closes the client."""
+        self.resource.close()
+
+    def __enter__(self) -> GTasksClient:
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()

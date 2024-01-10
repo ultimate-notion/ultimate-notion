@@ -15,7 +15,7 @@ from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 class PropertyType(TypedObject, polymorphic_base=True):
     """Base class for Notion property objects."""
 
-    id: str | None = None  # noqa: A003
+    id: str | None = None
     name: str | None = None
 
     @classmethod
@@ -43,7 +43,7 @@ class Number(PropertyType, type='number'):
     """Defines the number configuration for a database property."""
 
     class _NestedData(GenericObject):
-        format: NumberFormat = NumberFormat.NUMBER  # noqa: A003
+        format: NumberFormat = NumberFormat.NUMBER
 
         # leads to better error messages, see
         # https://github.com/pydantic/pydantic/issues/355

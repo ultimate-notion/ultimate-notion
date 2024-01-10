@@ -113,7 +113,7 @@ class BlocksEndpoint(Endpoint):
             return parent
 
         # https://developers.notion.com/reference/get-block-children
-        def list(self, parent):  # noqa: A003
+        def list(self, parent):
             """Return all Blocks contained by the specified parent.
 
             `parent` may be any suitable `ObjectReference` type.

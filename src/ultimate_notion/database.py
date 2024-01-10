@@ -70,6 +70,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def icon(self) -> File | Emoji | None:
+        """Return the icon of this database as file or emoji."""
         icon = self.obj_ref.icon
         if isinstance(icon, objs.FileObject):
             return File.wrap_obj_ref(icon)
@@ -83,6 +84,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def cover(self) -> File | None:
+        """Return the cover of this database as file."""
         cover = self.obj_ref.cover
         return File.wrap_obj_ref(cover) if cover is not None else None
 
@@ -128,10 +130,12 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def url(self) -> str:
+        """URL of this database."""
         return self.obj_ref.url
 
     @property
     def is_inline(self) -> bool:
+        """Is this database an inline database?"""
         return self.obj_ref.is_inline
 
     def delete(self) -> Database:
@@ -174,6 +178,15 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session = get_active_session()
         query = session.api.databases.query(self.obj_ref)  # ToDo: use self.query when implemented
         return View(database=self, pages=self._pages_from_query(query), query=query)
+
+    def __len__(self) -> int:
+        """Return the number of pages in this database."""
+        return len(self.fetch_all())
+
+    @property
+    def is_empty(self) -> bool:
+        """Is this database empty?"""
+        return len(self) == 0
 
     def create_page(self, **kwargs) -> Page:
         """Create a page with properties according to the schema within the corresponding database."""

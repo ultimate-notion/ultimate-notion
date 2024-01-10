@@ -95,8 +95,8 @@ class PropertyItemList(ObjectList, type='property_item'):
     """
 
     class _NestedData(GenericObject):
-        id: str = None  # type: ignore  # noqa: A003
-        type: str = None  # type: ignore  # noqa: A003
+        id: str = None  # type: ignore
+        type: str = None  # type: ignore
         next_url: str | None = None
 
     property_item: _NestedData = _NestedData()

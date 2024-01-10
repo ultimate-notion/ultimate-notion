@@ -302,7 +302,7 @@ class View:
         # ToDo: Implement me
         raise NotImplementedError
 
-    def filter(self):  # noqa: A003
+    def filter(self):
         """Filter the view."""
         # ToDo: Implement me
         raise NotImplementedError

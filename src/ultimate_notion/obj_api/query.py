@@ -132,7 +132,7 @@ class QueryFilter(GenericObject):
 class PropertyFilter(QueryFilter):
     """Represents a database property filter in Notion."""
 
-    property: str  # noqa: A003
+    property: str
 
     rich_text: TextCondition | None = None
     phone_number: TextCondition | None = None
@@ -150,7 +150,7 @@ class PropertyFilter(QueryFilter):
 class SearchFilter(QueryFilter):
     """Represents a search property filter in Notion."""
 
-    property: str  # noqa: A003
+    property: str
     value: str
 
 
@@ -212,7 +212,7 @@ class SortDirection(str, Enum):
 class DBSort(GenericObject):
     """Sort instruction when querying a database"""
 
-    property: str  # noqa: A003
+    property: str
     direction: SortDirection
 
 
@@ -226,7 +226,7 @@ class SearchSort(GenericObject):
 class Query(GenericObject, ABC):
     """Abstract query object in Notion for searching pages/databases and querying databases"""
 
-    filter: SerializeAsAny[QueryFilter] | None = None  # noqa: A003
+    filter: SerializeAsAny[QueryFilter] | None = None
     start_cursor: UUID | None = None
     page_size: int = MAX_PAGE_SIZE
 
@@ -315,7 +315,7 @@ class SearchQueryBuilder(QueryBuilder):
         self.query = SearchQuery()
         super().__init__(endpoint=endpoint, query=text)
 
-    def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder:  # noqa: A003
+    def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder:
         """Filter for pages or databases only"""
         if not (page_only ^ db_only):
             msg = 'Either `page_only` or `db_only` must be true, not both.'
@@ -347,7 +347,7 @@ class DBQueryBuilder(QueryBuilder):
         self.query = DBQuery()
         super().__init__(endpoint=endpoint, database_id=db_id)
 
-    def filter(self, condition: QueryFilter) -> DBQueryBuilder:  # noqa: A003
+    def filter(self, condition: QueryFilter) -> DBQueryBuilder:
         """Add the given filter to the query."""
         self.query.filter = condition
         return self

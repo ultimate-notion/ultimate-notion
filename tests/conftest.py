@@ -120,7 +120,7 @@ def custom_config() -> Yield[str]:
         with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
             client_secret_path = tmp_dir_path / Path('client_secret.json')
             client_secret_path.write_text(
-                '{"installed":{"client_id":"secret","project_id":"ultimate-notion",'
+                '{"installed":{"client_id":"secret...","project_id":"ultimate-notion",'
                 '"auth_uri":"https://accounts.google.com/o/oauth2/auth",'
                 '"token_uri":"https://oauth2.googleapis.com/token",'
                 '"auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",'
