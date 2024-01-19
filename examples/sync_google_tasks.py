@@ -6,7 +6,7 @@ https://developers.google.com/tasks/quickstart/python
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from ultimate_notion.adapters.google_tasks import GTasksClient, SyncGTasks
+from ultimate_notion.adapters.google import GTasksClient, SyncGTasks
 from ultimate_notion import (
     OptionNS,
     Option,
@@ -16,7 +16,7 @@ from ultimate_notion import (
     ColType,
     Session,
 )
-from ultimate_notion import sync
+from ultimate_notion.adapters import sync
 
 
 ######################################################
@@ -97,7 +97,7 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
         due_col=Task.due_date,
     )
     # Schedule the sync task to run every 5 minutes
-    sync_task.run_every(seconds=5).in_total(times=300).schedule()
+    sync_task.run_every(seconds=5).in_total(times=3).schedule()
 
     # Run all scheduled tasks
     sync.run_all_tasks()
