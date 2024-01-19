@@ -155,12 +155,12 @@ class GTask(GObject):
         self._update(resp)
 
     @property
-    def completed(self) -> bool:
+    def is_completed(self) -> bool:
         """Returns whether this task is completed."""
         return self.status == Status.COMPLETED
 
-    @completed.setter
-    def completed(self, completed: bool):
+    @is_completed.setter
+    def is_completed(self, completed: bool):
         """Sets the completed status of this task."""
         resource = self._resource.tasks()
         resp = resource.patch(
@@ -237,7 +237,7 @@ class GTaskList(GObject):
 
         return tasks
 
-    def __iter__(self) -> Iterator[GTask]:
+    def __iter__(self) -> Iterator[GTask]:  # type: ignore[override]
         """Returns an iterator over all tasks in this task list."""
         yield from self.all_tasks()
 
@@ -249,6 +249,11 @@ class GTaskList(GObject):
     def is_empty(self) -> bool:
         """Is this task list empty?"""
         return len(self) == 0
+
+    def __bool__(self) -> bool:
+        """Overwrite default behaviour."""
+        msg = 'Use .is_empty instead of bool(task_list) to check if a task list is empty.'
+        raise RuntimeError(msg)
 
     def get_task(self, task_id: str) -> GTask:
         """Returns the task with the given ID."""

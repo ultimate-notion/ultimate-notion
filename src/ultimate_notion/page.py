@@ -103,7 +103,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         # We have to subclass in order to populate it with the descriptor `PageProperty``
         # as this only works on the class level and we want a unique class for each property.
         page_props_cls = type('_PageProperties', (PageProperties,), {})
-        if self.database:
+        if self.database is not None:
             for col in self.database.schema.get_cols():
                 setattr(page_props_cls, col.attr_name, PageProperty(prop_name=col.name))
         return page_props_cls(page=self)

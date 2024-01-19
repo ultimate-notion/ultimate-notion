@@ -30,5 +30,5 @@ def test_simple_taskdb():
 
 @pytest.mark.vcr()
 @pytest.mark.skipif(sys.platform == 'win32', reason='Does not run on Windows')
-def test_google_tasks(custom_config):
-    exec_pyfile('examples/google_tasks.py')
+def test_sync_google_tasks():
+    exec_pyfile('examples/sync_google_tasks.py')

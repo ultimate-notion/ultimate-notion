@@ -55,6 +55,11 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [ ] create a comment within a block or page
 - [ ] retrieve comments of a block or page
 
+## Miscellaneous
+
+- [x] general synchronization capabilities with external services
+- [x] client for [Google Tasks API] and synchronization adapter
+
 ## Notion API Limitations
 
 Some features that the Notion UI provides are not possible to implement due to limitations of the API itself.
@@ -80,4 +85,4 @@ If you think those limitations should be fixed, [let the developers of Notion kn
 [Verification]: https://developers.notion.com/reference/page-property-values#verification
 [Wiki database]: https://developers.notion.com/docs/working-with-databases#wiki-databases
 [updating the database schema]: https://developers.notion.com/reference/update-a-database#errors
-[here]: https://github.com/ramnes/notion-sdk-py/discussions/128
+[Google Tasks API]: https://developers.google.com/tasks/overview

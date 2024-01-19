@@ -54,7 +54,7 @@ class RichText(PropertyValue, type='rich_text'):
 class Number(PropertyValue, type='number'):
     """Simple number type."""
 
-    number: float | int | None = None  # ToDo: Recheck if it should be int | float | None instead
+    number: float | int | None = None
 
 
 class Checkbox(PropertyValue, type='checkbox'):

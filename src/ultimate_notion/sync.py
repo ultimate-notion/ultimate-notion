@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
+import pickle  # noqa: S403
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from enum import Enum
@@ -41,15 +41,15 @@ class SyncTask(ABC):
     _in_total_times: int | None = None
 
     def __init__(
-        self, name: str, attr_map: dict[str, str], resolve_conflict: ConflictMode | str = ConflictMode.NEWER
+        self, name: str, attr_map: dict[str, str], conflict_mode: ConflictMode | str = ConflictMode.NEWER
     ) -> None:
-        if isinstance(resolve_conflict, str):
-            resolve_conflict = ConflictMode(resolve_conflict)
+        if isinstance(conflict_mode, str):
+            conflict_mode = ConflictMode(conflict_mode)
 
         self.name = name
         self.attr_map = attr_map
-        self.resolve_conflict = resolve_conflict
-        self.state_path = get_cfg_file().parent / 'sync_states' / f'{name}.json'
+        self.conflict_mode = conflict_mode
+        self.state_path = get_cfg_file().parent / 'sync_states' / f'{name}.pickle'
         super().__init__()
 
     def schedule(self: Self) -> Self:
@@ -165,7 +165,10 @@ class SyncTask(ABC):
         for obj_hash, obj in notion_objs.items():
             if obj_hash not in state:
                 notion_obj_dct = self.notion_to_dict(obj)
-                self.other_create_obj(**notion_obj_dct)
+                other_obj_dct = {
+                    other_attr: notion_obj_dct[notion_attr] for notion_attr, other_attr in self.attr_map.items()
+                }
+                self.other_create_obj(**other_obj_dct)
                 state[obj_hash] = notion_obj_dct
         return state
 
@@ -174,21 +177,24 @@ class SyncTask(ABC):
         for obj_hash, obj in other_objs.items():
             if obj_hash not in state:
                 other_obj_dct = self.other_to_dict(obj)
-                self.notion_create_obj(**other_obj_dct)
-                state[obj_hash] = other_obj_dct
+                notion_obj_dct = {
+                    notion_attr: other_obj_dct[other_attr] for notion_attr, other_attr in self.attr_map.items()
+                }
+                self.notion_create_obj(**notion_obj_dct)
+                state[obj_hash] = notion_obj_dct
         return state
 
     def resolve_conflict(self: Self, notion_obj: Any, other_obj: Any, notion_attr: str, other_attr: str) -> Any:
         """Resolve a conflict between two objects on an attribute."""
         notion_obj_dct, other_obj_dct = self.notion_to_dict(notion_obj), self.other_to_dict(other_obj)
 
-        if self.resolve_conflict == ConflictMode.NOTION:
+        if self.conflict_mode == ConflictMode.NOTION:
             self.other_update_obj(other_obj, other_attr, notion_obj_dct[notion_attr])
             return notion_obj_dct[notion_attr]
-        elif self.resolve_conflict == ConflictMode.OTHER:
+        elif self.conflict_mode == ConflictMode.OTHER:
             self.notion_update_obj(notion_obj, notion_attr, other_obj_dct[other_attr])
             return other_obj_dct[other_attr]
-        elif self.resolve_conflict == ConflictMode.NEWER:
+        elif self.conflict_mode == ConflictMode.NEWER:
             if self.notion_timestamp(notion_obj) > self.other_timestamp(other_obj):
                 self.other_update_obj(other_obj, other_attr, notion_obj_dct[notion_attr])
                 return notion_obj_dct[notion_attr]
@@ -196,7 +202,7 @@ class SyncTask(ABC):
                 self.notion_update_obj(notion_obj, notion_attr, other_obj_dct[other_attr])
                 return other_obj_dct[other_attr]
         else:
-            msg = f'Conflict between {notion_obj} and {other_obj} on attribute {other_attr}'
+            msg = f'Unknown conflict mode {self.conflict_mode}'
             raise RuntimeError(msg)
 
     def initial_sync(self: Self, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
@@ -204,7 +210,7 @@ class SyncTask(ABC):
 
         This is a two-way sync, i.e. the objects are compared and the differences are resolved.
         """
-        state = {}
+        state: dict[str, Any] = {}
         common_hashes = set(notion_objs) & set(other_objs)
 
         for obj_hash in common_hashes:
@@ -267,13 +273,13 @@ class SyncTask(ABC):
         return self().__await__()
 
     async def __call__(self: Self):
-        """Run the task."""
-        while True:
-            with open(str(self.state_path), 'w', encoding='utf8') as state_file:
-                state = json.load(state_file) if state_file else None
+        """Run the task as scheduled."""
+        self.state_path.parent.mkdir(parents=True, exist_ok=True)
+        state = pickle.loads(self.state_path.read_bytes()) if self.state_path.exists() else None  # noqa: S301
 
-                new_state = self.sync(state)
-                json.dump(new_state, state_file)
+        while True:
+            new_state = self.sync(state)
+            self.state_path.write_bytes(pickle.dumps(new_state))
 
             if self._in_total_times is not None:
                 self._in_total_times -= 1
