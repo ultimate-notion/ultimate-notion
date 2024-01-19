@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from html import escape as htmlescape
 from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
@@ -33,7 +33,7 @@ class View:
     def __init__(self, database: Database, pages: list[Page], query: DBQueryBuilder):
         self.database = database
         self._query = query
-        self._title_col = database.schema.get_title_prop().name
+        self._title_col = database.schema.get_title_col().name
         self._columns = self._get_columns(self._title_col)
         self._pages: np.ndarray = np.array(pages)
         self.default_limit = 10
@@ -176,6 +176,10 @@ class View:
         else:
             return self.as_table(tablefmt='html')
 
+    def __iter__(self) -> Iterator[Page]:
+        """Iterate over the pages in the view."""
+        return iter(self.to_pages())
+
     def __repr__(self) -> str:
         return get_repr(self, desc=self.database.title)
 
@@ -184,6 +188,16 @@ class View:
 
     def __len__(self):
         return len(self._row_indices)
+
+    @property
+    def is_empty(self) -> bool:
+        """Is this view empty?"""
+        return len(self) == 0
+
+    def __bool__(self) -> bool:
+        """Overwrite default behaviour."""
+        msg = 'Use .is_empty instead of bool(view) to check if a view is empty.'
+        raise RuntimeError(msg)
 
     @property
     def has_index(self) -> bool:

@@ -5,6 +5,7 @@ from __future__ import annotations
 import textwrap
 from copy import deepcopy
 from functools import wraps
+from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar, cast
 from uuid import UUID
@@ -285,3 +286,8 @@ def convert_md_to_py(path: Path | str):
     py_str = '\n'.join([c for c in codeblocks if c != ''])
 
     path.with_suffix('.py').write_text(py_str)
+
+
+def str_hash(*args: str, n_chars: int = 16) -> str:
+    """Hashes string arguments to a n-character string."""
+    return sha256(''.join(args).encode('utf-8')).hexdigest()[:n_chars]

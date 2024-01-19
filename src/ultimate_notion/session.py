@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from threading import RLock
 from types import TracebackType
 from typing import Any, ClassVar, cast
@@ -216,7 +217,11 @@ class Session:
         """Get or create the database."""
         dbs = SList(db for db in self.search_db(schema.db_title) if db.parent == parent)
         if len(dbs) == 0:
-            return self.create_db(parent, schema)
+            db = self.create_db(parent, schema)
+            while not [db for db in self.search_db(schema.db_title) if db.parent == parent]:
+                # wait until the database is created on the server-side
+                time.sleep(1)
+            return db
         else:
             db = dbs.item()
             db.schema = schema

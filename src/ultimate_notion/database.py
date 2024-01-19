@@ -188,6 +188,11 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Is this database empty?"""
         return len(self) == 0
 
+    def __bool__(self) -> bool:
+        """Overwrite default behaviour."""
+        msg = 'Use .is_empty instead of bool(db) to check if a database is empty.'
+        raise RuntimeError(msg)
+
     def create_page(self, **kwargs) -> Page:
         """Create a page with properties according to the schema within the corresponding database."""
         schema_kwargs = {col.attr_name: col for col in self.schema.get_cols()}

@@ -167,8 +167,8 @@ class PageSchema:
         return cls.as_table(tablefmt='html')
 
     @classmethod
-    def get_title_prop(cls) -> Column:
-        """Returns the title property."""
+    def get_title_col(cls) -> Column:
+        """Returns the column holding the title of the pages."""
         return SList(col for col in cls.get_cols() if isinstance(col.type, Title)).item()
 
     @classmethod
@@ -196,7 +196,7 @@ class PageSchema:
     @classmethod
     def get_db(cls) -> Database:
         """Get the database that is bound to this schema."""
-        if cls.is_bound() and cls._database:
+        if cls.is_bound() and cls._database is not None:
             return cls._database
         else:
             raise SchemaNotBoundError(cls)

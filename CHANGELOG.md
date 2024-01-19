@@ -2,8 +2,10 @@
 
 ## Version 0.4
 
-- New: Introduce a configuration file under `~/.ultimate-notion/config.toml`.
+- New: Introduced a configuration file under `~/.ultimate-notion/config.toml`.
 - New: Added a simple Google Tasks client.
+- New: Added a general sychronization task for Notion to other services.
+- New: Added a specific Google Tasks synchronization task.
 
 ## Version 0.3, 2023-12-26
 

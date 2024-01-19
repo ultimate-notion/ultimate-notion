@@ -31,7 +31,7 @@ def test_gtask_tasklist(client: GTasksClient, custom_config: str):
     assert new_task.title == 'My new task'
 
     assert new_task in new_list.all_tasks()
-    new_task.completed = True
+    new_task.is_completed = True
     new_list.clear()
     assert new_task not in new_list.all_tasks()
 
@@ -62,8 +62,8 @@ def test_gtask_task(client: GTasksClient, custom_config: str):
     new_task.notes = 'My notes'
     assert new_task.notes == 'My notes'
 
-    new_task.completed = True
-    assert new_task.completed
+    new_task.is_completed = True
+    assert new_task.is_completed
 
     new_task.position_after(None)
     assert new_task.position == 0
