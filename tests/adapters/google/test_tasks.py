@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from ultimate_notion.adapters.google_tasks import GTasksClient
+from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
 @pytest.fixture

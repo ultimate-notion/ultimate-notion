@@ -8,11 +8,11 @@ import pickle  # noqa: S403
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, TypeAlias, TypeVar
+from typing import Any, TypeVar
+
+from pydantic import BaseModel, Field
 
 from ultimate_notion.config import get_cfg_file
-
-State: TypeAlias = dict[str, Any]
 
 _logger = logging.getLogger(__name__)
 
@@ -29,6 +29,17 @@ class ConflictMode(str, Enum):
     NOTION = 'notion'
     OTHER = 'other'  # any other service than Notion
     ERROR = 'error'
+
+
+class State(BaseModel):
+    """The state of a sync task.
+
+    The state holds the synched objects and their attributes as a dictionary of Notion attributes."""
+
+    ids: dict[str, str] = Field(default_factory=dict)
+    """Maps Notion object ids to other object ids."""
+    objs: dict[str, Any] = Field(default_factory=dict)
+    """Dictionary of Notion objects indexed by their ids."""
 
 
 class SyncTask(ABC):
@@ -95,6 +106,16 @@ class SyncTask(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def notion_id(self: Self, obj: Any) -> str:
+        """Get the id of the Notion object."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def other_id(self: Self, obj: Any) -> str:
+        """Get the id of the other object."""
+        raise NotImplementedError()
+
+    @abstractmethod
     def notion_hash(self: Self, obj: Any) -> str:
         """Get the hash of the Notion object for object mapping/linking."""
         raise NotImplementedError()
@@ -146,7 +167,7 @@ class SyncTask(ABC):
 
     def sync_notion_deleted(self: Self, state: State, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
         """Sync an object in the state that was deleted in Notion."""
-        for obj_hash in state:
+        for obj_hash in list(state.keys()):
             if obj_hash not in notion_objs:
                 self.other_delete_obj(other_objs[obj_hash])
                 del state[obj_hash]
@@ -154,7 +175,7 @@ class SyncTask(ABC):
 
     def sync_other_deleted(self: Self, state: State, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
         """Sync an object in the state that was deleted in the other service."""
-        for obj_hash in state:
+        for obj_hash in list(state.keys()):
             if obj_hash not in other_objs:
                 self.notion_delete_obj(notion_objs[obj_hash])
                 del state[obj_hash]
@@ -229,12 +250,11 @@ class SyncTask(ABC):
     def sync_state_changes(self: Self, state: State, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
         """Sync changes with respect to the state and update the state.
 
-        This is a three-way sync, i.e. the objects are compared and the differences are resolved.
+        This is a three-way sync, i.e. the objects are compared to the state as base and the differences are resolved.
         """
         for obj_hash, state_obj_dct in state.items():
             notion_obj, other_obj = notion_objs[obj_hash], other_objs[obj_hash]
             notion_obj_dct, other_obj_dct = self.notion_to_dict(notion_obj), self.other_to_dict(other_obj)
-            # notion_is_newer = self.notion_timestamp(notion_obj) > self.other_timestamp(other_obj)
 
             for notion_attr, other_attr in self.attr_map.items():
                 if notion_obj_dct[notion_attr] != state_obj_dct[notion_attr] == other_obj_dct[other_attr]:
@@ -269,7 +289,7 @@ class SyncTask(ABC):
         return state
 
     def __await__(self):
-        # Delegate the await to the __call__ method
+        """Delegate the await to the __call__ method"""
         return self().__await__()
 
     async def __call__(self: Self):

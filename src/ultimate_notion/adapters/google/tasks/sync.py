@@ -7,8 +7,8 @@ from datetime import datetime
 from typing import Any
 
 from ultimate_notion import Column, Database, Page
-from ultimate_notion.adapters.google_tasks.client import GTask, GTaskList
-from ultimate_notion.sync import ConflictMode, SyncTask
+from ultimate_notion.adapters.google.tasks.client import GTask, GTaskList
+from ultimate_notion.adapters.sync import ConflictMode, SyncTask
 from ultimate_notion.utils import str_hash
 
 
