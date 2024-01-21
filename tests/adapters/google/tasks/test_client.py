@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
 from ultimate_notion.adapters.google.tasks import GTasksClient
@@ -11,7 +13,7 @@ def client():
 
 
 @pytest.mark.vcr()
-def test_gtask_client(client: GTasksClient, custom_config: str):
+def test_gtask_client(client: GTasksClient):
     new_list = client.create_tasklist('My new tasklist')
     assert new_list.title == 'My new tasklist'
 
@@ -25,14 +27,14 @@ def test_gtask_client(client: GTasksClient, custom_config: str):
 
 
 @pytest.mark.vcr()
-def test_gtask_tasklist(client: GTasksClient, custom_config: str):
+def test_gtask_tasklist(client: GTasksClient):
     new_list = client.create_tasklist('My new tasklist')
     new_task = new_list.create_task('My new task')
     assert new_task.title == 'My new task'
 
     assert new_task in new_list.all_tasks()
     new_task.is_completed = True
-    new_list.clear()
+    new_task.delete()
     assert new_task not in new_list.all_tasks()
 
     same_list = client.get_tasklist(new_list.id)
@@ -46,11 +48,16 @@ def test_gtask_tasklist(client: GTasksClient, custom_config: str):
 
 
 @pytest.mark.vcr()
-def test_gtask_task(client: GTasksClient, custom_config: str):
+def test_gtask_task(client: GTasksClient):
     new_list = client.create_tasklist('My new tasklist')
-    new_task = new_list.create_task('My new task')
+    now = datetime.now(timezone.utc)
+    tomorrow = now + timedelta(days=1)
+    new_task = new_list.create_task('My new task', due=now)
     assert new_task.title == 'My new task'
     assert new_task.tasklist == new_list
+    assert new_task.due.date() == now.date()  # time is not stored in Google Tasks
+    new_task.due = tomorrow
+    assert new_task.due.date() == tomorrow.date()
 
     same_task = new_list.get_task(new_task.id)
     same_task.title = 'My renamed task'

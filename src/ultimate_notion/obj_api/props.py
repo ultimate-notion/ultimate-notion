@@ -111,10 +111,10 @@ class People(PropertyValue, type='people'):
     people: list[User] = None  # type: ignore
 
     # Custom serializer as we receive various UserRef subtypes but need to pass
-    # a proper UserRef to the Notion API. It's just so inconsistent!
+    # a proper UserRef to the Notion API. Notion API is just so inconsistent!
     @model_serializer
     def serialize(self) -> dict[str, Any]:
-        return {'people': [{'id': user.id, 'object': user.object} for user in self.people]}
+        return {'people': [{'id': user.id, 'object': user.object} for user in self.people], 'type': 'people'}
 
 
 class URL(PropertyValue, type='url'):
