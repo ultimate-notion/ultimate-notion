@@ -97,6 +97,7 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
         due_col=Task.due_date,
     )
     # Schedule the sync task to run every 5 minutes
+    # Omit the `in_total` argument to run the task forever
     sync_task.run_every(seconds=5).in_total(times=3).schedule()
 
     # Run all scheduled tasks

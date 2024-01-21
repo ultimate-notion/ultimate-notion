@@ -38,6 +38,16 @@ class PropertyValue(TypedObject, polymorphic_base=True):
         """
         return cls.model_construct(**{cls.model_fields['type'].get_default(): value})
 
+    def serialize_for_api(self):
+        """Serialize the object for sending it to the Notion API."""
+        # TODO: read-only fields should not be sent to the API
+        # https://github.com/jheddings/notional/issues/9
+
+        # We include "null" values as those are used to delete properties
+        dump_dct = self.model_dump(mode='json', exclude_none=True, by_alias=True)
+        dump_dct.setdefault(dump_dct['type'], None)
+        return dump_dct
+
 
 class Title(PropertyValue, type='title'):
     """Notion title type."""
@@ -69,9 +79,12 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, start: dt_date, end: dt_date | None = None):
+    def build(cls, start: dt_date | None, end: dt_date | None = None):
         """Create a new Date from the native values."""
-        return cls.model_construct(date=DateRange(start=start, end=end))
+        if start is None:
+            return cls.model_construct()
+        else:
+            return cls.model_construct(date=DateRange(start=start, end=end))
 
 
 class Status(PropertyValue, type='status'):

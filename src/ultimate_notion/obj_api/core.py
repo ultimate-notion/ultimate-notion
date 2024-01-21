@@ -58,10 +58,7 @@ class GenericObject(BaseModel):
 
     def serialize_for_api(self):
         """Serialize the object for sending it to the Notion API."""
-        # TODO: read-only fields should not be sent to the API
-        # https://github.com/jheddings/notional/issues/9
-
-        # the API doesn't like "undefined" values...
+        # Notion API doesn't like "null" values
         return self.model_dump(mode='json', exclude_none=True, by_alias=True)
 
     @classmethod

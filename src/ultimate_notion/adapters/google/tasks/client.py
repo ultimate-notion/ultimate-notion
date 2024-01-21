@@ -1,15 +1,21 @@
 """Client for Google Tasks API.
 
-Follow this quickstart guide to enalbe the API and create the necessary credentials:
+Follow this quickstart guide to enable the API and create the necessary credentials:
 https://developers.google.com/tasks/quickstart/python
 
-Official API documentation: https://googleapis.github.io/google-api-python-client/docs/dyn/tasks_v1.html
+Official Python API documentation: https://googleapis.github.io/google-api-python-client/docs/dyn/tasks_v1.html
+Official REST documentation: https://developers.google.com/tasks/reference/rest
+
+!!! danger
+    The Google Task API does not support setting time information for due dates.
+    Thus, the time information of a datetime object is truncated and a pure date is obtained.
+    https://issuetracker.google.com/issues/128979662
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import datetime
+from datetime import date, datetime, time, timezone
 from enum import Enum
 from typing import Literal
 
@@ -21,6 +27,11 @@ from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from ultimate_notion.config import Config, get_or_create_cfg
 from ultimate_notion.utils import SList
+
+DEFAULT_LIST_ID_LEN = 32
+""""Length of the ID of the Google default tasklist."""
+MAX_RESULTS_PER_PAGE = 100
+"""Maximum number of results per page when fetching all tasks."""
 
 
 class Scope(str, Enum):
@@ -96,7 +107,8 @@ class GTask(GObject):
     kind: Literal[Kind.TASK]
     completed_at: datetime | None = Field(alias='completed', default=None)
     is_deleted: bool = Field(alias='deleted', default=False)
-    due: datetime | None = None
+    hidden: bool = False
+    due_: datetime | None = Field(alias='due', default=None)
     notes_: str | None = Field(alias='notes', default=None)
     parent_id: str | None = Field(alias='parent', default=None)
     position_: str = Field(alias='position')
@@ -129,6 +141,20 @@ class GTask(GObject):
         resp = resource.get(tasklist=self.tasklist_id, task=self.id).execute()
         self._update(resp)
         return self
+
+    @property
+    def due(self) -> datetime | None:
+        """Returns the due date of this task."""
+        return self.due_
+
+    @due.setter
+    def due(self, due_date: datetime | date | None):
+        """Sets the due date of this task."""
+        due_date = assert_datetime(due_date)
+        due_date_str = due_date if due_date is None else due_date.isoformat()
+        resource = self._resource.tasks()
+        resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'due': due_date_str}).execute()
+        self._update(resp)
 
     @property
     def notes(self) -> str | None:
@@ -220,19 +246,26 @@ class GTaskList(GObject):
 
     kind: Literal[Kind.TASK_LIST]
 
-    def all_tasks(self, max_results: int | None = None) -> list[GTask]:
-        """Returns a list of all tasks in this task list."""
+    def all_tasks(self, *, show_deleted=False) -> list[GTask]:
+        """Returns a list of all tasks, completed or not, in this task list."""
         resource = self._resource.tasks()
         page_token = None
         tasks = []
 
         while True:
-            results = resource.list(tasklist=self.id, maxResults=max_results, pageToken=page_token).execute()
+            results = resource.list(
+                tasklist=self.id,
+                maxResults=MAX_RESULTS_PER_PAGE,
+                pageToken=page_token,
+                showCompleted=True,
+                showHidden=True,
+                showDeleted=show_deleted,
+            ).execute()
             items = results.get('items', [])
             tasks.extend([GTask(_resource=self._resource, **item) for item in items])
 
             page_token = results.get('nextPageToken')
-            if not page_token:
+            if page_token is None:
                 break
 
         return tasks
@@ -261,8 +294,9 @@ class GTaskList(GObject):
         task = resource.get(tasklist=self.id, task=task_id).execute()
         return GTask(_resource=self._resource, **task)
 
-    def create_task(self, title: str, due: datetime | None = None) -> GTask:
+    def create_task(self, title: str, due: date | datetime | None = None) -> GTask:
         """Creates a new task."""
+        due = assert_datetime(due)
         resource = self._resource.tasks()
         body = {'title': title}
         if due is not None:
@@ -270,8 +304,11 @@ class GTaskList(GObject):
         task = resource.insert(tasklist=self.id, body=body).execute()
         return GTask(_resource=self._resource, **task)
 
-    def delete(self):
+    def delete(self) -> None:
         """Deletes this task list."""
+        if len(self.id) == DEFAULT_LIST_ID_LEN:
+            msg = 'This is the default tasklist and thus cannot be deleted!'
+            raise RuntimeError(msg)
         resource = self._resource.tasklists()
         resource.delete(tasklist=self.id).execute()
         # We return None as the object is deleted
@@ -393,3 +430,16 @@ class GTasksClient:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
+
+
+def assert_datetime(dt: date | datetime | None) -> datetime | None:
+    """Asserts that the given object is a datetime object or None."""
+    if dt is None:
+        return None
+    elif isinstance(dt, datetime):
+        return dt
+    elif isinstance(dt, date):
+        return datetime.combine(dt, time(tzinfo=timezone.utc))
+    else:
+        msg = f'Expected a datetime object or None, but got {type(dt)}!'
+        raise TypeError(msg)

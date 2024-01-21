@@ -6,6 +6,7 @@
 - New: Added a simple Google Tasks client.
 - New: Added a general sychronization task for Notion to other services.
 - New: Added a specific Google Tasks synchronization task.
+- Fix: A page property can be deleted by setting it to `None`.
 
 ## Version 0.3, 2023-12-26
 

@@ -8,7 +8,7 @@ import pickle  # noqa: S403
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, TypeVar
+from typing import Any, TypeAlias, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -20,6 +20,7 @@ all_tasks: set[SyncTask] = set()
 """All tasks that have been created so far."""
 
 Self = TypeVar('Self', bound='SyncTask')
+ID: TypeAlias = str
 
 
 class ConflictMode(str, Enum):
@@ -36,10 +37,10 @@ class State(BaseModel):
 
     The state holds the synched objects and their attributes as a dictionary of Notion attributes."""
 
-    ids: dict[str, str] = Field(default_factory=dict)
+    ids: dict[ID, ID] = Field(default_factory=dict)
     """Maps Notion object ids to other object ids."""
-    objs: dict[str, Any] = Field(default_factory=dict)
-    """Dictionary of Notion objects indexed by their ids."""
+    objs: dict[ID, dict[str, Any]] = Field(default_factory=dict)
+    """Dictionary of Notion objects synched with other service and indexed by their ids."""
 
 
 class SyncTask(ABC):
@@ -106,12 +107,12 @@ class SyncTask(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def notion_id(self: Self, obj: Any) -> str:
+    def notion_id(self: Self, obj: Any) -> ID:
         """Get the id of the Notion object."""
         raise NotImplementedError()
 
     @abstractmethod
-    def other_id(self: Self, obj: Any) -> str:
+    def other_id(self: Self, obj: Any) -> ID:
         """Get the id of the other object."""
         raise NotImplementedError()
 
@@ -156,87 +157,125 @@ class SyncTask(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def notion_create_obj(self, **kwargs: Any) -> None:
+    def notion_create_obj(self, **kwargs: Any) -> Any:
         """Create a new page."""
         raise NotImplementedError()
 
     @abstractmethod
-    def other_create_obj(self, **kwargs: Any) -> None:
+    def other_create_obj(self, **kwargs: Any) -> Any:
         """Create a new other object."""
         raise NotImplementedError()
 
-    def sync_notion_deleted(self: Self, state: State, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
+    def sync_notion_deleted(self: Self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Sync an object in the state that was deleted in Notion."""
-        for obj_hash in list(state.keys()):
-            if obj_hash not in notion_objs:
-                self.other_delete_obj(other_objs[obj_hash])
-                del state[obj_hash]
+        for notion_id, other_id in state.ids.copy().items():
+            if notion_id not in notion_objs:
+                if other_id in other_objs:
+                    _logger.debug(f'Deleting other object with id {other_id}')
+                    self.other_delete_obj(other_objs[other_id])
+                    del other_objs[other_id]
+                del state.ids[notion_id]
+                del state.objs[notion_id]
         return state
 
-    def sync_other_deleted(self: Self, state: State, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
+    def sync_other_deleted(self: Self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Sync an object in the state that was deleted in the other service."""
-        for obj_hash in list(state.keys()):
-            if obj_hash not in other_objs:
-                self.notion_delete_obj(notion_objs[obj_hash])
-                del state[obj_hash]
+        for notion_id, other_id in state.ids.copy().items():
+            if other_id not in other_objs:
+                if notion_id in notion_objs:
+                    _logger.debug(f'Deleting Notion object with id {notion_id}')
+                    self.notion_delete_obj(notion_objs[notion_id])
+                    del notion_objs[notion_id]
+                del state.ids[notion_id]
+                del state.objs[notion_id]
         return state
 
-    def sync_notion_created(self: Self, state: State, notion_objs: dict[str, Any]) -> State:
+    def sync_notion_created(self: Self, state: State, notion_objs: dict[ID, Any]) -> State:
         """Sync an object not in the state and created in Notion."""
-        for obj_hash, obj in notion_objs.items():
-            if obj_hash not in state:
-                notion_obj_dct = self.notion_to_dict(obj)
+        for notion_id, notion_obj in notion_objs.items():
+            if notion_id not in state.objs:
+                notion_obj_dct = self.notion_to_dict(notion_obj)
                 other_obj_dct = {
                     other_attr: notion_obj_dct[notion_attr] for notion_attr, other_attr in self.attr_map.items()
                 }
-                self.other_create_obj(**other_obj_dct)
-                state[obj_hash] = notion_obj_dct
+                _logger.debug(f'Creating other object with attributes: {other_obj_dct}')
+                other_obj = self.other_create_obj(**other_obj_dct)
+
+                if self.other_to_dict(other_obj) != other_obj_dct:
+                    msg = 'The other object created by Notion does not match the expected object.'
+                    raise RuntimeError(msg)
+
+                other_id = self.other_id(other_obj)
+                state.ids[notion_id] = other_id
+                state.objs[notion_id] = notion_obj_dct
         return state
 
-    def sync_other_created(self: Self, state: State, other_objs: dict[str, Any]) -> State:
+    def sync_other_created(self: Self, state: State, other_objs: dict[ID, Any]) -> State:
         """Sync an object not in the state and created in other service."""
-        for obj_hash, obj in other_objs.items():
-            if obj_hash not in state:
-                other_obj_dct = self.other_to_dict(obj)
+        for other_id, other_obj in other_objs.items():
+            if other_id not in state.ids.values():
+                other_obj_dct = self.other_to_dict(other_obj)
                 notion_obj_dct = {
                     notion_attr: other_obj_dct[other_attr] for notion_attr, other_attr in self.attr_map.items()
                 }
-                self.notion_create_obj(**notion_obj_dct)
-                state[obj_hash] = notion_obj_dct
+                _logger.debug(f'Creating Notion object with attributes: {notion_obj_dct}')
+                notion_obj = self.notion_create_obj(**notion_obj_dct)
+
+                if self.notion_to_dict(notion_obj) != notion_obj_dct:
+                    msg = 'The Notion object created by other service does not match the expected object.'
+                    raise RuntimeError(msg)
+
+                notion_id = self.notion_id(notion_obj)
+                state.ids[notion_id] = other_id
+                state.objs[notion_id] = notion_obj_dct
         return state
 
     def resolve_conflict(self: Self, notion_obj: Any, other_obj: Any, notion_attr: str, other_attr: str) -> Any:
         """Resolve a conflict between two objects on an attribute."""
+        _logger.debug(
+            f'Resolving conflict on attribute {notion_attr} of Notion object {self.notion_id(notion_obj)}'
+            f'and attribute {other_attr} of other object {self.other_id(other_obj)}.'
+        )
         notion_obj_dct, other_obj_dct = self.notion_to_dict(notion_obj), self.other_to_dict(other_obj)
 
         if self.conflict_mode == ConflictMode.NOTION:
+            _logger.debug(f'Updating other object with attribute {other_attr} to {notion_obj_dct[notion_attr]}')
             self.other_update_obj(other_obj, other_attr, notion_obj_dct[notion_attr])
             return notion_obj_dct[notion_attr]
         elif self.conflict_mode == ConflictMode.OTHER:
+            _logger.debug(f'Updating Notion object with attribute {notion_attr} to {other_obj_dct[other_attr]}')
             self.notion_update_obj(notion_obj, notion_attr, other_obj_dct[other_attr])
             return other_obj_dct[other_attr]
         elif self.conflict_mode == ConflictMode.NEWER:
             if self.notion_timestamp(notion_obj) > self.other_timestamp(other_obj):
+                _logger.debug(f'Updating other object with attribute {other_attr} to {notion_obj_dct[notion_attr]}')
                 self.other_update_obj(other_obj, other_attr, notion_obj_dct[notion_attr])
                 return notion_obj_dct[notion_attr]
             else:
+                _logger.debug(f'Updating Notion object with attribute {notion_attr} to {other_obj_dct[other_attr]}')
                 self.notion_update_obj(notion_obj, notion_attr, other_obj_dct[other_attr])
                 return other_obj_dct[other_attr]
         else:
             msg = f'Unknown conflict mode {self.conflict_mode}'
             raise RuntimeError(msg)
 
-    def initial_sync(self: Self, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
+    def initial_sync(self: Self, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Make the initial state.
 
         This is a two-way sync, i.e. the objects are compared and the differences are resolved.
         """
-        state: dict[str, Any] = {}
-        common_hashes = set(notion_objs) & set(other_objs)
+        _logger.debug('Performing initial sync...')
+        state = State()
+        notion_hashes = {self.notion_hash(obj): obj_id for obj_id, obj in notion_objs.items()}
+        other_hashes = {self.other_hash(obj): obj_id for obj_id, obj in other_objs.items()}
 
-        for obj_hash in common_hashes:
-            state_obj = state[obj_hash] = {}
-            notion_obj, other_obj = notion_objs[obj_hash], other_objs[obj_hash]
+        for obj_hash in notion_hashes.keys() & other_hashes.keys():
+            notion_id, other_id = notion_hashes[obj_hash], other_hashes[obj_hash]
+
+            state.ids[notion_id] = other_id
+            state_obj = state.objs[notion_id] = {}
+
+            notion_obj, other_obj = notion_objs[notion_id], other_objs[other_id]
             notion_obj_dct, other_obj_dct = self.notion_to_dict(notion_obj), self.other_to_dict(other_obj)
 
             for notion_attr, other_attr in self.attr_map.items():
@@ -247,34 +286,37 @@ class SyncTask(ABC):
 
         return state
 
-    def sync_state_changes(self: Self, state: State, notion_objs: dict[str, Any], other_objs: dict[str, Any]) -> State:
+    def sync_state_changes(self: Self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Sync changes with respect to the state and update the state.
 
         This is a three-way sync, i.e. the objects are compared to the state as base and the differences are resolved.
         """
-        for obj_hash, state_obj_dct in state.items():
-            notion_obj, other_obj = notion_objs[obj_hash], other_objs[obj_hash]
+        _logger.debug('Performing state sync...')
+        for notion_id, state_obj_dct in state.objs.items():
+            notion_obj, other_obj = notion_objs[notion_id], other_objs[state.ids[notion_id]]
             notion_obj_dct, other_obj_dct = self.notion_to_dict(notion_obj), self.other_to_dict(other_obj)
 
             for notion_attr, other_attr in self.attr_map.items():
                 if notion_obj_dct[notion_attr] != state_obj_dct[notion_attr] == other_obj_dct[other_attr]:
+                    _logger.debug(f'Updating other object with attribute {other_attr} to {notion_obj_dct[notion_attr]}')
                     self.other_update_obj(other_obj, other_attr, notion_obj_dct[notion_attr])
                     state_obj_dct[notion_attr] = notion_obj_dct[notion_attr]
                 elif notion_obj_dct[notion_attr] == state_obj_dct[notion_attr] != other_obj_dct[other_attr]:
-                    self.other_update_obj(other_obj, other_attr, notion_obj_dct[notion_attr])
+                    _logger.debug(f'Updating Notion object with attribute {notion_attr} to {other_obj_dct[other_attr]}')
+                    self.notion_update_obj(notion_obj, notion_attr, other_obj_dct[other_attr])
                     state_obj_dct[notion_attr] = notion_obj_dct[notion_attr]
                 elif notion_obj_dct[notion_attr] != state_obj_dct[notion_attr] != other_obj_dct[other_attr]:
                     state_obj_dct[notion_attr] = self.resolve_conflict(notion_obj, other_obj, notion_attr, other_attr)
 
         return state
 
-    def sync(self: Self, state: State | None = None) -> State:
+    def sync(self: Self, state: State | None) -> State:
         """The actual sync operation.
 
         The state holds the synched objects and their attributes as a dictionary of Notion attributes.
         """
-        notion_objs = {self.notion_hash(obj): obj for obj in self.get_notion_objects()}
-        other_objs = {self.other_hash(obj): obj for obj in self.get_other_objects()}
+        notion_objs = {self.notion_id(obj): obj for obj in self.get_notion_objects()}
+        other_objs = {self.other_id(obj): obj for obj in self.get_other_objects()}
 
         if state is None:
             state = self.initial_sync(notion_objs, other_objs)
@@ -298,8 +340,8 @@ class SyncTask(ABC):
         state = pickle.loads(self.state_path.read_bytes()) if self.state_path.exists() else None  # noqa: S301
 
         while True:
-            new_state = self.sync(state)
-            self.state_path.write_bytes(pickle.dumps(new_state))
+            state = self.sync(state)
+            self.state_path.write_bytes(pickle.dumps(state))
 
             if self._in_total_times is not None:
                 self._in_total_times -= 1

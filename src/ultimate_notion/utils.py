@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import datetime
 import textwrap
 from copy import deepcopy
+from datetime import tzinfo
 from functools import wraps
 from hashlib import sha256
 from pathlib import Path
@@ -291,3 +293,12 @@ def convert_md_to_py(path: Path | str):
 def str_hash(*args: str, n_chars: int = 16) -> str:
     """Hashes string arguments to a n-character string."""
     return sha256(''.join(args).encode('utf-8')).hexdigest()[:n_chars]
+
+
+def local_time_zone() -> tzinfo:
+    """Returns the local time zone."""
+    tzinfo = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+    if tzinfo is None:
+        msg = 'Could not determine local time zone!'
+        raise RuntimeError(msg)
+    return tzinfo
