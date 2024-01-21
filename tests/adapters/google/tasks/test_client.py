@@ -13,7 +13,7 @@ def client():
 
 
 @pytest.mark.vcr()
-def test_gtask_client(client: GTasksClient):
+def test_gtask_client(client: GTasksClient, custom_config: str):
     new_list = client.create_tasklist('My new tasklist')
     assert new_list.title == 'My new tasklist'
 
@@ -27,7 +27,7 @@ def test_gtask_client(client: GTasksClient):
 
 
 @pytest.mark.vcr()
-def test_gtask_tasklist(client: GTasksClient):
+def test_gtask_tasklist(client: GTasksClient, custom_config: str):
     new_list = client.create_tasklist('My new tasklist')
     new_task = new_list.create_task('My new task')
     assert new_task.title == 'My new task'
@@ -48,7 +48,7 @@ def test_gtask_tasklist(client: GTasksClient):
 
 
 @pytest.mark.vcr()
-def test_gtask_task(client: GTasksClient):
+def test_gtask_task(client: GTasksClient, custom_config: str):
     new_list = client.create_tasklist('My new tasklist')
     now = datetime.now(timezone.utc)
     tomorrow = now + timedelta(days=1)
