@@ -325,12 +325,6 @@ class GTaskList(GObject):
         resp = resource.patch(tasklist=self.id, body={'title': new_title}).execute()
         self._update(resp)
 
-    def clear(self) -> GTaskList:
-        """Clears all completed tasks in this task list."""
-        resource = self._resource.tasks()
-        resource.clear(tasklist=self.id).execute()
-        return self
-
     def reload(self) -> GTaskList:
         """Reloads this task list from the API."""
         resource = self._resource.tasklists()

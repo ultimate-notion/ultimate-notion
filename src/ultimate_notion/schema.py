@@ -526,7 +526,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         elif self.col_ref is not None and self.col_ref._schema.is_bound():
             db = self.col_ref._schema._database
             session = get_active_session()
-            return session.get_db(self.obj_ref.relation.database_id).schema if db else None
+            return session.get_db(self.obj_ref.relation.database_id).schema if db is not None else None
         else:
             return None
 
