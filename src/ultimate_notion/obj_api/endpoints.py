@@ -444,7 +444,6 @@ class PagesEndpoint(Endpoint):
             properties = page.properties
 
         props = {name: value.serialize_for_api() if value is not None else None for name, value in properties.items()}
-
         data = self.raw_api.update(page.id.hex, properties=props)
 
         return page.update(**data)

@@ -39,6 +39,20 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     def __str__(self) -> str:
         return self.name
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Option):
+            # We compare only the name as the id is not set for new options
+            res = self.name == other.name
+        elif other is None:
+            res = False
+        else:
+            msg = f'Cannot compare Option with types {type(other)}'
+            raise RuntimeError(msg)
+        return res
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
 
 class OptionNS:
     """Option namespace to simplify working with (Multi-)Select options."""

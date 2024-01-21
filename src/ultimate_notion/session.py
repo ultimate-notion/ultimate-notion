@@ -219,7 +219,7 @@ class Session:
         if len(dbs) == 0:
             db = self.create_db(parent, schema)
             while not [db for db in self.search_db(schema.db_title) if db.parent == parent]:
-                # wait until the database is created on the server-side
+                _log.debug(f'Waiting for database {db.id} to be fully created...')
                 time.sleep(1)
             return db
         else:

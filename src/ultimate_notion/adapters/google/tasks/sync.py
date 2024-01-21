@@ -3,13 +3,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from ultimate_notion import Column, Database, Page
 from ultimate_notion.adapters.google.tasks.client import GTask, GTaskList
-from ultimate_notion.adapters.sync import ConflictMode, SyncTask
-from ultimate_notion.utils import str_hash
+from ultimate_notion.adapters.sync import ID, ConflictMode, SyncTask
+from ultimate_notion.utils import get_active_session, str_hash
 
 
 class SyncGTasks(SyncTask):
@@ -49,6 +49,13 @@ class SyncGTasks(SyncTask):
 
     def get_notion_objects(self) -> list[Page]:
         """Get all pages from database."""
+        # We remove all cached pages from the database to make sure we get the latest version
+        cache = get_active_session().cache
+        cached_pages = [
+            obj_id for obj_id, obj in cache.items() if isinstance(obj, Page) and obj.database == self.notion_db
+        ]
+        for page_id in cached_pages:
+            del cache[page_id]
         return self.notion_db.fetch_all().to_pages()
 
     def get_other_objects(self) -> list[GTask]:
@@ -63,6 +70,14 @@ class SyncGTasks(SyncTask):
         """Get the timestamp of the Google Task."""
         return obj.updated
 
+    def notion_id(self, obj: Page) -> ID:
+        """Get the ID of the Notion page."""
+        return str(obj.id)
+
+    def other_id(self, obj: GTask) -> ID:
+        """Get the ID of the Google Task."""
+        return obj.id
+
     def notion_hash(self, obj: Page) -> str:
         """Get the hash of the Notion page for object mapping/linking."""
         return str_hash(obj.title)
@@ -73,10 +88,13 @@ class SyncGTasks(SyncTask):
 
     def notion_to_dict(self, obj: Page) -> dict[str, Any]:
         """Convert a Notion object to a dictionary."""
+        due_date: datetime | date | None = obj.props[self.due_col].value
+        if isinstance(due_date, datetime):
+            due_date = due_date.date()
         return {
             self.title_col: obj.title,
-            self.completed_col: obj.props[self.completed_col] == self.completed_val,
-            self.due_col: obj.props[self.due_col],
+            self.completed_col: obj.props[self.completed_col].value == self.completed_val,
+            self.due_col: due_date,
         }
 
     def other_to_dict(self, obj: GTask) -> dict[str, Any]:
@@ -84,12 +102,18 @@ class SyncGTasks(SyncTask):
         return {
             'title': obj.title,
             'is_completed': obj.is_completed,
-            'due': obj.due,
+            'due': obj.due if obj.due is None else obj.due.date(),
         }
 
     def notion_update_obj(self, obj: Page, attr: str, value: Any) -> None:
         """Set an attribute of the Notion object, e.g. page."""
-        obj.props[attr] = value
+        if attr == self.completed_col:
+            if value:
+                obj.props[attr] = self.completed_val
+            else:
+                obj.props[attr] = self.not_completed_val
+        else:
+            obj.props[attr] = value
 
     def other_update_obj(self, obj: GTask, attr: str, value: Any) -> None:
         """Set an attribute of the other object."""
@@ -103,13 +127,17 @@ class SyncGTasks(SyncTask):
         """Delete the other object."""
         obj.delete()
 
-    def notion_create_obj(self, **kwargs: Any) -> None:
+    def notion_create_obj(self, **kwargs: Any) -> Page:
         """Create a new page."""
         kwargs[self.completed_col] = self.completed_val if kwargs[self.completed_col] else self.not_completed_val
-        attr_kwargs = {self.notion_db.schema.get_col(key).attr_name: value for key, value in kwargs.items()}
-        self.notion_db.create_page(**attr_kwargs)
+        attr_kwargs = {
+            self.notion_db.schema.get_col(key).attr_name: value for key, value in kwargs.items() if value is not None
+        }
+        page = self.notion_db.create_page(**attr_kwargs)
+        return page
 
-    def other_create_obj(self, **kwargs: Any) -> None:
+    def other_create_obj(self, **kwargs: Any) -> GTask:
         """Create a new other object."""
-        task = self.tasklist.create_task(title=kwargs['title'], due=kwargs['due'].value)
+        task = self.tasklist.create_task(title=kwargs['title'], due=kwargs['due'])
         task.is_completed = kwargs['is_completed']
+        return task
