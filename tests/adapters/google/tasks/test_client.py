@@ -55,8 +55,10 @@ def test_gtask_task(client: GTasksClient):
     new_task = new_list.create_task('My new task', due=now)
     assert new_task.title == 'My new task'
     assert new_task.tasklist == new_list
+    assert new_task.due is not None
     assert new_task.due.date() == now.date()  # time is not stored in Google Tasks
     new_task.due = tomorrow
+    assert new_task.due is not None
     assert new_task.due.date() == tomorrow.date()
 
     same_task = new_list.get_task(new_task.id)
