@@ -10,16 +10,17 @@ from ultimate_notion.config import (
 )
 
 
-def test_get_cfg_file(custom_config):
-    assert str(get_cfg_file()) == custom_config
+def test_get_cfg_file(custom_config: Path):
+    assert get_cfg_file() == custom_config
 
 
-def test_get_or_create_cfg(custom_config):
+def test_get_or_create_cfg(custom_config: Path):
     with patch.dict(os.environ, {ENV_NOTION_TOKEN: 'my-token'}):
         cfg = get_or_create_cfg()
 
     assert cfg.ultimate_notion.token == 'my-token'
-    assert cfg.ultimate_notion.cfg_path == Path(custom_config)
+    assert cfg.ultimate_notion.cfg_path == custom_config
+    assert cfg.google is not None
     assert isinstance(cfg.google.client_secret_json, Path)
     assert isinstance(cfg.google.token_json, Path)
 

@@ -304,6 +304,11 @@ class GTaskList(GObject):
         task = resource.insert(tasklist=self.id, body=body).execute()
         return GTask(_resource=self._resource, **task)
 
+    @property
+    def is_default(self) -> bool:
+        """Is this the default task list?"""
+        return len(self.id) == DEFAULT_LIST_ID_LEN
+
     def delete(self) -> None:
         """Deletes this task list."""
         if len(self.id) == DEFAULT_LIST_ID_LEN:
@@ -392,8 +397,11 @@ class GTasksClient:
 
         return tasklists
 
-    def get_tasklist(self, tasklist_id: str) -> GTaskList:
-        """Returns the task list with the given ID."""
+    def get_tasklist(self, tasklist_id: str = '@default') -> GTaskList:
+        """Returns the task list with the given ID.
+
+        If no ID is given, the default task list is returned.
+        """
         tasklist = self.resource.tasklists().get(tasklist=tasklist_id).execute()
         return GTaskList(_resource=self.resource, **tasklist)
 

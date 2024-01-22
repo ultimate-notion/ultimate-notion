@@ -1,34 +1,48 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 
+from tests.conftest import VCR
 from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
-@pytest.fixture
-def client():
+@pytest.fixture(scope='module')
+def gtasks():
+    """Returns a GTasksClient instance with read_only=False."""
     return GTasksClient(read_only=False)
 
 
+@pytest.fixture(scope='module', autouse=True)
+def gtasks_cleanups(gtasks: GTasksClient, my_vcr: VCR):
+    """Clean all Tasklists except of the default one before the tests."""
+    with my_vcr.use_cassette('gtasks_cleanups.yaml'):
+        for tasklist in gtasks.all_tasklists():
+            if not tasklist.is_default:
+                tasklist.delete()
+        yield
+
+
 @pytest.mark.vcr()
-def test_gtask_client(client: GTasksClient, custom_config: str):
-    new_list = client.create_tasklist('My new tasklist')
+def test_gtask_client(gtasks: GTasksClient, custom_config: Path):
+    new_list = gtasks.create_tasklist('My new tasklist')
     assert new_list.title == 'My new tasklist'
 
-    same_list = client.get_tasklist(new_list.id)
+    same_list = gtasks.get_tasklist(new_list.id)
     assert same_list == new_list
 
-    all_lists = client.all_tasklists()
+    all_lists = gtasks.all_tasklists()
     assert new_list in all_lists
 
     new_list.delete()
 
 
 @pytest.mark.vcr()
-def test_gtask_tasklist(client: GTasksClient, custom_config: str):
-    new_list = client.create_tasklist('My new tasklist')
+def test_gtask_tasklist(gtasks: GTasksClient, custom_config: Path):
+    new_list = gtasks.create_tasklist('My new tasklist')
+    assert not new_list.is_default
     new_task = new_list.create_task('My new task')
     assert new_task.title == 'My new task'
 
@@ -37,7 +51,7 @@ def test_gtask_tasklist(client: GTasksClient, custom_config: str):
     new_task.delete()
     assert new_task not in new_list.all_tasks()
 
-    same_list = client.get_tasklist(new_list.id)
+    same_list = gtasks.get_tasklist(new_list.id)
     same_list.title = 'My renamed tasklist'
     assert new_list == same_list
     assert new_list.title != same_list.title
@@ -46,10 +60,16 @@ def test_gtask_tasklist(client: GTasksClient, custom_config: str):
 
     new_list.delete()
 
+    default_tasklist = gtasks.get_tasklist()
+    assert default_tasklist.is_default
+
+    with pytest.raises(RuntimeError):
+        default_tasklist.delete()
+
 
 @pytest.mark.vcr()
-def test_gtask_task(client: GTasksClient, custom_config: str):
-    new_list = client.create_tasklist('My new tasklist')
+def test_gtask_task(gtasks: GTasksClient, custom_config: Path):
+    new_list = gtasks.create_tasklist('My new tasklist')
     now = datetime.now(timezone.utc)
     tomorrow = now + timedelta(days=1)
     new_task = new_list.create_task('My new task', due=now)
