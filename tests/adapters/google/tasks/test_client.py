@@ -9,6 +9,11 @@ from tests.conftest import VCR
 from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
+@pytest.fixture(scope='module', autouse=True)
+def notion_cleanups():
+    """Overwrites fixture from conftest.py to avoid an open session"""
+
+
 @pytest.fixture(scope='module')
 def gtasks():
     """Returns a GTasksClient instance with read_only=False."""

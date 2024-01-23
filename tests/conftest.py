@@ -96,13 +96,17 @@ def vcr_config():
 @pytest.fixture(scope='module')
 def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCRManager:
     """My VCR for fixtures"""
-    cfg = vcr_config | {'cassette_library_dir': 'tests/cassettes/conftest'}
+    cassette_str = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
+    cfg = vcr_config | {'cassette_library_dir': cassette_str}
     disable_recording = request.config.getoption('--disable-recording')
     if disable_recording:
         my_vcr = MagicMock()
         my_vcr.use_cassette.return_value.__enter__.return_value = None
     else:
-        my_vcr = VCR(**cfg)
+        mode = request.config.getoption('--record-mode')
+        if mode == 'rewrite':
+            mode = 'all'
+        my_vcr = VCR(record_mode=vcr_mode(mode), **cfg)
     return my_vcr
 
 
