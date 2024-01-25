@@ -4,7 +4,6 @@ Note: Follow this quickstart guide first to enable the Google API and create the
 https://developers.google.com/tasks/quickstart/python
 """
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
 from ultimate_notion.adapters.google import GTasksClient, SyncGTasks
 from ultimate_notion import (
@@ -24,7 +23,7 @@ from ultimate_notion.adapters import sync
 ######################################################
 
 PARENT_PAGE = "Tests"  # Defines the page where the database should be created
-today = datetime.now(tz=ZoneInfo("Europe/Berlin"))
+today = datetime(2024, 1, 1)
 
 
 class Status(OptionNS):
@@ -98,7 +97,7 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
     )
     # Schedule the sync task to run every 5 minutes
     # Omit the `in_total` argument to run the task forever
-    sync_task.run_every(seconds=5).in_total(times=3).schedule()
+    sync_task.run_every(seconds=2).in_total(times=3).schedule()
 
-    # Run all scheduled tasks
+    # # Run all scheduled tasks
     sync.run_all_tasks()

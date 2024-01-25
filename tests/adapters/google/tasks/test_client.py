@@ -9,29 +9,24 @@ from tests.conftest import VCR
 from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
-@pytest.fixture(scope='module', autouse=True)
-def notion_cleanups():
-    """Overwrites fixture from conftest.py to avoid an open session"""
-
-
-@pytest.fixture(scope='module')
-def gtasks():
+@pytest.fixture()
+def gtasks(custom_config: Path) -> GTasksClient:
     """Returns a GTasksClient instance with read_only=False."""
     return GTasksClient(read_only=False)
 
 
 @pytest.fixture(scope='module', autouse=True)
-def gtasks_cleanups(gtasks: GTasksClient, my_vcr: VCR):
+def gtasks_cleanups(my_vcr: VCR):
     """Clean all Tasklists except of the default one before the tests."""
+    gtasks = GTasksClient(read_only=False)
     with my_vcr.use_cassette('gtasks_cleanups.yaml'):
         for tasklist in gtasks.all_tasklists():
             if not tasklist.is_default:
                 tasklist.delete()
-        yield
 
 
 @pytest.mark.vcr()
-def test_gtask_client(gtasks: GTasksClient, custom_config: Path):
+def test_gtask_client(gtasks: GTasksClient):
     new_list = gtasks.create_tasklist('My new tasklist')
     assert new_list.title == 'My new tasklist'
 
@@ -45,7 +40,7 @@ def test_gtask_client(gtasks: GTasksClient, custom_config: Path):
 
 
 @pytest.mark.vcr()
-def test_gtask_tasklist(gtasks: GTasksClient, custom_config: Path):
+def test_gtask_tasklist(gtasks: GTasksClient):
     new_list = gtasks.create_tasklist('My new tasklist')
     assert not new_list.is_default
     new_task = new_list.create_task('My new task')
@@ -73,7 +68,7 @@ def test_gtask_tasklist(gtasks: GTasksClient, custom_config: Path):
 
 
 @pytest.mark.vcr()
-def test_gtask_task(gtasks: GTasksClient, custom_config: Path):
+def test_gtask_task(gtasks: GTasksClient):
     new_list = gtasks.create_tasklist('My new tasklist')
     now = datetime.now(timezone.utc)
     tomorrow = now + timedelta(days=1)

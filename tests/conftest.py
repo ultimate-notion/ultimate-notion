@@ -1,6 +1,13 @@
 """Fixtures for Ultimate-Notion unit tests.
 
 Set `NOTION_TOKEN` environment variable for tests interacting with the Notion API.
+
+Common pitfalls:
+* never use dynamic values, e.g. datetime.now() in tests as VCRpy will record them and they will be used in the replay.
+* be extremely careful with module/session level fixtures that use VCRpy. Only the first test using the fixture will
+  record the cassette. All other tests will replay the same cassette, even if they use a different fixture. This can
+  lead to unexpected results when not applied with extreme caution.
+
 """
 
 from __future__ import annotations
@@ -23,7 +30,6 @@ from ultimate_notion import Option, Session, schema
 from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, get_cfg_file
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
-from ultimate_notion.session import ENV_NOTION_TOKEN
 
 ALL_COL_DB = 'All Columns DB'  # Manually created DB in Notion with all possible columns including AI columns!
 WIKI_DB = 'Wiki DB'
@@ -33,23 +39,6 @@ TASK_DB = 'Task DB'
 
 T = TypeVar('T')
 Yield: TypeAlias = Generator[T, None, None]
-
-
-class VCRManager:
-    """Singelton for the VCR instance"""
-
-    _vcr_instance: VCR = None
-
-    @classmethod
-    def set_vcr(cls, vcr_instance: VCR):
-        cls._vcr_instance = vcr_instance
-
-    @classmethod
-    def get_vcr(cls) -> VCR:
-        if cls._vcr_instance is None:
-            msg = 'VCR instance not set. Please call set_vcr first.'
-            raise ValueError(msg)
-        return cls._vcr_instance
 
 
 @pytest.fixture(scope='module')
@@ -94,8 +83,8 @@ def vcr_config():
 
 
 @pytest.fixture(scope='module')
-def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCRManager:
-    """My VCR for fixtures"""
+def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCR:
+    """My VCR for module/session-level fixtures"""
     cassette_str = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
     cfg = vcr_config | {'cassette_library_dir': cassette_str}
     disable_recording = request.config.getoption('--disable-recording')
@@ -110,12 +99,7 @@ def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCRManager:
     return my_vcr
 
 
-def pytest_recording_configure(config, vcr):
-    """This hook is only called when @pytest.mark.vcr is used"""
-    VCRManager.set_vcr(vcr)  # register the vcr instance of pytest-recording globally
-
-
-@pytest.fixture(scope='module')
+@pytest.fixture()
 def custom_config(my_vcr: VCR) -> Yield[Path]:
     # Create a temporary file
     if my_vcr.record_mode != vcr_mode.NONE:
@@ -145,20 +129,13 @@ def custom_config(my_vcr: VCR) -> Yield[Path]:
 
 
 @pytest.fixture(scope='module')
-def notion(my_vcr: VCR) -> Yield[Session]:
+def notion() -> Yield[Session]:
     """Return the notion session used for live testing.
 
     This fixture depends on the `NOTION_TOKEN` environment variable. If it is not
     present, this fixture will skip the current test.
     """
-    if my_vcr.record_mode != vcr_mode.NONE and os.getenv(ENV_NOTION_TOKEN) is None:
-        msg = (
-            f'{ENV_NOTION_TOKEN} not defined and record mode is not `none`!\n'
-            'Use `export {ENV_NOTION_TOKEN}=secret_...` or `--record-mode=none`'
-        )
-        raise RuntimeError(msg)
-
-    with my_vcr.use_cassette('notion.yaml'), uno.Session() as notion:
+    with uno.Session() as notion:
         yield notion
 
 
@@ -176,7 +153,7 @@ def root_page(notion: Session, my_vcr: VCR) -> Page:
         return notion.search_page('Tests').item()
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def article_db(notion: Session, root_page: Page, my_vcr: VCR) -> Database:
     """Simple database of articles"""
 
@@ -242,7 +219,7 @@ def static_dbs(
         return {all_cols_db, wiki_db, contacts_db, task_db}
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def new_task_db(notion: Session, root_page: Page, my_vcr: VCR) -> Yield[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
@@ -362,7 +339,6 @@ def new_task_db(notion: Session, root_page: Page, my_vcr: VCR) -> Yield[Database
         db.delete()
 
 
-# ToDo: https://stackoverflow.com/questions/38748257/disable-autouse-fixtures-on-specific-pytest-marks
 @pytest.fixture(scope='module', autouse=True)
 def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database], my_vcr: VCR):
     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
@@ -388,5 +364,9 @@ def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], s
                 page.delete()
 
     with my_vcr.use_cassette('notion_cleanups.yaml'):
-        yield
+        clean()
+
+    yield
+
+    with my_vcr.use_cassette('notion_cleanups.yaml'):
         clean()
