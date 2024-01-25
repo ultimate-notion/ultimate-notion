@@ -12,7 +12,7 @@ from ultimate_notion.adapters.google.tasks import GTasksClient
 @pytest.fixture()
 def gtasks(custom_config: Path) -> GTasksClient:
     """Returns a GTasksClient instance with read_only=False."""
-    return GTasksClient(read_only=False)
+    yield GTasksClient(read_only=False)
 
 
 @pytest.fixture(scope='module', autouse=True)

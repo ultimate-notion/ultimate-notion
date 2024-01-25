@@ -7,7 +7,7 @@ Common pitfalls:
 * be extremely careful with module/session level fixtures that use VCRpy. Only the first test using the fixture will
   record the cassette. All other tests will replay the same cassette, even if they use a different fixture. This can
   lead to unexpected results when not applied with extreme caution.
-
+* be aware of the difference between `yield` and `return` in fixtures because the latter closes the cassette.
 """
 
 from __future__ import annotations
@@ -99,7 +99,7 @@ def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCR:
     return my_vcr
 
 
-@pytest.fixture()
+@pytest.fixture
 def custom_config(my_vcr: VCR) -> Yield[Path]:
     # Create a temporary file
     if my_vcr.record_mode != vcr_mode.NONE:
