@@ -16,7 +16,7 @@ def gtasks(custom_config: Path) -> Yield[GTasksClient]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def gtasks_cleanups(my_vcr: VCR):
+def gtasks_cleanups(my_vcr: VCR, custom_config: Path):
     """Clean all Tasklists except of the default one before the tests."""
     gtasks = GTasksClient(read_only=False)
     with my_vcr.use_cassette('gtasks_cleanups.yaml'):

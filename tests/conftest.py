@@ -99,7 +99,7 @@ def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCR:
     return my_vcr
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def custom_config(my_vcr: VCR) -> Yield[Path]:
     # Create a temporary file
     if my_vcr.record_mode != vcr_mode.NONE:
