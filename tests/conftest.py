@@ -8,6 +8,10 @@ Common pitfalls:
   record the cassette. All other tests will replay the same cassette, even if they use a different fixture. This can
   lead to unexpected results when not applied with extreme caution.
 * be aware of the difference between `yield` and `return` in fixtures because the latter closes the cassette.
+* In case of errors like `Token has been expired or revoked.` delete the token.json file in the `config.toml`
+  directory. This will force the Google API to create a new token. Execute the tests and add `-s` to the pytest,
+  e.g.: `hatch run vcr-rewrite -k test_sync_google_tasks -s`. Then check it using `hatch run vcr-only`.
+  Be aware that `pytest-dotenv` will load the local `config.toml` file for development.
 """
 
 from __future__ import annotations
@@ -27,7 +31,8 @@ from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
 from ultimate_notion import Option, Session, schema
-from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, get_cfg_file
+from ultimate_notion.adapters.google.tasks import GTasksClient
+from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
 
@@ -103,12 +108,17 @@ def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCR:
 def custom_config(my_vcr: VCR) -> Yield[Path]:
     # Create a temporary file
     if my_vcr.record_mode != vcr_mode.NONE:
-        yield get_cfg_file()
-    else:
+        # Note: pytest-dotenv will use ~/.vscode/.env as default and load the local
+        # ultimate-notion configuration file for development here.
+        cfg_path = get_cfg_file()
+        with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
+            yield cfg_path
+    else:  # corresponds to VCR-ONLY
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             cfg_path = tmp_dir_path / Path('config.cfg')
 
             with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
+                get_or_create_cfg()
                 client_secret_path = tmp_dir_path / Path('client_secret.json')
                 client_secret_path.write_text(
                     '{"installed":{"client_id":"secret...","project_id":"ultimate-notion",'
@@ -370,3 +380,11 @@ def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], s
 
     with my_vcr.use_cassette('notion_cleanups.yaml'):
         clean()
+
+
+def delete_all_taskslists():
+    """Delete all taskslists except of the default one"""
+    gtasks = GTasksClient(read_only=False)
+    for tasklist in gtasks.all_tasklists():
+        if not tasklist.is_default:
+            tasklist.delete()

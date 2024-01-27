@@ -22,6 +22,7 @@ DEFAULT_CFG = f"""\
 # * You can use environment variables in the format ${{env:VAR_NAME}} or ${{env:VAR_NAME|DEFAULT_VALUE}}.
 
 [ultimate_notion]
+sync_state_dir = "sync_states"
 token = "${{env:{ENV_NOTION_TOKEN}}}"
 
 [google]
@@ -34,6 +35,7 @@ class UNOCfg(BaseModel):
     """Configuration related to Ultimate Notion itself."""
 
     token: str | None = None
+    sync_state_dir: Path = Path('sync_states')
     cfg_path: FilePath  # will be set automatically
 
 
@@ -50,20 +52,29 @@ class Config(BaseModel):
     ultimate_notion: UNOCfg
     google: GoogleCfg | None = None
 
+    @field_validator('ultimate_notion')
+    @classmethod
+    def uno_convert_path(cls, value: UNOCfg, info: ValidationInfo) -> UNOCfg:
+        if not value.sync_state_dir.is_absolute():
+            value.sync_state_dir = value.cfg_path.parent / value.sync_state_dir
+            if not value.sync_state_dir.exists():
+                value.sync_state_dir.mkdir(parents=True)
+        return value
+
     @field_validator('google')
     @classmethod
-    def convert_json_path(cls, v: GoogleCfg | None, info: ValidationInfo) -> GoogleCfg | None:
+    def google_convert_path(cls, value: GoogleCfg | None, info: ValidationInfo) -> GoogleCfg | None:
         def make_rel_path_abs(entry: FilePath | None):
             if entry is not None and not entry.is_absolute():
                 cfg_path: Path = info.data['ultimate_notion'].cfg_path
                 entry = cfg_path.parent / entry
             return entry
 
-        if v is not None:
-            v.client_secret_json = make_rel_path_abs(v.client_secret_json)
-            v.token_json = make_rel_path_abs(v.token_json)
+        if value is not None:
+            value.client_secret_json = make_rel_path_abs(value.client_secret_json)
+            value.token_json = make_rel_path_abs(value.token_json)
 
-        return v
+        return value
 
 
 def get_cfg_file() -> Path:

@@ -1,8 +1,11 @@
 """How to synchronize your tasks between Google Tasks and a Notion database.
 
-Note: Follow this quickstart guide first to enable the Google API and create
-the necessary credentials:
-https://developers.google.com/tasks/quickstart/python
+There are two ways to do this:
+1. using a declarative Notion database definition or
+2. using an existing Notion database that was created manually.
+
+Note: Follow this guide first to enable the Google API and create the
+necessary credentials: https://developers.google.com/tasks/quickstart/python
 """
 # mypy: disable-error-code="attr-defined"
 
@@ -66,9 +69,9 @@ with Session() as notion:
             status=Status.done,
         )
 
-################################################
-# Define a few Google Tasks task in a tasklist #
-################################################
+#################################################
+# Define a few tasks in a Google Tasks tasklist #
+#################################################
 
 with GTasksClient() as gtasks:
     tasklist = gtasks.get_or_create_tasklist('My synched task list')
@@ -82,10 +85,10 @@ with GTasksClient() as gtasks:
         )
 
 ######################################################
-# Create the Sync Task between Notion & Google Tasks #
+# Create the sync task between Notion & Google Tasks #
 ######################################################
 
-# Version 1: Using the Notion database declaration from above
+# Option 1: Using the Notion database declaration from above
 with Session() as notion, GTasksClient(read_only=False) as gtasks:
     task_db = notion.get_or_create_db(parent=parent, schema=Task)
     tasklist = gtasks.get_or_create_tasklist('My synched task list')
@@ -100,13 +103,13 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
     )
     # Schedule the sync task to run every 5 minutes
     # Omit the `in_total` argument to run the task forever
-    sync_task.run_every(seconds=2).in_total(times=3).schedule()
+    sync_task.run_every(seconds=2).in_total(times=2).schedule()
 
     # Run all scheduled tasks
     sync.run_all_tasks()
 
 
-# Version 2: Using an existing Notion database that was created manually
+# Option 2: Using an existing Notion database that was created manually
 with Session() as notion, GTasksClient(read_only=False) as gtasks:
     task_db = notion.search_db('My synched task db').item()
     status_col = task_db.schema.get_col('Status')
@@ -121,5 +124,5 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
         not_completed_val=status_col.type.options['Backlog'],
         due_col=due_date_col,
     )
-    sync_task.run_every(seconds=2).in_total(times=3).schedule()
+    sync_task.run_every(seconds=2).in_total(times=2).schedule()
     sync.run_all_tasks()

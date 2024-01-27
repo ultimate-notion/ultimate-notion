@@ -12,7 +12,7 @@ from typing import Any, TypeAlias, TypeVar
 
 from pydantic import BaseModel, Field
 
-from ultimate_notion.config import get_cfg_file
+from ultimate_notion.config import get_cfg
 
 _logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ class SyncTask(ABC):
         self.name = name
         self.attr_map = attr_map
         self.conflict_mode = conflict_mode
-        self.state_path = get_cfg_file().parent / 'sync_states' / f'{name}.pickle'
+        self.state_path = get_cfg().ultimate_notion.sync_state_dir / f'{name}.pickle'
         super().__init__()
 
     def schedule(self: Self) -> Self:

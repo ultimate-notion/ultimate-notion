@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import VCR, Yield
+from tests.conftest import VCR, Yield, delete_all_taskslists
 from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
@@ -18,11 +18,8 @@ def gtasks(custom_config: Path) -> Yield[GTasksClient]:
 @pytest.fixture(scope='module', autouse=True)
 def gtasks_cleanups(my_vcr: VCR, custom_config: Path):
     """Clean all Tasklists except of the default one before the tests."""
-    gtasks = GTasksClient(read_only=False)
     with my_vcr.use_cassette('gtasks_cleanups.yaml'):
-        for tasklist in gtasks.all_tasklists():
-            if not tasklist.is_default:
-                tasklist.delete()
+        delete_all_taskslists()
 
 
 @pytest.mark.vcr()
@@ -70,13 +67,13 @@ def test_gtask_tasklist(gtasks: GTasksClient):
 @pytest.mark.vcr()
 def test_gtask_task(gtasks: GTasksClient):
     new_list = gtasks.create_tasklist('My new tasklist')
-    now = datetime.now(timezone.utc)
-    tomorrow = now + timedelta(days=1)
-    new_task = new_list.create_task('My new task', due=now)
+    today = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    tomorrow = today + timedelta(days=1)
+    new_task = new_list.create_task('My new task', due=today)
     assert new_task.title == 'My new task'
     assert new_task.tasklist == new_list
     assert new_task.due is not None
-    assert new_task.due.date() == now.date()  # time is not stored in Google Tasks
+    assert new_task.due.date() == today.date()  # time is not stored in Google Tasks
     new_task.due = tomorrow
     assert new_task.due is not None
     assert new_task.due.date() == tomorrow.date()
