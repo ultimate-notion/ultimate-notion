@@ -9,7 +9,7 @@ from datetime import tzinfo
 from functools import wraps
 from hashlib import sha256
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeAlias, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeAlias, TypeVar, cast
 from uuid import UUID
 
 import numpy as np
@@ -206,7 +206,16 @@ Self = TypeVar('Self', bound='Wrapper[Any]')  # ToDo: Replace when requires-pyth
 GT = TypeVar('GT', bound=GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Wrapper(Generic[GT]):
+class ObjRefWrapper(Protocol[GT]):
+    """Wrapper for objects that have an obj_ref attribute.
+
+    Note: This allows us to define Mixin classes that require the obj_ref attribute.
+    """
+
+    obj_ref: GT
+
+
+class Wrapper(ObjRefWrapper[GT]):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
     obj_ref: GT

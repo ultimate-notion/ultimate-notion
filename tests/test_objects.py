@@ -4,7 +4,7 @@ from typing import cast
 
 import pytest
 
-from ultimate_notion.database import Database
+from ultimate_notion.database import Database, Page
 from ultimate_notion.schema import MultiSelect, Select, Status
 
 
@@ -33,3 +33,11 @@ def test_multi_select_options(all_cols_db: Database):
     multi_select_prop_type = cast(MultiSelect, all_cols_db.schema.get_col('Multi-Select').type)
     all_options = ['MultiOption1', 'MultiOption2']
     assert [option.name for _, option in multi_select_prop_type.options.items()] == all_options
+
+
+@pytest.mark.vcr()
+def test_rich_text_md(md_page: Page):
+    pass
+    # from IPython import embed
+
+    # embed()
