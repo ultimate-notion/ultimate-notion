@@ -22,21 +22,21 @@
     <span class=n>Session</span><span class=p>,</span>
 <span class=p>)</span>
 
-<span class=n>PARENT_PAGE</span> <span class=o>=</span> <span class=s2>&quot;Tests&quot;</span>  <span class=c1># Defines the page where the database should be created</span>
-<span class=n>today</span> <span class=o>=</span> <span class=n>datetime</span><span class=o>.</span><span class=n>now</span><span class=p>(</span><span class=n>tz</span><span class=o>=</span><span class=n>ZoneInfo</span><span class=p>(</span><span class=s2>&quot;Europe/Berlin&quot;</span><span class=p>))</span>
+<span class=n>PARENT_PAGE</span> <span class=o>=</span> <span class=s1>&#39;Tests&#39;</span>  <span class=c1># Defines the page where the database should be created</span>
+<span class=n>today</span> <span class=o>=</span> <span class=n>datetime</span><span class=o>.</span><span class=n>now</span><span class=p>(</span><span class=n>tz</span><span class=o>=</span><span class=n>ZoneInfo</span><span class=p>(</span><span class=s1>&#39;Europe/Berlin&#39;</span><span class=p>))</span>
 
 
 <span class=k>class</span> <span class=nc>Status</span><span class=p>(</span><span class=n>OptionNS</span><span class=p>):</span>
-    <span class=n>backlog</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s2>&quot;Backlog&quot;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>GRAY</span><span class=p>)</span>
-    <span class=n>in_progress</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s2>&quot;In Progress&quot;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>BLUE</span><span class=p>)</span>
-    <span class=n>blocked</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s2>&quot;Blocked&quot;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>RED</span><span class=p>)</span>
-    <span class=n>done</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s2>&quot;Done&quot;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>GREEN</span><span class=p>)</span>
+    <span class=n>backlog</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s1>&#39;Backlog&#39;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>GRAY</span><span class=p>)</span>
+    <span class=n>in_progress</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s1>&#39;In Progress&#39;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>BLUE</span><span class=p>)</span>
+    <span class=n>blocked</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s1>&#39;Blocked&#39;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>RED</span><span class=p>)</span>
+    <span class=n>done</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s1>&#39;Done&#39;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>GREEN</span><span class=p>)</span>
 
 
 <span class=k>class</span> <span class=nc>Priority</span><span class=p>(</span><span class=n>OptionNS</span><span class=p>):</span>
-    <span class=n>high</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s2>&quot;✹ High&quot;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>RED</span><span class=p>)</span>
-    <span class=n>medium</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s2>&quot;✷ Medium&quot;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>YELLOW</span><span class=p>)</span>
-    <span class=n>low</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s2>&quot;✶ Low&quot;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>GRAY</span><span class=p>)</span>
+    <span class=n>high</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s1>&#39;✹ High&#39;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>RED</span><span class=p>)</span>
+    <span class=n>medium</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s1>&#39;✷ Medium&#39;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>YELLOW</span><span class=p>)</span>
+    <span class=n>low</span> <span class=o>=</span> <span class=n>Option</span><span class=p>(</span><span class=s1>&#39;✶ Low&#39;</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=n>Color</span><span class=o>.</span><span class=n>GRAY</span><span class=p>)</span>
 
 
 <span class=c1># assembling the formula to show the urgency of the task</span>
@@ -44,7 +44,7 @@
     <span class=s1>&#39;if(empty(prop(&quot;Due Date&quot;)), toNumber(&quot;&quot;), &#39;</span>
     <span class=s1>&#39;dateBetween(prop(&quot;Due Date&quot;), now(), &quot;days&quot;))&#39;</span>
 <span class=p>)</span>
-<span class=n>weeks_left</span> <span class=o>=</span> <span class=sa>f</span><span class=s2>&quot;(if(((</span><span class=si>{</span><span class=n>days_left</span><span class=si>}</span><span class=s2>) &lt; 0), -1, 1)) * floor(abs((</span><span class=si>{</span><span class=n>days_left</span><span class=si>}</span><span class=s2>) / 7))&quot;</span>
+<span class=n>weeks_left</span> <span class=o>=</span> <span class=sa>f</span><span class=s1>&#39;(if(((</span><span class=si>{</span><span class=n>days_left</span><span class=si>}</span><span class=s1>) &lt; 0), -1, 1)) * floor(abs((</span><span class=si>{</span><span class=n>days_left</span><span class=si>}</span><span class=s1>) / 7))&#39;</span>
 <span class=n>time_left</span> <span class=o>=</span> <span class=p>(</span>
     <span class=sa>f</span><span class=s1>&#39;if(empty((</span><span class=si>{</span><span class=n>days_left</span><span class=si>}</span><span class=s1>)), &quot;&quot;, (((if(((</span><span class=si>{</span><span class=n>days_left</span><span class=si>}</span><span class=s1>) &lt; 0), &quot;-&quot;, &quot;&quot;)) + &#39;</span>
     <span class=sa>f</span><span class=s1>&#39;(if(((</span><span class=si>{</span><span class=n>weeks_left</span><span class=si>}</span><span class=s1>) == 0), &quot;&quot;, (format(abs((</span><span class=si>{</span><span class=n>weeks_left</span><span class=si>}</span><span class=s1>))) + &quot;w&quot;)))) + &#39;</span>
@@ -55,18 +55,18 @@
     <span class=s1>&#39;if(prop(&quot;Status&quot;) == &quot;Done&quot;, &quot;✅&quot;, (if(empty(prop(&quot;Due Date&quot;)), &quot;&quot;, &#39;</span>
     <span class=s1>&#39;(if((formatDate(now(), &quot;YWD&quot;) == formatDate(prop(&quot;Due Date&quot;), &quot;YWD&quot;)), &#39;</span>
     <span class=sa>f</span><span class=s1>&#39;&quot;🔹 Today&quot;, (if(now() &gt; prop(&quot;Due Date&quot;), &quot;🔥 &quot; + </span><span class=si>{</span><span class=n>time_left</span><span class=si>}</span><span class=s1>, &quot;🕐 &quot; &#39;</span>
-    <span class=sa>f</span><span class=s2>&quot;+ </span><span class=si>{</span><span class=n>time_left</span><span class=si>}</span><span class=s2>)))))))&quot;</span>
+    <span class=sa>f</span><span class=s1>&#39;+ </span><span class=si>{</span><span class=n>time_left</span><span class=si>}</span><span class=s1>)))))))&#39;</span>
 <span class=p>)</span>
 
 
-<span class=k>class</span> <span class=nc>Task</span><span class=p>(</span><span class=n>PageSchema</span><span class=p>,</span> <span class=n>db_title</span><span class=o>=</span><span class=s2>&quot;My task list&quot;</span><span class=p>):</span>
+<span class=k>class</span> <span class=nc>Task</span><span class=p>(</span><span class=n>PageSchema</span><span class=p>,</span> <span class=n>db_title</span><span class=o>=</span><span class=s1>&#39;My task list&#39;</span><span class=p>):</span>
 <span class=w>    </span><span class=sd>&quot;&quot;&quot;My personal task list of all the important stuff I have to do&quot;&quot;&quot;</span>
 
-    <span class=n>task</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s2>&quot;Task&quot;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Title</span><span class=p>())</span>
-    <span class=n>status</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s2>&quot;Status&quot;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Select</span><span class=p>(</span><span class=n>Status</span><span class=p>))</span>
-    <span class=n>priority</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s2>&quot;Priority&quot;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Select</span><span class=p>(</span><span class=n>Priority</span><span class=p>))</span>
-    <span class=n>urgency</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s2>&quot;Urgency&quot;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Formula</span><span class=p>(</span><span class=n>urgency</span><span class=p>))</span>
-    <span class=n>due_date</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s2>&quot;Due Date&quot;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Date</span><span class=p>())</span>
+    <span class=n>task</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Task&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Title</span><span class=p>())</span>
+    <span class=n>status</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Status&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Select</span><span class=p>(</span><span class=n>Status</span><span class=p>))</span>
+    <span class=n>priority</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Priority&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Select</span><span class=p>(</span><span class=n>Priority</span><span class=p>))</span>
+    <span class=n>urgency</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Urgency&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Formula</span><span class=p>(</span><span class=n>urgency</span><span class=p>))</span>
+    <span class=n>due_date</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Due Date&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Date</span><span class=p>())</span>
 
 
 <span class=k>with</span> <span class=n>Session</span><span class=p>()</span> <span class=k>as</span> <span class=n>notion</span><span class=p>:</span>
@@ -75,55 +75,55 @@
 
     <span class=c1># just create 10 random tasks for demonstration</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Plan vacation&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Plan vacation&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>+</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>weeks</span><span class=o>=</span><span class=mi>3</span><span class=p>,</span> <span class=n>days</span><span class=o>=</span><span class=mi>3</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>backlog</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>high</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Read book about procastination&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Read book about procastination&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>+</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>weeks</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>days</span><span class=o>=</span><span class=mi>2</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>backlog</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>medium</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Clean the house&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Clean the house&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>+</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>days</span><span class=o>=</span><span class=mi>5</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>in_progress</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>low</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Build tool with Ultimate Notion&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Build tool with Ultimate Notion&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>+</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>days</span><span class=o>=</span><span class=mi>1</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>in_progress</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>low</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Complete project report for work&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Complete project report for work&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span><span class=p>,</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>in_progress</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>medium</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Call family&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Call family&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>-</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>days</span><span class=o>=</span><span class=mi>1</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>done</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>low</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Pay yearly utility bills&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Pay yearly utility bills&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>-</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>days</span><span class=o>=</span><span class=mi>5</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>blocked</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>high</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Run first Marathon&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Run first Marathon&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>-</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>weeks</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>days</span><span class=o>=</span><span class=mi>1</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>done</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>low</span><span class=p>,</span>
     <span class=p>)</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
-        <span class=n>task</span><span class=o>=</span><span class=s2>&quot;Clearing out the cellar&quot;</span><span class=p>,</span>
+        <span class=n>task</span><span class=o>=</span><span class=s1>&#39;Clearing out the cellar&#39;</span><span class=p>,</span>
         <span class=n>due_date</span><span class=o>=</span><span class=n>today</span> <span class=o>-</span> <span class=n>timedelta</span><span class=p>(</span><span class=n>weeks</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>days</span><span class=o>=</span><span class=mi>2</span><span class=p>),</span>
         <span class=n>status</span><span class=o>=</span><span class=n>Status</span><span class=o>.</span><span class=n>in_progress</span><span class=p>,</span>
         <span class=n>priority</span><span class=o>=</span><span class=n>Priority</span><span class=o>.</span><span class=n>low</span><span class=p>,</span>
