@@ -40,6 +40,7 @@ ALL_COL_DB = 'All Columns DB'  # Manually created DB in Notion with all possible
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
 GETTING_STARTED_PAGE = 'Getting Started'
+MD_PAGE = 'Markdown Test'
 TASK_DB = 'Task DB'
 
 T = TypeVar('T')
@@ -194,23 +195,29 @@ def intro_page(notion: Session, my_vcr: VCR) -> Page:
 
 @pytest.fixture(scope='module')
 def all_cols_db(notion: Session, my_vcr: VCR) -> Database:
-    """Return manually created database with all columns, also AI columns"""
+    """Return manually created database with all columns, also AI columns."""
     with my_vcr.use_cassette('all_cols_db.yaml'):
         return notion.search_db(ALL_COL_DB).item()
 
 
 @pytest.fixture(scope='module')
 def wiki_db(notion: Session, my_vcr: VCR) -> Database:
-    """Return manually created wiki db"""
+    """Return manually created wiki db."""
     with my_vcr.use_cassette('wiki_db.yaml'):
         return notion.search_db(WIKI_DB).item()
 
 
 @pytest.fixture(scope='module')
-def static_pages(root_page: Page, intro_page: Page, my_vcr: VCR) -> set[Page]:
+def md_page(notion: Session, my_vcr: VCR) -> Page:
+    """Return a page with markdown content."""
+    with my_vcr.use_cassette('md_page.yaml'):
+        return notion.search_page(MD_PAGE).item()
+
+
+@pytest.fixture(scope='module')
+def static_pages(root_page: Page, intro_page: Page, md_page: Page) -> set[Page]:
     """Return all static pages for the unit tests"""
-    with my_vcr.use_cassette('static_pages.yaml'):
-        return {intro_page, root_page}
+    return {intro_page, root_page, md_page}
 
 
 @pytest.fixture(scope='module')
@@ -345,7 +352,10 @@ def new_task_db(notion: Session, root_page: Page, my_vcr: VCR) -> Yield[Database
 
     with my_vcr.use_cassette('new_task_db.yaml'):
         db = notion.create_db(parent=root_page, schema=Tasklist)
-        yield db
+
+    yield db
+
+    with my_vcr.use_cassette('new_task_db.yaml'):
         db.delete()
 
 

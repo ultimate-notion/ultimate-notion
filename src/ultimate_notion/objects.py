@@ -239,7 +239,7 @@ class RichText(str):
     def from_plain_text(cls, text: str) -> RichText:
         """Create RichTextList from plain text.
 
-        This method is a more explicit alias for the default constructor
+        This method is a more explicit alias for the default constructor.
         """
         return cls(text)
 

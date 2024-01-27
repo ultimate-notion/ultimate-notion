@@ -101,9 +101,9 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
         not_completed_val=Status.backlog,
         due_col=Task.due_date,
     )
-    # Schedule the sync task to run every 5 minutes
+    # Schedule the sync task to run every second
     # Omit the `in_total` argument to run the task forever
-    sync_task.run_every(seconds=2).in_total(times=2).schedule()
+    sync_task.run_every(seconds=1).in_total(times=2).schedule()
 
     # Run all scheduled tasks
     sync.run_all_tasks()
@@ -124,5 +124,5 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
         not_completed_val=status_col.type.options['Backlog'],
         due_col=due_date_col,
     )
-    sync_task.run_every(seconds=2).in_total(times=2).schedule()
+    sync_task.run_every(seconds=1).in_total(times=2).schedule()
     sync.run_all_tasks()
