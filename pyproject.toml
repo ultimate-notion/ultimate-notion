@@ -141,10 +141,7 @@ exclude_lines = [
 [tool.ruff]
 target-version = "py310"
 line-length = 120
-preview = true
-extend-select = [ # features in preview
-    "W292", # missing-newline-at-end-of-file
-]
+indent-width = 4
 include = [
     "src/**/*.py",
     "src/**/*.pyi",
@@ -152,6 +149,12 @@ include = [
     "tests/**/*.pyi",
     "examples/**/*.py",
     "docs/**/*.py"
+]
+
+[tool.ruff.lint]
+preview = true
+extend-select = [ # features in preview
+    "W292", # missing-newline-at-end-of-file
 ]
 select = [
     "A",
@@ -170,7 +173,7 @@ select = [
     "PLE",
     "PLR",
     "PLW",
-    "Q",
+    "Q", # quotes, e.g. single quotes
     "RUF",
     "S",
     "SIM",
