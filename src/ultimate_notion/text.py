@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterator
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -50,7 +50,7 @@ BLOCK_URL_LONG_RE = re.compile(
 )
 
 
-MD_STYLES = ('bold', 'italic', 'strikethrough', 'code')
+MD_STYLES = ('bold', 'italic', 'strikethrough', 'code', 'underline')
 """Markdown styles supported by Notion."""
 MD_STYLE_MAP = {
     'bold': ('**', '**'),
@@ -147,6 +147,7 @@ def md_spans(rich_texts: list[RichTextBase]) -> np.ndarray:
         curr_ranks = rank(-spans[:, j])
         for i in np.where(curr_ranks < old_ranks)[0]:
             spans[i, j] = 1 if spans[i, j] > 0 else 0  # start a new span if an encompassing span ends
+        old_ranks = curr_ranks
     return spans
 
 
@@ -161,23 +162,51 @@ def sorted_md_spans(md_spans: np.ndarray) -> Iterator[tuple[int, int, str]]:
         indices = tuple(idx[::-1] for idx in np.where(md_spans == span_len))
         for i, j in zip(*indices, strict=True):
             sorted_spans.append((j - span_len, j - 1, MD_STYLES[i]))
-            md_spans[i, j - span_len : j] = 0
+            md_spans[i, j - span_len + 1 : j + 1] = 0
     return reversed(sorted_spans)
 
 
 def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
     """Convert rich text to markdown."""
-    # ToDo: Implement, use this as pagelink and @ ↗ ↗
-    md_rich_texts = [rich_text.obj_ref.plain_text for rich_text in rich_texts]
-    for start, end, md_style in sorted_md_spans(md_spans(rich_texts)):
-        left = md_rich_texts[start]
+    from ultimate_notion.objects import Mention  # noqa: PLC0415  # ToDo: Remove when mypy doesn't need the cast below
+
+    def has_only_ws_chars(text: str) -> bool:
+        return re.match(r'^\s*$', text) is not None
+
+    def add_md_style(texts: list[str], start: int, end: int, md_style: str):
+        # we skip text blocks with only whitespace characters
+        if has_only_ws_chars(texts[start]) and start != end:
+            return add_md_style(texts, start + 1, end, md_style)
+        elif has_only_ws_chars(texts[end]) and start != end:
+            return add_md_style(texts, start, end - 1, md_style)
+
+        left = texts[start]
         if lmatch := re.search(r'\S', left):
-            md_rich_texts[start] = left[: lmatch.start()] + MD_STYLE_MAP[md_style][0] + left[lmatch.start() :]
-        right = md_rich_texts[end]
+            texts[start] = left[: lmatch.start()] + MD_STYLE_MAP[md_style][0] + left[lmatch.start() :]
+
+        right = texts[end]
         if rmatch := re.search(r'\S(?=\s*$)', right):
-            md_rich_texts[end] = right[: rmatch.end()] + MD_STYLE_MAP[md_style][1] + right[rmatch.end() :]
+            texts[end] = right[: rmatch.end()] + MD_STYLE_MAP[md_style][1] + right[rmatch.end() :]
+
         if bool(lmatch) != bool(rmatch):
             rt_objs = '\n'.join(str(rt.obj_ref) for rt in rich_texts)
             msg = f'Error when inserting markdown styles into:\n{rt_objs}'
             raise ValueError(msg)
+
+    md_rich_texts = [rich_text.obj_ref.plain_text for rich_text in rich_texts]
+    for idx, rich_text in enumerate(rich_texts):
+        if rich_text.is_equation:
+            md_rich_texts[idx] = '$' + rich_text.obj_ref.plain_text.strip() + '$'
+        elif rich_text.is_mention:
+            rich_text = cast(Mention, rich_text)
+            obj_ref = rich_text.obj_ref
+            match rich_text.type:
+                case 'user' | 'date':
+                    md_rich_texts[idx] = f'[{obj_ref.plain_text}]()'  # @ is already included
+                case _:
+                    md_rich_texts[idx] = f'↗[{obj_ref.plain_text}]({obj_ref.href})'
+
+    for start, end, md_style in sorted_md_spans(md_spans(rich_texts)):
+        add_md_style(md_rich_texts, start, end, md_style)
+
     return ''.join(md_rich_texts)

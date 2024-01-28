@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import cast
+from typing import TypeVar, cast
 
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
@@ -182,20 +182,40 @@ class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
         raise NotImplementedError
 
 
-class RichTextBase(Wrapper[objs.RichTextObject], wraps=objs.RichTextObject):
+T = TypeVar('T', bound=objs.RichTextObject)
+
+
+class RichTextBase(Wrapper[T], wraps=objs.RichTextObject):
     """Super class for text, equation and mentions of various kinds."""
 
+    @property
+    def is_text(self) -> bool:
+        return isinstance(self, Text)
 
-class Text(RichTextBase, wraps=objs.TextObject):
+    @property
+    def is_equation(self) -> bool:
+        return isinstance(self, Equation)
+
+    @property
+    def is_mention(self) -> bool:
+        return isinstance(self, Mention)
+
+
+class Text(RichTextBase[objs.TextObject], wraps=objs.TextObject):
     """A Text object."""
 
 
-class Equation(RichTextBase, wraps=objs.EquationObject):
+class Equation(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
     """An Equation object."""
 
 
-class Mention(RichTextBase, wraps=objs.MentionObject):
+class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
     """A Mention object."""
+
+    @property
+    def type(self) -> str:
+        """Type of the mention, e.g. user, page, etc."""
+        return self.obj_ref.mention.type
 
 
 class RichText(str):

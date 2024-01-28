@@ -101,6 +101,8 @@ def my_vcr(vcr_config: dict[str, str], request: SubRequest) -> VCR:
         mode = request.config.getoption('--record-mode')
         if mode == 'rewrite':
             mode = 'all'
+        elif mode is None:
+            mode = 'none'
         my_vcr = VCR(record_mode=vcr_mode(mode), **cfg)
     return my_vcr
 
