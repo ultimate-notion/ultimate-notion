@@ -311,3 +311,11 @@ def local_time_zone() -> tzinfo:
         msg = 'Could not determine local time zone!'
         raise RuntimeError(msg)
     return tzinfo
+
+
+def rank(arr: np.ndarray) -> np.ndarray:
+    """Returns the rank of the elements in the array and gives the same rank to equal elements."""
+    mask = np.argsort(arr)
+    rank = np.zeros_like(arr)
+    rank[1:] = np.cumsum(np.where(np.diff(arr[mask]) != 0, 1, 0))
+    return rank[np.argsort(mask)]

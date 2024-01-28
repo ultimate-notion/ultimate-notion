@@ -46,3 +46,11 @@ def test_find_index():
     assert utils.find_index(4, test_set) == 1
     assert utils.find_index(23, test_set) == 3
     assert utils.find_index(42, test_set) is None
+
+
+def test_rank():
+    assert_array_equal(utils.rank(np.array([1, 3, 2, 4])), np.array([0, 2, 1, 3]))
+    assert_array_equal(utils.rank(np.array([1, 3, 2, 2])), np.array([0, 2, 1, 1]))
+    assert_array_equal(utils.rank(np.array([3, 1, 2, 2])), np.array([2, 0, 1, 1]))
+    assert_array_equal(utils.rank(np.array([3, 1, 1, 2])), np.array([2, 0, 0, 1]))
+    assert_array_equal(utils.rank(np.array([7, 7, 11, 9])), np.array([0, 0, 2, 1]))

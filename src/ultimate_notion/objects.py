@@ -6,7 +6,7 @@ from typing import cast
 
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
-from ultimate_notion.text import chunky, html_img
+from ultimate_notion.text import chunky, html_img, rich_texts_to_markdown
 from ultimate_notion.utils import Wrapper, get_repr
 
 
@@ -201,7 +201,7 @@ class Mention(RichTextBase, wraps=objs.MentionObject):
 class RichText(str):
     """User-facing class holding several RichTexts."""
 
-    rich_texts: list[RichTextBase]
+    _rich_texts: list[RichTextBase]
 
     def __init__(self, plain_text: str):
         super().__init__()
@@ -209,19 +209,19 @@ class RichText(str):
         rich_texts: list[RichTextBase] = []
         for part in chunky(plain_text):
             rich_texts.append(Text(part))
-        self.rich_texts = rich_texts
+        self._rich_texts = rich_texts
 
     @classmethod
     def wrap_obj_ref(cls, obj_refs: list[objs.RichTextObject]) -> RichText:
         rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
         plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
         obj = cls(plain_text)
-        obj.rich_texts = rich_texts
+        obj._rich_texts = rich_texts
         return obj
 
     @property
     def obj_ref(self) -> list[objs.RichTextObject]:
-        return [elem.obj_ref for elem in self.rich_texts]
+        return [elem.obj_ref for elem in self._rich_texts]
 
     @classmethod
     def from_markdown(cls, text: str) -> RichText:
@@ -230,10 +230,9 @@ class RichText(str):
         # ToDo: Handle Equations and Mentions here accordingly
         raise NotImplementedError
 
-    def to_markdown(self) -> str | None:
+    def to_markdown(self) -> str:
         """Convert the list of RichText objects to markdown."""
-        # ToDo: Implement
-        raise NotImplementedError
+        return rich_texts_to_markdown(self._rich_texts)
 
     @classmethod
     def from_plain_text(cls, text: str) -> RichText:
