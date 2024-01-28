@@ -12,7 +12,7 @@ from notion_client.helpers import get_url
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import TypedObject
-from ultimate_notion.objects import User
+from ultimate_notion.objects import RichText, User
 from ultimate_notion.utils import ObjRefWrapper, Wrapper, get_active_session
 
 # Todo: Move the functionality from the PyDantic types in here, i.e. the currenctly commented code
@@ -97,19 +97,26 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         return get_url(str(self.id))
 
 
-class Block(DataObject[T], wraps=obj_blocks.Block):
+BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+class Block(DataObject[BT], wraps=obj_blocks.Block):
     """General Notion block."""
 
     # ToDo: Implement me!
 
 
-class TextBlock(DataObject[T], ABC, wraps=obj_blocks.TextBlock):
+class TextBlock(DataObject[BT], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Text block."""
 
-    # ToDo: Implement me!
+    @property
+    def rich_text(self) -> RichText:
+        """Return the text content of this text block."""
+        rich_texts = self.obj_ref.value.rich_text
+        return RichText.wrap_obj_ref([] if rich_texts is None else rich_texts)
 
 
-GT = TypeVar('GT', bound=TypedObject)  # ToDo: Use new syntax when requires-python >= 3.12
+GT = TypeVar('GT', bound=TypedObject)
 
 
 class ChildrenMixin(ObjRefWrapper[GT]):

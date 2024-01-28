@@ -383,7 +383,7 @@ class MentionObject(RichTextObject, type='mention'):
 class MentionUser(MentionData, type='user'):
     """Nested user data for `Mention` properties."""
 
-    user: UserRef
+    user: User
 
     @classmethod
     def build(cls, user: User) -> MentionObject:
