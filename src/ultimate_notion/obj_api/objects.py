@@ -1,4 +1,4 @@
-"""Wrapper for various Notion API objects like parents, mentions, emojis & users
+"""Wrapper for various Notion API objects like parents, mentions, emojis & users.
 
 Similar to other records, these object provide access to the primitive data structure
 used in the Notion API as well as higher-level methods.
@@ -95,9 +95,10 @@ class ObjectReference(GenericObject):
         raise ValueError(msg)
 
 
-# https://developers.notion.com/reference/parent-object
 class ParentRef(TypedObject, ABC, polymorphic_base=True):
     """Reference another block as a parent.
+
+    Notion API: [Parent Object](https://developers.notion.com/reference/parent-object)
 
     Note: This class is simply a placeholder for the typed concrete *Ref classes.
           Callers should always instantiate the intended concrete versions.
@@ -202,7 +203,7 @@ class FileObject(TypedObject, polymorphic_base=True):
     """A Notion file object.
 
     Depending on the context, a FileObject may require a name (such as in the `Files`
-    property).  This makes the object hierarchy difficult, so here we simply allow
+    property). This makes the object hierarchy difficult, so here we simply allow
     `name` to be optional. It is the responsibility of the caller to set `name` if
     required by the API.
     """
@@ -252,29 +253,6 @@ class Annotations(GenericObject):
     code: bool = False
     color: BGColor = None  # type: ignore
 
-    @property
-    def is_plain(self):
-        """Determine if any flags are set in this `Annotations` object.
-
-        If all flags match their defaults, this is considered a "plain" style.
-        """
-
-        # Todo: a better approach here would be to just compare all fields to defaults
-
-        if self.bold:
-            return False
-        if self.italic:
-            return False
-        if self.strikethrough:
-            return False
-        if self.underline:
-            return False
-        if self.code:
-            return False
-        if self.color is not None:
-            return False
-        return True
-
 
 class RichTextObject(TypedObject, polymorphic_base=True):
     """Base class for Notion rich text elements."""
@@ -282,30 +260,6 @@ class RichTextObject(TypedObject, polymorphic_base=True):
     plain_text: str
     href: str | None = None
     annotations: Annotations | None = None
-
-    # def __str__(self):
-    #     """Return a string representation of this object."""
-
-    #     if self.href is None:
-    #         text = self.plain_text or ""
-    #     elif self.plain_text is None or len(self.plain_text) == 0:
-    #         text = f"({self.href})"
-    #     else:
-    #         text = f"[{self.plain_text}]({self.href})"
-
-    #     if self.annotations:
-    #         if self.annotations.bold:
-    #             text = f"*{text}*"
-    #         if self.annotations.italic:
-    #             text = f"**{text}**"
-    #         if self.annotations.underline:
-    #             text = f"_{text}_"
-    #         if self.annotations.strikethrough:
-    #             text = f"~{text}~"
-    #         if self.annotations.code:
-    #             text = f"`{text}`"
-
-    #     return text
 
     @classmethod
     def build(cls, text: str, href: str | None = None, style: Annotations | None = None):
