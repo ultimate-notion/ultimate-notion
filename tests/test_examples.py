@@ -12,11 +12,6 @@ from tests.conftest import delete_all_taskslists
 from ultimate_notion.config import get_cfg
 
 
-@pytest.fixture(scope='module', autouse=True)
-def notion_cleanups():
-    """Overwrites fixture from conftest.py to avoid an open session."""
-
-
 def exec_pyfile(file_path: str) -> None:
     """Executes a Python module as a script, as if it was called from the command line."""
     code = compile(Path(file_path).read_text(), file_path, 'exec')
