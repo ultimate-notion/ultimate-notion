@@ -1,12 +1,13 @@
 # Changelog
 
-## Version 0.4
+## Version 0.4, 2024-02-
 
 - New: Introduced a configuration file under `~/.ultimate-notion/config.toml`.
 - New: Added a simple Google Tasks client.
 - New: Added a general sychronization task for Notion to other services.
 - New: Added a specific Google Tasks synchronization task.
 - Fix: A page property can be deleted by setting it to `None`.
+- Chg: Reworked the testing setup to use VCR.py more efficiently and be more robust.
 
 ## Version 0.3, 2023-12-26
 

@@ -256,6 +256,7 @@ debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
 vcr-off = "test --disable-recording {args}"
 vcr-only = "test --record-mode none --block-network {args}"
 vcr-rewrite = "test --record-mode=rewrite {args}"
+vcr-rewrite-fixtures = ["vcr-rewrite --overwrite-fixtures {args}"]
 vcr-drop-cassettes = "find ./tests -type d -name 'cassettes' -exec rm -rf {{}} +"
 ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"

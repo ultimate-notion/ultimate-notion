@@ -2,6 +2,9 @@
 
 Set `NOTION_TOKEN` environment variable for tests interacting with the Notion API.
 
+Most Notion API related fixtures have scope `module`, not `session` to avoid opening several sessions at one
+in `test_exmples.py`.
+
 Common pitfalls:
 * never use dynamic values, e.g. datetime.now() in tests as VCRpy will record them and they will be used in the replay.
 * be extremely careful with module/session level fixtures that use VCRpy. Only the first test using the fixture will
@@ -12,6 +15,7 @@ Common pitfalls:
   directory. This will force the Google API to create a new token. Execute the tests and add `-s` to the pytest,
   e.g.: `hatch run vcr-rewrite -k test_sync_google_tasks -s`. Then check it using `hatch run vcr-only`.
   Be aware that `pytest-dotenv` will load the local `config.toml` file for development.
+* Fixture that create new databases or objects should have function scope to avoid side effects between tests.
 """
 
 from __future__ import annotations
@@ -23,7 +27,7 @@ import tempfile
 from collections.abc import Generator
 from functools import wraps
 from pathlib import Path
-from typing import TypeAlias, TypeVar
+from typing import TYPE_CHECKING, TypeAlias, TypeVar
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -38,6 +42,9 @@ from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, get_cfg_file, get_or
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
 
+if TYPE_CHECKING:
+    from _pytest.config.argparsing import Parser
+
 ALL_COL_DB = 'All Columns DB'  # Manually created DB in Notion with all possible columns including AI columns!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
@@ -47,6 +54,11 @@ TASK_DB = 'Task DB'
 
 T = TypeVar('T')
 Yield: TypeAlias = Generator[T, None, None]
+
+
+def pytest_addoption(parser: Parser):
+    """Add falg to the pytest command line so that we can overwrite fixtures but not always!"""
+    parser.addoption('--overwrite-fixtures', action='store_true', default=False, help='Overwrite existing fixtures.')
 
 
 @pytest.fixture(scope='session')
@@ -136,7 +148,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
         def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR, str]:
             if scope == 'module':
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
-                cassette_name = f'mod_{request.module.__name__.split(".")[-1]}__{func.__name__}.yaml'
+                cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
             else:  # scope == 'session'
                 cassette_dir = str(request.config.rootdir / 'tests' / 'cassettes' / 'fixtures')
                 cassette_name = f'sess_{func.__name__}.yaml'
@@ -148,17 +160,22 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
                 vcr.use_cassette.return_value.__enter__.return_value = None
             else:
                 mode = request.config.getoption('--record-mode')
+                overwrite_fixtures = request.config.getoption('--overwrite-fixtures')
                 if mode == 'rewrite':
-                    mode = 'all'
+                    # This avoids rewriting the fixture cassettes every time we rewrite for a new test!
+                    mode = 'all' if overwrite_fixtures else 'once'
                 elif mode is None:
                     mode = 'none'
                 vcr = VCR(record_mode=vcr_mode(mode), **vcr_config)
 
             return vcr, cassette_name
 
+        # Note: We added `notion` as fixture as py.test sometimes tears down the session fixture before the vcr fixture.
+        # This should not happen as `getfixturevalue` defines the dependency but happens in some cases, thus this fix.
+
         @wraps(func)
         @pytest.fixture(scope=scope, autouse=autouse)
-        def generator_wrapper(request: SubRequest, vcr_config: dict[str, str]):
+        def generator_wrapper(request: SubRequest, vcr_config: dict[str, str], notion: Session):
             vcr, cassette_name = setup_vcr(request, vcr_config)
             fixture_args = [request.getfixturevalue(arg) for arg in args]
             # This opens and closes the cassette for each iteration of the generator
@@ -176,7 +193,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
 
         @wraps(func)
         @pytest.fixture(scope=scope, autouse=autouse)
-        def function_wrapper(request: SubRequest, vcr_config: dict[str, str]):
+        def function_wrapper(request: SubRequest, vcr_config: dict[str, str], notion: Session):
             vcr, cassette_name = setup_vcr(request, vcr_config)
             fixture_args = [request.getfixturevalue(arg) for arg in args]
 
@@ -191,92 +208,91 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
     return decorator
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def notion() -> Yield[Session]:
-    """Return the notion session used for live testing.
-
-    This fixture depends on the `NOTION_TOKEN` environment variable. If it is not
-    present, this fixture will skip the current test.
-    """
+    """Return the notion session used for live testing."""
     with uno.Session() as notion:
         yield notion
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def contacts_db(notion: Session) -> Database:
-    """Return a test database"""
+    """Return a test database."""
     return notion.search_db(CONTACTS_DB).item()
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def root_page(notion: Session) -> Page:
-    """Return the page reference used as parent page for live testing"""
+    """Return the page reference used as parent page for live testing."""
     return notion.search_page('Tests').item()
 
 
-@vcr_fixture(scope='session')
-def article_db(notion: Session, root_page: Page) -> Database:
-    """Simple database of articles"""
+@pytest.fixture(scope='function')
+def article_db(notion: Session, root_page: Page) -> Yield[Database]:
+    """Simple database of articles."""
 
     class Article(schema.PageSchema, db_title='Articles'):
         name = schema.Column('Name', schema.Title())
         cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Column('Description', schema.Text())
 
-    return notion.create_db(parent=root_page, schema=Article)
+    db = notion.create_db(parent=root_page, schema=Article)
+    yield db
+    db.delete()
 
 
-@vcr_fixture(scope='session')
-def page_hierarchy(notion: Session, root_page: Page) -> tuple[Page, Page, Page]:
-    """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2"""
+@pytest.fixture(scope='function')
+def page_hierarchy(notion: Session, root_page: Page) -> Yield[tuple[Page, Page, Page]]:
+    """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2."""
     l1_page = notion.create_page(parent=root_page, title='level_1')
     l2_page = notion.create_page(parent=l1_page, title='level_2')
-    return root_page, l1_page, l2_page
+    yield root_page, l1_page, l2_page
+    l2_page.delete(), l1_page.delete()
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def intro_page(notion: Session) -> Page:
-    """Return the default 'Getting Started' page"""
+    """Return the default 'Getting Started' page."""
     return notion.search_page(GETTING_STARTED_PAGE).item()
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def all_cols_db(notion: Session) -> Database:
     """Return manually created database with all columns, also AI columns."""
     return notion.search_db(ALL_COL_DB).item()
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def wiki_db(notion: Session) -> Database:
     """Return manually created wiki db."""
     return notion.search_db(WIKI_DB).item()
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def md_text_page(notion: Session) -> Page:
     """Return a page with markdown content."""
     return notion.search_page(MD_TEXT_TEST_PAGE).item()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def static_pages(root_page: Page, intro_page: Page, md_text_page: Page) -> set[Page]:
-    """Return all static pages for the unit tests"""
+    """Return all static pages for the unit tests."""
     return {intro_page, root_page, md_text_page}
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def task_db(notion: Session) -> Database:
-    """Return manually created wiki db"""
+    """Return manually created wiki db."""
     return notion.search_db(TASK_DB).item()
 
 
-@vcr_fixture(scope='session')
+@vcr_fixture(scope='module')
 def static_dbs(all_cols_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database) -> set[Database]:
-    """Return all static pages for the unit tests"""
+    """Return all static pages for the unit tests."""
     return {all_cols_db, wiki_db, contacts_db, task_db}
 
 
-@vcr_fixture(scope='module')
+@pytest.fixture(scope='function')
 def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
@@ -395,7 +411,7 @@ def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
     db.delete()
 
 
-@vcr_fixture(scope='session', autouse=True)
+@vcr_fixture(scope='module', autouse=True)
 def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]):
     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
 
@@ -425,7 +441,7 @@ def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], s
 
 
 def delete_all_taskslists():
-    """Delete all taskslists except of the default one"""
+    """Delete all taskslists except of the default one."""
     gtasks = GTasksClient(read_only=False)
     for tasklist in gtasks.all_tasklists():
         if not tasklist.is_default:
