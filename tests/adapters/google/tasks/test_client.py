@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import VCR, Yield, delete_all_taskslists
+from tests.conftest import Yield, delete_all_taskslists, vcr_fixture
 from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
@@ -15,11 +15,10 @@ def gtasks(custom_config: Path) -> Yield[GTasksClient]:
     yield GTasksClient(read_only=False)
 
 
-@pytest.fixture(scope='module', autouse=True)
-def gtasks_cleanups(my_vcr: VCR, custom_config: Path):
+@vcr_fixture(scope='module', autouse=True)
+def gtasks_cleanups(custom_config: Path):
     """Clean all Tasklists except of the default one before the tests."""
-    with my_vcr.use_cassette('gtasks_cleanups.yaml'):
-        delete_all_taskslists()
+    delete_all_taskslists()
 
 
 @pytest.mark.vcr()
