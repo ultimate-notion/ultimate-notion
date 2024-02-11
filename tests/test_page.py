@@ -146,3 +146,8 @@ def test_created_edited_by(notion: Session, root_page: Page):
     florian = notion.search_user('Florian Wilhelm').item()
     assert root_page.created_by == florian
     assert root_page.last_edited_by in {myself, florian}
+
+
+@pytest.mark.vcr()
+def test_page_to_markdown(md_page: Page):
+    _ = md_page.to_markdown()

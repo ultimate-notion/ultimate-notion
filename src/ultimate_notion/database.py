@@ -5,6 +5,8 @@ from __future__ import annotations
 from textwrap import dedent
 from typing import cast
 
+from notion_client.helpers import get_url
+
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -39,6 +41,11 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     def __repr__(self) -> str:
         return get_repr(self)
+
+    @property
+    def url(self) -> str:
+        """Return the URL of this database."""
+        return get_url(str(self.id))
 
     @property
     def title(self) -> RichText:
@@ -129,7 +136,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             raise SchemaError(dedent(msg))
 
     @property
-    def url(self) -> str:
+    def block_url(self) -> str:
         """URL of this database."""
         return self.obj_ref.url
 
