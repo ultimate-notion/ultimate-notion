@@ -50,6 +50,8 @@ WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
 GETTING_STARTED_PAGE = 'Getting Started'
 MD_TEXT_TEST_PAGE = 'Markdown Text Test'
+MD_PAGE_TEST_PAGE = 'Markdown Page Test'
+MD_SUBPAGE_TEST_PAGE = 'Markdown SubPage Test'
 TASK_DB = 'Task DB'
 
 T = TypeVar('T')
@@ -270,14 +272,26 @@ def wiki_db(notion: Session) -> Database:
 
 @vcr_fixture(scope='module')
 def md_text_page(notion: Session) -> Page:
-    """Return a page with markdown content."""
+    """Return a page with markdown text content."""
     return notion.search_page(MD_TEXT_TEST_PAGE).item()
 
 
+@vcr_fixture(scope='module')
+def md_page(notion: Session) -> Page:
+    """Return a page with markdown content."""
+    return notion.search_page(MD_PAGE_TEST_PAGE).item()
+
+
+@vcr_fixture(scope='module')
+def md_subpage(notion: Session) -> Page:
+    """Return a page with markdown content."""
+    return notion.search_page(MD_SUBPAGE_TEST_PAGE).item()
+
+
 @pytest.fixture(scope='module')
-def static_pages(root_page: Page, intro_page: Page, md_text_page: Page) -> set[Page]:
+def static_pages(root_page: Page, intro_page: Page, md_text_page: Page, md_page: Page, md_subpage: Page) -> set[Page]:
     """Return all static pages for the unit tests."""
-    return {intro_page, root_page, md_text_page}
+    return {intro_page, root_page, md_text_page, md_page, md_subpage}
 
 
 @vcr_fixture(scope='module')

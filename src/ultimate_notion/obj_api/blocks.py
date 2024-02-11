@@ -133,71 +133,29 @@ class Paragraph(TextBlock, type='paragraph'):
 
     paragraph: _NestedData = _NestedData()
 
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
 
-    #     if self.paragraph and self.paragraph.rich_text:
-    #         return markdown(*self.paragraph.rich_text)
-
-    #     return ""
+class _NestedHeadingData(GenericObject):
+    rich_text: list[RichTextObject] = None  # type: ignore
+    color: Color | BGColor = Color.DEFAULT
+    is_toggleable: bool = False
 
 
 class Heading1(TextBlock, type='heading_1'):
     """A heading_1 block in Notion."""
 
-    class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None  # type: ignore
-        color: Color | BGColor = Color.DEFAULT
-
-    heading_1: _NestedData = _NestedData()
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.heading_1 and self.heading_1.rich_text:
-    #         return f"# {markdown(*self.heading_1.rich_text)} #"
-
-    #     return ""
+    heading_1: _NestedHeadingData = _NestedHeadingData()
 
 
 class Heading2(TextBlock, type='heading_2'):
     """A heading_2 block in Notion."""
 
-    class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None  # type: ignore
-        color: Color | BGColor = Color.DEFAULT
-
-    heading_2: _NestedData = _NestedData()
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.heading_2 and self.heading_2.rich_text:
-    #         return f"## {markdown(*self.heading_2.rich_text)} ##"
-
-    #     return ""
+    heading_2: _NestedHeadingData = _NestedHeadingData()
 
 
 class Heading3(TextBlock, type='heading_3'):
     """A heading_3 block in Notion."""
 
-    class _NestedData(GenericObject):
-        rich_text: list[RichTextObject] = None  # type: ignore
-        color: Color | BGColor = Color.DEFAULT
-
-    heading_3: _NestedData = _NestedData()
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.heading_3 and self.heading_3.rich_text:
-    #         return f"### {markdown(*self.heading_3.rich_text)} ###"
-
-    #     return ""
+    heading_3: _NestedHeadingData = _NestedHeadingData()
 
 
 class Quote(TextBlock, type='quote'):
@@ -210,15 +168,6 @@ class Quote(TextBlock, type='quote'):
 
     quote: _NestedData = _NestedData()
 
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.quote and self.quote.rich_text:
-    #         return "> " + markdown(*self.quote.rich_text)
-
-    #     return ""
-
 
 class Code(TextBlock, type='code'):
     """A code block in Notion."""
@@ -229,26 +178,6 @@ class Code(TextBlock, type='code'):
         language: CodeLang = CodeLang.PLAIN_TEXT
 
     code: _NestedData = _NestedData()
-
-    # @classmethod
-    # def build(cls, text, lang=CodingLanguage.PLAIN_TEXT):
-    #     """Compose a `Code` block from the given text and language."""
-    #     block = super().build(text)
-    #     block.code.language = lang
-    #     return block
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     lang = self.code.language.value if self.code and self.code.language else ""
-
-    #     # FIXME this is not the standard way to represent code blocks in markdown...
-
-    #     if self.code and self.code.rich_text:
-    #         return f"```{lang}\n{markdown(*self.code.rich_text)}\n```"
-
-    #     return ""
 
 
 class Callout(TextBlock, type='callout'):
@@ -262,20 +191,6 @@ class Callout(TextBlock, type='callout'):
 
     callout: _NestedData = _NestedData()
 
-    # @classmethod
-    # def build(cls, text, emoji=None, color=FullColor.GRAY_BACKGROUND):
-    #     """Compose a `Callout` block from the given text, emoji and color."""
-
-    #     if emoji is not None:
-    #         emoji = EmojiObject[emoji]
-
-    #     nested = Callout._NestedData(icon=emoji, color=color)
-
-    #     callout = cls(callout=nested)
-    #     callout.concat(text)
-
-    #     return callout
-
 
 class BulletedListItem(TextBlock, type='bulleted_list_item'):
     """A bulleted list item in Notion."""
@@ -286,15 +201,6 @@ class BulletedListItem(TextBlock, type='bulleted_list_item'):
         color: Color | BGColor = Color.DEFAULT
 
     bulleted_list_item: _NestedData = _NestedData()
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.bulleted_list_item and self.bulleted_list_item.rich_text:
-    #         return f"- {markdown(*self.bulleted_list_item.rich_text)}"
-
-    #     return ""
 
 
 class NumberedListItem(TextBlock, type='numbered_list_item'):
@@ -307,15 +213,6 @@ class NumberedListItem(TextBlock, type='numbered_list_item'):
 
     numbered_list_item: _NestedData = _NestedData()
 
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.numbered_list_item and self.numbered_list_item.rich_text:
-    #         return f"1. {markdown(*self.numbered_list_item.rich_text)}"
-
-    #     return ""
-
 
 class ToDo(TextBlock, type='to_do'):
     """A todo list item in Notion."""
@@ -327,36 +224,6 @@ class ToDo(TextBlock, type='to_do'):
         color: Color | BGColor = Color.DEFAULT
 
     to_do: _NestedData = _NestedData()
-
-    # @classmethod
-    # def build(cls, text, checked=False, href=None):
-    #     """Compose a ToDo block from the given text and checked state."""
-    #     return ToDo(
-    #         to_do=ToDo._NestedData(
-    #             rich_text=[TextObject[text, href]],
-    #             checked=checked,
-    #         )
-    #     )
-
-    # @property
-    # def IsChecked(self):
-    #     """Determine if this ToDo is marked as checked or not.
-
-    #     If the block is empty (e.g. no nested data), this method returns `None`.
-    #     """
-    #     return self.to_do.checked if self.to_do else None
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.to_do and self.to_do.rich_text:
-    #         if self.to_do.checked:
-    #             return f"- [x] {markdown(*self.to_do.rich_text)}"
-
-    #         return f"- [ ] {markdown(*self.to_do.rich_text)}"
-
-    #     return ""
 
 
 class Toggle(TextBlock, type='toggle'):
@@ -374,11 +241,6 @@ class Divider(Block, type='divider'):
     """A divider block in Notion."""
 
     divider: Any = None
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-    #     return "---"
 
 
 class TableOfContents(Block, type='table_of_contents'):
@@ -407,25 +269,6 @@ class Embed(Block, type='embed'):
 
     embed: _NestedData = _NestedData()
 
-    # @classmethod
-    # def build(cls, url):
-    #     """Create a new `Embed` block from the given URL."""
-    #     return Embed(embed=Embed._NestedData(url=url))
-
-    # @property
-    # def URL(self):
-    #     """Return the URL contained in this `Embed` block."""
-    #     return self.embed.url
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.embed and self.embed.url:
-    #         return f"<{self.embed.url}>"
-
-    #     return ""
-
 
 class Bookmark(Block, type='bookmark'):
     """A bookmark block in Notion."""
@@ -436,25 +279,6 @@ class Bookmark(Block, type='bookmark'):
 
     bookmark: _NestedData = _NestedData()
 
-    # @classmethod
-    # def build(cls, url):
-    #     """Compose a new `Bookmark` block from a specific URL."""
-    #     return Bookmark(bookmark=Bookmark._NestedData(url=url))
-
-    # @property
-    # def URL(self):
-    #     """Return the URL contained in this `Bookmark` block."""
-    #     return self.bookmark.url
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.bookmark and self.bookmark.url:
-    #         return f"<{self.bookmark.url}>"
-
-    #     return ""
-
 
 class LinkPreview(Block, type='link_preview'):
     """A link_preview block in Notion."""
@@ -464,59 +288,39 @@ class LinkPreview(Block, type='link_preview'):
 
     link_preview: _NestedData = _NestedData()
 
-    # @classmethod
-    # def build(cls, url):
-    #     """Create a new `LinkPreview` block from the given URL."""
-    #     return LinkPreview(link_preview=LinkPreview._NestedData(url=url))
-
-    # @property
-    # def URL(self):
-    #     """Return the URL contained in this `LinkPreview` block."""
-    #     return self.link_preview.url
-
-    # @property
-    # def Markdown(self):
-    #     """Return the contents of this block as markdown text."""
-
-    #     if self.link_preview and self.link_preview.url:
-    #         return f"<{self.link_preview.url}>"
-
-    #     return ""
-
 
 class Equation(Block, type='equation'):
     """An equation block in Notion."""
 
     class _NestedData(GenericObject):
-        expression: str = None  # type: ignore
+        expression: str | None = None
 
     equation: _NestedData = _NestedData()
 
-    # @classmethod
-    # def build(cls, expr):
-    #     """Create a new `Equation` block from the given expression."""
-    #     return LinkPreview(equation=Equation._NestedData(expression=expr))
+
+class FileObjectBlock(Block, ABC):
+    """A abstract block referencing a FileObject."""
 
 
-class File(Block, type='file'):
+class File(FileObjectBlock, type='file'):
     """A file block in Notion."""
 
     file: SerializeAsAny[FileObject] = None  # type: ignore
 
 
-class Image(Block, type='image'):
+class Image(FileObjectBlock, type='image'):
     """An image block in Notion."""
 
     image: SerializeAsAny[FileObject] = None  # type: ignore
 
 
-class Video(Block, type='video'):
+class Video(FileObjectBlock, type='video'):
     """A video block in Notion."""
 
     video: SerializeAsAny[FileObject] = None  # type: ignore
 
 
-class PDF(Block, type='pdf'):
+class PDF(FileObjectBlock, type='pdf'):
     """A pdf block in Notion."""
 
     pdf: SerializeAsAny[FileObject] = None  # type: ignore
@@ -550,16 +354,6 @@ class Column(Block, type='column'):
 
     column: _NestedData = _NestedData()
 
-    # @classmethod
-    # def build(cls, *blocks):
-    #     """Create a new `Column` block with the given blocks as children."""
-    #     col = cls()
-
-    #     for block in blocks:
-    #         col.append(block)
-
-    #     return col
-
 
 class ColumnList(Block, type='column_list'):
     """A column list block in Notion."""
@@ -571,16 +365,6 @@ class ColumnList(Block, type='column_list'):
 
     column_list: _NestedData = _NestedData()
 
-    # @classmethod
-    # def build(cls, *columns):
-    #     """Create a new `Column` block with the given blocks as children."""
-    #     cols = cls()
-
-    #     for col in columns:
-    #         cols.append(col)
-
-    #     return cols
-
 
 class TableRow(Block, type='table_row'):
     """A table_row block in Notion."""
@@ -588,56 +372,7 @@ class TableRow(Block, type='table_row'):
     class _NestedData(GenericObject):
         cells: list[list[RichTextObject]] | None = None
 
-        def __getitem__(self, col):
-            """Return the cell content for the requested column.
-
-            This will raise an `IndexError` if there are not enough columns.
-            """
-            if col > len(self.cells):
-                raise IndexError()
-
-            return self.cells[col]
-
     table_row: _NestedData = _NestedData()
-
-    # def __getitem__(self, cell_num):
-    #     """Return the cell content for the requested column."""
-    #     return self.table_row[cell_num]
-
-    # @classmethod
-    # def build(cls, *cells):
-    #     """Create a new `TableRow` block with the given cell contents."""
-    #     row = cls()
-
-    #     for cell in cells:
-    #         row.append(cell)
-
-    #     return row
-
-    # def append(self, text):
-    #     """Append the given text as a new cell in this `TableRow`.
-
-    #     `text` may be a string, `RichTextObject` or a list of `RichTextObject`'s.
-
-    #     :param text: the text content to append
-    #     """
-    #     if self.table_row.cells is None:
-    #         self.table_row.cells = []
-
-    #     if isinstance(text, list):
-    #         self.table_row.cells.append(list)
-
-    #     elif isinstance(text, RichTextObject):
-    #         self.table_row.cells.append([text])
-
-    #     else:
-    #         rtf = TextObject[text]
-    #         self.table_row.cells.append([rtf])
-
-    # @property
-    # def Width(self):
-    #     """Return the width (number of cells) in this `TableRow`."""
-    #     return len(self.table_row.cells) if self.table_row.cells else 0
 
 
 class Table(Block, type='table'):
@@ -653,44 +388,6 @@ class Table(Block, type='table'):
         children: list[TableRow] | None = None
 
     table: _NestedData = _NestedData()
-
-    # @classmethod
-    # def build(cls, *rows):
-    #     """Create a new `Table` block with the given rows."""
-    #     table = cls()
-
-    #     for row in rows:
-    #         table.append(row)
-
-    #     return table
-
-    # def append(self, block: TableRow):
-    #     """Append the given row to this table.
-
-    #     This method is only applicable when creating a new `Table` block.  In order to
-    #     add rows to an existing `Table`, use the `blocks.children.append()` endpoint.
-
-    #     When adding a row, this method will rase an exception if the width does not
-    #     match the expected number of cells for existing rows in the block.
-    #     """
-
-    #     # XXX need to review whether this is applicable during update...  may need
-    #     # to raise an error if the block has already been created on the server
-
-    #     if not isinstance(block, TableRow):
-    #         raise ValueError("Only TableRow may be appended to Table blocks.")
-
-    #     if self.Width == 0:
-    #         self.table.table_width = block.Width
-    #     elif self.Width != block.Width:
-    #         raise ValueError("Number of cells in row must match table")
-
-    #     self.table.children.append(block)
-
-    # @property
-    # def Width(self):
-    #     """Return the current width of this table."""
-    #     return self.table.table_width
 
 
 class LinkToPage(Block, type='link_to_page'):

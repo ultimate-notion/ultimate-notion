@@ -232,7 +232,8 @@ class RichText(str):
         self._rich_texts = rich_texts
 
     @classmethod
-    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextObject]) -> RichText:
+    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextObject] | None) -> RichText:
+        obj_refs = [] if obj_refs is None else obj_refs
         rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
         plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
         obj = cls(plain_text)
@@ -271,7 +272,7 @@ class RichText(str):
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this text."""
-        # ToDo: Later use Markdown output.
+        # ToDo: Later use Markdown output or better have `to_html` using mistune and markdown
         return self.to_plain_text()
 
     def __eq__(self, other: object) -> bool:

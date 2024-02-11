@@ -172,7 +172,7 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int
     return clone
 
 
-def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject) -> UUID:
+def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject | objs.BlockRef) -> UUID:
     """Retrieves a UUID from an object reference.
 
     Only meant for internal use.

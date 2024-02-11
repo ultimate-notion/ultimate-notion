@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 import mistune
 from emoji import is_emoji
+from notion_client.helpers import get_url
 
 from ultimate_notion.blocks import Block, ChildDatabase, ChildPage, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -119,6 +120,11 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return self._render_md(self.to_markdown())  # Github flavored markdown
 
     @property
+    def url(self) -> str:
+        """Return the URL of this database."""
+        return get_url(str(self.id))
+
+    @property
     def content(self) -> list[Block]:
         """Return the content of this page, i.e. all blocks belonging to this page"""
         if self._content is None:  # generate cache
@@ -222,21 +228,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown."""
-        # ToDo: Since notion2md is also quite buggy, use an own implementation here using Mistune!
-        import os  # noqa: PLC0415
-
-        from notion2md.exporter.block import StringExporter  # noqa: PLC0415
-
-        from ultimate_notion.session import ENV_NOTION_TOKEN, Session  # noqa: PLC0415
-
-        auth_token = Session.get_or_create().client.options.auth
-        if auth_token is None:
-            msg = 'Impossible to pass the auth token to notion_client via an environment variable'
-            raise RuntimeError(msg)
-        os.environ[ENV_NOTION_TOKEN] = auth_token  # used internally by notion_client used by notion2md
-
-        md = f'# {self.title}\n'
-        md += StringExporter(block_id=self.id).export()
+        md = '\n'.join(block.to_markdown() for block in self.content)
         return md
 
     def show(self, *, simple: bool | None = None):

@@ -199,6 +199,37 @@ class EmojiObject(TypedObject, type='emoji'):
         return EmojiObject.model_construct(emoji=emoji)
 
 
+class Annotations(GenericObject):
+    """Style information for RichTextObject's."""
+
+    bold: bool = False
+    italic: bool = False
+    strikethrough: bool = False
+    underline: bool = False
+    code: bool = False
+    color: BGColor = None  # type: ignore
+
+
+class RichTextObject(TypedObject, polymorphic_base=True):
+    """Base class for Notion rich text elements."""
+
+    plain_text: str
+    href: str | None = None
+    annotations: Annotations | None = None
+
+    @classmethod
+    def build(cls, text: str, href: str | None = None, style: Annotations | None = None):
+        """Compose a TextObject from the given properties.
+
+        Args:
+            text: the plain text of this object
+            href: an optional link for this object
+            style: an optional Annotations object for this text
+        """
+        style = deepcopy(style)
+        return cls.model_construct(plain_text=text, href=href, annotations=style)
+
+
 class FileObject(TypedObject, polymorphic_base=True):
     """A Notion file object.
 
@@ -209,6 +240,7 @@ class FileObject(TypedObject, polymorphic_base=True):
     """
 
     name: str | None = None
+    caption: list[RichTextObject] | None = None
 
 
 class HostedFile(FileObject, type='file'):
@@ -241,37 +273,6 @@ class DateRange(GenericObject):
     start: date | datetime
     end: date | datetime | None = None
     time_zone: str | None = None
-
-
-class Annotations(GenericObject):
-    """Style information for RichTextObject's."""
-
-    bold: bool = False
-    italic: bool = False
-    strikethrough: bool = False
-    underline: bool = False
-    code: bool = False
-    color: BGColor = None  # type: ignore
-
-
-class RichTextObject(TypedObject, polymorphic_base=True):
-    """Base class for Notion rich text elements."""
-
-    plain_text: str
-    href: str | None = None
-    annotations: Annotations | None = None
-
-    @classmethod
-    def build(cls, text: str, href: str | None = None, style: Annotations | None = None):
-        """Compose a TextObject from the given properties.
-
-        Args:
-            text: the plain text of this object
-            href: an optional link for this object
-            style: an optional Annotations object for this text
-        """
-        style = deepcopy(style)
-        return cls.model_construct(plain_text=text, href=href, annotations=style)
 
 
 class LinkObject(GenericObject):

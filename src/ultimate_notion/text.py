@@ -266,3 +266,8 @@ def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
     add_underlines(md_rich_texts, rich_texts)
 
     return ''.join(md_rich_texts)
+
+
+def md_comment(text: str) -> str:
+    """Create a markdown comment."""
+    return f'[//]: # ({text})\n'
