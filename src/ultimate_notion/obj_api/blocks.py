@@ -266,6 +266,7 @@ class Embed(Block, type='embed'):
 
     class _NestedData(GenericObject):
         url: str = None  # type: ignore
+        caption: list[RichTextObject] | None = None
 
     embed: _NestedData = _NestedData()
 
@@ -393,7 +394,7 @@ class Table(Block, type='table'):
 class LinkToPage(Block, type='link_to_page'):
     """A link_to_page block in Notion."""
 
-    link_to_page: SerializeAsAny[ParentRef]
+    link_to_page: SerializeAsAny[ParentRef] = None  # type: ignore
 
 
 class SyncedBlock(Block, type='synced_block'):

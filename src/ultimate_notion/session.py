@@ -14,7 +14,7 @@ from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
 from ultimate_notion.blocks import Block, DataObject
-from ultimate_notion.config import ENV_NOTION_TOKEN, Config, get_cfg_file, get_or_create_cfg
+from ultimate_notion.config import Config, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.objects import RichText, User
@@ -59,7 +59,7 @@ class Session:
         auth = cfg.ultimate_notion.token
 
         if auth is None:
-            msg = f'No Notion token found! Check {get_cfg_file()} or set the environment variable {ENV_NOTION_TOKEN}.'
+            msg = f'No Notion token found! Check {get_cfg_file()}.'
             raise RuntimeError(msg)
 
         _log.info('Initializing Notion session...')
@@ -296,8 +296,3 @@ class Session:
         """Retrieve a single block by an object reference."""
         block_uuid = get_uuid(block_ref)
         return Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
-
-    def _get_blocks(self, parent_ref: ObjRef) -> list[Block]:
-        """Retrieve all blocks of a parent block."""
-        parent_uuid = get_uuid(parent_ref)
-        return [Block.wrap_obj_ref(block) for block in self.api.blocks.children.list(parent=parent_uuid)]

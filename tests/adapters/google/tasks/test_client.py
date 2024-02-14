@@ -9,7 +9,7 @@ from tests.conftest import Yield, delete_all_taskslists, vcr_fixture
 from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
-@pytest.fixture()
+@vcr_fixture(scope='module')
 def gtasks(custom_config: Path) -> Yield[GTasksClient]:
     """Returns a GTasksClient instance with read_only=False."""
     yield GTasksClient(read_only=False)
