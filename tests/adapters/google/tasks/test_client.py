@@ -5,14 +5,14 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import Yield, delete_all_taskslists, vcr_fixture
+from tests.conftest import delete_all_taskslists, vcr_fixture
 from ultimate_notion.adapters.google.tasks import GTasksClient
 
 
-@vcr_fixture(scope='module')
-def gtasks(custom_config: Path) -> Yield[GTasksClient]:
+@pytest.fixture
+def gtasks(custom_config: Path) -> GTasksClient:
     """Returns a GTasksClient instance with read_only=False."""
-    yield GTasksClient(read_only=False)
+    return GTasksClient(read_only=False)
 
 
 @vcr_fixture(scope='module', autouse=True)
