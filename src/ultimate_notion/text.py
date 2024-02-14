@@ -6,7 +6,10 @@ import re
 from collections.abc import Callable, Iterator
 from typing import TYPE_CHECKING, cast
 
+import mistune
 import numpy as np
+from mistune import Markdown
+from mistune.directives import FencedDirective, TableOfContents
 
 from ultimate_notion.utils import rank
 
@@ -270,4 +273,23 @@ def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
 
 def md_comment(text: str) -> str:
     """Create a markdown comment."""
-    return f'[//]: # ({text})\n'
+    return f'<!--- {text} -->\n'
+
+
+def md_renderer() -> Markdown:
+    """Create a markdown renderer."""
+    return mistune.create_markdown(
+        plugins=[
+            'strikethrough',
+            'url',
+            'task_lists',
+            'math',
+            'table',
+            FencedDirective(
+                [
+                    TableOfContents(),
+                ]
+            ),
+        ],
+        escape=False,
+    )

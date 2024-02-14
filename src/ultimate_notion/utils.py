@@ -172,6 +172,12 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int
     return clone
 
 
+def get_url(object_id: UUID | str) -> str:
+    """Return the URL for the object with the given id."""
+    object_id = object_id if isinstance(object_id, UUID) else UUID(object_id)
+    return f'https://notion.so/{object_id.hex}'
+
+
 def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject | objs.BlockRef) -> UUID:
     """Retrieves a UUID from an object reference.
 

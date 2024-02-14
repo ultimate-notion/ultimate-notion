@@ -76,7 +76,7 @@ class ObjectReference(GenericObject):
 
         if isinstance(ref, ParentRef):
             # ParentRef's are typed-objects with a nested UUID
-            return ObjectReference.model_construct(id=ref())
+            return ObjectReference.model_construct(id=ref.value)
 
         if isinstance(ref, GenericObject) and hasattr(ref, 'id'):
             # re-compose the ObjectReference from the internal ID

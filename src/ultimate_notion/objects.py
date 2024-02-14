@@ -334,3 +334,16 @@ class User(Wrapper[objs.User], wraps=objs.User):
             return self.obj_ref.person.email
         else:  # it's a bot without an e-mail
             return None
+
+
+def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | None) -> File | Emoji | None:
+    """Wrap the icon object into the corresponding class."""
+    if isinstance(icon_obj, objs.ExternalFile):
+        return File.wrap_obj_ref(icon_obj)
+    elif isinstance(icon_obj, objs.EmojiObject):
+        return Emoji.wrap_obj_ref(icon_obj)
+    elif icon_obj is None:
+        return None
+    else:
+        msg = f'unknown icon object of {type(icon_obj)}'
+        raise RuntimeError(msg)

@@ -4,18 +4,21 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 from uuid import UUID
 
-from notion_client.helpers import get_url
 from tabulate import tabulate
 
+from ultimate_notion import objects
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import TypedObject
 from ultimate_notion.objects import RichText, User
 from ultimate_notion.text import md_comment
-from ultimate_notion.utils import ObjRefWrapper, Wrapper, get_active_session, get_uuid
+from ultimate_notion.utils import Wrapper, get_active_session, get_url, get_uuid
+
+if TYPE_CHECKING:
+    from ultimate_notion.page import Page
+
 
 # Todo: Implement the constructors for the blocks
 T = TypeVar('T', bound=obj_blocks.DataObject)
@@ -109,7 +112,7 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
     @property
     def block_url(self) -> str:
         """Return the URL of the block."""
-        return get_url(str(self.id))
+        return get_url(self.id)
 
 
 class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
@@ -122,17 +125,19 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
         return RichText.wrap_obj_ref(rich_texts)
 
 
-GT = TypeVar('GT', bound=TypedObject)
-
-
-class ChildrenMixin(ObjRefWrapper[GT]):
+class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
     """Mixin for blocks that support children blocks."""
 
     @property
-    def children(self) -> list[Block]:
+    def children(self: DataObject) -> list[Block]:
         """Return all children."""
-        nested_obj = self.obj_ref.value
-        if nested_obj.children is not None:
+        if self.has_children:
+            nested_obj = self.obj_ref.value
+
+            if nested_obj.children is None:
+                session = get_active_session()
+                nested_obj.children = list(session.api.blocks.children.list(parent=get_uuid(self.obj_ref)))
+
             return [Block.wrap_obj_ref(child) for child in nested_obj.children]
         else:
             return []
@@ -185,7 +190,7 @@ class Quote(TextBlock[obj_blocks.Quote], ChildrenMixin, wraps=obj_blocks.Quote):
     """Quote block."""
 
     def to_markdown(self) -> str:
-        return f'> {self.rich_text.to_markdown()}'
+        return f'> {self.rich_text.to_markdown()}\n'
 
 
 class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
@@ -210,8 +215,17 @@ class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
 class Callout(TextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
     """Callout block."""
 
+    @property
+    def icon(self) -> objects.File | objects.Emoji | None:
+        return objects.wrap_icon(self.obj_ref.callout.icon)
+
     def to_markdown(self) -> str:
-        return f'```{{tip}}\n{self.rich_text.to_markdown()}\n```'
+        if isinstance(icon := self.icon, objects.Emoji):
+            return f'{icon} {self.rich_text.to_markdown()}\n'
+        elif isinstance(icon := self.icon, objects.File):
+            return f'![icon]({icon.url}) {self.rich_text.to_markdown()}\n'
+        else:
+            return f'{self.rich_text.to_markdown()}\n'
 
     # @classmethod
     # def build(cls, text, emoji=None, color=FullColor.GRAY_BACKGROUND):
@@ -280,7 +294,7 @@ class TableOfContents(Block[obj_blocks.TableOfContents], wraps=obj_blocks.TableO
     """Table of contents block."""
 
     def to_markdown(self) -> str:  # noqa: PLR6301
-        return '.. toc::\n'
+        return '```{toc}\n```'
 
 
 class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
@@ -300,9 +314,13 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
         """Return the URL of the embeded item."""
         return self.obj_ref.embed.url
 
+    @property
+    def caption(self) -> RichText:
+        return RichText.wrap_obj_ref(self.obj_ref.embed.caption)
+
     def to_markdown(self) -> str:
         if self.embed_url is not None:
-            return f'<{self.embed_url}>\n'
+            return f'[{self.embed_url}]({self.embed_url})\n'
         else:
             return ''
 
@@ -419,7 +437,7 @@ class Image(FileObjectBlock[obj_blocks.Image], wraps=obj_blocks.Image):
 
     def to_markdown(self) -> str:
         alt = self.url.rsplit('/').pop()
-        caption = self.caption.to_plain_text() if self.caption else 'image'
+        caption = self.caption.to_plain_text()
         if caption:
             return f'<figure><img src="{self.url}" alt="{alt}" /><figcaption>{caption}</figcaption></figure>\n'
         else:
@@ -450,22 +468,30 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
     """Child page block."""
 
     def to_markdown(self) -> str:
-        return f'**📄 {self.title}**\n'
+        return f'[📄 **<u>{self.title}</u>**]({self.url})\n'
 
     @property
     def title(self) -> str:
         return self.obj_ref.child_page.title
+
+    @property
+    def url(self) -> str:
+        return get_url(self.obj_ref.id)
 
 
 class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatabase):
     """Child database block."""
 
     def to_markdown(self) -> str:
-        return f'**🗄️ {self.title}**\n'
+        return f'[**🗄️ {self.title}**]({self.url})\n'
 
     @property
     def title(self) -> str:
         return self.obj_ref.child_database.title
+
+    @property
+    def url(self) -> str:
+        return get_url(self.obj_ref.id)
 
 
 class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
@@ -579,7 +605,7 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
     def to_markdown(self) -> str:
         headers = 'firstrow' if self.has_column_header else [''] * self.width
         table = [[cell.to_markdown() for cell in row.cells] for row in self.rows]
-        return tabulate(table, headers, tablefmt='github')
+        return tabulate(table, headers, tablefmt='github') + '\n'
 
     # def build(cls, *rows):
     #     """Create a new `Table` block with the given rows."""
@@ -590,34 +616,21 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
 
     #     return table
 
-    # def append(self, block: TableRow):
-    #     """Append the given row to this table.
-
-    #     This method is only applicable when creating a new `Table` block.  In order to
-    #     add rows to an existing `Table`, use the `blocks.children.append()` endpoint.
-
-    #     When adding a row, this method will rase an exception if the width does not
-    #     match the expected number of cells for existing rows in the block.
-    #     """
-
-    #     # XXX need to review whether this is applicable during update...  may need
-    #     # to raise an error if the block has already been created on the server
-
-    #     if not isinstance(block, TableRow):
-    #         raise ValueError("Only TableRow may be appended to Table blocks.")
-
-    #     if self.Width == 0:
-    #         self.table.table_width = block.Width
-    #     elif self.Width != block.Width:
-    #         raise ValueError("Number of cells in row must match table")
-
-    #     self.table.children.append(block)
-
 
 class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
     """Link to page block."""
 
-    # ToDo: Implement me!
+    @property
+    def url(self) -> str:
+        return get_url(get_uuid(self.obj_ref.link_to_page))
+
+    @property
+    def page(self) -> Page:
+        session = get_active_session()
+        return session.get_page(get_uuid(self.obj_ref.link_to_page))
+
+    def to_markdown(self) -> str:
+        return f'[**↗️ <u>{self.page.title}</u>**]({self.url})\n'
 
 
 class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks.SyncedBlock):
@@ -653,5 +666,15 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks
         return md
 
 
-class Template(Block[obj_blocks.Template], ChildrenMixin, wraps=obj_blocks.Template):
+class Template(TextBlock[obj_blocks.Template], ChildrenMixin, wraps=obj_blocks.Template):
     """Template block."""
+
+    def to_markdown(self) -> str:
+        return f'<button type="button">{self.rich_text.to_markdown()}</button>\n'
+
+
+class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.UnsupportedBlock):
+    """Unsupported blocks in the API."""
+
+    def to_markdown(self) -> str:  # noqa: PLR6301
+        return '<kbd>Unsupported block</kbd>\n'

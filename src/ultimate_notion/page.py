@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
+from textwrap import dedent
 from typing import TYPE_CHECKING, Any, cast
 
-import mistune
 from emoji import is_emoji
-from notion_client.helpers import get_url
 
 from ultimate_notion.blocks import Block, ChildDatabase, ChildPage, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
-from ultimate_notion.objects import Emoji, File, RichText
+from ultimate_notion.objects import Emoji, File, RichText, wrap_icon
 from ultimate_notion.props import PropertyValue, Title
-from ultimate_notion.utils import get_active_session, get_repr, is_notebook
+from ultimate_notion.text import md_renderer
+from ultimate_notion.utils import get_active_session, get_repr, get_url, get_uuid, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -90,7 +90,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     """
 
     props: PageProperties
-    _render_md = mistune.create_markdown(plugins=['strikethrough', 'url', 'task_lists', 'math'], escape=False)
+    _render_md = md_renderer()
     _content: list[Block] | None = None
 
     @classmethod
@@ -117,20 +117,20 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this page."""
-        return self._render_md(self.to_markdown())  # Github flavored markdown
+        return self.to_html()
 
     @property
     def url(self) -> str:
         """Return the URL of this database."""
-        return get_url(str(self.id))
+        return get_url(self.id)
 
     @property
     def content(self) -> list[Block]:
         """Return the content of this page, i.e. all blocks belonging to this page"""
         if self._content is None:  # generate cache
             session = get_active_session()
-            self._content = session._get_blocks(self.id)
-
+            child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
+            self._content = [Block.wrap_obj_ref(block) for block in child_blocks]
         return self._content
 
     @property
@@ -186,15 +186,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     def icon(self) -> File | Emoji | None:
         """Icon of the page, i.e. emojis, Notion's icons, or custom images."""
         icon = self.obj_ref.icon
-        if isinstance(icon, objs.ExternalFile):
-            return File.wrap_obj_ref(icon)
-        elif isinstance(icon, objs.EmojiObject):
-            return Emoji.wrap_obj_ref(icon)
-        elif icon is None:
-            return None
-        else:
-            msg = f'unknown icon object of {type(icon)}'
-            raise RuntimeError(msg)
+        return wrap_icon(icon)
 
     @icon.setter
     def icon(self, icon: File | Emoji | str | None):
@@ -231,6 +223,76 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         md = '\n'.join(block.to_markdown() for block in self.content)
         return md
 
+    def to_html(self, *, raw: bool = False) -> str:
+        """Return the content of the page as HTML."""
+        # prepend MathJax configuration
+        if raw:
+            return self._render_md(self.to_markdown())
+
+        html_before = dedent(
+            """
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 15px 0;
+                }
+
+                th, td {
+                    border: 1px solid #999;
+                    padding: 0.5rem;
+                    text-align: left;
+                }
+
+                th {
+                    background-color: #f3f3f3;
+                    color: #333;
+                }
+
+                tr:nth-child(even) {
+                    background-color: #f2f2f2;
+                }
+                a {
+                    color: #007BFF;
+                    text-decoration: none;
+                }
+                a:hover {
+                    color: #0056b3;
+                    text-decoration: none;
+                }
+                kbd {
+                    padding: 0.2em 0.4em;
+                    font-size: 0.87em;
+                    color: #24292e;
+                    background-color: #f6f8fa;
+                    border: 1px solid #d1d5da;
+                    border-radius: 3px;
+                    box-shadow: inset 0 -1px 0 #d1d5da;
+                    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+                }
+              </style>
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+              <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$']]}});
+              </script>
+              <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+            </head>
+            <body>
+            """
+        )
+        html_after = dedent(
+            """
+            <script>hljs.highlightAll();</script>
+            </body>
+            </html>
+            """
+        )
+        return html_before + self._render_md(self.to_markdown()) + html_after
+
     def show(self, *, simple: bool | None = None):
         """Show the content of the page, rendered in Jupyter Lab"""
         simple = simple if simple is not None else is_notebook()
@@ -261,5 +323,5 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Reload this page."""
         session = get_active_session()
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
-        self._content = None  # this forces a new retrieval next time
+        self._content = None  # this forces a new retrieval of children next time
         return self

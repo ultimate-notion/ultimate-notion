@@ -5,8 +5,6 @@ from __future__ import annotations
 from textwrap import dedent
 from typing import cast
 
-from notion_client.helpers import get_url
-
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -15,7 +13,7 @@ from ultimate_notion.objects import Emoji, File, RichText
 from ultimate_notion.page import Page
 from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
 from ultimate_notion.text import camel_case, snake_case
-from ultimate_notion.utils import dict_diff_str, get_active_session, get_repr
+from ultimate_notion.utils import dict_diff_str, get_active_session, get_repr, get_url
 from ultimate_notion.view import View
 
 
@@ -45,7 +43,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def url(self) -> str:
         """Return the URL of this database."""
-        return get_url(str(self.id))
+        return get_url(self.id)
 
     @property
     def title(self) -> RichText:
