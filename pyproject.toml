@@ -206,16 +206,16 @@ unfixable = [
 [tool.ruff.format]
 quote-style = 'single'
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["ultimate_notion"]
 
-[tool.ruff.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Allow print/pprint
 "examples/*" = ["T201"]
 # Tests can use magic values, assertions, and relative imports
@@ -305,7 +305,7 @@ build-check = [
 # skip-install = true # mypy gives more feedback if project is installed locally, strange but true
 dependencies = [
     "mypy~=1.8.0",
-    "ruff==0.1.14",
+    "ruff==0.2.1",
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [

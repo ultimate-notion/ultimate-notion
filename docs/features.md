@@ -33,7 +33,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] read page properties defined by a database schema
 - [x] change page properties
 - [x] navigate pages using parent and children links
-- [ ] read the blocks within a page
+- [x] read the blocks within a page
 - [ ] add/remove and modify the blocks within a page
 - [x] view the content of a page as [Markdown]
 
