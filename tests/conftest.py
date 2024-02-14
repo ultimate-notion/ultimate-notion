@@ -106,7 +106,7 @@ def vcr_config():
 
 @pytest.fixture(scope='session')
 def custom_config(request: SubRequest) -> Yield[Path]:
-    if request.config.getoption('--record-mode') is None:  # corresponds to VCR-ONLY
+    if request.config.getoption('--record-mode') == 'none':  # corresponds to VCR-ONLY
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             cfg_path = tmp_dir_path / Path('config.cfg')
 
