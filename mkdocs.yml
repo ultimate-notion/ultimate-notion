@@ -2,7 +2,7 @@
 site_name: Ultimate Notion
 site_description: The ultimate Python client for Notion!
 site_author: Florian Wilhelm
-site_url: https://ultimate-notion.com/
+site_url: https://ultimate-notion.com
 copyright: 'Copyright &copy; Florian Wilhelm 2022-present'
 
 # Repository
@@ -38,6 +38,7 @@ docs_dir: docs
 site_dir: site
 theme:
   name: material
+  custom_dir: docs/overrides/
   language: en
   favicon: assets/images/favicon.svg
   # logo: assets/images/logo_no_text.svg # just doesn't look good
@@ -72,11 +73,15 @@ theme:
 watch:
 - src/ultimate_notion
 
+hooks:
+- docs/scripts/copy_social_card.py
+
 # Extensions
 plugins:
   # Built-in
   search: {}
   autorefs: {}
+  social: {}
   # Extra
   include-markdown: {}
   glightbox: {}
@@ -87,6 +92,7 @@ plugins:
   gen-files:
     scripts:
       - docs/scripts/gen_ref_nav.py
+      - docs/scripts/copy_social_card.py
   literate-nav:
     nav_file: SUMMARY.md
   section-index: {}
