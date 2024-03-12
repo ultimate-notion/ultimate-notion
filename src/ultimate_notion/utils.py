@@ -335,6 +335,6 @@ def is_stable_version(version_str: str) -> bool:
     return not (version.is_prerelease or version.is_devrelease or version.is_postrelease)
 
 
-def is_stable_release():
+def is_stable_release() -> bool:
     """Return whether the current version is a stable release."""
     return is_stable_version(__version__)

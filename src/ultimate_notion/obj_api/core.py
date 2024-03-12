@@ -20,7 +20,7 @@ class GenericObject(BaseModel):
     Notion API.  Properties in Title Case are provided for convenience.
     """
 
-    model_config = ConfigDict(extra='ignore' if is_stable_release else 'forbid')
+    model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
     @classmethod
     def _set_field_default(cls, name: str, default: str):
