@@ -91,7 +91,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     props: PageProperties
     _render_md = md_renderer()
-    _content: list[Block] | None = None
+    _children: list[Block] | None = None
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Page:
@@ -125,25 +125,25 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return get_url(self.id)
 
     @property
-    def content(self) -> list[Block]:
+    def children(self) -> list[Block]:
         """Return the content of this page, i.e. all blocks belonging to this page"""
-        if self._content is None:  # generate cache
+        if self._children is None:  # generate cache
             session = get_active_session()
             child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
-            self._content = [Block.wrap_obj_ref(block) for block in child_blocks]
-        return self._content
+            self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
+        return self._children
 
     @property
-    def children(self) -> list[Page | Database]:
-        """Return all contained databases and pages within this page"""
+    def subpages(self) -> list[Page]:
+        """Return all contained pages within this page"""
         session = get_active_session()
-        children: list[Page | Database] = []
-        for block in self.content:
-            if isinstance(block, ChildPage):
-                children.append(session.get_page(block.id))
-            elif isinstance(block, ChildDatabase):
-                children.append(session.get_db(block.id))
-        return children
+        return [session.get_page(block.id) for block in self.children if isinstance(block, ChildPage)]
+
+    @property
+    def subdbs(self) -> list[Database]:
+        """Return all contained databases within this page"""
+        session = get_active_session()
+        return [session.get_db(block.id) for block in self.children if isinstance(block, ChildDatabase)]
 
     @property
     def database(self) -> Database | None:
@@ -220,7 +220,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown."""
-        md = '\n'.join(block.to_markdown() for block in self.content)
+        md = '\n'.join(block.to_markdown() for block in self.children)
         return md
 
     def to_html(self, *, raw: bool = False) -> str:
@@ -323,5 +323,5 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Reload this page."""
         session = get_active_session()
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
-        self._content = None  # this forces a new retrieval of children next time
+        self._children = None  # this forces a new retrieval of children next time
         return self

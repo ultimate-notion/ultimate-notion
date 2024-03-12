@@ -5,7 +5,8 @@ from textwrap import dedent
 
 import pytest
 
-from ultimate_notion import Emoji, File, Page, RichText, Session
+from ultimate_notion import Database, Emoji, File, Page, RichText, Session
+from ultimate_notion.blocks import Block
 
 
 @pytest.mark.vcr()
@@ -46,16 +47,34 @@ def test_reload_page(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_parent_children(notion: Session, root_page: Page):
+def test_parent_subpages(notion: Session, root_page: Page):
     parent = notion.create_page(root_page, title='Parent')
     child1 = notion.create_page(parent, title='Child 1')
     child2 = notion.create_page(parent, title='Child 2')
 
     assert child1.parent == parent
     assert child2.parent == parent
-    assert parent.children == [child1, child2]
-    assert all(isinstance(child, Page) for child in parent.children)
+    assert parent.subpages == [child1, child2]
+    assert all(isinstance(page, Page) for page in parent.subpages)
     assert child1.ancestors == (root_page, parent)
+
+
+@pytest.mark.vcr()
+def test_parent_children(intro_page: Page):
+    assert all(isinstance(block, Block) for block in intro_page.children)
+
+
+@pytest.mark.vcr()
+def test_parent_subdbs(notion: Session, root_page: Page):
+    parent = notion.create_page(root_page, title='Parent')
+    db1 = notion.create_db(parent)
+    db2 = notion.create_db(parent)
+
+    assert db1.parent == parent
+    assert db2.parent == parent
+    assert parent.subdbs == [db1, db2]
+    assert all(isinstance(db, Database) for db in parent.subdbs)
+    assert db1.ancestors == (root_page, parent)
 
 
 @pytest.mark.vcr()

@@ -59,7 +59,7 @@ def test_rich_text_md(md_text_page: Page):
         'Half a [lin](https://google.de/)[k](https://amazon.com/) for two destinations',
         '✨Magic ✨',
     ]
-    for idx, block in enumerate(md_text_page.content):
+    for idx, block in enumerate(md_text_page.children):
         assert isinstance(block, TextBlock)
         our_md = block.rich_text.to_markdown()
         assert our_md == correct_mds[idx]
