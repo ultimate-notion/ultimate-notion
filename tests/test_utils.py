@@ -54,3 +54,15 @@ def test_rank():
     assert_array_equal(utils.rank(np.array([3, 1, 2, 2])), np.array([2, 0, 1, 1]))
     assert_array_equal(utils.rank(np.array([3, 1, 1, 2])), np.array([2, 0, 0, 1]))
     assert_array_equal(utils.rank(np.array([7, 7, 11, 9])), np.array([0, 0, 2, 1]))
+
+
+def test_is_stable_version():
+    assert utils.is_stable_version('1.2.3') is True
+    assert utils.is_stable_version('1.2.3a') is False
+    assert utils.is_stable_version('1.2.3b') is False
+    assert utils.is_stable_version('1.2.3rc') is False
+    assert utils.is_stable_version('1.2.3.dev') is False
+    assert utils.is_stable_version('1.2.3.post') is False
+    assert utils.is_stable_version('1.2.3.post1') is False
+    assert utils.is_stable_version('1.2.3.post0') is False
+    assert utils.is_stable_version('1.2.3.post1.dev') is False

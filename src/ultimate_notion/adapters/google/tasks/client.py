@@ -26,7 +26,7 @@ from googleapiclient.discovery import Resource, build
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from ultimate_notion.config import Config, get_or_create_cfg
-from ultimate_notion.utils import SList
+from ultimate_notion.utils import SList, is_stable_release
 
 DEFAULT_LIST_ID_LEN = 32
 """"Length of the ID of the Google default tasklist."""
@@ -44,7 +44,7 @@ class Scope(str, Enum):
 class Link(BaseModel):
     """Representation of a link in a Google Task."""
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='ignore' if is_stable_release else 'forbid')
     description: str
     Link: HttpUrl
     type: str
@@ -67,7 +67,7 @@ class Kind(str, Enum):
 class GObject(BaseModel):
     """Representation of a general Google Object from the Tasks API."""
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='ignore' if is_stable_release else 'forbid')
 
     id: str  # A003
     title_: str = Field(..., alias='title')
@@ -102,7 +102,7 @@ class GObject(BaseModel):
 class GTask(GObject):
     """Representation of a Google Task."""
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='ignore' if is_stable_release else 'forbid')
 
     kind: Literal[Kind.TASK]
     completed_at: datetime | None = Field(alias='completed', default=None)

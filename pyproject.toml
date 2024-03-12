@@ -37,6 +37,7 @@ dependencies = [
     "pandas~=2.0",
     "pydantic~=2.0",
     "mistune~=3.0",  # markdown parser
+    "packaging",
 ]
 dynamic = ["version"]
 
@@ -304,8 +305,8 @@ build-check = [
 [tool.hatch.envs.lint]
 # skip-install = true # mypy gives more feedback if project is installed locally, strange but true
 dependencies = [
-    "mypy~=1.8.0",
-    "ruff==0.2.1",
+    "mypy~=1.9.0",
+    "ruff~=0.3.2",
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [
@@ -314,12 +315,12 @@ typing = [
 ]
 style = [
     "echo \"VERSION: `ruff --version`\"",
-    "ruff {args:.}",
+    "ruff check {args:.}",
     "ruff format --check {args:.}",
 ]
 fix = [
     "ruff format {args:.}",
-    "ruff --fix {args:.}",
+    "ruff check --fix {args:.}",
     "style",  # feedback on what is not fixable
 ]
 all = [

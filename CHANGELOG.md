@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.5
+
+- New: More robust with respect to Notion API changes.
+
 ## Version 0.4, 2024-02-14
 
 - New: Introduced a configuration file under `~/.ultimate-notion/config.toml`.

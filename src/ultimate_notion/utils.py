@@ -13,11 +13,13 @@ from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeAlias, TypeVar, c
 from uuid import UUID
 
 import numpy as np
+from packaging.version import Version
 
+from ultimate_notion import __version__
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import GenericObject
 
 if TYPE_CHECKING:
+    from ultimate_notion.obj_api.core import GenericObject
     from ultimate_notion.session import Session
 
 
@@ -209,7 +211,7 @@ def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str
 
 
 Self = TypeVar('Self', bound='Wrapper[Any]')  # ToDo: Replace when requires-python >= 3.11
-GT = TypeVar('GT', bound=GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
+GT = TypeVar('GT', bound='GenericObject')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
 class ObjRefWrapper(Protocol[GT]):
@@ -325,3 +327,14 @@ def rank(arr: np.ndarray) -> np.ndarray:
     rank = np.zeros_like(arr)
     rank[1:] = np.cumsum(np.where(np.diff(arr[mask]) != 0, 1, 0))
     return rank[np.argsort(mask)]
+
+
+def is_stable_version(version_str: str) -> bool:
+    """Return whether the given version is a stable release."""
+    version = Version(version_str)
+    return not (version.is_prerelease or version.is_devrelease or version.is_postrelease)
+
+
+def is_stable_release():
+    """Return whether the current version is a stable release."""
+    return is_stable_version(__version__)

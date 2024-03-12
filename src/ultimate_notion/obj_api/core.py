@@ -8,6 +8,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, ValidatorFunctionWrapHandler, field_validator, model_validator
 
+from ultimate_notion.utils import is_stable_release
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +20,7 @@ class GenericObject(BaseModel):
     Notion API.  Properties in Title Case are provided for convenience.
     """
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='ignore' if is_stable_release else 'forbid')
 
     @classmethod
     def _set_field_default(cls, name: str, default: str):
