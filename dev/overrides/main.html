@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block htmltitle %}
-{% if page and page.meta and page.meta.title %}
-<title>{{ page.meta.title }}</title>
+{% if page and page.meta and page.meta.title_bar %}
+<title>{{ page.meta.title_bar }}</title>
 {% else %}
 <title>{{ config.site_name }} - {{ page.title }}</title>
 {% endif %}
