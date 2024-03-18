@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD031 -->
 # Contributing
 
 Welcome to the contributor guide of Ultimate Notion.
@@ -72,38 +73,32 @@ This often provides additional considerations and avoids unnecessary work.
    page. This creates a copy of the code under your account on GitHub.
 
 3. Clone this copy to your local disk:
-
-      ```console
-      git clone git@github.com:YourLogin/ultimate-notion.git
-      cd ultimate-notion
-      ```
+   ```console
+   git clone git@github.com:YourLogin/ultimate-notion.git
+   cd ultimate-notion
+   ```
 
 4. Make sure [hatch] and [pre-commit] is installed using [pipx]:
-
-      ```console
-      pipx install hatch
-      pipx install pre-commit
-      ```
+   ```console
+   pipx install hatch
+   pipx install pre-commit
+   ```
 
 5. Optionally run `hatch config set dirs.env.virtual .direnv` to let
    [VS Code] find your virtual environments. If you are using [VS Code],
    then it's quite convenient to add a file `.vscode/.env` in your checkout with:
-
-      ```ini
-      NOTION_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
-      ULTIMATE_NOTION_CONFIG=/path/to/repo/.ultimate-notion/config.toml
-      ```
-
+   ```ini
+   NOTION_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+   ULTIMATE_NOTION_CONFIG=/path/to/repo/.ultimate-notion/config.toml
+   ```
    These settings will also be respected by [pytest] using [pytest-dotenv].
 
 ### Implement your changes
 
 1. Create a branch to hold your changes:
-
-      ```console
-      git checkout -b my-feature
-      ```
-
+   ```console
+   git checkout -b my-feature
+   ```
    and start making changes. Never work on the main branch!
 
 2. Start your work on this branch. Don't forget to add [docstrings] in [Google style]
@@ -118,26 +113,23 @@ This often provides additional considerations and avoids unnecessary work.
 5. Add yourself to the list of contributors in `AUTHORS.md`.
 
 6. When you’re done editing, do:
-
-      ```console
-      git add <MODIFIED FILES>
-      git commit
-      ```
-
-   to record your changes in [git].
-
+   ```console
+   git add <MODIFIED FILES>
+   git commit
+   ```
+   to record your changes in [git].\
    Please make sure you see the validation messages from [pre-commit] and fix and remaining issues.
 
-   !!! info
-         Don't forget to add unit tests and documentation in case your
-         contribution adds a feature and is not just a bugfix.
+!!! info
+      Don't forget to add unit tests and documentation in case your
+      contribution adds a feature and is not just a bugfix.
 
-         Moreover, writing an [descriptive commit message] is highly recommended.
-         In case of doubt, you can check the commit history with:
-         ```
-         git log --graph --decorate --pretty=oneline --abbrev-commit --all
-         ```
-         to look for recurring communication patterns.
+      Moreover, writing an [descriptive commit message] is highly recommended.
+      In case of doubt, you can check the commit history with:
+      ```
+      git log --graph --decorate --pretty=oneline --abbrev-commit --all
+      ```
+      to look for recurring communication patterns.
 
 ### Submit your contribution
 

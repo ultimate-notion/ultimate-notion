@@ -1,6 +1,8 @@
 ---
-title: Ultimate Notion
+title_bar: Ultimate Notion
 ---
+
+# Ultimate Notion
 
 ![Ultimate Notion logo](assets/images/logo_with_text.svg){: style="height:200px; display:block; margin-left:auto; margin-right:auto;"}
 
