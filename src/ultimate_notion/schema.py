@@ -181,17 +181,13 @@ class PageSchema:
             # backward relation was initialized in the other schema
             return True
 
+        # backward relation was not yet initialised in the other schema (during the creation of the data model)
         other_schema_no_backrels_dct = {
             name: prop_type
             for name, prop_type in other_schema_dct.items()
             if not (isinstance(prop_type, Relation) and not prop_type.schema)
         }
-
-        if other_schema_no_backrels_dct == own_schema_dct:
-            # backward relation was not yet initialised in the other schema (during the creation of the data model)
-            return True
-
-        return False
+        return other_schema_no_backrels_dct == own_schema_dct
 
     @classmethod
     def get_db(cls) -> Database:
