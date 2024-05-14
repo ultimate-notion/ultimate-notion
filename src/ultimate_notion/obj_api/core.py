@@ -75,6 +75,7 @@ class NotionObject(GenericObject):
     object: str
     request_id: UUID = None  # type: ignore
     id: UUID | str = None  # type: ignore
+    in_trash: bool | None = None  # type: ignore
 
     def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)
@@ -200,7 +201,13 @@ class TypedObject(GenericObject):
             msg = f'Unsupported sub-type: {type_name}'
             raise ValueError(msg)
 
-        logger.debug('initializing typed object %s :: %s => %s -- %s', cls, type_name, sub_cls, value)
+        logger.debug(
+            'initializing typed object %s :: %s => %s -- %s',
+            cls,
+            type_name,
+            sub_cls,
+            value,
+        )
 
         return sub_cls(**value)
 
