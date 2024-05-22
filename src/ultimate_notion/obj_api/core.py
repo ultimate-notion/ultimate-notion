@@ -192,7 +192,10 @@ class TypedObject(GenericObject):
         type_name = value.get('type')
 
         if type_name is None:
-            logger.debug(f'Missing type in data {value} - breaking recursion')
+            logger.warning(f'Missing type in data {value}. Most likely a User object without type')
+            # Normally we would raise a ValueError here, but the User object is a special case
+            # where the type is in rare cases not provided.
+            # ToDo: Write a unit test for this case.
             return handler(value)
 
         sub_cls = cls._typemap.get(type_name)
