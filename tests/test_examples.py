@@ -19,7 +19,7 @@ def notion_cleanups():
 
 def exec_pyfile(file_path: str) -> None:
     """Executes a Python module as a script, as if it was called from the command line."""
-    code = compile(Path(file_path).read_text(), file_path, 'exec')
+    code = compile(Path(file_path).read_text(encoding='utf-8'), file_path, 'exec')
     exec(code, {'__MODULE__': '__main__'})  # noqa: S102
 
 

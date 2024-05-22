@@ -261,7 +261,7 @@ def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
     def add_underlines(md_rich_texts: list[str], rich_texts: list[RichTextBase]):
         for left, right in find_span(rich_texts, lambda rt: rt.obj_ref.annotations.underline):
             md_rich_texts[left] = '<u>' + md_rich_texts[left]
-            md_rich_texts[right] = md_rich_texts[right] + '</u>'
+            md_rich_texts[right] += '</u>'
 
     md_rich_texts = [rich_text.obj_ref.plain_text for rich_text in rich_texts]
     add_mentions(md_rich_texts, rich_texts)
