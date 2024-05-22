@@ -19,6 +19,7 @@ from datetime import date, datetime, time, timezone
 from enum import Enum
 from typing import Literal
 
+from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -367,7 +368,11 @@ class GTasksClient:
         creds = Credentials.from_authorized_user_file(token_path, self._scopes) if token_path.exists() else None
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
+                try:
+                    creds.refresh(Request())
+                except RefreshError as e:
+                    msg = f'Error refreshing token. Please delete {token_path} and try again!'
+                    raise RuntimeError(msg) from e
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(secret_path, self._scopes)
                 creds = flow.run_local_server(port=0)
