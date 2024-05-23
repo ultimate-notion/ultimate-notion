@@ -16,6 +16,7 @@ env:
   PYTHONUNBUFFERED: "1"
   FORCE_COLOR: "1"
   NOTION_TOKEN: "${{ secrets.NOTION_AUTH_TOKEN }}"
+  PIP_COMPILE_DISABLE: true
   PIPX_HOME: "${{ github.workspace }}/.pipx"
 
 jobs:
@@ -47,20 +48,26 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Ensure latest pip & pipx
+    - name: Ensure latest pip & install pipx
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade pipx
+        python -m pip install -q pipx
 
     - name: Install Hatch & pre-commit
-      run: pipx install hatch pre-commit
+      run: |
+        pipx install pre-commit
+        pipx install hatch
+        hatch --version
+        hatch python install ${{ matrix.python-version }}
 
     - name: Lint
       if: matrix.python-version == '3.10' && runner.os == 'Linux'
       run: hatch run lint:all
 
     - name: Run tests and track code coverage
-      run: hatch run ci
+      run: |
+        hatch run pip list
+        hatch run ci
 
     - name: Coveralls Parallel
       uses: coverallsapp/github-action@v2
