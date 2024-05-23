@@ -227,12 +227,19 @@ ban-relative-imports = "all"
 # Hatch Environment Setup #
 ###########################
 
+[tool.hatch.env]
+requires = ["hatch-pip-compile~=1.11.1"]
+
 # Default environment
 [tool.hatch.envs.default]
-type = "virtual"
+type = "pip-compile"
 python = "3.10"
 post-install-commands = ["pre-commit install"]
-features = ["all"]
+features = ["google"]  # state them explicitly, not just "all", to avoid installing ultimate-notion from PyPI!
+pip-compile-installer = "pip-sync"
+pip-compile-constraint = "default"  # keep locks between default & others consistent
+pip-compile-hashes = false  # no hashes in lock files
+lock-filename = "locks/{env_name}.lock"
 dependencies = [
     "coverage[toml]>=6.2",
     "pytest",
@@ -261,29 +268,29 @@ vcr-drop-cassettes = "find ./tests -type d -name 'cassettes' -exec rm -rf {{}} +
 ci = "vcr-only --cov-report lcov {args}"
 doctest = "pytest docs/examples/"
 md2py = "python -c \"from ultimate_notion.utils import convert_md_to_py; convert_md_to_py('{args}')\""
+upgrade-all = "PIP_COMPILE_UPGRADE=1 hatch env run --env {env_name} -- python --version"
+upgrade-pkg = "PIP_COMPILE_UPGRADE_PACKAGE='{args}' hatch env run --env {env_name} -- python --version"
 
 # Docs environment
 [tool.hatch.envs.docs]
 dependencies = [
-    "mkdocs~=1.5.3",
-    "mkdocs-material[imaging]~=9.5.16",
+    "mkdocs",
+    "mkdocs-material[imaging]",
     # Plugins
     "mkdocs-include-markdown-plugin",
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
-    "mkdocs-minify-plugin~=0.7.1",
+    "mkdocs-minify-plugin",
     "mkdocs-section-index",
-    "mkdocs-git-revision-date-localized-plugin~=1.1.0",
+    "mkdocs-git-revision-date-localized-plugin",
     "mkdocstrings[python]",
-    "mkdocs-redirects~=1.2.1",
-    "mkdocs-glightbox~=0.3.0",
-    "mike~=2.0.0",
+    "mkdocs-redirects",
+    "mkdocs-glightbox",
+    "mike",
     # Extensions
-    "pymdown-extensions~=10.5.0",
-    # Necessary for syntax highlighting in code blocks
-    "pygments~=2.17.2",
-    # Validation
-    "linkchecker~=10.3.0",
+    "pymdown-extensions",
+    "pygments", # Necessary for syntax highlighting in code blocks
+    "linkchecker", # Validation
     ]
 [tool.hatch.envs.docs.env-vars]
 SOURCE_DATE_EPOCH = "1580601600"
@@ -305,8 +312,8 @@ build-check = [
 [tool.hatch.envs.lint]
 # skip-install = true # mypy gives more feedback if project is installed locally, strange but true
 dependencies = [
-    "mypy~=1.10.0",
-    "ruff~=0.4.4",
+    "mypy",
+    "ruff==0.4.4", # make sure this is consistent with with pyproject.toml, thus pinned!
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [

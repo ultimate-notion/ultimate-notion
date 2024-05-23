@@ -16,9 +16,8 @@ repos:
   - id: mixed-line-ending
     args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
 
-# Ruff replaces flake8, autoflake and isort
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: 'v0.4.4'
+  rev: 'v0.4.4'  # make sure this is consistent with with pyproject.toml
   hooks:
     - id: ruff
     - id: ruff-format
