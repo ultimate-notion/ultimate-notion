@@ -26,7 +26,7 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/search
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"5f505199-b292-4713-920b-61d813bf72a3","created_time":"2022-08-22T15:47:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"archived":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-5f505199b2924713920b61d813bf72a3","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"90291ccf-948c-4aa2-bd7c-6b977f69bba6"}'
+    content: '{"object":"list","results":[{"object":"page","id":"5f505199-b292-4713-920b-61d813bf72a3","created_time":"2022-08-22T15:47:00.000Z","last_edited_time":"2024-05-23T10:52:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-5f505199b2924713920b61d813bf72a3","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"25ec8af6-14d1-462a-b821-cb0c7dbc32e3"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -40,19 +40,23 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"3a0-NAnSEetiBxEV4CkJ9XXKpXgxpgw"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 25ec8af6-14d1-462a-b821-cb0c7dbc32e3
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"page_id": "5f505199-b292-4713-920b-61d813bf72a3", "type":
-      "page_id"}, "title": [{"plain_text": "Item DB", "text": {"content": "Item DB"},
-      "type": "text"}], "properties": {"Name": {"type": "title", "title": {}}, "Size":
-      {"select": {"options": [{"name": "S", "color": "green"}, {"name": "M", "color":
-      "yellow"}, {"name": "L", "color": "red"}]}, "type": "select"}, "Price": {"number":
-      {"format": "dollar"}, "type": "number"}}}'
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "title": [{"type": "text", "plain_text": "Item DB", "text": {"content": "Item
+      DB"}}], "properties": {"Name": {"type": "title", "title": {}}, "Size": {"type":
+      "select", "select": {"options": [{"name": "S", "color": "green"}, {"name": "M",
+      "color": "yellow"}, {"name": "L", "color": "red"}]}}, "Price": {"type": "number",
+      "number": {"format": "dollar"}}}}'
     headers:
       accept:
       - '*/*'
@@ -77,9 +81,9 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"834dbf2a-b89f-4307-9743-507fec93bf10","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab","cover":null,"icon":null,"created_time":"2024-05-23T10:52:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:52:00.000Z","title":[{"type":"text","text":{"content":"Item
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      DB","href":null}],"description":[],"is_inline":false,"properties":{"Price":{"id":"Fn%7Cm","name":"Price","type":"number","number":{"format":"dollar"}},"Size":{"id":"ZSBa","name":"Size","type":"select","select":{"options":[{"id":"83df0678-d3ff-4b3a-a2d8-2eef3971fa00","name":"S","color":"green","description":null},{"id":"4c830ba9-4e65-42a5-ada7-480d59f18ad4","name":"M","color":"yellow","description":null},{"id":"a6f26cb6-4e48-4d15-ad8d-a32bee89dbfa","name":"L","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/834dbf2ab89f43079743507fec93bf10","public_url":null,"archived":false,"request_id":"03245a72-332c-4598-9267-249e5b32e522"}'
+      DB","href":null}],"description":[],"is_inline":false,"properties":{"Price":{"id":"IbQF","name":"Price","type":"number","number":{"format":"dollar"}},"Size":{"id":"OIRG","name":"Size","type":"select","select":{"options":[{"id":"7af5d984-1ec8-4d71-b9c8-e9567cb7cc6f","name":"S","color":"green","description":null},{"id":"434a19b2-1212-471b-a3b8-60cf9b269838","name":"M","color":"yellow","description":null},{"id":"3dc03c31-2293-488b-bc84-15b1d1bed269","name":"L","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/4d17dcd59b5f431f88fd58bad9981eab","public_url":null,"archived":false,"in_trash":false,"request_id":"27ebd3df-ab94-4713-88e5-f7516216fd97"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -93,15 +97,19 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"538-jHQNCMcsijfbSvKY32q9owa10dg"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 27ebd3df-ab94-4713-88e5-f7516216fd97
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"description": [{"plain_text": "Database of all the items we sell", "text":
-      {"content": "Database of all the items we sell"}, "type": "text"}]}'
+    body: '{"description": [{"type": "text", "plain_text": "Database of all the items
+      we sell", "text": {"content": "Database of all the items we sell"}}]}'
     headers:
       accept:
       - '*/*'
@@ -124,13 +132,13 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/834dbf2a-b89f-4307-9743-507fec93bf10
+    uri: https://api.notion.com/v1/databases/4d17dcd5-9b5f-431f-88fd-58bad9981eab
   response:
-    content: '{"object":"database","id":"834dbf2a-b89f-4307-9743-507fec93bf10","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab","cover":null,"icon":null,"created_time":"2024-05-23T10:52:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Item
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
       DB","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all the items we sell","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      of all the items we sell","href":null}],"is_inline":false,"properties":{"Price":{"id":"Fn%7Cm","name":"Price","type":"number","number":{"format":"dollar"}},"Size":{"id":"ZSBa","name":"Size","type":"select","select":{"options":[{"id":"83df0678-d3ff-4b3a-a2d8-2eef3971fa00","name":"S","color":"green","description":null},{"id":"4c830ba9-4e65-42a5-ada7-480d59f18ad4","name":"M","color":"yellow","description":null},{"id":"a6f26cb6-4e48-4d15-ad8d-a32bee89dbfa","name":"L","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/834dbf2ab89f43079743507fec93bf10","public_url":null,"archived":false,"request_id":"f0b6c19a-9c89-4f69-bfc6-6fe1ae574db5"}'
+      of all the items we sell","href":null}],"is_inline":false,"properties":{"Price":{"id":"IbQF","name":"Price","type":"number","number":{"format":"dollar"}},"Size":{"id":"OIRG","name":"Size","type":"select","select":{"options":[{"id":"7af5d984-1ec8-4d71-b9c8-e9567cb7cc6f","name":"S","color":"green","description":null},{"id":"434a19b2-1212-471b-a3b8-60cf9b269838","name":"M","color":"yellow","description":null},{"id":"3dc03c31-2293-488b-bc84-15b1d1bed269","name":"L","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/4d17dcd59b5f431f88fd58bad9981eab","public_url":null,"archived":false,"in_trash":false,"request_id":"c4d72a4a-df4f-40a6-84fd-ab2bd2dd69ef"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -144,18 +152,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"63a-E76aJ9M204khZRX59zqId+w1bG8"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - c4d72a4a-df4f-40a6-84fd-ab2bd2dd69ef
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"page_id": "5f505199-b292-4713-920b-61d813bf72a3", "type":
-      "page_id"}, "title": [{"plain_text": "Customer DB", "text": {"content": "Customer
-      DB"}, "type": "text"}], "properties": {"Name": {"type": "title", "title": {}},
-      "Items Purchased": {"relation": {"database_id": "834dbf2a-b89f-4307-9743-507fec93bf10",
-      "type": "single_property", "single_property": {}}, "type": "relation"}}}'
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "title": [{"type": "text", "plain_text": "Customer DB", "text": {"content":
+      "Customer DB"}}], "properties": {"Name": {"type": "title", "title": {}}, "Items
+      Purchased": {"type": "relation", "relation": {"type": "single_property", "database_id":
+      "4d17dcd5-9b5f-431f-88fd-58bad9981eab", "single_property": {}}}}}'
     headers:
       accept:
       - '*/*'
@@ -180,10 +192,10 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"62f4f59d-5871-4728-9131-f7a3289d6366","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"database","id":"d6510649-a492-43dc-82ba-aede0c966caf","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Customer
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
-      DB","href":null}],"description":[],"is_inline":false,"properties":{"Items Purchased":{"id":"cO%3BW","name":"Items
-      Purchased","type":"relation","relation":{"database_id":"834dbf2a-b89f-4307-9743-507fec93bf10","type":"single_property","single_property":{}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/62f4f59d587147289131f7a3289d6366","public_url":null,"archived":false,"request_id":"02c3824e-3340-484f-b500-152b6ecef4ce"}'
+      DB","href":null}],"description":[],"is_inline":false,"properties":{"Items Purchased":{"id":"MVJD","name":"Items
+      Purchased","type":"relation","relation":{"database_id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab","type":"single_property","single_property":{}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/d6510649a49243dc82baaede0c966caf","public_url":null,"archived":false,"in_trash":false,"request_id":"59b3efe8-404f-4332-a5f7-f41a3b81d01e"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -197,15 +209,19 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"44c-P2z/WrX29mDXuvdvF8SfP2V4ps8"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 59b3efe8-404f-4332-a5f7-f41a3b81d01e
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"description": [{"plain_text": "Database of all our beloved customers",
-      "text": {"content": "Database of all our beloved customers"}, "type": "text"}]}'
+    body: '{"description": [{"type": "text", "plain_text": "Database of all our beloved
+      customers", "text": {"content": "Database of all our beloved customers"}}]}'
     headers:
       accept:
       - '*/*'
@@ -228,14 +244,14 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/62f4f59d-5871-4728-9131-f7a3289d6366
+    uri: https://api.notion.com/v1/databases/d6510649-a492-43dc-82ba-aede0c966caf
   response:
-    content: '{"object":"database","id":"62f4f59d-5871-4728-9131-f7a3289d6366","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"database","id":"d6510649-a492-43dc-82ba-aede0c966caf","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Customer
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
       DB","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all our beloved customers","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
       of all our beloved customers","href":null}],"is_inline":false,"properties":{"Items
-      Purchased":{"id":"cO%3BW","name":"Items Purchased","type":"relation","relation":{"database_id":"834dbf2a-b89f-4307-9743-507fec93bf10","type":"single_property","single_property":{}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/62f4f59d587147289131f7a3289d6366","public_url":null,"archived":false,"request_id":"c727ae8c-f02f-49a1-ac92-e3853b58eb50"}'
+      Purchased":{"id":"MVJD","name":"Items Purchased","type":"relation","relation":{"database_id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab","type":"single_property","single_property":{}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/d6510649a49243dc82baaede0c966caf","public_url":null,"archived":false,"in_trash":false,"request_id":"b3e704e2-9f9a-4926-a2e8-0b717954df76"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -249,18 +265,21 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"556-Pb8yYkjHbJ1hMnA6gwin8jZNc7I"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - b3e704e2-9f9a-4926-a2e8-0b717954df76
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "834dbf2a-b89f-4307-9743-507fec93bf10", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "T-shirt",
-      "text": {"content": "T-shirt"}, "type": "text"}], "type": "title"}, "Size":
-      {"select": {"name": "L", "color": "red"}, "type": "select"}, "Price": {"number":
-      17.0, "type": "number"}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "4d17dcd5-9b5f-431f-88fd-58bad9981eab"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "T-shirt", "text": {"content": "T-shirt"}}]}, "Size": {"type": "select", "select":
+      {"name": "L", "color": "red"}}, "Price": {"type": "number", "number": 17.0}}}'
     headers:
       accept:
       - '*/*'
@@ -285,7 +304,7 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"e2d0a856-f055-4fcc-b52e-50de97ccb73a","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"834dbf2a-b89f-4307-9743-507fec93bf10"},"archived":false,"properties":{"Price":{"id":"Fn%7Cm","type":"number","number":17},"Size":{"id":"ZSBa","type":"select","select":{"id":"a6f26cb6-4e48-4d15-ad8d-a32bee89dbfa","name":"L","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"T-shirt","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"T-shirt","href":null}]}},"url":"https://www.notion.so/T-shirt-e2d0a856f0554fccb52e50de97ccb73a","public_url":null,"request_id":"57706761-2093-489e-8bb8-44f13bc7e9bb"}'
+    content: '{"object":"page","id":"ca20f19d-f4b0-42d9-95fb-12eec1067cb8","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab"},"archived":false,"in_trash":false,"properties":{"Price":{"id":"IbQF","type":"number","number":17},"Size":{"id":"OIRG","type":"select","select":{"id":"3dc03c31-2293-488b-bc84-15b1d1bed269","name":"L","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"T-shirt","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"T-shirt","href":null}]}},"url":"https://www.notion.so/T-shirt-ca20f19df4b042d995fb12eec1067cb8","public_url":null,"request_id":"3f02e475-fdbd-44c5-9aa1-d4e825fdffca"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -299,18 +318,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"400-zWIB3VFwDoA9lApUPjUFOI7UsBE"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 3f02e475-fdbd-44c5-9aa1-d4e825fdffca
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "834dbf2a-b89f-4307-9743-507fec93bf10", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "Khaki pants",
-      "text": {"content": "Khaki pants"}, "type": "text"}], "type": "title"}, "Size":
-      {"select": {"name": "M", "color": "yellow"}, "type": "select"}, "Price": {"number":
-      25.0, "type": "number"}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "4d17dcd5-9b5f-431f-88fd-58bad9981eab"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Khaki pants", "text": {"content": "Khaki pants"}}]}, "Size": {"type": "select",
+      "select": {"name": "M", "color": "yellow"}}, "Price": {"type": "number", "number":
+      25.0}}}'
     headers:
       accept:
       - '*/*'
@@ -335,9 +358,9 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"5a8df24e-576c-4483-b54f-bf13f3df0fc2","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"834dbf2a-b89f-4307-9743-507fec93bf10"},"archived":false,"properties":{"Price":{"id":"Fn%7Cm","type":"number","number":25},"Size":{"id":"ZSBa","type":"select","select":{"id":"4c830ba9-4e65-42a5-ada7-480d59f18ad4","name":"M","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Khaki
+    content: '{"object":"page","id":"3e1a5d3d-e517-4443-871c-80510965ca2c","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab"},"archived":false,"in_trash":false,"properties":{"Price":{"id":"IbQF","type":"number","number":25},"Size":{"id":"OIRG","type":"select","select":{"id":"434a19b2-1212-471b-a3b8-60cf9b269838","name":"M","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Khaki
       pants","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Khaki
-      pants","href":null}]}},"url":"https://www.notion.so/Khaki-pants-5a8df24e576c4483b54fbf13f3df0fc2","public_url":null,"request_id":"0d4359ad-5614-48eb-b643-d8f0e5bee8d8"}'
+      pants","href":null}]}},"url":"https://www.notion.so/Khaki-pants-3e1a5d3de5174443871c80510965ca2c","public_url":null,"request_id":"d1cdd95a-e1e7-4fa9-8261-5ea434a5df58"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -351,18 +374,21 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"40f-gSIf+Whgkpy+zaQ+XPw6otKt/7w"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - d1cdd95a-e1e7-4fa9-8261-5ea434a5df58
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "834dbf2a-b89f-4307-9743-507fec93bf10", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "Tank top",
-      "text": {"content": "Tank top"}, "type": "text"}], "type": "title"}, "Size":
-      {"select": {"name": "S", "color": "green"}, "type": "select"}, "Price": {"number":
-      15.0, "type": "number"}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "4d17dcd5-9b5f-431f-88fd-58bad9981eab"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Tank top", "text": {"content": "Tank top"}}]}, "Size": {"type": "select", "select":
+      {"name": "S", "color": "green"}}, "Price": {"type": "number", "number": 15.0}}}'
     headers:
       accept:
       - '*/*'
@@ -387,9 +413,9 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"2f519d66-4389-4b60-8e3a-4a4c35f86ffc","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"834dbf2a-b89f-4307-9743-507fec93bf10"},"archived":false,"properties":{"Price":{"id":"Fn%7Cm","type":"number","number":15},"Size":{"id":"ZSBa","type":"select","select":{"id":"83df0678-d3ff-4b3a-a2d8-2eef3971fa00","name":"S","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tank
+    content: '{"object":"page","id":"300dedd3-ceb5-4ed0-92a3-509cc8017cf4","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab"},"archived":false,"in_trash":false,"properties":{"Price":{"id":"IbQF","type":"number","number":15},"Size":{"id":"OIRG","type":"select","select":{"id":"7af5d984-1ec8-4d71-b9c8-e9567cb7cc6f","name":"S","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tank
       top","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tank
-      top","href":null}]}},"url":"https://www.notion.so/Tank-top-2f519d6643894b608e3a4a4c35f86ffc","public_url":null,"request_id":"a233c986-ebf8-4f20-9fdf-028c42cfb8a5"}'
+      top","href":null}]}},"url":"https://www.notion.so/Tank-top-300dedd3ceb54ed092a3509cc8017cf4","public_url":null,"request_id":"c9697f36-2aad-4d47-8047-645cbb45e76d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -403,18 +429,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"405-FEOlxOQt8eq3V7ZPG2ui3Y48Ick"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - c9697f36-2aad-4d47-8047-645cbb45e76d
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "62f4f59d-5871-4728-9131-f7a3289d6366", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "Ada Lovelace",
-      "text": {"content": "Ada Lovelace"}, "type": "text"}], "type": "title"}, "Items
-      Purchased": {"relation": [{"id": "2f519d66-4389-4b60-8e3a-4a4c35f86ffc"}], "type":
-      "relation", "has_more": false}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "d6510649-a492-43dc-82ba-aede0c966caf"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Ada Lovelace", "text": {"content": "Ada Lovelace"}}]}, "Items Purchased": {"type":
+      "relation", "relation": [{"id": "300dedd3-ceb5-4ed0-92a3-509cc8017cf4"}], "has_more":
+      false}}}'
     headers:
       accept:
       - '*/*'
@@ -439,10 +469,10 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"eb8e4946-535c-4694-a756-b289cfc3a781","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"62f4f59d-5871-4728-9131-f7a3289d6366"},"archived":false,"properties":{"Items
-      Purchased":{"id":"cO%3BW","type":"relation","relation":[{"id":"2f519d66-4389-4b60-8e3a-4a4c35f86ffc"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Ada
+    content: '{"object":"page","id":"ddce08bb-e3b6-44dd-9c0e-bd239edf4a77","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"d6510649-a492-43dc-82ba-aede0c966caf"},"archived":false,"in_trash":false,"properties":{"Items
+      Purchased":{"id":"MVJD","type":"relation","relation":[{"id":"300dedd3-ceb5-4ed0-92a3-509cc8017cf4"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Ada
       Lovelace","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Ada
-      Lovelace","href":null}]}},"url":"https://www.notion.so/Ada-Lovelace-eb8e4946535c4694a756b289cfc3a781","public_url":null,"request_id":"4693f1c7-3b12-4dc4-80de-838fcb6ded79"}'
+      Lovelace","href":null}]}},"url":"https://www.notion.so/Ada-Lovelace-ddce08bbe3b644dd9c0ebd239edf4a77","public_url":null,"request_id":"1309fa7f-6d24-4182-8671-4cd5f7eda7b0"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -456,18 +486,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"3e6-XdJIYubRjo9wYFwUu6hcE5CxGZ4"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 1309fa7f-6d24-4182-8671-4cd5f7eda7b0
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "62f4f59d-5871-4728-9131-f7a3289d6366", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "Andy Herzfeld",
-      "text": {"content": "Andy Herzfeld"}, "type": "text"}], "type": "title"}, "Items
-      Purchased": {"relation": [{"id": "5a8df24e-576c-4483-b54f-bf13f3df0fc2"}], "type":
-      "relation", "has_more": false}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "d6510649-a492-43dc-82ba-aede0c966caf"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Andy Herzfeld", "text": {"content": "Andy Herzfeld"}}]}, "Items Purchased":
+      {"type": "relation", "relation": [{"id": "3e1a5d3d-e517-4443-871c-80510965ca2c"}],
+      "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -492,10 +526,10 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"3cf84e81-7e95-496a-921b-a9c64fcae5b8","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"62f4f59d-5871-4728-9131-f7a3289d6366"},"archived":false,"properties":{"Items
-      Purchased":{"id":"cO%3BW","type":"relation","relation":[{"id":"5a8df24e-576c-4483-b54f-bf13f3df0fc2"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Andy
+    content: '{"object":"page","id":"d54dc010-80a3-4b46-bb7c-cc303472e28a","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"d6510649-a492-43dc-82ba-aede0c966caf"},"archived":false,"in_trash":false,"properties":{"Items
+      Purchased":{"id":"MVJD","type":"relation","relation":[{"id":"3e1a5d3d-e517-4443-871c-80510965ca2c"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Andy
       Herzfeld","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Andy
-      Herzfeld","href":null}]}},"url":"https://www.notion.so/Andy-Herzfeld-3cf84e817e95496a921ba9c64fcae5b8","public_url":null,"request_id":"6a500c33-3b6d-40aa-b92e-664d28c9036a"}'
+      Herzfeld","href":null}]}},"url":"https://www.notion.so/Andy-Herzfeld-d54dc01080a34b46bb7ccc303472e28a","public_url":null,"request_id":"dc6d88da-98d1-4f78-96cb-02d7347945a4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -509,18 +543,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"3e9-wX5B3vH+0CsDFx7cRz693Ob2pnQ"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - dc6d88da-98d1-4f78-96cb-02d7347945a4
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "62f4f59d-5871-4728-9131-f7a3289d6366", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "Doug Engelbart",
-      "text": {"content": "Doug Engelbart"}, "type": "text"}], "type": "title"}, "Items
-      Purchased": {"relation": [{"id": "5a8df24e-576c-4483-b54f-bf13f3df0fc2"}, {"id":
-      "e2d0a856-f055-4fcc-b52e-50de97ccb73a"}], "type": "relation", "has_more": false}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "d6510649-a492-43dc-82ba-aede0c966caf"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Doug Engelbart", "text": {"content": "Doug Engelbart"}}]}, "Items Purchased":
+      {"type": "relation", "relation": [{"id": "3e1a5d3d-e517-4443-871c-80510965ca2c"},
+      {"id": "ca20f19d-f4b0-42d9-95fb-12eec1067cb8"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -545,10 +583,10 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"4357a80c-966b-40b9-a4c4-a7271f19f128","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"62f4f59d-5871-4728-9131-f7a3289d6366"},"archived":false,"properties":{"Items
-      Purchased":{"id":"cO%3BW","type":"relation","relation":[{"id":"5a8df24e-576c-4483-b54f-bf13f3df0fc2"},{"id":"e2d0a856-f055-4fcc-b52e-50de97ccb73a"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Doug
+    content: '{"object":"page","id":"88531026-4d4b-4991-849d-5bee1abc139b","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"d6510649-a492-43dc-82ba-aede0c966caf"},"archived":false,"in_trash":false,"properties":{"Items
+      Purchased":{"id":"MVJD","type":"relation","relation":[{"id":"3e1a5d3d-e517-4443-871c-80510965ca2c"},{"id":"ca20f19d-f4b0-42d9-95fb-12eec1067cb8"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Doug
       Engelbart","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Doug
-      Engelbart","href":null}]}},"url":"https://www.notion.so/Doug-Engelbart-4357a80c966b40b9a4c4a7271f19f128","public_url":null,"request_id":"06bb3bc8-b973-4d0e-95fb-df2c6008c85e"}'
+      Engelbart","href":null}]}},"url":"https://www.notion.so/Doug-Engelbart-885310264d4b4991849d5bee1abc139b","public_url":null,"request_id":"e7335dc7-58a9-4f60-8f0f-fc8a1acde3ea"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -562,9 +600,13 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"41a-VeNnrt+v/S3YYeA1RbG2ni37lTM"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - e7335dc7-58a9-4f60-8f0f-fc8a1acde3ea
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
@@ -588,10 +630,10 @@ interactions:
       user-agent:
       - secret...
     method: DELETE
-    uri: https://api.notion.com/v1/blocks/834dbf2a-b89f-4307-9743-507fec93bf10
+    uri: https://api.notion.com/v1/blocks/4d17dcd5-9b5f-431f-88fd-58bad9981eab
   response:
-    content: '{"object":"block","id":"834dbf2a-b89f-4307-9743-507fec93bf10","parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"type":"child_database","child_database":{"title":"Item
-      DB"},"request_id":"e9bbb4e0-c709-448c-8883-71344d44e38e"}'
+    content: '{"object":"block","id":"4d17dcd5-9b5f-431f-88fd-58bad9981eab","parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"created_time":"2024-05-23T10:52:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"in_trash":true,"type":"child_database","child_database":{"title":"Item
+      DB"},"request_id":"76d6913b-907a-4bb7-bf48-854b7b927303"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -605,9 +647,13 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"223-KgeJ4GA2HdsbcT1f1jwJMFCOvy0"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 76d6913b-907a-4bb7-bf48-854b7b927303
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
@@ -631,10 +677,10 @@ interactions:
       user-agent:
       - secret...
     method: DELETE
-    uri: https://api.notion.com/v1/blocks/62f4f59d-5871-4728-9131-f7a3289d6366
+    uri: https://api.notion.com/v1/blocks/d6510649-a492-43dc-82ba-aede0c966caf
   response:
-    content: '{"object":"block","id":"62f4f59d-5871-4728-9131-f7a3289d6366","parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"type":"child_database","child_database":{"title":"Customer
-      DB"},"request_id":"1dc7ddc7-c4c9-4c28-80c7-a9275f248e55"}'
+    content: '{"object":"block","id":"d6510649-a492-43dc-82ba-aede0c966caf","parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"in_trash":true,"type":"child_database","child_database":{"title":"Customer
+      DB"},"request_id":"340a0a05-7b7c-4dcc-924d-83c570bb0ee4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -648,19 +694,23 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"227-tg6bgKRWwbRbhEndOj+s77kKPsQ"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 340a0a05-7b7c-4dcc-924d-83c570bb0ee4
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"page_id": "5f505199-b292-4713-920b-61d813bf72a3", "type":
-      "page_id"}, "title": [{"plain_text": "Item DB", "text": {"content": "Item DB"},
-      "type": "text"}], "properties": {"Name": {"type": "title", "title": {}}, "Size":
-      {"select": {"options": [{"name": "S", "color": "green"}, {"name": "M", "color":
-      "yellow"}, {"name": "L", "color": "red"}]}, "type": "select"}, "Price": {"number":
-      {"format": "dollar"}, "type": "number"}}}'
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "title": [{"type": "text", "plain_text": "Item DB", "text": {"content": "Item
+      DB"}}], "properties": {"Name": {"type": "title", "title": {}}, "Size": {"type":
+      "select", "select": {"options": [{"name": "S", "color": "green"}, {"name": "M",
+      "color": "yellow"}, {"name": "L", "color": "red"}]}}, "Price": {"type": "number",
+      "number": {"format": "dollar"}}}}'
     headers:
       accept:
       - '*/*'
@@ -685,9 +735,9 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"08af14a1-a230-4ef2-9763-8d7c4fb6cc87","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"092aec23-34a1-4831-8869-31fde612bbd4","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Item
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      DB","href":null}],"description":[],"is_inline":false,"properties":{"Size":{"id":"%40~%7Dv","name":"Size","type":"select","select":{"options":[{"id":"cb5c64e4-e6c6-4bf3-8a50-57d48b7ac775","name":"S","color":"green","description":null},{"id":"58360433-0f2c-4ccb-bc82-4d8cf6da6b41","name":"M","color":"yellow","description":null},{"id":"abd35255-46c5-4167-a3fa-896ecfd6adfc","name":"L","color":"red","description":null}]}},"Price":{"id":"rck%3B","name":"Price","type":"number","number":{"format":"dollar"}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/08af14a1a2304ef297638d7c4fb6cc87","public_url":null,"archived":false,"request_id":"89b585a4-7ffb-4bb1-8650-133d3bc0b3d9"}'
+      DB","href":null}],"description":[],"is_inline":false,"properties":{"Price":{"id":"%3Avr%3D","name":"Price","type":"number","number":{"format":"dollar"}},"Size":{"id":"%3DBbs","name":"Size","type":"select","select":{"options":[{"id":"c6dd6c25-4dce-4ce0-af71-f00d6d20b955","name":"S","color":"green","description":null},{"id":"0b16e033-0fb2-4f66-98ea-633d5a7e5efc","name":"M","color":"yellow","description":null},{"id":"583b814a-561a-4a84-9a50-52b6c1f07ca5","name":"L","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/092aec2334a14831886931fde612bbd4","public_url":null,"archived":false,"in_trash":false,"request_id":"831fbcec-bd4d-4ddd-b414-1555b42edea1"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -701,15 +751,19 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"53e-srNMBkHxGw5M0qnK4w/pclN9ZMo"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 831fbcec-bd4d-4ddd-b414-1555b42edea1
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"description": [{"plain_text": "Database of all the items we sell", "text":
-      {"content": "Database of all the items we sell"}, "type": "text"}]}'
+    body: '{"description": [{"type": "text", "plain_text": "Database of all the items
+      we sell", "text": {"content": "Database of all the items we sell"}}]}'
     headers:
       accept:
       - '*/*'
@@ -732,13 +786,13 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/08af14a1-a230-4ef2-9763-8d7c4fb6cc87
+    uri: https://api.notion.com/v1/databases/092aec23-34a1-4831-8869-31fde612bbd4
   response:
-    content: '{"object":"database","id":"08af14a1-a230-4ef2-9763-8d7c4fb6cc87","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"092aec23-34a1-4831-8869-31fde612bbd4","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Item
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
       DB","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all the items we sell","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      of all the items we sell","href":null}],"is_inline":false,"properties":{"Size":{"id":"%40~%7Dv","name":"Size","type":"select","select":{"options":[{"id":"cb5c64e4-e6c6-4bf3-8a50-57d48b7ac775","name":"S","color":"green","description":null},{"id":"58360433-0f2c-4ccb-bc82-4d8cf6da6b41","name":"M","color":"yellow","description":null},{"id":"abd35255-46c5-4167-a3fa-896ecfd6adfc","name":"L","color":"red","description":null}]}},"Price":{"id":"rck%3B","name":"Price","type":"number","number":{"format":"dollar"}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/08af14a1a2304ef297638d7c4fb6cc87","public_url":null,"archived":false,"request_id":"ccdba81e-f109-4187-aea4-551afe0cd363"}'
+      of all the items we sell","href":null}],"is_inline":false,"properties":{"Price":{"id":"%3Avr%3D","name":"Price","type":"number","number":{"format":"dollar"}},"Size":{"id":"%3DBbs","name":"Size","type":"select","select":{"options":[{"id":"c6dd6c25-4dce-4ce0-af71-f00d6d20b955","name":"S","color":"green","description":null},{"id":"0b16e033-0fb2-4f66-98ea-633d5a7e5efc","name":"M","color":"yellow","description":null},{"id":"583b814a-561a-4a84-9a50-52b6c1f07ca5","name":"L","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/092aec2334a14831886931fde612bbd4","public_url":null,"archived":false,"in_trash":false,"request_id":"99fd46a7-0fbb-47ac-805b-fac116b74ccc"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -752,18 +806,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"640-QSucgwhBnXD4BIvEebvRLyH1Lu8"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 99fd46a7-0fbb-47ac-805b-fac116b74ccc
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"page_id": "5f505199-b292-4713-920b-61d813bf72a3", "type":
-      "page_id"}, "title": [{"plain_text": "Customer DB", "text": {"content": "Customer
-      DB"}, "type": "text"}], "properties": {"Name": {"type": "title", "title": {}},
-      "Items Purchased": {"relation": {"database_id": "08af14a1-a230-4ef2-9763-8d7c4fb6cc87",
-      "type": "dual_property", "dual_property": {}}, "type": "relation"}}}'
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "title": [{"type": "text", "plain_text": "Customer DB", "text": {"content":
+      "Customer DB"}}], "properties": {"Name": {"type": "title", "title": {}}, "Items
+      Purchased": {"type": "relation", "relation": {"type": "dual_property", "database_id":
+      "092aec23-34a1-4831-8869-31fde612bbd4", "dual_property": {}}}}}'
     headers:
       accept:
       - '*/*'
@@ -788,11 +846,11 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"f8262c73-1ce7-4be7-9731-309ba62d9e57","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"database","id":"17f47ecd-5df6-4018-9f74-a455675cf460","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Customer
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
-      DB","href":null}],"description":[],"is_inline":false,"properties":{"Items Purchased":{"id":"%3E%5DNx","name":"Items
-      Purchased","type":"relation","relation":{"database_id":"08af14a1-a230-4ef2-9763-8d7c4fb6cc87","type":"dual_property","dual_property":{"synced_property_name":"Related
-      to Customer DB (Items Purchased)","synced_property_id":"%7CS%7CV"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/f8262c731ce74be79731309ba62d9e57","public_url":null,"archived":false,"request_id":"56e774ea-6909-4b5b-ae7a-9ba02d4a0583"}'
+      DB","href":null}],"description":[],"is_inline":false,"properties":{"Items Purchased":{"id":"QNec","name":"Items
+      Purchased","type":"relation","relation":{"database_id":"092aec23-34a1-4831-8869-31fde612bbd4","type":"dual_property","dual_property":{"synced_property_name":"Related
+      to Customer DB (Items Purchased)","synced_property_id":"euGZ"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/17f47ecd5df640189f74a455675cf460","public_url":null,"archived":false,"in_trash":false,"request_id":"05065c01-c6f0-4574-b132-1a79a657d3cf"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -806,15 +864,19 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"4a5-rHyO1Zi4i+F4QClvVkHQGLGJrVg"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 05065c01-c6f0-4574-b132-1a79a657d3cf
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"description": [{"plain_text": "Database of all our beloved customers",
-      "text": {"content": "Database of all our beloved customers"}, "type": "text"}]}'
+    body: '{"description": [{"type": "text", "plain_text": "Database of all our beloved
+      customers", "text": {"content": "Database of all our beloved customers"}}]}'
     headers:
       accept:
       - '*/*'
@@ -837,15 +899,15 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/f8262c73-1ce7-4be7-9731-309ba62d9e57
+    uri: https://api.notion.com/v1/databases/17f47ecd-5df6-4018-9f74-a455675cf460
   response:
-    content: '{"object":"database","id":"f8262c73-1ce7-4be7-9731-309ba62d9e57","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"database","id":"17f47ecd-5df6-4018-9f74-a455675cf460","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Customer
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
       DB","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all our beloved customers","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
       of all our beloved customers","href":null}],"is_inline":false,"properties":{"Items
-      Purchased":{"id":"%3E%5DNx","name":"Items Purchased","type":"relation","relation":{"database_id":"08af14a1-a230-4ef2-9763-8d7c4fb6cc87","type":"dual_property","dual_property":{"synced_property_name":"Related
-      to Customer DB (Items Purchased)","synced_property_id":"%7CS%7CV"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/f8262c731ce74be79731309ba62d9e57","public_url":null,"archived":false,"request_id":"ef18fd29-6d81-4e8c-95de-64696b188d2a"}'
+      Purchased":{"id":"QNec","name":"Items Purchased","type":"relation","relation":{"database_id":"092aec23-34a1-4831-8869-31fde612bbd4","type":"dual_property","dual_property":{"synced_property_name":"Related
+      to Customer DB (Items Purchased)","synced_property_id":"euGZ"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/17f47ecd5df640189f74a455675cf460","public_url":null,"archived":false,"in_trash":false,"request_id":"944d241f-6703-4967-9395-df93ca6abf63"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -859,14 +921,18 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"5af-7Z43vpC/ZWBjoBsFjfF+e8uyONU"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 944d241f-6703-4967-9395-df93ca6abf63
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"properties": {"%7CS%7CV": {"name": "Bought by"}}}'
+    body: '{"properties": {"euGZ": {"name": "Bought by"}}}'
     headers:
       accept:
       - '*/*'
@@ -877,7 +943,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '51'
+      - '47'
       content-type:
       - application/json
       cookie:
@@ -889,15 +955,15 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/08af14a1-a230-4ef2-9763-8d7c4fb6cc87
+    uri: https://api.notion.com/v1/databases/092aec23-34a1-4831-8869-31fde612bbd4
   response:
-    content: '{"object":"database","id":"08af14a1-a230-4ef2-9763-8d7c4fb6cc87","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"092aec23-34a1-4831-8869-31fde612bbd4","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Item
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
       DB","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all the items we sell","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      of all the items we sell","href":null}],"is_inline":false,"properties":{"Size":{"id":"%40~%7Dv","name":"Size","type":"select","select":{"options":[{"id":"cb5c64e4-e6c6-4bf3-8a50-57d48b7ac775","name":"S","color":"green","description":null},{"id":"58360433-0f2c-4ccb-bc82-4d8cf6da6b41","name":"M","color":"yellow","description":null},{"id":"abd35255-46c5-4167-a3fa-896ecfd6adfc","name":"L","color":"red","description":null}]}},"Price":{"id":"rck%3B","name":"Price","type":"number","number":{"format":"dollar"}},"Bought
-      by":{"id":"%7CS%7CV","name":"Bought by","type":"relation","relation":{"database_id":"f8262c73-1ce7-4be7-9731-309ba62d9e57","type":"dual_property","dual_property":{"synced_property_name":"Items
-      Purchased","synced_property_id":"%3E%5DNx"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/08af14a1a2304ef297638d7c4fb6cc87","public_url":null,"archived":false,"request_id":"915072df-420a-4130-b342-34ed43d57ce7"}'
+      of all the items we sell","href":null}],"is_inline":false,"properties":{"Price":{"id":"%3Avr%3D","name":"Price","type":"number","number":{"format":"dollar"}},"Size":{"id":"%3DBbs","name":"Size","type":"select","select":{"options":[{"id":"c6dd6c25-4dce-4ce0-af71-f00d6d20b955","name":"S","color":"green","description":null},{"id":"0b16e033-0fb2-4f66-98ea-633d5a7e5efc","name":"M","color":"yellow","description":null},{"id":"583b814a-561a-4a84-9a50-52b6c1f07ca5","name":"L","color":"red","description":null}]}},"Bought
+      by":{"id":"euGZ","name":"Bought by","type":"relation","relation":{"database_id":"17f47ecd-5df6-4018-9f74-a455675cf460","type":"dual_property","dual_property":{"synced_property_name":"Items
+      Purchased","synced_property_id":"QNec"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/092aec2334a14831886931fde612bbd4","public_url":null,"archived":false,"in_trash":false,"request_id":"58a059b3-4e15-4423-b7f3-af85467ef166"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -911,9 +977,13 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"72f-SWSkONypn7pdeBd0RAsA55pPNQA"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 58a059b3-4e15-4423-b7f3-af85467ef166
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
@@ -941,15 +1011,15 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/f8262c73-1ce7-4be7-9731-309ba62d9e57
+    uri: https://api.notion.com/v1/databases/17f47ecd-5df6-4018-9f74-a455675cf460
   response:
-    content: '{"object":"database","id":"f8262c73-1ce7-4be7-9731-309ba62d9e57","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"database","id":"17f47ecd-5df6-4018-9f74-a455675cf460","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Customer
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
       DB","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all our beloved customers","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
       of all our beloved customers","href":null}],"is_inline":false,"properties":{"Items
-      Purchased":{"id":"%3E%5DNx","name":"Items Purchased","type":"relation","relation":{"database_id":"08af14a1-a230-4ef2-9763-8d7c4fb6cc87","type":"dual_property","dual_property":{"synced_property_name":"Bought
-      by","synced_property_id":"%7CS%7CV"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/f8262c731ce74be79731309ba62d9e57","public_url":null,"archived":false,"request_id":"e34122c4-ff57-4bf9-bd2b-ea421ac8563d"}'
+      Purchased":{"id":"QNec","name":"Items Purchased","type":"relation","relation":{"database_id":"092aec23-34a1-4831-8869-31fde612bbd4","type":"dual_property","dual_property":{"synced_property_name":"Bought
+      by","synced_property_id":"euGZ"}}},"Name":{"id":"title","name":"Name","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/17f47ecd5df640189f74a455675cf460","public_url":null,"archived":false,"in_trash":false,"request_id":"172522e8-52f3-4261-9a09-07f18b198633"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -963,18 +1033,21 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"590-1SYoHRWv6vKdCIhrIUgk7iWnTz8"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 172522e8-52f3-4261-9a09-07f18b198633
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "08af14a1-a230-4ef2-9763-8d7c4fb6cc87", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "T-shirt",
-      "text": {"content": "T-shirt"}, "type": "text"}], "type": "title"}, "Size":
-      {"select": {"name": "L", "color": "red"}, "type": "select"}, "Price": {"number":
-      17.0, "type": "number"}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "092aec23-34a1-4831-8869-31fde612bbd4"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "T-shirt", "text": {"content": "T-shirt"}}]}, "Size": {"type": "select", "select":
+      {"name": "L", "color": "red"}}, "Price": {"type": "number", "number": 17.0}}}'
     headers:
       accept:
       - '*/*'
@@ -999,8 +1072,8 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"7ff02295-2744-4682-994f-377e62320b65","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"08af14a1-a230-4ef2-9763-8d7c4fb6cc87"},"archived":false,"properties":{"Size":{"id":"%40~%7Dv","type":"select","select":{"id":"abd35255-46c5-4167-a3fa-896ecfd6adfc","name":"L","color":"red"}},"Price":{"id":"rck%3B","type":"number","number":17},"Bought
-      by":{"id":"%7CS%7CV","type":"relation","relation":[],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"T-shirt","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"T-shirt","href":null}]}},"url":"https://www.notion.so/T-shirt-7ff0229527444682994f377e62320b65","public_url":null,"request_id":"c7613f9b-b6e0-40cc-bce4-5df40fb4da81"}'
+    content: '{"object":"page","id":"1395ff04-bbef-4802-829d-cbabd578c9e5","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"092aec23-34a1-4831-8869-31fde612bbd4"},"archived":false,"in_trash":false,"properties":{"Price":{"id":"%3Avr%3D","type":"number","number":17},"Size":{"id":"%3DBbs","type":"select","select":{"id":"583b814a-561a-4a84-9a50-52b6c1f07ca5","name":"L","color":"red"}},"Bought
+      by":{"id":"euGZ","type":"relation","relation":[],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"T-shirt","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"T-shirt","href":null}]}},"url":"https://www.notion.so/T-shirt-1395ff04bbef4802829dcbabd578c9e5","public_url":null,"request_id":"5971c370-31e7-49ec-ab50-ff7d1c295039"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1014,18 +1087,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"451-yYfuJ3noFfSzU51DeF916PppwTk"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 5971c370-31e7-49ec-ab50-ff7d1c295039
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "f8262c73-1ce7-4be7-9731-309ba62d9e57", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "Ada Lovelace",
-      "text": {"content": "Ada Lovelace"}, "type": "text"}], "type": "title"}, "Items
-      Purchased": {"relation": [{"id": "7ff02295-2744-4682-994f-377e62320b65"}], "type":
-      "relation", "has_more": false}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "17f47ecd-5df6-4018-9f74-a455675cf460"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Ada Lovelace", "text": {"content": "Ada Lovelace"}}]}, "Items Purchased": {"type":
+      "relation", "relation": [{"id": "1395ff04-bbef-4802-829d-cbabd578c9e5"}], "has_more":
+      false}}}'
     headers:
       accept:
       - '*/*'
@@ -1050,10 +1127,10 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"d860d89a-8772-48f9-a6d7-f8a64a3206c1","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"f8262c73-1ce7-4be7-9731-309ba62d9e57"},"archived":false,"properties":{"Items
-      Purchased":{"id":"%3E%5DNx","type":"relation","relation":[{"id":"7ff02295-2744-4682-994f-377e62320b65"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Ada
+    content: '{"object":"page","id":"86eb22e7-909c-4ef4-a7f1-4f07a1fcb858","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"17f47ecd-5df6-4018-9f74-a455675cf460"},"archived":false,"in_trash":false,"properties":{"Items
+      Purchased":{"id":"QNec","type":"relation","relation":[{"id":"1395ff04-bbef-4802-829d-cbabd578c9e5"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Ada
       Lovelace","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Ada
-      Lovelace","href":null}]}},"url":"https://www.notion.so/Ada-Lovelace-d860d89a877248f9a6d7f8a64a3206c1","public_url":null,"request_id":"ba4facc4-55ae-4e03-a50e-ef20276593d7"}'
+      Lovelace","href":null}]}},"url":"https://www.notion.so/Ada-Lovelace-86eb22e7909c4ef4a7f14f07a1fcb858","public_url":null,"request_id":"4c173c3e-45da-4422-a5c4-d541f6b8fcd9"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1067,18 +1144,22 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"3e6-6uIb4s5OMGZ4moR89GfbrhBKIwU"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 4c173c3e-45da-4422-a5c4-d541f6b8fcd9
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "f8262c73-1ce7-4be7-9731-309ba62d9e57", "type":
-      "database_id"}, "properties": {"Name": {"title": [{"plain_text": "Andy Herzfeld",
-      "text": {"content": "Andy Herzfeld"}, "type": "text"}], "type": "title"}, "Items
-      Purchased": {"relation": [{"id": "7ff02295-2744-4682-994f-377e62320b65"}], "type":
-      "relation", "has_more": false}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "17f47ecd-5df6-4018-9f74-a455675cf460"},
+      "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Andy Herzfeld", "text": {"content": "Andy Herzfeld"}}]}, "Items Purchased":
+      {"type": "relation", "relation": [{"id": "1395ff04-bbef-4802-829d-cbabd578c9e5"}],
+      "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1103,10 +1184,10 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"b8710e62-1269-4ea4-b353-94e73fcfbd93","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"f8262c73-1ce7-4be7-9731-309ba62d9e57"},"archived":false,"properties":{"Items
-      Purchased":{"id":"%3E%5DNx","type":"relation","relation":[{"id":"7ff02295-2744-4682-994f-377e62320b65"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Andy
+    content: '{"object":"page","id":"f58ef66b-fe0f-4565-a8da-68525b8d28dc","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"17f47ecd-5df6-4018-9f74-a455675cf460"},"archived":false,"in_trash":false,"properties":{"Items
+      Purchased":{"id":"QNec","type":"relation","relation":[{"id":"1395ff04-bbef-4802-829d-cbabd578c9e5"}],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Andy
       Herzfeld","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Andy
-      Herzfeld","href":null}]}},"url":"https://www.notion.so/Andy-Herzfeld-b8710e6212694ea4b35394e73fcfbd93","public_url":null,"request_id":"f4d38f57-020e-4d46-9a25-f741376a6be2"}'
+      Herzfeld","href":null}]}},"url":"https://www.notion.so/Andy-Herzfeld-f58ef66bfe0f4565a8da68525b8d28dc","public_url":null,"request_id":"47dac1f6-59ef-4519-9bfc-2bf6632d18d6"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1120,17 +1201,21 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"3e9-AnKC4vO1bPTUlqFlipcRVdk34ts"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 47dac1f6-59ef-4519-9bfc-2bf6632d18d6
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"page_id": "5f505199-b292-4713-920b-61d813bf72a3", "type":
-      "page_id"}, "title": [{"plain_text": "Task List", "text": {"content": "Task
-      List"}, "type": "text"}], "properties": {"Task": {"type": "title", "title":
-      {}}, "Due by": {"type": "date", "date": {}}}}'
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "title": [{"type": "text", "plain_text": "Task List", "text": {"content": "Task
+      List"}}], "properties": {"Task": {"type": "title", "title": {}}, "Due by": {"type":
+      "date", "date": {}}}}'
     headers:
       accept:
       - '*/*'
@@ -1155,10 +1240,10 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Task
+    content: '{"object":"database","id":"2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Task
       List","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Task
-      List","href":null}],"description":[],"is_inline":false,"properties":{"Due by":{"id":"uo%7D%7C","name":"Due
-      by","type":"date","date":{}},"Task":{"id":"title","name":"Task","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/cc4fa0cd864a43d9b2c81ca9f81a4e48","public_url":null,"archived":false,"request_id":"aca5d00a-f35a-48eb-9720-669b932d9524"}'
+      List","href":null}],"description":[],"is_inline":false,"properties":{"Due by":{"id":"hErX","name":"Due
+      by","type":"date","date":{}},"Task":{"id":"title","name":"Task","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/2a7c6232eaf843d2912998b6a0e1bc3b","public_url":null,"archived":false,"in_trash":false,"request_id":"d9c77bb5-82c9-4698-8863-c03d8f7e2ef4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1172,15 +1257,19 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"3cc-XRgnXXXOtzNAar9m679L1tlWQK0"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - d9c77bb5-82c9-4698-8863-c03d8f7e2ef4
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"description": [{"plain_text": "A really simple task lists with subtasks",
-      "text": {"content": "A really simple task lists with subtasks"}, "type": "text"}]}'
+    body: '{"description": [{"type": "text", "plain_text": "A really simple task lists
+      with subtasks", "text": {"content": "A really simple task lists with subtasks"}}]}'
     headers:
       accept:
       - '*/*'
@@ -1203,14 +1292,14 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48
+    uri: https://api.notion.com/v1/databases/2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b
   response:
-    content: '{"object":"database","id":"cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Task
+    content: '{"object":"database","id":"2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Task
       List","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Task
       List","href":null}],"description":[{"type":"text","text":{"content":"A really
       simple task lists with subtasks","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"A
       really simple task lists with subtasks","href":null}],"is_inline":false,"properties":{"Due
-      by":{"id":"uo%7D%7C","name":"Due by","type":"date","date":{}},"Task":{"id":"title","name":"Task","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/cc4fa0cd864a43d9b2c81ca9f81a4e48","public_url":null,"archived":false,"request_id":"fadb77c4-88d9-49e3-982c-9d2a4d3ce879"}'
+      by":{"id":"hErX","name":"Due by","type":"date","date":{}},"Task":{"id":"title","name":"Task","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/2a7c6232eaf843d2912998b6a0e1bc3b","public_url":null,"archived":false,"in_trash":false,"request_id":"e52ac864-aa36-44bc-9b19-2cabfb4d0dbb"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1224,15 +1313,20 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"4dc-dQiM44rHwyCuSBMoN2M8vVfnmc0"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - e52ac864-aa36-44bc-9b19-2cabfb4d0dbb
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"properties": {"Parent Task": {"relation": {"database_id": "cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48",
-      "type": "single_property", "single_property": {}}, "type": "relation"}}}'
+    body: '{"properties": {"Parent Task": {"type": "relation", "relation": {"type":
+      "single_property", "database_id": "2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b", "single_property":
+      {}}}}}'
     headers:
       accept:
       - '*/*'
@@ -1255,15 +1349,15 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48
+    uri: https://api.notion.com/v1/databases/2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b
   response:
-    content: '{"object":"database","id":"cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48","cover":null,"icon":null,"created_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-02-14T17:38:00.000Z","title":[{"type":"text","text":{"content":"Task
+    content: '{"object":"database","id":"2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b","cover":null,"icon":null,"created_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-05-23T10:53:00.000Z","title":[{"type":"text","text":{"content":"Task
       List","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Task
       List","href":null}],"description":[{"type":"text","text":{"content":"A really
       simple task lists with subtasks","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"A
       really simple task lists with subtasks","href":null}],"is_inline":false,"properties":{"Parent
-      Task":{"id":"Q%3A%3Ej","name":"Parent Task","type":"relation","relation":{"database_id":"cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48","type":"single_property","single_property":{}}},"Due
-      by":{"id":"uo%7D%7C","name":"Due by","type":"date","date":{}},"Task":{"id":"title","name":"Task","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/cc4fa0cd864a43d9b2c81ca9f81a4e48","public_url":null,"archived":false,"request_id":"2ab2c360-4d69-4667-a2e1-8b3b3213dca8"}'
+      Task":{"id":"%5BaDI","name":"Parent Task","type":"relation","relation":{"database_id":"2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b","type":"single_property","single_property":{}}},"Due
+      by":{"id":"hErX","name":"Due by","type":"date","date":{}},"Task":{"id":"title","name":"Task","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/2a7c6232eaf843d2912998b6a0e1bc3b","public_url":null,"archived":false,"in_trash":false,"request_id":"8354474b-0183-49eb-8a4b-2540245da3eb"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1277,17 +1371,21 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"591-bGL+FP73te4UzZNtYsWKfqj05Jo"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 8354474b-0183-49eb-8a4b-2540245da3eb
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48", "type":
-      "database_id"}, "properties": {"Task": {"title": [{"plain_text": "Clean the
-      house", "text": {"content": "Clean the house"}, "type": "text"}], "type": "title"},
-      "Due by": {"date": {"start": "2024-03-13T18:38:20.104017"}, "type": "date"}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b"},
+      "properties": {"Task": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Clean the house", "text": {"content": "Clean the house"}}]}, "Due by": {"type":
+      "date", "date": {"start": "2024-06-20T12:53:20.024419"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1312,11 +1410,11 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"c8d13012-cf6a-4ea4-805a-ebc71689216d","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48"},"archived":false,"properties":{"Parent
-      Task":{"id":"Q%3A%3Ej","type":"relation","relation":[],"has_more":false},"Due
-      by":{"id":"uo%7D%7C","type":"date","date":{"start":"2024-03-13T18:38:00.000+00:00","end":null,"time_zone":null}},"Task":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Clean
+    content: '{"object":"page","id":"00eacb17-3a77-4423-b71a-eb707438074b","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b"},"archived":false,"in_trash":false,"properties":{"Parent
+      Task":{"id":"%5BaDI","type":"relation","relation":[],"has_more":false},"Due
+      by":{"id":"hErX","type":"date","date":{"start":"2024-06-20T12:53:00.000+00:00","end":null,"time_zone":null}},"Task":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Clean
       the house","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Clean
-      the house","href":null}]}},"url":"https://www.notion.so/Clean-the-house-c8d13012cf6a4ea4805aebc71689216d","public_url":null,"request_id":"8b1dd484-7183-4cd1-9266-5ad243333b3e"}'
+      the house","href":null}]}},"url":"https://www.notion.so/Clean-the-house-00eacb173a774423b71aeb707438074b","public_url":null,"request_id":"f3ba2368-18a8-4b9b-9885-982fc852a494"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1330,19 +1428,23 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"432-C+wod2yyMnMWTcdJq+tWwEDmlT4"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - f3ba2368-18a8-4b9b-9885-982fc852a494
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48", "type":
-      "database_id"}, "properties": {"Task": {"title": [{"plain_text": "Vacuum living
-      room", "text": {"content": "Vacuum living room"}, "type": "text"}], "type":
-      "title"}, "Due by": {"date": {"start": "2024-02-21T18:38:20.104017"}, "type":
-      "date"}, "Parent Task": {"relation": [{"id": "c8d13012-cf6a-4ea4-805a-ebc71689216d"}],
-      "type": "relation", "has_more": false}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b"},
+      "properties": {"Task": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Vacuum living room", "text": {"content": "Vacuum living room"}}]}, "Due by":
+      {"type": "date", "date": {"start": "2024-05-30T12:53:20.024419"}}, "Parent Task":
+      {"type": "relation", "relation": [{"id": "00eacb17-3a77-4423-b71a-eb707438074b"}],
+      "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1367,11 +1469,11 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"0b604746-a0dd-46b0-9629-a69a52c5e83f","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48"},"archived":false,"properties":{"Parent
-      Task":{"id":"Q%3A%3Ej","type":"relation","relation":[{"id":"c8d13012-cf6a-4ea4-805a-ebc71689216d"}],"has_more":false},"Due
-      by":{"id":"uo%7D%7C","type":"date","date":{"start":"2024-02-21T18:38:00.000+00:00","end":null,"time_zone":null}},"Task":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Vacuum
+    content: '{"object":"page","id":"bbe73f30-06fe-4de8-b868-53dacd38f846","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b"},"archived":false,"in_trash":false,"properties":{"Parent
+      Task":{"id":"%5BaDI","type":"relation","relation":[{"id":"00eacb17-3a77-4423-b71a-eb707438074b"}],"has_more":false},"Due
+      by":{"id":"hErX","type":"date","date":{"start":"2024-05-30T12:53:00.000+00:00","end":null,"time_zone":null}},"Task":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Vacuum
       living room","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Vacuum
-      living room","href":null}]}},"url":"https://www.notion.so/Vacuum-living-room-0b604746a0dd46b09629a69a52c5e83f","public_url":null,"request_id":"16227b0b-8a49-4d3e-b4cf-3872d88fb488"}'
+      living room","href":null}]}},"url":"https://www.notion.so/Vacuum-living-room-bbe73f3006fe4de8b86853dacd38f846","public_url":null,"request_id":"4ee10f81-81d9-4be0-af13-8c12b708edd9"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1385,19 +1487,23 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"468-3Ur3Ldq+HlbW3dcXT5tLfPEWqUg"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 4ee10f81-81d9-4be0-af13-8c12b708edd9
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"database_id": "cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48", "type":
-      "database_id"}, "properties": {"Task": {"title": [{"plain_text": "Tidy up kitchen",
-      "text": {"content": "Tidy up kitchen"}, "type": "text"}], "type": "title"},
-      "Due by": {"date": {"start": "2024-02-17T18:38:20.104017"}, "type": "date"},
-      "Parent Task": {"relation": [{"id": "c8d13012-cf6a-4ea4-805a-ebc71689216d"}],
-      "type": "relation", "has_more": false}}}'
+    body: '{"parent": {"type": "database_id", "database_id": "2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b"},
+      "properties": {"Task": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Tidy up kitchen", "text": {"content": "Tidy up kitchen"}}]}, "Due by": {"type":
+      "date", "date": {"start": "2024-05-26T12:53:20.024419"}}, "Parent Task": {"type":
+      "relation", "relation": [{"id": "00eacb17-3a77-4423-b71a-eb707438074b"}], "has_more":
+      false}}}'
     headers:
       accept:
       - '*/*'
@@ -1422,11 +1528,11 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"1995c07f-48e8-4455-bc3e-64295f10dcda","created_time":"2024-02-14T17:38:00.000Z","last_edited_time":"2024-02-14T17:38:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"cc4fa0cd-864a-43d9-b2c8-1ca9f81a4e48"},"archived":false,"properties":{"Parent
-      Task":{"id":"Q%3A%3Ej","type":"relation","relation":[{"id":"c8d13012-cf6a-4ea4-805a-ebc71689216d"}],"has_more":false},"Due
-      by":{"id":"uo%7D%7C","type":"date","date":{"start":"2024-02-17T18:38:00.000+00:00","end":null,"time_zone":null}},"Task":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tidy
+    content: '{"object":"page","id":"e4a187d6-20d3-4a8b-ac4f-6b97c742f2ef","created_time":"2024-05-23T10:53:00.000Z","last_edited_time":"2024-05-23T10:53:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"2a7c6232-eaf8-43d2-9129-98b6a0e1bc3b"},"archived":false,"in_trash":false,"properties":{"Parent
+      Task":{"id":"%5BaDI","type":"relation","relation":[{"id":"00eacb17-3a77-4423-b71a-eb707438074b"}],"has_more":false},"Due
+      by":{"id":"hErX","type":"date","date":{"start":"2024-05-26T12:53:00.000+00:00","end":null,"time_zone":null}},"Task":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tidy
       up kitchen","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tidy
-      up kitchen","href":null}]}},"url":"https://www.notion.so/Tidy-up-kitchen-1995c07f48e84455bc3e64295f10dcda","public_url":null,"request_id":"0db55509-69e2-412c-98cf-dd0ec8cc9247"}'
+      up kitchen","href":null}]}},"url":"https://www.notion.so/Tidy-up-kitchen-e4a187d620d34a8bac4f6b97c742f2ef","public_url":null,"request_id":"d157c630-847c-47c6-a449-db30a8ba415c"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -1440,9 +1546,13 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"45f-ARXwly7wzHDYwouFfTX9ZZH5sys"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - d157c630-847c-47c6-a449-db30a8ba415c
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200

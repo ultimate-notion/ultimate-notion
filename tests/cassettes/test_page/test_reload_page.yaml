@@ -1,7 +1,7 @@
 interactions:
 - request:
-    body: '{"parent": {"page_id": "5f505199-b292-4713-920b-61d813bf72a3", "type":
-      "page_id"}, "properties": {}}'
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "properties": {}}'
     headers:
       accept:
       - '*/*'
@@ -26,7 +26,7 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"65ddafbd-3d34-4388-b4d3-96dc6bf57d3d","created_time":"2024-03-12T17:25:00.000Z","last_edited_time":"2024-03-12T17:25:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"properties":{"title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/65ddafbd3d344388b4d396dc6bf57d3d","public_url":null,"request_id":"bda578ce-f5bf-42ef-9d0e-ca7425bc02ae"}'
+    content: '{"object":"page","id":"e4284a0f-5dd8-42b1-91e6-7cb5c14efd0f","created_time":"2024-05-23T10:55:00.000Z","last_edited_time":"2024-05-23T10:55:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/e4284a0f5dd842b191e67cb5c14efd0f","public_url":null,"request_id":"07898f1a-18b2-45a3-b63f-aadc1528436b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -40,9 +40,13 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"27c-A4HwDf512S1hpl68UfuXYu+FQKU"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - 07898f1a-18b2-45a3-b63f-aadc1528436b
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
@@ -66,9 +70,9 @@ interactions:
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/pages/65ddafbd-3d34-4388-b4d3-96dc6bf57d3d
+    uri: https://api.notion.com/v1/pages/e4284a0f-5dd8-42b1-91e6-7cb5c14efd0f
   response:
-    content: '{"object":"page","id":"65ddafbd-3d34-4388-b4d3-96dc6bf57d3d","created_time":"2024-03-12T17:25:00.000Z","last_edited_time":"2024-03-12T17:25:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"properties":{"title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/65ddafbd3d344388b4d396dc6bf57d3d","public_url":null,"request_id":"ace2c142-3617-4007-bc9b-242ad5c045db"}'
+    content: '{"object":"page","id":"e4284a0f-5dd8-42b1-91e6-7cb5c14efd0f","created_time":"2024-05-23T10:55:00.000Z","last_edited_time":"2024-05-23T10:55:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/e4284a0f5dd842b191e67cb5c14efd0f","public_url":null,"request_id":"b518ba09-e389-4323-bb0f-25e61d51db96"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -82,9 +86,13 @@ interactions:
       - cloudflare
       Transfer-Encoding:
       - chunked
-      Vary:
+      etag:
+      - W/"27c-hbVc1bL2ct1JY/TtF4bkRbZ02cE"
+      vary:
       - Accept-Encoding
-      X-Powered-By:
+      x-notion-request-id:
+      - b518ba09-e389-4323-bb0f-25e61d51db96
+      x-powered-by:
       - Express
     http_version: HTTP/1.1
     status_code: 200
