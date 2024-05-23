@@ -71,7 +71,7 @@ def store_retvals(func):
                 parent=test_area,
                 title=db_name,
                 schema={
-                    "Name": schema.Title(),
+                    'Name': schema.Title(),
                 },
             )
             return db
@@ -133,7 +133,7 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int
 
             def __deepcopy__(self, memo):
                 return deepcopy_with_sharing(
-                    self, shared_attribute_names=["share_me"], memo=memo
+                    self, shared_attribute_names=['share_me'], memo=memo
                 )
 
 
