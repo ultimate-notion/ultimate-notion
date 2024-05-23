@@ -238,7 +238,7 @@ dependencies = [
     "pytest",
     "pytest-cov",
     "pytest-mock",
-    "pytest-recording",
+    "pytest-recording>=0.13.1",
     "pytest-dotenv",
     "pytest-sugar",
     "hypothesis",
@@ -248,7 +248,7 @@ dependencies = [
     "mktestdocs",
     "packaging",
     "matplotlib",
-    "vcrpy>=2.0.1", # also required by pytest-recording
+    "vcrpy>=6.0.1", # also required by pytest-recording
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"

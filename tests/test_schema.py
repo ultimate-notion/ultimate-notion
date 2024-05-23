@@ -163,7 +163,7 @@ def test_self_ref_relation(notion: Session, root_page: Page):
     assert db_a.schema.relation._schema is db_a._schema  # type: ignore
 
 
-# ToDo: Reactivate after the bug on the Notion API side is fixd that adding a two-way relation column with update
+# ToDo: Reactivate after the bug on the Notion API side is fixed that adding a two-way relation column with update
 #       actually generates a one-way relation column.
 # @pytest.mark.vcr()
 # def test_self_ref_two_way_col(notion: Session, root_page: Page):

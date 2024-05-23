@@ -155,6 +155,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
                 cassette_dir = str(request.config.rootdir / 'tests' / 'cassettes' / 'fixtures')
                 cassette_name = f'sess_{func.__name__}.yaml'
 
+            vcr_config = vcr_config.copy()  # to avoid changing the original config
             vcr_config |= {'cassette_library_dir': cassette_dir}
             disable_recording = request.config.getoption('--disable-recording')
             if disable_recording:
