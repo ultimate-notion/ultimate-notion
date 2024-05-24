@@ -56,7 +56,7 @@ jobs:
     - name: Install Hatch & pre-commit
       run: |
         pipx install pre-commit
-        pipx install hatch
+        pipx install hatch~=1.9.7
         hatch --version
         hatch python install ${{ matrix.python-version }}
 
@@ -66,7 +66,7 @@ jobs:
 
     - name: Run tests and track code coverage
       run: |
-        hatch run pip list
+        hatch run pip list  # for debugging
         hatch run ci
 
     - name: Coveralls Parallel
