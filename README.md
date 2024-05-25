@@ -10,7 +10,7 @@ pages in the most convenient and pythonic way.
 |---------|------------------------------------|
 | CI/CD   | [![Tests][Tests-image]][Tests-link] [![Coverage][Coverage-image]][Coverage-link] [![Publish Package][Publish-image]][Publish-link] [![Build Docs][Docs-image]][Docs-link] |
 | Package | [![PyPI - Version][PyPI_ver-image]][PyPI_ver-link] [![PyPI - Downloads][PyPI_down-image]][PyPI_down-link] [![PyPI - Python Version][PyPI_py-image]][PyPI_py-link] |
-| Details | [![Hatch project][hatch-image]][hatch-link] [![Linting - Ruff][ruff-image]][ruff-link] [![Types - Mypy][mypy-image]][mypy-link] [![License - MIT][MIT-image]][MIT-link] [![Docs - mkdocs][mkdocs-image]][mkdocs-link] [![GitHub Sponsors][sponsor-image]][sponsor-link] |
+| Details | [![Hatch project][hatch-image]][hatch-link] [![Linting - Ruff][ruff-image]][ruff-link] [![Pre-Commit][precommit-image]][precommit-link] [![Types - Mypy][mypy-image]][mypy-link] [![License - MIT][MIT-image]][MIT-link] [![Docs - mkdocs][mkdocs-image]][mkdocs-link] [![GitHub Sponsors][sponsor-image]][sponsor-link] |
 
 ## Installation
 
@@ -57,7 +57,6 @@ After having cloned this repository:
 
 1. make sure [hatch] is installed globally, e.g. `pipx install hatch`,
 2. make sure [pre-commit] is installed globally, e.g. with `pipx install pre-commit`,
-3. optionally run `hatch config set dirs.env.virtual .direnv` to let [VS Code] find your virtual environments,
 
 and then you are already set up to start hacking. Use `hatch run test` to run the unit tests or `hatch run vcr-only`
 to run the offline unit tests using [VCR.py]. Regenerate the cassettes with `hatch run vcr-rewrite`.
@@ -118,3 +117,6 @@ Ultimate Notion highly depends on [notion-sdk-py].
 [sponsor-link]: https://github.com/sponsors/FlorianWilhelm
 [mkdocs-image]: https://img.shields.io/static/v1?label=‎&message=mkdocs&logo=Material+for+MkDocs&color=526CFE&logoColor=white
 [mkdocs-link]: https://ultimate-notion.com/
+
+[precommit-image]: https://img.shields.io/static/v1?label=‎&message=pre-commit&logo=pre-commit&color=76877c
+[precommit-link]: https://pre-commit.com/

@@ -23,6 +23,7 @@ from __future__ import annotations
 import inspect
 import json
 import os
+import shutil
 import tempfile
 from collections.abc import Generator
 from functools import wraps
@@ -106,10 +107,10 @@ def vcr_config():
 
 @pytest.fixture(scope='session')
 def custom_config(request: SubRequest) -> Yield[Path]:
-    if request.config.getoption('--record-mode') == 'none':  # corresponds to VCR-ONLY
+    """Return a custom configuration file for the tests."""
+    if request.config.getoption('--record-mode') == 'none':  # corresponds to `vcr-only`
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             cfg_path = tmp_dir_path / Path('config.cfg')
-
             with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
                 get_or_create_cfg()
                 client_secret_path = tmp_dir_path / Path('client_secret.json')
@@ -126,9 +127,24 @@ def custom_config(request: SubRequest) -> Yield[Path]:
                     '{"token": "secret...", "refresh_token": "secret...", "token_uri": "https://oauth2.googleapis.com/token",'
                     '"client_id": "secret.apps.googleusercontent.com", "client_secret": "secret...",'
                     '"scopes": ["https://www.googleapis.com/auth/tasks"], "universe_domain": "googleapis.com", '
-                    '"expiry": "2099-01-04T17:33:08.600154Z"}'
+                    '"expiry": "2099-01-04T17:33:08.600154Z"}'  # here we made sure that the token is valid forever
                 )
                 yield cfg_path
+
+    elif request.config.getoption('--record-mode') == 'once':  # corresponds to `test`
+        cfg_path = get_cfg_file()
+        # make sure that the token is valid forever to avoid problems with the Google API
+        with tempfile.TemporaryDirectory() as tmp_dir_path:
+            shutil.copytree(cfg_path.parent, tmp_dir_path, dirs_exist_ok=True)
+            cfg_path = tmp_dir_path / Path('config.cfg')
+            with open(tmp_dir_path / Path('token.json'), 'r+', encoding='utf-8') as fh:
+                token_data = json.load(fh)
+                token_data['expiry'] = '2099-01-04T17:33:08.600154Z'
+                fh.seek(0)
+                json.dump(token_data, fh)
+            with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
+                yield cfg_path
+
     else:
         # Note: pytest-dotenv will use ~/.vscode/.env as default and load the local
         # ultimate-notion configuration file for development here.

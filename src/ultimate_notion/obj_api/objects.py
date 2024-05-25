@@ -20,7 +20,6 @@ from __future__ import annotations
 from abc import ABC
 from copy import deepcopy
 from datetime import date, datetime
-from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -152,13 +151,6 @@ class WorkspaceRef(ParentRef, type='workspace'):
 
 class UserRef(NotionObject, object='user'):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
-
-
-class UserType(str, Enum):
-    """Available user types."""
-
-    PERSON = 'person'
-    BOT = 'bot'
 
 
 class User(UserRef, TypedObject, polymorphic_base=True):
