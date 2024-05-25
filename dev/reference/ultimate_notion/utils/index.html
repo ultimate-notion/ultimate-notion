@@ -14,7 +14,7 @@
 
     <span class=k>def</span> <span class=nf>__deepcopy__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>memo</span><span class=p>):</span>
         <span class=k>return</span> <span class=n>deepcopy_with_sharing</span><span class=p>(</span>
-            <span class=bp>self</span><span class=p>,</span> <span class=n>shared_attribute_names</span><span class=o>=</span><span class=p>[</span><span class=s2>&quot;share_me&quot;</span><span class=p>],</span> <span class=n>memo</span><span class=o>=</span><span class=n>memo</span>
+            <span class=bp>self</span><span class=p>,</span> <span class=n>shared_attribute_names</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;share_me&#39;</span><span class=p>],</span> <span class=n>memo</span><span class=o>=</span><span class=n>memo</span>
         <span class=p>)</span>
 
 
@@ -34,7 +34,7 @@ def create_blank_db(notion, test_area):
             parent=test_area,
             title=db_name,
             schema={
-                &quot;Name&quot;: schema.Title(),
+                &#39;Name&#39;: schema.Title(),
             },
         )
         return db
