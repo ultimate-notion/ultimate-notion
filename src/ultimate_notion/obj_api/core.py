@@ -75,7 +75,6 @@ class NotionObject(GenericObject):
     object: str
     request_id: UUID = None  # type: ignore
     id: UUID | str = None  # type: ignore
-    in_trash: bool | None = None
 
     def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)

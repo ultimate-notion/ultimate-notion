@@ -36,7 +36,8 @@ class DataObject(NotionObject):
     parent: SerializeAsAny[ParentRef] = None  # type: ignore
     has_children: bool = False
 
-    archived: bool = False
+    in_trash: bool = False  # used to be `archived`
+    archived: bool = False  # DEPRECATED! ToDo: Remove in v1.0
 
     created_time: datetime = None  # type: ignore
     created_by: UserRef = None  # type: ignore

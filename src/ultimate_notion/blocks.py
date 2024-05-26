@@ -94,8 +94,8 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
     @property
     def is_deleted(self) -> bool:
-        """Return wether the object is deleted/archived."""
-        return self.obj_ref.archived
+        """Return wether the object is in trash."""
+        return self.obj_ref.in_trash or self.obj_ref.archived
 
 
 BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12

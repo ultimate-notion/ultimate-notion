@@ -161,6 +161,7 @@ class NumberFormat(str, Enum):
     PERCENT = 'percent'
     DOLLAR = 'dollar'
     CANADIAN_DOLLAR = 'canadian_dollar'
+    AUSTRALIAN_DOLLAR = 'australian_dollar'
     EURO = 'euro'
     POUND = 'pound'
     YEN = 'yen'
