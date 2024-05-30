@@ -3,7 +3,7 @@
 ## Version 0.5
 
 - New: More robust with respect to Notion API changes.
-- Chg: `archived` property was renamed to `in_trash`.
+- Chg: Internally, `archived` property was renamed to `in_trash`.
 - Chg: Renamed `.content` to `.children` of a page for more consitency.
 
 ## Version 0.4, 2024-02-14

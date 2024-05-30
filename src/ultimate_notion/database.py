@@ -5,6 +5,8 @@ from __future__ import annotations
 from textwrap import dedent
 from typing import cast
 
+from pydantic import BaseModel
+
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -198,8 +200,15 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         msg = 'Use .is_empty instead of bool(db) to check if a database is empty.'
         raise RuntimeError(msg)
 
+    def pydantic_model(self) -> BaseModel:
+        """Return a Pydantic model for this database."""
+        # Check https://github.com/ultimate-notion/ultimate-notion/issues/32 for details
+        raise NotImplementedError
+
     def create_page(self, **kwargs) -> Page:
         """Create a page with properties according to the schema within the corresponding database."""
+
+        # ToDo: let pydantic_model check the kwargs and raise an error if something is wrong
         schema_kwargs = {col.attr_name: col for col in self.schema.get_cols()}
         if not set(kwargs).issubset(set(schema_kwargs)):
             add_kwargs = set(kwargs) - set(schema_kwargs)
