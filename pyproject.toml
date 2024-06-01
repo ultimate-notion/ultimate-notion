@@ -255,7 +255,7 @@ dependencies = [
     "mktestdocs",
     "packaging",
     "matplotlib",
-    "vcrpy>=6.0.1", # also required by pytest-recording
+    "vcrpy~=5.1", # < 6.0.0 to avoid breaking changes with RuntimeError: asyncio.run() cannot be called from a running event loop
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
