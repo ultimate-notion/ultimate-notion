@@ -68,20 +68,20 @@ In Notion everything is either a *page* or a *block*. A page contains a number o
 bulleted list, tables, quotes and so on.
 
 An important and special block is the *database*, which may be within a page, i.e. *inline*, as a block
-or at the same hierarchy level as a *page*. Every *database* has a *schema*, i.e. a set of *columns* with specific types,
-e.g. number, text, url, etc., that imposes structured *properties* on every page within that database.
-Only pages contained in a database have properties. Notion itself also offers *linked databases*
-(with ↗ next to the database title) but those are not accessible via the API, thus you must
-always work with the source database. A special type of database is a *wiki database* that comes with a pre-defined schema,
-i.e., title, last_edited_time, owner, tags, verification.
+or at the same hierarchy level as a *page*. Every *database* has a *schema* defined by a set of *properties*,
+i.e. columns, with specific types, e.g. number, text, url, etc., that imposes structured *properties*
+on every page within that database. Only pages contained in a database have properties.
+Notion itself also offers *linked databases* (with ↗ next to the database title) but those are not accessible
+via the API, thus you must always work with the source database. A special type of database is a
+*wiki database* that comes with a pre-defined schema, i.e., title, last_edited_time, owner, tags, verification.
 
 Besides the properties of pages contained in a database, every page has *attributes* such as a title, cover, icon, or
-whether it is archived or not. The *title* attribute of a page is special and will always be included in the schema if
-the page is contained in a database. The column name of the title attribute can be customized. Think of the title
-property as a human-readable identifier, which does not have to be unique! This concept is important
+whether it is archived or not. The *title* attribute of a page is special and will always be included as a property
+in the schema if the page is contained in a database. The property name of the title attribute can be customized.
+Think of the title property as a human-readable identifier, which does not have to be unique! This concept is important
 when *relation* properties are used between different databases as the title property of a linked page will show up in
-the relation column of the other database. If a page is deleted by you using Ultimate Notion, it will not be deleted
-but *archived* and this page attribute will be set accordingly.
+the relation property of the other database. If a page is deleted by you using Ultimate Notion, it will not be deleted
+directly but moved to the trash can, i.e. "🗑️ Trash" in the sidebar.
 
 A page, e.g. with title "child-page", can be contained in another page, e.g. with title "parent-page". This leads to a
 hierarchy that is typically used for structuring content. We say that "parent-page" is the *parent* of "child-page" and

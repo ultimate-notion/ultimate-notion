@@ -46,7 +46,8 @@ from ultimate_notion.page import Page
 if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
 
-ALL_COL_DB = 'All Columns DB'  # Manually created DB in Notion with all possible columns including AI columns!
+# ToDo: Rename to 'All Properties DB'
+ALL_PROPS_DB = 'All Columns DB'  # Manually created DB in Notion with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
 GETTING_STARTED_PAGE = 'Getting Started'
@@ -251,9 +252,9 @@ def article_db(notion: Session, root_page: Page) -> Yield[Database]:
     """Simple database of articles."""
 
     class Article(schema.PageSchema, db_title='Articles'):
-        name = schema.Column('Name', schema.Title())
-        cost = schema.Column('Cost', schema.Number(schema.NumberFormat.DOLLAR))
-        desc = schema.Column('Description', schema.Text())
+        name = schema.Property('Name', schema.Title())
+        cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
+        desc = schema.Property('Description', schema.Text())
 
     db = notion.create_db(parent=root_page, schema=Article)
     yield db
@@ -276,9 +277,9 @@ def intro_page(notion: Session) -> Page:
 
 
 @vcr_fixture(scope='module')
-def all_cols_db(notion: Session) -> Database:
-    """Return manually created database with all columns, also AI columns."""
-    return notion.search_db(ALL_COL_DB).item()
+def all_props_db(notion: Session) -> Database:
+    """Return manually created database with all properties, also AI properties."""
+    return notion.search_db(ALL_PROPS_DB).item()
 
 
 @vcr_fixture(scope='module')
@@ -318,9 +319,9 @@ def task_db(notion: Session) -> Database:
 
 
 @vcr_fixture(scope='module')
-def static_dbs(all_cols_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database) -> set[Database]:
+def static_dbs(all_props_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database) -> set[Database]:
     """Return all static pages for the unit tests."""
-    return {all_cols_db, wiki_db, contacts_db, task_db}
+    return {all_props_db, wiki_db, contacts_db, task_db}
 
 
 @pytest.fixture(scope='function')
@@ -423,19 +424,19 @@ def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
     class Tasklist(schema.PageSchema, db_title='My Tasks'):
         """My personal task list"""
 
-        task = schema.Column('Task', schema.Title())
-        status = schema.Column('Status', schema.Select(status_options))
-        priority = schema.Column('Priority', schema.Select(priority_options))
-        urgency = schema.Column('Urgency', schema.Formula(urgency_formula))
-        started = schema.Column('Started', schema.Date())
-        due_date = schema.Column('Due Date', schema.Date())
-        due_by = schema.Column('Due by', schema.Formula(due_formula))
-        done = schema.Column('Done', schema.Formula(done_formula))
-        repeats = schema.Column('Repeats', schema.Select(repeats_options))
-        url = schema.Column('URL', schema.URL())
-        # ToDo: Reintroduce after the problem with adding a two-way relation column is fixed in the Notion API
-        # parent = schema.Column('Parent Task', schema.Relation(schema.SelfRef))
-        # subs = schema.Column('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_col=parent))
+        task = schema.Property('Task', schema.Title())
+        status = schema.Property('Status', schema.Select(status_options))
+        priority = schema.Property('Priority', schema.Select(priority_options))
+        urgency = schema.Property('Urgency', schema.Formula(urgency_formula))
+        started = schema.Property('Started', schema.Date())
+        due_date = schema.Property('Due Date', schema.Date())
+        due_by = schema.Property('Due by', schema.Formula(due_formula))
+        done = schema.Property('Done', schema.Formula(done_formula))
+        repeats = schema.Property('Repeats', schema.Select(repeats_options))
+        url = schema.Property('URL', schema.URL())
+        # ToDo: Reintroduce after the problem with adding a two-way relation property is fixed in the Notion API
+        # parent = schema.Property('Parent Task', schema.Relation(schema.SelfRef))
+        # subs = schema.Property('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_prop=parent))
 
     db = notion.create_db(parent=root_page, schema=Tasklist)
     yield db

@@ -153,18 +153,18 @@ class Session:
             1. initialize external forward relations, i.e. relations pointing to other databases
             2. create the database using a Notion API call and potential external forward relations
             3. initialize self-referencing forward relations
-            4. create columns with self-referencing forward relations using an update call
+            4. create properties with self-referencing forward relations using an update call
             5. update the backward references, i.e. two-way relations, using an update call
         """
         if schema:
             schema._init_fwd_rels()
-            schema_dct = {col.name: col.type.obj_ref for col in schema._get_init_cols()}
+            schema_dct = {prop.name: prop.type.obj_ref for prop in schema._get_init_props()}
             title = schema.db_title.obj_ref if schema.db_title is not None else None
             db_obj = self.api.databases.create(parent=parent.obj_ref, title=title, schema=schema_dct)
             if schema.db_desc:
                 db_obj = self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
         else:
-            schema_dct = {col.name: col.type.obj_ref for col in DefaultSchema._get_init_cols()}
+            schema_dct = {prop.name: prop.type.obj_ref for prop in DefaultSchema._get_init_props()}
             db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
 
         db: Database = Database.wrap_obj_ref(db_obj)

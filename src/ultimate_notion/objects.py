@@ -59,7 +59,7 @@ class OptionNS:
 
     @classmethod
     def to_list(cls) -> list[Option]:
-        """Convert the enum to a list as needed by the (Multi)Select column types."""
+        """Convert the enum to a list as needed by the (Multi)Select property types."""
         return [
             getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
         ]
@@ -95,14 +95,14 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
         return self.name
 
 
-class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
-    """A web resource e.g. for the files property."""
+class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
+    """Information about a web resource e.g. for the files property."""
 
     obj_ref: objs.FileObject
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> File:
-        self = cast(File, cls.__new__(cls))
+    def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> FileInfo:
+        self = cast(FileInfo, cls.__new__(cls))
         self.obj_ref = obj_ref
         return self
 
@@ -112,7 +112,7 @@ class File(Wrapper[objs.FileObject], wraps=objs.FileObject):
     def __eq__(self, other: object) -> bool:
         if isinstance(other, str):
             return str(self) == other
-        elif isinstance(other, File):
+        elif isinstance(other, FileInfo):
             return str(self) == str(other)
         else:
             return NotImplemented
@@ -336,10 +336,10 @@ class User(Wrapper[objs.User], wraps=objs.User):
             return None
 
 
-def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | None) -> File | Emoji | None:
+def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | None) -> FileInfo | Emoji | None:
     """Wrap the icon object into the corresponding class."""
     if isinstance(icon_obj, objs.ExternalFile):
-        return File.wrap_obj_ref(icon_obj)
+        return FileInfo.wrap_obj_ref(icon_obj)
     elif isinstance(icon_obj, objs.EmojiObject):
         return Emoji.wrap_obj_ref(icon_obj)
     elif icon_obj is None:

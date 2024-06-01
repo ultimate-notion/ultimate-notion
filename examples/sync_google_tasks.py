@@ -13,11 +13,11 @@ from datetime import datetime, timedelta, timezone
 
 from ultimate_notion import (
     Color,
-    ColType,
-    Column,
     Option,
     OptionNS,
     PageSchema,
+    Property,
+    PropType,
     Session,
 )
 from ultimate_notion.adapters import sync
@@ -41,9 +41,9 @@ class Status(OptionNS):
 class Task(PageSchema, db_title='My synched task db'):
     """My personal task list of all the important stuff I have to do"""
 
-    task = Column('Task', ColType.Title())
-    status = Column('Status', ColType.Select(Status))
-    due_date = Column('Due Date', ColType.Date())
+    task = Property('Task', PropType.Title())
+    status = Property('Status', PropType.Select(Status))
+    due_date = Property('Due Date', PropType.Date())
 
 
 with Session() as notion:
@@ -112,8 +112,8 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
 # Option 2: Using an existing Notion database that was created manually
 with Session() as notion, GTasksClient(read_only=False) as gtasks:
     task_db = notion.search_db('My synched task db').item()
-    status_col = task_db.schema.get_col('Status')
-    due_date_col = task_db.schema.get_col('Due Date')
+    status_col = task_db.schema.get_prop('Status')
+    due_date_col = task_db.schema.get_prop('Due Date')
     tasklist = gtasks.get_or_create_tasklist('My synched task list')
 
     sync_task = SyncGTasks(

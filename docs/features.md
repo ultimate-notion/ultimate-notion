@@ -2,19 +2,20 @@
 
 Some of the feature listed here, loosely correspond to the features of the endpoints defined in the [Notion API].
 Please note that a slightly different terminology is used. Since the term *properties* is highly
-overloaded, we call the properties of a database *schema* and refer to the individual properties as
-*columns*. With *page properties*, we denote only the properties of a page within a database that correspond
-to the columns of the schema. In contrast to that, the properties that every page has, e.g. title,
+overloaded, we call the properties of a database as a whole *schema* and refer to the individual
+properties as *database properties* or sometimes *columns* in the context of a table or view.
+With *page properties*, we denote only the properties of a page within a database that correspond
+to the properties of the database schema. In contrast to that, the properties that every page has, e.g. title,
 icon, last edited by/time, etc., are called *page attributes*.
 
 ## Databases
 
 - [x] retrieve a database by its ID
 - [x] search for a database by its title
-- [x] create a new database with a given schema, i.e. columns and their types
+- [x] create a new database with a given schema, i.e. properties and their types
 - [x] delete/archive and restore/unarchive a database
-- [ ] update a database schema, i.e. adding/removing columns or changing their types
-- [ ] change the properties of database columns, e.g. name, formula of formula column, options, etc.
+- [ ] update a database schema, i.e. adding/removing properties or changing their types
+- [ ] change database properties, e.g. name, formula of formula property, options, etc.
 - [x] read the database attributes like title, description, cover, icon, etc.
 - [x] change database attributes like title, description, etc.
 - [x] retrieve all pages of a database
@@ -64,14 +65,14 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 Some features that the Notion UI provides are not possible to implement due to limitations of the API itself.
 
-- creating a [Status] column or updating the options as well as option groups. Sending an Status column within a create
-  database call is currently accepted but just ignored, i.e. a database without the column will show up.
-- creating a [Unique ID] column or updating its properties like the prefix. This column type is not even mentioned
+- creating a [Status] property or updating the options as well as option groups. Sending an Status property within a create
+  database call is currently accepted but just ignored, i.e. a database without the property will show up.
+- creating a [Unique ID] property or updating its properties like the prefix. This property type is not even mentioned
   as one of the [database properties].
-- creating a [Wiki database] which has a special [Verification] column.
-- [updating the database schema] with respect to the options of a select/multi-select column, the formula of a
-  formula column, and synced content.
-- referencing in a formula expression another formula column, e.g. `prop("other formula")`. Use substitution instead.
+- creating a [Wiki database] which has a special [Verification] property.
+- [updating the database schema] with respect to the options of a select/multi-select property, the formula of a
+  formula property, and synced content.
+- referencing in a formula expression another formula property, e.g. `prop("other formula")`. Use substitution instead.
 - creating a two-way relation with the same source and target database, i.e. self-referencing. The update database call
   is currently accepted but only a one-way relation created, which seems to be a bug.
 - uploading files as icons or in general uploading files.

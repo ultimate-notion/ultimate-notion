@@ -5,6 +5,7 @@
 - New: More robust with respect to Notion API changes.
 - Chg: Internally, `archived` property was renamed to `in_trash`.
 - Chg: Renamed `.content` to `.children` of a page for more consitency.
+- Chg: Use Property again to consistently refer to the columns of a database.
 
 ## Version 0.4, 2024-02-14
 

@@ -5,11 +5,11 @@ from zoneinfo import ZoneInfo
 
 from ultimate_notion import (
     Color,
-    ColType,
-    Column,
     Option,
     OptionNS,
     PageSchema,
+    Property,
+    PropType,
     Session,
 )
 
@@ -53,11 +53,11 @@ urgency = (
 class Task(PageSchema, db_title='My task list'):
     """My personal task list of all the important stuff I have to do"""
 
-    task = Column('Task', ColType.Title())
-    status = Column('Status', ColType.Select(Status))
-    priority = Column('Priority', ColType.Select(Priority))
-    urgency = Column('Urgency', ColType.Formula(urgency))
-    due_date = Column('Due Date', ColType.Date())
+    task = Property('Task', PropType.Title())
+    status = Property('Status', PropType.Select(Status))
+    priority = Property('Priority', PropType.Select(Priority))
+    urgency = Property('Urgency', PropType.Formula(urgency))
+    due_date = Property('Due Date', PropType.Date())
 
 
 with Session() as notion:

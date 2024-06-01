@@ -216,13 +216,13 @@ class Callout(TextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
     """Callout block."""
 
     @property
-    def icon(self) -> objects.File | objects.Emoji | None:
+    def icon(self) -> objects.FileInfo | objects.Emoji | None:
         return objects.wrap_icon(self.obj_ref.callout.icon)
 
     def to_markdown(self) -> str:
         if isinstance(icon := self.icon, objects.Emoji):
             return f'{icon} {self.rich_text.to_markdown()}\n'
-        elif isinstance(icon := self.icon, objects.File):
+        elif isinstance(icon := self.icon, objects.FileInfo):
             return f'![icon]({icon.url}) {self.rich_text.to_markdown()}\n'
         else:
             return f'{self.rich_text.to_markdown()}\n'
@@ -495,7 +495,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
 
 
 class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
-    """Collumn block."""
+    """Column block."""
 
     def to_markdown(self) -> str:
         mds = []
@@ -667,7 +667,10 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks
 
 
 class Template(TextBlock[obj_blocks.Template], ChildrenMixin, wraps=obj_blocks.Template):
-    """Template block."""
+    """Template block.
+
+    Deprecated: As of March 27, 2023 creation of template blocks will no longer be supported.
+    """
 
     def to_markdown(self) -> str:
         return f'<button type="button">{self.rich_text.to_markdown()}</button>\n'

@@ -1,7 +1,7 @@
 """Functionality around defining a database schema.
 
 Currently only normal databases, no wiki databases, can be created [1].
-Neither the `Unique ID` nor `Status` nor the `Verfication` page property can be set as a database column
+Neither the `Unique ID` nor `Status` nor the `Verfication` page property can be set as a database property
 in a custom Schema when creating the database.
 
 [1] https://developers.notion.com/docs/working-with-databases#wiki-databases
@@ -9,7 +9,7 @@ in a custom Schema when creating the database.
 
 ### Design Principles
 
-A schema is a subclass of `PageShema` that holds `Column` objects with a name and an
+A schema is a subclass of `PageShema` that holds `Property` objects with a name and an
 actual `PropertyType`, e.g. `Text`, `Number`.
 
 The source of truth is always the `obj_ref` and a `PropertyType` holds only auxilliary
@@ -55,12 +55,12 @@ class SchemaNotBoundError(SchemaError):
         super().__init__(msg)
 
 
-class ReadOnlyColumnError(SchemaError):
-    """Raised when a read-only columns tries to be written to."""
+class ReadOnlyPropertyError(SchemaError):
+    """Raised when an attempt is made to write to a write-protected property."""
 
-    def __init__(self, col: Column):
-        self.col = col
-        msg = f"Argument {col.attr_name} refers to the read-only column '{col.name}' of type {col.type}"
+    def __init__(self, prop: Property):
+        self.prop = prop
+        msg = f"Argument {prop.attr_name} refers to the read-only propert '{prop.name}' of type {prop.type}"
         super().__init__(msg)
 
 
@@ -84,18 +84,18 @@ class PageSchema:
         cls, schema_dct: dict[str, PropertyType], db_title: str | None = None, db_desc: str | None = None
     ) -> type[PageSchema]:
         """Creation of a schema from a dictionary for easy support of dynamically created schemas."""
-        title_cols = [k for k, v in schema_dct.items() if isinstance(v, Title)]
-        if not title_cols:
+        title_props = [k for k, v in schema_dct.items() if isinstance(v, Title)]
+        if not title_props:
             msg = 'Missing an item with property type `Title` as value'
             raise SchemaError(msg)
-        elif len(title_cols) > 1:
-            msg = f'More than one item with property type `Title` as value found: {", ".join(title_cols)}'
+        elif len(title_props) > 1:
+            msg = f'More than one item with property type `Title` as value found: {", ".join(title_props)}'
             raise SchemaError(msg)
 
         cls_name = f'{cls.__name__}FromDct'
         attrs: dict[str, Any] = {'db_desc': db_desc}
-        for col_name, prop_type in schema_dct.items():
-            attrs[snake_case(col_name)] = Column(col_name, prop_type)
+        for prop_name, prop_type in schema_dct.items():
+            attrs[snake_case(prop_name)] = Property(prop_name, prop_type)
         return type(cls_name, (PageSchema,), attrs, db_title=db_title)
 
     @classmethod
@@ -104,19 +104,19 @@ class PageSchema:
         return cls.get_db().create_page(**kwargs)
 
     @classmethod
-    def get_cols(cls) -> list[Column]:
-        """Get all columns of this schema."""
-        return [col for col in cls.__dict__.values() if isinstance(col, Column)]
+    def get_props(cls) -> list[Property]:
+        """Get all properties of this schema."""
+        return [prop for prop in cls.__dict__.values() if isinstance(prop, Property)]
 
     @classmethod
-    def get_col(cls, col_name: str) -> Column:
-        """Get a specific column from this schema assuming that column names are unique."""
-        return SList([col for col in cls.get_cols() if col.name == col_name]).item()
+    def get_prop(cls, prop_name: str) -> Property:
+        """Get a specific property from this schema assuming that property names are unique."""
+        return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
         """Convert this schema to a dictionary."""
-        return {col.name: col.type for col in cls.get_cols()}
+        return {prop.name: prop.type for prop in cls.get_props()}
 
     @classmethod
     def as_table(cls, tablefmt: str | None = None) -> str:
@@ -137,8 +137,8 @@ class PageSchema:
 
         headers = ['Name', 'Property', 'Attribute']
         rows = []
-        for col in cls.get_cols():
-            rows.append((col.name, col.type, col.attr_name))
+        for prop in cls.get_props():
+            rows.append((prop.name, prop.type, prop.attr_name))
 
         return tabulate(rows, headers=headers, tablefmt=tablefmt)
 
@@ -167,9 +167,9 @@ class PageSchema:
         return cls.as_table(tablefmt='html')
 
     @classmethod
-    def get_title_col(cls) -> Column:
-        """Returns the column holding the title of the pages."""
-        return SList(col for col in cls.get_cols() if isinstance(col.type, Title)).item()
+    def get_title_prop(cls) -> Property:
+        """Returns the property holding the title of the pages."""
+        return SList(prop for prop in cls.get_props() if isinstance(prop.type, Title)).item()
 
     @classmethod
     def is_consistent_with(cls, other_schema: type[PageSchema]) -> bool:
@@ -209,29 +209,29 @@ class PageSchema:
         return cls._database is not None
 
     @classmethod
-    def _get_fwd_rels(cls) -> list[Column]:
+    def _get_fwd_rels(cls) -> list[Property]:
         return [
-            col
-            for col in cls.get_cols()
-            if isinstance(col.type, Relation) and not (col.type._is_two_way_target or col.type.is_self_ref)
+            prop
+            for prop in cls.get_props()
+            if isinstance(prop.type, Relation) and not (prop.type._is_two_way_target or prop.type.is_self_ref)
         ]
 
     @classmethod
     def _init_fwd_rels(cls):
         """Initialise all non-self-referencing forward relations assuming that the target schemas exist."""
-        for col in cls._get_fwd_rels():
-            col_type = cast(Relation, col.type)
-            col_type._make_obj_ref()
+        for prop in cls._get_fwd_rels():
+            prop_type = cast(Relation, prop.type)
+            prop_type._make_obj_ref()
 
     @classmethod
-    def _get_self_refs(cls) -> list[Column]:
-        """Get all self-referencing relation columns."""
-        return [col for col in cls.get_cols() if isinstance(col.type, Relation) and col.type.is_self_ref]
+    def _get_self_refs(cls) -> list[Property]:
+        """Get all self-referencing relation properties."""
+        return [prop for prop in cls.get_props() if isinstance(prop.type, Relation) and prop.type.is_self_ref]
 
     @classmethod
     def _has_self_refs(cls) -> bool:
-        """Determine if self-referencing relation columns are present."""
-        return bool([col for col in cls.get_cols() if isinstance(col.type, Relation) and col.type.is_self_ref])
+        """Determine if self-referencing relation properties are present."""
+        return bool([prop for prop in cls.get_props() if isinstance(prop.type, Relation) and prop.type.is_self_ref])
 
     @classmethod
     def _init_self_refs(cls):
@@ -239,20 +239,20 @@ class PageSchema:
         if not cls._has_self_refs():
             return
         db = cls.get_db()  # raises if not bound!
-        for col in cls._get_self_refs():
-            col_type = cast(Relation, col.type)
-            col_type._schema = cls  # replace placeholder `SelfRef` with this schema
-            col_type._make_obj_ref()
+        for prop in cls._get_self_refs():
+            prop_type = cast(Relation, prop.type)
+            prop_type._schema = cls  # replace placeholder `SelfRef` with this schema
+            prop_type._make_obj_ref()
 
-        self_refs_dct = {col.name: col.type.obj_ref for col in cls._get_self_refs()} or None
+        self_refs_dct = {prop.name: prop.type.obj_ref for prop in cls._get_self_refs()} or None
         session = get_active_session()
         db.obj_ref = session.api.databases.update(db.obj_ref, schema=self_refs_dct)
         cls._set_obj_refs()
 
     @classmethod
-    def _get_init_cols(cls) -> list[Column]:
-        """Get all columns that are initialized by now."""
-        return [col for col in cls.get_cols() if hasattr(col.type, 'obj_ref')]
+    def _get_init_props(cls) -> list[Property]:
+        """Get all properties that are initialized by now."""
+        return [prop for prop in cls.get_props() if hasattr(prop.type, 'obj_ref')]
 
     @classmethod
     def _update_bwd_rels(cls):
@@ -278,14 +278,14 @@ class PageSchema:
 class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     """Base class for Notion property objects.
 
-    Property types define the value types of columns in a database, e.g. number, date, text, etc.
+    Property types define the value types of properties in a database, e.g. number, date, text, etc.
     """
 
     obj_ref: T
-    #: If the Notion API allows to create a new database with a column of this type
+    #: If the Notion API allows to create a new database with a property of this type
     allowed_at_creation = True
-    #: Back reference to the column having this type
-    col_ref: Column | None = None
+    #: Back reference to the property having this type
+    prop_ref: Property | None = None
 
     @property
     def id(self) -> str | None:
@@ -326,8 +326,8 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
         return self.__class__.__name__
 
 
-class Column:
-    """Column with a name and a certain Property Type for defining a Notion database schema.
+class Property:
+    """Database property/column with a name and a certain property type for defining a Notion database schema.
 
     This is implemented as a descriptor.
     """
@@ -345,10 +345,10 @@ class Column:
     def __set_name__(self, owner: type[PageSchema], name: str):
         self._schema = owner
         self._attr_name = name
-        self._type.col_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
+        self._type.prop_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
 
     def __repr__(self) -> str:
-        return get_repr(self, name='Column', desc=self.type)
+        return get_repr(self, name='Property', desc=self.type)
 
     @property
     def name(self) -> str:
@@ -372,22 +372,22 @@ class Column:
 
 
 class Title(PropertyType[obj_schema.Title], wraps=obj_schema.Title):
-    """Defines the mandatory title column in a database."""
+    """Defines the mandatory title property in a database."""
 
 
 class Text(PropertyType[obj_schema.RichText], wraps=obj_schema.RichText):
-    """Defines a text column in a database."""
+    """Defines a text property in a database."""
 
 
 class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
-    """Defines a number column in a database."""
+    """Defines a number property in a database."""
 
     def __init__(self, number_format: NumberFormat):
         super().__init__(number_format)
 
 
 class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
-    """Defines a select column in a database."""
+    """Defines a select property in a database."""
 
     def __init__(self, options: list[Option] | type[OptionNS]):
         if isinstance(options, type) and issubclass(options, OptionNS):
@@ -402,7 +402,7 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
 
 
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
-    """Defines a multi-select column in a database."""
+    """Defines a multi-select property in a database."""
 
     def __init__(self, options: list[Option] | type[OptionNS]):
         if isinstance(options, type) and issubclass(options, OptionNS):
@@ -417,12 +417,12 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
 
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
-    """Defines a status column in a database.
+    """Defines a status property in a database.
 
-    The Notion API doesn't allow to create a column of this type.
+    The Notion API doesn't allow to create a property of this type.
     Sending it to the API with options and option groups defined results in an error
     about the existence of the keys `options` and `groups` and removing them
-    creates a database with the column missing... ignorance is bliss.
+    creates a database with the property missing... ignorance is bliss.
 
     Also the Status configuration is not mentioned as a
     [Property Schema Object])https://developers.notion.com/reference/property-schema-object).
@@ -440,37 +440,37 @@ class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
 
 
 class Date(PropertyType[obj_schema.Date], wraps=obj_schema.Date):
-    """Defines a date column in a database."""
+    """Defines a date property in a database."""
 
 
 class People(PropertyType[obj_schema.People], wraps=obj_schema.People):
-    """Defines a people column in a database."""
+    """Defines a people property in a database."""
 
 
 class Files(PropertyType[obj_schema.Files], wraps=obj_schema.Files):
-    """Defines a files column in a database."""
+    """Defines a files property in a database."""
 
 
 class Checkbox(PropertyType[obj_schema.Checkbox], wraps=obj_schema.Checkbox):
-    """Defines a checkbox column in database."""
+    """Defines a checkbox property in database."""
 
 
 class Email(PropertyType[obj_schema.Email], wraps=obj_schema.Email):
-    """Defines an e-mail column in a database."""
+    """Defines an e-mail property in a database."""
 
 
 class URL(PropertyType[obj_schema.URL], wraps=obj_schema.URL):
-    """Defines a URL column in a database."""
+    """Defines a URL property in a database."""
 
 
 class PhoneNumber(PropertyType[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNumber):
-    """Defines a phone number column in a database."""
+    """Defines a phone number property in a database."""
 
 
 class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
-    """Defines a formula column in a database.
+    """Defines a formula property in a database.
 
-    Currently the formula expression cannot reference other formula columns, e.g. `prop("other formula")`
+    Currently the formula expression cannot reference other formula properties, e.g. `prop("other formula")`
     This is a limitation of the API.
     """
 
@@ -490,37 +490,37 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
     """Relation to another database."""
 
     _schema: type[PageSchema] | None = None  # other schema, i.e. of the target database
-    _two_way_col: Column | None = None  # other column, i.e. of the target database
+    _two_way_prop: Property | None = None  # other property, i.e. of the target database
 
-    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_col: Column | None = None):
-        if two_way_col and not schema:
-            msg = '`schema` needs to be provided if `two_way_col` is set'
+    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Property | None = None):
+        if two_way_prop and not schema:
+            msg = '`schema` needs to be provided if `two_way_prop` is set'
             raise RuntimeError(msg)
 
-        if isinstance(schema, Column):
-            msg = 'Please provide a schema, not a column! Use `two_way_col` to specify a column.'
+        if isinstance(schema, Property):
+            msg = 'Please provide a schema, not a property! Use `two_way_prop` to specify a property.'
             raise ValueError(msg)
 
         self._schema = schema
 
-        if two_way_col is not None:
-            if not isinstance(two_way_col.type, Relation):
-                msg = f'The two-way column {two_way_col.name} needs to be of type Relation!'
+        if two_way_prop is not None:
+            if not isinstance(two_way_prop.type, Relation):
+                msg = f'The two-way property {two_way_prop.name} needs to be of type Relation!'
                 raise ValueError(msg)
 
-            if two_way_col.type.schema is not None:
-                msg = f'The two-way column {two_way_col.name} must not reference a schema itself'
+            if two_way_prop.type.schema is not None:
+                msg = f'The two-way property {two_way_prop.name} must not reference a schema itself'
                 raise ValueError(msg)
 
-            self._two_way_col = two_way_col
+            self._two_way_prop = two_way_prop
 
     @property
     def schema(self) -> type[PageSchema] | None:
         """Schema of the relation database."""
         if self._schema:
             return self._schema if self._schema is not SelfRef else None
-        elif self.col_ref is not None and self.col_ref._schema.is_bound():
-            db = self.col_ref._schema._database
+        elif self.prop_ref is not None and self.prop_ref._schema.is_bound():
+            db = self.prop_ref._schema._database
             session = get_active_session()
             return session.get_db(self.obj_ref.relation.database_id).schema if db is not None else None
         else:
@@ -532,29 +532,29 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         return self._schema is None
 
     @property
-    def two_way_col(self) -> Column | None:
-        """Return the target column object of a two-way relation."""
-        if self._two_way_col:
-            return self._two_way_col
+    def two_way_prop(self) -> Property | None:
+        """Return the target property object of a two-way relation."""
+        if self._two_way_prop:
+            return self._two_way_prop
         elif (
             hasattr(self, 'obj_ref')
             and self.schema
             and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation)
         ):
             prop_name = self.obj_ref.relation.dual_property.synced_property_name
-            return self.schema.get_col(prop_name) if prop_name else None
+            return self.schema.get_prop(prop_name) if prop_name else None
         else:
             return None
 
     @property
     def is_two_way(self) -> bool:
         """Determine if this relation is a two-way relation."""
-        return self.two_way_col is not None
+        return self.two_way_prop is not None
 
     @property
     def is_self_ref(self) -> bool:
         """Determines if this relation is self referencing the same schema."""
-        return (self._schema is SelfRef) or (self.col_ref is not None and self._schema is self.col_ref._schema)
+        return (self._schema is SelfRef) or (self.prop_ref is not None and self._schema is self.prop_ref._schema)
 
     def _make_obj_ref(self):
         """Initialize the low-level object references for this relation.
@@ -567,34 +567,34 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             msg = f"A database with schema '{self.schema.__name__}' needs to be created first!"
             raise RelationError(msg) from e
 
-        if self.two_way_col:
+        if self.two_way_prop:
             self.obj_ref = obj_schema.DualPropertyRelation.build(db.id)
         else:
             self.obj_ref = obj_schema.SinglePropertyRelation.build(db.id)
 
     def _update_bwd_rel(self):
         """Change the default name of a two-way relation target to the defined one."""
-        if self.col_ref is None:
-            msg = 'Trying to inialize a backward relation for one-way relation that is not bound to a column'
+        if self.prop_ref is None:
+            msg = 'Trying to inialize a backward relation for one-way relation that is not bound to a property'
             raise SchemaError(msg)
 
         if not (isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation)):
-            msg = f'Trying to inialize backward relation for one-way relation {self.col_ref.name}'
+            msg = f'Trying to inialize backward relation for one-way relation {self.prop_ref.name}'
             raise SchemaError(msg)
 
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
-        two_way_col_name = self._two_way_col.name
-        if obj_synced_property_name != two_way_col_name:
+        two_way_prop_name = self._two_way_prop.name
+        if obj_synced_property_name != two_way_prop_name:
             session = get_active_session()
 
             # change the old default name in the target schema to what was passed during initialization
             other_db = self.schema.get_db()
             prop_id = self.obj_ref.relation.dual_property.synced_property_id
-            schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_col_name)}
+            schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_prop_name)}
             session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
-            our_db = self.col_ref._schema.get_db()
+            our_db = self.prop_ref._schema.get_db()
             session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
             our_db.schema._set_obj_refs()
 
@@ -604,9 +604,9 @@ class RollupError(SchemaError):
 
 
 class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
-    """Defines the rollup column in a database."""
+    """Defines the rollup property in a database."""
 
-    def __init__(self, relation: Column, property: Column, calculate: AggFunc):  # noqa: A002
+    def __init__(self, relation: Property, property: Property, calculate: AggFunc):  # noqa: A002
         if not isinstance(relation.type, Relation):
             msg = f'Relation {relation} must be of type Relation'
             raise RollupError(msg)
@@ -615,23 +615,23 @@ class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
 
 
 class CreatedTime(PropertyType[obj_schema.CreatedTime], wraps=obj_schema.CreatedTime):
-    """Defines the created-time column in a database."""
+    """Defines the created-time property in a database."""
 
 
 class CreatedBy(PropertyType[obj_schema.CreatedBy], wraps=obj_schema.CreatedBy):
-    """Defines the created-by column in a database."""
+    """Defines the created-by property in a database."""
 
 
 class LastEditedBy(PropertyType[obj_schema.LastEditedBy], wraps=obj_schema.LastEditedBy):
-    """Defines the last-edited-by column in a database."""
+    """Defines the last-edited-by property in a database."""
 
 
 class LastEditedTime(PropertyType[obj_schema.LastEditedTime], wraps=obj_schema.LastEditedTime):
-    """Defines the last-edited-time column in a database."""
+    """Defines the last-edited-time property in a database."""
 
 
 class ID(PropertyType[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
-    """Defines a unique ID column in a database."""
+    """Defines a unique ID property in a database."""
 
     allowed_at_creation = False
 
@@ -642,7 +642,7 @@ class ID(PropertyType[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
 
 
 class Verification(PropertyType[obj_schema.Verification], wraps=obj_schema.Verification):
-    """Defines a unique ID column in a database."""
+    """Defines a unique ID property in a database."""
 
     allowed_at_creation = False
 
@@ -653,12 +653,12 @@ class DefaultSchema(PageSchema, db_title=None):
     As inferred by just creating an empty database in the Notion UI.
     """
 
-    name = Column('Name', Title())
-    tags = Column('Tags', MultiSelect([]))
+    name = Property('Name', Title())
+    tags = Property('Tags', MultiSelect([]))
 
 
-class ColType:
-    """Namespace class of all columns types for easier access."""
+class PropType:
+    """Namespace class of all property types of a database for easier access."""
 
     Title = Title
     Text = Text

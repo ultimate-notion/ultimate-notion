@@ -11,7 +11,7 @@ from ultimate_notion.blocks import Block, ChildDatabase, ChildPage, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
-from ultimate_notion.objects import Emoji, File, RichText, wrap_icon
+from ultimate_notion.objects import Emoji, FileInfo, RichText, wrap_icon
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.text import md_renderer
 from ultimate_notion.utils import get_active_session, get_repr, get_url, get_uuid, is_notebook
@@ -105,8 +105,8 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         # as this only works on the class level and we want a unique class for each property.
         page_props_cls = type('_PageProperties', (PageProperties,), {})
         if self.database is not None:
-            for col in self.database.schema.get_cols():
-                setattr(page_props_cls, col.attr_name, PageProperty(prop_name=col.name))
+            for prop in self.database.schema.get_props():
+                setattr(page_props_cls, prop.attr_name, PageProperty(prop_name=prop.name))
         return page_props_cls(page=self)
 
     def __str__(self) -> str:
@@ -155,7 +155,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         else:
             return None
 
-    def _get_title_col_name(self) -> str:
+    def _get_title_prop_name(self) -> str:
         """Get the name of the title property."""
         # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
         for name, prop in self.obj_ref.properties.items():
@@ -167,7 +167,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     @property
     def title(self) -> RichText:
         """Title of the page."""
-        title_prop_name = self._get_title_col_name()
+        title_prop_name = self._get_title_prop_name()
         title_prop = self.obj_ref.properties[title_prop_name]
         title = cast(Title, PropertyValue.wrap_obj_ref(title_prop))
         return title.value
@@ -178,31 +178,31 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         if text is None:
             text = ''
         title = Title(text)
-        title_prop_name = self._get_title_col_name()
+        title_prop_name = self._get_title_prop_name()
         session = get_active_session()
         session.api.pages.update(self.obj_ref, **{title_prop_name: title.obj_ref})
 
     @property
-    def icon(self) -> File | Emoji | None:
+    def icon(self) -> FileInfo | Emoji | None:
         """Icon of the page, i.e. emojis, Notion's icons, or custom images."""
         icon = self.obj_ref.icon
         return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: File | Emoji | str | None):
+    def icon(self, icon: FileInfo | Emoji | str | None):
         """Set the icon of this page."""
         if isinstance(icon, str) and not isinstance(icon, Emoji):
-            icon = Emoji(icon) if is_emoji(icon) else File(url=icon, name=None)
+            icon = Emoji(icon) if is_emoji(icon) else FileInfo(url=icon, name=None)
         icon_obj = None if icon is None else icon.obj_ref
         session = get_active_session()
         session.api.pages.set_attr(self.obj_ref, icon=icon_obj)
 
     @property
-    def cover(self) -> File | None:
+    def cover(self) -> FileInfo | None:
         """Cover of the page."""
         cover = self.obj_ref.cover
         if isinstance(cover, objs.ExternalFile):
-            return File.wrap_obj_ref(cover)
+            return FileInfo.wrap_obj_ref(cover)
         elif cover is None:
             return None
         else:
@@ -210,10 +210,10 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             raise RuntimeError(msg)
 
     @cover.setter
-    def cover(self, cover: File | str | None):
+    def cover(self, cover: FileInfo | str | None):
         """Set the cover fo this page."""
         if isinstance(cover, str):
-            cover = File(url=cover, name=None)
+            cover = FileInfo(url=cover, name=None)
         cover_obj = None if cover is None else cover.obj_ref
         session = get_active_session()
         session.api.pages.set_attr(self.obj_ref, cover=cover_obj)

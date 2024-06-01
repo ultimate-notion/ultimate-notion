@@ -1,8 +1,8 @@
 # Introduction to pages
 
 Pages are one of the most essential building blocks of Notion.
-A page has certain *attributes* such as a title, cover, icon, and wether it is deleted
-(archived in the bin) or not.
+A page has certain *attributes* such as a title, cover, icon, and wether it is deleted, i.e.
+in the trash, or not.
 Items within a database, or rows if you will, are just pages and the schema of the database,
 that is the set of columns and their types, imposes *properties* on each contained page.
 

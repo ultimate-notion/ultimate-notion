@@ -15,8 +15,8 @@ notion = uno.Session.get_or_create()
 ## Declarative schemas & relations
 
 We start by defining the schema for our items in a really pythonic way.
-The schema should have three columns, the title column `Name` for the name of an item, e.g. "Jeans",
-a size column `Size` and of course a `Price` column numbers in Dollars. The size of of piece of
+The schema should have three properties, the title property `Name` for the name of an item, e.g. "Jeans",
+a size property `Size` and of course a `Price` property numbers in Dollars. The size of of piece of
 clothing can be chosen from the options `S`, `M` and `L`. We can directly translate this schema into
 Python code:
 
@@ -30,9 +30,9 @@ class Size(uno.OptionNS):
 
 class Item(uno.PageSchema, db_title='Item DB'):
     """Database of all the items we sell"""
-    name = uno.Column('Name', uno.ColType.Title())
-    size = uno.Column('Size', uno.ColType.Select(Size))
-    price = uno.Column('Price', uno.ColType.Number(uno.NumberFormat.DOLLAR))
+    name = uno.Property('Name', uno.PropType.Title())
+    size = uno.Property('Size', uno.PropType.Select(Size))
+    price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
 ```
 
 Since a database needs to be a block wighin a page, we assume there is a page called
@@ -49,8 +49,8 @@ Now we create a database for our customers and define a one-way [Relation] to th
 ```python
 class Customer(uno.PageSchema, db_title='Customer DB'):
     """Database of all our beloved customers"""
-    name = uno.Column('Name', uno.ColType.Title())
-    purchases = uno.Column('Items Purchased', uno.ColType.Relation(Item))
+    name = uno.Property('Name', uno.PropType.Title())
+    purchases = uno.Property('Items Purchased', uno.PropType.Relation(Item))
 
 customer_db = notion.create_db(parent=root_page, schema=Customer)
 ```
@@ -60,8 +60,8 @@ customer_db = notion.create_db(parent=root_page, schema=Customer)
     database already exists. Thus the order of creating the databases from the schemas
     is important.
 
-All available column database are provided by [ColType], which is just a namespace
-for the various column types defined in [schema]. Column types with the class
+All available types of a database property are provided by [PropType], which is just a namespace
+for the various property types defined in [schema]. Property types with the class
 variable `allowed_at_creation` set to `False` are currently not supported by the Notion API.
 when creating a new database.
 
@@ -108,23 +108,23 @@ from `Customer` needs to become a two-way relation. We can achieve this, with a 
 ```python
 class Item(uno.PageSchema, db_title='Item DB'):
     """Database of all the items we sell"""
-    name = uno.Column('Name', uno.ColType.Title())
-    size = uno.Column('Size', uno.ColType.Select(Size))
-    price = uno.Column('Price', uno.ColType.Number(uno.NumberFormat.DOLLAR))
-    bought_by = uno.Column('Bought by', uno.ColType.Relation())
+    name = uno.Property('Name', uno.PropType.Title())
+    size = uno.Property('Size', uno.PropType.Select(Size))
+    price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+    bought_by = uno.Property('Bought by', uno.PropType.Relation())
 
 class Customer(uno.PageSchema, db_title='Customer DB'):
     """Database of all our beloved customers"""
-    name = uno.Column('Name', uno.ColType.Title())
-    purchases = uno.Column(
+    name = uno.Property('Name', uno.PropType.Title())
+    purchases = uno.Property(
         'Items Purchased',
-        uno.ColType.Relation(Item, two_way_col=Item.bought_by)
+        uno.PropType.Relation(Item, two_way_prop=Item.bought_by)
     )
 ```
 
-So what happens here is that we first create a *target* relation column `bought_by` in `Item` by not
-specifying any other schema. Then in `Customer`, we define now a two-way column but specifying not only
-the schema `Item` bouth also the column we want to synchronize with using the `two_way_col` keyword.
+So what happens here is that we first create a *target* relation property `bought_by` in `Item` by not
+specifying any other schema. Then in `Customer`, we define now a two-way property but specifying not only
+the schema `Item` bouth also the property we want to synchronize with using the `two_way_prop` keyword.
 
 Let's delete the old databases and recreate them with our updates schemas and a few items
 
@@ -149,9 +149,9 @@ certain tasks can be subtasks of others:
 ```python
 class Task(uno.PageSchema, db_title='Task List'):
     """A really simple task lists with subtasks"""
-    task = uno.Column('Task', uno.ColType.Title())
-    due_by = uno.Column('Due by', uno.ColType.Date())
-    parent = uno.Column('Parent Task', uno.ColType.Relation(uno.SelfRef))
+    task = uno.Property('Task', uno.PropType.Title())
+    due_by = uno.Property('Due by', uno.PropType.Date())
+    parent = uno.Property('Parent Task', uno.PropType.Relation(uno.SelfRef))
 
 task_db = notion.create_db(parent=root_page, schema=Task)
 
@@ -183,5 +183,5 @@ Task.create(
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
 [create]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.PageSchema.create
 [Relation]:  ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Relation
-[ColType]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.ColType
+[PropType]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.PropType
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema

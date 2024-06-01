@@ -312,8 +312,8 @@ build-check = [
 [tool.hatch.envs.lint]
 # skip-install = true # mypy gives more feedback if project is installed locally, strange but true
 dependencies = [
-    "mypy",
-    "ruff==0.4.4", # make sure this is consistent with with pyproject.toml, thus pinned!
+    "mypy==1.10",
+    "ruff==0.4.5", # make sure this is consistent with .pre-commit-config.yaml, thus pinned!
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion.obj_api.props import DateType
-from ultimate_notion.objects import File, Option, RichText, User
+from ultimate_notion.objects import FileInfo, Option, RichText, User
 from ultimate_notion.utils import Wrapper, get_active_session, get_repr
 
 if TYPE_CHECKING:
@@ -227,15 +227,15 @@ class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNum
 class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
     """Files property value."""
 
-    def __init__(self, files: File | list[File]):
+    def __init__(self, files: FileInfo | list[FileInfo]):
         if not isinstance(files, list):
             files = [files]
 
         super().__init__(files)
 
     @property
-    def value(self) -> list[File]:
-        return [File.wrap_obj_ref(file) for file in self.obj_ref.files]
+    def value(self) -> list[FileInfo]:
+        return [FileInfo.wrap_obj_ref(file) for file in self.obj_ref.files]
 
 
 class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):

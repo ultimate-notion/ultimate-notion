@@ -11,7 +11,7 @@ import pandas as pd
 from tabulate import tabulate
 
 from ultimate_notion.obj_api.query import DBQueryBuilder
-from ultimate_notion.objects import File, RichText
+from ultimate_notion.objects import FileInfo, RichText
 from ultimate_notion.page import Page
 from ultimate_notion.text import html_img
 from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, get_repr, is_notebook
@@ -33,7 +33,7 @@ class View:
     def __init__(self, database: Database, pages: list[Page], query: DBQueryBuilder):
         self.database = database
         self._query = query
-        self._title_col = database.schema.get_title_col().name
+        self._title_col = database.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
         self._pages: np.ndarray = np.array(pages)
         self.default_limit = 10
@@ -61,7 +61,7 @@ class View:
 
     @property
     def columns(self) -> list[str]:
-        """Columns of the database view aligned with the elements of a row."""
+        """Columns/properties of the database view aligned with the elements of a row."""
         cols = list(self._columns[self._col_indices])
         if self.has_icon:
             cols.insert(0, self._icon_name)
@@ -116,7 +116,7 @@ class View:
             return rows
         for idx, row in enumerate(rows):
             page = self.get_page(idx)
-            icon = html_img(page.icon.url, size=1.2) if isinstance(page.icon, File) else page.icon
+            icon = html_img(page.icon.url, size=1.2) if isinstance(page.icon, FileInfo) else page.icon
             row[title_idx] = icon
         return rows
 

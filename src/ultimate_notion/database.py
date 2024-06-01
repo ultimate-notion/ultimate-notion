@@ -11,9 +11,9 @@ from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.query import DBQueryBuilder
-from ultimate_notion.objects import Emoji, File, RichText
+from ultimate_notion.objects import Emoji, FileInfo, RichText
 from ultimate_notion.page import Page
-from ultimate_notion.schema import Column, PageSchema, PropertyType, PropertyValue, ReadOnlyColumnError, SchemaError
+from ultimate_notion.schema import PageSchema, Property, PropertyType, PropertyValue, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.text import camel_case, snake_case
 from ultimate_notion.utils import dict_diff_str, get_active_session, get_repr, get_url
 from ultimate_notion.view import View
@@ -76,11 +76,11 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session.api.databases.update(self.obj_ref, description=text.obj_ref)
 
     @property
-    def icon(self) -> File | Emoji | None:
+    def icon(self) -> FileInfo | Emoji | None:
         """Return the icon of this database as file or emoji."""
         icon = self.obj_ref.icon
         if isinstance(icon, objs.FileObject):
-            return File.wrap_obj_ref(icon)
+            return FileInfo.wrap_obj_ref(icon)
         elif isinstance(icon, objs.EmojiObject):
             return Emoji.wrap_obj_ref(icon)
         elif icon is None:
@@ -90,10 +90,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             raise RuntimeError(msg)
 
     @property
-    def cover(self) -> File | None:
+    def cover(self) -> FileInfo | None:
         """Return the cover of this database as file."""
         cover = self.obj_ref.cover
-        return File.wrap_obj_ref(cover) if cover is not None else None
+        return FileInfo.wrap_obj_ref(cover) if cover is not None else None
 
     @property
     def is_wiki(self) -> bool:
@@ -106,7 +106,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         title = str(self)
         cls_name = f'{camel_case(title)}Schema'
         attrs = {
-            snake_case(k): Column(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
+            snake_case(k): Property(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
             for k, v in obj_ref.properties.items()
         }
         schema: type[PageSchema] = type(cls_name, (PageSchema,), attrs, db_title=title)
@@ -127,11 +127,11 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             schema.bind_db(self)
             self._schema = schema
         else:
-            cols_added, cols_removed, cols_changed = dict_diff_str(self.schema.to_dict(), schema.to_dict())
+            props_added, props_removed, props_changed = dict_diff_str(self.schema.to_dict(), schema.to_dict())
             msg = f"""Provided schema is not consistent with the current schema of the database:
-                      Columns added: {cols_added}
-                      Columns removed: {cols_removed}
-                      Columns changed: {cols_changed}
+                      Properties added: {props_added}
+                      Properties removed: {props_removed}
+                      Properties changed: {props_changed}
                    """
             raise SchemaError(dedent(msg))
 
@@ -209,7 +209,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Create a page with properties according to the schema within the corresponding database."""
 
         # ToDo: let pydantic_model check the kwargs and raise an error if something is wrong
-        schema_kwargs = {col.attr_name: col for col in self.schema.get_cols()}
+        schema_kwargs = {prop.attr_name: prop for prop in self.schema.get_props()}
         if not set(kwargs).issubset(set(schema_kwargs)):
             add_kwargs = set(kwargs) - set(schema_kwargs)
             msg = f"kwargs {', '.join(add_kwargs)} not defined in schema"
@@ -217,12 +217,12 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
         schema_dct = {}
         for kwarg, value in kwargs.items():
-            col = schema_kwargs[kwarg]
-            prop_value_cls = col.type.prop_value  # map schema to page property
+            prop = schema_kwargs[kwarg]
+            prop_value_cls = prop.type.prop_value  # map schema to page property
             # ToDo: Check at that point in case of selectoption if the option is already defined in Schema!
 
             if prop_value_cls.readonly:
-                raise ReadOnlyColumnError(col)
+                raise ReadOnlyPropertyError(prop)
 
             prop_value = value if isinstance(value, PropertyValue) else prop_value_cls(value)
 

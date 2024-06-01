@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
-from ultimate_notion import Column, Database, Page
+from ultimate_notion import Database, Page, Property
 from ultimate_notion.adapters.google.tasks.client import GTask, GTaskList
 from ultimate_notion.adapters.sync import ID, ConflictMode, SyncTask
 from ultimate_notion.utils import get_active_session, str_hash
@@ -20,16 +20,16 @@ class SyncGTasks(SyncTask):
         *,
         notion_db: Database,
         tasklist: GTaskList,
-        completed_col: Column | str,
+        completed_col: Property | str,
         completed_val: Any,
         not_completed_val: Any,
-        due_col: Column | str,
+        due_col: Property | str,
         name: str = 'SyncGTasks',
         conflict_mode: ConflictMode = ConflictMode.NEWER,
     ):
-        if isinstance(completed_col, Column):
+        if isinstance(completed_col, Property):
             completed_col = completed_col.name
-        if isinstance(due_col, Column):
+        if isinstance(due_col, Property):
             due_col = due_col.name
 
         self.notion_db = notion_db
@@ -38,7 +38,7 @@ class SyncGTasks(SyncTask):
         self.completed_val = completed_val
         self.not_completed_val = not_completed_val
         self.due_col = due_col
-        self.title_col = self.notion_db.schema.get_title_col().name
+        self.title_col = self.notion_db.schema.get_title_prop().name
 
         attr_map = {
             self.title_col: 'title',
@@ -131,7 +131,7 @@ class SyncGTasks(SyncTask):
         """Create a new page."""
         kwargs[self.completed_col] = self.completed_val if kwargs[self.completed_col] else self.not_completed_val
         attr_kwargs = {
-            self.notion_db.schema.get_col(key).attr_name: value for key, value in kwargs.items() if value is not None
+            self.notion_db.schema.get_prop(key).attr_name: value for key, value in kwargs.items() if value is not None
         }
         page = self.notion_db.create_page(**attr_kwargs)
         return page

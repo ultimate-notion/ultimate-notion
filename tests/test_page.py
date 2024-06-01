@@ -5,7 +5,7 @@ from textwrap import dedent
 
 import pytest
 
-from ultimate_notion import Database, Emoji, File, Page, RichText, Session
+from ultimate_notion import Database, Emoji, FileInfo, Page, RichText, Session
 from ultimate_notion.blocks import Block
 
 
@@ -98,15 +98,15 @@ def test_icon_attr(notion: Session, root_page: Page):
 
     notion_icon = 'https://www.notion.so/icons/snake_purple.svg'
     new_page.icon = notion_icon  # test automatic conversation
-    assert isinstance(new_page.icon, File)
+    assert isinstance(new_page.icon, FileInfo)
     assert new_page.icon == notion_icon
 
-    new_page.icon = File(url=notion_icon)
-    assert isinstance(new_page.icon, File)
+    new_page.icon = FileInfo(url=notion_icon)
+    assert isinstance(new_page.icon, FileInfo)
     assert new_page.icon == notion_icon
 
     new_page.reload()
-    assert new_page.icon == File(url=notion_icon)
+    assert new_page.icon == FileInfo(url=notion_icon)
 
     new_page.icon = None
     new_page.reload()
@@ -120,15 +120,15 @@ def test_cover_attr(notion: Session, root_page: Page):
     assert new_page.cover is None
     cover_file = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
     new_page.cover = cover_file  # type: ignore[assignment] # test automatic conversation
-    assert isinstance(new_page.cover, File)
+    assert isinstance(new_page.cover, FileInfo)
     assert new_page.cover == cover_file
 
-    new_page.cover = File(url=cover_file)
-    assert isinstance(new_page.cover, File)
+    new_page.cover = FileInfo(url=cover_file)
+    assert isinstance(new_page.cover, FileInfo)
     assert new_page.cover == cover_file
 
     new_page.reload()
-    assert new_page.cover == File(url=cover_file)
+    assert new_page.cover == FileInfo(url=cover_file)
 
     new_page.cover = None
     new_page.reload()
