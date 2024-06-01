@@ -6,7 +6,7 @@ import logging
 from typing import Any, ClassVar
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, ValidatorFunctionWrapHandler, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidatorFunctionWrapHandler, field_validator, model_validator
 
 from ultimate_notion.utils import is_stable_release
 
@@ -74,7 +74,7 @@ class NotionObject(GenericObject):
 
     object: str
     request_id: UUID = None  # type: ignore
-    id: UUID | str = None  # type: ignore
+    id: UUID | str = Field(union_mode='left_to_right', default=None)  # type: ignore
 
     def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)

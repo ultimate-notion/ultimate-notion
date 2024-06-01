@@ -17,6 +17,7 @@ from ultimate_notion.blocks import Block, DataObject
 from ultimate_notion.config import Config, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api.endpoints import NotionAPI
+from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.objects import RichText, User
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
@@ -45,6 +46,7 @@ class Session:
     api: NotionAPI
     _active_session: Session | None = None
     _lock = RLock()
+    _own_bot_id: UUID | None = None
     cache: ClassVar[dict[UUID, DataObject | User]] = {}
 
     def __init__(self, cfg: Config | None = None, **kwargs: Any):
@@ -268,12 +270,24 @@ class Session:
         return page
 
     def get_user(self, user_ref: ObjRef, *, use_cache: bool = True) -> User:
-        """Get a user by uuid."""
+        """Get a user by uuid.
+
+        Attention: Trying to retrieve yourself, i.e. the bot integration, only works if `whoami()`
+        was called before to fill the cache since the low-level api, i.e. `api.users.retrieve()`
+        does not work for the bot integration.
+        """
         user_uuid = get_uuid(user_ref)
+        self.whoami()  # make sure cache is filled with bot user
+
         if use_cache and user_uuid in self.cache:
             return cast(User, self.cache[user_uuid])
         else:
-            user = User.wrap_obj_ref(self.api.users.retrieve(user_uuid))
+            try:
+                user_obj = self.api.users.retrieve(user_uuid)
+            except APIResponseError:
+                _log.warning(f'User with id {user_uuid} not found!')
+                user_obj = UnknownUserObj(id=user_uuid, object='user', type='unknown')
+            user = User.wrap_obj_ref(user_obj)
             self.cache[user.id] = user
             return user
 
@@ -283,8 +297,12 @@ class Session:
 
     def whoami(self) -> User:
         """Return the user object of this bot."""
-        user = self.api.users.me()
-        return cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user)))
+        if self._own_bot_id is None:
+            user = self.api.users.me()
+            self._own_bot_id = user.id
+            return cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user)))
+        else:
+            return cast(User, self.cache[self._own_bot_id])
 
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace."""

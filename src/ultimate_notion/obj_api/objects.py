@@ -20,7 +20,7 @@ from __future__ import annotations
 from abc import ABC
 from copy import deepcopy
 from datetime import date, datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
 from pydantic import Field
@@ -177,6 +177,19 @@ class Bot(User, type='bot'):
         workspace_name: str = None  # type: ignore
 
     bot: _NestedData = _NestedData()
+
+
+class UnknownUser(User, type='unknown'):
+    """Represents an unknown user in Notion.
+
+    This is a unoffical placeholder for a user that is not recognized by the API.
+    """
+
+    name: Literal['Unknown User'] = 'Unknown User'
+
+    class _NestedData(GenericObject): ...
+
+    unknown: _NestedData = _NestedData()
 
 
 class EmojiObject(TypedObject, type='emoji'):

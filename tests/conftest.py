@@ -46,8 +46,7 @@ from ultimate_notion.page import Page
 if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
 
-# ToDo: Rename to 'All Properties DB'
-ALL_PROPS_DB = 'All Columns DB'  # Manually created DB in Notion with all possible properties including AI properties!
+ALL_PROPS_DB = 'All Properties DB'  # Manually created DB with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
 GETTING_STARTED_PAGE = 'Getting Started'

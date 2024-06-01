@@ -29,6 +29,8 @@ def test_whoami_get_user(notion: Session):
     assert me.name == 'Github Unittests'
     user = notion.get_user(me.id)
     assert user.id == me.id
+    user = notion.get_user(me.id, use_cache=False)
+    assert user.name == 'Unknown User'
 
 
 @pytest.mark.vcr()
