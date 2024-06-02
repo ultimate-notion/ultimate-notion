@@ -74,7 +74,8 @@ class NotionObject(GenericObject):
 
     object: str
     request_id: UUID = None  # type: ignore
-    id: UUID | str = Field(union_mode='left_to_right', default=None)  # type: ignore
+    #: ìd is an UUID if possible or a, possible not unique, string depending on the object
+    id: UUID | str = Field(union_mode='left_to_right', default=None)
 
     def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)

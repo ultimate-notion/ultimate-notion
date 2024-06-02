@@ -325,6 +325,10 @@ class User(Wrapper[objs.User], wraps=objs.User):
         return isinstance(self.obj_ref, objs.Bot)
 
     @property
+    def is_unknown(self) -> bool:
+        return isinstance(self.obj_ref, objs.UnknownUser)
+
+    @property
     def avatar_url(self):
         return self.obj_ref.avatar_url
 
