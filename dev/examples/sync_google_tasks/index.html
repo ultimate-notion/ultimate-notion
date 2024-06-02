@@ -22,11 +22,11 @@
 
 <span class=kn>from</span> <span class=nn>ultimate_notion</span> <span class=kn>import</span> <span class=p>(</span>
     <span class=n>Color</span><span class=p>,</span>
-    <span class=n>ColType</span><span class=p>,</span>
-    <span class=n>Column</span><span class=p>,</span>
     <span class=n>Option</span><span class=p>,</span>
     <span class=n>OptionNS</span><span class=p>,</span>
     <span class=n>PageSchema</span><span class=p>,</span>
+    <span class=n>Property</span><span class=p>,</span>
+    <span class=n>PropType</span><span class=p>,</span>
     <span class=n>Session</span><span class=p>,</span>
 <span class=p>)</span>
 <span class=kn>from</span> <span class=nn>ultimate_notion.adapters</span> <span class=kn>import</span> <span class=n>sync</span>
@@ -50,9 +50,9 @@
 <span class=k>class</span> <span class=nc>Task</span><span class=p>(</span><span class=n>PageSchema</span><span class=p>,</span> <span class=n>db_title</span><span class=o>=</span><span class=s1>&#39;My synched task db&#39;</span><span class=p>):</span>
 <span class=w>    </span><span class=sd>&quot;&quot;&quot;My personal task list of all the important stuff I have to do&quot;&quot;&quot;</span>
 
-    <span class=n>task</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Task&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Title</span><span class=p>())</span>
-    <span class=n>status</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Status&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Select</span><span class=p>(</span><span class=n>Status</span><span class=p>))</span>
-    <span class=n>due_date</span> <span class=o>=</span> <span class=n>Column</span><span class=p>(</span><span class=s1>&#39;Due Date&#39;</span><span class=p>,</span> <span class=n>ColType</span><span class=o>.</span><span class=n>Date</span><span class=p>())</span>
+    <span class=n>task</span> <span class=o>=</span> <span class=n>Property</span><span class=p>(</span><span class=s1>&#39;Task&#39;</span><span class=p>,</span> <span class=n>PropType</span><span class=o>.</span><span class=n>Title</span><span class=p>())</span>
+    <span class=n>status</span> <span class=o>=</span> <span class=n>Property</span><span class=p>(</span><span class=s1>&#39;Status&#39;</span><span class=p>,</span> <span class=n>PropType</span><span class=o>.</span><span class=n>Select</span><span class=p>(</span><span class=n>Status</span><span class=p>))</span>
+    <span class=n>due_date</span> <span class=o>=</span> <span class=n>Property</span><span class=p>(</span><span class=s1>&#39;Due Date&#39;</span><span class=p>,</span> <span class=n>PropType</span><span class=o>.</span><span class=n>Date</span><span class=p>())</span>
 
 
 <span class=k>with</span> <span class=n>Session</span><span class=p>()</span> <span class=k>as</span> <span class=n>notion</span><span class=p>:</span>
@@ -121,8 +121,8 @@
 <span class=c1># Option 2: Using an existing Notion database that was created manually</span>
 <span class=k>with</span> <span class=n>Session</span><span class=p>()</span> <span class=k>as</span> <span class=n>notion</span><span class=p>,</span> <span class=n>GTasksClient</span><span class=p>(</span><span class=n>read_only</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span> <span class=k>as</span> <span class=n>gtasks</span><span class=p>:</span>
     <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>search_db</span><span class=p>(</span><span class=s1>&#39;My synched task db&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
-    <span class=n>status_col</span> <span class=o>=</span> <span class=n>task_db</span><span class=o>.</span><span class=n>schema</span><span class=o>.</span><span class=n>get_col</span><span class=p>(</span><span class=s1>&#39;Status&#39;</span><span class=p>)</span>
-    <span class=n>due_date_col</span> <span class=o>=</span> <span class=n>task_db</span><span class=o>.</span><span class=n>schema</span><span class=o>.</span><span class=n>get_col</span><span class=p>(</span><span class=s1>&#39;Due Date&#39;</span><span class=p>)</span>
+    <span class=n>status_col</span> <span class=o>=</span> <span class=n>task_db</span><span class=o>.</span><span class=n>schema</span><span class=o>.</span><span class=n>get_prop</span><span class=p>(</span><span class=s1>&#39;Status&#39;</span><span class=p>)</span>
+    <span class=n>due_date_col</span> <span class=o>=</span> <span class=n>task_db</span><span class=o>.</span><span class=n>schema</span><span class=o>.</span><span class=n>get_prop</span><span class=p>(</span><span class=s1>&#39;Due Date&#39;</span><span class=p>)</span>
     <span class=n>tasklist</span> <span class=o>=</span> <span class=n>gtasks</span><span class=o>.</span><span class=n>get_or_create_tasklist</span><span class=p>(</span><span class=s1>&#39;My synched task list&#39;</span><span class=p>)</span>
 
     <span class=n>sync_task</span> <span class=o>=</span> <span class=n>SyncGTasks</span><span class=p>(</span>
