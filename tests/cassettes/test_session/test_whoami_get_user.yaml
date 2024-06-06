@@ -19,59 +19,12 @@ interactions:
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/users/me
-  response:
-    content: '{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
-      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true},"workspace_name":"GitHub
-      Unittests"},"request_id":"976b9d20-e5d0-4a03-a501-33031c8c4717"}'
-    headers:
-      CF-Cache-Status:
-      - DYNAMIC
-      Connection:
-      - keep-alive
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=utf-8
-      Server:
-      - cloudflare
-      Transfer-Encoding:
-      - chunked
-      etag:
-      - W/"17d-/srOg1wRy7cjd6Zx0r2rId+owYs"
-      vary:
-      - Accept-Encoding
-      x-notion-request-id:
-      - 976b9d20-e5d0-4a03-a501-33031c8c4717
-      x-powered-by:
-      - Express
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      connection:
-      - keep-alive
-      cookie:
-      - secret...
-      host:
-      - api.notion.com
-      notion-version:
-      - '2022-06-28'
-      user-agent:
-      - secret...
-    method: GET
     uri: https://api.notion.com/v1/users/645e79dd-3e43-40de-9d51-39357c1c427f
   response:
-    content: '{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
-      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true},"workspace_name":"GitHub
-      Unittests"},"request_id":"ec600bb4-bb1b-420d-b625-04c44a36cf22"}'
+    content: '{"object":"error","status":404,"code":"object_not_found","message":"Could
+      not find user with ID: 645e79dd-3e43-40de-9d51-39357c1c427f. Make sure your
+      integration has capabilities to read user information. With those capabilities,
+      only members and guests in the integration''s workspace are visible.","request_id":"1b6a69ac-7291-4db5-8f74-3a521679e722"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
@@ -86,13 +39,13 @@ interactions:
       Transfer-Encoding:
       - chunked
       etag:
-      - W/"17d-0BHHanuEyRM0kbTuTIKsa8MVKSY"
+      - W/"15f-/UdQbeB1/1KeVA1ssRXeacSmZHk"
       vary:
       - Accept-Encoding
       x-notion-request-id:
-      - ec600bb4-bb1b-420d-b625-04c44a36cf22
+      - 1b6a69ac-7291-4db5-8f74-3a521679e722
       x-powered-by:
       - Express
     http_version: HTTP/1.1
-    status_code: 200
+    status_code: 404
 version: 1
