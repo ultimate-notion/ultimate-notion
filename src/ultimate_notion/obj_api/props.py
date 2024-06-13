@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import date as dt_date
 from datetime import datetime
-from typing import Any, TypeAlias
+from typing import Any
 
 from pydantic import SerializeAsAny, field_validator, model_serializer
 
@@ -20,9 +20,6 @@ from ultimate_notion.obj_api.objects import (
     User,
 )
 from ultimate_notion.obj_api.schema import AggFunc, SelectOption
-
-#: Notion's complex `Date` type, which is either a date or without time or a date range of the former.
-DateType: TypeAlias = dt_date | tuple[dt_date, dt_date]  # Note that date is the superclass of datetime!
 
 
 class PropertyValue(TypedObject, polymorphic_base=True):
@@ -179,13 +176,8 @@ class DateFormula(FormulaResult, type='date'):
     date: DateRange | None = None
 
     @property
-    def value(self) -> None | DateType:
-        if self.date is None:
-            return None
-        elif self.date.end is None:
-            return self.date.start
-        else:
-            return self.date.start, self.date.end
+    def value(self):
+        return self.date.to_pendulum() if self.date else None
 
 
 class BooleanFormula(FormulaResult, type='boolean'):
@@ -244,13 +236,8 @@ class RollupDate(RollupObject, type='date'):
     date: DateRange | None = None
 
     @property
-    def value(self) -> DateType | None:
-        if self.date is None:
-            return None
-        elif self.date.end is None:
-            return self.date.start
-        else:
-            return self.date.start, self.date.end
+    def value(self):
+        return self.date.to_pendulum() if self.date else None
 
 
 class RollupArray(RollupObject, type='array'):

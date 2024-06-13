@@ -22,6 +22,7 @@
 # - numpy~=1.24
 # - packaging
 # - pandas~=2.0
+# - pendulum
 # - pydantic~=2.0
 # - tabulate>=0.9
 # - google-api-python-client
@@ -273,6 +274,8 @@ pandocfilters==1.5.1
     # via nbconvert
 parso==0.8.4
     # via jedi
+pendulum==3.0.0
+    # via hatch.envs.default
 pexpect==4.9.0
     # via ipython
 pillow==10.3.0
@@ -348,6 +351,8 @@ python-dateutil==2.9.0.post0
     #   jupyter-client
     #   matplotlib
     #   pandas
+    #   pendulum
+    #   time-machine
 python-dotenv==1.0.1
     # via pytest-dotenv
 python-json-logger==2.0.7
@@ -416,6 +421,8 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
+time-machine==2.14.1
+    # via pendulum
 tinycss2==1.3.0
     # via nbconvert
 tomli==2.0.1
@@ -455,7 +462,9 @@ typing-extensions==4.12.1
     #   pydantic
     #   pydantic-core
 tzdata==2024.1
-    # via pandas
+    # via
+    #   pandas
+    #   pendulum
 uri-template==1.3.0
     # via jsonschema
 uritemplate==4.1.1

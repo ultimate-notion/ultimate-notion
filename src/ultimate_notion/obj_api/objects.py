@@ -23,6 +23,7 @@ from datetime import date, datetime
 from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
+import pendulum as pnd
 from pydantic import Field
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
@@ -278,6 +279,52 @@ class DateRange(GenericObject):
     start: date | datetime
     end: date | datetime | None = None
     time_zone: str | None = None
+
+    @classmethod
+    def build(cls, dt: pnd.DateTime | pnd.Date | pnd.Interval):
+        """Compose a DateRange object from the given properties."""
+
+        def to_naive_dt(dt: pnd.DateTime | pnd.Date | datetime | date) -> datetime | date:
+            if type(dt) is datetime or type(dt) is date:
+                return dt
+            elif isinstance(dt, pnd.DateTime):
+                dt = dt.naive()
+                return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)  # noqa: DTZ001
+            else:  # pnd.Date
+                return date(dt.year, dt.month, dt.day)
+
+        if isinstance(dt, pnd.Interval):
+            time_zone = dt.start.timezone_name if isinstance(dt.start, pnd.DateTime) else None
+            start = to_naive_dt(dt.start)
+            end = to_naive_dt(dt.end)
+        elif isinstance(dt, pnd.DateTime):
+            time_zone = dt.timezone_name
+            start = to_naive_dt(dt)
+            end = None
+        elif isinstance(dt, pnd.Date):
+            time_zone = None
+            start = to_naive_dt(dt)
+            end = None
+        else:
+            msg = f"Unsupported type for 'dt': {type(dt)}"
+            raise TypeError(msg)
+        return cls.model_construct(start=start, end=end, time_zone=time_zone)
+
+    def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
+        """Convert the DateRange to a pendulum object."""
+        if self.time_zone is None:
+            if self.end is None:
+                return pnd.instance(self.start)
+            else:
+                return pnd.Interval(start=pnd.instance(self.start), end=pnd.instance(self.end))
+        else:  # noqa: PLR5501
+            if self.end is None:
+                return pnd.instance(self.start, tz=self.time_zone)
+            else:
+                return pnd.Interval(
+                    start=pnd.instance(self.start, tz=self.time_zone),
+                    end=pnd.instance(self.end, tz=self.time_zone),
+                )
 
 
 class LinkObject(GenericObject):
