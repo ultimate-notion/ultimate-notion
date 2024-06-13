@@ -5,7 +5,6 @@ from __future__ import annotations
 import datetime
 import textwrap
 from copy import deepcopy
-from datetime import tzinfo
 from functools import wraps
 from hashlib import sha256
 from pathlib import Path
@@ -13,6 +12,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeAlias, TypeVar, c
 from uuid import UUID
 
 import numpy as np
+import pendulum as pnd
 from packaging.version import Version
 
 from ultimate_notion import __version__
@@ -312,15 +312,6 @@ def str_hash(*args: str, n_chars: int = 16) -> str:
     return sha256(''.join(args).encode('utf-8')).hexdigest()[:n_chars]
 
 
-def local_time_zone() -> tzinfo:
-    """Returns the local time zone."""
-    tzinfo = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
-    if tzinfo is None:
-        msg = 'Could not determine local time zone!'
-        raise RuntimeError(msg)
-    return tzinfo
-
-
 def rank(arr: np.ndarray) -> np.ndarray:
     """Returns the rank of the elements in the array and gives the same rank to equal elements."""
     mask = np.argsort(arr)
@@ -338,3 +329,36 @@ def is_stable_version(version_str: str) -> bool:
 def is_stable_release() -> bool:
     """Return whether the current version is a stable release."""
     return is_stable_version(__version__)
+
+
+def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date:
+    """Parse a string to a pendulum object using the local timezone if none provided or UTC otherwise."""
+    dt = pnd.parse(dt_str, exact=True, tz=None)
+    if isinstance(dt, pnd.DateTime):
+        if dt.tz is None:
+            return dt.in_tz('local')
+        else:
+            return dt.in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
+    elif isinstance(dt, pnd.Date):
+        return dt
+    else:
+        msg = f'Unexpected parsing result of type {type(dt)} for {dt_str}'
+        raise TypeError(msg)
+
+
+def to_pendulum(dt: str | datetime.datetime | datetime.date | pnd.Interval) -> pnd.DateTime | pnd.Date | pnd.Interval:
+    """Convert a datetime or date object to a pendulum object."""
+    if isinstance(dt, pnd.DateTime | pnd.Date | pnd.Interval):
+        return dt
+    elif isinstance(dt, str):
+        return parse_dt_str(dt)
+    elif isinstance(dt, datetime.datetime):
+        if dt.tzinfo is None:
+            return pnd.instance(dt, tz='local')
+        else:
+            return pnd.instance(dt).in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
+    elif isinstance(dt, datetime.date):
+        return pnd.instance(dt)
+    else:
+        msg = f'Unexpected type {type(dt)} for {dt}'
+        raise TypeError(msg)

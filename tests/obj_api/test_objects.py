@@ -1,16 +1,46 @@
-from datetime import date, datetime, timezone
+import datetime as dt
+
+import pendulum as pnd
+import pytest
 
 from ultimate_notion.obj_api import objects as objs
 
 
 def test_date_range():
-    date_obj = date(2023, 1, 1)
-    datetime_obj = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
-    obj = objs.DateRange.build(start=date_obj, end=datetime_obj)
-    assert obj.start == date_obj
-    assert obj.end == datetime_obj
-    assert isinstance(obj.start, date)
-    assert isinstance(obj.end, datetime)
+    date = pnd.date(2024, 1, 1)
+    obj = objs.DateRange.build(date)
+    assert isinstance(obj.start, dt.date)
+    assert obj.start == date
+    assert obj.end is None
+    assert obj.time_zone is None
+    assert obj.to_pendulum() == date
 
-    obj = objs.DateRange.build(start=datetime_obj)
-    assert obj.start == datetime_obj
+    tz = 'Europe/Berlin'
+    datetime = pnd.datetime(2024, 1, 1, 12, 0, 0, tz=tz)
+    obj = objs.DateRange.build(datetime)
+    assert isinstance(obj.start, dt.datetime)
+    assert obj.start == datetime.naive()
+    assert obj.end is None
+    assert obj.time_zone == tz
+    assert obj.to_pendulum() == datetime
+
+    date_interval = pnd.interval(start=pnd.parse('2024-01-01', exact=True), end=pnd.parse('2024-01-03', exact=True))
+    obj = objs.DateRange.build(date_interval)
+    assert isinstance(obj.start, dt.date)
+    assert obj.start == date_interval.start
+    assert isinstance(obj.end, dt.date)
+    assert obj.end == date_interval.end
+    assert obj.time_zone is None
+    assert obj.to_pendulum() == date_interval
+
+    datetime_interval = pnd.interval(start=pnd.parse('2024-01-01 10:00'), end=pnd.parse('2024-01-03 12:00'))
+    obj = objs.DateRange.build(datetime_interval)
+    assert isinstance(obj.start, dt.datetime)
+    assert obj.start == datetime_interval.start.naive()
+    assert isinstance(obj.end, dt.datetime)
+    assert obj.end == datetime_interval.end.naive()
+    assert obj.time_zone == 'UTC'
+    assert obj.to_pendulum() == datetime_interval
+
+    with pytest.raises(TypeError):
+        objs.DateRange.build(dt.datetime(2024, 1, 1, 12, 0, 0, tzinfo=dt.timezone.utc))
