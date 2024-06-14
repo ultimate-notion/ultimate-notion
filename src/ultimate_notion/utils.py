@@ -331,16 +331,24 @@ def is_stable_release() -> bool:
     return is_stable_version(__version__)
 
 
-def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date:
+def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
     """Parse a string to a pendulum object using the local timezone if none provided or UTC otherwise."""
+    def set_tz(dt: pnd.DateTime | pnd.Date) -> pnd.DateTime | pnd.Date:
+        if isinstance(dt, pnd.DateTime):
+            if dt.tz is None:
+                return dt.in_tz('local')
+            else:
+                return dt.in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
+        else:
+            return dt  # as it is a date and has no tz information
+
     dt = pnd.parse(dt_str, exact=True, tz=None)
     if isinstance(dt, pnd.DateTime):
-        if dt.tz is None:
-            return dt.in_tz('local')
-        else:
-            return dt.in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
+        return set_tz(dt)
     elif isinstance(dt, pnd.Date):
         return dt
+    elif isinstance(dt, pnd.Interval):
+        return pnd.Interval(start=set_tz(dt.start), end=set_tz(dt.end))
     else:
         msg = f'Unexpected parsing result of type {type(dt)} for {dt_str}'
         raise TypeError(msg)

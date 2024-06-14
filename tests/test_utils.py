@@ -71,6 +71,26 @@ def test_is_stable_version():
     assert utils.is_stable_version('1.2.3.post1.dev') is False
 
 
+def test_parse_dt_str():
+    tz = 'Europe/Berlin'
+    pnd.timezone(tz)
+    assert utils.parse_dt_str('2021-01-01') == pnd.date(2021, 1, 1)
+    assert utils.parse_dt_str('2021-01-01 12:00:00') == pnd.datetime(2021, 1, 1, 12, 0, 0, tz=tz)
+    assert utils.parse_dt_str('2021-01-01 12:00:00+02:00') == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
+
+    datetime_interval_str = '2021-01-01 12:00:00/2021-01-03 12:00:00'
+    datetime_interval = utils.parse_dt_str(datetime_interval_str)
+    assert datetime_interval == pnd.interval(start=pnd.datetime(2021, 1, 1, 12, 0, 0, tz=tz),
+                                         end=pnd.datetime(2021, 1, 3, 12, 0, 0, tz=tz))
+    datetime_interval_str = '2021-01-01 12:00:00+02:00/2021-01-03 12:00:00+02:00'
+    datetime_interval = utils.parse_dt_str(datetime_interval_str)
+    assert datetime_interval == pnd.interval(start=pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC'),
+                                         end=pnd.datetime(2021, 1, 3, 10, 0, 0, tz='UTC'))
+    date_interval_str = '2021-01-01/2021-01-03'
+    date_interval = utils.parse_dt_str(date_interval_str)
+    assert date_interval == pnd.interval(start=pnd.date(2021, 1, 1), end=pnd.date(2021, 1, 3))
+
+
 def test_to_pendulum():
     tz = 'Europe/Berlin'
     pnd.timezone(tz)
