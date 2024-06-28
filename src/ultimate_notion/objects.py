@@ -13,7 +13,9 @@ from ultimate_notion.utils import Wrapper, get_repr
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     """Option for select & multi-select property."""
 
-    def __init__(self, name: str, *, color: Color = Color.DEFAULT):
+    def __init__(self, name: str, *, color: Color | str = Color.DEFAULT):
+        if isinstance(color, str):
+            color = Color(color)
         super().__init__(name, color=color)
 
     @property
@@ -202,7 +204,7 @@ class RichTextBase(Wrapper[T], wraps=objs.RichTextObject):
 
 
 class Text(RichTextBase[objs.TextObject], wraps=objs.TextObject):
-    """A Text object."""
+    """A Text object used by `RichText`, which should be used instead of this class."""
 
 
 class Equation(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
@@ -212,6 +214,10 @@ class Equation(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
 class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
     """A Mention object."""
 
+    # ToDo: Implement this!
+    # def __init__(self, *, user: User | None = None, db: Database | None = None, page: Page | None = None):
+    #     super().__init__(*args, **kwargs)
+
     @property
     def type(self) -> str:
         """Type of the mention, e.g. user, page, etc."""
@@ -219,7 +225,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
 
 class RichText(str):
-    """User-facing class holding several RichTexts."""
+    """User-facing class holding several RichTextsBase objects."""
 
     _rich_texts: list[RichTextBase]
 
@@ -285,6 +291,9 @@ class RichText(str):
 
     def __hash__(self):
         return hash(str(self))
+
+    # # TODO: Implement this
+    # add __plus__ und equation and mention
 
 
 class User(Wrapper[objs.User], wraps=objs.User):

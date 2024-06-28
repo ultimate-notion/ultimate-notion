@@ -12,9 +12,9 @@ from tabulate import tabulate
 from ultimate_notion import objects
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.objects import RichText, User
+from ultimate_notion.objects import RichText, RichTextBase, User
 from ultimate_notion.text import md_comment
-from ultimate_notion.utils import Wrapper, get_active_session, get_url, get_uuid
+from ultimate_notion.utils import Wrapper, flatten, get_active_session, get_url, get_uuid
 
 if TYPE_CHECKING:
     from ultimate_notion.page import Page
@@ -117,6 +117,16 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
 
 class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Text block."""
+
+    def __init__(self, text: str | RichText | RichTextBase | list[RichTextBase]) -> None:
+        if isinstance(text, str):
+            texts = RichText(text).obj_ref
+        elif isinstance(text, RichText | RichTextBase):
+            texts = text.obj_ref
+        elif isinstance(text, list):
+            texts = flatten([rt.obj_ref for rt in text])
+
+        super().__init__(texts)
 
     @property
     def rich_text(self) -> RichText:

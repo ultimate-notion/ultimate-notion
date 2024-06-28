@@ -7,6 +7,7 @@ from typing import Any, ClassVar
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, ValidatorFunctionWrapHandler, field_validator, model_validator
+from typing_extensions import Self
 
 from ultimate_notion.utils import is_stable_release
 
@@ -23,7 +24,7 @@ class GenericObject(BaseModel):
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
     @classmethod
-    def _set_field_default(cls, name: str, default: str):
+    def _set_field_default(cls, name: str, default: str) -> None:
         """Modify the `BaseModel` field information for a specific class instance.
 
         This is necessary in particular for subclasses that change the default values
@@ -44,7 +45,7 @@ class GenericObject(BaseModel):
         cls.model_rebuild(force=True)
 
     # https://github.com/pydantic/pydantic/discussions/3139
-    def update(self, **data):
+    def update(self, **data: Any) -> Self:
         """Update the internal attributes with new data."""
 
         new_obj_dct = self.model_dump()
@@ -72,10 +73,12 @@ class GenericObject(BaseModel):
 class NotionObject(GenericObject):
     """A top-level Notion API resource."""
 
+    #: object is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ...
     object: str
-    request_id: UUID = None  # type: ignore
-    #: ìd is an UUID if possible or a, possible not unique, string depending on the object
+    #: id is an UUID if possible or a string (possibly not unique) depending on the object
     id: UUID | str = Field(union_mode='left_to_right', default=None)
+    #: request_id is a UUID that is used to track requests in the Notion API
+    request_id: UUID | None = None
 
     def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)
@@ -125,6 +128,7 @@ class TypedObject(GenericObject):
     Calling the object provides direct access to the data stored in `{type}`.
     """
 
+    #: type is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ...
     type: str
     _polymorphic_base: ClassVar[bool] = False
 

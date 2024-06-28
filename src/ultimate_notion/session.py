@@ -306,9 +306,7 @@ class Session:
 
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace."""
-        return [
-            cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.as_list()
-        ]
+        return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
 
     def _get_block(self, block_ref: ObjRef) -> Block:
         """Retrieve a single block by an object reference."""

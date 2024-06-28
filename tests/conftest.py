@@ -25,10 +25,10 @@ import json
 import os
 import shutil
 import tempfile
-from collections.abc import Generator
+from collections.abc import Iterator
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeAlias, TypeVar
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -46,7 +46,9 @@ from ultimate_notion.page import Page
 if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
 
-ALL_PROPS_DB = 'All Properties DB'  # Manually created DB with all possible properties including AI properties!
+# Manually created DBs and Pages in Notion for testing purposes
+TESTS_PAGE = 'Tests'  # root page for all tests with connected Notion integration
+ALL_PROPS_DB = 'All Properties DB'  # DB with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
 GETTING_STARTED_PAGE = 'Getting Started'
@@ -54,9 +56,6 @@ MD_TEXT_TEST_PAGE = 'Markdown Text Test'
 MD_PAGE_TEST_PAGE = 'Markdown Page Test'
 MD_SUBPAGE_TEST_PAGE = 'Markdown SubPage Test'
 TASK_DB = 'Task DB'
-
-T = TypeVar('T')
-Yield: TypeAlias = Generator[T, None, None]
 
 
 def pytest_addoption(parser: Parser):
@@ -106,7 +105,7 @@ def vcr_config():
 
 
 @pytest.fixture(scope='session')
-def custom_config(request: SubRequest) -> Yield[Path]:
+def custom_config(request: SubRequest) -> Iterator[Path]:
     """Return a custom configuration file for the tests."""
     if request.config.getoption('--record-mode') == 'none':  # corresponds to `vcr-only`
         with tempfile.TemporaryDirectory() as tmp_dir_path:
@@ -228,7 +227,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
 
 
 @pytest.fixture(scope='module')
-def notion() -> Yield[Session]:
+def notion() -> Iterator[Session]:
     """Return the notion session used for live testing."""
     with uno.Session() as notion:
         yield notion
@@ -243,11 +242,11 @@ def contacts_db(notion: Session) -> Database:
 @vcr_fixture(scope='module')
 def root_page(notion: Session) -> Page:
     """Return the page reference used as parent page for live testing."""
-    return notion.search_page('Tests').item()
+    return notion.search_page(TESTS_PAGE).item()
 
 
 @pytest.fixture(scope='function')
-def article_db(notion: Session, root_page: Page) -> Yield[Database]:
+def article_db(notion: Session, root_page: Page) -> Iterator[Database]:
     """Simple database of articles."""
 
     class Article(schema.PageSchema, db_title='Articles'):
@@ -261,7 +260,7 @@ def article_db(notion: Session, root_page: Page) -> Yield[Database]:
 
 
 @pytest.fixture(scope='function')
-def page_hierarchy(notion: Session, root_page: Page) -> Yield[tuple[Page, Page, Page]]:
+def page_hierarchy(notion: Session, root_page: Page) -> Iterator[tuple[Page, Page, Page]]:
     """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2."""
     l1_page = notion.create_page(parent=root_page, title='level_1')
     l2_page = notion.create_page(parent=l1_page, title='level_2')
@@ -324,7 +323,7 @@ def static_dbs(all_props_db: Database, wiki_db: Database, contacts_db: Database,
 
 
 @pytest.fixture(scope='function')
-def new_task_db(notion: Session, root_page: Page) -> Yield[Database]:
+def new_task_db(notion: Session, root_page: Page) -> Iterator[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
         Option('In Progres', color=uno.Color.BLUE),

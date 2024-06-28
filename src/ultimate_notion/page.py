@@ -127,6 +127,8 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     @property
     def children(self) -> list[Block]:
         """Return the content of this page, i.e. all blocks belonging to this page"""
+
+        # ToDo: Move this to ChildrenMixin
         if self._children is None:  # generate cache
             session = get_active_session()
             child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
@@ -145,9 +147,31 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         session = get_active_session()
         return [session.get_db(block.id) for block in self.children if isinstance(block, ChildDatabase)]
 
+    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Page:
+        """Append a block or a list of blocks to the content of this page."""
+        blocks = [blocks] if isinstance(blocks, Block) else blocks
+        block_objs = [block.obj_ref for block in blocks]
+        after_obj = None if after is None else after.obj_ref
+
+        session = get_active_session()
+        block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
+        blocks = [Block.wrap_obj_ref(block_obj) for block_obj in block_objs]
+
+        current_children = self.children  # force an initial load of the child blocks
+        if after is None:
+            current_children.extend(blocks)
+        else:
+            idx = next(idx for idx, block in enumerate(blocks) if block.id == after.id)
+            current_children[idx:idx] = blocks
+        return self
+
     @property
     def database(self) -> Database | None:
-        """If this page is located in a database return the database or None otherwise."""
+        """If this page is located in a database return the database or None otherwise.
+
+        This is a convenience method to avoid the need to check and cast the type of the parent.
+        """
+        # ToDo: Rework this and rather call it `parent_db`, also have `in_db` and return a boolean.
         from ultimate_notion.database import Database  # noqa: PLC0415
 
         if isinstance(self.parent, Database):
@@ -229,6 +253,7 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         if raw:
             return self._render_md(self.to_markdown())
 
+        # ToDo: Move this to an extra function and have a template for the HTML.
         html_before = dedent(
             """
             <!DOCTYPE html>

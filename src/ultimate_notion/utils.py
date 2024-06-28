@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import textwrap
 from copy import deepcopy
 from functools import wraps
 from hashlib import sha256
+from itertools import chain
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeAlias, TypeVar, cast
 from uuid import UUID
@@ -14,6 +15,7 @@ from uuid import UUID
 import numpy as np
 import pendulum as pnd
 from packaging.version import Version
+from typing_extensions import Self
 
 from ultimate_notion import __version__
 from ultimate_notion.obj_api import objects as objs
@@ -40,6 +42,11 @@ class SList(list[T]):
         else:
             msg = f"list of '{type(self[0]).__name__}' objects has more than one element"
         raise ValueError(msg)
+
+
+def flatten(nested_list: list[list[T]], /) -> list[T]:
+    """Flatten a nested list."""
+    return list(chain.from_iterable(nested_list))
 
 
 def is_notebook() -> bool:
@@ -210,7 +217,6 @@ def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str
     return keys_added_str, keys_removed_str, keys_changed_str
 
 
-Self = TypeVar('Self', bound='Wrapper[Any]')  # ToDo: Replace when requires-python >= 3.11
 GT = TypeVar('GT', bound='GenericObject')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
@@ -333,40 +339,52 @@ def is_stable_release() -> bool:
 
 def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
     """Parse a string to a pendulum object using the local timezone if none provided or UTC otherwise."""
-    def set_tz(dt: pnd.DateTime | pnd.Date) -> pnd.DateTime | pnd.Date:
-        if isinstance(dt, pnd.DateTime):
-            if dt.tz is None:
-                return dt.in_tz('local')
-            else:
-                return dt.in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
-        else:
-            return dt  # as it is a date and has no tz information
 
-    dt = pnd.parse(dt_str, exact=True, tz=None)
-    if isinstance(dt, pnd.DateTime):
-        return set_tz(dt)
-    elif isinstance(dt, pnd.Date):
-        return dt
-    elif isinstance(dt, pnd.Interval):
-        return pnd.Interval(start=set_tz(dt.start), end=set_tz(dt.end))
+    def set_tz(dt_spec: pnd.DateTime | pnd.Date | dt.datetime | dt.date) -> pnd.DateTime | pnd.Date:
+        """Set the timezone of the datetime specifier object if necessary."""
+        if isinstance(dt_spec, pnd.DateTime):
+            if dt_spec.tz is None:
+                return dt_spec.in_tz('local')
+            else:
+                return dt_spec.in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
+        elif isinstance(dt_spec, pnd.Date):
+            return dt_spec  # as it is a date and has no tz information
+        elif isinstance(dt_spec, dt.datetime):
+            if dt_spec.tzinfo is None:
+                return pnd.instance(dt_spec, tz='local')
+            else:
+                return pnd.instance(dt_spec).in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
+        elif isinstance(dt_spec, dt.date):
+            return pnd.instance(dt_spec)
+        else:
+            msg = f'Unexpected type {type(dt_spec)} for {dt_spec}'
+            raise TypeError(msg)
+
+    dt_spec = pnd.parse(dt_str, exact=True, tz=None)
+    if isinstance(dt_spec, pnd.DateTime):
+        return set_tz(dt_spec)
+    elif isinstance(dt_spec, pnd.Date):
+        return dt_spec
+    elif isinstance(dt_spec, pnd.Interval):
+        return pnd.Interval(start=set_tz(dt_spec.start), end=set_tz(dt_spec.end))
     else:
-        msg = f'Unexpected parsing result of type {type(dt)} for {dt_str}'
+        msg = f'Unexpected parsing result of type {type(dt_spec)} for {dt_str}'
         raise TypeError(msg)
 
 
-def to_pendulum(dt: str | datetime.datetime | datetime.date | pnd.Interval) -> pnd.DateTime | pnd.Date | pnd.Interval:
+def to_pendulum(dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> pnd.DateTime | pnd.Date | pnd.Interval:
     """Convert a datetime or date object to a pendulum object."""
-    if isinstance(dt, pnd.DateTime | pnd.Date | pnd.Interval):
-        return dt
-    elif isinstance(dt, str):
-        return parse_dt_str(dt)
-    elif isinstance(dt, datetime.datetime):
-        if dt.tzinfo is None:
-            return pnd.instance(dt, tz='local')
+    if isinstance(dt_spec, pnd.DateTime | pnd.Date | pnd.Interval):
+        return dt_spec
+    elif isinstance(dt_spec, str):
+        return parse_dt_str(dt_spec)
+    elif isinstance(dt_spec, dt.datetime):
+        if dt_spec.tzinfo is None:
+            return pnd.instance(dt_spec, tz='local')
         else:
-            return pnd.instance(dt).in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
-    elif isinstance(dt, datetime.date):
-        return pnd.instance(dt)
+            return pnd.instance(dt_spec).in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
+    elif isinstance(dt_spec, dt.date):
+        return pnd.instance(dt_spec)
     else:
-        msg = f'Unexpected type {type(dt)} for {dt}'
+        msg = f'Unexpected type {type(dt_spec)} for {dt_spec}'
         raise TypeError(msg)

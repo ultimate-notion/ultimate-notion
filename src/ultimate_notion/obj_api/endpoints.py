@@ -8,6 +8,7 @@ is just referred to as `raw_api`.
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias, cast
 from uuid import UUID
 
@@ -19,6 +20,7 @@ from ultimate_notion.obj_api.objects import (
     DatabaseRef,
     EmojiObject,
     FileObject,
+    GenericObject,
     ObjectReference,
     PageRef,
     ParentRef,
@@ -80,7 +82,9 @@ class BlocksEndpoint(Endpoint):
             return self.api.client.blocks.children
 
         # https://developers.notion.com/reference/patch-block-children
-        def append(self, parent, *blocks: Block):
+        def append(
+            self, parent: ParentRef | GenericObject | UUID | str, blocks: list[Block], *, after: Block | None = None
+        ) -> list[Block]:
             """Add the given blocks as children of the specified parent.
 
             The blocks info will be updated based on returned data.
@@ -89,31 +93,23 @@ class BlocksEndpoint(Endpoint):
             """
 
             parent_id = ObjectReference.build(parent).id
-
             children = [block.serialize_for_api() for block in blocks if block is not None]
 
             logger.info('Appending %d blocks to %s ...', len(children), parent_id)
 
-            # Typing within notion_client sucks, so we cast
-            data = cast(dict[str, Any], self.raw_api.append(block_id=parent_id, children=children))
-
-            if 'results' in data:
-                if len(blocks) == len(data['results']):
-                    for idx in range(len(blocks)):
-                        block = blocks[idx]
-                        result = data['results'][idx]
-                        block.update(**result)
-
-                else:
-                    logger.warning('Unable to update results; size mismatch')
-
+            endpoint_iter = EndpointIterator(endpoint=self.raw_api.append)
+            if after is None:
+                appended_blocks = endpoint_iter(block_id=parent_id, children=children)
             else:
-                logger.warning('Unable to update results; not provided')
+                appended_blocks = endpoint_iter(block_id=parent_id, children=children, after=after.id)
 
-            return parent
+            for block, appended_block in zip(blocks, appended_blocks, strict=True):
+                block.update(**appended_block.model_dump())
+
+            return blocks
 
         # https://developers.notion.com/reference/get-block-children
-        def list(self, parent):
+        def list(self, parent: ParentRef | GenericObject | UUID | str) -> Iterator[Block]:
             """Return all Blocks contained by the specified parent.
 
             `parent` may be any suitable `ObjectReference` type.
@@ -125,7 +121,7 @@ class BlocksEndpoint(Endpoint):
 
             blocks = EndpointIterator(endpoint=self.raw_api.list)
 
-            return blocks(block_id=parent_id)
+            return cast(Iterator[Block], blocks(block_id=parent_id))
 
     def __init__(self, *args, **kwargs):
         """Initialize the `blocks` endpoint for the Notion API."""
@@ -145,7 +141,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = ObjectReference.build(block).id
+        block_id = str(ObjectReference.build(block).id)
         logger.info('Deleting block :: %s', block_id)
 
         data = self.raw_api.delete(block_id)
@@ -158,7 +154,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = ObjectReference.build(block).id
+        block_id = str(ObjectReference.build(block).id)
         logger.info('Restoring block :: %s', block_id)
 
         data = self.raw_api.update(block_id, archived=False)
@@ -172,7 +168,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = ObjectReference.build(block).id
+        block_id = str(ObjectReference.build(block).id)
         logger.info('Retrieving block :: %s', block_id)
 
         data = self.raw_api.retrieve(block_id)
@@ -294,7 +290,8 @@ class DatabasesEndpoint(Endpoint):
 
         block_obj = self.api.blocks.delete(dbid)
         # block.update(**data) is not possible as the API returns a block, not a database
-        db.archived = block_obj.archived
+        db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
+        db.in_trash = block_obj.in_trash
         return db
 
     def restore(self, db: Database) -> Database:
@@ -306,7 +303,8 @@ class DatabasesEndpoint(Endpoint):
 
         block_obj = self.api.blocks.restore(dbid)
         # block.update(**data) is not possible as the API returns a block, not a database
-        db.archived = block_obj.archived
+        db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
+        db.in_trash = block_obj.in_trash
         return db
 
     # https://developers.notion.com/reference/post-database-query
@@ -514,7 +512,7 @@ class UsersEndpoint(Endpoint):
         return self.api.client.users
 
     # https://developers.notion.com/reference/get-users
-    def as_list(self):
+    def list(self):
         """Return an iterator for all users in the workspace."""
 
         logger.info('Listing known users...')
