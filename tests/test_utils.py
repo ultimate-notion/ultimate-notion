@@ -80,12 +80,14 @@ def test_parse_dt_str():
 
     datetime_interval_str = '2021-01-01 12:00:00/2021-01-03 12:00:00'
     datetime_interval = utils.parse_dt_str(datetime_interval_str)
-    assert datetime_interval == pnd.interval(start=pnd.datetime(2021, 1, 1, 12, 0, 0, tz=tz),
-                                         end=pnd.datetime(2021, 1, 3, 12, 0, 0, tz=tz))
+    assert datetime_interval == pnd.interval(
+        start=pnd.datetime(2021, 1, 1, 12, 0, 0, tz=tz), end=pnd.datetime(2021, 1, 3, 12, 0, 0, tz=tz)
+    )
     datetime_interval_str = '2021-01-01 12:00:00+02:00/2021-01-03 12:00:00+02:00'
     datetime_interval = utils.parse_dt_str(datetime_interval_str)
-    assert datetime_interval == pnd.interval(start=pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC'),
-                                         end=pnd.datetime(2021, 1, 3, 10, 0, 0, tz='UTC'))
+    assert datetime_interval == pnd.interval(
+        start=pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC'), end=pnd.datetime(2021, 1, 3, 10, 0, 0, tz='UTC')
+    )
     date_interval_str = '2021-01-01/2021-01-03'
     date_interval = utils.parse_dt_str(date_interval_str)
     assert date_interval == pnd.interval(start=pnd.date(2021, 1, 1), end=pnd.date(2021, 1, 3))

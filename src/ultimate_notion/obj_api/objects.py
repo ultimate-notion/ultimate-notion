@@ -57,13 +57,74 @@ class SelectGroup(GenericObject):
     option_ids: list[str] = Field(default_factory=list)
 
 
+class DateRange(GenericObject):
+    """A Notion date range, with an optional end date."""
+
+    start: date | datetime
+    end: date | datetime | None = None
+    time_zone: str | None = None
+
+    @classmethod
+    def build(cls, dt: pnd.DateTime | pnd.Date | pnd.Interval):
+        """Compose a DateRange object from the given properties."""
+
+        def to_naive_dt(dt: pnd.DateTime | pnd.Date | datetime | date) -> datetime | date:
+            if type(dt) is datetime or type(dt) is date:
+                return dt
+            elif isinstance(dt, pnd.DateTime):
+                dt = dt.naive()
+                return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)  # noqa: DTZ001
+            else:  # pnd.Date
+                return date(dt.year, dt.month, dt.day)
+
+        if isinstance(dt, pnd.Interval):
+            time_zone = dt.start.timezone_name if isinstance(dt.start, pnd.DateTime) else None
+            start = to_naive_dt(dt.start)
+            end = to_naive_dt(dt.end)
+        elif isinstance(dt, pnd.DateTime):
+            time_zone = dt.timezone_name
+            start = to_naive_dt(dt)
+            end = None
+        elif isinstance(dt, pnd.Date):
+            time_zone = None
+            start = to_naive_dt(dt)
+            end = None
+        else:
+            msg = f"Unsupported type for 'dt': {type(dt)}"
+            raise TypeError(msg)
+        return cls.model_construct(start=start, end=end, time_zone=time_zone)
+
+    def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
+        """Convert the DateRange to a pendulum object."""
+        if self.time_zone is None:
+            if self.end is None:
+                return pnd.instance(self.start)
+            else:
+                return pnd.Interval(start=pnd.instance(self.start), end=pnd.instance(self.end))
+        else:  # noqa: PLR5501
+            if self.end is None:
+                return pnd.instance(self.start, tz=self.time_zone)
+            else:
+                return pnd.Interval(
+                    start=pnd.instance(self.start, tz=self.time_zone),
+                    end=pnd.instance(self.end, tz=self.time_zone),
+                )
+
+
+class LinkObject(GenericObject):
+    """Reference a URL."""
+
+    type: str = 'url'
+    url: str = None  # type: ignore
+
+
 class ObjectReference(GenericObject):
     """A general-purpose object reference in the Notion API."""
 
     id: UUID
 
     @classmethod
-    def build(cls, ref):
+    def build(cls, ref: ParentRef | GenericObject | UUID | str) -> ObjectReference:
         """Compose an ObjectReference from the given reference.
 
         `ref` may be a `UUID`, `str`, `ParentRef` or `GenericObject` with an `id`.
@@ -86,12 +147,13 @@ class ObjectReference(GenericObject):
             return ObjectReference.model_construct(id=ref)
 
         if isinstance(ref, str):
-            ref = extract_id(ref)
+            if (id_str := extract_id(ref)) is not None:
+                return ObjectReference.model_construct(id=UUID(id_str))
+            else:
+                msg = f"Unrecognized 'ref' string: {ref}"
+                raise ValueError(msg)
 
-            if ref is not None:
-                return ObjectReference.model_construct(id=UUID(ref))
-
-        msg = "Unrecognized 'ref' attribute"
+        msg = f"Unrecognized 'ref' attribute: {ref}"
         raise ValueError(msg)
 
 
@@ -198,6 +260,7 @@ class EmojiObject(TypedObject, type='emoji'):
 
     emoji: str
 
+    # ToDo: Check if this should be better removed.
     @classmethod
     def build(cls, emoji):
         """Compose an EmojiObject from the given emoji string."""
@@ -234,104 +297,6 @@ class RichTextObject(TypedObject, polymorphic_base=True):
         """
         style = deepcopy(style)
         return cls.model_construct(plain_text=text, href=href, annotations=style)
-
-
-class FileObject(TypedObject, polymorphic_base=True):
-    """A Notion file object.
-
-    Depending on the context, a FileObject may require a name (such as in the `Files`
-    property). This makes the object hierarchy difficult, so here we simply allow
-    `name` to be optional. It is the responsibility of the caller to set `name` if
-    required by the API.
-    """
-
-    name: str | None = None
-    caption: list[RichTextObject] | None = None
-
-
-class HostedFile(FileObject, type='file'):
-    """A Notion file object."""
-
-    class _NestedData(GenericObject):
-        url: str
-        expiry_time: datetime | None = None
-
-    file: _NestedData
-
-
-class ExternalFile(FileObject, type='external'):
-    """An external file object."""
-
-    class _NestedData(GenericObject):
-        url: str
-
-    external: _NestedData
-
-    @classmethod
-    def build(cls, url, name=None):
-        """Create a new `ExternalFile` from the given URL."""
-        return cls.model_construct(name=name, external=cls._NestedData(url=url))
-
-
-class DateRange(GenericObject):
-    """A Notion date range, with an optional end date."""
-
-    start: date | datetime
-    end: date | datetime | None = None
-    time_zone: str | None = None
-
-    @classmethod
-    def build(cls, dt: pnd.DateTime | pnd.Date | pnd.Interval):
-        """Compose a DateRange object from the given properties."""
-
-        def to_naive_dt(dt: pnd.DateTime | pnd.Date | datetime | date) -> datetime | date:
-            if type(dt) is datetime or type(dt) is date:
-                return dt
-            elif isinstance(dt, pnd.DateTime):
-                dt = dt.naive()
-                return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)  # noqa: DTZ001
-            else:  # pnd.Date
-                return date(dt.year, dt.month, dt.day)
-
-        if isinstance(dt, pnd.Interval):
-            time_zone = dt.start.timezone_name if isinstance(dt.start, pnd.DateTime) else None
-            start = to_naive_dt(dt.start)
-            end = to_naive_dt(dt.end)
-        elif isinstance(dt, pnd.DateTime):
-            time_zone = dt.timezone_name
-            start = to_naive_dt(dt)
-            end = None
-        elif isinstance(dt, pnd.Date):
-            time_zone = None
-            start = to_naive_dt(dt)
-            end = None
-        else:
-            msg = f"Unsupported type for 'dt': {type(dt)}"
-            raise TypeError(msg)
-        return cls.model_construct(start=start, end=end, time_zone=time_zone)
-
-    def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
-        """Convert the DateRange to a pendulum object."""
-        if self.time_zone is None:
-            if self.end is None:
-                return pnd.instance(self.start)
-            else:
-                return pnd.Interval(start=pnd.instance(self.start), end=pnd.instance(self.end))
-        else:  # noqa: PLR5501
-            if self.end is None:
-                return pnd.instance(self.start, tz=self.time_zone)
-            else:
-                return pnd.Interval(
-                    start=pnd.instance(self.start, tz=self.time_zone),
-                    end=pnd.instance(self.end, tz=self.time_zone),
-                )
-
-
-class LinkObject(GenericObject):
-    """Reference a URL."""
-
-    type: str = 'url'
-    url: str = None  # type: ignore
 
 
 class TextObject(RichTextObject, type='text'):
@@ -409,7 +374,7 @@ class MentionPage(MentionData, type='page'):
     page: ObjectReference
 
     @classmethod
-    def build(cls, page_ref) -> MentionObject:
+    def build(cls, page_ref: PageRef) -> MentionObject:
         """Build a `Mention` object for the specified page reference."""
 
         ref = ObjectReference.build(page_ref)
@@ -423,10 +388,10 @@ class MentionDatabase(MentionData, type='database'):
     database: ObjectReference
 
     @classmethod
-    def build(cls, page) -> MentionObject:
+    def build(cls, db_ref: DatabaseRef) -> MentionObject:
         """Build a `Mention` object for the specified database reference."""
 
-        ref = ObjectReference.build(page)
+        ref = ObjectReference.build(db_ref)
         mention = MentionDatabase.model_construct(database=ref)
         return MentionObject.model_construct(plain_text=str(ref), mention=mention)
 
@@ -477,3 +442,40 @@ class MentionTemplateUser(MentionTemplateData, type='template_mention_user'):
     """Nested user template data for `Mention` properties."""
 
     template_mention_user: str
+
+
+class FileObject(TypedObject, polymorphic_base=True):
+    """A Notion file object.
+
+    Depending on the context, a FileObject may require a name (such as in the `Files`
+    property). This makes the object hierarchy difficult, so here we simply allow
+    `name` to be optional. It is the responsibility of the caller to set `name` if
+    required by the API.
+    """
+
+    name: str | None = None
+    caption: list[RichTextObject] | None = None
+
+
+class HostedFile(FileObject, type='file'):
+    """A Notion file object."""
+
+    class _NestedData(GenericObject):
+        url: str
+        expiry_time: datetime | None = None
+
+    file: _NestedData
+
+
+class ExternalFile(FileObject, type='external'):
+    """An external file object."""
+
+    class _NestedData(GenericObject):
+        url: str
+
+    external: _NestedData
+
+    @classmethod
+    def build(cls, url, name=None):
+        """Create a new `ExternalFile` from the given URL."""
+        return cls.model_construct(name=name, external=cls._NestedData(url=url))
