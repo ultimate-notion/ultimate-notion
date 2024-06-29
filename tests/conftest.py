@@ -460,7 +460,7 @@ def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], s
             if (
                 ancestors
                 and ancestors[0] == root_page
-                and page.database not in static_dbs
+                and page.parent_db not in static_dbs
                 and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
             ):
                 page.delete()

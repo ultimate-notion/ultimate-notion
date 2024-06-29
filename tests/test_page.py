@@ -5,7 +5,7 @@ from textwrap import dedent
 
 import pytest
 
-from ultimate_notion import Database, Emoji, FileInfo, Page, RichText, Session
+from ultimate_notion import Emoji, FileInfo, Page, RichText, Session
 from ultimate_notion.blocks import Block
 
 
@@ -65,19 +65,6 @@ def test_parent_children(intro_page: Page):
 
 
 @pytest.mark.vcr()
-def test_parent_subdbs(notion: Session, root_page: Page):
-    parent = notion.create_page(root_page, title='Parent')
-    db1 = notion.create_db(parent)
-    db2 = notion.create_db(parent)
-
-    assert db1.parent == parent
-    assert db2.parent == parent
-    assert parent.subdbs == [db1, db2]
-    assert all(isinstance(db, Database) for db in parent.subdbs)
-    assert db1.ancestors == (root_page, parent)
-
-
-@pytest.mark.vcr()
 def test_icon_attr(notion: Session, root_page: Page):
     new_page = notion.create_page(parent=root_page, title='My new page with icon')
 
@@ -91,7 +78,7 @@ def test_icon_attr(notion: Session, root_page: Page):
     assert isinstance(new_page.icon, Emoji)
     assert new_page.icon == emoji_icon
 
-    # clear cache and retrieve the database again to be sure it was udpated on the server side
+    # clear cache and retrieve the page again to be sure it was udpated on the server side
     del notion.cache[new_page.id]
     new_page = notion.get_page(new_page.id)
     assert new_page.icon == Emoji(emoji_icon)
@@ -257,3 +244,16 @@ def test_page_to_markdown(md_page: Page):
 
     for exp, act in zip(exp_output.strip().split('\n'), markdown, strict=True):
         assert exp == act
+
+
+@pytest.mark.vcr()
+def test_parent_db(notion: Session, root_page: Page):
+    db = notion.create_db(root_page)
+    db.title = 'Parent DB'
+    page_in_db = db.create_page()
+    assert page_in_db.in_db
+    assert page_in_db.parent_db is db
+
+    page_not_in_db = notion.create_page(root_page, 'Page not in DB')
+    assert not page_not_in_db.in_db
+    assert page_not_in_db.parent_db is None
