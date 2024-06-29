@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from textwrap import dedent
 from typing import TYPE_CHECKING, Any, cast
 
 from emoji import is_emoji
@@ -13,6 +12,7 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.objects import Emoji, FileInfo, RichText, wrap_icon
 from ultimate_notion.props import PropertyValue, Title
+from ultimate_notion.templates import page_html
 from ultimate_notion.text import md_renderer
 from ultimate_notion.utils import get_active_session, get_repr, get_url, is_notebook
 
@@ -223,74 +223,10 @@ class Page(ChildrenMixin[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
-        # prepend MathJax configuration
-        if raw:
-            return self._render_md(self.to_markdown())
-
-        # ToDo: Move this to an extra function and have a template for the HTML.
-        html_before = dedent(
-            """
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <style>
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 15px 0;
-                }
-
-                th, td {
-                    border: 1px solid #999;
-                    padding: 0.5rem;
-                    text-align: left;
-                }
-
-                th {
-                    background-color: #f3f3f3;
-                    color: #333;
-                }
-
-                tr:nth-child(even) {
-                    background-color: #f2f2f2;
-                }
-                a {
-                    color: #007BFF;
-                    text-decoration: none;
-                }
-                a:hover {
-                    color: #0056b3;
-                    text-decoration: none;
-                }
-                kbd {
-                    padding: 0.2em 0.4em;
-                    font-size: 0.87em;
-                    color: #24292e;
-                    background-color: #f6f8fa;
-                    border: 1px solid #d1d5da;
-                    border-radius: 3px;
-                    box-shadow: inset 0 -1px 0 #d1d5da;
-                    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-                }
-              </style>
-              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-              <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-              <script type="text/x-mathjax-config">
-                MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$']]}});
-              </script>
-              <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-            </head>
-            <body>
-            """
-        )
-        html_after = dedent(
-            """
-            <script>hljs.highlightAll();</script>
-            </body>
-            </html>
-            """
-        )
-        return html_before + self._render_md(self.to_markdown()) + html_after
+        html = self._render_md(self.to_markdown())
+        if not raw:
+            html = page_html(html)
+        return html
 
     def show(self, *, simple: bool | None = None):
         """Show the content of the page, rendered in Jupyter Lab"""
