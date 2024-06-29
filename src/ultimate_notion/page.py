@@ -59,7 +59,7 @@ class PageProperties:
 
     def __setitem__(self, prop_name: str, value: Any):
         # Todo: use the schema of the database to see which properties are writeable at all.
-        db = self._page.database
+        db = self._page.parent_db
         if db is None:
             msg = f'Trying to set a property but page {self._page} is not bound to any database'
             raise RuntimeError(msg)
@@ -104,8 +104,8 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         # We have to subclass in order to populate it with the descriptor `PageProperty``
         # as this only works on the class level and we want a unique class for each property.
         page_props_cls = type('_PageProperties', (PageProperties,), {})
-        if self.database is not None:
-            for prop in self.database.schema.get_props():
+        if self.parent_db is not None:
+            for prop in self.parent_db.schema.get_props():
                 setattr(page_props_cls, prop.attr_name, PageProperty(prop_name=prop.name))
         return page_props_cls(page=self)
 
@@ -166,18 +166,22 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return self
 
     @property
-    def database(self) -> Database | None:
+    def parent_db(self) -> Database | None:
         """If this page is located in a database return the database or None otherwise.
 
         This is a convenience method to avoid the need to check and cast the type of the parent.
         """
-        # ToDo: Rework this and rather call it `parent_db`, also have `in_db` and return a boolean.
         from ultimate_notion.database import Database  # noqa: PLC0415
 
         if isinstance(self.parent, Database):
             return self.parent
         else:
             return None
+
+    @property
+    def in_db(self) -> bool:
+        """Return True if this page is located in a database."""
+        return self.parent_db is not None
 
     def _get_title_prop_name(self) -> str:
         """Get the name of the title property."""

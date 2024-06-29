@@ -7,6 +7,7 @@
 - Chg: Renamed `.content` to `.children` of a page for more consitency.
 - Chg: Use Property again to consistently refer to the columns of a database.
 - Chg: Make use of [pendulum](https://pendulum.eustace.io/) to represent `DateRange` values.
+- Chg: Renamed `page.database` renamed to `page.parent_db` and `page.in_db` added as methods.
 
 ## Version 0.4, 2024-02-14
 

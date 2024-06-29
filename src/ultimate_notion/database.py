@@ -48,9 +48,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return get_url(self.id)
 
     @property
-    def title(self) -> RichText:
+    def title(self) -> str | RichText:
         """Return the title of this database as rich text."""
         title = self.obj_ref.title
+        # `str` added as return value but always RichText returned, which inherits from str.
         return RichText.wrap_obj_ref(title)
 
     @title.setter

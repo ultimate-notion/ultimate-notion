@@ -100,7 +100,7 @@ def test_title_setter(notion: Session, article_db: Database):
     old_title = 'Articles'
     assert article_db.title == old_title
     new_title = 'My most favorite articles'
-    article_db.title = new_title  # type: ignore
+    article_db.title = new_title
     assert article_db.title == new_title
     # clear cache and retrieve the database again to be sure it was udpated on the server side
     del notion.cache[article_db.id]
@@ -108,7 +108,7 @@ def test_title_setter(notion: Session, article_db: Database):
     assert article_db.title == new_title
     article_db.title = RichText(old_title)
     assert article_db.title == old_title
-    article_db.title = ''  # type: ignore
+    article_db.title = ''
     assert article_db.title == ''
 
 
@@ -144,6 +144,19 @@ def test_reload_db(notion: Session, root_page: Page):
     old_obj_id = id(db.obj_ref)
     db.reload()
     assert old_obj_id != id(db.obj_ref)
+
+
+@pytest.mark.vcr()
+def test_parent_subdbs(notion: Session, root_page: Page):
+    parent = notion.create_page(root_page, title='Parent')
+    db1 = notion.create_db(parent)
+    db2 = notion.create_db(parent)
+
+    assert db1.parent == parent
+    assert db2.parent == parent
+    assert parent.subdbs == [db1, db2]
+    assert all(isinstance(db, Database) for db in parent.subdbs)
+    assert db1.ancestors == (root_page, parent)
 
 
 @pytest.mark.vcr()
