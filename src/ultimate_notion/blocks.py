@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, TypeVar, cast
 from uuid import UUID
 
 from tabulate import tabulate
+from typing_extensions import Self
 
 from ultimate_notion import objects
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -138,34 +139,34 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
 class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
     """Mixin for blocks that support children blocks."""
 
+    _children: list[Block] | None = None
+
     @property
-    def children(self: DataObject) -> list[Block]:
-        """Return all children."""
-        if self.has_children:
-            nested_obj = self.obj_ref.value
+    def children(self) -> list[Block]:
+        """Return the children of this block."""
+        if self._children is None:  # generate cache
+            session = get_active_session()
+            child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
+            self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
+        return self._children
 
-            if nested_obj.children is None:
-                session = get_active_session()
-                nested_obj.children = list(session.api.blocks.children.list(parent=get_uuid(self.obj_ref)))
+    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:
+        """Append a block or a list of blocks to the content of this block."""
+        blocks = [blocks] if isinstance(blocks, Block) else blocks
+        block_objs = [block.obj_ref for block in blocks]
+        after_obj = None if after is None else after.obj_ref
 
-            return [Block.wrap_obj_ref(child) for child in nested_obj.children]
+        session = get_active_session()
+        block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
+        blocks = [Block.wrap_obj_ref(block_obj) for block_obj in block_objs]
+
+        current_children = self.children  # force an initial load of the child blocks
+        if after is None:
+            current_children.extend(blocks)
         else:
-            return []
-
-    # def append(self, block):
-    #     """Append the given block to the children of this parent."""
-
-    #     if block is None:
-    #         raise ValueError("block cannot be None")
-
-    #     nested = self()
-
-    #     if nested.children is None:
-    #         nested.children = []
-
-    #     nested.children.append(block)
-
-    #     self.has_children = True
+            idx = next(idx for idx, block in enumerate(blocks) if block.id == after.id)
+            current_children[idx:idx] = blocks
+        return self
 
 
 class Paragraph(TextBlock[obj_blocks.Paragraph], ChildrenMixin[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph):
