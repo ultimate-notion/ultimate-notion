@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING, Any, cast
 
 from emoji import is_emoji
 
-from ultimate_notion.blocks import Block, ChildDatabase, ChildPage, DataObject
+from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.objects import Emoji, FileInfo, RichText, wrap_icon
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.text import md_renderer
-from ultimate_notion.utils import get_active_session, get_repr, get_url, get_uuid, is_notebook
+from ultimate_notion.utils import get_active_session, get_repr, get_url, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -82,7 +82,7 @@ class PageProperties:
         return {prop_name: self[prop_name] for prop_name in self}
 
 
-class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
+class Page(ChildrenMixin[obj_blocks.Page], wraps=obj_blocks.Page):
     """A Notion page.
 
     Attributes:
@@ -91,7 +91,6 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     props: PageProperties
     _render_md = md_renderer()
-    _children: list[Block] | None = None
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Page:
@@ -125,17 +124,6 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return get_url(self.id)
 
     @property
-    def children(self) -> list[Block]:
-        """Return the content of this page, i.e. all blocks belonging to this page"""
-
-        # ToDo: Move this to ChildrenMixin
-        if self._children is None:  # generate cache
-            session = get_active_session()
-            child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
-            self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
-        return self._children
-
-    @property
     def subpages(self) -> list[Page]:
         """Return all contained pages within this page"""
         session = get_active_session()
@@ -146,24 +134,6 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Return all contained databases within this page"""
         session = get_active_session()
         return [session.get_db(block.id) for block in self.children if isinstance(block, ChildDatabase)]
-
-    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Page:
-        """Append a block or a list of blocks to the content of this page."""
-        blocks = [blocks] if isinstance(blocks, Block) else blocks
-        block_objs = [block.obj_ref for block in blocks]
-        after_obj = None if after is None else after.obj_ref
-
-        session = get_active_session()
-        block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
-        blocks = [Block.wrap_obj_ref(block_obj) for block_obj in block_objs]
-
-        current_children = self.children  # force an initial load of the child blocks
-        if after is None:
-            current_children.extend(blocks)
-        else:
-            idx = next(idx for idx, block in enumerate(blocks) if block.id == after.id)
-            current_children[idx:idx] = blocks
-        return self
 
     @property
     def parent_db(self) -> Database | None:
