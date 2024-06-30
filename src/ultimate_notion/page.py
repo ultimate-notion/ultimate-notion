@@ -5,8 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, cast
 
 from emoji import is_emoji
+from typing_extensions import Self
 
-from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin
+from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenBlock
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
@@ -82,7 +83,7 @@ class PageProperties:
         return {prop_name: self[prop_name] for prop_name in self}
 
 
-class Page(ChildrenMixin[obj_blocks.Page], wraps=obj_blocks.Page):
+class Page(ChildrenBlock[obj_blocks.Page], wraps=obj_blocks.Page):
     """A Notion page.
 
     Attributes:
@@ -93,7 +94,7 @@ class Page(ChildrenMixin[obj_blocks.Page], wraps=obj_blocks.Page):
     _render_md = md_renderer()
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Page:
+    def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Self:
         obj = super().wrap_obj_ref(obj_ref)
         obj.props = obj._create_prop_attrs()
         return obj
@@ -240,21 +241,21 @@ class Page(ChildrenMixin[obj_blocks.Page], wraps=obj_blocks.Page):
 
             display_markdown(md, raw=True)
 
-    def delete(self) -> Page:
-        """Delete/archive this page."""
+    def delete(self) -> Self:
+        """Delete this page."""
         if not self.is_deleted:
             session = get_active_session()
             session.api.pages.delete(self.obj_ref)
         return self
 
-    def restore(self) -> Page:
-        """Restore/unarchive this page."""
+    def restore(self) -> Self:
+        """Restore this page."""
         if self.is_deleted:
             session = get_active_session()
             session.api.pages.restore(self.obj_ref)
         return self
 
-    def reload(self) -> Page:
+    def reload(self) -> Self:
         """Reload this page."""
         session = get_active_session()
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)

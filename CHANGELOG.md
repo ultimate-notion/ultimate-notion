@@ -8,6 +8,7 @@
 - Chg: Use Property again to consistently refer to the columns of a database.
 - Chg: Make use of [pendulum](https://pendulum.eustace.io/) to represent `DateRange` values.
 - Chg: Renamed `page.database` renamed to `page.parent_db` and `page.in_db` added as methods.
+- New: High-level method `session.get_block` to retrieve a single block.
 
 ## Version 0.4, 2024-02-14
 

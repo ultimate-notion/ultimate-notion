@@ -13,5 +13,18 @@ def test_headings(root_page: Page, notion: Session):
     h1 = uno.Heading1('My new page')
     page.append(h1)
 
-    # check if appending does not lead to doublicate appending.
-    # check what happens after a relead() call
+    assert len(page.children) == 1
+    assert page.children[0] == h1
+
+    page.reload()
+    assert len(page.children) == 1
+    assert page.children[0] == h1
+
+    h2 = uno.Heading2('Heading 2')
+    h3 = uno.Heading2('Heading 3')
+    h4 = uno.Heading2('Heading 4')
+    h21 = uno.Heading3('Heading 2.1')
+    page.append([h2, h3, h4])
+    page.append(h21, after=h2)
+
+    assert page.children == [h1, h2, h21, h3, h4]

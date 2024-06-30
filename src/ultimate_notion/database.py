@@ -6,6 +6,7 @@ from textwrap import dedent
 from typing import cast
 
 from pydantic import BaseModel
+from typing_extensions import Self
 
 from ultimate_notion.blocks import DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -146,21 +147,21 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Is this database an inline database?"""
         return self.obj_ref.is_inline
 
-    def delete(self) -> Database:
-        """Delete/archive this database."""
+    def delete(self) -> Self:
+        """Delete this database."""
         if not self.is_deleted:
             session = get_active_session()
             session.api.databases.delete(self.obj_ref)
         return self
 
-    def restore(self) -> Database:
-        """Restore/unarchive this database."""
+    def restore(self) -> Self:
+        """Restore this database."""
         if self.is_deleted:
             session = get_active_session()
             session.api.databases.restore(self.obj_ref)
         return self
 
-    def reload(self) -> Database:
+    def reload(self) -> Self:
         """Reload this database."""
         session = get_active_session()
         self.obj_ref = session.api.databases.retrieve(self.obj_ref.id)

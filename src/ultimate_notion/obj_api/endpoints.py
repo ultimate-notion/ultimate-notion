@@ -84,12 +84,12 @@ class BlocksEndpoint(Endpoint):
         # https://developers.notion.com/reference/patch-block-children
         def append(
             self, parent: ParentRef | GenericObject | UUID | str, blocks: list[Block], *, after: Block | None = None
-        ) -> list[Block]:
+        ) -> tuple[list[Block], list[Block]]:
             """Add the given blocks as children of the specified parent.
 
-            The blocks info will be updated based on returned data.
-
-            `parent` may be any suitable `ObjectReference` type.
+            The blocks info of the passed blocks will be updated and returned as first part of a tuple.
+            The second party of the tuple is an empty list or the updated blocks after the specified block
+            if `after` was specified. Use this to update the blocks with the latest version from the server.
             """
 
             parent_id = ObjectReference.build(parent).id
@@ -99,14 +99,19 @@ class BlocksEndpoint(Endpoint):
 
             endpoint_iter = EndpointIterator(endpoint=self.raw_api.append)
             if after is None:
-                appended_blocks = endpoint_iter(block_id=parent_id, children=children)
+                appended_blocks = list(endpoint_iter(block_id=parent_id, children=children))
+                if len(appended_blocks) != len(blocks):
+                    msg = 'Number of appended blocks does not match the number of provided blocks.'
+                    raise ValueError(msg)
             else:
-                appended_blocks = endpoint_iter(block_id=parent_id, children=children, after=after.id)
+                appended_blocks = list(endpoint_iter(block_id=parent_id, children=children, after=str(after.id)))
 
-            for block, appended_block in zip(blocks, appended_blocks, strict=True):
+            # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
+            # blocks after the specified block, where we append the blocks.
+            for block, appended_block in zip(blocks, appended_blocks[: len(blocks)], strict=True):
                 block.update(**appended_block.model_dump())
 
-            return blocks
+            return blocks, cast(list[Block], appended_blocks[len(blocks) :])
 
         # https://developers.notion.com/reference/get-block-children
         def list(self, parent: ParentRef | GenericObject | UUID | str) -> Iterator[Block]:
