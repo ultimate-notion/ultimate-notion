@@ -9,7 +9,7 @@ from functools import wraps
 from hashlib import sha256
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeAlias, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
 from uuid import UUID
 
 import numpy as np
@@ -23,9 +23,6 @@ from ultimate_notion.obj_api import objects as objs
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.core import GenericObject
     from ultimate_notion.session import Session
-
-
-ObjRef: TypeAlias = UUID | str
 
 
 T = TypeVar('T')

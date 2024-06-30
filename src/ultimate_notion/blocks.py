@@ -75,7 +75,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         elif isinstance(parent, objs.DatabaseRef):
             return session.get_db(db_ref=parent.database_id)
         elif isinstance(parent, objs.BlockRef):
-            return session._get_block(block_ref=parent.block_id)
+            return session.get_block(block_ref=parent.block_id)
         else:
             msg = f'Unknown parent reference {type(parent)}'
             raise RuntimeError(msg)
@@ -115,6 +115,12 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
         """Return the URL of the block."""
         return get_url(self.id)
 
+    def reload(self) -> Self:
+        """Reload the block from the API."""
+        session = get_active_session()
+        self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
+        return self
+
 
 class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Text block."""
@@ -136,8 +142,8 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
         return RichText.wrap_obj_ref(rich_texts)
 
 
-class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
-    """Mixin for blocks that support children blocks."""
+class ChildrenBlock(DataObject[T], wraps=obj_blocks.DataObject):
+    """Blocks that can have child blocks"""
 
     _children: list[Block] | None = None
 
@@ -156,20 +162,24 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
         block_objs = [block.obj_ref for block in blocks]
         after_obj = None if after is None else after.obj_ref
 
+        current_children = self.children  # force an initial load of the child blocks to append later
+
         session = get_active_session()
-        block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
+        block_objs, after_block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
         blocks = [Block.wrap_obj_ref(block_obj) for block_obj in block_objs]
 
-        current_children = self.children  # force an initial load of the child blocks
         if after is None:
             current_children.extend(blocks)
         else:
-            idx = next(idx for idx, block in enumerate(blocks) if block.id == after.id)
-            current_children[idx:idx] = blocks
+            insert_idx = next(idx for idx, block in enumerate(current_children) if block.id == after.id) + 1
+            # we update the blocks after the position we want to insert.
+            for block, updated_block_obj in zip(current_children[insert_idx:], after_block_objs, strict=True):
+                block.obj_ref.update(**updated_block_obj.model_dump())
+            current_children[insert_idx:insert_idx] = blocks
         return self
 
 
-class Paragraph(TextBlock[obj_blocks.Paragraph], ChildrenMixin[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph):
+class Paragraph(TextBlock[obj_blocks.Paragraph], ChildrenBlock[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph):
     """Paragraph block."""
 
     def to_markdown(self) -> str:
@@ -197,7 +207,7 @@ class Heading3(TextBlock[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
         return f'### {self.rich_text.to_markdown()}'
 
 
-class Quote(TextBlock[obj_blocks.Quote], ChildrenMixin, wraps=obj_blocks.Quote):
+class Quote(TextBlock[obj_blocks.Quote], ChildrenBlock, wraps=obj_blocks.Quote):
     """Quote block."""
 
     def to_markdown(self) -> str:
@@ -253,21 +263,21 @@ class Callout(TextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
     #     return callout
 
 
-class BulletedItem(TextBlock[obj_blocks.BulletedListItem], ChildrenMixin, wraps=obj_blocks.BulletedListItem):
+class BulletedItem(TextBlock[obj_blocks.BulletedListItem], ChildrenBlock, wraps=obj_blocks.BulletedListItem):
     """Bulleted list item."""
 
     def to_markdown(self) -> str:
         return f'- {self.rich_text.to_markdown()}\n'
 
 
-class NumberedItem(TextBlock[obj_blocks.NumberedListItem], ChildrenMixin, wraps=obj_blocks.NumberedListItem):
+class NumberedItem(TextBlock[obj_blocks.NumberedListItem], ChildrenBlock, wraps=obj_blocks.NumberedListItem):
     """Numbered list item."""
 
     def to_markdown(self) -> str:
         return f'1. {self.rich_text.to_markdown()}\n'
 
 
-class ToDoItem(TextBlock[obj_blocks.ToDo], ChildrenMixin, wraps=obj_blocks.ToDo):
+class ToDoItem(TextBlock[obj_blocks.ToDo], ChildrenBlock, wraps=obj_blocks.ToDo):
     """ToDo list item."""
 
     def is_checked(self) -> bool:
@@ -287,7 +297,7 @@ class ToDoItem(TextBlock[obj_blocks.ToDo], ChildrenMixin, wraps=obj_blocks.ToDo)
     #     )
 
 
-class ToggleItem(TextBlock[obj_blocks.Toggle], ChildrenMixin, wraps=obj_blocks.Toggle):
+class ToggleItem(TextBlock[obj_blocks.Toggle], ChildrenBlock, wraps=obj_blocks.Toggle):
     """Toggle list item."""
 
     def to_markdown(self) -> str:
@@ -505,7 +515,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         return get_url(self.obj_ref.id)
 
 
-class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
+class Column(Block[obj_blocks.Column], ChildrenBlock, wraps=obj_blocks.Column):
     """Column block."""
 
     def to_markdown(self) -> str:
@@ -525,7 +535,7 @@ class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
     #     return col
 
 
-class ColumnList(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.ColumnList):
+class ColumnList(Block[obj_blocks.ColumnList], ChildrenBlock, wraps=obj_blocks.ColumnList):
     """Column list block."""
 
     def to_markdown(self) -> str:
@@ -590,7 +600,7 @@ class TableRow(Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
     #         self.table_row.cells.append([rtf])
 
 
-class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
+class Table(Block[obj_blocks.Table], ChildrenBlock, wraps=obj_blocks.Table):
     """Table block."""
 
     def __getitem__(self, index: tuple[int, int]) -> RichText:
@@ -644,7 +654,7 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
         return f'[**↗️ <u>{self.page.title}</u>**]({self.url})\n'
 
 
-class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks.SyncedBlock):
+class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenBlock, wraps=obj_blocks.SyncedBlock):
     """Synced block - either original or synched."""
 
     @property
@@ -662,7 +672,7 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks
             return self
         elif (synched_from := self.obj_ref.synced_block.synced_from) is not None:
             session = get_active_session()
-            return cast(SyncedBlock, session._get_block(get_uuid(synched_from)))
+            return cast(SyncedBlock, session.get_block(get_uuid(synched_from)))
         else:
             msg = 'Unknown synched block, neither original nor synched!'
             raise RuntimeError(msg)
@@ -677,7 +687,7 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks
         return md
 
 
-class Template(TextBlock[obj_blocks.Template], ChildrenMixin, wraps=obj_blocks.Template):
+class Template(TextBlock[obj_blocks.Template], ChildrenBlock, wraps=obj_blocks.Template):
     """Template block.
 
     Deprecated: As of March 27, 2023 creation of template blocks will no longer be supported.

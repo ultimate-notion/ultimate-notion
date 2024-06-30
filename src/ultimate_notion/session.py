@@ -22,7 +22,7 @@ from ultimate_notion.objects import RichText, User
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.schema import DefaultSchema, PageSchema
-from ultimate_notion.utils import ObjRef, SList, get_uuid
+from ultimate_notion.utils import SList, get_uuid
 
 _log = logging.getLogger(__name__)
 
@@ -205,7 +205,7 @@ class Session:
             dbs = [db for db in dbs if not db.is_deleted]
         return SList(dbs)
 
-    def get_db(self, db_ref: ObjRef, *, use_cache: bool = True) -> Database:
+    def get_db(self, db_ref: UUID | str, *, use_cache: bool = True) -> Database:
         """Retrieve Notion database by uuid"""
         db_uuid = get_uuid(db_ref)
         if use_cache and db_uuid in self.cache:
@@ -252,7 +252,7 @@ class Session:
             pages = [page for page in pages if not page.is_deleted]
         return SList(pages)
 
-    def get_page(self, page_ref: ObjRef, *, use_cache: bool = True) -> Page:
+    def get_page(self, page_ref: UUID | str, *, use_cache: bool = True) -> Page:
         """Retrieve a page by uuid."""
         page_uuid = get_uuid(page_ref)
         if use_cache and page_uuid in self.cache:
@@ -269,7 +269,7 @@ class Session:
         self.cache[page.id] = page
         return page
 
-    def get_user(self, user_ref: ObjRef, *, use_cache: bool = True) -> User:
+    def get_user(self, user_ref: UUID | str, *, use_cache: bool = True) -> User:
         """Get a user by uuid.
 
         Attention: Trying to retrieve yourself, i.e. the bot integration, only works if `whoami()`
@@ -308,7 +308,7 @@ class Session:
         """Retrieve all users of this workspace."""
         return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
 
-    def _get_block(self, block_ref: ObjRef) -> Block:
+    def get_block(self, block_ref: UUID | str) -> Block:
         """Retrieve a single block by an object reference."""
         block_uuid = get_uuid(block_ref)
         return Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
