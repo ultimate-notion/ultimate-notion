@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import textwrap
+from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
 from hashlib import sha256
@@ -385,3 +386,17 @@ def to_pendulum(dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> pnd.Date
     else:
         msg = f'Unexpected type {type(dt_spec)} for {dt_spec}'
         raise TypeError(msg)
+
+
+@contextmanager
+def temp_timezone(tz: str | pnd.Timezone):
+    """Temporarily set the local timezone to the given timezone."""
+    if not isinstance(tz, pnd.Timezone):
+        tz = pnd.timezone(tz)
+
+    current_tz = pnd.local_timezone()  # type: ignore[operator] # seems to be a bug in mypy
+    pnd.set_local_timezone(tz)
+    try:
+        yield
+    finally:
+        pnd.set_local_timezone(current_tz)

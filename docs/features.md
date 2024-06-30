@@ -35,13 +35,14 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] change page properties
 - [x] navigate pages using parent and children links
 - [x] read the blocks within a page
-- [ ] add/remove and modify the blocks within a page
+- [x] add/remove the blocks within a page
 - [x] view the content of a page as [Markdown]
 
 ## Blocks
 
-- [ ] navigate blocks using references of parent and children
-- [ ] create blocks within a page or another block
+- [x] create a new block
+- [x] navigate blocks using references of parent and children
+- [x] create blocks within a page or another parent block
 - [ ] modify blocks
 
 ## Users
