@@ -42,6 +42,7 @@ from ultimate_notion.adapters.google.tasks import GTasksClient
 from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.page import Page
+from ultimate_notion.utils import temp_timezone
 
 if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
@@ -476,3 +477,11 @@ def delete_all_taskslists():
     for tasklist in gtasks.all_tasklists():
         if not tasklist.is_default:
             tasklist.delete()
+
+
+@pytest.fixture(scope='function')
+def tz_berlin() -> Iterator[str]:
+    """Set the timezone to Berlin for the tests."""
+    tz = 'Europe/Berlin'
+    with temp_timezone(tz):
+        yield tz
