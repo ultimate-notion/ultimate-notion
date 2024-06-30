@@ -394,7 +394,10 @@ def temp_timezone(tz: str | pnd.Timezone):
     if not isinstance(tz, pnd.Timezone):
         tz = pnd.timezone(tz)
 
-    current_tz = pnd.local_timezone()  # type: ignore[operator] # seems to be a bug in mypy
+    current_tz = pnd.local_timezone()
+    if not isinstance(current_tz, pnd.Timezone):
+        msg = f'Expected a Timezone object but got type {type(current_tz)}.'
+        raise RuntimeError(msg)
     pnd.set_local_timezone(tz)
     try:
         yield
