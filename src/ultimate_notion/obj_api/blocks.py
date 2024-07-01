@@ -3,8 +3,6 @@
 Blocks are the base for all Notion content.
 """
 
-# ToDo: Clean up all the comments in here
-
 from __future__ import annotations
 
 from abc import ABC
@@ -13,7 +11,6 @@ from typing import Any
 from uuid import UUID
 
 from pydantic import SerializeAsAny
-from typing_extensions import Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
@@ -89,15 +86,6 @@ class UnsupportedBlock(Block, type='unsupported'):
 class TextBlock(Block, ABC):
     """A standard abstract text block object in Notion."""
 
-    @classmethod
-    def build(cls, texts: list[RichTextObject] | None = None) -> Self:
-        """Compose a `TextBlock` from the given text items."""
-        if texts is None:
-            texts = []
-        obj = super().build()
-        obj.value.rich_text = texts
-        return obj
-
 
 class Paragraph(TextBlock, type='paragraph'):
     """A paragraph block in Notion."""
@@ -116,23 +104,23 @@ class _NestedHeadingData(GenericObject):
     is_toggleable: bool = False
 
 
-class Heading1(TextBlock, type='heading_1'):
+class Heading(TextBlock, ABC):
+    """Abstract Heading block."""
+
+
+class Heading1(Heading, type='heading_1'):
     """A heading_1 block in Notion."""
 
     heading_1: _NestedHeadingData = _NestedHeadingData()
 
-    @classmethod
-    def build(cls, texts: list[RichTextObject] | None = None) -> Self:
-        return super().build(texts)
 
-
-class Heading2(TextBlock, type='heading_2'):
+class Heading2(Heading, type='heading_2'):
     """A heading_2 block in Notion."""
 
     heading_2: _NestedHeadingData = _NestedHeadingData()
 
 
-class Heading3(TextBlock, type='heading_3'):
+class Heading3(Heading, type='heading_3'):
     """A heading_3 block in Notion."""
 
     heading_3: _NestedHeadingData = _NestedHeadingData()
