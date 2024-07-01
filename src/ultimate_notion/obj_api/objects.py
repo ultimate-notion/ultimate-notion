@@ -197,12 +197,9 @@ class BlockRef(ParentRef, type='block_id'):
     block_id: UUID
 
     @classmethod
-    def build(cls, block_ref):
-        """Compose a BlockRef from the given reference object.
-
-        `block_ref` can be either a string, UUID, or block.
-        """
-        ref = ObjectReference[block_ref]
+    def build(cls, block_ref: Page | str | UUID):
+        """Compose a BlockRef from the given reference object."""
+        ref = ObjectReference.build(block_ref)
         return BlockRef.model_construct(block_id=ref.id)
 
 
@@ -260,11 +257,9 @@ class EmojiObject(TypedObject, type='emoji'):
 
     emoji: str
 
-    # ToDo: Check if this should be better removed.
     @classmethod
-    def build(cls, emoji):
+    def build(cls, emoji: str):
         """Compose an EmojiObject from the given emoji string."""
-        # Todo: convert string-based emoji to unicode here!
         return EmojiObject.model_construct(emoji=emoji)
 
 

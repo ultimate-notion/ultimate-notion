@@ -13,6 +13,7 @@ from typing_extensions import Self
 from ultimate_notion import objects
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.objects import RichText, RichTextBase, User
 from ultimate_notion.text import md_comment
 from ultimate_notion.utils import Wrapper, flatten, get_active_session, get_url, get_uuid
@@ -127,13 +128,15 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
 
     def __init__(self, text: str | RichText | RichTextBase | list[RichTextBase]) -> None:
         if isinstance(text, str):
+            # ToDo: Allow passing markdown text here when the markdown parser is implemented
             texts = RichText(text).obj_ref
         elif isinstance(text, RichText | RichTextBase):
             texts = text.obj_ref
         elif isinstance(text, list):
             texts = flatten([rt.obj_ref for rt in text])
 
-        super().__init__(texts)
+        super().__init__()
+        self.obj_ref.value.rich_text = texts
 
     @property
     def rich_text(self) -> RichText:
@@ -186,21 +189,36 @@ class Paragraph(TextBlock[obj_blocks.Paragraph], ChildrenBlock[obj_blocks.Paragr
         return f'# {self.rich_text.to_markdown()}'
 
 
-class Heading1(TextBlock[obj_blocks.Heading1], wraps=obj_blocks.Heading1):
+class Heading(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
+    """Abstract Heading block."""
+
+    def __init__(
+        self,
+        text: str | RichText | RichTextBase | list[RichTextBase],
+        *,
+        color: Color | BGColor = Color.DEFAULT,
+        toggleable: bool = False,
+    ) -> None:
+        super().__init__(text)
+        self.obj_ref.value.color = color
+        self.obj_ref.value.is_toggleable = toggleable
+
+
+class Heading1(Heading[obj_blocks.Heading1], wraps=obj_blocks.Heading1):
     """Heading 1 block."""
 
     def to_markdown(self) -> str:
         return f'# {self.rich_text.to_markdown()}'
 
 
-class Heading2(TextBlock[obj_blocks.Heading2], wraps=obj_blocks.Heading2):
+class Heading2(Heading[obj_blocks.Heading2], wraps=obj_blocks.Heading2):
     """Heading 2 block."""
 
     def to_markdown(self) -> str:
         return f'## {self.rich_text.to_markdown()}'
 
 
-class Heading3(TextBlock[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
+class Heading3(Heading[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
     """Heading 3 block."""
 
     def to_markdown(self) -> str:
