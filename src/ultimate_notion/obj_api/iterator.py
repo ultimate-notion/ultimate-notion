@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable, Iterator
 from typing import Annotated, Any
 
 from pydantic import Field
@@ -124,21 +125,16 @@ class EndpointIterator:
     types).
     """
 
-    def __init__(self, endpoint):
-        """Initialize an object list iterator for the specified endpoint.
+    has_more: bool | None = None
+    page_num: int = -1
+    total_items: int = -1
+    next_cursor: str | None = None
 
-        If a class is provided, it will be constructued for each result returned by
-        this iterator.  The constructor must accept a single argument, which is the
-        `NotionObject` contained in the `ObjectList`.
-        """
+    def __init__(self, endpoint: Callable[..., Any | Awaitable[Any]]):
+        """Initialize an object list iterator for the specified endpoint."""
         self._endpoint = endpoint
 
-        self.has_more = None
-        self.page_num = -1
-        self.total_items = -1
-        self.next_cursor = None
-
-    def __call__(self, **kwargs):
+    def __call__(self, **kwargs: Any) -> Iterator[NotionObject]:
         """Return a generator for this endpoint using the given parameters."""
 
         self.has_more = True
@@ -163,13 +159,3 @@ class EndpointIterator:
 
             self.next_cursor = api_list.next_cursor
             self.has_more = api_list.has_more and self.next_cursor is not None
-
-    def as_list(self, **kwargs):
-        """Collect all items from the endpoint as a list."""
-
-        items = []
-
-        for item in self(**kwargs):
-            items.append(item)
-
-        return items

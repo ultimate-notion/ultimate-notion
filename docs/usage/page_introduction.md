@@ -69,7 +69,7 @@ The actual property names like `status` and `due_date` can be easily find out by
 holding our page, with:
 
 ```python
-task.database.schema.show()
+task.parent_db.schema.show()
 ```
 
 returning the actual column name, the property type and the Python attribute name within `props`:
@@ -124,7 +124,7 @@ Here is an example on how to change the task status, which is a select property.
 get the list of all options by accessing the the corresponding column type of the property with:
 
 ```python
-options = task.database.schema.status.type.options
+options = task.parent_db.schema.status.type.options
 ```
 
 This generates a dictionary of [Option] objects:

@@ -35,13 +35,14 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] change page properties
 - [x] navigate pages using parent and children links
 - [x] read the blocks within a page
-- [ ] add/remove and modify the blocks within a page
+- [x] add/remove the blocks within a page
 - [x] view the content of a page as [Markdown]
 
 ## Blocks
 
-- [ ] navigate blocks using references of parent and children
-- [ ] create blocks within a page or another block
+- [x] create a new block
+- [x] navigate blocks using references of parent and children
+- [x] create blocks within a page or another parent block
 - [ ] modify blocks
 
 ## Users
@@ -56,10 +57,11 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [ ] create a comment within a block or page
 - [ ] retrieve comments of a block or page
 
-## Miscellaneous
+## Extensions
 
 - [x] general synchronization capabilities with external services
-- [x] client for [Google Tasks API] and synchronization adapter
+- [x] client for [Google Tasks API] and synchronization adapter to sync google tasks with a Notion database
+- [ ] synchronization adapter for [Google Sheets API] to sync google sheets with a Notion database
 
 ## Notion API Limitations
 
@@ -87,3 +89,4 @@ If you think those limitations should be fixed, [let the developers of Notion kn
 [Wiki database]: https://developers.notion.com/docs/working-with-databases#wiki-databases
 [updating the database schema]: https://developers.notion.com/reference/update-a-database#errors
 [Google Tasks API]: https://developers.google.com/tasks/overview
+[Google Sheets API]: https://developers.google.com/sheets

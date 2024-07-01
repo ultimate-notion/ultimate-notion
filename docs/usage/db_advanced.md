@@ -82,9 +82,7 @@ to a database:
 ```python
 lovelace = Customer.create(name='Ada Lovelace', purchases=[tank_top])
 hertzfeld = Customer.create(name='Andy Herzfeld', purchases=[khaki_pants])
-engelbart = Customer.create(
-    name='Doug Engelbart', purchases=[khaki_pants, t_shirt]
-)
+engelbart = Customer.create(name='Doug Engelbart', purchases=[khaki_pants, t_shirt])
 ```
 
 !!! info

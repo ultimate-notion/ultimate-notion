@@ -9,8 +9,9 @@ from abc import ABC, abstractmethod
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
+import pendulum as pnd
+
 import ultimate_notion.obj_api.props as obj_props
-from ultimate_notion.obj_api.props import DateType
 from ultimate_notion.objects import FileInfo, Option, RichText, User
 from ultimate_notion.utils import Wrapper, get_active_session, get_repr
 
@@ -124,15 +125,12 @@ class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
         self.obj_ref = obj_props.Date.build(start, end)
 
     @property
-    def value(self) -> DateType | None:
-        # ToDo: Set `time_zone` accordingly if provided
+    def value(self) -> pnd.DateTime | pnd.Date | pnd.Interval | None:
         date = self.obj_ref.date
         if date is None:
             return None
-        elif date.end is None:
-            return date.start
         else:
-            return date.start, date.end
+            return date.to_pendulum()
 
 
 class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
@@ -244,7 +242,8 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     readonly = True
 
     @property
-    def value(self) -> str | float | int | DateType | None:  # all values of subclasses of `FormulaResult`
+    def value(self) -> str | float | int | pnd.DateTime | pnd.Date | pnd.Interval | None:
+        # returns all values of subclasses of `FormulaResult`
         return self.obj_ref.formula.value if self.obj_ref.formula else None
 
 
@@ -268,7 +267,7 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     readonly = True
 
     @property
-    def value(self) -> str | float | int | DateType | list[PropertyValue] | None:
+    def value(self) -> str | float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[PropertyValue] | None:
         # ToDo: Write a unit test for this!
         if self.obj_ref.rollup is None:
             return None

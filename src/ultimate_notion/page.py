@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
-from textwrap import dedent
 from typing import TYPE_CHECKING, Any, cast
 
 from emoji import is_emoji
+from typing_extensions import Self
 
-from ultimate_notion.blocks import Block, ChildDatabase, ChildPage, DataObject
+from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenBlock
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.objects import Emoji, FileInfo, RichText, wrap_icon
 from ultimate_notion.props import PropertyValue, Title
+from ultimate_notion.templates import page_html
 from ultimate_notion.text import md_renderer
-from ultimate_notion.utils import get_active_session, get_repr, get_url, get_uuid, is_notebook
+from ultimate_notion.utils import get_active_session, get_repr, get_url, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -59,7 +60,7 @@ class PageProperties:
 
     def __setitem__(self, prop_name: str, value: Any):
         # Todo: use the schema of the database to see which properties are writeable at all.
-        db = self._page.database
+        db = self._page.parent_db
         if db is None:
             msg = f'Trying to set a property but page {self._page} is not bound to any database'
             raise RuntimeError(msg)
@@ -82,7 +83,7 @@ class PageProperties:
         return {prop_name: self[prop_name] for prop_name in self}
 
 
-class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
+class Page(ChildrenBlock[obj_blocks.Page], wraps=obj_blocks.Page):
     """A Notion page.
 
     Attributes:
@@ -91,10 +92,9 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     props: PageProperties
     _render_md = md_renderer()
-    _children: list[Block] | None = None
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Page:
+    def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Self:
         obj = super().wrap_obj_ref(obj_ref)
         obj.props = obj._create_prop_attrs()
         return obj
@@ -104,8 +104,8 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         # We have to subclass in order to populate it with the descriptor `PageProperty``
         # as this only works on the class level and we want a unique class for each property.
         page_props_cls = type('_PageProperties', (PageProperties,), {})
-        if self.database is not None:
-            for prop in self.database.schema.get_props():
+        if self.parent_db is not None:
+            for prop in self.parent_db.schema.get_props():
                 setattr(page_props_cls, prop.attr_name, PageProperty(prop_name=prop.name))
         return page_props_cls(page=self)
 
@@ -125,15 +125,6 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return get_url(self.id)
 
     @property
-    def children(self) -> list[Block]:
-        """Return the content of this page, i.e. all blocks belonging to this page"""
-        if self._children is None:  # generate cache
-            session = get_active_session()
-            child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
-            self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
-        return self._children
-
-    @property
     def subpages(self) -> list[Page]:
         """Return all contained pages within this page"""
         session = get_active_session()
@@ -146,14 +137,22 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return [session.get_db(block.id) for block in self.children if isinstance(block, ChildDatabase)]
 
     @property
-    def database(self) -> Database | None:
-        """If this page is located in a database return the database or None otherwise."""
+    def parent_db(self) -> Database | None:
+        """If this page is located in a database return the database or None otherwise.
+
+        This is a convenience method to avoid the need to check and cast the type of the parent.
+        """
         from ultimate_notion.database import Database  # noqa: PLC0415
 
         if isinstance(self.parent, Database):
             return self.parent
         else:
             return None
+
+    @property
+    def in_db(self) -> bool:
+        """Return True if this page is located in a database."""
+        return self.parent_db is not None
 
     def _get_title_prop_name(self) -> str:
         """Get the name of the title property."""
@@ -225,73 +224,10 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
-        # prepend MathJax configuration
-        if raw:
-            return self._render_md(self.to_markdown())
-
-        html_before = dedent(
-            """
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <style>
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 15px 0;
-                }
-
-                th, td {
-                    border: 1px solid #999;
-                    padding: 0.5rem;
-                    text-align: left;
-                }
-
-                th {
-                    background-color: #f3f3f3;
-                    color: #333;
-                }
-
-                tr:nth-child(even) {
-                    background-color: #f2f2f2;
-                }
-                a {
-                    color: #007BFF;
-                    text-decoration: none;
-                }
-                a:hover {
-                    color: #0056b3;
-                    text-decoration: none;
-                }
-                kbd {
-                    padding: 0.2em 0.4em;
-                    font-size: 0.87em;
-                    color: #24292e;
-                    background-color: #f6f8fa;
-                    border: 1px solid #d1d5da;
-                    border-radius: 3px;
-                    box-shadow: inset 0 -1px 0 #d1d5da;
-                    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-                }
-              </style>
-              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-              <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-              <script type="text/x-mathjax-config">
-                MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$']]}});
-              </script>
-              <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-            </head>
-            <body>
-            """
-        )
-        html_after = dedent(
-            """
-            <script>hljs.highlightAll();</script>
-            </body>
-            </html>
-            """
-        )
-        return html_before + self._render_md(self.to_markdown()) + html_after
+        html = self._render_md(self.to_markdown())
+        if not raw:
+            html = page_html(html)
+        return html
 
     def show(self, *, simple: bool | None = None):
         """Show the content of the page, rendered in Jupyter Lab"""
@@ -305,21 +241,21 @@ class Page(DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
             display_markdown(md, raw=True)
 
-    def delete(self) -> Page:
-        """Delete/archive this page."""
+    def delete(self) -> Self:
+        """Delete this page."""
         if not self.is_deleted:
             session = get_active_session()
             session.api.pages.delete(self.obj_ref)
         return self
 
-    def restore(self) -> Page:
-        """Restore/unarchive this page."""
+    def restore(self) -> Self:
+        """Restore this page."""
         if self.is_deleted:
             session = get_active_session()
             session.api.pages.restore(self.obj_ref)
         return self
 
-    def reload(self) -> Page:
+    def reload(self) -> Self:
         """Reload this page."""
         session = get_active_session()
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
