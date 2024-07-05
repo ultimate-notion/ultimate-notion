@@ -95,12 +95,12 @@ class PropertyItemList(ObjectList, type='property_item'):
     do not typically match the schema for corresponding property values.
     """
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         id: str = None  # type: ignore
         type: str = None  # type: ignore
         next_url: str | None = None
 
-    property_item: _NestedData = _NestedData()
+    property_item: TypeData = TypeData()
 
 
 class EndpointIterator:

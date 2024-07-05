@@ -133,7 +133,7 @@ def test_create_basic_blocks(root_page: Page, notion: Session):
 
 @pytest.mark.vcr()
 def test_create_file_blocks(root_page: Page, notion: Session):
-    page = notion.create_page(parent=root_page, title='Page for creating advanced blocks')
+    page = notion.create_page(parent=root_page, title='Page for creating file blocks')
     children: list[uno.AnyBlock] = [
         uno.File('robots.txt', 'https://www.google.de/robots.txt'),
         uno.File('robots.txt', 'https://www.google.de/robots.txt', caption='Google Robots'),
@@ -167,3 +167,9 @@ def test_create_file_blocks(root_page: Page, notion: Session):
     """)  # noqa: E501
     for exp, act in zip(exp_output.lstrip('\n').split('\n'), output.split('\n'), strict=True):
         assert exp == act
+
+
+@pytest.mark.vcr()
+def test_create_child_blocks(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for creating child blocks')
+    page.to_markdown()

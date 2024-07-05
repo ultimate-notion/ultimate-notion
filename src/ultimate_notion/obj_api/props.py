@@ -284,17 +284,17 @@ class LastEditedBy(PropertyValue, type='last_edited_by'):
 class UniqueID(PropertyValue, type='unique_id'):
     """A Notion unique-id property value."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         number: int = 0
         prefix: str | None = None
 
-    unique_id: _NestedData = _NestedData()
+    unique_id: TypeData = TypeData()
 
 
 class Verification(PropertyValue, type='verification'):
     """A Notion verification property value."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         state: VState = VState.UNVERIFIED
         verified_by: SerializeAsAny[User] | None = None
         date: datetime | None = None
@@ -306,7 +306,7 @@ class Verification(PropertyValue, type='verification'):
         def validate_enum_field(cls, field: str):
             return VState(field)
 
-    verification: _NestedData = _NestedData()
+    verification: TypeData = TypeData()
 
 
 class PropertyItem(NotionObject, PropertyValue, object='property_item'):

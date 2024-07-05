@@ -42,7 +42,7 @@ class RichText(PropertyType, type='rich_text'):
 class Number(PropertyType, type='number'):
     """Defines the number configuration for a database property."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         format: NumberFormat = NumberFormat.NUMBER
 
         # leads to better error messages, see
@@ -52,119 +52,119 @@ class Number(PropertyType, type='number'):
         def validate_enum_field(cls, field: str):
             return NumberFormat(field)
 
-    number: _NestedData = _NestedData()
+    number: TypeData = TypeData()
 
     @classmethod
     def build(cls, format):  # noqa: A002
         """Create a `Number` object with the expected format."""
-        return cls.model_construct(number=cls._NestedData(format=format))
+        return cls.model_construct(number=cls.TypeData(format=format))
 
 
 class Select(PropertyType, type='select'):
     """Defines the select configuration for a database property."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         options: list[SelectOption] = Field(default_factory=list)
 
-    select: _NestedData = _NestedData()
+    select: TypeData = TypeData()
 
     @classmethod
     def build(cls, options):
         """Create a `Select` object from the list of `SelectOption`'s."""
-        return cls.model_construct(select=cls._NestedData(options=options))
+        return cls.model_construct(select=cls.TypeData(options=options))
 
 
 class MultiSelect(PropertyType, type='multi_select'):
     """Defines the multi-select configuration for a database property."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         options: list[SelectOption] = Field(default_factory=list)
 
-    multi_select: _NestedData = _NestedData()
+    multi_select: TypeData = TypeData()
 
     @classmethod
     def build(cls, options):
         """Create a `Select` object from the list of `SelectOption`'s."""
-        return cls.model_construct(multi_select=cls._NestedData(options=options))
+        return cls.model_construct(multi_select=cls.TypeData(options=options))
 
 
 class Status(PropertyType, type='status'):
     """Defines the status configuration for a database property."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         options: list[SelectOption] = Field(default_factory=list)
         groups: list[SelectGroup] = Field(default_factory=list)
 
-    status: _NestedData = _NestedData()
+    status: TypeData = TypeData()
 
 
 class Date(PropertyType, type='date'):
     """Defines the date configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    date: _NestedData = _NestedData()
+    date: TypeData = TypeData()
 
 
 class People(PropertyType, type='people'):
     """Defines the people configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    people: _NestedData = _NestedData()
+    people: TypeData = TypeData()
 
 
 class Files(PropertyType, type='files'):
     """Defines the files configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    files: _NestedData = _NestedData()
+    files: TypeData = TypeData()
 
 
 class Checkbox(PropertyType, type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    checkbox: _NestedData = _NestedData()
+    checkbox: TypeData = TypeData()
 
 
 class Email(PropertyType, type='email'):
     """Defines the email configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    email: _NestedData = _NestedData()
+    email: TypeData = TypeData()
 
 
 class URL(PropertyType, type='url'):
     """Defines the URL configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    url: _NestedData = _NestedData()
+    url: TypeData = TypeData()
 
 
 class PhoneNumber(PropertyType, type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    phone_number: _NestedData = _NestedData()
+    phone_number: TypeData = TypeData()
 
 
 class Formula(PropertyType, type='formula'):
     """Defines the formula configuration for a database property."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         expression: str = None  # type: ignore
 
-    formula: _NestedData = _NestedData()
+    formula: TypeData = TypeData()
 
     @classmethod
     def build(cls, expression):
-        return cls.model_construct(formula=cls._NestedData(expression=expression))
+        return cls.model_construct(formula=cls.TypeData(expression=expression))
 
 
 class PropertyRelation(TypedObject, polymorphic_base=True):
@@ -194,11 +194,11 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
     If a two-way relation property X relates to Y then the two-way relation property Y relates to X.
     """
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         synced_property_name: str | None = None
         synced_property_id: str | None = None
 
-    dual_property: _NestedData = _NestedData()
+    dual_property: TypeData = TypeData()
 
     @classmethod
     def build(cls, dbref):
@@ -219,7 +219,7 @@ class Relation(PropertyType, type='relation'):
 class Rollup(PropertyType, type='rollup'):
     """Defines the rollup configuration for a database property."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         function: AggFunc = AggFunc.COUNT
 
         relation_property_name: str | None = None
@@ -235,62 +235,62 @@ class Rollup(PropertyType, type='rollup'):
         def validate_enum_field(cls, field: str):
             return AggFunc(field)
 
-    rollup: _NestedData = _NestedData()
+    rollup: TypeData = TypeData()
 
     @classmethod
     def build(cls, relation, property, function):  # noqa: A002
         return Rollup.model_construct(
-            rollup=cls._NestedData(function=function, relation_property_name=relation, rollup_property_name=property)
+            rollup=cls.TypeData(function=function, relation_property_name=relation, rollup_property_name=property)
         )
 
 
 class CreatedTime(PropertyType, type='created_time'):
     """Defines the created-time configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    created_time: _NestedData = _NestedData()
+    created_time: TypeData = TypeData()
 
 
 class CreatedBy(PropertyType, type='created_by'):
     """Defines the created-by configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    created_by: _NestedData = _NestedData()
+    created_by: TypeData = TypeData()
 
 
 class LastEditedBy(PropertyType, type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    last_edited_by: _NestedData = _NestedData()
+    last_edited_by: TypeData = TypeData()
 
 
 class LastEditedTime(PropertyType, type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    last_edited_time: _NestedData = _NestedData()
+    last_edited_time: TypeData = TypeData()
 
 
 class UniqueID(PropertyType, type='unique_id'):
     """Unique ID database property."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         prefix: str | None = None
 
-    unique_id: _NestedData = _NestedData()
+    unique_id: TypeData = TypeData()
 
 
 class Verification(PropertyType, type='verification'):
     """Verfication database property of Wiki databases."""
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    verification: _NestedData = _NestedData()
+    verification: TypeData = TypeData()
 
 
 class RenameProp(GenericObject):
