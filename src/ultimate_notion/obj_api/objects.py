@@ -147,14 +147,10 @@ class ObjectReference(GenericObject):
         if isinstance(ref, UUID):
             return ObjectReference.model_construct(id=ref)
 
-        if isinstance(ref, str):
-            if (id_str := extract_id(ref)) is not None:
-                return ObjectReference.model_construct(id=UUID(id_str))
-            else:
-                msg = f"Unrecognized 'ref' string: {ref}"
-                raise ValueError(msg)
+        if isinstance(ref, str) and (id_str := extract_id(ref)) is not None:
+            return ObjectReference.model_construct(id=UUID(id_str))
 
-        msg = f"Unrecognized 'ref' attribute: {ref}"
+        msg = f'Cannot interpret {ref} of type {type(ref)} as reference to an object.'
         raise ValueError(msg)
 
 
@@ -225,20 +221,20 @@ class User(UserRef, TypedObject, polymorphic_base=True):
 class Person(User, type='person'):
     """Represents a Person in Notion."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         email: str = None  # type: ignore
 
-    person: _NestedData = _NestedData()
+    person: TypeData = TypeData()
 
 
 class Bot(User, type='bot'):
     """Represents a Bot in Notion."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         owner: WorkspaceRef = None  # type: ignore
         workspace_name: str = None  # type: ignore
 
-    bot: _NestedData = _NestedData()
+    bot: TypeData = TypeData()
 
 
 class UnknownUser(User, type='unknown'):
@@ -249,9 +245,9 @@ class UnknownUser(User, type='unknown'):
 
     name: Literal['Unknown User'] = 'Unknown User'
 
-    class _NestedData(GenericObject): ...
+    class TypeData(GenericObject): ...
 
-    unknown: _NestedData = _NestedData()
+    unknown: TypeData = TypeData()
 
 
 class EmojiObject(TypedObject, type='emoji'):
@@ -299,11 +295,11 @@ class RichTextBaseObject(TypedObject, polymorphic_base=True):
 class TextObject(RichTextBaseObject, type='text'):
     """Notion text element."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         content: str = None  # type: ignore
         link: LinkObject | None = None
 
-    text: _NestedData = _NestedData()
+    text: TypeData = TypeData()
 
     @classmethod
     def build(cls, text: str, href: str | None = None, style: Annotations | None = None) -> Self:
@@ -319,7 +315,7 @@ class TextObject(RichTextBaseObject, type='text'):
             return None
 
         link = LinkObject(url=href) if href else None
-        nested = TextObject._NestedData(content=text, link=link)
+        nested = TextObject.TypeData(content=text, link=link)
         style = deepcopy(style)
 
         return cls.model_construct(
@@ -333,10 +329,10 @@ class TextObject(RichTextBaseObject, type='text'):
 class EquationObject(RichTextBaseObject, type='equation'):
     """Notion equation element."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         expression: str
 
-    equation: _NestedData
+    equation: TypeData
 
 
 class MentionData(TypedObject, polymorphic_base=True):
@@ -417,10 +413,10 @@ class MentionLinkPreview(MentionData, type='link_preview'):
     These objects cannot be created via the API.
     """
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         url: str
 
-    link_preview: _NestedData
+    link_preview: TypeData
 
 
 class MentionTemplateData(TypedObject):
@@ -461,22 +457,22 @@ class FileObject(TypedObject, polymorphic_base=True):
 class HostedFile(FileObject, type='file'):
     """A Notion file object."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         url: str
         expiry_time: datetime | None = None
 
-    file: _NestedData
+    file: TypeData
 
 
 class ExternalFile(FileObject, type='external'):
     """An external file object."""
 
-    class _NestedData(GenericObject):
+    class TypeData(GenericObject):
         url: str
 
-    external: _NestedData
+    external: TypeData
 
     @classmethod
     def build(cls, url: str, name: str | None = None, caption: list[RichTextBaseObject] | None = None) -> Self:
         """Create a new `ExternalFile` from the given URL."""
-        return cls.model_construct(name=name, caption=caption, external=cls._NestedData(url=url))
+        return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url))

@@ -20,6 +20,7 @@ from ultimate_notion.text import md_comment
 from ultimate_notion.utils import Wrapper, flatten, get_active_session, get_url, get_uuid
 
 if TYPE_CHECKING:
+    from ultimate_notion.database import Database
     from ultimate_notion.page import Page
 
 
@@ -202,7 +203,12 @@ class ChildrenBlock(DataObject[T], wraps=obj_blocks.DataObject):
 
     @property
     def children(self) -> list[Block]:
-        """Return the children of this block."""
+        """Return the children of this block.
+
+        !!! Note
+
+            Also deleted blocks, e.g. pages or databases in the trash, are returned.
+        """
         if self._children is None:  # generate cache
             session = get_active_session()
             child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
@@ -433,8 +439,9 @@ class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
     """
 
     def __init__(self, url: str):
-        msg = 'LinkPreview blocks cannot be created or appended'
+        msg = 'The Notion API does not support creating or appending `link_preview` blocks.'
         raise NotImplementedError(msg)
+        # ToDo: Implement this when the API supports it
         # super().__init__()
         # self.obj_ref.value.url = url
 
@@ -562,33 +569,67 @@ class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
 
 
 class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
-    """Child page block."""
+    """Child page block.
+
+    !!! Note
+
+        To create a child page block, append an actual `Page` object to a parent block.
+    """
+
+    def __init__(self):
+        msg = 'Append an actual Page object to a parent block to create a child page block.'
+        raise NotImplementedError(msg)
 
     def to_markdown(self) -> str:
         return f'[📄 **<u>{self.title}</u>**]({self.url})\n'
 
     @property
     def title(self) -> str:
+        """Return the title of the child page."""
         return self.obj_ref.child_page.title
 
     @property
     def url(self) -> str:
+        """Return the URL of the Page object."""
         return get_url(self.obj_ref.id)
+
+    @property
+    def page(self) -> Page:
+        """Return the actual Page object."""
+        sess = get_active_session()
+        return sess.get_page(self.obj_ref.id)
 
 
 class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatabase):
-    """Child database block."""
+    """Child database block.
+
+    !!! Note
+
+        To create a child database block, append an actual `Database` object to a parent block.
+    """
+
+    def __init__(self):
+        msg = 'Append an actual Database object to a parent block to create a child database block.'
+        raise NotImplementedError(msg)
 
     def to_markdown(self) -> str:
         return f'[**🗄️ {self.title}**]({self.url})\n'
 
     @property
     def title(self) -> str:
+        """Return the title of the child database"""
         return self.obj_ref.child_database.title
 
     @property
     def url(self) -> str:
+        """Return the URL of the Database object."""
         return get_url(self.obj_ref.id)
+
+    @property
+    def db(self) -> Database:
+        """Return the actual Database object."""
+        sess = get_active_session()
+        return sess.get_db(self.obj_ref.id)
 
 
 class Column(Block[obj_blocks.Column], ChildrenBlock, wraps=obj_blocks.Column):

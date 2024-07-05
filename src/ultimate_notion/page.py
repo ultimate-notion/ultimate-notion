@@ -219,7 +219,7 @@ class Page(ChildrenBlock[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown."""
-        md = '\n'.join(block.to_markdown() for block in self.children)
+        md = '\n'.join(block.to_markdown() for block in self.children if block.is_deleted is False)
         return md
 
     def to_html(self, *, raw: bool = False) -> str:
