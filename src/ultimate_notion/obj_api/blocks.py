@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from abc import ABC
 from datetime import datetime
-from typing import Any
 from uuid import UUID
 
 from pydantic import SerializeAsAny
@@ -19,7 +18,7 @@ from ultimate_notion.obj_api.objects import (
     EmojiObject,
     FileObject,
     ParentRef,
-    RichTextObject,
+    RichTextBaseObject,
     UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyValue
@@ -47,13 +46,13 @@ class DataObject(NotionObject):
 class Database(DataObject, object='database'):
     """A database record type."""
 
-    title: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+    title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     url: str = None  # type: ignore
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyType] = None  # type: ignore
-    description: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+    description: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     is_inline: bool = False
 
 
@@ -77,8 +76,7 @@ class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
 class UnsupportedBlock(Block, type='unsupported'):
     """A placeholder for unsupported blocks in the API."""
 
-    class _NestedData(GenericObject):
-        pass
+    class _NestedData(GenericObject): ...
 
     unsupported: _NestedData | None = None
 
@@ -91,7 +89,7 @@ class Paragraph(TextBlock, type='paragraph'):
     """A paragraph block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] | None = None
         color: Color | BGColor = Color.DEFAULT
 
@@ -99,7 +97,7 @@ class Paragraph(TextBlock, type='paragraph'):
 
 
 class _NestedHeadingData(GenericObject):
-    rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     color: Color | BGColor = Color.DEFAULT
     is_toggleable: bool = False
 
@@ -130,7 +128,7 @@ class Quote(TextBlock, type='quote'):
     """A quote block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] | None = None
         color: Color | Color = Color.DEFAULT
 
@@ -141,8 +139,8 @@ class Code(TextBlock, type='code'):
     """A code block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
-        caption: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+        caption: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         language: CodeLang = CodeLang.PLAIN_TEXT
 
     code: _NestedData = _NestedData()
@@ -152,7 +150,7 @@ class Callout(TextBlock, type='callout'):
     """A callout block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] | None = None
         icon: SerializeAsAny[FileObject] | EmojiObject | None = None
         color: Color | BGColor = BGColor.GRAY
@@ -164,7 +162,7 @@ class BulletedListItem(TextBlock, type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] | None = None
         color: Color | BGColor = Color.DEFAULT
 
@@ -175,7 +173,7 @@ class NumberedListItem(TextBlock, type='numbered_list_item'):
     """A numbered list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] | None = None
         color: Color | BGColor = Color.DEFAULT
 
@@ -186,7 +184,7 @@ class ToDo(TextBlock, type='to_do'):
     """A todo list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         checked: bool = False
         children: list[SerializeAsAny[Block]] | None = None
         color: Color | BGColor = Color.DEFAULT
@@ -198,7 +196,7 @@ class Toggle(TextBlock, type='toggle'):
     """A toggle list item in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] | None = None
         color: Color | BGColor = Color.DEFAULT
 
@@ -208,7 +206,9 @@ class Toggle(TextBlock, type='toggle'):
 class Divider(Block, type='divider'):
     """A divider block in Notion."""
 
-    divider: Any = None
+    class _NestedData(GenericObject): ...
+
+    divider: _NestedData = _NestedData()
 
 
 class TableOfContents(Block, type='table_of_contents'):
@@ -223,8 +223,7 @@ class TableOfContents(Block, type='table_of_contents'):
 class Breadcrumb(Block, type='breadcrumb'):
     """A breadcrumb block in Notion."""
 
-    class _NestedData(GenericObject):
-        pass
+    class _NestedData(GenericObject): ...
 
     breadcrumb: _NestedData = _NestedData()
 
@@ -234,7 +233,7 @@ class Embed(Block, type='embed'):
 
     class _NestedData(GenericObject):
         url: str = None  # type: ignore
-        caption: list[SerializeAsAny[RichTextObject]] | None = None
+        caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
 
     embed: _NestedData = _NestedData()
 
@@ -244,7 +243,7 @@ class Bookmark(Block, type='bookmark'):
 
     class _NestedData(GenericObject):
         url: str = None  # type: ignore
-        caption: list[SerializeAsAny[RichTextObject]] | None = None
+        caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
 
     bookmark: _NestedData = _NestedData()
 
@@ -267,29 +266,29 @@ class Equation(Block, type='equation'):
     equation: _NestedData = _NestedData()
 
 
-class FileObjectBlock(Block, ABC):
+class FileBase(Block, ABC):
     """A abstract block referencing a FileObject."""
 
 
-class File(FileObjectBlock, type='file'):
+class File(FileBase, type='file'):
     """A file block in Notion."""
 
     file: SerializeAsAny[FileObject] = None  # type: ignore
 
 
-class Image(FileObjectBlock, type='image'):
+class Image(FileBase, type='image'):
     """An image block in Notion."""
 
     image: SerializeAsAny[FileObject] = None  # type: ignore
 
 
-class Video(FileObjectBlock, type='video'):
+class Video(FileBase, type='video'):
     """A video block in Notion."""
 
     video: SerializeAsAny[FileObject] = None  # type: ignore
 
 
-class PDF(FileObjectBlock, type='pdf'):
+class PDF(FileBase, type='pdf'):
     """A pdf block in Notion."""
 
     pdf: SerializeAsAny[FileObject] = None  # type: ignore
@@ -339,7 +338,7 @@ class TableRow(Block, type='table_row'):
     """A table_row block in Notion."""
 
     class _NestedData(GenericObject):
-        cells: list[list[SerializeAsAny[RichTextObject]]] | None = None
+        cells: list[list[SerializeAsAny[RichTextBaseObject]]] | None = None
 
     table_row: _NestedData = _NestedData()
 
@@ -379,7 +378,7 @@ class Template(Block, type='template'):
     """A template block in Notion."""
 
     class _NestedData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextObject]] | None = None
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] | None = None
         children: list[SerializeAsAny[Block]] | None = None
 
     template: _NestedData = _NestedData()

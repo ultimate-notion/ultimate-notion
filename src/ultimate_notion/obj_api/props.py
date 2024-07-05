@@ -15,7 +15,7 @@ from ultimate_notion.obj_api.objects import (
     DateRange,
     FileObject,
     ObjectReference,
-    RichTextObject,
+    RichTextBaseObject,
     TypedObject,
     User,
 )
@@ -49,13 +49,13 @@ class PropertyValue(TypedObject, polymorphic_base=True):
 class Title(PropertyValue, type='title'):
     """Notion title type."""
 
-    title: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+    title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
 
 
 class RichText(PropertyValue, type='rich_text'):
     """Notion rich text type."""
 
-    rich_text: list[SerializeAsAny[RichTextObject]] = None  # type: ignore
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
 
 
 class Number(PropertyValue, type='number'):

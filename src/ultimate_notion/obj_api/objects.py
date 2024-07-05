@@ -25,6 +25,7 @@ from uuid import UUID
 
 import pendulum as pnd
 from pydantic import Field
+from typing_extensions import Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import BGColor, Color
@@ -274,7 +275,7 @@ class Annotations(GenericObject):
     color: BGColor = None  # type: ignore
 
 
-class RichTextObject(TypedObject, polymorphic_base=True):
+class RichTextBaseObject(TypedObject, polymorphic_base=True):
     """Base class for Notion rich text elements."""
 
     plain_text: str
@@ -294,7 +295,7 @@ class RichTextObject(TypedObject, polymorphic_base=True):
         return cls.model_construct(plain_text=text, href=href, annotations=style)
 
 
-class TextObject(RichTextObject, type='text'):
+class TextObject(RichTextBaseObject, type='text'):
     """Notion text element."""
 
     class _NestedData(GenericObject):
@@ -328,7 +329,7 @@ class TextObject(RichTextObject, type='text'):
         )
 
 
-class EquationObject(RichTextObject, type='equation'):
+class EquationObject(RichTextBaseObject, type='equation'):
     """Notion equation element."""
 
     class _NestedData(GenericObject):
@@ -341,7 +342,7 @@ class MentionData(TypedObject, polymorphic_base=True):
     """Base class for typed `Mention` data objects."""
 
 
-class MentionObject(RichTextObject, type='mention'):
+class MentionObject(RichTextBaseObject, type='mention'):
     """Notion mention element."""
 
     mention: MentionData
@@ -352,6 +353,7 @@ class MentionUser(MentionData, type='user'):
 
     user: User
 
+    # ToDo: Check if this is needed!
     @classmethod
     def build(cls, user: User) -> MentionObject:
         """Build a `Mention` object for the specified user.
@@ -368,6 +370,7 @@ class MentionPage(MentionData, type='page'):
 
     page: ObjectReference
 
+    # ToDo: Check if this is needed!
     @classmethod
     def build(cls, page_ref: PageRef) -> MentionObject:
         """Build a `Mention` object for the specified page reference."""
@@ -382,6 +385,7 @@ class MentionDatabase(MentionData, type='database'):
 
     database: ObjectReference
 
+    # ToDo: Check if this is needed!
     @classmethod
     def build(cls, db_ref: DatabaseRef) -> MentionObject:
         """Build a `Mention` object for the specified database reference."""
@@ -396,6 +400,7 @@ class MentionDate(MentionData, type='date'):
 
     date: DateRange
 
+    # ToDo: Check if this is needed!
     @classmethod
     def build(cls, start, end=None) -> MentionObject:
         """Build a `Mention` object for the specified URL."""
@@ -449,7 +454,7 @@ class FileObject(TypedObject, polymorphic_base=True):
     """
 
     name: str | None = None
-    caption: list[RichTextObject] | None = None
+    caption: list[RichTextBaseObject] | None = None
 
 
 class HostedFile(FileObject, type='file'):
@@ -471,6 +476,6 @@ class ExternalFile(FileObject, type='external'):
     external: _NestedData
 
     @classmethod
-    def build(cls, url, name=None):
+    def build(cls, url: str, name: str | None = None, caption: list[RichTextBaseObject] | None = None) -> Self:
         """Create a new `ExternalFile` from the given URL."""
-        return cls.model_construct(name=name, external=cls._NestedData(url=url))
+        return cls.model_construct(name=name, caption=caption, external=cls._NestedData(url=url))

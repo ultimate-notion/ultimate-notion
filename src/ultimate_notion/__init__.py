@@ -14,6 +14,7 @@ finally:
 
 from ultimate_notion.blocks import (
     PDF,
+    AnyBlock,  # for type hinting
     Bookmark,
     Breadcrumb,
     BulletedItem,
@@ -52,6 +53,7 @@ from ultimate_notion.session import Session
 __all__ = [
     'PDF',
     'AggFunc',
+    'AnyBlock',
     'BGColor',
     'Bookmark',
     'Breadcrumb',
