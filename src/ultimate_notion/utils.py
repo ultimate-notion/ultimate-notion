@@ -11,6 +11,7 @@ from hashlib import sha256
 from itertools import chain
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
+from urllib.parse import urlparse
 from uuid import UUID
 
 import numpy as np
@@ -403,3 +404,12 @@ def temp_timezone(tz: str | pnd.Timezone):
         yield
     finally:
         pnd.set_local_timezone(current_tz)
+
+
+def is_url(string: str) -> bool:
+    """Check if a string is a valid URL."""
+    try:
+        result = urlparse(string)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False

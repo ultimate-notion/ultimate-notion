@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import TypeVar, cast
 
+from emoji import emojize, is_emoji
+
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.text import chunky, html_img, rich_texts_to_markdown
-from ultimate_notion.utils import Wrapper, get_repr
+from ultimate_notion.utils import Wrapper, get_repr, is_url
 
 
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
@@ -102,14 +104,14 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
 
     obj_ref: objs.FileObject
 
+    def __init__(self, *, url: str, name: str | None = None) -> None:
+        self.obj_ref = objs.ExternalFile.build(url=url, name=name)
+
     @classmethod
     def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> FileInfo:
         self = cast(FileInfo, cls.__new__(cls))
         self.obj_ref = obj_ref
         return self
-
-    def __init__(self, *, url: str, name: str | None = None) -> None:
-        self.obj_ref = objs.ExternalFile.build(url=url, name=name)
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, str):
@@ -135,6 +137,10 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
     @property
     def name(self) -> str | None:
         return self.obj_ref.name
+
+    @property
+    def caption(self) -> RichText:
+        return RichText.wrap_obj_ref(self.obj_ref.caption)
 
     @property
     def url(self) -> str:
@@ -184,10 +190,27 @@ class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
         raise NotImplementedError
 
 
-T = TypeVar('T', bound=objs.RichTextObject)
+def to_file_or_emoji(obj: FileInfo | Emoji | str) -> FileInfo | Emoji:
+    """Convert the object to a FileInfo or Emoji object.
+
+    Strings which are an emoji or describing an emoji, e.g. :thumbs_up: are converted to Emoji objects.
+    Strings which are URLs are converted to FileInfo objects.
+    """
+    if isinstance(obj, FileInfo | Emoji):
+        return obj
+    elif isinstance(obj, str):
+        if is_url(obj):
+            return FileInfo(url=obj)
+        elif is_emoji(emojized_obj := emojize(obj)):
+            return Emoji(emojized_obj)
+    msg = f'Cannot convert {obj} of type {type(obj)} to FileInfo or Emoji'
+    raise ValueError(msg)
 
 
-class RichTextBase(Wrapper[T], wraps=objs.RichTextObject):
+T = TypeVar('T', bound=objs.RichTextBaseObject)
+
+
+class RichTextBase(Wrapper[T], wraps=objs.RichTextBaseObject):
     """Super class for text, equation and mentions of various kinds."""
 
     @property
@@ -238,7 +261,7 @@ class RichText(str):
         self._rich_texts = rich_texts
 
     @classmethod
-    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextObject] | None) -> RichText:
+    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> RichText:
         obj_refs = [] if obj_refs is None else obj_refs
         rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
         plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
@@ -247,7 +270,7 @@ class RichText(str):
         return obj
 
     @property
-    def obj_ref(self) -> list[objs.RichTextObject]:
+    def obj_ref(self) -> list[objs.RichTextBaseObject]:
         return [elem.obj_ref for elem in self._rich_texts]
 
     @classmethod
@@ -297,6 +320,8 @@ class RichText(str):
 
 
 class User(Wrapper[objs.User], wraps=objs.User):
+    """User object for persons and bots."""
+
     @classmethod
     def wrap_obj_ref(cls, obj_ref: objs.User) -> User:
         self = cast(User, cls.__new__(cls))

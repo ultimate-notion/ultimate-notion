@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
 from uuid import UUID
 
 from tabulate import tabulate
@@ -13,8 +13,8 @@ from typing_extensions import Self
 from ultimate_notion import objects
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.enums import BGColor, Color
-from ultimate_notion.objects import RichText, RichTextBase, User
+from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
+from ultimate_notion.objects import Emoji, FileInfo, RichText, RichTextBase, User, to_file_or_emoji
 from ultimate_notion.text import md_comment
 from ultimate_notion.utils import Wrapper, flatten, get_active_session, get_url, get_uuid
 
@@ -122,11 +122,9 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
         self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
         return self
 
-
-class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
-    """Abstract Text block."""
-
-    def __init__(self, text: str | RichText | RichTextBase | list[RichTextBase]) -> None:
+    @staticmethod
+    def _text_to_obj_ref(text: str | RichText | RichTextBase | list[RichTextBase]) -> list[objs.RichTextBaseObject]:
+        """Convert various text representations to a list of rich text objects."""
         if isinstance(text, str):
             # ToDo: Allow passing markdown text here when the markdown parser is implemented
             texts = RichText(text).obj_ref
@@ -134,15 +132,66 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
             texts = text.obj_ref
         elif isinstance(text, list):
             texts = flatten([rt.obj_ref for rt in text])
+        return texts
 
+
+class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
+    """Abstract Text block."""
+
+    def __init__(self, text: str | RichText | RichTextBase | list[RichTextBase]) -> None:
         super().__init__()
-        self.obj_ref.value.rich_text = texts
+        self.obj_ref.value.rich_text = self._text_to_obj_ref(text)
 
     @property
     def rich_text(self) -> RichText:
         """Return the text content of this text block."""
         rich_texts = self.obj_ref.value.rich_text
         return RichText.wrap_obj_ref(rich_texts)
+
+
+#: For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock] in user code.
+AnyBlock: TypeAlias = Block[Any]
+
+
+class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
+    """Code block."""
+
+    def __init__(
+        self,
+        text: str | RichText | RichTextBase | list[RichTextBase],
+        *,
+        language: CodeLang = CodeLang.PLAIN_TEXT,
+        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
+    ) -> None:
+        super().__init__(text)
+        self.obj_ref.value.language = language
+        self.obj_ref.value.caption = self._text_to_obj_ref(caption) if caption is not None else []
+
+    @property
+    def caption(self) -> RichText:
+        return RichText.wrap_obj_ref(self.obj_ref.code.caption)
+
+    def to_markdown(self) -> str:
+        lang = self.obj_ref.code.language
+        return f'```{lang}\n{self.rich_text.to_markdown()}\n```'
+
+
+class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
+    """Abstract Text block with color."""
+
+    def __init__(
+        self,
+        text: str | RichText | RichTextBase | list[RichTextBase],
+        *,
+        color: Color | BGColor = Color.DEFAULT,
+    ) -> None:
+        super().__init__(text)
+        self.obj_ref.value.rich_text = self._text_to_obj_ref(text)
+        self.obj_ref.value.color = color
+
+    @property
+    def color(self) -> Color | BGColor:
+        return self.obj_ref.value.color
 
 
 class ChildrenBlock(DataObject[T], wraps=obj_blocks.DataObject):
@@ -182,14 +231,16 @@ class ChildrenBlock(DataObject[T], wraps=obj_blocks.DataObject):
         return self
 
 
-class Paragraph(TextBlock[obj_blocks.Paragraph], ChildrenBlock[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph):
+class Paragraph(
+    ColoredTextBlock[obj_blocks.Paragraph], ChildrenBlock[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph
+):
     """Paragraph block."""
 
     def to_markdown(self) -> str:
         return f'# {self.rich_text.to_markdown()}'
 
 
-class Heading(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
+class Heading(ColoredTextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Heading block."""
 
     def __init__(
@@ -199,8 +250,7 @@ class Heading(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
         color: Color | BGColor = Color.DEFAULT,
         toggleable: bool = False,
     ) -> None:
-        super().__init__(text)
-        self.obj_ref.value.color = color
+        super().__init__(text, color=color)
         self.obj_ref.value.is_toggleable = toggleable
 
 
@@ -225,78 +275,66 @@ class Heading3(Heading[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
         return f'### {self.rich_text.to_markdown()}'
 
 
-class Quote(TextBlock[obj_blocks.Quote], ChildrenBlock, wraps=obj_blocks.Quote):
+class Quote(ColoredTextBlock[obj_blocks.Quote], ChildrenBlock, wraps=obj_blocks.Quote):
     """Quote block."""
 
     def to_markdown(self) -> str:
         return f'> {self.rich_text.to_markdown()}\n'
 
 
-class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
-    """Code block."""
-
-    def to_markdown(self) -> str:
-        lang = self.obj_ref.code.language
-        return f'```{lang}\n{self.rich_text.to_markdown()}\n```'
-
-    @property
-    def caption(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.code.caption)
-
-    # @classmethod
-    # def build(cls, text, lang=CodingLanguage.PLAIN_TEXT):
-    #     """Compose a `Code` block from the given text and language."""
-    #     block = super().build(text)
-    #     block.code.language = lang
-    #     return block
-
-
-class Callout(TextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
+class Callout(ColoredTextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
     """Callout block."""
 
+    def __init__(
+        self,
+        text: str | RichText | RichTextBase | list[RichTextBase],
+        *,
+        color: Color | BGColor = Color.DEFAULT,
+        icon: FileInfo | Emoji | str | None = None,
+    ) -> None:
+        super().__init__(text, color=color)
+        if icon is not None:
+            self.obj_ref.value.icon = to_file_or_emoji(icon).obj_ref
+
     @property
-    def icon(self) -> objects.FileInfo | objects.Emoji | None:
+    def icon(self) -> FileInfo | Emoji | None:
         return objects.wrap_icon(self.obj_ref.callout.icon)
 
     def to_markdown(self) -> str:
-        if isinstance(icon := self.icon, objects.Emoji):
+        if isinstance(icon := self.icon, Emoji):
             return f'{icon} {self.rich_text.to_markdown()}\n'
-        elif isinstance(icon := self.icon, objects.FileInfo):
+        elif isinstance(icon := self.icon, FileInfo):
             return f'![icon]({icon.url}) {self.rich_text.to_markdown()}\n'
         else:
             return f'{self.rich_text.to_markdown()}\n'
 
-    # @classmethod
-    # def build(cls, text, emoji=None, color=FullColor.GRAY_BACKGROUND):
-    #     """Compose a `Callout` block from the given text, emoji and color."""
 
-    #     if emoji is not None:
-    #         emoji = EmojiObject[emoji]
-
-    #     nested = Callout._NestedData(icon=emoji, color=color)
-
-    #     callout = cls(callout=nested)
-    #     callout.concat(text)
-
-    #     return callout
-
-
-class BulletedItem(TextBlock[obj_blocks.BulletedListItem], ChildrenBlock, wraps=obj_blocks.BulletedListItem):
+class BulletedItem(ColoredTextBlock[obj_blocks.BulletedListItem], ChildrenBlock, wraps=obj_blocks.BulletedListItem):
     """Bulleted list item."""
 
     def to_markdown(self) -> str:
         return f'- {self.rich_text.to_markdown()}\n'
 
 
-class NumberedItem(TextBlock[obj_blocks.NumberedListItem], ChildrenBlock, wraps=obj_blocks.NumberedListItem):
+class NumberedItem(ColoredTextBlock[obj_blocks.NumberedListItem], ChildrenBlock, wraps=obj_blocks.NumberedListItem):
     """Numbered list item."""
 
     def to_markdown(self) -> str:
         return f'1. {self.rich_text.to_markdown()}\n'
 
 
-class ToDoItem(TextBlock[obj_blocks.ToDo], ChildrenBlock, wraps=obj_blocks.ToDo):
+class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenBlock, wraps=obj_blocks.ToDo):
     """ToDo list item."""
+
+    def __init__(
+        self,
+        text: str | RichText | RichTextBase | list[RichTextBase],
+        *,
+        checked: bool = False,
+        color: Color | BGColor = Color.DEFAULT,
+    ) -> None:
+        super().__init__(text, color=color)
+        self.obj_ref.value.checked = checked
 
     def is_checked(self) -> bool:
         return self.obj_ref.to_do.checked
@@ -305,24 +343,15 @@ class ToDoItem(TextBlock[obj_blocks.ToDo], ChildrenBlock, wraps=obj_blocks.ToDo)
         mark = 'x' if self.is_checked() else ' '
         return f'- [{mark}] {self.rich_text.to_markdown()}\n'
 
-    # def build(cls, text, checked=False, href=None):
-    #     """Compose a ToDo block from the given text and checked state."""
-    #     return ToDo(
-    #         to_do=ToDo._NestedData(
-    #             rich_text=[TextObject[text, href]],
-    #             checked=checked,
-    #         )
-    #     )
 
-
-class ToggleItem(TextBlock[obj_blocks.Toggle], ChildrenBlock, wraps=obj_blocks.Toggle):
+class ToggleItem(ColoredTextBlock[obj_blocks.Toggle], ChildrenBlock, wraps=obj_blocks.Toggle):
     """Toggle list item."""
 
     def to_markdown(self) -> str:
         return f'- {self.rich_text.to_markdown()}\n'
 
 
-class Divider(TextBlock[obj_blocks.Divider], wraps=obj_blocks.Divider):
+class Divider(Block[obj_blocks.Divider], wraps=obj_blocks.Divider):
     """Divider block."""
 
     def to_markdown(self) -> str:  # noqa: PLR6301
@@ -331,6 +360,10 @@ class Divider(TextBlock[obj_blocks.Divider], wraps=obj_blocks.Divider):
 
 class TableOfContents(Block[obj_blocks.TableOfContents], wraps=obj_blocks.TableOfContents):
     """Table of contents block."""
+
+    def __init__(self, *, color: Color | BGColor = Color.DEFAULT):
+        super().__init__()
+        self.obj_ref.value.color = color
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         return '```{toc}\n```'
@@ -348,9 +381,14 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
 class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
     """Embed block."""
 
+    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
+        super().__init__()
+        self.obj_ref.value.url = url
+        self.obj_ref.value.caption = self._text_to_obj_ref(caption) if caption is not None else None
+
     @property
-    def embed_url(self) -> str | None:
-        """Return the URL of the embeded item."""
+    def url(self) -> str | None:
+        """Return the URL of the embedded item."""
         return self.obj_ref.embed.url
 
     @property
@@ -358,19 +396,19 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
         return RichText.wrap_obj_ref(self.obj_ref.embed.caption)
 
     def to_markdown(self) -> str:
-        if self.embed_url is not None:
-            return f'[{self.embed_url}]({self.embed_url})\n'
+        if self.url is not None:
+            return f'[{self.url}]({self.url})\n'
         else:
             return ''
-
-    # @classmethod
-    # def build(cls, url):
-    #     """Create a new `Embed` block from the given URL."""
-    #     return Embed(embed=Embed._NestedData(url=url))
 
 
 class Bookmark(Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
+
+    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
+        super().__init__()
+        self.obj_ref.value.url = url
+        self.obj_ref.value.caption = self._text_to_obj_ref(caption) if caption is not None else None
 
     @property
     def url(self) -> str | None:
@@ -383,14 +421,21 @@ class Bookmark(Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
         else:
             return 'Bookmark: [Add a web bookmark]()\n'  # emtpy bookmark
 
-    # @classmethod
-    # def build(cls, url):
-    #     """Compose a new `Bookmark` block from a specific URL."""
-    #     return Bookmark(bookmark=Bookmark._NestedData(url=url))
-
 
 class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
-    """Link preview block."""
+    """Link preview block.
+
+    !!! Warning "Not Supported"
+
+        The `link_preview` block can only be returned as part of a response.
+        The Notion API does not support creating or appending `link_preview` blocks.
+    """
+
+    def __init__(self, url: str):
+        msg = 'LinkPreview blocks cannot be created or appended'
+        raise NotImplementedError(msg)
+        # super().__init__()
+        # self.obj_ref.value.url = url
 
     @property
     def url(self) -> str | None:
@@ -401,14 +446,13 @@ class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
             return f'Link preview: [{self.url}]({self.url})\n'
         return super().to_markdown()
 
-    # @classmethod
-    # def build(cls, url):
-    #     """Create a new `LinkPreview` block from the given URL."""
-    #     return LinkPreview(link_preview=LinkPreview._NestedData(url=url))
-
 
 class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
     """Equation block."""
+
+    def __init__(self, expression: str):
+        super().__init__()
+        self.obj_ref.value.expression = expression
 
     @property
     def expression(self) -> str:
@@ -420,48 +464,39 @@ class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
     def to_markdown(self) -> str:
         return f'$$\n{self.expression}\n$$\n'
 
-    # @classmethod
-    # def build(cls, expr):
-    #     """Create a new `Equation` block from the given expression."""
-    #     return LinkPreview(equation=Equation._NestedData(expression=expr))
+
+FT = TypeVar('FT', bound=obj_blocks.FileBase)
 
 
-FT = TypeVar('FT', bound=obj_blocks.FileObjectBlock)
-
-
-class FileObjectBlock(DataObject[FT], ABC, wraps=obj_blocks.FileObjectBlock):
+class FileObjectBlock(DataObject[FT], ABC, wraps=obj_blocks.FileBase):
     """Abstract Block holding a FileObject"""
 
     @property
-    def _file(self) -> objs.FileObject:
+    def file(self) -> FileInfo:
         if isinstance(file_obj := self.obj_ref.value, objs.FileObject):
-            return file_obj
+            return FileInfo.wrap_obj_ref(file_obj)
         else:
             msg = f'Unknown file type {type(file_obj)}'
             raise ValueError(msg)
 
     @property
     def caption(self) -> RichText:
-        return RichText.wrap_obj_ref(self._file.caption)
+        return self.file.caption
 
     @property
     def url(self) -> str:
-        file = self._file
-        if isinstance(file, objs.ExternalFile):
-            return file.external.url
-        elif isinstance(file, objs.HostedFile):
-            return file.file.url
-        else:
-            msg = f'Unknown file type {type(file)}'
-            raise ValueError(msg)
+        return self.file.url
 
 
 class File(FileObjectBlock[obj_blocks.File], wraps=obj_blocks.File):
     """File block."""
 
+    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
+        super().__init__()
+
     @property
     def name(self) -> str:
-        name = self._file.name
+        name = self.file.name
         return name if name is not None else ''
 
     def to_markdown(self) -> str:

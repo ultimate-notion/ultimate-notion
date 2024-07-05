@@ -24,7 +24,7 @@ from ultimate_notion.obj_api.objects import (
     ObjectReference,
     PageRef,
     ParentRef,
-    RichTextObject,
+    RichTextBaseObject,
     User,
 )
 from ultimate_notion.obj_api.props import PropertyItem, Title
@@ -207,8 +207,8 @@ class DatabasesEndpoint(Endpoint):
     def _build_request(
         parent: SerializeAsAny[ParentRef] | None = None,
         schema: dict[str, PropertyType] | None = None,
-        title: list[RichTextObject] | None = None,
-        description: list[RichTextObject] | None = None,
+        title: list[RichTextBaseObject] | None = None,
+        description: list[RichTextBaseObject] | None = None,
     ) -> dict[str, Any]:
         """Build a request payload from the given items.
 
@@ -235,7 +235,7 @@ class DatabasesEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/create-a-database
     def create(
-        self, parent: Page, schema: dict[str, PropertyType], title: list[RichTextObject] | None = None
+        self, parent: Page, schema: dict[str, PropertyType], title: list[RichTextBaseObject] | None = None
     ) -> Database:
         """Add a database to the given Page parent.
 
@@ -266,8 +266,8 @@ class DatabasesEndpoint(Endpoint):
     def update(
         self,
         db: Database,
-        title: list[RichTextObject] | None = None,
-        description: list[RichTextObject] | None = None,
+        title: list[RichTextBaseObject] | None = None,
+        description: list[RichTextBaseObject] | None = None,
         schema: dict[str, PropertyType] | None = None,
     ) -> Database:
         """Update the Database object on the server.
