@@ -140,7 +140,7 @@ class BlocksEndpoint(Endpoint):
         return self.api.client.blocks
 
     # https://developers.notion.com/reference/delete-a-block
-    def delete(self, block: Block) -> Block:
+    def delete(self, block: Block | UUID | str) -> Block:
         """Delete (archive) the specified Block.
 
         `block` may be any suitable `ObjectReference` type.
@@ -153,7 +153,7 @@ class BlocksEndpoint(Endpoint):
 
         return Block.model_validate(data)
 
-    def restore(self, block: Block) -> Block:
+    def restore(self, block: Block | UUID | str) -> Block:
         """Restore (unarchive) the specified Block.
 
         `block` may be any suitable `ObjectReference` type.
@@ -167,7 +167,7 @@ class BlocksEndpoint(Endpoint):
         return Block.model_validate(data)
 
     # https://developers.notion.com/reference/retrieve-a-block
-    def retrieve(self, block) -> Block:
+    def retrieve(self, block: Block | UUID | str) -> Block:
         """Return the requested Block.
 
         `block` may be any suitable `ObjectReference` type.
@@ -257,9 +257,9 @@ class DatabasesEndpoint(Endpoint):
         `dbref` may be any suitable `DatabaseRef` type.
         """
 
-        dbid = DatabaseRef.build(dbref).database_id
-        logger.info(f'Retrieving database with id `{dbid}`')
-        data = self.raw_api.retrieve(dbid)
+        db_id = DatabaseRef.build(dbref).database_id
+        logger.info(f'Retrieving database with id `{db_id}`')
+        data = self.raw_api.retrieve(str(db_id))
 
         return Database.model_validate(data)
 
@@ -289,11 +289,11 @@ class DatabasesEndpoint(Endpoint):
     def delete(self, db: Database) -> Database:
         """Delete (archive) the specified Database."""
 
-        dbid = DatabaseRef.build(db).database_id
+        db_id = DatabaseRef.build(db).database_id
 
-        logger.info(f'Deleting database `{db}` with id {dbid}')
+        logger.info(f'Deleting database `{db}` with id {db_id}')
 
-        block_obj = self.api.blocks.delete(dbid)
+        block_obj = self.api.blocks.delete(str(db_id))
         # block.update(**data) is not possible as the API returns a block, not a database
         db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
         db.in_trash = block_obj.in_trash
@@ -302,23 +302,23 @@ class DatabasesEndpoint(Endpoint):
     def restore(self, db: Database) -> Database:
         """Restore (unarchive) the specified Database."""
 
-        dbid = DatabaseRef.build(db).database_id
+        db_id = DatabaseRef.build(db).database_id
 
-        logger.info(f'Restoring database `{db}` with id {dbid}')
+        logger.info(f'Restoring database `{db}` with id {db_id}')
 
-        block_obj = self.api.blocks.restore(dbid)
+        block_obj = self.api.blocks.restore(str(db_id))
         # block.update(**data) is not possible as the API returns a block, not a database
         db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
         db.in_trash = block_obj.in_trash
         return db
 
     # https://developers.notion.com/reference/post-database-query
-    def query(self, db: Database) -> DBQueryBuilder:
+    def query(self, db: Database | UUID | str) -> DBQueryBuilder:
         """Initialize a new Query object with the target data class."""
         db_id = DatabaseRef.build(db).database_id
         logger.info('Initializing database query :: {%s}', db_id)
 
-        return DBQueryBuilder(endpoint=self.raw_api.query, db_id=db_id)
+        return DBQueryBuilder(endpoint=self.raw_api.query, db_id=str(db_id))
 
 
 class PagesEndpoint(Endpoint):
@@ -412,7 +412,7 @@ class PagesEndpoint(Endpoint):
         return self.set_attr(page, archived=False)
 
     # https://developers.notion.com/reference/retrieve-a-page
-    def retrieve(self, page) -> Page:
+    def retrieve(self, page: Page | UUID | str) -> Page:
         """Return the requested Page.
 
         `page` may be any suitable `PageRef` type.
@@ -430,7 +430,7 @@ class PagesEndpoint(Endpoint):
         return Page.model_validate(data)
 
     # https://developers.notion.com/reference/patch-page
-    def update(self, page: Page, **properties):
+    def update(self, page: Page, **properties) -> Page:
         """Update the Page object properties on the server.
 
         An optional `properties` may be specified as `"name"`: `PropertyValue` pairs.
@@ -458,7 +458,7 @@ class PagesEndpoint(Endpoint):
         cover: FileObject | None | T_UNSET = UNSET,
         icon: FileObject | EmojiObject | None | T_UNSET = UNSET,
         archived: bool | T_UNSET = UNSET,
-    ):
+    ) -> Page:
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
         `page` may be any suitable `PageRef` type.
@@ -517,17 +517,17 @@ class UsersEndpoint(Endpoint):
         return self.api.client.users
 
     # https://developers.notion.com/reference/get-users
-    def list(self):
+    def list(self) -> Iterator[User]:
         """Return an iterator for all users in the workspace."""
 
         logger.info('Listing known users...')
 
         users = EndpointIterator(endpoint=self.raw_api.list)
 
-        return users()
+        return cast(Iterator[User], users())
 
     # https://developers.notion.com/reference/get-user
-    def retrieve(self, user_id):
+    def retrieve(self, user_id) -> User:
         """Return the User with the given ID."""
 
         logger.info('Retrieving user :: %s', user_id)
@@ -537,7 +537,7 @@ class UsersEndpoint(Endpoint):
         return User.model_validate(data)
 
     # https://developers.notion.com/reference/get-self
-    def me(self):
+    def me(self) -> User:
         """Return the current bot User."""
 
         logger.info('Retrieving current integration bot')

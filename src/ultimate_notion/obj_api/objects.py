@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
 import pendulum as pnd
-from pydantic import Field
+from pydantic import Field, SerializeAsAny
 from typing_extensions import Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
@@ -44,7 +44,7 @@ class SelectOption(GenericObject):
     description: str | None = None  # ToDo: Undocumented, could also be [RichTextObject]
 
     @classmethod
-    def build(cls, name, color=Color.DEFAULT):
+    def build(cls, name, color=Color.DEFAULT) -> Self:
         """Create a `SelectOption` object from the given name and color."""
         return cls.model_construct(name=name, color=color)
 
@@ -66,7 +66,7 @@ class DateRange(GenericObject):
     time_zone: str | None = None
 
     @classmethod
-    def build(cls, dt: pnd.DateTime | pnd.Date | pnd.Interval):
+    def build(cls, dt: pnd.DateTime | pnd.Date | pnd.Interval) -> Self:
         """Compose a DateRange object from the given properties."""
 
         def to_naive_dt(dt: pnd.DateTime | pnd.Date | datetime | date) -> datetime | date:
@@ -174,7 +174,7 @@ class DatabaseRef(ParentRef, type='database_id'):
     database_id: UUID
 
     @classmethod
-    def build(cls, db_ref: Database | str | UUID):
+    def build(cls, db_ref: Database | str | UUID) -> DatabaseRef:
         """Compose a DatabaseRef from the given reference object."""
         ref = ObjectReference.build(db_ref)
         return DatabaseRef.model_construct(database_id=ref.id)
@@ -186,7 +186,7 @@ class PageRef(ParentRef, type='page_id'):
     page_id: UUID
 
     @classmethod
-    def build(cls, page_ref: Page | str | UUID):
+    def build(cls, page_ref: Page | str | UUID) -> PageRef:
         """Compose a PageRef from the given reference object."""
         ref = ObjectReference.build(page_ref)
         return PageRef.model_construct(page_id=ref.id)
@@ -198,7 +198,7 @@ class BlockRef(ParentRef, type='block_id'):
     block_id: UUID
 
     @classmethod
-    def build(cls, block_ref: Page | str | UUID):
+    def build(cls, block_ref: Page | str | UUID) -> BlockRef:
         """Compose a BlockRef from the given reference object."""
         ref = ObjectReference.build(block_ref)
         return BlockRef.model_construct(block_id=ref.id)
@@ -217,6 +217,7 @@ class UserRef(NotionObject, object='user'):
 class User(UserRef, TypedObject, polymorphic_base=True):
     """Represents a User in Notion."""
 
+    id: UUID = None  # type: ignore
     name: str | None = None
     avatar_url: str | None = None
 
@@ -259,7 +260,7 @@ class EmojiObject(TypedObject, type='emoji'):
     emoji: str
 
     @classmethod
-    def build(cls, emoji: str):
+    def build(cls, emoji: str) -> EmojiObject:
         """Compose an EmojiObject from the given emoji string."""
         return EmojiObject.model_construct(emoji=emoji)
 
@@ -283,7 +284,7 @@ class RichTextBaseObject(TypedObject, polymorphic_base=True):
     annotations: Annotations | None = None
 
     @classmethod
-    def build(cls, text: str, href: str | None = None, style: Annotations | None = None):
+    def build(cls, text: str, href: str | None = None, style: Annotations | None = None) -> Self:
         """Compose a TextObject from the given properties.
 
         Args:
@@ -305,7 +306,7 @@ class TextObject(RichTextBaseObject, type='text'):
     text: _NestedData = _NestedData()
 
     @classmethod
-    def build(cls, text: str, href: str | None = None, style: Annotations | None = None):
+    def build(cls, text: str, href: str | None = None, style: Annotations | None = None) -> Self:
         """Compose a TextObject from the given properties.
 
         Args:
@@ -454,7 +455,7 @@ class FileObject(TypedObject, polymorphic_base=True):
     """
 
     name: str | None = None
-    caption: list[RichTextBaseObject] | None = None
+    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
 
 
 class HostedFile(FileObject, type='file'):

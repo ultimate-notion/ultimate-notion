@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import mimetypes
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
@@ -468,8 +469,19 @@ class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
 FT = TypeVar('FT', bound=obj_blocks.FileBase)
 
 
-class FileObjectBlock(DataObject[FT], ABC, wraps=obj_blocks.FileBase):
-    """Abstract Block holding a FileObject"""
+class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
+    """Abstract Block for file-based blocks."""
+
+    def __init__(
+        self,
+        url: str,
+        *,
+        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
+    ):
+        super().__init__()
+        caption_obj = self._text_to_obj_ref(caption) if caption is not None else None
+        external_file = objs.ExternalFile.build(url=url, caption=caption_obj)
+        setattr(self.obj_ref, self.obj_ref.type, external_file)
 
     @property
     def file(self) -> FileInfo:
@@ -480,19 +492,26 @@ class FileObjectBlock(DataObject[FT], ABC, wraps=obj_blocks.FileBase):
             raise ValueError(msg)
 
     @property
-    def caption(self) -> RichText:
-        return self.file.caption
-
-    @property
     def url(self) -> str:
         return self.file.url
 
+    @property
+    def caption(self) -> RichText:
+        return self.file.caption
 
-class File(FileObjectBlock[obj_blocks.File], wraps=obj_blocks.File):
+
+class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
     """File block."""
 
-    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
-        super().__init__()
+    def __init__(
+        self,
+        name: str,
+        url: str,
+        *,
+        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
+    ):
+        super().__init__(url, caption=caption)
+        self.obj_ref.value.name = name
 
     @property
     def name(self) -> str:
@@ -506,8 +525,11 @@ class File(FileObjectBlock[obj_blocks.File], wraps=obj_blocks.File):
         return md
 
 
-class Image(FileObjectBlock[obj_blocks.Image], wraps=obj_blocks.Image):
+class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
     """Image block."""
+
+    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
+        super().__init__(url, caption=caption)
 
     def to_markdown(self) -> str:
         alt = self.url.rsplit('/').pop()
@@ -518,16 +540,17 @@ class Image(FileObjectBlock[obj_blocks.Image], wraps=obj_blocks.Image):
             return f'![{alt}]({self.url})\n'
 
 
-class Video(FileObjectBlock[obj_blocks.Video], wraps=obj_blocks.Video):
+class Video(FileBaseBlock[obj_blocks.Video], wraps=obj_blocks.Video):
     """Video block."""
 
     def to_markdown(self) -> str:
-        vtype = self.url.rsplit('.').pop()
-        md = f'<video width="320" height="240" controls><source src="{self.url}" type="video/{vtype}"></video>\n'
+        mime_type, _ = mimetypes.guess_type(self.url)
+        vtype = f' type="{mime_type}"' if mime_type else ''
+        md = f'<video width="320" height="240" controls><source src="{self.url}"{vtype}></video>\n'
         return md
 
 
-class PDF(FileObjectBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
+class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
     """PDF block."""
 
     def to_markdown(self) -> str:
