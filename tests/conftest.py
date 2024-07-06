@@ -33,6 +33,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from _pytest.fixtures import SubRequest
+from google.auth.exceptions import RefreshError
 from vcr import VCR
 from vcr import mode as vcr_mode
 
@@ -57,6 +58,9 @@ MD_TEXT_TEST_PAGE = 'Markdown Text Test'
 MD_PAGE_TEST_PAGE = 'Markdown Page Test'
 MD_SUBPAGE_TEST_PAGE = 'Markdown SubPage Test'
 TASK_DB = 'Task DB'
+
+# Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
+TEST_CFG_FILE = get_cfg_file()
 
 
 def pytest_addoption(parser: Parser):
@@ -137,6 +141,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             shutil.copytree(cfg_path.parent, tmp_dir_path, dirs_exist_ok=True)
             cfg_path = tmp_dir_path / Path('config.cfg')
+            # make sure that the token is valid forever to avoid problems with the Google API in the tests using VCR
             with open(tmp_dir_path / Path('token.json'), 'r+', encoding='utf-8') as fh:
                 token_data = json.load(fh)
                 token_data['expiry'] = '2099-01-04T17:33:08.600154Z'
@@ -474,9 +479,20 @@ def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], s
 def delete_all_taskslists():
     """Delete all taskslists except of the default one."""
     gtasks = GTasksClient(read_only=False)
-    for tasklist in gtasks.all_tasklists():
-        if not tasklist.is_default:
-            tasklist.delete()
+    try:
+        for tasklist in gtasks.all_tasklists():
+            if not tasklist.is_default:
+                tasklist.delete()
+    except RefreshError as e:
+        msg = (
+            "We tampered with the token's expiry date to allow for VCR testing but you seem to try to "
+            'connect to the Google API now. Perform the authentication flow again with:\n'
+            'hatch run python examples/sync_google_tasks.py\n'
+            f'and copy the token over to {TEST_CFG_FILE.parent}. Then use:\n'
+            'hatch run vcr-rewrite -k ...\n'
+            'to rewrite the VCR cassettes.'
+        )
+        raise RuntimeError(msg) from e
 
 
 @pytest.fixture(scope='function')

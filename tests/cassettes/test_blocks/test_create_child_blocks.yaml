@@ -1,0 +1,105 @@
+interactions:
+- request:
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "properties": {"title": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Page for creating child blocks", "text": {"content": "Page for creating child
+      blocks"}}]}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '258'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"50aafe0a-bf74-4871-b097-eb32fdf37dca","created_time":"2024-07-05T23:11:00.000Z","last_edited_time":"2024-07-05T23:11:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
+      for creating child blocks","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
+      for creating child blocks","href":null}]}},"url":"https://www.notion.so/Page-for-creating-child-blocks-50aafe0abf744871b097eb32fdf37dca","public_url":null,"request_id":"7712cfcc-cdce-4fe3-90ad-f2a991c321a7"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=Z9tpfV1175dhqGmgoTDnTxVCcDU5g1Y9GpYzx8Fcpv4-1720221109-1.0.1.1-4qeO.wK3Wgllz6Ebircpq39dkPyW.HY0QPYxOIaOZ6maqfXZqPJgNLnm0.Pw.2enx_MIx8eZO9h1trn7SLY94Q;
+        path=/; expires=Fri, 05-Jul-24 23:41:49 GMT; domain=.notion.com; HttpOnly;
+        Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"397-dNlK2lfWU32WuS2Czflh1qfAa0I"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 7712cfcc-cdce-4fe3-90ad-f2a991c321a7
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/50aafe0a-bf74-4871-b097-eb32fdf37dca/children?page_size=100
+  response:
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"60262caf-93ec-4db6-a51d-9279404c2acd"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"90-zicFKWhRoEWbbB2nSEphX+JOxg0"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 60262caf-93ec-4db6-a51d-9279404c2acd
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

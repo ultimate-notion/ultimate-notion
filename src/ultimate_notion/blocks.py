@@ -96,6 +96,17 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def has_children(self) -> bool:
         return self.obj_ref.has_children
 
+    # ToDo: Implement the delete and restore methods
+    # def delete(self, *, in_notion: bool = True) -> Self:
+    #     """Move the object to trash."""
+    #     self.obj_ref.in_trash = True
+    #     self.obj_ref.archived = True
+
+    # def restore(self, *, in_notion: bool = True) -> Self:
+    #     """Move the object to trash."""
+    #     self.obj_ref.in_trash = False
+    #     self.obj_ref.archived = False
+
     @property
     def is_deleted(self) -> bool:
         """Return wether the object is in trash."""
@@ -151,8 +162,8 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
         return RichText.wrap_obj_ref(rich_texts)
 
 
-#: For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock] in user code.
 AnyBlock: TypeAlias = Block[Any]
+"""For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock] in user code."""
 
 
 class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
@@ -772,26 +783,26 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
 
 
 class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenBlock, wraps=obj_blocks.SyncedBlock):
-    """Synced block - either original or synched."""
+    """Synced block - either original or synced."""
 
     @property
     def is_original(self) -> bool:
-        """Is this block the original content."""
+        """Return if this block is the original content."""
         return self.obj_ref.synced_block.synced_from is None
 
     @property
-    def is_synched(self) -> bool:
+    def is_synced(self) -> bool:
         return not self.is_original
 
     @property
     def block(self) -> SyncedBlock:
         if self.is_original:
             return self
-        elif (synched_from := self.obj_ref.synced_block.synced_from) is not None:
+        elif (synced_from := self.obj_ref.synced_block.synced_from) is not None:
             session = get_active_session()
-            return cast(SyncedBlock, session.get_block(get_uuid(synched_from)))
+            return cast(SyncedBlock, session.get_block(get_uuid(synced_from)))
         else:
-            msg = 'Unknown synched block, neither original nor synched!'
+            msg = 'Unknown synced block, neither original nor synced!'
             raise RuntimeError(msg)
 
     def to_markdown(self, *, with_comment: bool = True) -> str:
@@ -799,7 +810,7 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenBlock, wraps=obj_blocks
             md = md_comment('original block') if with_comment else ''
             md += '\n'.join([child.to_markdown() for child in self.children])
         else:
-            md = md_comment('synched block') if with_comment else ''
+            md = md_comment('synced block') if with_comment else ''
             md += self.block.to_markdown(with_comment=False)
         return md
 

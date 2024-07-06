@@ -30,16 +30,16 @@ from ultimate_notion.config import Config, get_or_create_cfg
 from ultimate_notion.utils import SList, is_stable_release
 
 DEFAULT_LIST_ID_LEN = 32
-""""Length of the ID of the Google default tasklist."""
+"""Length of the ID of the Google default tasklist."""
 MAX_RESULTS_PER_PAGE = 100
 """Maximum number of results per page when fetching all tasks."""
 
 
 class Scope(str, Enum):
-    # Allows read-only access to Google Tasks
     TASKS_RO = 'https://www.googleapis.com/auth/tasks.readonly'
-    # Allows read/write access to Google Tasks
+    """Allows read-only access to Google Tasks"""
     TASKS_RW = 'https://www.googleapis.com/auth/tasks'
+    """Allows read/write access to Google Tasks"""
 
 
 class Link(BaseModel):

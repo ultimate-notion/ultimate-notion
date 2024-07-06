@@ -147,17 +147,19 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Is this database an inline database?"""
         return self.obj_ref.is_inline
 
-    def delete(self) -> Self:
+    def delete(self, *, in_notion: bool = True) -> Self:
         """Delete this database."""
         if not self.is_deleted:
             session = get_active_session()
+            # ToDo: Also delete the corresponding ChildDatabase objects in the parent.
             session.api.databases.delete(self.obj_ref)
         return self
 
-    def restore(self) -> Self:
+    def restore(self, *, in_notion: bool = True) -> Self:
         """Restore this database."""
         if self.is_deleted:
             session = get_active_session()
+            # ToDo: Also restore the corresponding ChildDatabase objects in the parent.
             session.api.databases.restore(self.obj_ref)
         return self
 

@@ -13,7 +13,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] retrieve a database by its ID
 - [x] search for a database by its title
 - [x] create a new database with a given schema, i.e. properties and their types
-- [x] delete/archive and restore/unarchive a database
+- [x] delete and restore a database
 - [ ] update a database schema, i.e. adding/removing properties or changing their types
 - [ ] change database properties, e.g. name, formula of formula property, options, etc.
 - [x] read the database attributes like title, description, cover, icon, etc.
@@ -28,7 +28,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] retrieve a page by its ID
 - [x] search for a page by its title
 - [x] create a new page
-- [x] delete/archive and restore/unarchive a page
+- [x] delete and restore a page
 - [x] read page attributes like title, cover, icon, etc.
 - [x] change page attributes like title, cover, icon, etc.
 - [x] read page properties defined by a database schema
@@ -43,6 +43,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] create a new block
 - [x] navigate blocks using references of parent and children
 - [x] create blocks within a page or another parent block
+- [x] delete blocks
 - [ ] modify blocks
 
 ## Users

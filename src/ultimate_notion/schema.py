@@ -282,10 +282,11 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     """
 
     obj_ref: T
-    #: If the Notion API allows to create a new database with a property of this type
+    """Reference to the low-level object representation of this property type"""
     allowed_at_creation = True
-    #: Back reference to the property having this type
+    """If the Notion API allows to create a new database with a property of this type"""
     prop_ref: Property | None = None
+    """Back reference to the property having this type"""
 
     @property
     def id(self) -> str | None:

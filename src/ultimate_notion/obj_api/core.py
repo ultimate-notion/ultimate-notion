@@ -73,12 +73,12 @@ class GenericObject(BaseModel):
 class NotionObject(GenericObject):
     """A top-level Notion API resource."""
 
-    #: object is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ...
     object: str
-    #: id is an UUID if possible or a string (possibly not unique) depending on the object
+    """`object` is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ..."""
     id: UUID | str = Field(union_mode='left_to_right', default=None)
-    #: request_id is a UUID that is used to track requests in the Notion API
+    """`id` is an `UUID` if possible or a string (possibly not unique) depending on the object"""
     request_id: UUID | None = None
+    """`request_id` is a UUID that is used to track requests in the Notion API"""
 
     def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
         super().__init_subclass__(**kwargs)
@@ -128,8 +128,8 @@ class TypedObject(GenericObject):
     Calling the object provides direct access to the data stored in `{type}`.
     """
 
-    #: type is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ...
     type: str
+    """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
 
     def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs):  # noqa: A002
