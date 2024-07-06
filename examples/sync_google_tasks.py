@@ -38,7 +38,7 @@ class Status(OptionNS):
     done = Option('Done', color=Color.GREEN)
 
 
-class Task(PageSchema, db_title='My synched task db'):
+class Task(PageSchema, db_title='My synced task db'):
     """My personal task list of all the important stuff I have to do"""
 
     task = Property('Task', PropType.Title())
@@ -74,7 +74,7 @@ with Session() as notion:
 #################################################
 
 with GTasksClient() as gtasks:
-    tasklist = gtasks.get_or_create_tasklist('My synched task list')
+    tasklist = gtasks.get_or_create_tasklist('My synced task list')
     if tasklist.is_empty:
         tasklist.create_task('Clean the house', due=today + timedelta(days=5))
         tasklist.create_task(
@@ -84,14 +84,14 @@ with GTasksClient() as gtasks:
             'On Google Tasks only', due=today + timedelta(days=1)
         )
 
-######################################################
-# Create the sync task between Notion & Google Tasks #
-######################################################
+########################################################
+# Create the synced task between Notion & Google Tasks #
+########################################################
 
 # Option 1: Using the Notion database declaration from above
 with Session() as notion, GTasksClient(read_only=False) as gtasks:
     task_db = notion.get_or_create_db(parent=parent, schema=Task)
-    tasklist = gtasks.get_or_create_tasklist('My synched task list')
+    tasklist = gtasks.get_or_create_tasklist('My synced task list')
 
     sync_task = SyncGTasks(
         notion_db=task_db,
@@ -111,10 +111,10 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
 
 # Option 2: Using an existing Notion database that was created manually
 with Session() as notion, GTasksClient(read_only=False) as gtasks:
-    task_db = notion.search_db('My synched task db').item()
+    task_db = notion.search_db('My synced task db').item()
     status_col = task_db.schema.get_prop('Status')
     due_date_col = task_db.schema.get_prop('Due Date')
-    tasklist = gtasks.get_or_create_tasklist('My synched task list')
+    tasklist = gtasks.get_or_create_tasklist('My synced task list')
 
     sync_task = SyncGTasks(
         notion_db=task_db,

@@ -241,17 +241,37 @@ class Page(ChildrenBlock[obj_blocks.Page], wraps=obj_blocks.Page):
 
             display_markdown(md, raw=True)
 
-    def delete(self) -> Self:
-        """Delete this page."""
+    def delete(self, *, in_notion: bool = True) -> Self:
+        """Delete this page.
+
+        !!! Warning
+
+            Deleting a page will also delete all child pages and child databases recursively.
+            If these objects are already cached in the session, they will not be updated.
+            Use `session.cache.clear()` to clear the cache or call `reload` on them.
+
+        """
         if not self.is_deleted:
             session = get_active_session()
+            # recursively delete all subpages and subdatabases
+            # for page in self.subpages:
+            #     page.delete()
+            # for db in self.subdbs:
+            #     db.delete()
+            # delete the page itself
             session.api.pages.delete(self.obj_ref)
+            # delete the corresponding ChildPage objects in the parent.
+            # if isinstance(self.parent, ChildrenBlock):
+            #     for block in self.parent.children:
+            #         if block.id == self.id:
+            #             block.delete()
         return self
 
-    def restore(self) -> Self:
+    def restore(self, *, in_notion: bool = True) -> Self:
         """Restore this page."""
         if self.is_deleted:
             session = get_active_session()
+            # ToDo: Also restore the corresponding ChildPage objects in the parent.
             session.api.pages.restore(self.obj_ref)
         return self
 

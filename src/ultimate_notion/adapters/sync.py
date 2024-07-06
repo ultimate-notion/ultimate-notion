@@ -1,4 +1,4 @@
-"""Utilities to sync other services with Notion."""
+"""Utilities to synchronize other services with Notion."""
 
 from __future__ import annotations
 
@@ -35,12 +35,12 @@ class ConflictMode(str, Enum):
 class State(BaseModel):
     """The state of a sync task.
 
-    The state holds the synched objects and their attributes as a dictionary of Notion attributes."""
+    The state holds the synced objects and their attributes as a dictionary of Notion attributes."""
 
     ids: dict[ID, ID] = Field(default_factory=dict)
     """Maps Notion object ids to other object ids."""
     objs: dict[ID, dict[str, Any]] = Field(default_factory=dict)
-    """Dictionary of Notion objects synched with other service and indexed by their ids."""
+    """Dictionary of Notion objects synced with other service and indexed by their ids."""
 
 
 class SyncTask(ABC):
@@ -313,7 +313,7 @@ class SyncTask(ABC):
     def sync(self: Self, state: State | None) -> State:
         """The actual sync operation.
 
-        The state holds the synched objects and their attributes as a dictionary of Notion attributes.
+        The state holds the synced objects and their attributes as a dictionary of Notion attributes.
         """
         notion_objs = {self.notion_id(obj): obj for obj in self.get_notion_objects()}
         other_objs = {self.other_id(obj): obj for obj in self.get_other_objects()}

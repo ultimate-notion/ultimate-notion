@@ -229,7 +229,7 @@ def test_page_to_markdown(md_page: Page):
 
         <!--- original block -->
         # This is the original Paragraph on Page
-        <!--- synched block -->
+        <!--- synced block -->
         # This is the original Paragraph on SubPage
         [**↗️ <u>Markdown SubPage Test</u>**](https://notion.so/67ad5240b1b944679b073ef3ebbbc755)
 
