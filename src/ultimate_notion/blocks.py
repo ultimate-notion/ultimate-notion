@@ -96,16 +96,23 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def has_children(self) -> bool:
         return self.obj_ref.has_children
 
-    # ToDo: Implement the delete and restore methods
-    # def delete(self, *, in_notion: bool = True) -> Self:
-    #     """Move the object to trash."""
-    #     self.obj_ref.in_trash = True
-    #     self.obj_ref.archived = True
+    def _delete_me_from_parent(self) -> None:
+        """Remove the block from the parent's children list."""
+        if isinstance(self.parent, ChildrenBlock) and self.parent._children is not None:
+            for idx, child in enumerate(self.parent.children):
+                if child.id == self.id:
+                    del self.parent._children[idx]
+                    break
 
-    # def restore(self, *, in_notion: bool = True) -> Self:
-    #     """Move the object to trash."""
-    #     self.obj_ref.in_trash = False
-    #     self.obj_ref.archived = False
+    def delete(self) -> Self:
+        """Delete the block.
+
+        Pages and databases are moved to the trash, blocks are deleted permanently.
+        """
+        session = get_active_session()
+        self.obj_ref = cast(T, session.api.blocks.delete(self.id))
+        self._delete_me_from_parent()
+        return self
 
     @property
     def is_deleted(self) -> bool:
@@ -221,9 +228,13 @@ class ChildrenBlock(DataObject[T], wraps=obj_blocks.DataObject):
             Also deleted blocks, e.g. pages or databases in the trash, are returned.
         """
         if self._children is None:  # generate cache
-            session = get_active_session()
-            child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
-            self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
+            if self.is_deleted:
+                msg = 'Cannot retrieve children of a deleted block from Notion.'
+                raise RuntimeError(msg)
+            else:
+                session = get_active_session()
+                child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
+                self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
         return self._children
 
     def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:

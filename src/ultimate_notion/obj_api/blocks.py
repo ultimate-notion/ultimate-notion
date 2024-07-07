@@ -34,7 +34,7 @@ class DataObject(NotionObject):
     has_children: bool = False
 
     in_trash: bool = False  # used to be `archived`
-    archived: bool = False  # DEPRECATED! ToDo: Remove in v1.0
+    archived: bool = False  # ToDo: Deprecated but still partially used in Notion. Check to remove in v1.0!
 
     created_time: datetime = None  # type: ignore
     created_by: UserRef = None  # type: ignore

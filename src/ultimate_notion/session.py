@@ -229,16 +229,13 @@ class Session:
             db.schema = schema
             return db
 
-    def search_page(
-        self, title: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
-    ) -> SList[Page]:
-        """Search a page by name.
+    def search_page(self, title: str | None = None, *, exact: bool = True, reverse: bool = False) -> SList[Page]:
+        """Search a page by name. Deleted pages, i.e. in trash, are not included in the search.
 
         Args:
             title: title of the page, return all if `None`
             exact: perform an exact search, not only a substring match
             reverse: search in the reverse order, i.e. the least recently edited results first
-            deleted: include deleted pages in search
         """
         query = self.api.search(title).filter(page_only=True)
         if reverse:
@@ -248,8 +245,6 @@ class Session:
         ]
         if exact and title is not None:
             pages = [page for page in pages if page.title == title]
-        if not deleted:
-            pages = [page for page in pages if not page.is_deleted]
         return SList(pages)
 
     def get_page(self, page_ref: UUID | str, *, use_cache: bool = True) -> Page:
