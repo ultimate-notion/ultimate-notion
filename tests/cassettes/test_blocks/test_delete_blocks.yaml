@@ -1,0 +1,354 @@
+interactions:
+- request:
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "properties": {"title": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Page for deleting blocks", "text": {"content": "Page for deleting blocks"}}]}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '246'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"d327d732-15c7-4185-8ca5-22bd4eab026c","created_time":"2024-07-07T14:43:00.000Z","last_edited_time":"2024-07-07T14:43:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
+      for deleting blocks","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
+      for deleting blocks","href":null}]}},"url":"https://www.notion.so/Page-for-deleting-blocks-d327d73215c741858ca522bd4eab026c","public_url":null,"request_id":"cd21cd08-620f-4778-a3ff-642ca59209f3"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=bDAtrsGAWQ2E3JgFnbWuFPPjJjFsL_WejwAFwGwSVCI-1720363406-1.0.1.1-n6izWSDdPG_xhk7Grhr8VmTFAOOQ0LjU9e7mzGVOuKLW1Y5SGg3zOdKQm6u03_2CXf3EAV7jnLoJ2CSW1llnRg;
+        path=/; expires=Sun, 07-Jul-24 15:13:26 GMT; domain=.notion.com; HttpOnly;
+        Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"385-U70N/BQ58tYg1aM0wD/BqLNTY70"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - cd21cd08-620f-4778-a3ff-642ca59209f3
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/d327d732-15c7-4185-8ca5-22bd4eab026c/children?page_size=100
+  response:
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"9636de15-28b4-43bf-a3db-5dd9a36c6428"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"90-Px45vykQz0WOicKvVRFZUKTA5PA"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 9636de15-28b4-43bf-a3db-5dd9a36c6428
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"children": [{"type": "heading_1", "object": "block", "has_children":
+      false, "in_trash": false, "archived": false, "heading_1": {"rich_text": [{"type":
+      "text", "plain_text": "My new page", "text": {"content": "My new page"}}], "color":
+      "default", "is_toggleable": false}}, {"type": "paragraph", "object": "block",
+      "has_children": false, "in_trash": false, "archived": false, "paragraph": {"rich_text":
+      [{"type": "text", "plain_text": "This is a paragraph", "text": {"content": "This
+      is a paragraph"}}], "color": "default"}}]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '526'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: PATCH
+    uri: https://api.notion.com/v1/blocks/d327d732-15c7-4185-8ca5-22bd4eab026c/children
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"dd7956d3-41cd-4ae6-ba3f-c50829bc9a0c","parent":{"type":"page_id","page_id":"d327d732-15c7-4185-8ca5-22bd4eab026c"},"created_time":"2024-07-07T14:43:00.000Z","last_edited_time":"2024-07-07T14:43:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":false,"in_trash":false,"type":"heading_1","heading_1":{"rich_text":[{"type":"text","text":{"content":"My
+      new page","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"My
+      new page","href":null}],"is_toggleable":false,"color":"default"}},{"object":"block","id":"79e1ae08-e6f0-4ddd-9c3d-d98b531ec696","parent":{"type":"page_id","page_id":"d327d732-15c7-4185-8ca5-22bd4eab026c"},"created_time":"2024-07-07T14:43:00.000Z","last_edited_time":"2024-07-07T14:43:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
+      is a paragraph","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"This
+      is a paragraph","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"4432888c-65f7-4942-bd35-8f088265fe0f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"64f-3kNwV0uiNp3hTrao6+H4elQ9vxU"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 4432888c-65f7-4942-bd35-8f088265fe0f
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: DELETE
+    uri: https://api.notion.com/v1/blocks/79e1ae08-e6f0-4ddd-9c3d-d98b531ec696
+  response:
+    content: '{"object":"block","id":"79e1ae08-e6f0-4ddd-9c3d-d98b531ec696","parent":{"type":"page_id","page_id":"d327d732-15c7-4185-8ca5-22bd4eab026c"},"created_time":"2024-07-07T14:43:00.000Z","last_edited_time":"2024-07-07T14:43:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"in_trash":true,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
+      is a paragraph","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"This
+      is a paragraph","href":null}],"color":"default"},"request_id":"933e5fbb-e86b-461e-aee8-9ff18446c881"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"30e-H0fyFCd0Et5A6oPMbZTLjwATVIE"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 933e5fbb-e86b-461e-aee8-9ff18446c881
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: DELETE
+    uri: https://api.notion.com/v1/blocks/dd7956d3-41cd-4ae6-ba3f-c50829bc9a0c
+  response:
+    content: '{"object":"block","id":"dd7956d3-41cd-4ae6-ba3f-c50829bc9a0c","parent":{"type":"page_id","page_id":"d327d732-15c7-4185-8ca5-22bd4eab026c"},"created_time":"2024-07-07T14:43:00.000Z","last_edited_time":"2024-07-07T14:43:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"in_trash":true,"type":"heading_1","heading_1":{"rich_text":[{"type":"text","text":{"content":"My
+      new page","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"My
+      new page","href":null}],"is_toggleable":false,"color":"default"},"request_id":"289aee2f-d9eb-4fd5-a8f0-2abe7030f0b7"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"314-QbrICcGnsYvexdL54hKQTCS+LLI"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 289aee2f-d9eb-4fd5-a8f0-2abe7030f0b7
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/pages/d327d732-15c7-4185-8ca5-22bd4eab026c
+  response:
+    content: '{"object":"page","id":"d327d732-15c7-4185-8ca5-22bd4eab026c","created_time":"2024-07-07T14:43:00.000Z","last_edited_time":"2024-07-07T14:43:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
+      for deleting blocks","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
+      for deleting blocks","href":null}]}},"url":"https://www.notion.so/Page-for-deleting-blocks-d327d73215c741858ca522bd4eab026c","public_url":null,"request_id":"bf37126a-bb4f-45e2-afd3-504534b04046"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"385-tA+7/nq8pgKNSShH1ToZTRC3z7U"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - bf37126a-bb4f-45e2-afd3-504534b04046
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/d327d732-15c7-4185-8ca5-22bd4eab026c/children?page_size=100
+  response:
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"19df764a-9047-46d9-ad23-bc5029642361"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"90-d2pUZyeIP9bsN92yKIH1+mqcSfk"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 19df764a-9047-46d9-ad23-bc5029642361
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

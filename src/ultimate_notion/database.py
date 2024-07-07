@@ -8,7 +8,7 @@ from typing import cast
 from pydantic import BaseModel
 from typing_extensions import Self
 
-from ultimate_notion.blocks import DataObject
+from ultimate_notion.blocks import ChildrenBlock, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.query import DBQueryBuilder
@@ -147,20 +147,21 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Is this database an inline database?"""
         return self.obj_ref.is_inline
 
-    def delete(self, *, in_notion: bool = True) -> Self:
+    def delete(self) -> Self:
         """Delete this database."""
         if not self.is_deleted:
             session = get_active_session()
-            # ToDo: Also delete the corresponding ChildDatabase objects in the parent.
             session.api.databases.delete(self.obj_ref)
+            self._delete_me_from_parent()
         return self
 
-    def restore(self, *, in_notion: bool = True) -> Self:
+    def restore(self) -> Self:
         """Restore this database."""
         if self.is_deleted:
             session = get_active_session()
-            # ToDo: Also restore the corresponding ChildDatabase objects in the parent.
             session.api.databases.restore(self.obj_ref)
+            if isinstance(self.parent, ChildrenBlock):
+                self.parent._children = None  # this forces a new retrieval of children next time
         return self
 
     def reload(self) -> Self:

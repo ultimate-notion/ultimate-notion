@@ -33,6 +33,26 @@ def test_append_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
+def test_delete_blocks(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for deleting blocks')
+    h = uno.Heading1('My new page')
+    p = uno.Paragraph('This is a paragraph')
+    page.append([h, p])
+    assert page.children == [h, p]
+    assert not h.is_deleted
+    assert not p.is_deleted
+
+    p.delete()
+    assert page.children == [h]
+    assert p.is_deleted
+
+    h.delete()
+    assert h.is_deleted
+    page.reload()
+    assert page.children == []
+
+
+@pytest.mark.vcr()
 def test_create_basic_blocks(root_page: Page, notion: Session):
     page = notion.create_page(parent=root_page, title='Page for creating basic blocks')
     children: list[uno.AnyBlock] = [
