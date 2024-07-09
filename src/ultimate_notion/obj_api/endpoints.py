@@ -215,7 +215,7 @@ class DatabasesEndpoint(Endpoint):
         *NOTE* this method does not anticipate what the request will be used for and as
         such does not validate the inputs for any particular requests.
         """
-        request = {}
+        request: dict[str, Any] = {}
 
         if parent is not None:
             request['parent'] = parent.serialize_for_api()

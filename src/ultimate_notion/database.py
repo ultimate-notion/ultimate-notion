@@ -8,7 +8,7 @@ from typing import cast
 from pydantic import BaseModel
 from typing_extensions import Self
 
-from ultimate_notion.blocks import ChildrenBlock, DataObject
+from ultimate_notion.blocks import ChildrenMixin, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.query import DBQueryBuilder
@@ -160,7 +160,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         if self.is_deleted:
             session = get_active_session()
             session.api.databases.restore(self.obj_ref)
-            if isinstance(self.parent, ChildrenBlock):
+            if isinstance(self.parent, ChildrenMixin):
                 self.parent._children = None  # this forces a new retrieval of children next time
         return self
 
@@ -239,4 +239,8 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     def query(self):
         """Query a (large) database for pages in a more specific way."""
+        raise NotImplementedError
+
+    def to_markdown(self) -> str:
+        """Return the content of this database as Markdown."""
         raise NotImplementedError

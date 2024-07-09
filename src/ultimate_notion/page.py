@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, cast
 from emoji import is_emoji
 from typing_extensions import Self
 
-from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenBlock
+from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin, DataObject
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
@@ -83,7 +83,7 @@ class PageProperties:
         return {prop_name: self[prop_name] for prop_name in self}
 
 
-class Page(ChildrenBlock[obj_blocks.Page], wraps=obj_blocks.Page):
+class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     """A Notion page.
 
     Attributes:
@@ -219,7 +219,7 @@ class Page(ChildrenBlock[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown."""
-        md = '\n'.join(block.to_markdown() for block in self.children if block.is_deleted is False)
+        md = '\n'.join(block.to_markdown() for block in self.children)
         return md
 
     def to_html(self, *, raw: bool = False) -> str:
@@ -261,7 +261,7 @@ class Page(ChildrenBlock[obj_blocks.Page], wraps=obj_blocks.Page):
         if self.is_deleted:
             session = get_active_session()
             session.api.pages.restore(self.obj_ref)
-            if isinstance(self.parent, ChildrenBlock):
+            if isinstance(self.parent, ChildrenMixin):
                 self.parent._children = None  # this forces a new retrieval of children next time
         return self
 

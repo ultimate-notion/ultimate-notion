@@ -9,7 +9,7 @@ from emoji import emojize, is_emoji
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.text import chunky, html_img, rich_texts_to_markdown
-from ultimate_notion.utils import Wrapper, get_repr, is_url
+from ultimate_notion.utils import Wrapper, flatten, get_repr, is_url
 
 
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
@@ -317,6 +317,18 @@ class RichText(str):
 
     # # TODO: Implement this
     # add __plus__ und equation and mention
+
+
+def text_to_obj_ref(text: str | RichText | RichTextBase | list[RichTextBase]) -> list[objs.RichTextBaseObject]:
+    """Convert various text representations to a list of rich text objects."""
+    if isinstance(text, str):
+        # ToDo: Allow passing markdown text here when the markdown parser is implemented
+        texts = RichText(text).obj_ref
+    elif isinstance(text, RichText | RichTextBase):
+        texts = text.obj_ref
+    elif isinstance(text, list):
+        texts = flatten([rt.obj_ref for rt in text])
+    return texts
 
 
 class User(Wrapper[objs.User], wraps=objs.User):

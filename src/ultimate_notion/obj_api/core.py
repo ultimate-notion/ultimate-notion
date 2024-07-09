@@ -59,7 +59,7 @@ class GenericObject(BaseModel):
 
         return self
 
-    def serialize_for_api(self):
+    def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
         # Notion API doesn't like "null" values
         return self.model_dump(mode='json', exclude_none=True, by_alias=True)
