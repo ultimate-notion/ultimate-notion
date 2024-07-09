@@ -1,0 +1,206 @@
+interactions:
+- request:
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "properties": {"title": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Page for creating table blocks", "text": {"content": "Page for creating table
+      blocks"}}]}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '258'
+      content-type:
+      - application/json
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"57173479-4d19-477e-9873-b1ffa9a0c1d2","created_time":"2024-07-09T15:18:00.000Z","last_edited_time":"2024-07-09T15:18:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
+      for creating table blocks","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
+      for creating table blocks","href":null}]}},"url":"https://www.notion.so/Page-for-creating-table-blocks-571734794d19477e9873b1ffa9a0c1d2","public_url":null,"request_id":"d8064042-5ead-4f68-927c-9cf8565e6c77"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=PZxE1LuUM3145Y1VG8nc712NvO4WkrZmlshbk7rFZJU-1720538287-1.0.1.1-wD8ruAZHeTeWJegP.naykRgBNUYTSVELVzZs8OUzOKiMOKnUuq54ZzcDJLiCkoKhx4Ay6IjtYW6Fksh.KLS4uA;
+        path=/; expires=Tue, 09-Jul-24 15:48:07 GMT; domain=.notion.com; HttpOnly;
+        Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"397-Kh27VYLhqDQJEIBsnb9nrAZhb18"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - d8064042-5ead-4f68-927c-9cf8565e6c77
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/57173479-4d19-477e-9873-b1ffa9a0c1d2/children?page_size=100
+  response:
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"f334e4c0-95f7-45b4-9f9f-58df83498ef2"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"90-6TqtE8ouMOypLKDhRMUgCww3534"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - f334e4c0-95f7-45b4-9f9f-58df83498ef2
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"children": [{"type": "table", "object": "block", "has_children": false,
+      "in_trash": false, "archived": false, "table": {"table_width": 2, "has_column_header":
+      false, "has_row_header": false, "children": [{"type": "table_row", "object":
+      "block", "has_children": false, "in_trash": false, "archived": false, "table_row":
+      {"cells": [[], []]}}, {"type": "table_row", "object": "block", "has_children":
+      false, "in_trash": false, "archived": false, "table_row": {"cells": [[], []]}}]}}]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '483'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: PATCH
+    uri: https://api.notion.com/v1/blocks/57173479-4d19-477e-9873-b1ffa9a0c1d2/children
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"5d5e07cd-20e9-4f4f-93ce-6421ca58f643","parent":{"type":"page_id","page_id":"57173479-4d19-477e-9873-b1ffa9a0c1d2"},"created_time":"2024-07-09T15:18:00.000Z","last_edited_time":"2024-07-09T15:18:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":true,"archived":false,"in_trash":false,"type":"table","table":{"table_width":2,"has_column_header":false,"has_row_header":false}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"bb651d7b-579b-4d7b-b731-84c5d61a19a9"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"29d-3UCoWkA8C5+wRQPtFPzIEj5zw1U"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - bb651d7b-579b-4d7b-b731-84c5d61a19a9
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/5d5e07cd-20e9-4f4f-93ce-6421ca58f643/children?page_size=100
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"5aed4e2c-f5b2-4a61-a041-32a49197fe24","parent":{"type":"block_id","block_id":"5d5e07cd-20e9-4f4f-93ce-6421ca58f643"},"created_time":"2024-07-09T15:18:00.000Z","last_edited_time":"2024-07-09T15:18:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":false,"in_trash":false,"type":"table_row","table_row":{"cells":[[],[]]}},{"object":"block","id":"bd08f313-f016-4007-a9c8-bd53d888fbd9","parent":{"type":"block_id","block_id":"5d5e07cd-20e9-4f4f-93ce-6421ca58f643"},"created_time":"2024-07-09T15:18:00.000Z","last_edited_time":"2024-07-09T15:18:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":false,"in_trash":false,"type":"table_row","table_row":{"cells":[[],[]]}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"e59cf56c-723c-45a1-8709-9cfe062e1a62"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      etag:
+      - W/"45f-oO4vDo8czisatY7QX2hpZBVya9k"
+      vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - e59cf56c-723c-45a1-8709-9cfe062e1a62
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
