@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from abc import ABC
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import SerializeAsAny
@@ -238,6 +239,9 @@ class Embed(Block, type='embed'):
     embed: TypeData = TypeData()
 
 
+# ToDo: Is here a type `inline` missing? Unfurl attribute (Link Previews)? https://developers.notion.com/reference/unfurl-attribute-object
+
+
 class Bookmark(Block, type='bookmark'):
     """A bookmark block in Notion."""
 
@@ -342,6 +346,10 @@ class TableRow(Block, type='table_row'):
 
     table_row: TypeData = TypeData()
 
+    @classmethod
+    def build(cls, n_cells: int) -> TableRow:
+        return TableRow.model_construct(table_row=cls.TypeData.model_construct(cells=[[] for _ in range(n_cells)]))
+
 
 class Table(Block, type='table'):
     """A table block in Notion."""
@@ -372,6 +380,14 @@ class SyncedBlock(Block, type='synced_block'):
         children: list[SerializeAsAny[Block]] | None = None
 
     synced_block: TypeData = TypeData()
+
+    def serialize_for_api(self) -> dict[str, Any]:
+        """Serialize the object for sending it to the Notion API."""
+        model_data = self.model_dump(mode='json', exclude_none=True, by_alias=True)
+        # Everywhere else we have to remove "null" values but `synced_from` is an exception
+        if self.synced_block.synced_from is None:
+            model_data['synced_block']['synced_from'] = None
+        return model_data
 
 
 class Template(Block, type='template'):

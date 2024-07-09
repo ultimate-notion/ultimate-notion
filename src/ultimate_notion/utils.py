@@ -250,7 +250,7 @@ class Wrapper(ObjRefWrapper[GT]):
 
     @classmethod
     def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
-        """Wraps `obj_ref` into a high-level object for the API of Ultimate Notion."""
+        """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
         hl_cls = cls._obj_api_map[type(obj_ref)]
         hl_obj = hl_cls.__new__(hl_cls)
         hl_obj.obj_ref = obj_ref
@@ -391,7 +391,7 @@ def to_pendulum(dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> pnd.Date
 
 @contextmanager
 def temp_timezone(tz: str | pnd.Timezone):
-    """Temporarily set the local timezone to the given timezone."""
+    """Temporarily set the local timezone to the given timezone. Mostly used by unit tests."""
     if not isinstance(tz, pnd.Timezone):
         tz = pnd.timezone(tz)
 

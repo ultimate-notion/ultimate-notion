@@ -32,7 +32,7 @@ from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.text import extract_id
 
 if TYPE_CHECKING:
-    from ultimate_notion.obj_api.blocks import Database, Page
+    from ultimate_notion.obj_api.blocks import Block, Database, Page
 
 
 class SelectOption(GenericObject):
@@ -194,7 +194,7 @@ class BlockRef(ParentRef, type='block_id'):
     block_id: UUID
 
     @classmethod
-    def build(cls, block_ref: Page | str | UUID) -> BlockRef:
+    def build(cls, block_ref: Block | str | UUID) -> BlockRef:
         """Compose a BlockRef from the given reference object."""
         ref = ObjectReference.build(block_ref)
         return BlockRef.model_construct(block_id=ref.id)

@@ -201,7 +201,7 @@ def test_page_to_markdown(md_page: Page):
         | Cell 2, 1 | Cell 2, 2 |
         | Cell 3, 1 | Cell 3, 2 |
 
-        # This is an emoji! 😀😀
+        This is an emoji! 😀😀
         $$
         |x|=\\begin{cases}x, &\\quad x \\geq 0\\\\-x, &\\quad x < 0\\end{cases}
         $$
@@ -218,9 +218,9 @@ def test_page_to_markdown(md_page: Page):
 
         ## Unsupported Stuff in Markdown
         <!--- column 1 -->
-        # Column 1
+        Column 1
         <!--- column 2 -->
-        # Column
+        Column
         ```{toc}
         ```
         Tests / Markdown Page Test
@@ -228,9 +228,9 @@ def test_page_to_markdown(md_page: Page):
         [📄 **<u>Markdown SubPage Test</u>**](https://notion.so/67ad5240b1b944679b073ef3ebbbc755)
 
         <!--- original block -->
-        # This is the original Paragraph on Page
+        This is the original Paragraph on Page
         <!--- synced block -->
-        # This is the original Paragraph on SubPage
+        This is the original Paragraph on SubPage
         [**↗️ <u>Markdown SubPage Test</u>**](https://notion.so/67ad5240b1b944679b073ef3ebbbc755)
 
         <kbd>Unsupported block</kbd>
