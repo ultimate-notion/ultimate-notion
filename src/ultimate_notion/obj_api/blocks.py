@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from abc import ABC
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from pydantic import SerializeAsAny
@@ -22,7 +22,7 @@ from ultimate_notion.obj_api.objects import (
     RichTextBaseObject,
     UserRef,
 )
-from ultimate_notion.obj_api.props import PropertyValue
+from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import PropertyType
 
 
@@ -65,6 +65,22 @@ class Page(DataObject, object='page'):
     icon: SerializeAsAny[FileObject] | EmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyValue] = None  # type: ignore
+
+    def _get_title_prop_name(self) -> str:
+        """Get the name of the title property."""
+        # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
+        for name, prop in self.properties.items():
+            if prop.id == 'title':
+                return name
+        msg = 'Encountered a page without title property'
+        raise RuntimeError(msg)
+
+    @property
+    def title(self) -> list[RichTextBaseObject]:
+        """Retrieve the title of the page from page properties."""
+        title_prop_name = self._get_title_prop_name()
+        title_prop = cast(Title, self.properties[title_prop_name])
+        return title_prop.title
 
 
 class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
@@ -237,9 +253,6 @@ class Embed(Block, type='embed'):
         caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
 
     embed: TypeData = TypeData()
-
-
-# ToDo: Is here a type `inline` missing? Unfurl attribute (Link Previews)? https://developers.notion.com/reference/unfurl-attribute-object
 
 
 class Bookmark(Block, type='bookmark'):

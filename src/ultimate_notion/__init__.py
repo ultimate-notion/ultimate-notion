@@ -14,7 +14,7 @@ finally:
 
 from ultimate_notion.blocks import (
     PDF,
-    AnyBlock,  # for type hinting
+    AnyBlock,
     Bookmark,
     Breadcrumb,
     BulletedItem,
@@ -43,7 +43,7 @@ from ultimate_notion.blocks import (
 )
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
-from ultimate_notion.objects import Emoji, FileInfo, Option, OptionNS, RichText, User
+from ultimate_notion.objects import AnyText, Emoji, FileInfo, Math, Mention, Option, OptionNS, RichText, Text, User
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema, Property, PropType, SelfRef
 from ultimate_notion.session import Session
@@ -51,7 +51,8 @@ from ultimate_notion.session import Session
 __all__ = [
     'PDF',
     'AggFunc',
-    'AnyBlock',
+    'AnyBlock',  # for type hinting
+    'AnyText',  # for type hinting
     'BGColor',
     'Bookmark',
     'Breadcrumb',
@@ -74,6 +75,8 @@ __all__ = [
     'Image',
     'LinkPreview',
     'LinkToPage',
+    'Math',
+    'Mention',
     'NumberFormat',
     'NumberedItem',
     'Option',
@@ -90,6 +93,7 @@ __all__ = [
     'SyncedBlock',
     'Table',
     'TableOfContents',
+    'Text',
     'ToDoItem',
     'ToggleItem',
     'User',

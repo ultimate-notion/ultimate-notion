@@ -187,7 +187,7 @@ def sorted_md_spans(md_spans: np.ndarray) -> Iterator[tuple[int, int, str]]:
 def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
     """Convert a list of rich texts to markdown."""
     from ultimate_notion.objects import (  # noqa: PLC0415  # ToDo: Remove when mypy doesn't need the cast below
-        Equation,
+        Math,
         Mention,
     )
 
@@ -234,7 +234,7 @@ def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
     def add_mentions(md_rich_texts: list[str], rich_texts: list[RichTextBase]):
         for idx, text in enumerate(rich_texts):
             if text.is_equation:
-                text = cast(Equation, text)
+                text = cast(Math, text)
                 md_rich_texts[idx] = '$' + text.obj_ref.plain_text.strip() + '$'
             elif text.is_mention:
                 text = cast(Mention, text)
@@ -276,7 +276,7 @@ def md_comment(text: str) -> str:
     return f'<!--- {text} -->\n'
 
 
-def md_renderer() -> Markdown:
+def get_md_renderer() -> Markdown:
     """Create a markdown renderer."""
     return mistune.create_markdown(
         plugins=[
@@ -293,3 +293,7 @@ def md_renderer() -> Markdown:
         ],
         escape=False,
     )
+
+
+render_md = get_md_renderer()
+"""Convert Markdown to HTML."""

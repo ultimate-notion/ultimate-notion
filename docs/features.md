@@ -80,7 +80,8 @@ Some features that the Notion UI provides are not possible to implement due to l
   is currently accepted but only a one-way relation created, which seems to be a bug.
 - uploading files as icons or in general uploading files.
 - setting the icon and cover of a database.
-- pages cannot be moved as a [page’s parent cannot be changed].
+- moving pages is not possible as a [page’s parent cannot be changed].
+- setting a [reminder] based on date and/or time.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
@@ -93,3 +94,4 @@ If you think those limitations should be fixed, [let the developers of Notion kn
 [Google Tasks API]: https://developers.google.com/tasks/overview
 [Google Sheets API]: https://developers.google.com/sheets
 [page’s parent cannot be changed]: https://developers.notion.com/reference/patch-page
+[reminder]: https://www.notion.so/help/comments-mentions-and-reminders#reminders

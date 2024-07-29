@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from typing import cast
 
+import pendulum as pnd
 import pytest
 
+import ultimate_notion as uno
+from ultimate_notion import Database, Page, Session, User
 from ultimate_notion.blocks import TextBlock
-from ultimate_notion.database import Database, Page
 from ultimate_notion.schema import MultiSelect, Select, Status
 
 
@@ -63,3 +65,42 @@ def test_rich_text_md(md_text_page: Page):
         assert isinstance(block, TextBlock)
         our_md = block.rich_text.to_markdown()
         assert our_md == correct_mds[idx]
+
+
+@pytest.mark.vcr()
+def test_mention(person: User, root_page: Page, md_text_page: Page, all_props_db: Database, notion: Session):
+    user_mention = uno.Mention(person)
+    page_mention = uno.Mention(md_text_page)
+    db_mention = uno.Mention(all_props_db)
+    date_mention = uno.Mention(pnd.datetime(2022, 1, 1))
+
+    page = notion.create_page(parent=root_page, title='Mention blocks Test')
+    paragraph = uno.Paragraph(user_mention + ' : ' + page_mention + ' : ' + db_mention + ' : ' + date_mention)
+    page.append(paragraph)
+    exp_text = (
+        '[@Florian Wilhelm]() : ↗[Markdown Text Test](https://www.notion.so/0c8ea7f1c7ca4abb8890085c0fac383b)'
+        ' : ↗[All Properties DB](https://www.notion.so/4fa8756fa0da4efe9c484d6a323b69f8)'
+        ' : [2022-01-01T00:00:00.000+00:00]()'
+    )
+    assert page.to_markdown() == exp_text
+
+
+@pytest.mark.vcr()
+def test_rich_text_bases(person: User, root_page: Page, notion: Session):
+    text: uno.AnyText = uno.Text('This is an equation: ', color=uno.Color.BLUE)
+    text += uno.Math('E=mc^2', bold=True)
+    text += uno.Text(' and this is a mention: ', href='https://ultimate-notion.com')
+    text += uno.Mention(person)
+    assert isinstance(text, uno.RichText)
+
+    page = notion.create_page(parent=root_page, title='RichText Test')
+    page.append(uno.Paragraph(text))
+    exp_text = (
+        'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) '
+        '[@Florian Wilhelm]()'
+    )
+    assert page.to_markdown() == exp_text
+
+    notion.cache.clear()
+    page = notion.get_page(page.id)
+    assert page.to_markdown() == exp_text

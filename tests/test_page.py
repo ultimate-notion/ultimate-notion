@@ -257,3 +257,9 @@ def test_parent_db(notion: Session, root_page: Page):
     page_not_in_db = notion.create_page(root_page, 'Page not in DB')
     assert not page_not_in_db.in_db
     assert page_not_in_db.parent_db is None
+
+
+@pytest.mark.vcr()
+def test_unfurl_blocks(notion: Session, unfurl_page: Page):
+    pass
+    # ToDo: Implement test

@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
-from typing import TypeVar, cast
+import datetime as dt
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
 
+import pendulum as pnd
 from emoji import emojize, is_emoji
 
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
-from ultimate_notion.text import chunky, html_img, rich_texts_to_markdown
+from ultimate_notion.text import MAX_TEXT_OBJECT_SIZE, chunky, html_img, render_md, rich_texts_to_markdown
 from ultimate_notion.utils import Wrapper, flatten, get_repr, is_url
+
+if TYPE_CHECKING:
+    from ultimate_notion.database import Database
+    from ultimate_notion.page import Page
 
 
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
@@ -219,27 +225,111 @@ class RichTextBase(Wrapper[T], wraps=objs.RichTextBaseObject):
 
     @property
     def is_equation(self) -> bool:
-        return isinstance(self, Equation)
+        return isinstance(self, Math)
 
     @property
     def is_mention(self) -> bool:
         return isinstance(self, Mention)
 
+    def __add__(self, other: RichTextBase | RichText | str) -> RichText:
+        if isinstance(other, RichTextBase):
+            return RichText.wrap_obj_ref([self.obj_ref, other.obj_ref])
+        elif isinstance(other, RichText):
+            return RichText.wrap_obj_ref([self.obj_ref, *other.obj_ref])
+        elif isinstance(other, str):
+            return RichText.wrap_obj_ref([self.obj_ref, Text(other).obj_ref])
+        else:
+            msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
+            raise RuntimeError(msg)
+
 
 class Text(RichTextBase[objs.TextObject], wraps=objs.TextObject):
-    """A Text object used by `RichText`, which should be used instead of this class."""
+    """A Text object.
+
+    !!! note
+
+        Use `RichText` instead for longer texts with complex formatting.
+    """
+
+    def __init__(
+        self,
+        text: str,
+        *,
+        bold: bool = False,
+        italic: bool = False,
+        strikethrough: bool = False,
+        code: bool = False,
+        underline: bool = False,
+        color: Color = Color.DEFAULT,
+        href: str | None = None,
+    ):
+        if len(text) > MAX_TEXT_OBJECT_SIZE:
+            msg = f'Text object exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `RichText` instead!'
+            raise ValueError(msg)
+
+        annotations = objs.Annotations(
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+        )
+        super().__init__(text, href=href, style=annotations)
 
 
-class Equation(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
-    """An Equation object."""
+class Math(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
+    """A inline equation object.
+
+    A LaTeX equation in inline mode, e.g. `$ \\mathrm{E=mc^2} $`, but without the `$` signs.
+    """
+
+    def __init__(
+        self,
+        expression: str,
+        *,
+        bold: bool = False,
+        italic: bool = False,
+        strikethrough: bool = False,
+        code: bool = False,
+        underline: bool = False,
+        color: Color = Color.DEFAULT,
+        href: str | None = None,
+    ):
+        annotations = objs.Annotations(
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+        )
+        super().__init__(expression, href=href, style=annotations)
 
 
 class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
     """A Mention object."""
 
-    # ToDo: Implement this!
-    # def __init__(self, *, user: User | None = None, db: Database | None = None, page: Page | None = None):
-    #     super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        target: User | Page | Database | dt.datetime | dt.date | pnd.Interval,
+        *,
+        bold: bool = False,
+        italic: bool = False,
+        strikethrough: bool = False,
+        code: bool = False,
+        underline: bool = False,
+        color: Color = Color.DEFAULT,
+    ):
+        # ToDo: Reorganise this by splitting the objects module into separate files
+        from ultimate_notion.database import Database  # noqa: PLC0415
+        from ultimate_notion.page import Page  # noqa: PLC0415
+
+        annotations = objs.Annotations(
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+        )
+        if isinstance(target, User):
+            self.obj_ref = objs.MentionUser.build(target.obj_ref, style=annotations)
+        elif isinstance(target, Page):
+            self.obj_ref = objs.MentionPage.build(target.obj_ref, style=annotations)
+        elif isinstance(target, Database):
+            self.obj_ref = objs.MentionDatabase.build(target.obj_ref, style=annotations)
+        elif isinstance(target, dt.datetime | dt.date | pnd.Interval):
+            date_range = objs.DateRange.build(target)
+            self.obj_ref = objs.MentionDate.build(date_range, style=annotations)
+        else:
+            msg = f'Cannot create mention for {type(target)}'
+            raise ValueError(msg)
 
     @property
     def type(self) -> str:
@@ -253,6 +343,7 @@ class RichText(str):
     _rich_texts: list[RichTextBase]
 
     def __init__(self, plain_text: str):
+        # note that super().__new__ stores the plain text in the object for `str(self)`
         super().__init__()
 
         rich_texts: list[RichTextBase] = []
@@ -276,7 +367,7 @@ class RichText(str):
     @classmethod
     def from_markdown(cls, text: str) -> RichText:
         """Create RichTextList by parsing the markdown."""
-        # ToDo: Implement
+        # ToDo: Implement me!
         # ToDo: Handle Equations and Mentions here accordingly
         raise NotImplementedError
 
@@ -299,10 +390,13 @@ class RichText(str):
         """
         return str(self)
 
+    def to_html(self) -> str:
+        """Return rich text as HTML."""
+        return render_md(self.to_markdown())
+
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by Jupyter Lab automatically to display this text."""
-        # ToDo: Later use Markdown output or better have `to_html` using mistune and markdown
-        return self.to_plain_text()
+        return self.to_html()
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, str):
@@ -315,19 +409,34 @@ class RichText(str):
     def __hash__(self):
         return hash(str(self))
 
-    # # TODO: Implement this
-    # add __plus__ und equation and mention
+    def __add__(self, other: RichTextBase | RichText | str) -> RichText:
+        if isinstance(other, RichTextBase):
+            return RichText.wrap_obj_ref([*self.obj_ref, other.obj_ref])
+        elif isinstance(other, RichText):
+            return RichText.wrap_obj_ref([*self.obj_ref, *other.obj_ref])
+        elif isinstance(other, str):
+            return RichText.wrap_obj_ref([*self.obj_ref, Text(other).obj_ref])
+        else:
+            msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
+            raise RuntimeError(msg)
+
+
+AnyText: TypeAlias = RichTextBase[Any] | RichText
+"""For type hinting purposes, when working with various text types, e.g. `Text`, `RichText`, `Mention`, `Math`."""
 
 
 def text_to_obj_ref(text: str | RichText | RichTextBase | list[RichTextBase]) -> list[objs.RichTextBaseObject]:
     """Convert various text representations to a list of rich text objects."""
-    if isinstance(text, str):
-        # ToDo: Allow passing markdown text here when the markdown parser is implemented
-        texts = RichText(text).obj_ref
-    elif isinstance(text, RichText | RichTextBase):
+    if isinstance(text, RichText | RichTextBase):
         texts = text.obj_ref
     elif isinstance(text, list):
         texts = flatten([rt.obj_ref for rt in text])
+    elif isinstance(text, str):
+        # ToDo: Allow passing markdown text here when the markdown parser is implemented
+        texts = RichText(text).obj_ref
+    else:
+        msg = f'Cannot convert {type(text)} to RichText objects.'
+        raise ValueError(msg)
     return texts
 
 

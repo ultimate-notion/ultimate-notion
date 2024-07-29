@@ -14,7 +14,7 @@ from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.objects import Emoji, FileInfo, RichText, wrap_icon
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.templates import page_html
-from ultimate_notion.text import md_renderer
+from ultimate_notion.text import render_md
 from ultimate_notion.utils import get_active_session, get_repr, get_url, is_notebook
 
 if TYPE_CHECKING:
@@ -91,7 +91,6 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     """
 
     props: PageProperties
-    _render_md = md_renderer()
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Self:
@@ -154,22 +153,10 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         """Return True if this page is located in a database."""
         return self.parent_db is not None
 
-    def _get_title_prop_name(self) -> str:
-        """Get the name of the title property."""
-        # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
-        for name, prop in self.obj_ref.properties.items():
-            if prop.id == 'title':
-                return name
-        msg = 'Encountered a page without title property'
-        raise RuntimeError(msg)
-
     @property
     def title(self) -> RichText:
         """Title of the page."""
-        title_prop_name = self._get_title_prop_name()
-        title_prop = self.obj_ref.properties[title_prop_name]
-        title = cast(Title, PropertyValue.wrap_obj_ref(title_prop))
-        return title.value
+        return RichText.wrap_obj_ref(self.obj_ref.title)
 
     @title.setter
     def title(self, text: RichText | str | None):
@@ -177,7 +164,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         if text is None:
             text = ''
         title = Title(text)
-        title_prop_name = self._get_title_prop_name()
+        title_prop_name = self.obj_ref._get_title_prop_name()
         session = get_active_session()
         session.api.pages.update(self.obj_ref, **{title_prop_name: title.obj_ref})
 
@@ -224,7 +211,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
-        html = self._render_md(self.to_markdown())
+        html = render_md(self.to_markdown())
         if not raw:
             html = page_html(html)
         return html
