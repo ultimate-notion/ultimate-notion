@@ -17,7 +17,7 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.objects import Emoji, FileInfo, RichText, RichTextBase, User, text_to_obj_ref, to_file_or_emoji
 from ultimate_notion.text import md_comment
-from ultimate_notion.utils import Wrapper, get_active_session, get_url, get_uuid
+from ultimate_notion.utils import InvalidAPIUsageError, Wrapper, get_active_session, get_url, get_uuid
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -27,12 +27,7 @@ if TYPE_CHECKING:
 T = TypeVar('T', bound=obj_blocks.DataObject)
 
 
-class InvalidAPIUsageError(Exception):
-    """Raised when the API is used in an invalid way."""
-
-    def __init__(self, message='This part of the API is not intended to be used in this manner'):
-        self.message = message
-        super().__init__(self.message)
+# ToDo: Check if a lot here couldn't be reworked with build functionality
 
 
 class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
@@ -245,6 +240,11 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
             raise RuntimeError(msg)
 
         blocks = [blocks] if isinstance(blocks, Block) else blocks
+        for block in blocks:
+            if not isinstance(block, Block):
+                msg = f'Cannot append {type(block)} to a block.'
+                raise ValueError(msg)
+
         block_objs = [block.obj_ref for block in blocks]
         after_obj = None if after is None else after.obj_ref
 
@@ -480,7 +480,10 @@ class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
 
 
 class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
-    """Equation block."""
+    """Equation block.
+
+    LaTeX equation in display mode, e.g. `$$ \\mathrm{E=mc^2} $$`, but without the `$$` signs.
+    """
 
     def __init__(self, expression: str):
         super().__init__()

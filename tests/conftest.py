@@ -38,11 +38,9 @@ from vcr import VCR
 from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
-from ultimate_notion import Option, Session, schema
+from ultimate_notion import Database, Option, Page, Session, User, schema
 from ultimate_notion.adapters.google.tasks import GTasksClient
 from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, get_cfg_file, get_or_create_cfg
-from ultimate_notion.database import Database
-from ultimate_notion.page import Page
 from ultimate_notion.utils import temp_timezone
 
 if TYPE_CHECKING:
@@ -58,6 +56,7 @@ MD_TEXT_TEST_PAGE = 'Markdown Text Test'
 MD_PAGE_TEST_PAGE = 'Markdown Page Test'
 MD_SUBPAGE_TEST_PAGE = 'Markdown SubPage Test'
 TASK_DB = 'Task DB'
+UNFURL_TEST_PAGE = 'Embed/Inline & Unfurl'
 
 # Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
 TEST_CFG_FILE = get_cfg_file()
@@ -239,6 +238,12 @@ def notion() -> Iterator[Session]:
         yield notion
 
 
+@pytest.fixture(scope='module')
+def person(notion: Session) -> User:
+    """Return a user object for testing."""
+    return notion.search_user('Florian Wilhelm').item()
+
+
 @vcr_fixture(scope='module')
 def contacts_db(notion: Session) -> Database:
     """Return a test database."""
@@ -310,10 +315,18 @@ def md_subpage(notion: Session) -> Page:
     return notion.search_page(MD_SUBPAGE_TEST_PAGE).item()
 
 
+@vcr_fixture(scope='module')
+def unfurl_page(notion: Session) -> Page:
+    """Return a page with embed/inline & unfurl content."""
+    return notion.search_page(UNFURL_TEST_PAGE).item()
+
+
 @pytest.fixture(scope='module')
-def static_pages(root_page: Page, intro_page: Page, md_text_page: Page, md_page: Page, md_subpage: Page) -> set[Page]:
+def static_pages(  # noqa: PLR0917
+    root_page: Page, intro_page: Page, md_text_page: Page, md_page: Page, md_subpage: Page, unfurl_page: Page
+) -> set[Page]:
     """Return all static pages for the unit tests."""
-    return {intro_page, root_page, md_text_page, md_page, md_subpage}
+    return {intro_page, root_page, md_text_page, md_page, md_subpage, unfurl_page}
 
 
 @vcr_fixture(scope='module')

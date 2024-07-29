@@ -17,10 +17,11 @@ from default/unset values.
 
 from __future__ import annotations
 
+import datetime as dt
 from abc import ABC
 from copy import deepcopy
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
 import pendulum as pnd
@@ -41,7 +42,7 @@ class SelectOption(GenericObject):
     name: str
     id: str = None  # type: ignore  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color = Color.DEFAULT
-    description: str | None = None  # ToDo: Undocumented, could also be [RichTextObject]
+    description: str | None = None  # ToDo: Undocumented, could also be list[RichTextObject]
 
     @classmethod
     def build(cls, name, color=Color.DEFAULT) -> Self:
@@ -66,7 +67,7 @@ class DateRange(GenericObject):
     time_zone: str | None = None
 
     @classmethod
-    def build(cls, dt: pnd.DateTime | pnd.Date | pnd.Interval) -> Self:
+    def build(cls, dt_spec: dt.datetime | dt.date | pnd.Interval) -> Self:
         """Compose a DateRange object from the given properties."""
 
         def to_naive_dt(dt: pnd.DateTime | pnd.Date | datetime | date) -> datetime | date:
@@ -78,20 +79,20 @@ class DateRange(GenericObject):
             else:  # pnd.Date
                 return date(dt.year, dt.month, dt.day)
 
-        if isinstance(dt, pnd.Interval):
-            time_zone = dt.start.timezone_name if isinstance(dt.start, pnd.DateTime) else None
-            start = to_naive_dt(dt.start)
-            end = to_naive_dt(dt.end)
-        elif isinstance(dt, pnd.DateTime):
-            time_zone = dt.timezone_name
-            start = to_naive_dt(dt)
+        if isinstance(dt_spec, pnd.Interval):
+            time_zone = dt_spec.start.timezone_name if isinstance(dt_spec.start, pnd.DateTime) else None
+            start = to_naive_dt(dt_spec.start)
+            end = to_naive_dt(dt_spec.end)
+        elif isinstance(dt_spec, pnd.DateTime):
+            time_zone = dt_spec.timezone_name
+            start = to_naive_dt(dt_spec)
             end = None
-        elif isinstance(dt, pnd.Date):
+        elif isinstance(dt_spec, pnd.Date):
             time_zone = None
-            start = to_naive_dt(dt)
+            start = to_naive_dt(dt_spec)
             end = None
         else:
-            msg = f"Unsupported type for 'dt': {type(dt)}"
+            msg = f"Unsupported type for 'dt': {type(dt_spec)}"
             raise TypeError(msg)
         return cls.model_construct(start=start, end=end, time_zone=time_zone)
 
@@ -110,6 +111,11 @@ class DateRange(GenericObject):
                     start=pnd.instance(self.start, tz=self.time_zone),
                     end=pnd.instance(self.end, tz=self.time_zone),
                 )
+
+    def __str__(self) -> str:
+        # ToDo: Implement the possibility to configure date format globally, maybe in the config?
+        date_str = str(self.start) if self.end is None else f'{self.start} → {self.end}'
+        return f'@{date_str}'  # we add the @ as Notion does it too
 
 
 class LinkObject(GenericObject):
@@ -269,7 +275,7 @@ class Annotations(GenericObject):
     strikethrough: bool = False
     underline: bool = False
     code: bool = False
-    color: BGColor = None  # type: ignore
+    color: Color | BGColor = Color.DEFAULT
 
 
 class RichTextBaseObject(TypedObject, polymorphic_base=True):
@@ -279,17 +285,10 @@ class RichTextBaseObject(TypedObject, polymorphic_base=True):
     href: str | None = None
     annotations: Annotations | None = None
 
-    @classmethod
-    def build(cls, text: str, href: str | None = None, style: Annotations | None = None) -> Self:
-        """Compose a TextObject from the given properties.
 
-        Args:
-            text: the plain text of this object
-            href: an optional link for this object
-            style: an optional Annotations object for this text
-        """
-        style = deepcopy(style)
-        return cls.model_construct(plain_text=text, href=href, annotations=style)
+def rich_text_to_str(rich_texts: list[RichTextBaseObject]) -> str:
+    """Convert a list of rich texts to plain text."""
+    return ''.join(rich_text.plain_text for rich_text in rich_texts)
 
 
 class TextObject(RichTextBaseObject, type='text'):
@@ -302,7 +301,7 @@ class TextObject(RichTextBaseObject, type='text'):
     text: TypeData = TypeData()
 
     @classmethod
-    def build(cls, text: str, href: str | None = None, style: Annotations | None = None) -> Self:
+    def build(cls, text: str, *, href: str | None = None, style: Annotations | None = None) -> Self:
         """Compose a TextObject from the given properties.
 
         Args:
@@ -310,12 +309,8 @@ class TextObject(RichTextBaseObject, type='text'):
             href: optional link for this object
             style: optional annotations for styling this text
         """
-
-        if text is None:
-            return None
-
         link = LinkObject(url=href) if href else None
-        nested = TextObject.TypeData(content=text, link=link)
+        nested = cls.TypeData(content=text, link=link)
         style = deepcopy(style)
 
         return cls.model_construct(
@@ -334,83 +329,115 @@ class EquationObject(RichTextBaseObject, type='equation'):
 
     equation: TypeData
 
+    @classmethod
+    def build(cls, expression: str, *, href: str | None = None, style: Annotations | None = None) -> Self:
+        """Compose a TextObject from the given properties.
 
-class MentionData(TypedObject, polymorphic_base=True):
-    """Base class for typed `Mention` data objects."""
+        Args:
+            expression: expression
+            href: optional link for this object
+            style: optional annotations for styling this text
+        """
+        style = deepcopy(style)
+        return cls.model_construct(
+            plain_text=expression, equation=cls.TypeData(expression=expression), href=href, annotations=style
+        )
+
+
+class MentionBase(TypedObject, polymorphic_base=True):
+    """Base class for typed `Mention` objects."""
 
 
 class MentionObject(RichTextBaseObject, type='mention'):
     """Notion mention element."""
 
-    mention: MentionData
+    mention: SerializeAsAny[MentionBase]
+
+    @classmethod
+    def build(cls, target: User | Page | Database | DateRange, **kwargs: Any) -> MentionObject:
+        """Compose a MentionObject from the given target.
+
+        Args:
+            target: the target of the mention
+            kwargs: additional properties for the mention
+        """
+        if isinstance(target, User):
+            return MentionUser.build(target, **kwargs)
+        elif isinstance(target, Page):
+            return MentionPage.build(target, **kwargs)
+        elif isinstance(target, Database):
+            return MentionDatabase.build(target, **kwargs)
+        elif isinstance(target, DateRange):
+            return MentionDate.build(target, **kwargs)
+        else:
+            msg = f'Unsupported target type: {type(target)}'
+            raise TypeError(msg)
 
 
-class MentionUser(MentionData, type='user'):
+class MentionUser(MentionBase, type='user'):
     """Nested user data for `Mention` properties."""
 
-    user: User
+    user: SerializeAsAny[User]
 
-    # ToDo: Check if this is needed!
     @classmethod
-    def build(cls, user: User) -> MentionObject:
-        """Build a `Mention` object for the specified user.
-
-        The `id` field must be set for the given User.  Other fields may cause errors
-        if they do not match the specific type returned from the API.
-        """
+    def build(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
+        style = deepcopy(style)
         mention = MentionUser.model_construct(user=user)
-        return MentionObject.model_construct(plain_text=str(user), mention=mention)
+        # note that `href` is always `None` for user mentions
+        return MentionObject.model_construct(plain_text=user.name, href=None, annotations=style, mention=mention)
 
 
-class MentionPage(MentionData, type='page'):
+class MentionPage(MentionBase, type='page'):
     """Nested page data for `Mention` properties."""
 
-    page: ObjectReference
+    page: SerializeAsAny[ObjectReference]
 
-    # ToDo: Check if this is needed!
     @classmethod
-    def build(cls, page_ref: PageRef) -> MentionObject:
-        """Build a `Mention` object for the specified page reference."""
+    def build(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
+        style = deepcopy(style)
+        page_ref = ObjectReference.build(page)
+        mention = MentionPage.model_construct(page=page_ref)
+        # note that `href` is always `None` for page mentions
+        return MentionObject.model_construct(
+            plain_text=rich_text_to_str(page.title), href=None, annotations=style, mention=mention
+        )
 
-        ref = ObjectReference.build(page_ref)
-        mention = MentionPage.model_construct(page=ref)
-        return MentionObject.model_construct(plain_text=str(ref), mention=mention)
 
-
-class MentionDatabase(MentionData, type='database'):
+class MentionDatabase(MentionBase, type='database'):
     """Nested database information for `Mention` properties."""
 
-    database: ObjectReference
+    database: SerializeAsAny[ObjectReference]
 
-    # ToDo: Check if this is needed!
     @classmethod
-    def build(cls, db_ref: DatabaseRef) -> MentionObject:
-        """Build a `Mention` object for the specified database reference."""
+    def build(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
+        style = deepcopy(style)
+        db_ref = ObjectReference.build(db)
+        mention = MentionDatabase.model_construct(database=db_ref)
+        # note that `href` is always `None` for database mentions
+        return MentionObject.model_construct(
+            plain_text=rich_text_to_str(db.title), ref=None, annotations=style, mention=mention
+        )
 
-        ref = ObjectReference.build(db_ref)
-        mention = MentionDatabase.model_construct(database=ref)
-        return MentionObject.model_construct(plain_text=str(ref), mention=mention)
 
-
-class MentionDate(MentionData, type='date'):
+class MentionDate(MentionBase, type='date'):
     """Nested date data for `Mention` properties."""
 
     date: DateRange
 
-    # ToDo: Check if this is needed!
     @classmethod
-    def build(cls, start, end=None) -> MentionObject:
-        """Build a `Mention` object for the specified URL."""
+    def build(cls, date_range: DateRange, *, style: Annotations | None = None) -> MentionObject:
+        style = deepcopy(style)
+        mention = MentionDate.model_construct(date=date_range)
+        # note that `href` is always `None` for date mentions
+        return MentionObject.model_construct(plain_text=str(date_range), ref=None, annotations=style, mention=mention)
 
-        date_obj = DateRange(start=start, end=end)
-        mention = MentionDate.model_construct(date=date_obj)
-        return MentionObject.model_construct(plain_text=str(date_obj), mention=mention)
 
-
-class MentionLinkPreview(MentionData, type='link_preview'):
+class MentionLinkPreview(MentionBase, type='link_preview'):
     """Nested url data for `Mention` properties.
 
-    These objects cannot be created via the API.
+    !!! warning
+
+        Link previews cannot be created via the API.
     """
 
     class TypeData(GenericObject):
@@ -423,7 +450,7 @@ class MentionTemplateData(TypedObject):
     """Nested template data for `Mention` properties."""
 
 
-class MentionTemplate(MentionData, type='template_mention'):
+class MentionTemplate(MentionBase, type='template_mention'):
     """Nested template data for `Mention` properties."""
 
     template_mention: MentionTemplateData
