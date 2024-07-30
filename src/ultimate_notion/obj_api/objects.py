@@ -131,7 +131,7 @@ class ObjectReference(GenericObject):
     id: UUID
 
     @classmethod
-    def build(cls, ref: ParentRef | GenericObject | UUID | str) -> ObjectReference:
+    def build(cls, ref: ParentRef | GenericObject | UUID | str) -> Self:
         """Compose an ObjectReference from the given reference.
 
         `ref` may be a `UUID`, `str`, `ParentRef` or `GenericObject` with an `id`.
@@ -144,17 +144,17 @@ class ObjectReference(GenericObject):
 
         if isinstance(ref, ParentRef):
             # ParentRef's are typed-objects with a nested UUID
-            return ObjectReference.model_construct(id=ref.value)
+            return cls.model_construct(id=ref.value)
 
         if isinstance(ref, GenericObject) and hasattr(ref, 'id'):
             # re-compose the ObjectReference from the internal ID
-            return ObjectReference.build(ref.id)
+            return cls.build(ref.id)
 
         if isinstance(ref, UUID):
-            return ObjectReference.model_construct(id=ref)
+            return cls.model_construct(id=ref)
 
         if isinstance(ref, str) and (id_str := extract_id(ref)) is not None:
-            return ObjectReference.model_construct(id=UUID(id_str))
+            return cls.model_construct(id=UUID(id_str))
 
         msg = f'Cannot interpret {ref} of type {type(ref)} as reference to an object.'
         raise ValueError(msg)
@@ -382,7 +382,7 @@ class MentionUser(MentionBase, type='user'):
     @classmethod
     def build(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
-        mention = MentionUser.model_construct(user=user)
+        mention = cls.model_construct(user=user)
         # note that `href` is always `None` for user mentions
         return MentionObject.model_construct(plain_text=user.name, href=None, annotations=style, mention=mention)
 
@@ -396,7 +396,7 @@ class MentionPage(MentionBase, type='page'):
     def build(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         page_ref = ObjectReference.build(page)
-        mention = MentionPage.model_construct(page=page_ref)
+        mention = cls.model_construct(page=page_ref)
         # note that `href` is always `None` for page mentions
         return MentionObject.model_construct(
             plain_text=rich_text_to_str(page.title), href=None, annotations=style, mention=mention
@@ -412,7 +412,7 @@ class MentionDatabase(MentionBase, type='database'):
     def build(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         db_ref = ObjectReference.build(db)
-        mention = MentionDatabase.model_construct(database=db_ref)
+        mention = cls.model_construct(database=db_ref)
         # note that `href` is always `None` for database mentions
         return MentionObject.model_construct(
             plain_text=rich_text_to_str(db.title), ref=None, annotations=style, mention=mention
@@ -427,7 +427,7 @@ class MentionDate(MentionBase, type='date'):
     @classmethod
     def build(cls, date_range: DateRange, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
-        mention = MentionDate.model_construct(date=date_range)
+        mention = cls.model_construct(date=date_range)
         # note that `href` is always `None` for date mentions
         return MentionObject.model_construct(plain_text=str(date_range), ref=None, annotations=style, mention=mention)
 
@@ -500,6 +500,6 @@ class ExternalFile(FileObject, type='external'):
     external: TypeData
 
     @classmethod
-    def build(cls, url: str, name: str | None = None, caption: list[RichTextBaseObject] | None = None) -> Self:
+    def build(cls, url: str, *, name: str | None = None, caption: list[RichTextBaseObject] | None = None) -> Self:
         """Create a new `ExternalFile` from the given URL."""
         return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url))
