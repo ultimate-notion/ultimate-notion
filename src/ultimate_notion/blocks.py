@@ -138,83 +138,6 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         ...
 
 
-BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
-
-
-class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
-    """General Notion block."""
-
-    @property
-    def block_url(self) -> str:
-        """Return the URL of the block."""
-        return get_url(self.id)
-
-    def reload(self) -> Self:
-        """Reload the block from the API."""
-        session = get_active_session()
-        self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
-        return self
-
-
-class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
-    """Abstract Text block."""
-
-    def __init__(self, text: str | RichText | RichTextBase | list[RichTextBase]) -> None:
-        super().__init__()
-        self.obj_ref.value.rich_text = text_to_obj_ref(text)
-
-    @property
-    def rich_text(self) -> RichText:
-        """Return the text content of this text block."""
-        rich_texts = self.obj_ref.value.rich_text
-        return RichText.wrap_obj_ref(rich_texts)
-
-
-AnyBlock: TypeAlias = Block[Any]
-"""For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock] in user code."""
-
-
-class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
-    """Code block."""
-
-    def __init__(
-        self,
-        text: str | RichText | RichTextBase | list[RichTextBase],
-        *,
-        language: CodeLang = CodeLang.PLAIN_TEXT,
-        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
-    ) -> None:
-        super().__init__(text)
-        self.obj_ref.value.language = language
-        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
-
-    @property
-    def caption(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.code.caption)
-
-    def to_markdown(self) -> str:
-        lang = self.obj_ref.code.language
-        return f'```{lang}\n{self.rich_text.to_markdown()}\n```'
-
-
-class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
-    """Abstract Text block with color."""
-
-    def __init__(
-        self,
-        text: str | RichText | RichTextBase | list[RichTextBase],
-        *,
-        color: Color | BGColor = Color.DEFAULT,
-    ) -> None:
-        super().__init__(text)
-        self.obj_ref.value.rich_text = text_to_obj_ref(text)
-        self.obj_ref.value.color = color
-
-    @property
-    def color(self) -> Color | BGColor:
-        return self.obj_ref.value.color
-
-
 class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
     """Mixin for data objects that can have children"""
 
@@ -264,6 +187,83 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
         return self
 
 
+BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
+    """General Notion block."""
+
+    @property
+    def block_url(self) -> str:
+        """Return the URL of the block."""
+        return get_url(self.id)
+
+    def reload(self) -> Self:
+        """Reload the block from the API."""
+        session = get_active_session()
+        self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
+        return self
+
+
+AnyBlock: TypeAlias = Block[Any]
+"""For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock] in user code."""
+
+
+class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
+    """Abstract Text block."""
+
+    def __init__(self, text: str | RichText | RichTextBase | list[RichTextBase]) -> None:
+        super().__init__()
+        self.obj_ref.value.rich_text = text_to_obj_ref(text)
+
+    @property
+    def rich_text(self) -> RichText:
+        """Return the text content of this text block."""
+        rich_texts = self.obj_ref.value.rich_text
+        return RichText.wrap_obj_ref(rich_texts)
+
+
+class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
+    """Code block."""
+
+    def __init__(
+        self,
+        text: str | RichText | RichTextBase | list[RichTextBase],
+        *,
+        language: CodeLang = CodeLang.PLAIN_TEXT,
+        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
+    ) -> None:
+        super().__init__(text)
+        self.obj_ref.value.language = language
+        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+
+    @property
+    def caption(self) -> RichText:
+        return RichText.wrap_obj_ref(self.obj_ref.code.caption)
+
+    def to_markdown(self) -> str:
+        lang = self.obj_ref.code.language
+        return f'```{lang}\n{self.rich_text.to_markdown()}\n```'
+
+
+class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
+    """Abstract Text block with color."""
+
+    def __init__(
+        self,
+        text: str | RichText | RichTextBase | list[RichTextBase],
+        *,
+        color: Color | BGColor = Color.DEFAULT,
+    ) -> None:
+        super().__init__(text)
+        self.obj_ref.value.rich_text = text_to_obj_ref(text)
+        self.obj_ref.value.color = color
+
+    @property
+    def color(self) -> Color | BGColor:
+        return self.obj_ref.value.color
+
+
 class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin, wraps=obj_blocks.Paragraph):
     """Paragraph block."""
 
@@ -271,7 +271,7 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin, wraps=obj
         return f'{self.rich_text.to_markdown()}'
 
 
-class Heading(ColoredTextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
+class Heading(ColoredTextBlock[BT], ABC, wraps=obj_blocks.Heading):
     """Abstract Heading block."""
 
     def __init__(
@@ -655,7 +655,7 @@ class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
     """Column block."""
 
     def __init__(self):
-        msg = 'Column blocks cannot be created directly. Usge `Columns` instead.'
+        msg = 'Column blocks cannot be created directly. Use `Columns` instead.'
         raise InvalidAPIUsageError(msg)
 
     def to_markdown(self) -> str:
@@ -668,10 +668,10 @@ class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
 class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.ColumnList):
     """Columns block."""
 
-    def __init__(self, num: int):
+    def __init__(self, n_columns: int):
         """Create a new `Columns` block with the given number of columns."""
         super().__init__()
-        self.obj_ref.column_list.children = [obj_blocks.Column.build() for _ in range(num)]
+        self.obj_ref.column_list.children = [obj_blocks.Column.build() for _ in range(n_columns)]
 
     def __getitem__(self, index: int) -> Column:
         return cast(Column, self.children[index])

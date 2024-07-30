@@ -113,32 +113,31 @@ class Paragraph(TextBlock, type='paragraph'):
     paragraph: TypeData = TypeData()
 
 
-class _NestedHeadingData(GenericObject):
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-    color: Color | BGColor = Color.DEFAULT
-    is_toggleable: bool = False
-
-
 class Heading(TextBlock, ABC):
     """Abstract Heading block."""
+
+    class TypeData(GenericObject):
+        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+        color: Color | BGColor = Color.DEFAULT
+        is_toggleable: bool = False
 
 
 class Heading1(Heading, type='heading_1'):
     """A heading_1 block in Notion."""
 
-    heading_1: _NestedHeadingData = _NestedHeadingData()
+    heading_1: Heading.TypeData = Heading.TypeData()
 
 
 class Heading2(Heading, type='heading_2'):
     """A heading_2 block in Notion."""
 
-    heading_2: _NestedHeadingData = _NestedHeadingData()
+    heading_2: Heading.TypeData = Heading.TypeData()
 
 
 class Heading3(Heading, type='heading_3'):
     """A heading_3 block in Notion."""
 
-    heading_3: _NestedHeadingData = _NestedHeadingData()
+    heading_3: Heading.TypeData = Heading.TypeData()
 
 
 class Quote(TextBlock, type='quote'):
@@ -396,7 +395,7 @@ class SyncedBlock(Block, type='synced_block'):
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
-        model_data = self.model_dump(mode='json', exclude_none=True, by_alias=True)
+        model_data = super().serialize_for_api()
         # Everywhere else we have to remove "null" values but `synced_from` is an exception
         if self.synced_block.synced_from is None:
             model_data['synced_block']['synced_from'] = None
