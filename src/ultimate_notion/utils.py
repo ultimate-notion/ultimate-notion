@@ -11,7 +11,6 @@ from hashlib import sha256
 from itertools import chain
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
-from urllib.parse import urlparse
 from uuid import UUID
 
 import numpy as np
@@ -20,14 +19,13 @@ from packaging.version import Version
 from typing_extensions import Self
 
 from ultimate_notion import __version__
-from ultimate_notion.obj_api import objects as objs
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.core import GenericObject
     from ultimate_notion.session import Session
 
 
-T = TypeVar('T')
+T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
 class InvalidAPIUsageError(Exception):
@@ -121,10 +119,10 @@ def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[
 
 def find_index(elem: Any, lst: list[Any]) -> int | None:
     """Find the index of the element in the list or return `None`."""
-    if elem not in lst:
-        return None
-    else:
+    try:
         return lst.index(elem)
+    except ValueError:
+        return None
 
 
 def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int, Any] | None = None):
@@ -192,14 +190,6 @@ def get_url(object_id: UUID | str) -> str:
     """Return the URL for the object with the given id."""
     object_id = object_id if isinstance(object_id, UUID) else UUID(object_id)
     return f'https://notion.so/{object_id.hex}'
-
-
-def get_uuid(obj: str | UUID | objs.ParentRef | objs.NotionObject | objs.BlockRef) -> UUID:
-    """Retrieves a UUID from an object reference.
-
-    Only meant for internal use.
-    """
-    return objs.ObjectReference.build(obj).id
 
 
 KT = TypeVar('KT')
@@ -287,13 +277,27 @@ def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
 
 
-def convert_md_to_py(path: Path | str):
-    """Converts a Markdown file to a py file by extracting all python codeblocks"""
+def convert_md_to_py(path: Path | str, *, target_path: Path | str | None = None) -> None:
+    """Converts a Markdown file to a py file by extracting all python codeblocks
+
+    Args:
+        path: Path to the Markdown file to convert
+        target_path: Path to save the new Python file. If not provided, the new file will be the same file with .py
+
+    !!! warning
+
+        If a file with the same name already exists, it will be overwritten.
+    """
     if isinstance(path, str):
         path = Path(path)
     if not path.is_file():
         msg = f'{path} is no file!'
         raise RuntimeError(msg)
+
+    if target_path is None:
+        target_path = path.with_suffix('.py')
+    elif isinstance(target_path, str):
+        target_path = Path(target_path)
 
     md_str = path.read_text()
 
@@ -317,7 +321,7 @@ def convert_md_to_py(path: Path | str):
             block += line + '\n'
     py_str = '\n'.join([c for c in codeblocks if c != ''])
 
-    path.with_suffix('.py').write_text(py_str)
+    target_path.with_suffix('.py').write_text(py_str)
 
 
 def str_hash(*args: str, n_chars: int = 16) -> str:
@@ -337,11 +341,6 @@ def is_stable_version(version_str: str) -> bool:
     """Return whether the given version is a stable release."""
     version = Version(version_str)
     return not (version.is_prerelease or version.is_devrelease or version.is_postrelease)
-
-
-def is_stable_release() -> bool:
-    """Return whether the current version is a stable release."""
-    return is_stable_version(__version__)
 
 
 def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
@@ -414,10 +413,6 @@ def temp_timezone(tz: str | pnd.Timezone):
         pnd.set_local_timezone(current_tz)
 
 
-def is_url(string: str) -> bool:
-    """Check if a string is a valid URL."""
-    try:
-        result = urlparse(string)
-        return all([result.scheme, result.netloc])
-    except ValueError:
-        return False
+def is_stable_release() -> bool:
+    """Return whether the current version is a stable release."""
+    return is_stable_version(__version__)

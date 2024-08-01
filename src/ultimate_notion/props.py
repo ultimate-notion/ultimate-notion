@@ -12,7 +12,10 @@ from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 import pendulum as pnd
 
 import ultimate_notion.obj_api.props as obj_props
-from ultimate_notion.objects import FileInfo, Option, RichText, User
+from ultimate_notion.file import FileInfo
+from ultimate_notion.option import Option
+from ultimate_notion.text import RichText
+from ultimate_notion.user import User
 from ultimate_notion.utils import Wrapper, get_active_session, get_repr
 
 if TYPE_CHECKING:

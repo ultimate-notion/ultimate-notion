@@ -6,7 +6,8 @@ import pytest
 
 from ultimate_notion import Color, Session, props, schema
 from ultimate_notion.database import Database
-from ultimate_notion.objects import FileInfo, Option
+from ultimate_notion.file import FileInfo
+from ultimate_notion.option import Option
 from ultimate_notion.page import Page
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.schema import AggFunc, PageSchema, Property, ReadOnlyPropertyError, SchemaError

@@ -18,19 +18,18 @@ from default/unset values.
 from __future__ import annotations
 
 import datetime as dt
-from abc import ABC
+from abc import ABC, abstractmethod
 from copy import deepcopy
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
 import pendulum as pnd
 from pydantic import Field, SerializeAsAny
 from typing_extensions import Self
 
-from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
+from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject, extract_id
 from ultimate_notion.obj_api.enums import BGColor, Color
-from ultimate_notion.text import extract_id
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Block, Database, Page
@@ -59,7 +58,20 @@ class SelectGroup(GenericObject):
     option_ids: list[str] = Field(default_factory=list)
 
 
-class DateRange(GenericObject):
+class MentionMixin(ABC):
+    """Mixin for objects that can be mentioned in Notion.
+
+    This mixin adds a `mention` property to the object, which can be used to
+    reference the object in a mention.
+    """
+
+    @abstractmethod
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        """Return a mention object for this object."""
+        ...
+
+
+class DateRange(GenericObject, MentionMixin):
     """A Notion date range, with an optional end date."""
 
     start: date | datetime
@@ -95,6 +107,9 @@ class DateRange(GenericObject):
             msg = f"Unsupported type for 'dt': {type(dt_spec)}"
             raise TypeError(msg)
         return cls.model_construct(start=start, end=end, time_zone=time_zone)
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        return MentionDate.build(self, style=style)
 
     def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
         """Convert the DateRange to a pendulum object."""
@@ -160,6 +175,14 @@ class ObjectReference(GenericObject):
         raise ValueError(msg)
 
 
+def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
+    """Retrieves a UUID from an object reference.
+
+    Only meant for internal use.
+    """
+    return ObjectReference.build(obj).id
+
+
 class ParentRef(TypedObject, ABC, polymorphic_base=True):
     """Reference another block as a parent.
 
@@ -216,12 +239,15 @@ class UserRef(NotionObject, object='user'):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
 
 
-class User(UserRef, TypedObject, polymorphic_base=True):
+class User(UserRef, TypedObject, MentionMixin, polymorphic_base=True):
     """Represents a User in Notion."""
 
     id: UUID = None  # type: ignore
     name: str | None = None
     avatar_url: str | None = None
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        return MentionUser.build(self, style=style)
 
 
 class Person(User, type='person'):
@@ -352,26 +378,6 @@ class MentionObject(RichTextBaseObject, type='mention'):
     """Notion mention element."""
 
     mention: SerializeAsAny[MentionBase]
-
-    @classmethod
-    def build(cls, target: User | Page | Database | DateRange, **kwargs: Any) -> MentionObject:
-        """Compose a MentionObject from the given target.
-
-        Args:
-            target: the target of the mention
-            kwargs: additional properties for the mention
-        """
-        if isinstance(target, User):
-            return MentionUser.build(target, **kwargs)
-        elif isinstance(target, Page):
-            return MentionPage.build(target, **kwargs)
-        elif isinstance(target, Database):
-            return MentionDatabase.build(target, **kwargs)
-        elif isinstance(target, DateRange):
-            return MentionDate.build(target, **kwargs)
-        else:
-            msg = f'Unsupported target type: {type(target)}'
-            raise TypeError(msg)
 
 
 class MentionUser(MentionBase, type='user'):

@@ -15,9 +15,14 @@ from pydantic import SerializeAsAny
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
+    Annotations,
     BlockRef,
     EmojiObject,
     FileObject,
+    MentionDatabase,
+    MentionMixin,
+    MentionObject,
+    MentionPage,
     ParentRef,
     RichTextBaseObject,
     UserRef,
@@ -44,7 +49,7 @@ class DataObject(NotionObject):
     last_edited_by: UserRef = None  # type: ignore
 
 
-class Database(DataObject, object='database'):
+class Database(DataObject, MentionMixin, object='database'):
     """A database record type."""
 
     title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
@@ -56,8 +61,11 @@ class Database(DataObject, object='database'):
     description: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     is_inline: bool = False
 
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        return MentionDatabase.build(self, style=style)
 
-class Page(DataObject, object='page'):
+
+class Page(DataObject, MentionMixin, object='page'):
     """A standard Notion page object."""
 
     url: str = None  # type: ignore
@@ -81,6 +89,9 @@ class Page(DataObject, object='page'):
         title_prop_name = self._get_title_prop_name()
         title_prop = cast(Title, self.properties[title_prop_name])
         return title_prop.title
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        return MentionPage.build(self, style=style)
 
 
 class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
@@ -337,6 +348,10 @@ class Column(Block, type='column'):
         children: list[SerializeAsAny[Block]] | None = None
 
     column: TypeData = TypeData()
+
+    @classmethod
+    def build(cls) -> Column:
+        return Column.model_construct(column=cls.TypeData.model_construct(children=[]))
 
 
 class ColumnList(Block, type='column_list'):

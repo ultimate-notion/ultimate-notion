@@ -10,10 +10,10 @@ import numpy as np
 import pandas as pd
 from tabulate import tabulate
 
+from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.query import DBQueryBuilder
-from ultimate_notion.objects import FileInfo, RichText
 from ultimate_notion.page import Page
-from ultimate_notion.text import html_img
+from ultimate_notion.text import RichText, html_img
 from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, get_repr, is_notebook
 
 if TYPE_CHECKING:

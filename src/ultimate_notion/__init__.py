@@ -42,11 +42,14 @@ from ultimate_notion.blocks import (
     Video,
 )
 from ultimate_notion.database import Database
+from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
-from ultimate_notion.objects import AnyText, Emoji, FileInfo, Math, Mention, Option, OptionNS, RichText, Text, User
+from ultimate_notion.option import Option, OptionNS
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema, Property, PropType, SelfRef
 from ultimate_notion.session import Session
+from ultimate_notion.text import AnyText, Emoji, Math, Mention, RichText, Text
+from ultimate_notion.user import User
 
 __all__ = [
     'PDF',

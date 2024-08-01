@@ -123,11 +123,3 @@ def test_to_pendulum(tz_berlin):
 
     with pytest.raises(TypeError):
         utils.to_pendulum(pnd.duration(days=21))
-
-
-def test_is_url():
-    assert utils.is_url('https://www.example.com')
-    assert utils.is_url('http://www.example.com')
-    assert not utils.is_url('http://')
-    assert not utils.is_url('')
-    assert not utils.is_url('www.example.com')

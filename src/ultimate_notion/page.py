@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, TypeGuard, cast
 
 from emoji import is_emoji
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin, DataObject
+from ultimate_notion.file import FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
-from ultimate_notion.objects import Emoji, FileInfo, RichText, wrap_icon
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.templates import page_html
-from ultimate_notion.text import render_md
+from ultimate_notion.text import Emoji, RichText, render_md
 from ultimate_notion.utils import get_active_session, get_repr, get_url, is_notebook
 
 if TYPE_CHECKING:
@@ -119,6 +119,11 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return self.to_html()
 
     @property
+    def is_page(self) -> bool:
+        """Return whether the object is a page."""
+        return True
+
+    @property
     def url(self) -> str:
         """Return the URL of this database."""
         return get_url(self.id)
@@ -141,9 +146,11 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
         This is a convenience method to avoid the need to check and cast the type of the parent.
         """
-        from ultimate_notion.database import Database  # noqa: PLC0415
 
-        if isinstance(self.parent, Database):
+        def is_db(obj: DataObject | None) -> TypeGuard[Database]:
+            return obj is not None and obj.is_db
+
+        if is_db(self.parent):
             return self.parent
         else:
             return None

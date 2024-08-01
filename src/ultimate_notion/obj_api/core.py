@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any, ClassVar
 from uuid import UUID
 
@@ -12,6 +13,61 @@ from typing_extensions import Self
 from ultimate_notion.utils import is_stable_release
 
 logger = logging.getLogger(__name__)
+
+BASE_URL_PATTERN = r'https://(www.)?notion.so/'
+UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
+
+UUID_RE = re.compile(rf'^(?P<id>{UUID_PATTERN})$')
+
+PAGE_URL_SHORT_RE = re.compile(
+    rf"""^
+      {BASE_URL_PATTERN}
+      (?P<page_id>{UUID_PATTERN})
+    $""",
+    flags=re.IGNORECASE | re.VERBOSE,
+)
+
+PAGE_URL_LONG_RE = re.compile(
+    rf"""^
+      {BASE_URL_PATTERN}
+      (?P<title>.*)-
+      (?P<page_id>{UUID_PATTERN})
+    $""",
+    flags=re.IGNORECASE | re.VERBOSE,
+)
+
+BLOCK_URL_LONG_RE = re.compile(
+    rf"""^
+      {BASE_URL_PATTERN}
+      (?P<username>.*)/
+      (?P<title>.*)-
+      (?P<page_id>{UUID_PATTERN})
+      \#(?P<block_id>{UUID_PATTERN})
+    $""",
+    flags=re.IGNORECASE | re.VERBOSE,
+)
+
+
+def extract_id(text: str) -> str | None:
+    """Examine the given text to find a valid Notion object ID."""
+
+    m = UUID_RE.match(text)
+    if m is not None:
+        return m.group('id')
+
+    m = PAGE_URL_LONG_RE.match(text)
+    if m is not None:
+        return m.group('page_id')
+
+    m = PAGE_URL_SHORT_RE.match(text)
+    if m is not None:
+        return m.group('page_id')
+
+    m = BLOCK_URL_LONG_RE.match(text)
+    if m is not None:
+        return m.group('block_id')
+
+    return None
 
 
 class GenericObject(BaseModel):

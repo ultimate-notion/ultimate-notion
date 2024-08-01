@@ -9,13 +9,13 @@ from pydantic import BaseModel
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject
+from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.query import DBQueryBuilder
-from ultimate_notion.objects import Emoji, FileInfo, RichText
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema, Property, PropertyType, PropertyValue, ReadOnlyPropertyError, SchemaError
-from ultimate_notion.text import camel_case, snake_case
+from ultimate_notion.text import Emoji, RichText, camel_case, snake_case
 from ultimate_notion.utils import dict_diff_str, get_active_session, get_repr, get_url
 from ultimate_notion.view import View
 
@@ -102,6 +102,11 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Is this database a wiki database."""
         # ToDo: Implement using the verification property
         raise NotImplementedError
+
+    @property
+    def is_db(self) -> bool:
+        """Return whether the object is a database."""
+        return True
 
     def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[PageSchema]:
         """Reflection about the database schema."""
