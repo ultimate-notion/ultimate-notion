@@ -18,11 +18,13 @@ from ultimate_notion.config import Config, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
-from ultimate_notion.objects import RichText, User
+from ultimate_notion.obj_api.objects import get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.schema import DefaultSchema, PageSchema
-from ultimate_notion.utils import SList, get_uuid
+from ultimate_notion.text import RichText
+from ultimate_notion.user import User
+from ultimate_notion.utils import SList
 
 _log = logging.getLogger(__name__)
 

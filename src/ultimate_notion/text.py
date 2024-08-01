@@ -2,55 +2,29 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import re
 from collections.abc import Callable, Iterator
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
+from urllib.parse import urlparse
 
 import mistune
 import numpy as np
+import pendulum as pnd
 from mistune import Markdown
 from mistune.directives import FencedDirective, TableOfContents
 
-from ultimate_notion.utils import rank
+from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.enums import Color
+from ultimate_notion.user import User
+from ultimate_notion.utils import Wrapper, flatten, get_repr, rank
 
 if TYPE_CHECKING:
-    from ultimate_notion.objects import RichTextBase
+    from ultimate_notion.database import Database
+    from ultimate_notion.page import Page
 
 MAX_TEXT_OBJECT_SIZE = 2000
 """The max text size according to the Notion API is 2000 characters."""
-
-BASE_URL_PATTERN = r'https://(www.)?notion.so/'
-UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
-
-UUID_RE = re.compile(rf'^(?P<id>{UUID_PATTERN})$')
-
-PAGE_URL_SHORT_RE = re.compile(
-    rf"""^
-      {BASE_URL_PATTERN}
-      (?P<page_id>{UUID_PATTERN})
-    $""",
-    flags=re.IGNORECASE | re.VERBOSE,
-)
-
-PAGE_URL_LONG_RE = re.compile(
-    rf"""^
-      {BASE_URL_PATTERN}
-      (?P<title>.*)-
-      (?P<page_id>{UUID_PATTERN})
-    $""",
-    flags=re.IGNORECASE | re.VERBOSE,
-)
-
-BLOCK_URL_LONG_RE = re.compile(
-    rf"""^
-      {BASE_URL_PATTERN}
-      (?P<username>.*)/
-      (?P<title>.*)-
-      (?P<page_id>{UUID_PATTERN})
-      \#(?P<block_id>{UUID_PATTERN})
-    $""",
-    flags=re.IGNORECASE | re.VERBOSE,
-)
 
 
 MD_STYLES = ('bold', 'italic', 'strikethrough', 'code', 'link')
@@ -64,26 +38,256 @@ MD_STYLE_MAP = {
 """Mapping from markdown style to markdown symbol."""
 
 
-def extract_id(text: str) -> str | None:
-    """Examine the given text to find a valid Notion object ID."""
+T = TypeVar('T', bound=objs.RichTextBaseObject)
 
-    m = UUID_RE.match(text)
-    if m is not None:
-        return m.group('id')
 
-    m = PAGE_URL_LONG_RE.match(text)
-    if m is not None:
-        return m.group('page_id')
+class RichTextBase(Wrapper[T], wraps=objs.RichTextBaseObject):
+    """Super class for text, equation and mentions of various kinds."""
 
-    m = PAGE_URL_SHORT_RE.match(text)
-    if m is not None:
-        return m.group('page_id')
+    @property
+    def is_text(self) -> bool:
+        return isinstance(self, Text)
 
-    m = BLOCK_URL_LONG_RE.match(text)
-    if m is not None:
-        return m.group('block_id')
+    @property
+    def is_equation(self) -> bool:
+        return isinstance(self, Math)
 
-    return None
+    @property
+    def is_mention(self) -> bool:
+        return isinstance(self, Mention)
+
+    def __add__(self, other: RichTextBase | RichText | str) -> RichText:
+        if isinstance(other, RichTextBase):
+            return RichText.wrap_obj_ref([self.obj_ref, other.obj_ref])
+        elif isinstance(other, RichText):
+            return RichText.wrap_obj_ref([self.obj_ref, *other.obj_ref])
+        elif isinstance(other, str):
+            return RichText.wrap_obj_ref([self.obj_ref, Text(other).obj_ref])
+        else:
+            msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
+            raise RuntimeError(msg)
+
+
+class Text(RichTextBase[objs.TextObject], wraps=objs.TextObject):
+    """A Text object.
+
+    !!! note
+
+        Use `RichText` instead for longer texts with complex formatting.
+    """
+
+    def __init__(
+        self,
+        text: str,
+        *,
+        bold: bool = False,
+        italic: bool = False,
+        strikethrough: bool = False,
+        code: bool = False,
+        underline: bool = False,
+        color: Color = Color.DEFAULT,
+        href: str | None = None,
+    ):
+        if len(text) > MAX_TEXT_OBJECT_SIZE:
+            msg = f'Text object exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `RichText` instead!'
+            raise ValueError(msg)
+
+        annotations = objs.Annotations(
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+        )
+        super().__init__(text, href=href, style=annotations)
+
+
+class Math(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
+    """A inline equation object.
+
+    A LaTeX equation in inline mode, e.g. `$ \\mathrm{E=mc^2} $`, but without the `$` signs.
+    """
+
+    def __init__(
+        self,
+        expression: str,
+        *,
+        bold: bool = False,
+        italic: bool = False,
+        strikethrough: bool = False,
+        code: bool = False,
+        underline: bool = False,
+        color: Color = Color.DEFAULT,
+        href: str | None = None,
+    ):
+        annotations = objs.Annotations(
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+        )
+        super().__init__(expression, href=href, style=annotations)
+
+
+class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
+    """A Mention object."""
+
+    def __init__(
+        self,
+        target: User | Page | Database | dt.datetime | dt.date | pnd.Interval,
+        *,
+        bold: bool = False,
+        italic: bool = False,
+        strikethrough: bool = False,
+        code: bool = False,
+        underline: bool = False,
+        color: Color = Color.DEFAULT,
+    ):
+        annotations = objs.Annotations(
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+        )
+        if isinstance(target, dt.datetime | dt.date | pnd.Interval):
+            self.obj_ref = objs.DateRange.build(target).build_mention(style=annotations)
+        else:
+            self.obj_ref = target.obj_ref.build_mention(style=annotations)
+
+    @property
+    def type(self) -> str:
+        """Type of the mention, e.g. user, page, etc."""
+        return self.obj_ref.mention.type
+
+
+class RichText(str):
+    """User-facing class holding several RichTextsBase objects."""
+
+    _rich_texts: list[RichTextBase]
+
+    def __init__(self, plain_text: str):
+        # note that super().__new__ stores the plain text in the object for `str(self)`
+        super().__init__()
+
+        rich_texts: list[RichTextBase] = []
+        for part in chunky(plain_text):
+            rich_texts.append(Text(part))
+        self._rich_texts = rich_texts
+
+    @classmethod
+    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> RichText:
+        obj_refs = [] if obj_refs is None else obj_refs
+        rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
+        plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
+        obj = cls(plain_text)
+        obj._rich_texts = rich_texts
+        return obj
+
+    @property
+    def obj_ref(self) -> list[objs.RichTextBaseObject]:
+        return [elem.obj_ref for elem in self._rich_texts]
+
+    @classmethod
+    def from_markdown(cls, text: str) -> RichText:
+        """Create RichTextList by parsing the markdown."""
+        # ToDo: Implement me!
+        # ToDo: Handle Equations and Mentions here accordingly
+        raise NotImplementedError
+
+    def to_markdown(self) -> str:
+        """Convert the list of RichText objects to markdown."""
+        return rich_texts_to_markdown(self._rich_texts)
+
+    @classmethod
+    def from_plain_text(cls, text: str) -> RichText:
+        """Create RichTextList from plain text.
+
+        This method is a more explicit alias for the default constructor.
+        """
+        return cls(text)
+
+    def to_plain_text(self) -> str:
+        """Return rich text as plaintext
+
+        This method is a more explicit variant then just using the object.
+        """
+        return str(self)
+
+    def to_html(self) -> str:
+        """Return rich text as HTML."""
+        return render_md(self.to_markdown())
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this text."""
+        return self.to_html()
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return str(self) == other
+        elif isinstance(other, RichText):
+            return str(self) == str(other)
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __add__(self, other: RichTextBase | RichText | str) -> RichText:
+        if isinstance(other, RichTextBase):
+            return RichText.wrap_obj_ref([*self.obj_ref, other.obj_ref])
+        elif isinstance(other, RichText):
+            return RichText.wrap_obj_ref([*self.obj_ref, *other.obj_ref])
+        elif isinstance(other, str):
+            return RichText.wrap_obj_ref([*self.obj_ref, Text(other).obj_ref])
+        else:
+            msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
+            raise RuntimeError(msg)
+
+
+AnyText: TypeAlias = RichTextBase[Any] | RichText
+"""For type hinting purposes, when working with various text types, e.g. `Text`, `RichText`, `Mention`, `Math`."""
+
+
+class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
+    """Emoji object which behaves like str."""
+
+    def __init__(self, emoji: str) -> None:
+        self.obj_ref = objs.EmojiObject.build(emoji)
+
+    def __repr__(self) -> str:
+        return get_repr(self)
+
+    def __str__(self) -> str:
+        return self.obj_ref.emoji
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return str(self) == other
+        elif isinstance(other, Emoji):
+            return str(self) == str(other)
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this file."""
+        return str(self)
+
+    def to_code(self) -> str:
+        """Represent the emoji as :shortcode:, e.g. :smile:"""
+        raise NotImplementedError
+
+    @classmethod
+    def from_code(cls, shortcode: str) -> Emoji:
+        """Create an Emoji object from a :shortcode:, e.g. :smile:"""
+        raise NotImplementedError
+
+
+def text_to_obj_ref(text: str | RichText | RichTextBase | list[RichTextBase]) -> list[objs.RichTextBaseObject]:
+    """Convert various text representations to a list of rich text objects."""
+    if isinstance(text, RichText | RichTextBase):
+        texts = text.obj_ref
+    elif isinstance(text, list):
+        texts = flatten([rt.obj_ref for rt in text])
+    elif isinstance(text, str):
+        # ToDo: Allow passing markdown text here when the markdown parser is implemented
+        texts = RichText(text).obj_ref
+    else:
+        msg = f'Cannot convert {type(text)} to RichText objects.'
+        raise ValueError(msg)
+    return texts
 
 
 def chunky(text: str, length: int = MAX_TEXT_OBJECT_SIZE) -> Iterator[str]:
@@ -125,6 +329,15 @@ def decapitalize(string: str) -> str:
     if not string:
         return string
     return string[0].lower() + string[1:]
+
+
+def is_url(string: str) -> bool:
+    """Check if a string is a valid URL."""
+    try:
+        result = urlparse(string)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
 
 
 def html_img(url: str, size: float) -> str:
@@ -186,10 +399,6 @@ def sorted_md_spans(md_spans: np.ndarray) -> Iterator[tuple[int, int, str]]:
 
 def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
     """Convert a list of rich texts to markdown."""
-    from ultimate_notion.objects import (  # noqa: PLC0415  # ToDo: Remove when mypy doesn't need the cast below
-        Math,
-        Mention,
-    )
 
     def has_only_ws_chars(text: str) -> bool:
         return re.match(r'^\s*$', text) is not None

@@ -499,7 +499,8 @@ def delete_all_taskslists():
     except RefreshError as e:
         msg = (
             "We tampered with the token's expiry date to allow for VCR testing but you seem to try to "
-            'connect to the Google API now. Perform the authentication flow again with:\n'
+            'connect to the Google API now.\n'
+            'Delete `token.json` and perform the authentication flow again with:\n'
             'hatch run python examples/sync_google_tasks.py\n'
             f'and copy the token over to {TEST_CFG_FILE.parent}. Then use:\n'
             'hatch run vcr-rewrite -k ...\n'

@@ -5,19 +5,18 @@ from __future__ import annotations
 import mimetypes
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast
 from uuid import UUID
 
 from tabulate import tabulate
 from typing_extensions import Self
 
-from ultimate_notion import objects
+from ultimate_notion.file import FileInfo, to_file_or_emoji, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
-from ultimate_notion.objects import Emoji, FileInfo, RichText, RichTextBase, User, text_to_obj_ref, to_file_or_emoji
-from ultimate_notion.text import md_comment
-from ultimate_notion.utils import InvalidAPIUsageError, Wrapper, get_active_session, get_url, get_uuid
+from ultimate_notion.text import Emoji, RichText, RichTextBase, User, md_comment, text_to_obj_ref
+from ultimate_notion.utils import InvalidAPIUsageError, Wrapper, get_active_session, get_url
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -25,9 +24,6 @@ if TYPE_CHECKING:
 
 
 T = TypeVar('T', bound=obj_blocks.DataObject)
-
-
-# ToDo: Check if a lot here couldn't be reworked with build functionality
 
 
 class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
@@ -132,6 +128,16 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         """Return wether the object is in trash."""
         return self.obj_ref.in_trash or self.obj_ref.archived
 
+    @property
+    def is_page(self) -> bool:
+        """Return whether the object is a page."""
+        return False
+
+    @property
+    def is_db(self) -> bool:
+        """Return whether the object is a database."""
+        return False
+
     @abstractmethod
     def to_markdown(self) -> str:
         """Return the content of the block as Markdown."""
@@ -152,7 +158,7 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
                 raise RuntimeError(msg)
             else:
                 session = get_active_session()
-                child_blocks = session.api.blocks.children.list(parent=get_uuid(self.obj_ref))
+                child_blocks = session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref))
                 self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
         return self._children[:]  # we copy to allow block deletion while iterating over it
 
@@ -329,7 +335,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
 
     @property
     def icon(self) -> FileInfo | Emoji | None:
-        return objects.wrap_icon(self.obj_ref.callout.icon)
+        return wrap_icon(self.obj_ref.callout.icon)
 
     def to_markdown(self) -> str:
         if isinstance(icon := self.icon, Emoji):
@@ -404,9 +410,10 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
     """Breadcrumb block."""
 
     def to_markdown(self) -> str:
-        from ultimate_notion.page import Page  # noqa: PLC0415
+        def is_page(obj: DataObject) -> TypeGuard[Page]:
+            return obj.is_page
 
-        return ' / '.join(page.title for page in self.ancestors if isinstance(page, Page)) + '\n'
+        return ' / '.join(ancestor.title for ancestor in self.ancestors if is_page(ancestor)) + '\n'
 
 
 class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
@@ -755,12 +762,12 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
 
     @property
     def url(self) -> str:
-        return get_url(get_uuid(self.obj_ref.link_to_page))
+        return get_url(objs.get_uuid(self.obj_ref.link_to_page))
 
     @property
     def page(self) -> Page:
         session = get_active_session()
-        return session.get_page(get_uuid(self.obj_ref.link_to_page))
+        return session.get_page(objs.get_uuid(self.obj_ref.link_to_page))
 
     def to_markdown(self) -> str:
         return f'[**↗️ <u>{self.page.title}</u>**]({self.url})\n'
@@ -791,7 +798,7 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks
             return self
         elif (synced_from := self.obj_ref.synced_block.synced_from) is not None:
             session = get_active_session()
-            return cast(SyncedBlock, session.get_block(get_uuid(synced_from)))
+            return cast(SyncedBlock, session.get_block(objs.get_uuid(synced_from)))
         else:
             msg = 'Unknown synced block, neither original nor synced!'
             raise RuntimeError(msg)
