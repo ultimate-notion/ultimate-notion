@@ -242,7 +242,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
             Deleting a page will also delete all child pages and child databases recursively.
             If these objects are already cached in the session, they will not be updated.
-            Use `session.cache.clear()` to clear the cache or call `reload` on them.
+            Use `session.cache.clear()` to clear the cache or call `reload()` on them.
         """
         if not self.is_deleted:
             session = get_active_session()
