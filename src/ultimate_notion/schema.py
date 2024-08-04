@@ -25,17 +25,16 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
+from ultimate_notion.core import Wrapper
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.text import RichText, snake_case
-from ultimate_notion.utils import SList, Wrapper, get_active_session, get_repr, is_notebook
+from ultimate_notion.utils import SList, get_active_session, get_repr, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
-
-T = TypeVar('T', bound=obj_schema.PropertyType)
 
 
 class SchemaError(Exception):
@@ -273,6 +272,9 @@ class PageSchema:
             obj_ref = db_props_dct.get(prop_name)
             if obj_ref:
                 prop_type.obj_ref = obj_ref
+
+
+T = TypeVar('T', bound=obj_schema.PropertyType)
 
 
 class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):

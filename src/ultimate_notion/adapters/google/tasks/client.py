@@ -103,9 +103,7 @@ class GObject(BaseModel):
 class GTask(GObject):
     """Representation of a Google Task."""
 
-    model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
-
-    kind: Literal[Kind.TASK]
+    kind: Literal[Kind.TASK]  # ToDo: This is nonsense, replace with proper generic
     completed_at: datetime | None = Field(alias='completed', default=None)
     is_deleted: bool = Field(alias='deleted', default=False)
     hidden: bool = False

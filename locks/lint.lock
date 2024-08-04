@@ -4,6 +4,7 @@
 # [constraints] locks/default.lock (SHA256: 88402576ed001b50bd7cd262d30d09c9ae654f2e20467cb37eaa28c47d19089b)
 #
 # - mypy==1.10
+# - pyright~=1.1
 # - ruff==0.4.5
 # - emoji~=2.8
 # - mistune~=3.0
@@ -109,6 +110,10 @@ mypy==1.10.0
     # via hatch.envs.lint
 mypy-extensions==1.0.0
     # via mypy
+nodeenv==1.9.0
+    # via
+    #   -c locks/default.lock
+    #   pyright
 notion-client==2.2.1
     # via
     #   -c locks/default.lock
@@ -165,6 +170,8 @@ pyparsing==3.1.2
     # via
     #   -c locks/default.lock
     #   httplib2
+pyright==1.1.374
+    # via hatch.envs.lint
 python-dateutil==2.9.0.post0
     # via
     #   -c locks/default.lock

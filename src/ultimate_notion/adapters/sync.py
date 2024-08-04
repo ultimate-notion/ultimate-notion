@@ -8,9 +8,10 @@ import pickle  # noqa: S403
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, TypeAlias, TypeVar
+from typing import Any, TypeAlias
 
 from pydantic import BaseModel, Field
+from typing_extensions import Self
 
 from ultimate_notion.config import get_cfg
 
@@ -19,7 +20,6 @@ _logger = logging.getLogger(__name__)
 all_tasks: set[SyncTask] = set()
 """All tasks that have been created so far."""
 
-Self = TypeVar('Self', bound='SyncTask')
 ID: TypeAlias = str
 
 
@@ -64,21 +64,21 @@ class SyncTask(ABC):
         self.state_path = get_cfg().ultimate_notion.sync_state_dir / f'{name}.pickle'
         super().__init__()
 
-    def schedule(self: Self) -> Self:
+    def schedule(self) -> Self:
         """Apply the task."""
         all_tasks.add(self)
         return self
 
-    def run_every(self: Self, hours: int = 0, minutes: int = 0, seconds: int = 0) -> Self:
+    def run_every(self, hours: int = 0, minutes: int = 0, seconds: int = 0) -> Self:
         """Schedule the task to run every so many seconds."""
         self._run_every_secs = timedelta(hours=hours, minutes=minutes, seconds=seconds).total_seconds()
         return self
 
-    def run_once(self: Self) -> Self:
+    def run_once(self) -> Self:
         self._run_every_secs = None
         return self
 
-    def in_total(self: Self, times: int) -> Self:
+    def in_total(self, times: int) -> Self:
         """Schedule the task to run a total of so many times."""
         if times <= 0:
             msg = 'times must be positive'
@@ -87,42 +87,42 @@ class SyncTask(ABC):
         return self
 
     @abstractmethod
-    def get_notion_objects(self: Self) -> list[Any]:
+    def get_notion_objects(self) -> list[Any]:
         """Get all Notion objects to sync."""
         raise NotImplementedError()
 
     @abstractmethod
-    def get_other_objects(self: Self) -> list[Any]:
+    def get_other_objects(self) -> list[Any]:
         """Get all other objects to sync."""
         raise NotImplementedError()
 
     @abstractmethod
-    def notion_timestamp(self: Self, obj: Any) -> datetime:
+    def notion_timestamp(self, obj: Any) -> datetime:
         """Get the timestamp of the Notion object."""
         raise NotImplementedError()
 
     @abstractmethod
-    def other_timestamp(self: Self, obj: Any) -> datetime:
+    def other_timestamp(self, obj: Any) -> datetime:
         """Get the timestamp of the other object."""
         raise NotImplementedError()
 
     @abstractmethod
-    def notion_id(self: Self, obj: Any) -> ID:
+    def notion_id(self, obj: Any) -> ID:
         """Get the id of the Notion object."""
         raise NotImplementedError()
 
     @abstractmethod
-    def other_id(self: Self, obj: Any) -> ID:
+    def other_id(self, obj: Any) -> ID:
         """Get the id of the other object."""
         raise NotImplementedError()
 
     @abstractmethod
-    def notion_hash(self: Self, obj: Any) -> str:
+    def notion_hash(self, obj: Any) -> str:
         """Get the hash of the Notion object for object mapping/linking."""
         raise NotImplementedError()
 
     @abstractmethod
-    def other_hash(self: Self, obj: Any) -> str:
+    def other_hash(self, obj: Any) -> str:
         """Get the hash of the other object for object mapping/linking."""
         raise NotImplementedError()
 
@@ -166,7 +166,7 @@ class SyncTask(ABC):
         """Create a new other object."""
         raise NotImplementedError()
 
-    def sync_notion_deleted(self: Self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
+    def sync_notion_deleted(self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Sync an object in the state that was deleted in Notion."""
         for notion_id, other_id in state.ids.copy().items():
             if notion_id not in notion_objs:
@@ -178,7 +178,7 @@ class SyncTask(ABC):
                 del state.objs[notion_id]
         return state
 
-    def sync_other_deleted(self: Self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
+    def sync_other_deleted(self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Sync an object in the state that was deleted in the other service."""
         for notion_id, other_id in state.ids.copy().items():
             if other_id not in other_objs:
@@ -190,7 +190,7 @@ class SyncTask(ABC):
                 del state.objs[notion_id]
         return state
 
-    def sync_notion_created(self: Self, state: State, notion_objs: dict[ID, Any]) -> State:
+    def sync_notion_created(self, state: State, notion_objs: dict[ID, Any]) -> State:
         """Sync an object not in the state and created in Notion."""
         for notion_id, notion_obj in notion_objs.items():
             if notion_id not in state.objs:
@@ -210,7 +210,7 @@ class SyncTask(ABC):
                 state.objs[notion_id] = notion_obj_dct
         return state
 
-    def sync_other_created(self: Self, state: State, other_objs: dict[ID, Any]) -> State:
+    def sync_other_created(self, state: State, other_objs: dict[ID, Any]) -> State:
         """Sync an object not in the state and created in other service."""
         for other_id, other_obj in other_objs.items():
             if other_id not in state.ids.values():
@@ -230,7 +230,7 @@ class SyncTask(ABC):
                 state.objs[notion_id] = notion_obj_dct
         return state
 
-    def resolve_conflict(self: Self, notion_obj: Any, other_obj: Any, notion_attr: str, other_attr: str) -> Any:
+    def resolve_conflict(self, notion_obj: Any, other_obj: Any, notion_attr: str, other_attr: str) -> Any:
         """Resolve a conflict between two objects on an attribute."""
         _logger.debug(
             f'Resolving conflict on attribute {notion_attr} of Notion object {self.notion_id(notion_obj)}'
@@ -259,7 +259,7 @@ class SyncTask(ABC):
             msg = f'Unknown conflict mode {self.conflict_mode}'
             raise RuntimeError(msg)
 
-    def initial_sync(self: Self, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
+    def initial_sync(self, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Make the initial state.
 
         This is a two-way sync, i.e. the objects are compared and the differences are resolved.
@@ -286,7 +286,7 @@ class SyncTask(ABC):
 
         return state
 
-    def sync_state_changes(self: Self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
+    def sync_state_changes(self, state: State, notion_objs: dict[ID, Any], other_objs: dict[ID, Any]) -> State:
         """Sync changes with respect to the state and update the state.
 
         This is a three-way sync, i.e. the objects are compared to the state as base and the differences are resolved.
@@ -310,7 +310,7 @@ class SyncTask(ABC):
 
         return state
 
-    def sync(self: Self, state: State | None) -> State:
+    def sync(self, state: State | None) -> State:
         """The actual sync operation.
 
         The state holds the synced objects and their attributes as a dictionary of Notion attributes.
@@ -334,7 +334,7 @@ class SyncTask(ABC):
         """Delegate the await to the __call__ method"""
         return self().__await__()
 
-    async def __call__(self: Self):
+    async def __call__(self):
         """Run the task as scheduled."""
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
         state = pickle.loads(self.state_path.read_bytes()) if self.state_path.exists() else None  # noqa: S301
