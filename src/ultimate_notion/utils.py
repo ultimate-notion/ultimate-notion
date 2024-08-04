@@ -10,18 +10,16 @@ from functools import wraps
 from hashlib import sha256
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar
 from uuid import UUID
 
 import numpy as np
 import pendulum as pnd
 from packaging.version import Version
-from typing_extensions import Self
 
 from ultimate_notion import __version__
 
 if TYPE_CHECKING:
-    from ultimate_notion.obj_api.core import GenericObject
     from ultimate_notion.session import Session
 
 
@@ -192,8 +190,8 @@ def get_url(object_id: UUID | str) -> str:
     return f'https://notion.so/{object_id.hex}'
 
 
-KT = TypeVar('KT')
-VT = TypeVar('VT')
+KT = TypeVar('KT')  # ToDo: Use new syntax when requires-python >= 3.12
+VT = TypeVar('VT')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
 def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
@@ -212,51 +210,6 @@ def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str
     keys_removed_str = ', '.join([str(k) for k in keys_removed]) or 'None'
     keys_changed_str = ', '.join(f'{k}: {v[0]} -> {v[1]}' for k, v in values_changed.items()) or 'None'
     return keys_added_str, keys_removed_str, keys_changed_str
-
-
-GT = TypeVar('GT', bound='GenericObject')  # ToDo: Use new syntax when requires-python >= 3.12
-
-
-class ObjRefWrapper(Protocol[GT]):
-    """Wrapper for objects that have an obj_ref attribute.
-
-    Note: This allows us to define Mixin classes that require the obj_ref attribute.
-    """
-
-    obj_ref: GT
-
-
-class Wrapper(ObjRefWrapper[GT]):
-    """Convert objects from the obj-based API to the high-level API and vice versa."""
-
-    obj_ref: GT
-
-    _obj_api_map: ClassVar[dict[type[GT], type[Wrapper]]] = {}  # type: ignore[misc]
-
-    def __init_subclass__(cls, wraps: type[GT], **kwargs: Any):
-        super().__init_subclass__(**kwargs)
-        cls._obj_api_map[wraps] = cls
-
-    def __new__(cls: type[Wrapper], *args, **kwargs) -> Wrapper:
-        # Needed for wrap_obj_ref and its call to __new__ to work!
-        return super().__new__(cls)
-
-    def __init__(self, *args: Any, **kwargs: Any):
-        """Default constructor that also builds `obj_ref`."""
-        obj_api_type: type[GenericObject] = self._obj_api_map_inv[self.__class__]
-        self.obj_ref = obj_api_type.build(*args, **kwargs)
-
-    @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
-        """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
-        hl_cls = cls._obj_api_map[type(obj_ref)]
-        hl_obj = hl_cls.__new__(hl_cls)
-        hl_obj.obj_ref = obj_ref
-        return cast(Self, hl_obj)
-
-    @property
-    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT]]:
-        return {v: k for k, v in self._obj_api_map.items()}
 
 
 def get_active_session() -> Session:

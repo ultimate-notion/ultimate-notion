@@ -4,9 +4,10 @@ from typing import cast
 
 from emoji import emojize, is_emoji
 
+from ultimate_notion.core import Wrapper
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.text import Emoji, RichText, html_img, is_url
-from ultimate_notion.utils import Wrapper, get_repr
+from ultimate_notion.utils import get_repr
 
 
 class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):

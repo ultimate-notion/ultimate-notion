@@ -83,7 +83,6 @@ exclude = [
 # External Tools #
 ##################
 
-# ToDo: Switch to pyright
 [tool.mypy]
 files = ["src/ultimate_notion", "tests", "examples"]
 disallow_untyped_defs = false
@@ -93,6 +92,21 @@ pretty = true
 show_column_numbers = true
 warn_no_return = false
 warn_unused_ignores = true
+
+# ToDo: Consider switching to pyright and remove mypy
+[tool.pyright]
+include = ["src", "tests", "examples"]
+exclude = ["**/__pycache__"]
+
+# Type checking mode: "basic" (default) or "strict"
+typeCheckingMode = "basic"
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+pythonVersion = "3.10"
+pythonPlatform = "All"
+
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -316,12 +330,13 @@ build-check = [
 # skip-install = true # mypy gives more feedback if project is installed locally, strange but true
 dependencies = [
     "mypy==1.10",
+    "pyright~=1.1",  # currently only for testing, not used in CI
     "ruff==0.4.5", # make sure this is consistent with .pre-commit-config.yaml, thus pinned!
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [
     "echo \"VERSION: `mypy --version`\"",
-    "mypy --install-types --non-interactive {args}"
+    "mypy --install-types --non-interactive {args}"  # ToDo: Use pyright later here
 ]
 style = [
     "echo \"VERSION: `ruff --version`\"",

@@ -11,12 +11,13 @@ from uuid import UUID
 from tabulate import tabulate
 from typing_extensions import Self
 
+from ultimate_notion.core import Wrapper
 from ultimate_notion.file import FileInfo, to_file_or_emoji, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.text import Emoji, RichText, RichTextBase, User, md_comment, text_to_obj_ref
-from ultimate_notion.utils import InvalidAPIUsageError, Wrapper, get_active_session, get_url
+from ultimate_notion.utils import InvalidAPIUsageError, get_active_session, get_url
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database

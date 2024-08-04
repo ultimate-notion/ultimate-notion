@@ -14,10 +14,11 @@ import pendulum as pnd
 from mistune import Markdown
 from mistune.directives import FencedDirective, TableOfContents
 
+from ultimate_notion.core import Wrapper
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.user import User
-from ultimate_notion.utils import Wrapper, flatten, get_repr, rank
+from ultimate_notion.utils import flatten, get_repr, rank
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
