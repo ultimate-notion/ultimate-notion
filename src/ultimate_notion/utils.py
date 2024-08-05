@@ -10,8 +10,7 @@ from functools import wraps
 from hashlib import sha256
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypeVar
-from uuid import UUID
+from typing import Any, TypeVar
 
 import numpy as np
 import pendulum as pnd
@@ -19,19 +18,7 @@ from packaging.version import Version
 
 from ultimate_notion import __version__
 
-if TYPE_CHECKING:
-    from ultimate_notion.session import Session
-
-
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
-
-
-class InvalidAPIUsageError(Exception):
-    """Raised when the API is used in an invalid way."""
-
-    def __init__(self, message='This part of the API is not intended to be used in this manner'):
-        self.message = message
-        super().__init__(self.message)
 
 
 class SList(list[T]):
@@ -184,12 +171,6 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int
     return clone
 
 
-def get_url(object_id: UUID | str) -> str:
-    """Return the URL for the object with the given id."""
-    object_id = object_id if isinstance(object_id, UUID) else UUID(object_id)
-    return f'https://notion.so/{object_id.hex}'
-
-
 KT = TypeVar('KT')  # ToDo: Use new syntax when requires-python >= 3.12
 VT = TypeVar('VT')  # ToDo: Use new syntax when requires-python >= 3.12
 
@@ -210,24 +191,6 @@ def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str
     keys_removed_str = ', '.join([str(k) for k in keys_removed]) or 'None'
     keys_changed_str = ', '.join(f'{k}: {v[0]} -> {v[1]}' for k, v in values_changed.items()) or 'None'
     return keys_added_str, keys_removed_str, keys_changed_str
-
-
-def get_active_session() -> Session:
-    """Return the current active session or raise an exception.
-
-    Avoids cyclic imports when used within the package itself.
-    For internal use mostly.
-    """
-    from ultimate_notion.session import Session  # noqa: PLC0415
-
-    return Session.get_active()
-
-
-def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
-    """Default representation, i.e. `repr(...)`, used by us for consistency."""
-    type_str = str(name) if name is not None else obj.__class__.__name__
-    desc_str = str(desc) if desc is not None else str(obj)
-    return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
 
 
 def convert_md_to_py(path: Path | str, *, target_path: Path | str | None = None) -> None:
@@ -294,6 +257,11 @@ def is_stable_version(version_str: str) -> bool:
     """Return whether the given version is a stable release."""
     version = Version(version_str)
     return not (version.is_prerelease or version.is_devrelease or version.is_postrelease)
+
+
+def is_stable_release() -> bool:
+    """Return whether the current version is a stable release."""
+    return is_stable_version(__version__)
 
 
 def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
@@ -364,8 +332,3 @@ def temp_timezone(tz: str | pnd.Timezone):
         yield
     finally:
         pnd.set_local_timezone(current_tz)
-
-
-def is_stable_release() -> bool:
-    """Return whether the current version is a stable release."""
-    return is_stable_version(__version__)
