@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject
+from ultimate_notion.core import get_active_session, get_repr, get_url
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -16,7 +17,7 @@ from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema, Property, PropertyType, PropertyValue, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.text import Emoji, RichText, camel_case, snake_case
-from ultimate_notion.utils import dict_diff_str, get_active_session, get_repr, get_url
+from ultimate_notion.utils import dict_diff_str
 from ultimate_notion.view import View
 
 

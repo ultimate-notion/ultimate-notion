@@ -8,6 +8,7 @@ from emoji import is_emoji
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin, DataObject
+from ultimate_notion.core import get_active_session, get_repr, get_url
 from ultimate_notion.file import FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -15,7 +16,7 @@ from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.templates import page_html
 from ultimate_notion.text import Emoji, RichText, render_md
-from ultimate_notion.utils import get_active_session, get_repr, get_url, is_notebook
+from ultimate_notion.utils import is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database

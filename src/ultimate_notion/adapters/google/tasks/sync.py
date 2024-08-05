@@ -9,7 +9,8 @@ from typing import Any
 from ultimate_notion import Database, Page, Property
 from ultimate_notion.adapters.google.tasks.client import GTask, GTaskList
 from ultimate_notion.adapters.sync import ID, ConflictMode, SyncTask
-from ultimate_notion.utils import get_active_session, str_hash
+from ultimate_notion.core import get_active_session
+from ultimate_notion.utils import str_hash
 
 
 class SyncGTasks(SyncTask):
