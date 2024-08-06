@@ -7,7 +7,8 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import Session
-from ultimate_notion.blocks import ChildDatabase, ChildPage
+from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin
+from ultimate_notion.core import InvalidAPIUsageError
 from ultimate_notion.page import Page
 
 
@@ -91,8 +92,10 @@ def test_create_basic_blocks(root_page: Page, notion: Session):
     page.append(children)
     output = page.to_markdown()
     exp_output = dedent("""
-        # My new page
-        ## Heading 2
+        # Page for creating basic blocks
+
+        ## My new page
+        ### Heading 2
         This is a paragraph
         This is coloured paragraph
         ```python
@@ -179,6 +182,8 @@ def test_create_file_blocks(root_page: Page, notion: Session):
     page.append(children)
     output = page.to_markdown()
     exp_output = dedent("""
+        # Page for creating file blocks
+
         [📎 robots.txt](https://www.google.de/robots.txt)
 
         [📎 robots.txt](https://www.google.de/robots.txt)
@@ -230,6 +235,8 @@ def test_create_column_blocks(root_page: Page, notion: Session):
     cols[1].append(uno.Paragraph('Column 2'))
     output = page.to_markdown()
     exp_output = dedent("""
+        # Page for creating column blocks
+
         <!--- column 1 -->
         Column 1
         <!--- column 2 -->
@@ -251,6 +258,8 @@ def test_create_table_blocks(root_page: Page, notion: Session):
     # table[1, 1] = uno.Paragraph('Cell 4')
     output = page.to_markdown()
     exp_output = dedent("""
+        # Page for creating table blocks
+
         |    |    |
         |----|----|
         |    |    |
@@ -266,7 +275,7 @@ def test_create_link_blocks(root_page: Page, notion: Session):
     target_page = notion.create_page(parent=root_page, title='Target Page')
     link = uno.LinkToPage(target_page)
     page.append(link)
-    output = page.to_markdown()
+    output = page.children[0].to_markdown()
     exp_output = '[**↗️ <u>Target Page</u>**]('
     assert output.startswith(exp_output)
 
@@ -284,6 +293,8 @@ def test_create_sync_blocks(root_page: Page, notion: Session):
 
     output = page.to_markdown()
     exp_output = dedent("""
+        # Page for creating sync blocks
+
         <!--- original block -->
         This is a synced paragraph
         <!--- synced block -->
@@ -294,3 +305,25 @@ def test_create_sync_blocks(root_page: Page, notion: Session):
 
     with pytest.raises(RuntimeError):
         sync_block = sync_block.create_synced()
+
+
+@pytest.mark.vcr()
+def test_nested_blocks(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for creating nested blocks')
+    h1 = uno.Heading1('Non-toggable Heading')
+    p1 = uno.Paragraph('This is a paragraph')
+    page.append(h1)
+    with pytest.raises(InvalidAPIUsageError):
+        h1.append(p1)
+
+    h1 = uno.Heading1('Toggable Heading', toggleable=True)
+    page.append(h1)
+    h1.append(p1)
+
+    p2 = uno.Paragraph('This is a paragraph with a nested element')
+    page.append(p2)
+    p2.append(uno.Paragraph('Nested Paragraph'))
+
+    assert len(page.children) == 3
+    assert cast(ChildrenMixin, page.children[1]).children == [p1]
+    assert len(cast(ChildrenMixin, page.children[2]).children) == 1

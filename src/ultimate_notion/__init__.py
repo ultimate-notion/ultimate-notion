@@ -43,13 +43,13 @@ from ultimate_notion.blocks import (
 )
 from ultimate_notion.core import get_active_session
 from ultimate_notion.database import Database
-from ultimate_notion.file import FileInfo
+from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
 from ultimate_notion.option import Option, OptionNS
 from ultimate_notion.page import Page
 from ultimate_notion.schema import PageSchema, Property, PropType, SelfRef
 from ultimate_notion.session import Session
-from ultimate_notion.text import AnyText, Emoji, Math, Mention, RichText, Text
+from ultimate_notion.text import AnyText, Math, Mention, RichText, Text, join
 from ultimate_notion.user import User
 
 __all__ = [
@@ -105,4 +105,5 @@ __all__ = [
     'Video',
     '__version__',
     'get_active_session',
+    'join',
 ]

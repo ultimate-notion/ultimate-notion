@@ -20,7 +20,6 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from datetime import date, datetime
 from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
@@ -74,37 +73,39 @@ class MentionMixin(ABC):
 class DateRange(GenericObject, MentionMixin):
     """A Notion date range, with an optional end date."""
 
-    start: date | datetime
-    end: date | datetime | None = None
+    start: dt.date | dt.datetime
+    end: dt.date | dt.datetime | None = None
     time_zone: str | None = None
 
     @classmethod
     def build(cls, dt_spec: dt.datetime | dt.date | pnd.Interval) -> Self:
         """Compose a DateRange object from the given properties."""
 
-        def to_naive_dt(dt: pnd.DateTime | pnd.Date | datetime | date) -> datetime | date:
-            if type(dt) is datetime or type(dt) is date:
-                return dt
-            elif isinstance(dt, pnd.DateTime):
-                dt = dt.naive()
-                return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)  # noqa: DTZ001
-            else:  # pnd.Date
-                return date(dt.year, dt.month, dt.day)
-
         if isinstance(dt_spec, pnd.Interval):
             time_zone = dt_spec.start.timezone_name if isinstance(dt_spec.start, pnd.DateTime) else None
-            start = to_naive_dt(dt_spec.start)
-            end = to_naive_dt(dt_spec.end)
+            start = dt_spec.start
+            end = dt_spec.end
         elif isinstance(dt_spec, pnd.DateTime):
             time_zone = dt_spec.timezone_name
-            start = to_naive_dt(dt_spec)
+            start = dt_spec
             end = None
         elif isinstance(dt_spec, pnd.Date):
             time_zone = None
-            start = to_naive_dt(dt_spec)
+            start = dt_spec
+            end = None
+        elif isinstance(dt_spec, dt.datetime):
+            if dt_spec.tzinfo is not None:  # we just don't trust the timezone of the datetime
+                msg = 'Datetime objects must not have a timezone set. Use a pendulum object instead.'
+                raise ValueError(msg)
+            time_zone = pnd.local_timezone().name
+            start = dt_spec
+            end = None
+        elif isinstance(dt_spec, dt.date):
+            time_zone = None
+            start = dt_spec
             end = None
         else:
-            msg = f"Unsupported type for 'dt': {type(dt_spec)}"
+            msg = f"Unsupported type for 'dt_spec': {type(dt_spec)}"
             raise TypeError(msg)
         return cls.model_construct(start=start, end=end, time_zone=time_zone)
 
@@ -492,7 +493,7 @@ class HostedFile(FileObject, type='file'):
 
     class TypeData(GenericObject):
         url: str
-        expiry_time: datetime | None = None
+        expiry_time: dt.datetime | None = None
 
     file: TypeData
 

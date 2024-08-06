@@ -159,16 +159,23 @@ def test_created_edited_by(notion: Session, root_page: Page):
 
 @pytest.mark.vcr()
 def test_page_to_markdown(md_page: Page):
+    def remove_query_string(line: str) -> str:
+        line = re.sub(r'\?.*?\]', ']', line)
+        line = re.sub(r'prod.*?\)', ')', line)
+        return line
+
     exp_output = dedent(
         """
-        # Headline 1
-        ## Headline 2
-        ### Headline 3
+        # Markdown Page Test
+
+        ## Headline 1
+        ### Headline 2
+        #### Headline 3
         ---
 
-        # Toggle Headline 1
-        ## Toggle Headline 2
-        ### Toggle Headline 3
+        ## Toggle Headline 1
+        ### Toggle Headline 2
+        #### Toggle Headline 3
         - Item 1
 
         - Item 2
@@ -216,7 +223,7 @@ def test_page_to_markdown(md_page: Page):
 
         [📎 logo_with_text.svg](https://ultimate-notion.com/latest/assets/images/logo_with_text.svg)
 
-        ## Unsupported Stuff in Markdown
+        ### Unsupported Stuff in Markdown
         <!--- column 1 -->
         Column 1
         <!--- column 2 -->
@@ -237,10 +244,8 @@ def test_page_to_markdown(md_page: Page):
     """
     )
     markdown = md_page.to_markdown().strip().split('\n')
-    img_line = markdown[51]
-    img_line = re.sub(r'\?.*?\]', ']', img_line)
-    img_line = re.sub(r'prod.*?\)', ')', img_line)
-    markdown[51] = img_line
+    idx = 53
+    markdown[idx] = remove_query_string(markdown[idx])
 
     for exp, act in zip(exp_output.strip().split('\n'), markdown, strict=True):
         assert exp == act
