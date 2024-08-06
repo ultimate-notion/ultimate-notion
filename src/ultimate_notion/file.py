@@ -1,3 +1,5 @@
+"""File and emoji objects for the Notion API."""
+
 from __future__ import annotations
 
 from typing import cast
@@ -6,7 +8,7 @@ from emoji import emojize, is_emoji
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.text import Emoji, RichText, html_img, is_url
+from ultimate_notion.text import RichText, html_img, is_url
 
 
 class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
@@ -61,6 +63,43 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         else:
             msg = f'Unknown file type {type(self.obj_ref)}'
             raise RuntimeError(msg)
+
+
+class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
+    """Emoji object which behaves like str."""
+
+    def __init__(self, emoji: str) -> None:
+        self.obj_ref = objs.EmojiObject.build(emoji)
+
+    def __repr__(self) -> str:
+        return get_repr(self)
+
+    def __str__(self) -> str:
+        return self.obj_ref.emoji
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return str(self) == other
+        elif isinstance(other, Emoji):
+            return str(self) == str(other)
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by Jupyter Lab automatically to display this file."""
+        return str(self)
+
+    def to_code(self) -> str:
+        """Represent the emoji as :shortcode:, e.g. :smile:"""
+        raise NotImplementedError
+
+    @classmethod
+    def from_code(cls, shortcode: str) -> Emoji:
+        """Create an Emoji object from a :shortcode:, e.g. :smile:"""
+        raise NotImplementedError
 
 
 def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | None) -> FileInfo | Emoji | None:

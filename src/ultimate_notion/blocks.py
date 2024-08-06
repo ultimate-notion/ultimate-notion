@@ -12,11 +12,11 @@ from tabulate import tabulate
 from typing_extensions import Self
 
 from ultimate_notion.core import InvalidAPIUsageError, Wrapper, get_active_session, get_url
-from ultimate_notion.file import FileInfo, to_file_or_emoji, wrap_icon
+from ultimate_notion.file import Emoji, FileInfo, to_file_or_emoji, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
-from ultimate_notion.text import Emoji, RichText, RichTextBase, User, md_comment, text_to_obj_ref
+from ultimate_notion.text import RichText, RichTextBase, User, md_comment, text_to_obj_ref
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -145,7 +145,11 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
 
 
 class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
-    """Mixin for data objects that can have children"""
+    """Mixin for data objects that can have children
+
+    Note that we don't use the `children` property of some Notion objects, e.g. paragraph, quote, etc.,
+    as not every object has this property, e.g. a page, database or toggable heading.
+    """
 
     _children: list[Block] | None = None
 
@@ -169,6 +173,8 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
             raise RuntimeError(msg)
 
         blocks = [blocks] if isinstance(blocks, Block) else blocks
+        if not blocks:
+            return self
         for block in blocks:
             if not isinstance(block, Block):
                 msg = f'Cannot append {type(block)} to a block.'
@@ -190,6 +196,8 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
             for block, updated_block_obj in zip(self._children[insert_idx:], after_block_objs, strict=True):
                 block.obj_ref.update(**updated_block_obj.model_dump())
             self._children[insert_idx:insert_idx] = blocks
+
+        self.obj_ref.has_children = True
         return self
 
 
@@ -277,7 +285,7 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin, wraps=obj
         return f'{self.rich_text.to_markdown()}'
 
 
-class Heading(ColoredTextBlock[BT], ABC, wraps=obj_blocks.Heading):
+class Heading(ColoredTextBlock[BT], ChildrenMixin, ABC, wraps=obj_blocks.Heading):
     """Abstract Heading block."""
 
     def __init__(
@@ -290,26 +298,36 @@ class Heading(ColoredTextBlock[BT], ABC, wraps=obj_blocks.Heading):
         super().__init__(text, color=color)
         self.obj_ref.value.is_toggleable = toggleable
 
+    @property
+    def toggleable(self) -> bool:
+        return self.obj_ref.value.is_toggleable
+
+    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:
+        if not self.toggleable:
+            msg = 'Cannot append blocks to a non-toggleable heading.'
+            raise InvalidAPIUsageError(msg)
+        return super().append(blocks, after=after)
+
 
 class Heading1(Heading[obj_blocks.Heading1], wraps=obj_blocks.Heading1):
     """Heading 1 block."""
 
     def to_markdown(self) -> str:
-        return f'# {self.rich_text.to_markdown()}'
+        return f'## {self.rich_text.to_markdown()}'  # we use ## as # is used for page titles
 
 
 class Heading2(Heading[obj_blocks.Heading2], wraps=obj_blocks.Heading2):
     """Heading 2 block."""
 
     def to_markdown(self) -> str:
-        return f'## {self.rich_text.to_markdown()}'
+        return f'### {self.rich_text.to_markdown()}'
 
 
 class Heading3(Heading[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
     """Heading 3 block."""
 
     def to_markdown(self) -> str:
-        return f'### {self.rich_text.to_markdown()}'
+        return f'#### {self.rich_text.to_markdown()}'
 
 
 class Quote(ColoredTextBlock[obj_blocks.Quote], ChildrenMixin, wraps=obj_blocks.Quote):

@@ -9,13 +9,13 @@ from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin, DataObject
 from ultimate_notion.core import get_active_session, get_repr, get_url
-from ultimate_notion.file import FileInfo, wrap_icon
+from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.templates import page_html
-from ultimate_notion.text import Emoji, RichText, render_md
+from ultimate_notion.text import RichText, render_md
 from ultimate_notion.utils import is_notebook
 
 if TYPE_CHECKING:
@@ -213,20 +213,26 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         session.api.pages.set_attr(self.obj_ref, cover=cover_obj)
 
     def to_markdown(self) -> str:
-        """Return the content of the page as Markdown."""
-        md = '\n'.join(block.to_markdown() for block in self.children)
+        """Return the content of the page as Markdown.
+
+        !!! note
+
+            This will not include nested blocks, i.e. children.
+        """
+        md = f'# {self.title}\n\n'
+        md += '\n'.join(block.to_markdown() for block in self.children)
         return md
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
         html = render_md(self.to_markdown())
         if not raw:
-            html = page_html(html)
+            html = page_html(html, title=self.title)
         return html
 
     def show(self, *, simple: bool | None = None):
         """Show the content of the page, rendered in Jupyter Lab"""
-        simple = simple if simple is not None else is_notebook()
+        simple = simple if simple is not None else not is_notebook()
         md = self.to_markdown()
 
         if simple:

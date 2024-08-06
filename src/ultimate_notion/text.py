@@ -14,7 +14,7 @@ import pendulum as pnd
 from mistune import Markdown
 from mistune.directives import FencedDirective, TableOfContents
 
-from ultimate_notion.core import Wrapper, get_repr
+from ultimate_notion.core import Wrapper
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.user import User
@@ -239,47 +239,12 @@ AnyText: TypeAlias = RichTextBase[Any] | RichText
 """For type hinting purposes, when working with various text types, e.g. `Text`, `RichText`, `Mention`, `Math`."""
 
 
-class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
-    """Emoji object which behaves like str."""
-
-    def __init__(self, emoji: str) -> None:
-        self.obj_ref = objs.EmojiObject.build(emoji)
-
-    def __repr__(self) -> str:
-        return get_repr(self)
-
-    def __str__(self) -> str:
-        return self.obj_ref.emoji
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, str):
-            return str(self) == other
-        elif isinstance(other, Emoji):
-            return str(self) == str(other)
-        else:
-            return NotImplemented
-
-    def __hash__(self):
-        return hash(str(self))
-
-    def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this file."""
-        return str(self)
-
-    def to_code(self) -> str:
-        """Represent the emoji as :shortcode:, e.g. :smile:"""
-        raise NotImplementedError
-
-    @classmethod
-    def from_code(cls, shortcode: str) -> Emoji:
-        """Create an Emoji object from a :shortcode:, e.g. :smile:"""
-        raise NotImplementedError
-
-
 def text_to_obj_ref(text: str | RichText | RichTextBase | list[RichTextBase]) -> list[objs.RichTextBaseObject]:
     """Convert various text representations to a list of rich text objects."""
-    if isinstance(text, RichText | RichTextBase):
+    if isinstance(text, RichText):
         texts = text.obj_ref
+    elif isinstance(text, RichTextBase):
+        texts = [text.obj_ref]
     elif isinstance(text, list):
         texts = flatten([rt.obj_ref for rt in text])
     elif isinstance(text, str):
@@ -507,3 +472,18 @@ def get_md_renderer() -> Markdown:
 
 render_md = get_md_renderer()
 """Convert Markdown to HTML."""
+
+
+def join(texts: list[AnyText], *, delim: str | AnyText = ' ') -> RichText:
+    """Join multiple text objects into a single text object with a given delimeter."""
+    if len(texts) == 0:
+        return RichText.wrap_obj_ref([])
+
+    if isinstance(delim, str):
+        delim_obj = text_to_obj_ref(delim)
+
+    all_objs = text_to_obj_ref(texts[0])
+    for text in texts[1:]:
+        all_objs.extend([*delim_obj, *text_to_obj_ref(text)])
+
+    return RichText.wrap_obj_ref(all_objs)

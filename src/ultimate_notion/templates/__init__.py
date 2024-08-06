@@ -15,7 +15,7 @@ def get_template(name: str, relative_to: str | ModuleType = __name__) -> string.
     return string.Template(content)
 
 
-def page_html(content: str) -> str:
+def page_html(content: str, *, title: str = '') -> str:
     """Wrap the content of the page as proper HTML for displaying."""
     template = get_template('page.html')
-    return template.substitute(content=content)
+    return template.safe_substitute(content=content, title=title)

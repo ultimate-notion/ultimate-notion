@@ -93,7 +93,7 @@ def test_mention(person: User, root_page: Page, md_text_page: Page, all_props_db
         ' : ↗[All Properties DB](https://www.notion.so/4fa8756fa0da4efe9c484d6a323b69f8)'
         ' : [2022-01-01T00:00:00.000+00:00]()'
     )
-    assert page.to_markdown() == exp_text
+    assert page.children[0].to_markdown() == exp_text
 
 
 @pytest.mark.vcr()
@@ -110,8 +110,8 @@ def test_rich_text_bases(person: User, root_page: Page, notion: Session):
         'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) '
         '[@Florian Wilhelm]()'
     )
-    assert page.to_markdown() == exp_text
+    assert page.children[0].to_markdown() == exp_text
 
     notion.cache.clear()
     page = notion.get_page(page.id)
-    assert page.to_markdown() == exp_text
+    assert page.children[0].to_markdown() == exp_text

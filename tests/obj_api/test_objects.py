@@ -6,7 +6,7 @@ import pytest
 from ultimate_notion.obj_api import objects as objs
 
 
-def test_date_range():
+def test_date_range(tz_berlin):
     date = pnd.date(2024, 1, 1)
     obj = objs.DateRange.build(date)
     assert isinstance(obj.start, dt.date)
@@ -15,13 +15,12 @@ def test_date_range():
     assert obj.time_zone is None
     assert obj.to_pendulum() == date
 
-    tz = 'Europe/Berlin'
-    datetime = pnd.datetime(2024, 1, 1, 12, 0, 0, tz=tz)
+    datetime = pnd.datetime(2024, 1, 1, 12, 0, 0, tz=tz_berlin)
     obj = objs.DateRange.build(datetime)
     assert isinstance(obj.start, dt.datetime)
-    assert obj.start == datetime.naive()
+    assert obj.start == datetime
     assert obj.end is None
-    assert obj.time_zone == tz
+    assert obj.time_zone == tz_berlin
     assert obj.to_pendulum() == datetime
 
     date_interval = pnd.interval(start=pnd.parse('2024-01-01', exact=True), end=pnd.parse('2024-01-03', exact=True))
@@ -36,11 +35,11 @@ def test_date_range():
     datetime_interval = pnd.interval(start=pnd.parse('2024-01-01 10:00'), end=pnd.parse('2024-01-03 12:00'))
     obj = objs.DateRange.build(datetime_interval)
     assert isinstance(obj.start, dt.datetime)
-    assert obj.start == datetime_interval.start.naive()
+    assert obj.start == datetime_interval.start
     assert isinstance(obj.end, dt.datetime)
-    assert obj.end == datetime_interval.end.naive()
+    assert obj.end == datetime_interval.end
     assert obj.time_zone == 'UTC'
     assert obj.to_pendulum() == datetime_interval
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         objs.DateRange.build(dt.datetime(2024, 1, 1, 12, 0, 0, tzinfo=dt.timezone.utc))
