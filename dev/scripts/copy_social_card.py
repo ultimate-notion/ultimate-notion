@@ -5,5 +5,5 @@ import shutil
 
 
 def on_post_build(config, **kwargs):
-    if os.path.exists('assets/images/socialg'):
+    if os.path.exists('assets/images/social'):  # only on gh-pages branch
         shutil.copyfile('docs/assets/images/social-card.png', 'assets/images/social/index.png')
