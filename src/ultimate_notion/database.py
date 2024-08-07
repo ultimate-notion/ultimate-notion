@@ -100,7 +100,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def is_wiki(self) -> bool:
-        """Is this database a wiki database."""
+        """Return whether the database is a wiki."""
         # ToDo: Implement using the verification property
         raise NotImplementedError
 
@@ -150,7 +150,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def is_inline(self) -> bool:
-        """Is this database an inline database?"""
+        """Return whether the database is inline."""
         return self.obj_ref.is_inline
 
     def delete(self) -> Self:
@@ -203,7 +203,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def is_empty(self) -> bool:
-        """Is this database empty?"""
+        """Return whether the database is empty."""
         return len(self) == 0
 
     def __bool__(self) -> bool:

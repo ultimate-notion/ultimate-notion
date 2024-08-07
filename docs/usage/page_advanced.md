@@ -289,3 +289,4 @@ Let's take a look how our fancy text page looks like in the end.
 [Math]: ../../reference/ultimate_notion/text/#ultimate_notion.text.Math
 [Mention]: ../../reference/ultimate_notion/text/#ultimate_notion.text.Mention
 [RichText]: ../../reference/ultimate_notion/text/#ultimate_notion.text.RichText
+[AnyText]: ../../reference/ultimate_notion/text/#ultimate_notion.text.AnyText

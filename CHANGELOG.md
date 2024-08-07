@@ -1,14 +1,14 @@
 # Changelog
 
-## Version 0.5
+## Version 0.5, 2024-08-07
 
-- New: Method `page.append` to append content to a page. Finally, blocks are supported!
+- New: Method `page.append` to append content to a page. Creation of blocks is supported!
 - New: Documentation on how to create the content of a page.
 - New: More robustness with respect to Notion API changes.
 - New: High-level method `session.get_block` to retrieve a single block.
 - Chg: Internally, `archived` property was renamed to `in_trash`.
 - Chg: Renamed `.content` to `.children` of a page for more consitency.
-- Chg: Use Property again to consistently refer to the columns of a database.
+- Chg: Use `Property` again to consistently refer to the columns of a database.
 - Chg: Make use of [pendulum](https://pendulum.eustace.io/) to represent `DateRange` values.
 - Chg: Renamed `page.database` to `page.parent_db` and `page.in_db` added as methods.
 - Chg: Large restructering of the code base.

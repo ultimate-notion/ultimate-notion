@@ -71,11 +71,7 @@ def extract_id(text: str) -> str | None:
 
 
 class GenericObject(BaseModel):
-    """The base for all API objects.
-
-    As a general convention, data fields in lower case are defined by the
-    Notion API.  Properties in Title Case are provided for convenience.
-    """
+    """The base for all API objects."""
 
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
@@ -167,8 +163,8 @@ class NotionObject(GenericObject):
 class TypedObject(GenericObject):
     """A type-referenced object.
 
-    Many objects in the Notion API follow a standard pattern with a 'type' property
-    followed by additional data.  These objects must specify a `type` attribute to
+    Many objects in the Notion API follow a standard pattern with a `type` property
+    followed by additional data. These objects must specify a `type` attribute to
     ensure that the correct object is created.
 
     For example, this contains a nested 'detail' object:
@@ -180,8 +176,6 @@ class TypedObject(GenericObject):
                 ...
             }
         }
-
-    Calling the object provides direct access to the data stored in `{type}`.
     """
 
     type: str
@@ -229,7 +223,7 @@ class TypedObject(GenericObject):
     @model_validator(mode='wrap')
     @classmethod
     def _resolve_type(cls, value: Any, handler: ValidatorFunctionWrapHandler):
-        """Instantiate the correct object based on the 'type' field.
+        """Instantiate the correct object based on the `type` field.
 
         Following this approach: https://github.com/pydantic/pydantic/discussions/7008
         Also the reason for `polymorphic_base` is explained there.
