@@ -9,17 +9,9 @@ necessary credentials: https://developers.google.com/tasks/quickstart/python
 """
 # mypy: disable-error-code="attr-defined"
 
-from datetime import datetime, timedelta, timezone
+import pendulum as pnd  # simpler and more intuitive datetime library
 
-from ultimate_notion import (
-    Color,
-    Option,
-    OptionNS,
-    PageSchema,
-    Property,
-    PropType,
-    Session,
-)
+import ultimate_notion as uno
 from ultimate_notion.adapters import sync
 from ultimate_notion.adapters.google import GTasksClient, SyncGTasks
 
@@ -28,44 +20,44 @@ from ultimate_notion.adapters.google import GTasksClient, SyncGTasks
 ######################################################
 
 PARENT_PAGE = 'Tests'  # Defines the page where the database should be created
-today = datetime(2024, 1, 1, tzinfo=timezone.utc)
+today = pnd.datetime(2024, 1, 1, tz='UTC')
 
 
-class Status(OptionNS):
-    backlog = Option('Backlog', color=Color.GRAY)
-    in_progress = Option('In Progress', color=Color.BLUE)
-    blocked = Option('Blocked', color=Color.RED)
-    done = Option('Done', color=Color.GREEN)
+class Status(uno.OptionNS):
+    backlog = uno.Option('Backlog', color=uno.Color.GRAY)
+    in_progress = uno.Option('In Progress', color=uno.Color.BLUE)
+    blocked = uno.Option('Blocked', color=uno.Color.RED)
+    done = uno.Option('Done', color=uno.Color.GREEN)
 
 
-class Task(PageSchema, db_title='My synced task db'):
+class Task(uno.PageSchema, db_title='My synced task db'):
     """My personal task list of all the important stuff I have to do"""
 
-    task = Property('Task', PropType.Title())
-    status = Property('Status', PropType.Select(Status))
-    due_date = Property('Due Date', PropType.Date())
+    task = uno.Property('Task', uno.PropType.Title())
+    status = uno.Property('Status', uno.PropType.Select(Status))
+    due_date = uno.Property('Due Date', uno.PropType.Date())
 
 
-with Session() as notion:
+with uno.Session() as notion:
     parent = notion.search_page(PARENT_PAGE).item()
     task_db = notion.get_or_create_db(parent=parent, schema=Task)
 
     if task_db.is_empty:
         Task.create(
             task='Clean the house',
-            due_date=today + timedelta(days=5),
+            due_date=today.add(days=5),
             status=Status.in_progress,
         )
 
         Task.create(
             task='Try out Ultimate Notion',
-            due_date=today - timedelta(days=1),
+            due_date=today.subtract(days=1),
             status=Status.done,
         )
 
         Task.create(
             task='On Notion Only',
-            due_date=today + timedelta(days=3),
+            due_date=today.add(days=3),
             status=Status.done,
         )
 
@@ -76,20 +68,18 @@ with Session() as notion:
 with GTasksClient() as gtasks:
     tasklist = gtasks.get_or_create_tasklist('My synced task list')
     if tasklist.is_empty:
-        tasklist.create_task('Clean the house', due=today + timedelta(days=5))
+        tasklist.create_task('Clean the house', due=today.add(days=5))
         tasklist.create_task(
-            'Try out Ultimate Notion', due=today - timedelta(days=1)
+            'Try out Ultimate Notion', due=today.subtract(days=1)
         )
-        tasklist.create_task(
-            'On Google Tasks only', due=today + timedelta(days=1)
-        )
+        tasklist.create_task('On Google Tasks only', due=today.add(days=1))
 
 ########################################################
 # Create the synced task between Notion & Google Tasks #
 ########################################################
 
 # Option 1: Using the Notion database declaration from above
-with Session() as notion, GTasksClient(read_only=False) as gtasks:
+with uno.Session() as notion, GTasksClient(read_only=False) as gtasks:
     task_db = notion.get_or_create_db(parent=parent, schema=Task)
     tasklist = gtasks.get_or_create_tasklist('My synced task list')
 
@@ -110,7 +100,7 @@ with Session() as notion, GTasksClient(read_only=False) as gtasks:
 
 
 # Option 2: Using an existing Notion database that was created manually
-with Session() as notion, GTasksClient(read_only=False) as gtasks:
+with uno.Session() as notion, GTasksClient(read_only=False) as gtasks:
     task_db = notion.search_db('My synced task db').item()
     status_col = task_db.schema.get_prop('Status')
     due_date_col = task_db.schema.get_prop('Due Date')
