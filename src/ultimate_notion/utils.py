@@ -21,6 +21,18 @@ from ultimate_notion import __version__
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
+class EmptyListError(Exception):
+    """Custom exception for an empty list in SList."""
+
+    ...
+
+
+class MultipleItemsError(Exception):
+    """Custom exception for a list with multiple items in SList."""
+
+    ...
+
+
 class SList(list[T]):
     """A list that holds often only a single element."""
 
@@ -29,9 +41,10 @@ class SList(list[T]):
             return self[0]
         elif len(self) == 0:
             msg = 'list is empty'
+            raise EmptyListError(msg)
         else:
-            msg = f"list of '{type(self[0]).__name__}' objects has more than one element"
-        raise ValueError(msg)
+            msg = 'list has multiple items'
+            raise MultipleItemsError(msg)
 
 
 def flatten(nested_list: list[list[T]], /) -> list[T]:

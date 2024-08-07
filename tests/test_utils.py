@@ -25,11 +25,14 @@ def test_find_indices():
 def test_slist():
     lst = utils.SList(range(3))
     assert isinstance(lst, list)
-    with pytest.raises(ValueError):
+    with pytest.raises(utils.MultipleItemsError):
         lst.item()
     lst = utils.SList([42])
     item = lst.item()
     assert item == 42
+    lst = utils.SList([])
+    with pytest.raises(utils.EmptyListError):
+        lst.item()
 
 
 def test_deepcopy_with_sharing():
