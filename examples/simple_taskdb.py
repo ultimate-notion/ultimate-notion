@@ -1,33 +1,24 @@
 """This example demonstrates how to create a simple task list"""
 
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+import pendulum as pnd  # simpler and more intuitive datetime library
 
-from ultimate_notion import (
-    Color,
-    Option,
-    OptionNS,
-    PageSchema,
-    Property,
-    PropType,
-    Session,
-)
+import ultimate_notion as uno
 
 PARENT_PAGE = 'Tests'  # Defines the page where the database should be created
-today = datetime.now(tz=ZoneInfo('Europe/Berlin'))
+today = pnd.now('Europe/Berlin')
 
 
-class Status(OptionNS):
-    backlog = Option('Backlog', color=Color.GRAY)
-    in_progress = Option('In Progress', color=Color.BLUE)
-    blocked = Option('Blocked', color=Color.RED)
-    done = Option('Done', color=Color.GREEN)
+class Status(uno.OptionNS):
+    backlog = uno.Option('Backlog', color=uno.Color.GRAY)
+    in_progress = uno.Option('In Progress', color=uno.Color.BLUE)
+    blocked = uno.Option('Blocked', color=uno.Color.RED)
+    done = uno.Option('Done', color=uno.Color.GREEN)
 
 
-class Priority(OptionNS):
-    high = Option('✹ High', color=Color.RED)
-    medium = Option('✷ Medium', color=Color.YELLOW)
-    low = Option('✶ Low', color=Color.GRAY)
+class Priority(uno.OptionNS):
+    high = uno.Option('✹ High', color=uno.Color.RED)
+    medium = uno.Option('✷ Medium', color=uno.Color.YELLOW)
+    low = uno.Option('✶ Low', color=uno.Color.GRAY)
 
 
 # assembling the formula to show the urgency of the task
@@ -50,42 +41,42 @@ urgency = (
 )
 
 
-class Task(PageSchema, db_title='My task list'):
+class Task(uno.PageSchema, db_title='My task list'):
     """My personal task list of all the important stuff I have to do"""
 
-    task = Property('Task', PropType.Title())
-    status = Property('Status', PropType.Select(Status))
-    priority = Property('Priority', PropType.Select(Priority))
-    urgency = Property('Urgency', PropType.Formula(urgency))
-    due_date = Property('Due Date', PropType.Date())
+    task = uno.Property('Task', uno.PropType.Title())
+    status = uno.Property('Status', uno.PropType.Select(Status))
+    priority = uno.Property('Priority', uno.PropType.Select(Priority))
+    urgency = uno.Property('Urgency', uno.PropType.Formula(urgency))
+    due_date = uno.Property('Due Date', uno.PropType.Date())
 
 
-with Session() as notion:
+with uno.Session() as notion:
     parent = notion.search_page(PARENT_PAGE).item()
     task_db = notion.create_db(parent=parent, schema=Task)
 
     # just create 10 random tasks for demonstration
     Task.create(
         task='Plan vacation',
-        due_date=today + timedelta(weeks=3, days=3),
+        due_date=today.add(weeks=3, days=3),
         status=Status.backlog,
         priority=Priority.high,
     )
     Task.create(
         task='Read book about procastination',
-        due_date=today + timedelta(weeks=2, days=2),
+        due_date=today.add(weeks=2, days=2),
         status=Status.backlog,
         priority=Priority.medium,
     )
     Task.create(
         task='Clean the house',
-        due_date=today + timedelta(days=5),
+        due_date=today.add(days=5),
         status=Status.in_progress,
         priority=Priority.low,
     )
     Task.create(
         task='Build tool with Ultimate Notion',
-        due_date=today + timedelta(days=1),
+        due_date=today.add(days=1),
         status=Status.in_progress,
         priority=Priority.low,
     )
@@ -97,25 +88,25 @@ with Session() as notion:
     )
     Task.create(
         task='Call family',
-        due_date=today - timedelta(days=1),
+        due_date=today.subtract(days=1),
         status=Status.done,
         priority=Priority.low,
     )
     Task.create(
         task='Pay yearly utility bills',
-        due_date=today - timedelta(days=5),
+        due_date=today.subtract(days=5),
         status=Status.blocked,
         priority=Priority.high,
     )
     Task.create(
         task='Run first Marathon',
-        due_date=today - timedelta(weeks=1, days=1),
+        due_date=today.subtract(weeks=1, days=1),
         status=Status.done,
         priority=Priority.low,
     )
     Task.create(
         task='Clearing out the cellar',
-        due_date=today - timedelta(weeks=2, days=2),
+        due_date=today.subtract(weeks=2, days=2),
         status=Status.in_progress,
         priority=Priority.low,
     )
