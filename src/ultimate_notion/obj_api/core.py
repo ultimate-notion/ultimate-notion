@@ -248,7 +248,10 @@ class TypedObject(GenericObject):
         if type_name is None:
             logger.warning(f'Missing type in data {value}. Most likely a User object without type')
             msg = f"Missing 'type' in data {value}"
-            raise ValueError(msg)
+            if value['object'] == 'user':
+                type_name = 'unknown'
+            else:
+                raise ValueError(msg)
 
         sub_cls = cls._typemap.get(type_name)
 
