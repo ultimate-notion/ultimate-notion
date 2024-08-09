@@ -1,0 +1,50 @@
+name: Check latest release
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+    schedule:
+        - cron: "0 8 * * 1"
+
+
+concurrency:
+  group: check-latest-release
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: "1"
+  FORCE_COLOR: "1"
+  NOTION_TOKEN: "${{ secrets.NOTION_AUTH_TOKEN }}"
+  PIP_COMPILE_DISABLE: true
+  PIPX_HOME: "${{ github.workspace }}/.pipx"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Ensure latest pip & install pipx
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -q pipx
+
+    - name: Install Hatch & Ultimate Notion
+      run: |
+        pipx install hatch
+        hatch --version
+        hatch python install 3.10
+
+    - name: Run tests to check latest release
+      run: hatch run prod:test
