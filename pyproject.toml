@@ -115,7 +115,8 @@ testpaths = [
     "tests",
 ]
 markers = [
-    "webtest: tests that use the Notion web API"
+    "webtest: tests that use the Notion web API",
+    "check_latest_release: tests that check the latest release on PyPI"
 ]
 env_files = [
     ".vscode/.env"
@@ -278,6 +279,7 @@ dependencies = [
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
 debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
 vcr-off = "test --disable-recording {args}"
+test-prod = "pytest --disable-recording --check-latest-release {args}"
 vcr-only = "test --record-mode none --block-network {args}"
 vcr-rewrite = "test --record-mode=rewrite {args}"
 vcr-rewrite-fixtures = "vcr-rewrite --overwrite-fixtures {args}"
@@ -352,3 +354,18 @@ all = [
     "style",
     "typing",
 ]
+
+# Production environment taking latest Ultimate Notion from PyPI
+[tool.hatch.envs.prod]
+detached = true
+python = "3.10"
+dependencies = [
+    "ultimate-notion[all]",
+    "pytest",
+    "pytest-dotenv",
+    "pytest-sugar",
+    "pytest-recording>=0.13.1",
+    "vcrpy~=5.1", # < 6.0.0 to avoid breaking changes with RuntimeError: asyncio.run() cannot be called from a running event loop
+    ]
+[tool.hatch.envs.prod.scripts]
+test = "pytest tests/test_latest_release.py --disable-recording --check-latest-release {args}"

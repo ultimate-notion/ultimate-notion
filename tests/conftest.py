@@ -63,8 +63,35 @@ TEST_CFG_FILE = get_cfg_file()
 
 
 def pytest_addoption(parser: Parser):
-    """Add falg to the pytest command line so that we can overwrite fixtures but not always!"""
+    """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
     parser.addoption('--overwrite-fixtures', action='store_true', default=False, help='Overwrite existing fixtures.')
+    parser.addoption(
+        '--check-latest-release',
+        action='store_true',
+        default=False,
+        help='Run tests that check the latest release on PyPI.',
+    )
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
+    marker_name = 'check_latest_release'
+    flag_name = f'--{marker_name.replace("_", "-")}'
+    if config.getoption(flag_name):
+        release_tests = [item for item in items if marker_name in item.keywords]
+        if not release_tests:
+            pytest.skip(f'No tests with marker {marker_name} found!')
+        items[:] = release_tests
+    else:
+        skip_release_test = pytest.mark.skip(reason=f'use flag {marker_name} to run')
+        for item in items:
+            if marker_name in item.keywords:
+                item.add_marker(skip_release_test)
+
+
+def exec_pyfile(file_path: str) -> None:
+    """Executes a Python module as a script, as if it was called from the command line."""
+    code = compile(Path(file_path).read_text(encoding='utf-8'), file_path, 'exec')
+    exec(code, {'__MODULE__': '__main__'})  # noqa: S102
 
 
 @pytest.fixture(scope='session')

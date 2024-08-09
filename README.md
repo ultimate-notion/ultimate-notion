@@ -34,7 +34,7 @@ integration token. Then it's as simple as:
 ```python
 import ultimate_notion as uno
 
-PAGE_TITLE = "Getting Started"
+PAGE_TITLE = 'Getting Started'
 
 with uno.Session() as notion:
     page = notion.search_page(PAGE_TITLE).item()
