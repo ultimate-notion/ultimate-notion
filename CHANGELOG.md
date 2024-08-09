@@ -2,7 +2,7 @@
 
 ## Version 0.5.1, 2024-08-09
 
-- Fix: Added type `unknown` in user data when user is no longer accessing the workspace, :issue:`39`
+- Fix: Added type `unknown` in user data when user is no longer accessing the workspace, issue #39
 
 ## Version 0.5, 2024-08-07
 
