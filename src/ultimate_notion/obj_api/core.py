@@ -249,7 +249,7 @@ class TypedObject(GenericObject):
             logger.warning(f'Missing type in data {value}. Most likely a User object without type')
             msg = f"Missing 'type' in data {value}"
             if value['object'] == 'user':
-                type_name = 'unknown'
+                type_name = 'unknown'  # for the unofficial type objects.UnknownUser
             else:
                 raise ValueError(msg)
 

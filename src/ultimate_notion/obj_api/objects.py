@@ -273,7 +273,7 @@ class Bot(User, type='bot'):
 class UnknownUser(User, type='unknown'):
     """Represents an unknown user in Notion.
 
-    This is a unoffical placeholder for a user that is not recognized by the API.
+    This is a unofficial placeholder for a user that is not recognized by the API.
     """
 
     name: Literal['Unknown User'] = 'Unknown User'
