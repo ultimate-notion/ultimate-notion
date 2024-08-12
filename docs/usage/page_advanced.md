@@ -243,8 +243,8 @@ For longer texts without content, `uno.RichText` should be directly used as ther
 !!! warning
 
     Be cautious with the operator precedence of `+=` and `+` in the example above.
-    While `rt += 'We can even add a normal string to it.\n'` works just as `rt`
-    is already of type `RichText`, `rt += 'We can even add a normal string to '` +  uno.Text('it.'n')'
+    While `rt += 'We can even add a normal string to it.\n'` works since `rt` is of type `RichText`,
+    which supports this, `rt += 'We can even add a normal string to ' +  uno.Text('it.\n')`
     would not work as we would first conatenate a `str` with a `Text` before we append it to a `RichText`.
 
 Let's see how we can mention a person, page, database or even a date.

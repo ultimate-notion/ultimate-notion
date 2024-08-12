@@ -79,10 +79,10 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     if config.getoption(flag_name):
         release_tests = [item for item in items if marker_name in item.keywords]
         if not release_tests:
-            pytest.skip(f'No tests with marker {marker_name} found!')
+            pytest.skip(f'No tests with marker `{marker_name}` found!')
         items[:] = release_tests
     else:
-        skip_release_test = pytest.mark.skip(reason=f'use flag {marker_name} to run')
+        skip_release_test = pytest.mark.skip(reason=f'use flag `{flag_name}` to run')
         for item in items:
             if marker_name in item.keywords:
                 item.add_marker(skip_release_test)
