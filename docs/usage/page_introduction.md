@@ -144,7 +144,7 @@ task.props.status = options['In Progress']
 
 !!! info
     The functionality around updating select/multi-select properties will be changed in
-    the future to make the expderience more user-friendly.
+    the future to make the experience more user-friendly.
 
 [Page object]: ../../reference/ultimate_notion/page/#ultimate_notion.page.Page
 [Task List example]: ../../examples/simple_taskdb/
