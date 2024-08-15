@@ -8,7 +8,7 @@ from emoji import emojize, is_emoji
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.text import RichText, html_img, is_url
+from ultimate_notion.text import RichText, html_img
 
 
 class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
@@ -69,6 +69,11 @@ class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
     """Emoji object which behaves like str."""
 
     def __init__(self, emoji: str) -> None:
+        if not is_emoji(emoji):
+            emoji = emojize(emoji)
+        if not is_emoji(emoji):
+            msg = f'Invalid emoji string: {emoji}'
+            raise ValueError(msg)
         self.obj_ref = objs.EmojiObject.build(emoji)
 
     def __repr__(self) -> str:
@@ -113,20 +118,3 @@ def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | None) -> FileInfo |
     else:
         msg = f'unknown icon object of {type(icon_obj)}'
         raise RuntimeError(msg)
-
-
-def to_file_or_emoji(obj: FileInfo | Emoji | str) -> FileInfo | Emoji:
-    """Convert the object to a FileInfo or Emoji object.
-
-    Strings which are an emoji or describing an emoji, e.g. :thumbs_up: are converted to Emoji objects.
-    Strings which are URLs are converted to FileInfo objects.
-    """
-    if isinstance(obj, FileInfo | Emoji):
-        return obj
-    elif isinstance(obj, str):
-        if is_url(obj):
-            return FileInfo(url=obj)
-        elif is_emoji(emojized_obj := emojize(obj)):
-            return Emoji(emojized_obj)
-    msg = f'Cannot convert {obj} of type {type(obj)} to FileInfo or Emoji'
-    raise ValueError(msg)

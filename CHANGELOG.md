@@ -1,8 +1,15 @@
 # Changelog
 
+## Version 0.6
+
+- Fix: `has_children` doesn't return a wrong value anymore for pages and databases.
+- New: Also use the session cache for blocks.
+- Fix: Several issues with blocks and duplicated but ID-equivalent objects.
+- Chg: Children of pages are proper pages/databases instead of `ChildPage`/`ChildDatabase`.
+
 ## Version 0.5.1, 2024-08-09
 
-- Fix: Added type `unknown` in user data when user is no longer accessing the workspace, issue #39
+- Fix: Added type `unknown` in user data to generate `UnknownUser`, issue #39.
 
 ## Version 0.5, 2024-08-07
 

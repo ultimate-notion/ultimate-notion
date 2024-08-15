@@ -12,7 +12,7 @@ from tabulate import tabulate
 from typing_extensions import Self
 
 from ultimate_notion.core import InvalidAPIUsageError, Wrapper, get_active_session, get_url
-from ultimate_notion.file import Emoji, FileInfo, to_file_or_emoji, wrap_icon
+from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
@@ -45,6 +45,17 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def id(self) -> UUID:
         """Return the ID of the block."""
         return self.obj_ref.id
+
+    @property
+    def block_url(self) -> str:
+        """Return the URL of the block.
+
+        !!! note
+
+            Databases and pages are also considered blocks in Notion but they also have a
+            long-form URL. Use the `url` property to get the long-form URL.
+        """
+        return get_url(self.id)
 
     @property
     def in_notion(self) -> bool:
@@ -108,10 +119,11 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def _delete_me_from_parent(self) -> None:
         """Remove the block from the parent's children list."""
         if isinstance(self.parent, ChildrenMixin) and self.parent._children is not None:
-            for idx, child in enumerate(self.parent.children):
+            for idx, child in enumerate(self.parent._children):
                 if child.id == self.id:
                     del self.parent._children[idx]
                     break
+            self.parent.obj_ref.has_children = bool(self.parent._children)
 
     def delete(self) -> Self:
         """Delete the block.
@@ -143,6 +155,14 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         """Return the content of the block as Markdown."""
         ...
 
+    def _to_markdown(self) -> str:
+        """Return the content of the block as Markdown.
+
+        This method can be overridden to provide a custom Markdown representation,
+        e.g. for a page/database child block.
+        """
+        return self.to_markdown()
+
 
 class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
     """Mixin for data objects that can have children
@@ -153,18 +173,31 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
 
     _children: list[Block] | None = None
 
+    def _gen_children_cache(self) -> list[Block]:
+        """Generate the children cache."""
+        if self.is_deleted:
+            msg = 'Cannot retrieve children of a deleted block from Notion.'
+            raise RuntimeError(msg)
+
+        session = get_active_session()
+        child_blocks_objs = session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref))
+        child_blocks = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
+
+        for idx, child_block in enumerate(child_blocks):
+            if isinstance(child_block, ChildPage):
+                child_blocks[idx] = cast(Block, child_block.page)
+            elif isinstance(child_block, ChildDatabase):
+                child_blocks[idx] = cast(Block, child_block.db)
+
+        return [cast(Block, session.cache.setdefault(block.id, block)) for block in child_blocks]
+
     @property
     def children(self) -> list[Block]:
         """Return the children of this block."""
-        if self._children is None:  # generate cache
-            if self.is_deleted:
-                msg = 'Cannot retrieve children of a deleted block from Notion.'
-                raise RuntimeError(msg)
-            else:
-                session = get_active_session()
-                child_blocks = session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref))
-                self._children = [Block.wrap_obj_ref(block) for block in child_blocks]
-        return self._children[:]  # we copy to allow block deletion while iterating over it
+        if self._children is None:
+            self._children = self._gen_children_cache()
+            self.obj_ref.has_children = bool(self._children)  # update the property manually to avoid API call
+        return self._children[:]  # we copy to allow deleting blocks while iterating over it
 
     def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:
         """Append a block or a list of blocks to the content of this block."""
@@ -179,14 +212,21 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
             if not isinstance(block, Block):
                 msg = f'Cannot append {type(block)} to a block.'
                 raise ValueError(msg)
+            if block.in_notion:
+                msg = 'Cannot append a block that is already in Notion.'
+                raise InvalidAPIUsageError(msg)
 
+        if self._children is None:
+            self._children = self._gen_children_cache()
+
+        session = get_active_session()
         block_objs = [block.obj_ref for block in blocks]
         after_obj = None if after is None else after.obj_ref
-
-        self._children = self.children  # force an initial load of the child blocks to append later
-        session = get_active_session()
         block_objs, after_block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
-        blocks = [Block.wrap_obj_ref(block_obj) for block_obj in block_objs]
+
+        for block, obj in zip(blocks, block_objs, strict=True):
+            block.obj_ref = obj
+            session.cache[block.id] = block
 
         if after is None:
             self._children.extend(blocks)
@@ -207,26 +247,26 @@ BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires
 class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
     """General Notion block."""
 
-    @property
-    def block_url(self) -> str:
-        """Return the URL of the block."""
-        return get_url(self.id)
-
     def reload(self) -> Self:
         """Reload the block from the API."""
         session = get_active_session()
         self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
         return self
 
+    def _update_in_notion(self) -> None:
+        """Update the locally modified block on Notion."""
+        session = get_active_session()
+        self.obj_ref = cast(BT, session.api.blocks.update(self.obj_ref))
+
 
 AnyBlock: TypeAlias = Block[Any]
-"""For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock] in user code."""
+"""For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock], in user code."""
 
 
 class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Text block."""
 
-    def __init__(self, text: str | RichText | RichTextBase | list[RichTextBase]) -> None:
+    def __init__(self, text: str | RichText | RichTextBase) -> None:
         super().__init__()
         self.obj_ref.value.rich_text = text_to_obj_ref(text)
 
@@ -236,27 +276,49 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
         rich_texts = self.obj_ref.value.rich_text
         return RichText.wrap_obj_ref(rich_texts)
 
+    @rich_text.setter
+    def rich_text(self, text: str | RichText | RichTextBase) -> None:
+        # Right now this leads to a mypy error, see
+        # https://github.com/python/mypy/issues/3004
+        # Always pass `RichText` objects to this setter to avoid this error.
+        self.obj_ref.value.rich_text = text_to_obj_ref(text)
+        self._update_in_notion()
+
 
 class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
     """Code block."""
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase | list[RichTextBase],
+        text: str | RichText | RichTextBase,
         *,
         language: CodeLang = CodeLang.PLAIN_TEXT,
-        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
+        caption: str | RichText | RichTextBase | None = None,
     ) -> None:
         super().__init__(text)
         self.obj_ref.value.language = language
         self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
 
     @property
+    def language(self) -> CodeLang:
+        return self.obj_ref.value.language
+
+    @language.setter
+    def language(self, language: CodeLang) -> None:
+        self.obj_ref.value.language = language
+        self._update_in_notion()
+
+    @property
     def caption(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.code.caption)
+        return RichText.wrap_obj_ref(self.obj_ref.value.caption)
+
+    @caption.setter
+    def caption(self, caption: str | RichText | RichTextBase | None) -> None:
+        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+        self._update_in_notion()
 
     def to_markdown(self) -> str:
-        lang = self.obj_ref.code.language
+        lang = self.obj_ref.value.language
         return f'```{lang}\n{self.rich_text.to_markdown()}\n```'
 
 
@@ -265,7 +327,7 @@ class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase | list[RichTextBase],
+        text: str | RichText | RichTextBase,
         *,
         color: Color | BGColor = Color.DEFAULT,
     ) -> None:
@@ -276,6 +338,11 @@ class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
     @property
     def color(self) -> Color | BGColor:
         return self.obj_ref.value.color
+
+    @color.setter
+    def color(self, color: Color | BGColor) -> None:
+        self.obj_ref.value.color = color
+        self._update_in_notion()
 
 
 class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin, wraps=obj_blocks.Paragraph):
@@ -290,7 +357,7 @@ class Heading(ColoredTextBlock[BT], ChildrenMixin, ABC, wraps=obj_blocks.Heading
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase | list[RichTextBase],
+        text: str | RichText | RichTextBase,
         *,
         color: Color | BGColor = Color.DEFAULT,
         toggleable: bool = False,
@@ -300,7 +367,17 @@ class Heading(ColoredTextBlock[BT], ChildrenMixin, ABC, wraps=obj_blocks.Heading
 
     @property
     def toggleable(self) -> bool:
+        """Return whether the heading is toggleable."""
         return self.obj_ref.value.is_toggleable
+
+    @toggleable.setter
+    def toggleable(self, toggleable: bool) -> None:
+        """Set the heading to be toggleable or not."""
+        if self.toggleable and self.has_children:
+            msg = 'Cannot make a toggleable heading non-toggleable if it has children.'
+            raise InvalidAPIUsageError(msg)
+        self.obj_ref.value.is_toggleable = toggleable
+        self._update_in_notion()
 
     def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:
         if not self.toggleable:
@@ -338,22 +415,40 @@ class Quote(ColoredTextBlock[obj_blocks.Quote], ChildrenMixin, wraps=obj_blocks.
 
 
 class Callout(ColoredTextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
-    """Callout block."""
+    """Callout block.
+
+    !!! note
+
+        The default icon is an electric light bulb, i.e. 💡 in case `None` is passed as icon.
+        It is not possible to remove the icon, but you can change it to a different emoji or a file.
+    """
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase | list[RichTextBase],
+        text: str | RichText | RichTextBase,
         *,
         color: Color | BGColor = Color.DEFAULT,
-        icon: FileInfo | Emoji | str | None = None,
+        icon: FileInfo | Emoji | None = None,
     ) -> None:
         super().__init__(text, color=color)
         if icon is not None:
-            self.obj_ref.value.icon = to_file_or_emoji(icon).obj_ref
+            self.obj_ref.value.icon = icon.obj_ref
 
     @property
-    def icon(self) -> FileInfo | Emoji | None:
+    def default_icon(self) -> Emoji:
+        """Return the default icon for the callout block."""
+        return Emoji('💡')
+
+    @property
+    def icon(self) -> FileInfo | Emoji:
         return wrap_icon(self.obj_ref.callout.icon)
+
+    @icon.setter
+    def icon(self, icon: FileInfo | Emoji | None) -> None:
+        if icon is None:
+            icon = self.default_icon
+        self.obj_ref.value.icon = icon.obj_ref
+        self._update_in_notion()
 
     def to_markdown(self) -> str:
         if isinstance(icon := self.icon, Emoji):
@@ -383,7 +478,7 @@ class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin, wraps=obj_block
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase | list[RichTextBase],
+        text: str | RichText | RichTextBase,
         *,
         checked: bool = False,
         color: Color | BGColor = Color.DEFAULT,
@@ -391,11 +486,17 @@ class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin, wraps=obj_block
         super().__init__(text, color=color)
         self.obj_ref.value.checked = checked
 
-    def is_checked(self) -> bool:
+    @property
+    def checked(self) -> bool:
         return self.obj_ref.to_do.checked
 
+    @checked.setter
+    def checked(self, checked: bool) -> None:
+        self.obj_ref.value.checked = checked
+        self._update_in_notion()
+
     def to_markdown(self) -> str:
-        mark = 'x' if self.is_checked() else ' '
+        mark = 'x' if self.checked else ' '
         return f'- [{mark}] {self.rich_text.to_markdown()}\n'
 
 
@@ -437,7 +538,7 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
 class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
     """Embed block."""
 
-    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
+    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | None = None):
         super().__init__()
         self.obj_ref.value.url = url
         self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else None
@@ -445,11 +546,22 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
     @property
     def url(self) -> str | None:
         """Return the URL of the embedded item."""
-        return self.obj_ref.embed.url
+        return self.obj_ref.value.url
+
+    @url.setter
+    def url(self, url: str) -> None:
+        self.obj_ref.value.url = url
+        self._update_in_notion()
 
     @property
     def caption(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.embed.caption)
+        """Return the caption of the embedded item."""
+        return RichText.wrap_obj_ref(self.obj_ref.value.caption)
+
+    @caption.setter
+    def caption(self, caption: str | RichText | RichTextBase | None) -> None:
+        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+        self._update_in_notion()
 
     def to_markdown(self) -> str:
         if self.url is not None:
@@ -461,7 +573,7 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
 class Bookmark(Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
 
-    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
+    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | None = None):
         super().__init__()
         self.obj_ref.value.url = url
         self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else None
@@ -469,7 +581,12 @@ class Bookmark(Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     @property
     def url(self) -> str | None:
         """Return the URL of the bookmark."""
-        return self.obj_ref.bookmark.url
+        return self.obj_ref.value.url
+
+    @url.setter
+    def url(self, url: str) -> None:
+        self.obj_ref.value.url = url
+        self._update_in_notion()
 
     def to_markdown(self) -> str:
         if self.url is not None:
@@ -510,19 +627,24 @@ class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
     LaTeX equation in display mode, e.g. `$$ \\mathrm{E=mc^2} $$`, but without the `$$` signs.
     """
 
-    def __init__(self, expression: str):
+    def __init__(self, latex: str):
         super().__init__()
-        self.obj_ref.value.expression = expression
+        self.obj_ref.value.expression = latex
 
     @property
-    def expression(self) -> str:
+    def latex(self) -> str:
         if (expr := self.obj_ref.equation.expression) is not None:
             return expr.rstrip()
         else:
             return ''
 
+    @latex.setter
+    def latex(self, latex: str) -> None:
+        self.obj_ref.value.expression = latex
+        self._update_in_notion()
+
     def to_markdown(self) -> str:
-        return f'$$\n{self.expression}\n$$\n'
+        return f'$$\n{self.latex}\n$$\n'
 
 
 FT = TypeVar('FT', bound=obj_blocks.FileBase)
@@ -535,7 +657,7 @@ class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
         self,
         url: str,
         *,
-        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
+        caption: str | RichText | RichTextBase | None = None,
     ):
         super().__init__()
         caption_obj = text_to_obj_ref(caption) if caption is not None else None
@@ -567,7 +689,7 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
         name: str,
         url: str,
         *,
-        caption: str | RichText | RichTextBase | list[RichTextBase] | None = None,
+        caption: str | RichText | RichTextBase | None = None,
     ):
         super().__init__(url, caption=caption)
         self.obj_ref.value.name = name
@@ -587,7 +709,7 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
 class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
     """Image block."""
 
-    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | list[RichTextBase] | None = None):
+    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | None = None):
         super().__init__(url, caption=caption)
 
     def to_markdown(self) -> str:
@@ -626,15 +748,12 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
     !!! note
 
         To create a child page block, create a new page with the corresponding parent.
+        This block is used only internally.
     """
 
     def __init__(self):
         msg = 'To create a child page block, create a new page with the corresponding parent.'
         raise InvalidAPIUsageError(msg)
-
-    def to_markdown(self) -> str:
-        """Return the reference to this page as Markdown."""
-        return f'[📄 **<u>{self.title}</u>**]({self.block_url})\n'
 
     @property
     def title(self) -> str:
@@ -647,6 +766,10 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
         sess = get_active_session()
         return sess.get_page(self.obj_ref.id)
 
+    def to_markdown(self) -> str:  # noqa: PLR6301
+        msg = '`ChildPage` is only used internally, work with a proper `Page` instead.'
+        raise InvalidAPIUsageError(msg)
+
 
 class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatabase):
     """Child database block.
@@ -654,15 +777,12 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
     !!! note
 
         To create a child database block as an end-user, create a new database with the corresponding parent.
+        This block is used only internally.
     """
 
     def __init__(self):
         msg = 'To create a child database block, create a new database with the corresponding parent.'
         raise InvalidAPIUsageError(msg)
-
-    def to_markdown(self) -> str:
-        """Return the reference to this database as Markdown."""
-        return f'[**🗄️ {self.title}**]({self.block_url})\n'
 
     @property
     def title(self) -> str:
@@ -674,6 +794,10 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         """Return the actual Database object."""
         sess = get_active_session()
         return sess.get_db(self.obj_ref.id)
+
+    def to_markdown(self) -> str:  # noqa: PLR6301
+        msg = '`ChildDatabase` is only used internally, work with a proper `Database` instead.'
+        raise InvalidAPIUsageError(msg)
 
 
 class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):

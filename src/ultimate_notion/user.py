@@ -9,7 +9,12 @@ from ultimate_notion.obj_api import objects as objs
 
 
 class User(Wrapper[objs.User], wraps=objs.User):
-    """User object for persons and bots."""
+    """User object for persons, bots and unknown users.
+
+    Unknown users are users, which no longer participate in the workspace
+    or were revoked access. They are represented by their ID and have
+    the name `Unknown User`.
+    """
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: objs.User) -> User:
@@ -59,5 +64,5 @@ class User(Wrapper[objs.User], wraps=objs.User):
     def email(self) -> str | None:
         if isinstance(self.obj_ref, objs.Person):
             return self.obj_ref.person.email
-        else:  # it's a bot without an e-mail
+        else:  # it's a bot or unknown without an e-mail
             return None

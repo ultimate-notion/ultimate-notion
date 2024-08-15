@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any, TypeGuard, cast
 from emoji import is_emoji
 from typing_extensions import Self
 
-from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin, DataObject
-from ultimate_notion.core import get_active_session, get_repr, get_url
+from ultimate_notion.blocks import ChildrenMixin, DataObject
+from ultimate_notion.core import get_active_session, get_repr
 from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -126,20 +126,23 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     @property
     def url(self) -> str:
-        """Return the URL of this database."""
-        return get_url(self.id)
+        """Return the URL of this page."""
+        return self.obj_ref.url
+
+    @property
+    def public_url(self) -> str | None:
+        """Return the public URL of this database."""
+        return self.obj_ref.public_url
 
     @property
     def subpages(self) -> list[Page]:
         """Return all contained pages within this page"""
-        session = get_active_session()
-        return [session.get_page(block.id) for block in self.children if isinstance(block, ChildPage)]
+        return [block for block in self.children if is_page_guard(block)]
 
     @property
     def subdbs(self) -> list[Database]:
         """Return all contained databases within this page"""
-        session = get_active_session()
-        return [session.get_db(block.id) for block in self.children if isinstance(block, ChildDatabase)]
+        return [block for block in self.children if is_db_guard(block)]
 
     @property
     def parent_db(self) -> Database | None:
@@ -148,10 +151,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         This is a convenience method to avoid the need to check and cast the type of the parent.
         """
 
-        def is_db(obj: DataObject | None) -> TypeGuard[Database]:
-            return obj is not None and obj.is_db
-
-        if is_db(self.parent):
+        if is_db_guard(self.parent):
             return self.parent
         else:
             return None
@@ -217,11 +217,15 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
         !!! note
 
-            This will not include nested blocks, i.e. children.
+            This will not include nested blocks, i.e. the children of top-level blocks.
         """
         md = f'# {self.title}\n\n'
-        md += '\n'.join(block.to_markdown() for block in self.children)
+        md += '\n'.join(block._to_markdown() for block in self.children)
         return md
+
+    def _to_markdown(self) -> str:
+        """Return the reference to this page as Markdown."""
+        return f'[📄 **<u>{self.title}</u>**]({self.block_url})\n'
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
@@ -272,3 +276,13 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
         self._children = None  # this forces a new retrieval of children next time
         return self
+
+
+def is_db_guard(obj: DataObject | None) -> TypeGuard[Database]:
+    """Return whether the object is a database as type guard."""
+    return obj is not None and obj.is_db
+
+
+def is_page_guard(obj: DataObject | None) -> TypeGuard[Page]:
+    """Return whether the object is a page as type guard."""
+    return obj is not None and obj.is_page

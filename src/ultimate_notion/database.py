@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject
-from ultimate_notion.core import get_active_session, get_repr, get_url
+from ultimate_notion.core import get_active_session, get_repr
 from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -47,7 +47,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def url(self) -> str:
         """Return the URL of this database."""
-        return get_url(self.id)
+        return self.obj_ref.url
 
     @property
     def title(self) -> str | RichText:
@@ -142,11 +142,6 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
                       Properties changed: {props_changed}
                    """
             raise SchemaError(dedent(msg))
-
-    @property
-    def block_url(self) -> str:
-        """URL of this database."""
-        return self.obj_ref.url
 
     @property
     def is_inline(self) -> bool:
@@ -250,3 +245,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def to_markdown(self) -> str:
         """Return the content of this database as Markdown."""
         raise NotImplementedError
+
+    def _to_markdown(self) -> str:
+        """Return the reference to this database as Markdown."""
+        return f'[**🗄️ {self.title}**]({self.block_url})\n'
