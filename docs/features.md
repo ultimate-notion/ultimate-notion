@@ -8,6 +8,12 @@ With *page properties*, we denote only the properties of a page within a databas
 to the properties of the database schema. In contrast to that, the properties that every page has, e.g. title,
 icon, last edited by/time, etc., are called *page attributes*.
 
+## General
+
+- [x] high-level and pythonic interface for the Notion API
+- [x] caching to avoid unnecessary calls to the Notion API
+- [ ] 100% feature parity with the low-level Notion API
+
 ## Databases
 
 - [x] retrieve a database by its ID
@@ -40,11 +46,9 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Blocks
 
-- [x] create a new block
+- [x] create/delete/modify a block
 - [x] navigate blocks using references of parent and children
 - [x] create blocks within a page or another parent block
-- [x] delete blocks
-- [ ] modify blocks
 
 ## Users
 
@@ -55,10 +59,10 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Comments
 
-- [ ] create a comment within a block or page
+- [ ] create/delete/modify a comment within a block or page
 - [ ] retrieve comments of a block or page
 
-## Extensions
+## Adapters
 
 - [x] general synchronization capabilities with external services
 - [x] client for [Google Tasks API] and synchronization adapter to sync google tasks with a Notion database

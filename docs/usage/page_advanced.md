@@ -51,7 +51,7 @@ my_page.append([
         'But he has become a poet and now he is fine." - D. Hilbert',
         color=uno.Color.BLUE
         ),
-    uno.Callout('Ultimate Notion rocks!', color=uno.BGColor.PURPLE, icon='🚀'),
+    uno.Callout('Ultimate Notion rocks!', color=uno.BGColor.PURPLE, icon=uno.Emoji('🚀')),
     uno.Heading2('Showing off some more...'),
     uno.BulletedItem('First bulleted item'),
     uno.BulletedItem('Second bulleted item'),

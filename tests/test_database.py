@@ -88,7 +88,7 @@ def test_db_attributes(contacts_db: Database):
 
     assert contacts_db.cover is None
 
-    assert contacts_db.url.startswith('https://notion.so/d')
+    assert contacts_db.url.startswith('https://www.notion.so/d')
 
     assert not contacts_db.is_deleted
 

@@ -149,6 +149,16 @@ class Session:
             msg = 'Invalid API reponse'
             raise SessionError(msg) from err
 
+    def get_block(self, block_ref: UUID | str, *, use_cache: bool = True) -> Block:
+        """Retrieve a single block by an object reference."""
+        block_uuid = get_uuid(block_ref)
+        if use_cache and block_uuid in self.cache:
+            return cast(Block, self.cache[block_uuid])
+        else:
+            block = Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
+            self.cache[block.id] = block
+            return block
+
     def create_db(self, parent: Page, schema: type[PageSchema] | None = None) -> Database:
         """Create a new database within a page.
 
@@ -269,12 +279,14 @@ class Session:
     def get_user(self, user_ref: UUID | str, *, use_cache: bool = True) -> User:
         """Get a user by uuid.
 
-        Attention: Trying to retrieve yourself, i.e. the bot integration, only works if `whoami()`
-        was called before to fill the cache since the low-level api, i.e. `api.users.retrieve()`
-        does not work for the bot integration.
+        !!! warning
+
+            Trying to retrieve yourself, i.e. the bot integration, only works if `use_cache` is true,
+            since the low-level api, i.e. `api.users.retrieve()` does not work for the bot integration.
+            Better use `whoami()` to get the bot integration user object.
         """
         user_uuid = get_uuid(user_ref)
-        self.whoami()  # make sure cache is filled with bot user
+        self.whoami()  # make sure cache is filled with the uuid of the bot integration
 
         if use_cache and user_uuid in self.cache:
             return cast(User, self.cache[user_uuid])
@@ -292,6 +304,10 @@ class Session:
         """Search a user by name."""
         return SList(user for user in self.all_users() if user.name == name)
 
+    def all_users(self) -> list[User]:
+        """Retrieve all users of this workspace."""
+        return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
+
     def whoami(self) -> User:
         """Return the user object of this bot."""
         if self._own_bot_id is None:
@@ -300,12 +316,3 @@ class Session:
             return cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user)))
         else:
             return cast(User, self.cache[self._own_bot_id])
-
-    def all_users(self) -> list[User]:
-        """Retrieve all users of this workspace."""
-        return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
-
-    def get_block(self, block_ref: UUID | str) -> Block:
-        """Retrieve a single block by an object reference."""
-        block_uuid = get_uuid(block_ref)
-        return Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))

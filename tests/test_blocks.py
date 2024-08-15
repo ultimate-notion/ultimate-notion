@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import Session
-from ultimate_notion.blocks import ChildDatabase, ChildPage, ChildrenMixin
+from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.core import InvalidAPIUsageError
 from ultimate_notion.page import Page
 
@@ -17,6 +17,10 @@ def test_append_blocks(root_page: Page, notion: Session):
     page = notion.create_page(parent=root_page, title='Page for appending blocks')
     h1 = uno.Heading1('My new page')
     page.append(h1)
+
+    # We guarantee that the objects stay the same
+    assert h1 is page.children[0]
+    assert page.children[0].parent is page
 
     assert len(page.children) == 1
     assert page.children[0] == h1
@@ -32,7 +36,9 @@ def test_append_blocks(root_page: Page, notion: Session):
     page.append([h2, h3, h4])
     page.append(h21, after=h2)
 
-    assert page.children == [h1, h2, h21, h3, h4]
+    added_children = [h1, h2, h21, h3, h4]
+    assert page.children == added_children
+    assert all(pchild is achild for pchild, achild in zip(page.children, added_children, strict=True))
 
 
 @pytest.mark.vcr()
@@ -68,8 +74,10 @@ def test_create_basic_blocks(root_page: Page, notion: Session):
         uno.Quote('This is a quote'),
         uno.Quote('This is a quote with a citation', color=uno.Color.GREEN),
         uno.Callout('This is a callout'),
-        uno.Callout('This is a callout with color and icon', color=uno.Color.PURPLE, icon='🚀'),
-        uno.Callout('This is a another callout with color and icon', color=uno.Color.YELLOW, icon=':thumbs_up:'),
+        uno.Callout('This is a callout with color and icon', color=uno.Color.PURPLE, icon=uno.Emoji('🚀')),
+        uno.Callout(
+            'This is a another callout with color and icon', color=uno.Color.YELLOW, icon=uno.Emoji(':thumbs_up:')
+        ),
         uno.BulletedItem('First item'),
         uno.BulletedItem('Second item', color=uno.Color.BLUE),
         uno.NumberedItem('First item'),
@@ -215,8 +223,8 @@ def test_create_child_blocks(root_page: Page, notion: Session):
     page.reload()
     assert page.children == [subpage, subdb]
     child_page, child_db = page.children
-    assert cast(ChildPage, child_page).page == subpage
-    assert cast(ChildDatabase, child_db).db == subdb
+    assert child_page is subpage
+    assert child_db is subdb
 
     for child in page.children:
         child.delete()
@@ -310,13 +318,13 @@ def test_create_sync_blocks(root_page: Page, notion: Session):
 @pytest.mark.vcr()
 def test_nested_blocks(root_page: Page, notion: Session):
     page = notion.create_page(parent=root_page, title='Page for creating nested blocks')
-    h1 = uno.Heading1('Non-toggable Heading')
+    h1 = uno.Heading1('Non-toggleable Heading')
     p1 = uno.Paragraph('This is a paragraph')
     page.append(h1)
     with pytest.raises(InvalidAPIUsageError):
         h1.append(p1)
 
-    h1 = uno.Heading1('Toggable Heading', toggleable=True)
+    h1 = uno.Heading1('Toggleable Heading', toggleable=True)
     page.append(h1)
     h1.append(p1)
 
@@ -327,3 +335,84 @@ def test_nested_blocks(root_page: Page, notion: Session):
     assert len(page.children) == 3
     assert cast(ChildrenMixin, page.children[1]).children == [p1]
     assert len(cast(ChildrenMixin, page.children[2]).children) == 1
+
+
+@pytest.mark.vcr()
+def test_has_children(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for checking children')
+    assert not page.has_children
+    page.append(uno.Paragraph('This is a paragraph'))
+    assert page.has_children
+
+
+@pytest.mark.vcr()
+def test_modify_basic_blocks(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for modifying basic blocks')
+    children: list[uno.AnyBlock] = [
+        paragraph := uno.Paragraph('Red paragraph', color=uno.Color.RED),
+        code := uno.Code('print("Hello World")', language=uno.CodeLang.PYTHON),
+        heading := uno.Heading1('My new page', toggleable=True),
+        callout := uno.Callout('This is a callout', icon=uno.Emoji('🚀')),
+        todo := uno.ToDoItem('Checked item', checked=True),
+        embed := uno.Embed('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+        bookmark := uno.Bookmark('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+        equation := uno.Equation(r'-1 = \exp(i \pi)'),
+    ]
+    page.append(children)
+
+    paragraph.color = uno.Color.PINK
+    paragraph.rich_text = uno.RichText('Pink paragraph')
+    paragraph.reload()
+    assert paragraph.color == uno.Color.PINK
+
+    code.language = uno.CodeLang.JAVASCRIPT
+    code.caption = uno.RichText('JavaScript Code')
+
+    heading.append(uno.Paragraph('This is a nested paragraph'))
+    with pytest.raises(InvalidAPIUsageError):
+        heading.toggleable = False
+    heading.children[0].delete()
+    heading.toggleable = False
+
+    assert callout.icon == uno.Emoji('🚀')
+    callout.icon = uno.Emoji(':thumbs_up:')
+
+    todo.checked = False
+
+    embed.url = 'https://notion.so'
+    embed.caption = uno.RichText('Notion Homepage')
+
+    bookmark.url = 'https://notion.so'
+
+    equation.latex = r'e = mc^2'
+
+    page.reload()
+
+    child_paragraph = cast(uno.Paragraph, page.children[0])
+    assert child_paragraph.color == uno.Color.PINK
+    assert child_paragraph.rich_text == 'Pink paragraph'
+
+    child_code = cast(uno.Code, page.children[1])
+    assert child_code.language == uno.CodeLang.JAVASCRIPT
+    assert child_code.caption == uno.RichText('JavaScript Code')
+    child_code.caption = None  # type: ignore[assignment]
+    child_code.reload()
+    assert child_code.caption == ''
+
+    child_heading = cast(uno.Heading1, page.children[2])
+    assert child_heading.toggleable is False
+
+    child_callout = cast(uno.Callout, page.children[3])
+    assert child_callout.icon == '👍'
+
+    child_todo = cast(uno.ToDoItem, page.children[4])
+    assert child_todo.checked is False
+
+    child_embed = cast(uno.Embed, page.children[5])
+    assert child_embed.caption == 'Notion Homepage'
+
+    child_bookmark = cast(uno.Bookmark, page.children[6])
+    assert child_bookmark.url == 'https://notion.so'
+
+    child_equation = cast(uno.Equation, page.children[7])
+    assert child_equation.latex == r'e = mc^2'
