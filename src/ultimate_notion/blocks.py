@@ -441,7 +441,10 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
 
     @property
     def icon(self) -> FileInfo | Emoji:
-        return wrap_icon(self.obj_ref.callout.icon)
+        if (icon := self.obj_ref.value.icon) is None:
+            return self.default_icon
+        else:
+            return wrap_icon(icon)
 
     @icon.setter
     def icon(self, icon: FileInfo | Emoji | None) -> None:

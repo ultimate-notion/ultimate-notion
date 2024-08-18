@@ -179,7 +179,7 @@ class Callout(TextBlock, type='callout'):
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] | None = None
-        icon: SerializeAsAny[FileObject] | EmojiObject | None = None
+        icon: SerializeAsAny[FileObject] | EmojiObject = None  # type: ignore
         color: Color | BGColor = BGColor.GRAY
 
     callout: TypeData = TypeData()
