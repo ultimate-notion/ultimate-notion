@@ -107,14 +107,12 @@ class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
         raise NotImplementedError
 
 
-def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | None) -> FileInfo | Emoji | None:
+def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject) -> FileInfo | Emoji:
     """Wrap the icon object into the corresponding class."""
     if isinstance(icon_obj, objs.ExternalFile):
         return FileInfo.wrap_obj_ref(icon_obj)
     elif isinstance(icon_obj, objs.EmojiObject):
         return Emoji.wrap_obj_ref(icon_obj)
-    elif icon_obj is None:
-        return None
     else:
         msg = f'unknown icon object of {type(icon_obj)}'
         raise RuntimeError(msg)

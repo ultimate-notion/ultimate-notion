@@ -179,8 +179,10 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     @property
     def icon(self) -> FileInfo | Emoji | None:
         """Icon of the page, i.e. emojis, Notion's icons, or custom images."""
-        icon = self.obj_ref.icon
-        return wrap_icon(icon)
+        if (icon := self.obj_ref.icon) is None:
+            return None
+        else:
+            return wrap_icon(icon)
 
     @icon.setter
     def icon(self, icon: FileInfo | Emoji | str | None):
