@@ -5,6 +5,7 @@ from __future__ import annotations
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
+from ultimate_notion.text import RichText
 
 
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
@@ -28,7 +29,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     def description(self) -> str:
         """Description of the option."""
         if desc := self.obj_ref.description:
-            return desc
+            return RichText.wrap_obj_ref(desc)
         else:
             return ''
 
