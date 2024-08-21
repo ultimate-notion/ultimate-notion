@@ -86,6 +86,7 @@ Some features that the Notion UI provides are not possible to implement due to l
 - setting the icon and cover of a database.
 - moving pages is not possible as a [page’s parent cannot be changed].
 - setting a [reminder] based on date and/or time.
+- modifying the url of file-like block, e.g. `File`, `Image`, etc.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 

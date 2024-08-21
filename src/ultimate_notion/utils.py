@@ -52,6 +52,14 @@ def flatten(nested_list: list[list[T]], /) -> list[T]:
     return list(chain.from_iterable(nested_list))
 
 
+def safe_list_get(lst: list[T], idx: int, *, default: T | None = None) -> T | None:
+    """Get the element at the index of the list or return the default value."""
+    try:
+        return lst[idx]
+    except IndexError:
+        return default
+
+
 def is_notebook() -> bool:
     """Determine if we are running within a Jupyter notebook."""
     try:

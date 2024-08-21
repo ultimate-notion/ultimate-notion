@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from datetime import date as dt_date
-from datetime import datetime
+import datetime as dt
+from abc import ABC
 from typing import Any
 
+import pendulum as pnd
 from pydantic import SerializeAsAny, field_validator, model_serializer
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject
@@ -76,12 +76,9 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, start: dt_date | None, end: dt_date | None = None):
+    def build(cls, dt_spec: dt.datetime | dt.date | pnd.Interval):
         """Create a new Date from the native values."""
-        if start is None:
-            return cls.model_construct()
-        else:
-            return cls.model_construct(date=DateRange(start=start, end=end))
+        return cls.model_construct(date=DateRange.build(dt_spec))
 
 
 class Status(PropertyValue, type='status'):
@@ -144,20 +141,11 @@ class FormulaResult(TypedObject, ABC, polymorphic_base=True):
     This object contains the result of the expression in the database properties.
     """
 
-    @property
-    @abstractmethod
-    def value(self):
-        """Return the result of this FormulaResult."""
-
 
 class StringFormula(FormulaResult, type='string'):
     """A Notion string formula result."""
 
     string: str | None = None
-
-    @property
-    def value(self):
-        return self.string
 
 
 class NumberFormula(FormulaResult, type='number'):
@@ -165,29 +153,17 @@ class NumberFormula(FormulaResult, type='number'):
 
     number: float | int | None = None
 
-    @property
-    def value(self):
-        return self.number
-
 
 class DateFormula(FormulaResult, type='date'):
     """A Notion date formula result."""
 
     date: DateRange | None = None
 
-    @property
-    def value(self):
-        return self.date.to_pendulum() if self.date else None
-
 
 class BooleanFormula(FormulaResult, type='boolean'):
     """A Notion boolean formula result."""
 
     boolean: bool | None = None
-
-    @property
-    def value(self):
-        return self.boolean
 
 
 class Formula(PropertyValue, type='formula'):
@@ -213,21 +189,11 @@ class RollupObject(TypedObject, ABC, polymorphic_base=True):
 
     function: AggFunc | None = None
 
-    @property
-    @abstractmethod
-    def value(self):
-        """Return the native representation of this Rollup object."""
-
 
 class RollupNumber(RollupObject, type='number'):
     """A Notion rollup number property value."""
 
     number: float | int | None = None
-
-    @property
-    def value(self) -> float | int | None:
-        """Return the native representation of this Rollup object."""
-        return self.number
 
 
 class RollupDate(RollupObject, type='date'):
@@ -235,20 +201,11 @@ class RollupDate(RollupObject, type='date'):
 
     date: DateRange | None = None
 
-    @property
-    def value(self):
-        return self.date.to_pendulum() if self.date else None
-
 
 class RollupArray(RollupObject, type='array'):
     """A Notion rollup array property value."""
 
     array: list[PropertyValue]
-
-    @property
-    def value(self) -> list[PropertyValue]:
-        """Return the native representation of this Rollup object."""
-        return self.array
 
 
 class Rollup(PropertyValue, type='rollup'):
@@ -260,7 +217,7 @@ class Rollup(PropertyValue, type='rollup'):
 class CreatedTime(PropertyValue, type='created_time'):
     """A Notion created-time property value."""
 
-    created_time: datetime
+    created_time: dt.datetime
 
 
 class CreatedBy(PropertyValue, type='created_by'):
@@ -272,7 +229,7 @@ class CreatedBy(PropertyValue, type='created_by'):
 class LastEditedTime(PropertyValue, type='last_edited_time'):
     """A Notion last-edited-time property value."""
 
-    last_edited_time: datetime
+    last_edited_time: dt.datetime
 
 
 class LastEditedBy(PropertyValue, type='last_edited_by'):
@@ -297,7 +254,7 @@ class Verification(PropertyValue, type='verification'):
     class TypeData(GenericObject):
         state: VState = VState.UNVERIFIED
         verified_by: SerializeAsAny[User] | None = None
-        date: datetime | None = None
+        date: dt.datetime | None = None
 
         # leads to better error messages, see
         # https://github.com/pydantic/pydantic/issues/355

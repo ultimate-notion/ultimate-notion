@@ -14,7 +14,7 @@ from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
 
-from ultimate_notion.obj_api.blocks import Block, Database, Page
+from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
     DatabaseRef,
@@ -189,8 +189,14 @@ class BlocksEndpoint(Endpoint):
 
         logger.info('Updating block :: %s', block.id)
 
+        params = block.serialize_for_api()
+        if isinstance(block, FileBase):
+            # The Notiopn API does not support setting a new typed FileObject, e.g. `external` or `file`
+            # It even must be removed from the params
+            dtype = params[block.type].pop('type')
+            del params[block.type][dtype]
         # Typing in notion_client sucks, so we cast
-        data = cast(dict[str, Any], self.raw_api.update(block.id.hex, **block.serialize_for_api()))
+        data = cast(dict[str, Any], self.raw_api.update(block.id.hex, **params))
 
         return block.update(**data)
 
