@@ -21,7 +21,7 @@ from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.obj_api.objects import get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
-from ultimate_notion.schema import DefaultSchema, PageSchema
+from ultimate_notion.schema import DefaultSchema, Schema
 from ultimate_notion.text import RichText
 from ultimate_notion.user import User
 from ultimate_notion.utils import SList
@@ -159,7 +159,7 @@ class Session:
             self.cache[block.id] = block
             return block
 
-    def create_db(self, parent: Page, schema: type[PageSchema] | None = None) -> Database:
+    def create_db(self, parent: Page, schema: type[Schema] | None = None) -> Database:
         """Create a new database within a page.
 
         Implementation:
@@ -191,7 +191,7 @@ class Session:
         self.cache[db.id] = db
         return db
 
-    def create_dbs(self, parents: Page | list[Page], schemas: list[type[PageSchema]]) -> list[Database]:
+    def create_dbs(self, parents: Page | list[Page], schemas: list[type[Schema]]) -> list[Database]:
         """Create new databases in the right order in case there a relations between them."""
         # ToDo: Implement
         raise NotImplementedError
@@ -227,7 +227,7 @@ class Session:
             self.cache[db.id] = db
             return db
 
-    def get_or_create_db(self, parent: Page, schema: type[PageSchema]) -> Database:
+    def get_or_create_db(self, parent: Page, schema: type[Schema]) -> Database:
         """Get or create the database."""
         dbs = SList(db for db in self.search_db(schema.db_title) if db.parent == parent)
         if len(dbs) == 0:

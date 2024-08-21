@@ -9,7 +9,7 @@ in a custom Schema when creating the database.
 
 ### Design Principles
 
-A schema is a subclass of `PageShema` that holds `Property` objects with a name and an
+A schema is a subclass of `Schema` that holds `Property` objects with a name and an
 actual `PropertyType`, e.g. `Text`, `Number`.
 
 The source of truth is always the `obj_ref` and a `PropertyType` holds only auxilliary
@@ -48,7 +48,7 @@ class SchemaError(Exception):
 class SchemaNotBoundError(SchemaError):
     """Raised when the schema is not bound to a database."""
 
-    def __init__(self, schema: type[PageSchema]):
+    def __init__(self, schema: type[Schema]):
         self.schema = schema
         msg = f'Schema {schema.__name__} is not bound to any database'
         super().__init__(msg)
@@ -63,7 +63,7 @@ class ReadOnlyPropertyError(SchemaError):
         super().__init__(msg)
 
 
-class PageSchema:
+class Schema:
     """Base class for the schema of a database."""
 
     db_title: RichText | None
@@ -81,7 +81,7 @@ class PageSchema:
     @classmethod
     def from_dict(
         cls, schema_dct: dict[str, PropertyType], db_title: str | None = None, db_desc: str | None = None
-    ) -> type[PageSchema]:
+    ) -> type[Schema]:
         """Creation of a schema from a dictionary for easy support of dynamically created schemas."""
         title_props = [k for k, v in schema_dct.items() if isinstance(v, Title)]
         if not title_props:
@@ -95,7 +95,7 @@ class PageSchema:
         attrs: dict[str, Any] = {'db_desc': db_desc}
         for prop_name, prop_type in schema_dct.items():
             attrs[snake_case(prop_name)] = Property(prop_name, prop_type)
-        return type(cls_name, (PageSchema,), attrs, db_title=db_title)
+        return type(cls_name, (Schema,), attrs, db_title=db_title)
 
     @classmethod
     def create(cls, **kwargs) -> Page:
@@ -171,7 +171,7 @@ class PageSchema:
         return SList(prop for prop in cls.get_props() if isinstance(prop.type, Title)).item()
 
     @classmethod
-    def is_consistent_with(cls, other_schema: type[PageSchema]) -> bool:
+    def is_consistent_with(cls, other_schema: type[Schema]) -> bool:
         """Is this schema consistent with another ignoring backward relations if not in other schema."""
         own_schema_dct = cls.to_dict()
         other_schema_dct = other_schema.to_dict()
@@ -338,14 +338,14 @@ class Property:
     _name: str
     _type: PropertyType
     # properties below are set by __set_name__
-    _schema: type[PageSchema]
+    _schema: type[Schema]
     _attr_name: str  # Python attribute name of the property in the schema
 
     def __init__(self, name: str, type: PropertyType) -> None:  # noqa: A002
         self._name = name
         self._type = type
 
-    def __set_name__(self, owner: type[PageSchema], name: str):
+    def __set_name__(self, owner: type[Schema], name: str):
         self._schema = owner
         self._attr_name = name
         self._type.prop_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
@@ -485,17 +485,17 @@ class RelationError(SchemaError):
     """Error if a Relation cannot be initialised."""
 
 
-class SelfRef(PageSchema, db_title=None):
+class SelfRef(Schema, db_title=None):
     """Target schema for self-referencing database relations."""
 
 
 class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
     """Relation to another database."""
 
-    _schema: type[PageSchema] | None = None  # other schema, i.e. of the target database
+    _schema: type[Schema] | None = None  # other schema, i.e. of the target database
     _two_way_prop: Property | None = None  # other property, i.e. of the target database
 
-    def __init__(self, schema: type[PageSchema] | None = None, *, two_way_prop: Property | None = None):
+    def __init__(self, schema: type[Schema] | None = None, *, two_way_prop: Property | None = None):
         if two_way_prop and not schema:
             msg = '`schema` needs to be provided if `two_way_prop` is set'
             raise RuntimeError(msg)
@@ -518,7 +518,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             self._two_way_prop = two_way_prop
 
     @property
-    def schema(self) -> type[PageSchema] | None:
+    def schema(self) -> type[Schema] | None:
         """Schema of the relation database."""
         if self._schema:
             return self._schema if self._schema is not SelfRef else None
@@ -650,7 +650,7 @@ class Verification(PropertyType[obj_schema.Verification], wraps=obj_schema.Verif
     allowed_at_creation = False
 
 
-class DefaultSchema(PageSchema, db_title=None):
+class DefaultSchema(Schema, db_title=None):
     """Default database schema of Notion.
 
     As inferred by just creating an empty database in the Notion UI.

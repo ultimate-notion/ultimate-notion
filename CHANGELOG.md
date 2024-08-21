@@ -6,6 +6,7 @@
 - New: Also use the session cache for blocks.
 - Fix: Several issues with blocks and duplicated but ID-equivalent objects.
 - Chg: Children of pages are proper pages/databases instead of `ChildPage`/`ChildDatabase`.
+- Chg: Renamed `PageSchema` to `Schema`.
 
 ## Version 0.5.1, 2024-08-09
 

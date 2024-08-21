@@ -190,3 +190,4 @@ keep in mind that some methods are just stubs.
 [tail]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.tail
 [create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
+[schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema

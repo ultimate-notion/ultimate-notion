@@ -287,7 +287,7 @@ def root_page(notion: Session) -> Page:
 def article_db(notion: Session, root_page: Page) -> Iterator[Database]:
     """Simple database of articles."""
 
-    class Article(schema.PageSchema, db_title='Articles'):
+    class Article(schema.Schema, db_title='Articles'):
         name = schema.Property('Name', schema.Title())
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
@@ -465,7 +465,7 @@ def new_task_db(notion: Session, root_page: Page) -> Iterator[Database]:
         f'("🕐 " + ({t_left_formula})))))))))'
     )
 
-    class Tasklist(schema.PageSchema, db_title='My Tasks'):
+    class Tasklist(schema.Schema, db_title='My Tasks'):
         """My personal task list"""
 
         task = schema.Property('Task', schema.Title())

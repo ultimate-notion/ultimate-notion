@@ -47,7 +47,7 @@ from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
 from ultimate_notion.option import Option, OptionNS
 from ultimate_notion.page import Page
-from ultimate_notion.schema import PageSchema, Property, PropType, SelfRef
+from ultimate_notion.schema import Property, PropType, Schema, SelfRef
 from ultimate_notion.session import Session
 from ultimate_notion.text import AnyText, Math, Mention, RichText, Text, join
 from ultimate_notion.user import User
@@ -86,12 +86,12 @@ __all__ = [
     'Option',
     'OptionNS',
     'Page',
-    'PageSchema',
     'Paragraph',
     'PropType',
     'Property',
     'Quote',
     'RichText',
+    'Schema',
     'SelfRef',
     'Session',
     'SyncedBlock',

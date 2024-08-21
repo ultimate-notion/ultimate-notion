@@ -28,7 +28,7 @@ class Size(uno.OptionNS):
     L = uno.Option(name='L', color=uno.Color.RED)
 
 
-class Item(uno.PageSchema, db_title='Item DB'):
+class Item(uno.Schema, db_title='Item DB'):
     """Database of all the items we sell"""
     name = uno.Property('Name', uno.PropType.Title())
     size = uno.Property('Size', uno.PropType.Select(Size))
@@ -47,7 +47,7 @@ item_db = notion.create_db(parent=root_page, schema=Item)
 Now we create a database for our customers and define a one-way [Relation] to the items:
 
 ```python
-class Customer(uno.PageSchema, db_title='Customer DB'):
+class Customer(uno.Schema, db_title='Customer DB'):
     """Database of all our beloved customers"""
     name = uno.Property('Name', uno.PropType.Title())
     purchases = uno.Property('Items Purchased', uno.PropType.Relation(Item))
@@ -104,14 +104,14 @@ that we also wanted to see direclty which customers bought a specific item. In t
 from `Customer` needs to become a two-way relation. We can achieve this, with a simple modification in both schemas:
 
 ```python
-class Item(uno.PageSchema, db_title='Item DB'):
+class Item(uno.Schema, db_title='Item DB'):
     """Database of all the items we sell"""
     name = uno.Property('Name', uno.PropType.Title())
     size = uno.Property('Size', uno.PropType.Select(Size))
     price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
     bought_by = uno.Property('Bought by', uno.PropType.Relation())
 
-class Customer(uno.PageSchema, db_title='Customer DB'):
+class Customer(uno.Schema, db_title='Customer DB'):
     """Database of all our beloved customers"""
     name = uno.Property('Name', uno.PropType.Title())
     purchases = uno.Property(
@@ -145,7 +145,7 @@ Assume now that we want to have a schema that references itself, for instance a 
 certain tasks can be subtasks of others:
 
 ```python
-class Task(uno.PageSchema, db_title='Task List'):
+class Task(uno.Schema, db_title='Task List'):
     """A really simple task lists with subtasks"""
     task = uno.Property('Task', uno.PropType.Title())
     due_by = uno.Property('Due by', uno.PropType.Date())
@@ -179,7 +179,7 @@ Task.create(
 
 [Notion docs]: https://www.notion.so/help/relations-and-rollups#create-a-relation
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
-[create]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.PageSchema.create
+[create]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema.create
 [Relation]:  ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Relation
 [PropType]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.PropType
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema
