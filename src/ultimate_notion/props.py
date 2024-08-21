@@ -5,8 +5,8 @@ The names of the properties reflect the name in the Notion UI.
 
 from __future__ import annotations
 
+import datetime as dt
 from abc import ABC, abstractmethod
-from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import pendulum as pnd
@@ -123,9 +123,8 @@ class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
 class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
     """Date(-time) property value."""
 
-    # ToDo: Also use `time_zone` here defined in obj_api props or objects
-    def __init__(self, start: datetime | date, end: datetime | date | None = None):
-        self.obj_ref = obj_props.Date.build(start, end)
+    def __init__(self, dt_spec: dt.datetime | dt.date | pnd.Interval):
+        self.obj_ref = obj_props.Date.build(dt_spec)
 
     @property
     def value(self) -> pnd.DateTime | pnd.Date | pnd.Interval | None:

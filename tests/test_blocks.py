@@ -416,3 +416,43 @@ def test_modify_basic_blocks(root_page: Page, notion: Session):
 
     child_equation = cast(uno.Equation, page.children[7])
     assert child_equation.latex == r'e = mc^2'
+
+
+@pytest.mark.vcr()
+def test_modify_file_blocks(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for modifying file blocks')
+    children: list[uno.AnyBlock] = [
+        file := uno.File('robots.txt', 'https://www.google.de/robots.txt'),
+        image := uno.Image(
+            'https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg', caption='Path on meadow'
+        ),
+        video := uno.Video('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+        pdf := uno.PDF('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf'),
+    ]
+    page.append(children)
+
+    file.name = 'my_robot'
+    assert file.caption == ''
+    new_caption_text = 'My Robot.txt of Google'
+    file.caption = new_caption_text  # type: ignore[assignment]
+
+    file.reload()
+    assert file.name == 'my_robot.txt'
+    assert file.caption == new_caption_text
+
+    assert image.caption == 'Path on meadow'
+    new_caption_text = 'Flowers on meadow'
+    image.caption = uno.RichText(new_caption_text)
+    image.reload()
+    assert image.caption == new_caption_text
+
+    assert video.caption == ''
+    new_caption_text = 'Rick Roll but not really'
+    video.caption = new_caption_text  # type: ignore[assignment]
+    video.reload()
+    assert video.caption == uno.RichText(new_caption_text)
+
+    new_caption_text = 'Dummy PDF'
+    pdf.caption = uno.RichText(new_caption_text)
+    pdf.reload()
+    assert pdf.caption == new_caption_text

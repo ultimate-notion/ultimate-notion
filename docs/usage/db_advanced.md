@@ -23,9 +23,9 @@ Python code:
 ```python
 class Size(uno.OptionNS):
     """Namespace for the select options of our various sizes"""
-    S = uno.Option(name='S', color='green')
-    M = uno.Option(name='M', color='yellow')
-    L = uno.Option(name='L', color='red')
+    S = uno.Option(name='S', color=uno.Color.GREEN)
+    M = uno.Option(name='M', color=uno.Color.YELLOW)
+    L = uno.Option(name='L', color=uno.Color.RED)
 
 
 class Item(uno.PageSchema, db_title='Item DB'):

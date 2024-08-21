@@ -497,6 +497,18 @@ class HostedFile(FileObject, type='file'):
 
     file: TypeData
 
+    @classmethod
+    def build(
+        cls,
+        url: str,
+        *,
+        name: str | None = None,
+        caption: list[RichTextBaseObject] | None = None,
+        expiry_time: dt.datetime | None = None,
+    ) -> Self:
+        """Create a new `HostedFile` from the given URL."""
+        return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url, expiry_time=expiry_time))
+
 
 class ExternalFile(FileObject, type='external'):
     """An external file object."""

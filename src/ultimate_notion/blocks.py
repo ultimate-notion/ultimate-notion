@@ -255,8 +255,9 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
 
     def _update_in_notion(self) -> None:
         """Update the locally modified block on Notion."""
-        session = get_active_session()
-        self.obj_ref = cast(BT, session.api.blocks.update(self.obj_ref))
+        if self.in_notion:
+            session = get_active_session()
+            self.obj_ref = cast(BT, session.api.blocks.update(self.obj_ref))
 
 
 AnyBlock: TypeAlias = Block[Any]
@@ -434,22 +435,22 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
         if icon is not None:
             self.obj_ref.value.icon = icon.obj_ref
 
-    @property
-    def default_icon(self) -> Emoji:
-        """Return the default icon for the callout block."""
+    @staticmethod
+    def get_default_icon() -> Emoji:
+        """Return the default icon of a callout block."""
         return Emoji('💡')
 
     @property
     def icon(self) -> FileInfo | Emoji:
         if (icon := self.obj_ref.value.icon) is None:
-            return self.default_icon
+            return self.get_default_icon()
         else:
             return wrap_icon(icon)
 
     @icon.setter
     def icon(self, icon: FileInfo | Emoji | None) -> None:
         if icon is None:
-            icon = self.default_icon
+            icon = self.get_default_icon()
         self.obj_ref.value.icon = icon.obj_ref
         self._update_in_notion()
 
@@ -616,7 +617,7 @@ class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
 
     @property
     def url(self) -> str | None:
-        return self.obj_ref.link_preview.url
+        return self.obj_ref.value.url
 
     def to_markdown(self) -> str:
         if self.block_url is not None:
@@ -661,31 +662,44 @@ class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
         url: str,
         *,
         caption: str | RichText | RichTextBase | None = None,
+        name: str | None = None,
     ):
         super().__init__()
-        caption_obj = text_to_obj_ref(caption) if caption is not None else None
-        external_file = objs.ExternalFile.build(url=url, caption=caption_obj)
-        setattr(self.obj_ref, self.obj_ref.type, external_file)
+        file_info = FileInfo(url=url, name=name, caption=caption)
+        self.obj_ref.value = file_info.obj_ref
 
     @property
-    def file(self) -> FileInfo:
+    def file_info(self) -> FileInfo:
+        """Return the file information of this block as a copy."""
         if isinstance(file_obj := self.obj_ref.value, objs.FileObject):
-            return FileInfo.wrap_obj_ref(file_obj)
+            return FileInfo.wrap_obj_ref(file_obj.model_copy(deep=True))
         else:
             msg = f'Unknown file type {type(file_obj)}'
             raise ValueError(msg)
 
     @property
     def url(self) -> str:
-        return self.file.url
+        return self.file_info.url
 
     @property
     def caption(self) -> RichText:
-        return self.file.caption
+        return self.file_info.caption
+
+    @caption.setter
+    def caption(self, caption: str | RichText | RichTextBase | None) -> None:
+        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+        self._update_in_notion()
 
 
 class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
-    """File block."""
+    """File block.
+
+    !!! note
+
+        Only the caption and name can be modified, the URL is read-only.
+        Note that only the file name not the file suffix can be modified,
+        the suffix is determined initially by the url.
+    """
 
     def __init__(
         self,
@@ -694,13 +708,17 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
         *,
         caption: str | RichText | RichTextBase | None = None,
     ):
-        super().__init__(url, caption=caption)
-        self.obj_ref.value.name = name
+        super().__init__(url, caption=caption, name=name)
 
     @property
     def name(self) -> str:
-        name = self.file.name
+        name = self.file_info.name
         return name if name is not None else ''
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self.obj_ref.value.name = name
+        self._update_in_notion()
 
     def to_markdown(self) -> str:
         md = f'[📎 {self.name}]({self.url})\n'
@@ -710,7 +728,12 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
 
 
 class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
-    """Image block."""
+    """Image block.
+
+    !!! note
+
+        Only the caption can be modified, the URL is read-only.
+    """
 
     def __init__(self, url: str, *, caption: str | RichText | RichTextBase | None = None):
         super().__init__(url, caption=caption)
@@ -725,7 +748,12 @@ class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
 
 
 class Video(FileBaseBlock[obj_blocks.Video], wraps=obj_blocks.Video):
-    """Video block."""
+    """Video block.
+
+    !!! note
+
+        Only the caption can be modified, the URL is read-only.
+    """
 
     def to_markdown(self) -> str:
         mime_type, _ = mimetypes.guess_type(self.url)
@@ -735,7 +763,12 @@ class Video(FileBaseBlock[obj_blocks.Video], wraps=obj_blocks.Video):
 
 
 class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
-    """PDF block."""
+    """PDF block.
+
+    !!! note
+
+        Only the caption can be modified, the URL is read-only.
+    """
 
     def to_markdown(self) -> str:
         name = self.url.rsplit('/').pop()

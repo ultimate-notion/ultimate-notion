@@ -21,4 +21,3 @@ from ultimate_notion.props import Date
 def test_date_with_datetime(d1, d2):
     # ToDo: Implement actual test
     Date(d1)
-    Date(d1, d2)

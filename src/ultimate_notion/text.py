@@ -18,7 +18,7 @@ from ultimate_notion.core import Wrapper
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.user import User
-from ultimate_notion.utils import rank
+from ultimate_notion.utils import flatten, rank
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -213,9 +213,7 @@ class RichText(str):
         return self.to_html()
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, str):
-            return str(self) == other
-        elif isinstance(other, RichText):
+        if isinstance(other, str | RichText):
             return str(self) == str(other)
         else:
             return NotImplemented
@@ -239,12 +237,14 @@ AnyText: TypeAlias = RichTextBase[Any] | RichText
 """For type hinting purposes, when working with various text types, e.g. `Text`, `RichText`, `Mention`, `Math`."""
 
 
-def text_to_obj_ref(text: str | RichText | RichTextBase) -> list[objs.RichTextBaseObject]:
+def text_to_obj_ref(text: str | RichText | RichTextBase | list[RichTextBase]) -> list[objs.RichTextBaseObject]:
     """Convert various text representations to a list of rich text objects."""
     if isinstance(text, RichText):
         texts = text.obj_ref
     elif isinstance(text, RichTextBase):
         texts = [text.obj_ref]
+    elif isinstance(text, list):
+        texts = flatten([rt.obj_ref for rt in text])
     elif isinstance(text, str):
         # ToDo: Allow passing markdown text here when the markdown parser is implemented
         texts = RichText(text).obj_ref
