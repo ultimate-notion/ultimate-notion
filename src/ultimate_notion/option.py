@@ -42,6 +42,8 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         if isinstance(other, Option):
             # We compare only the name as the id is not set for new options
             res = self.name == other.name
+        elif isinstance(other, str):
+            res = self.name == other
         elif other is None:
             res = False
         else:

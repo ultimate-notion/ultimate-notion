@@ -97,6 +97,25 @@ This is how are two databases `item_db` and `customer_db` look like in the Notio
 !!! note
     The description of the databases corresponds to the the docstring of the schema classes `Item` and `Customer`.
 
+## Fast access of page properties
+
+The properties of a page, defined by the properties of the database the page resides in, can be easily accessed with
+the `.props` namespace, e.g.:
+
+```python
+assert lovelace.props.name == 'Ada Lovelace'
+assert engelbart.props.purchases == [khaki_pants, t_shirt]
+```
+
+This is especially neat when using a REPL with autocompletion like [JupyterLab] or [IPython].
+As an alternative, also the bracket-notation can be used. This allows us to use the actual property names
+fro the schema definition, e.g.:
+
+```python
+assert lovelace.props['Name'] == 'Ada Lovelace'
+assert engelbart.props['Items Purchased'] == [khaki_pants, t_shirt]
+```
+
 ## Two-way & self relations
 
 Notion also supports two-way relations and so does Ultimate Notion. Taking the same example as before, imagine
@@ -161,12 +180,12 @@ clean_house = Task.create(
     task='Clean the house',
     due_by=today + timedelta(weeks=4)
 )
-Task.create(
+vacuum_room = Task.create(
     task='Vacuum living room',
     due_by=today + timedelta(weeks=1),
     parent=clean_house
 )
-Task.create(
+tidyup_kitchen = Task.create(
     task='Tidy up kitchen',
     due_by=today + timedelta(days=3),
     parent=clean_house

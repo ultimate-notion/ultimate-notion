@@ -49,7 +49,7 @@ Alternatively, you can set the your token directly in the configuration file.
 
 ## Loading a Notion page
 
-To try out if your integration works, just copy&paste the following code into your favorite editor or better [Jupyter Lab].
+To try out if your integration works, just copy&paste the following code into your favorite editor or better [JupyterLab].
 Replace the content of `PAGE_TITLE` with the title of the page, you granted access for your integration and make sure your
 token is set correctly as environment variable or in your configuration file.
 
@@ -57,7 +57,7 @@ token is set correctly as environment variable or in your configuration file.
 --8<-- "examples/getting_started.py"
 ```
 
-Run the code and you should see in Jupyter Lab following rendered Markdown code or just the plain output if you run the
+Run the code and you should see in JupyterLab following rendered Markdown code or just the plain output if you run the
 code in a terminal.
 
 ![Getting started page](../assets/images/notion-getting-started-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}

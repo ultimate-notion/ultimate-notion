@@ -40,7 +40,7 @@ class SelectOption(GenericObject):
     name: str
     id: str = None  # type: ignore  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color = Color.DEFAULT
-    description: str | None = None  # ToDo: Undocumented, could also be list[RichTextObject]
+    description: list[RichTextBaseObject] | None = None  # ToDo: Undocumented in the Notion API
 
     @classmethod
     def build(cls, name, color=Color.DEFAULT) -> Self:
@@ -87,18 +87,16 @@ class DateRange(GenericObject, MentionMixin):
             end = dt_spec.end
         elif isinstance(dt_spec, pnd.DateTime):
             time_zone = dt_spec.timezone_name
-            start = dt_spec
+            start = dt_spec.naive()
             end = None
         elif isinstance(dt_spec, pnd.Date):
             time_zone = None
             start = dt_spec
             end = None
         elif isinstance(dt_spec, dt.datetime):
-            if dt_spec.tzinfo is not None:  # we just don't trust the timezone of the datetime
-                msg = 'Datetime objects must not have a timezone set. Use a pendulum object instead.'
-                raise ValueError(msg)
-            time_zone = pnd.local_timezone().name
-            start = dt_spec
+            # we just don't trust the timezone of the naive datetime and convert to utc
+            time_zone = 'UTC'
+            start = dt_spec.astimezone(dt.timezone.utc)
             end = None
         elif isinstance(dt_spec, dt.date):
             time_zone = None
@@ -119,14 +117,15 @@ class DateRange(GenericObject, MentionMixin):
                 return pnd.instance(self.start)
             else:
                 return pnd.Interval(start=pnd.instance(self.start), end=pnd.instance(self.end))
-        else:  # noqa: PLR5501
+        else:
+            pnd_start = pnd.instance(self.start)
+            pnd_start = pnd_start.in_tz(self.time_zone) if isinstance(pnd_start, pnd.DateTime) else pnd_start
             if self.end is None:
-                return pnd.instance(self.start, tz=self.time_zone)
+                return pnd_start
             else:
-                return pnd.Interval(
-                    start=pnd.instance(self.start, tz=self.time_zone),
-                    end=pnd.instance(self.end, tz=self.time_zone),
-                )
+                pnd_end = pnd.instance(self.end)
+                pnd_end = pnd_end.in_tz(self.time_zone) if isinstance(pnd_end, pnd.DateTime) else pnd_end
+                return pnd.Interval(start=pnd_start, end=pnd_end)
 
     def __str__(self) -> str:
         # ToDo: Implement the possibility to configure date format globally, maybe in the config?

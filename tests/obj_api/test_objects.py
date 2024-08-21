@@ -1,7 +1,6 @@
 import datetime as dt
 
 import pendulum as pnd
-import pytest
 
 from ultimate_notion.obj_api import objects as objs
 
@@ -18,7 +17,7 @@ def test_date_range(tz_berlin):
     datetime = pnd.datetime(2024, 1, 1, 12, 0, 0, tz=tz_berlin)
     obj = objs.DateRange.build(datetime)
     assert isinstance(obj.start, dt.datetime)
-    assert obj.start == datetime
+    assert obj.start == datetime.naive()
     assert obj.end is None
     assert obj.time_zone == tz_berlin
     assert obj.to_pendulum() == datetime
@@ -40,6 +39,3 @@ def test_date_range(tz_berlin):
     assert obj.end == datetime_interval.end
     assert obj.time_zone == 'UTC'
     assert obj.to_pendulum() == datetime_interval
-
-    with pytest.raises(ValueError):
-        objs.DateRange.build(dt.datetime(2024, 1, 1, 12, 0, 0, tzinfo=dt.timezone.utc))

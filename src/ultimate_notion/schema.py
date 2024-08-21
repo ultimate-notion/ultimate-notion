@@ -162,7 +162,7 @@ class Schema:
 
     @classmethod
     def _repr_html_(cls) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this schema."""
+        """Called by JupyterLab automatically to display this schema."""
         return cls.as_table(tablefmt='html')
 
     @classmethod

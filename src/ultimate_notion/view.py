@@ -169,7 +169,7 @@ class View:
             print(table_str)  # noqa: T201
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this view."""
+        """Called by JupyterLab automatically to display this view."""
         if len(self) > self.default_limit:
             html_str = self.limit(self.default_limit).as_table(tablefmt='html')
             html_str = f'<div style="display: inline-block;text-align: center;">{html_str}&#8942;</div></div>\n'

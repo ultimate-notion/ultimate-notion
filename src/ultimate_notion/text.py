@@ -209,7 +209,7 @@ class RichText(str):
         return render_md(self.to_markdown())
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this text."""
+        """Called by JupyterLab automatically to display this text."""
         return self.to_html()
 
     def __eq__(self, other: object) -> bool:

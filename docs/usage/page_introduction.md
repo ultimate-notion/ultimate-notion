@@ -23,7 +23,7 @@ notion = uno.Session.get_or_create()  # if NOTION_TOKEN is set in environment
 intro_page = notion.search_page('Getting Started').item()
 ```
 
-We can also display that content of the page within [Jupyter Lab] or even at the console with
+We can also display that content of the page within [JupyterLab] or even at the console with
 
 ```python
 intro_page.show()
@@ -93,15 +93,11 @@ f'Task "{task.title}" was {task.props["Status"]} on {task.props["Due Date"]}'
 
 ## Working with properties
 
-The properties of a page are all subclasses of [PropertyValue] and each provides a `value` attribute to
-access the actual low-level Python object like `int`, `float`, `datetime`, the `str` subtype [RichText]
-and so on. There are a few excpetions though like [Select], [MultiSelect] and [Status] where value will
-return an [Option] object given you access to its name, color and description.
+The properties of a page provide access to the actual low-level Python object like `int`, `float`, `datetime`,
+the `str` subtype [RichText] and so on. There are a few exceptions though, like [Select], [MultiSelect] and [Status],
+where an [Option] object given you access to its name, color and description.
 
-To change a page property, we can just assign a new value to the corresponding [PropertyValue]. This
-is possible with the corresponding property value from the `value` attribute but also using the
-low-level Python object. To demonstrate this we gonna set a different due date for our task but
-first we save the current value to switch it back again.
+To change a page property, we can just assign a new value to the corresponding property, e.g.:
 
 ```python
 from datetime import datetime, timedelta
@@ -110,7 +106,7 @@ old_due_date = task.props.due_date
 # assign a datetime Python object
 new_due_date_dt = datetime(2024, 1, 1, 12, 0) + timedelta(days=7)
 task.props.due_date = new_due_date_dt
-assert task.props.due_date.value.date() == new_due_date_dt.date()
+assert task.props.due_date.date() == new_due_date_dt.date()
 
 # reassign the old property value object
 task.props.due_date = old_due_date

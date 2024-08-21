@@ -185,4 +185,969 @@ interactions:
       - Express
     http_version: HTTP/1.1
     status_code: 200
+- request:
+    body: '{"query": "Task DB", "filter": {"property": "object", "value": "database"},
+      "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '93'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/search
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"database\",\"id\":\"30926987-8e4b-4721-8574-36a8fd17775d\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:46:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:46:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Task
+      List\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Task
+      List\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"A
+      really simple task lists with subtasks\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"A
+      really simple task lists with subtasks\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Parent
+      Task\":{\"id\":\"SatS\",\"name\":\"Parent Task\",\"type\":\"relation\",\"relation\":{\"database_id\":\"30926987-8e4b-4721-8574-36a8fd17775d\",\"type\":\"single_property\",\"single_property\":{}}},\"Due
+      by\":{\"id\":\"iSA%5E\",\"name\":\"Due by\",\"type\":\"date\",\"date\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/309269878e4b4721857436a8fd17775d\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"32dbf8a0-ce73-4b3b-8c12-676915382a08\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:46:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:46:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"nJzf\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"bb0d72c0-5ca2-46ca-97dc-8692cb4582eb\",\"type\":\"dual_property\",\"dual_property\":{\"synced_property_name\":\"Bought
+      by\",\"synced_property_id\":\"%3CFV%5B\"}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/32dbf8a0ce734b3b8c12676915382a08\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"bb0d72c0-5ca2-46ca-97dc-8692cb4582eb\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:46:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:46:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Bought
+      by\":{\"id\":\"%3CFV%5B\",\"name\":\"Bought by\",\"type\":\"relation\",\"relation\":{\"database_id\":\"32dbf8a0-ce73-4b3b-8c12-676915382a08\",\"type\":\"dual_property\",\"dual_property\":{\"synced_property_name\":\"Items
+      Purchased\",\"synced_property_id\":\"nJzf\"}}},\"Price\":{\"id\":\"J~Gb\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Size\":{\"id\":\"MynF\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"4813e4e7-bcb9-4abe-8788-a43889a5f1b7\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"8970a6e5-14c5-4317-958c-5d509e63ca87\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"fbbd0224-8401-4cf7-8b3d-e5d9ed62ae2e\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/bb0d72c05ca246ca97dc8692cb4582eb\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"80f59c45-0cf1-47cf-8dd4-3f0452899aea\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:42:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:42:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"ZV~c\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"d8b66a82-40fd-4fd6-8469-1d1c0e6577f2\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/80f59c450cf147cf8dd43f0452899aea\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"d8b66a82-40fd-4fd6-8469-1d1c0e6577f2\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:42:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:42:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Size\":{\"id\":\"%3Aj%60r\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"f9111126-bb3b-4438-b86a-d213c56f3c33\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"e50cf31f-7868-44b2-8acf-1a943a760ede\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"6e5f23e3-c49c-4dc4-8af3-08c79417e68c\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Price\":{\"id\":\"Cakf\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/d8b66a8240fd4fd684691d1c0e6577f2\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"88cea1ef-5686-4143-8f03-b2281d6c9428\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:41:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:41:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"sE%40%3F\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"ca6e2e46-7dc4-4be9-ae4b-fc2542f7f471\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/88cea1ef568641438f03b2281d6c9428\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"ca6e2e46-7dc4-4be9-ae4b-fc2542f7f471\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:41:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:41:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Price\":{\"id\":\"BYE%3E\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Size\":{\"id\":\"GN%5C%60\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"ef0e07a6-5aa2-48c0-8494-434e182d8515\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"2857ae80-97db-4118-a32d-3864448c31b1\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"975e27eb-4526-4beb-bade-d94950205759\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/ca6e2e467dc44be9ae4bfc2542f7f471\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"fe920f95-aeba-42aa-9dc6-7048b0ea9fd6\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:40:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:40:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"O~wb\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"be07f7d9-20a3-43d9-996d-ce25d546fcf4\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/fe920f95aeba42aa9dc67048b0ea9fd6\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"be07f7d9-20a3-43d9-996d-ce25d546fcf4\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:40:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:40:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Price\":{\"id\":\"%3EWrV\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Size\":{\"id\":\"zA%3Es\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"a3ecc569-3a14-4bb9-a131-bdadb1816cc8\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"7eb45489-c20e-4ca3-bd9a-838a564bddf6\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"76f830a6-8a8b-4b92-88e7-4700027c6499\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/be07f7d920a343d9996dce25d546fcf4\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"10e01743-0b5c-49f4-af14-4c95e1fffe3e\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:37:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:37:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"aeXt\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"237cd43d-224d-446e-aaa5-a0a0cf92e049\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/10e017430b5c49f4af144c95e1fffe3e\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"237cd43d-224d-446e-aaa5-a0a0cf92e049\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:37:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:37:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Price\":{\"id\":\"nyPi\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Size\":{\"id\":\"uf%5C%7C\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"9a4897dd-909f-414b-8611-c5ac8616fa07\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"56be6e17-4c18-47b6-9f1a-09e2b67596d5\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"69a2e4f3-e606-4056-bf87-014bf65f8c25\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/237cd43d224d446eaaa5a0a0cf92e049\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"134ab843-001f-4929-9d5e-12f6819632b7\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:36:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"m%3Dru\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"a46f5ca8-a8ce-4a93-9116-99d5d2c59936\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/134ab843001f49299d5e12f6819632b7\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"a46f5ca8-a8ce-4a93-9116-99d5d2c59936\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:36:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Size\":{\"id\":\"A%3CVc\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"af0d4dda-a3e3-4c9a-a0f2-1cd32dde22a9\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"fa566f9f-e534-4ae1-b560-7e31c003080e\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"0e00a73f-4e80-47fa-8c28-1203a1d500ab\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Price\":{\"id\":\"HJRx\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/a46f5ca8a8ce4a93911699d5d2c59936\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"73c5cb34-103e-453a-91dd-8f3eb165119d\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:34:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:34:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Task
+      List\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Task
+      List\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"A
+      really simple task lists with subtasks\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"A
+      really simple task lists with subtasks\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Due
+      by\":{\"id\":\"%3ADhG\",\"name\":\"Due by\",\"type\":\"date\",\"date\":{}},\"Parent
+      Task\":{\"id\":\"TTsv\",\"name\":\"Parent Task\",\"type\":\"relation\",\"relation\":{\"database_id\":\"73c5cb34-103e-453a-91dd-8f3eb165119d\",\"type\":\"single_property\",\"single_property\":{}}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/73c5cb34103e453a91dd8f3eb165119d\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"5d49e7b8-96ad-41f4-a618-a12996694313\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:34:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:34:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"%7DeR%40\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"635d0db6-2020-4d51-ba38-402a60056e27\",\"type\":\"dual_property\",\"dual_property\":{\"synced_property_name\":\"Bought
+      by\",\"synced_property_id\":\"E%60uV\"}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/5d49e7b896ad41f4a618a12996694313\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"635d0db6-2020-4d51-ba38-402a60056e27\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:33:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:34:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Bought
+      by\":{\"id\":\"E%60uV\",\"name\":\"Bought by\",\"type\":\"relation\",\"relation\":{\"database_id\":\"5d49e7b8-96ad-41f4-a618-a12996694313\",\"type\":\"dual_property\",\"dual_property\":{\"synced_property_name\":\"Items
+      Purchased\",\"synced_property_id\":\"%7DeR%40\"}}},\"Size\":{\"id\":\"Hpp%3A\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"db9cb5b0-8b51-4c2a-bcc1-ecc5369ef380\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"b775bd04-e6d5-49b5-9b33-70467f6ed4e3\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"b9f46c72-e003-4eca-b686-4f543c268642\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Price\":{\"id\":\"eyUS\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/635d0db620204d51ba38402a60056e27\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"99348910-bfb1-4013-bf79-c5fc733ce1f4\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:32:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:32:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"FiT%5C\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"ee8d5485-41cd-489f-a6d5-3050b319f7b0\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/99348910bfb14013bf79c5fc733ce1f4\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"ee8d5485-41cd-489f-a6d5-3050b319f7b0\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:32:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:32:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Price\":{\"id\":\"i%7D%7CB\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Size\":{\"id\":\"sIiD\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"a7b00079-3a7c-4c48-947c-40aeaac28cc8\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"709d8a0b-9ae7-4f03-bcff-a459a6545b75\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"3c13dc66-7a1d-452b-93bb-e7758ac0ca22\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/ee8d548541cd489fa6d53050b319f7b0\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"83a6fd93-d54b-48df-859e-0fb7ca76c7b4\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:24:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:24:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"hQk%5E\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"5725709c-3185-4718-91eb-c9faad8d3a86\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/83a6fd93d54b48df859e0fb7ca76c7b4\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"5725709c-3185-4718-91eb-c9faad8d3a86\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:24:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:24:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Price\":{\"id\":\"VFrf\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Size\":{\"id\":\"%5EB%7BX\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"c871cc17-be3c-4db9-bc2d-1a3be0c84ba3\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"8cd0cdb0-6fde-4f2d-90a8-8b14e989b1a0\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"0330d996-7347-4192-93f4-352714fb443b\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/5725709c3185471891ebc9faad8d3a86\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"281000fa-5da0-4e0a-930a-980885573bcd\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:19:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:19:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Customer
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Customer
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all our beloved customers\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all our beloved customers\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Items
+      Purchased\":{\"id\":\"y%3BYd\",\"name\":\"Items Purchased\",\"type\":\"relation\",\"relation\":{\"database_id\":\"97eddb52-f8fe-44e3-a5cf-07bd68c04086\",\"type\":\"single_property\",\"single_property\":{}}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/281000fa5da04e0a930a980885573bcd\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"97eddb52-f8fe-44e3-a5cf-07bd68c04086\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-21T16:19:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-21T16:19:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Item
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Item
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all the items we sell\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all the items we sell\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Size\":{\"id\":\"KQ%5Cw\",\"name\":\"Size\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"8e5d06d0-22a0-425c-a22a-5881f37820c0\",\"name\":\"S\",\"color\":\"green\",\"description\":null},{\"id\":\"01eb38e0-e647-44f0-ae83-3323289d4286\",\"name\":\"M\",\"color\":\"yellow\",\"description\":null},{\"id\":\"de6d590a-fd62-409c-9595-69a032cd0fdb\",\"name\":\"L\",\"color\":\"red\",\"description\":null}]}},\"Price\":{\"id\":\"ZRN%7B\",\"name\":\"Price\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/97eddb52f8fe44e3a5cf07bd68c04086\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"5162bc14-0d88-4212-93ee-b2c07cc43f00\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-19T19:50:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-19T19:50:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Status\":{\"id\":\"VdJ%5E\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"d2a8dbbf-a4eb-4117-98d9-2deb51531cce\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"42d13193-77e1-4f34-8bd0-c6feff6ba23e\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"81c381cc-37c9-4488-addd-876163c4193e\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"0aa5fcad-f51a-4ac7-98f2-593370c0338a\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Urgency\":{\"id\":\"gM%3Cm\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:VdJ%5E:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:vU%7DH:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Due Date\":{\"id\":\"vU%7DH\",\"name\":\"Due
+      Date\",\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"yTDR\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"294198f7-d5f6-444e-8e85-c2b6fee132ac\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"3209234b-e677-4c29-b48d-b888f0c993f2\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"2cbab90f-c464-4396-8e04-f053aaace77d\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/5162bc140d88421293eeb2c07cc43f00\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"905fe1f5-9114-418f-b044-6fec85466aba\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-19T08:17:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-19T08:17:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Due
+      Date\":{\"id\":\"%3DIub\",\"name\":\"Due Date\",\"type\":\"date\",\"date\":{}},\"Status\":{\"id\":\"%3FvVt\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"d7104726-3daf-4d34-b3c1-d8597e98d518\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"f5531777-112b-444e-b464-f1baef32481f\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"c1b55bd8-d45a-49eb-88ee-70249adc772c\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"bc3d3867-b69a-4b4b-ad16-2679a624822b\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Priority\":{\"id\":\"WvpJ\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"3c616fbe-df97-48e9-aff8-571256ee2e6d\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"f4251d7f-7692-4386-9d6d-859342900d58\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"c450dd36-4458-4a39-ad03-7292312fa73b\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Urgency\":{\"id\":\"uW_y\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:%3FvVt:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%3DIub:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/905fe1f59114418fb0446fec85466aba\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"71401dba-1bd2-4448-aa70-01382d985358\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-12T19:46:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-12T19:46:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Due
+      Date\":{\"id\":\"%40uTT\",\"name\":\"Due Date\",\"type\":\"date\",\"date\":{}},\"Urgency\":{\"id\":\"eMW_\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:zt%3EO:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:%40uTT:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Status\":{\"id\":\"zt%3EO\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"5635d834-5966-4af0-a0ec-2275546c976f\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"eb6a5379-de90-46ae-a8ea-21a7c9e70697\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"bd5dc04a-24c6-4c25-9e01-56d8192e5a70\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"6d2fcfe8-d021-4317-8112-e1e072608ebf\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Priority\":{\"id\":\"%7DiC%3A\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"5d4be7c5-780c-4cf8-87c8-0cf4b3b08134\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"df4565a9-e07e-469d-985c-4d9b7f2d9282\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"057a8a10-69f2-41f0-9b16-6d8a075674ea\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/71401dba1bd24448aa7001382d985358\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"f1e0a3f0-424f-4da6-b99c-a3a3779678c6\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-12T08:18:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-12T08:18:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Priority\":{\"id\":\"EUdP\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"1f42e6de-3338-4037-8e19-6398b95c2259\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"1fb734e2-25bc-4761-b8a0-757248baca4c\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"d890d312-d0f1-44d3-b055-ff333cc37b23\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Urgency\":{\"id\":\"Rq_o\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:gc%3Cj:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:thkh:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Status\":{\"id\":\"gc%3Cj\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"ca9dd2b6-cf30-4411-966c-027efe3582e6\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"d3777d56-20d3-43b1-b97c-0504dcda8255\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"88829c92-441f-4504-bdac-5d4a7e18663e\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"e7b873bc-ae2a-466b-a1ae-8f38d1274e17\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Due
+      Date\":{\"id\":\"thkh\",\"name\":\"Due Date\",\"type\":\"date\",\"date\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/f1e0a3f0424f4da6b99ca3a3779678c6\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"978322bd-9492-4193-81b2-453f14a28e09\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-09T14:37:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-09T14:37:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Urgency\":{\"id\":\"Be%40W\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:F%3A%5CU:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:jD~%3D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Status\":{\"id\":\"F%3A%5CU\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"03387f56-3988-49e5-9557-55bd2607084f\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"75e77ad8-e45e-4fd9-b689-1450dd68cf1f\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"6ad95acd-d224-4783-9346-0ce2fc6373bd\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"6bd3da5d-7133-4617-b6f9-ab0bc9cd373d\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Priority\":{\"id\":\"am_F\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"852593ad-c9de-42ed-8b94-98ecc6cbe964\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"beb28ba2-b9a3-4ac6-99fb-41c9daef3039\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"41d32c94-d8cc-43d1-94c8-714457863d43\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Due Date\":{\"id\":\"jD~%3D\",\"name\":\"Due
+      Date\",\"type\":\"date\",\"date\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/978322bd9492419381b2453f14a28e09\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"13ffd987-db96-4fea-9154-b3ceab46927e\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-09T13:55:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-09T13:55:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Urgency\":{\"id\":\"VFUI\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:%7ByvS:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:Zk%5Db:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Due Date\":{\"id\":\"Zk%5Db\",\"name\":\"Due
+      Date\",\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"%5Bt%3C%3E\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"1ed16024-2e8a-48e4-8a4a-766612ae944d\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"58044fbe-4427-42e2-b1f3-9d0dad67a105\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"b5d0157f-577a-4084-836b-72ce10e0b7b8\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Status\":{\"id\":\"%7ByvS\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"8d712a13-8c65-4c30-9cdc-3b6bb3b967bf\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"7b283351-f292-433f-9291-3e1483f12891\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"b270ffd8-a26c-4fcf-a983-910cff1ea12f\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"52766805-6abf-4deb-9957-c97e195d2459\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/13ffd987db964fea9154b3ceab46927e\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"bf6df392-4ef6-4734-a5b5-852171c4f519\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-09T13:51:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-09T13:51:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Due
+      Date\":{\"id\":\"A%3Dn~\",\"name\":\"Due Date\",\"type\":\"date\",\"date\":{}},\"Urgency\":{\"id\":\"Mymv\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:VyF%7D:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:A%3Dn~:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Status\":{\"id\":\"VyF%7D\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"a5e27683-b026-4453-bf01-84617d7dbc56\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"b4ab0dde-d605-4dcd-803b-f73c43701d7f\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"86d4fd90-2c70-42d1-93d2-27a7a8c6e952\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"63d4f26b-298c-4b1e-9d71-225ff472a7ca\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Priority\":{\"id\":\"jsTV\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"acd1f806-6e05-4add-8f81-c8e353517dd1\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"7230b281-663b-47ab-837a-5feffd36cc38\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"21d262c0-28fc-4dff-bc91-df72ad32c679\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/bf6df3924ef64734a5b5852171c4f519\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"5968dad0-7dd3-4d27-82f7-c876e2bbe359\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-09T13:50:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-09T13:50:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Status\":{\"id\":\"%40%3EPL\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"ec90b0b7-4f9b-4c20-8ac7-07a34e68b711\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"f518a24a-d7df-47d0-b1f6-c7977de7fb45\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"741c32fb-18c9-4440-8c5f-baecfcbfe752\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"0f913410-c506-4b78-a435-02a0719fcc1b\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Due
+      Date\":{\"id\":\"LI~%3C\",\"name\":\"Due Date\",\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"Otix\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"a0e33be5-71f9-4030-ba4b-0a8a9f582654\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"b26c1726-d29f-40eb-928f-a15865cab29b\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"c7eebe30-b9be-4fa1-8ffb-e6d1ff80b3b6\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Urgency\":{\"id\":\"mb%5Ez\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:%40%3EPL:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:LI~%3C:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/5968dad07dd34d2782f7c876e2bbe359\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"624d3fd5-bab9-4826-a9b1-715f3a5aa855\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-09T13:45:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-09T13:45:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Urgency\":{\"id\":\"ON%60R\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:cswO:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:W%5Cad:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Due Date\":{\"id\":\"W%5Cad\",\"name\":\"Due
+      Date\",\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"%5EOt%3D\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"0b7a3362-f4a6-4d03-b04a-e82fc5b76eec\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"15ca8234-ae76-455e-bd1c-32b2e67c12c9\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"81bc19af-bf82-47dd-b107-7f7f7657917e\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Status\":{\"id\":\"cswO\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"dba453dc-0bc8-4a04-8d14-7fa00a59d2d3\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"e802e7b7-390e-4e00-a377-dcf530395b07\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"b58ab0e5-9d96-4fc5-9814-5708f741ed4b\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"f6aa2fee-db92-46cd-bafc-0554bce9f9c0\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/624d3fd5bab94826a9b1715f3a5aa855\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"93f8d17e-901b-4213-a675-85c1b707c34c\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-09T13:30:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-09T13:30:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Due
+      Date\":{\"id\":\"J%7BCs\",\"name\":\"Due Date\",\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"ME%3Ag\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"9a71e2e9-dc9f-470f-9c6a-749cc5342a00\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"1ef9cc54-c192-4cd1-b2e4-7c5d77c1f927\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"4aa3e37e-84ad-49e6-b967-f20988b25986\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Status\":{\"id\":\"%5Bo%3Dw\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"a798c479-ec11-4983-95a4-224c3f5f2089\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"17e3bf34-7a52-4955-8bdd-ecd296b613fa\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"2475f944-8e55-4b75-8dd6-c565201b68e8\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"95d1ff5e-b5f1-49ee-8d3b-88c68c45b646\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Urgency\":{\"id\":\"l%3AIN\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:%5Bo%3Dw:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:J%7BCs:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/93f8d17e901b4213a67585c1b707c34c\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"5d7f0a87-f92a-471f-8b45-4828d4bf27b3\",\"cover\":null,\"icon\":null,\"created_time\":\"2024-08-09T12:05:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2024-08-09T12:05:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      task list\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Urgency\":{\"id\":\"%3F%3DqE\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:_k%3BZ:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:TroI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Due Date\":{\"id\":\"TroI\",\"name\":\"Due
+      Date\",\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"%5DXql\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"63d4ada5-17d9-414f-b875-1603f50366f3\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"cd76b337-fb12-4c19-99fe-99d2accfe079\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"5d130c95-ec49-4630-ae1c-69d716f079ed\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Status\":{\"id\":\"_k%3BZ\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"1a279dc0-b541-42fd-a1ee-3fb5b5f7c183\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"2a1b1be4-c18a-4f6a-816c-8817746d7c52\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"eec9db03-baea-4129-a503-596140844c55\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"3f90feb0-1cf7-458e-b32e-e2e5465aa032\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/5d7f0a87f92a471f8b454828d4bf27b3\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"4fa8756f-a0da-4efe-9c48-4d6a323b69f8\",\"cover\":null,\"icon\":null,\"created_time\":\"2023-08-12T12:22:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2024-06-01T20:01:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"All
+      Properties DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"All
+      Properties DB\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"Files\":{\"id\":\"%3BCha\",\"name\":\"Files\",\"type\":\"files\",\"files\":{}},\"Select\":{\"id\":\"%3Dzw%7C\",\"name\":\"Select\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"b554ca09-3d4d-4963-b24e-b4789755e79e\",\"name\":\"Option1\",\"color\":\"default\",\"description\":null},{\"id\":\"853aabd5-b24e-479f-9b16-5b1d50995f10\",\"name\":\"Option2\",\"color\":\"red\",\"description\":null}]}},\"Last
+      edited time\":{\"id\":\"%3D%7B%7BM\",\"name\":\"Last edited time\",\"type\":\"last_edited_time\",\"last_edited_time\":{}},\"Created
+      by\":{\"id\":\"Bde%5C\",\"name\":\"Created by\",\"type\":\"created_by\",\"created_by\":{}},\"ID\":{\"id\":\"GIY%3B\",\"name\":\"ID\",\"type\":\"unique_id\",\"unique_id\":{\"prefix\":\"ABC\"}},\"Email\":{\"id\":\"IWgp\",\"name\":\"Email\",\"type\":\"email\",\"email\":{}},\"Date\":{\"id\":\"LG%3AF\",\"name\":\"Date\",\"type\":\"date\",\"date\":{}},\"People\":{\"id\":\"OTkG\",\"name\":\"People\",\"type\":\"people\",\"people\":{}},\"Checkbox\":{\"id\":\"QxPZ\",\"name\":\"Checkbox\",\"type\":\"checkbox\",\"checkbox\":{}},\"Number\":{\"id\":\"WL%40f\",\"name\":\"Number\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Status\":{\"id\":\"%5Enaj\",\"name\":\"Status\",\"type\":\"status\",\"status\":{\"options\":[{\"id\":\"dce1e338-da63-4b60-8126-6752aec02589\",\"name\":\"Not
+      started\",\"color\":\"default\",\"description\":null},{\"id\":\"61b541c0-4d17-4059-b158-8b72b6aef724\",\"name\":\"In
+      progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"1b92c97e-00e4-4409-be80-c48e2906e443\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}],\"groups\":[{\"id\":\"efa11b9c-c42f-4a78-a096-20c583573047\",\"name\":\"To-do\",\"color\":\"gray\",\"option_ids\":[\"dce1e338-da63-4b60-8126-6752aec02589\"]},{\"id\":\"6006542b-8e37-4dab-b232-edde3cebb032\",\"name\":\"In
+      progress\",\"color\":\"blue\",\"option_ids\":[\"61b541c0-4d17-4059-b158-8b72b6aef724\"]},{\"id\":\"11dfbcef-680a-4392-a439-568e93683c7d\",\"name\":\"Complete\",\"color\":\"green\",\"option_ids\":[\"1b92c97e-00e4-4409-be80-c48e2906e443\"]}]}},\"AI
+      custom\":{\"id\":\"b%5DMq\",\"name\":\"AI custom\",\"type\":\"rich_text\",\"rich_text\":{}},\"Text\":{\"id\":\"dNkb\",\"name\":\"Text\",\"type\":\"rich_text\",\"rich_text\":{}},\"AI
+      key info\":{\"id\":\"iGrF\",\"name\":\"AI key info\",\"type\":\"rich_text\",\"rich_text\":{}},\"Phone
+      number\":{\"id\":\"k%7DwY\",\"name\":\"Phone number\",\"type\":\"phone_number\",\"phone_number\":{}},\"AI
+      summary\":{\"id\":\"p%5CHX\",\"name\":\"AI summary\",\"type\":\"rich_text\",\"rich_text\":{}},\"Rollup\":{\"id\":\"pwp_\",\"name\":\"Rollup\",\"type\":\"rollup\",\"rollup\":{\"rollup_property_name\":\"Name\",\"relation_property_name\":\"Relation\",\"rollup_property_id\":\"title\",\"relation_property_id\":\"|eR]\",\"function\":\"count\"}},\"Relation
+      two-way\":{\"id\":\"sXu%40\",\"name\":\"Relation two-way\",\"type\":\"relation\",\"relation\":{\"database_id\":\"301bb96e-972c-4d15-bfb3-debcef317109\",\"type\":\"dual_property\",\"dual_property\":{\"synced_property_name\":\"Related
+      to Schema B (1) (Relation two-way)\",\"synced_property_id\":\"J_fD\"}}},\"Last
+      edited by\":{\"id\":\"uaO%5E\",\"name\":\"Last edited by\",\"type\":\"last_edited_by\",\"last_edited_by\":{}},\"Formula\":{\"id\":\"wsPE\",\"name\":\"Formula\",\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:WL%40f:5dd6f15d-e78b-422b-84f6-ade77aa73906:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      * 2\"}},\"URL\":{\"id\":\"ypoy\",\"name\":\"URL\",\"type\":\"url\",\"url\":{}},\"Created
+      time\":{\"id\":\"%7CLPX\",\"name\":\"Created time\",\"type\":\"created_by\",\"created_by\":{}},\"Relation\":{\"id\":\"%7CeR%5D\",\"name\":\"Relation\",\"type\":\"relation\",\"relation\":{\"database_id\":\"301bb96e-972c-4d15-bfb3-debcef317109\",\"type\":\"single_property\",\"single_property\":{}}},\"Multi-Select\":{\"id\":\"~ML%40\",\"name\":\"Multi-Select\",\"type\":\"multi_select\",\"multi_select\":{\"options\":[{\"id\":\"]klO\",\"name\":\"MultiOption1\",\"color\":\"purple\",\"description\":null},{\"id\":\"\\\\vwn\",\"name\":\"MultiOption2\",\"color\":\"yellow\",\"description\":null}]}},\"Title\":{\"id\":\"title\",\"name\":\"Title\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/4fa8756fa0da4efe9c484d6a323b69f8\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"b0cb6b70-e740-496d-9c81-8a298fa2d5e1\",\"cover\":null,\"icon\":null,\"created_time\":\"2023-12-02T16:10:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2023-12-03T10:26:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Task
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Task
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Urgency\":{\"id\":\"JDC%3D\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:ob%5DU:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Due Date\":{\"id\":\"K%3A%3Fo\",\"name\":\"Due
+      Date\",\"type\":\"date\",\"date\":{}},\"Status\":{\"id\":\"ob%5DU\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"87cca86b-1377-4ca0-b8f6-1ac78beeff06\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"ce60f469-5d10-4c18-937f-3e8a539f7bff\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"a91749bb-7d95-4a1d-a510-3b2e1f9f1852\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"d9f19f59-2ac7-405e-b2e5-1740e808c9be\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Priority\":{\"id\":\"sGSq\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"131f03a1-028c-4fac-97fa-f2a5aee5a196\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"f73161a0-22a3-460a-8f64-eb24148f01cb\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"bf393d83-8f47-4fb9-88e3-f6a8be3fa324\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/b0cb6b70e740496d9c818a298fa2d5e1\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"d4f1e8cd-1a15-4e16-97d9-900f12740960\",\"cover\":null,\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F91D\"},\"created_time\":\"2023-03-30T07:19:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2023-11-24T11:13:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Contacts
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Contacts
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all my contacts!\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all my contacts!\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Level\":{\"id\":\"%3CVau\",\"name\":\"Level\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"2c039f9c-787a-4a7c-ad3e-027e126170a5\",\"name\":\"Student\",\"color\":\"purple\",\"description\":null},{\"id\":\"GiE^\",\"name\":\"Junior\",\"color\":\"default\",\"description\":null},{\"id\":\"]yHE\",\"name\":\"Advanced\",\"color\":\"blue\",\"description\":null},{\"id\":\"Sg=B\",\"name\":\"Senior\",\"color\":\"orange\",\"description\":null},{\"id\":\"bcd02e10-3ad5-4f7e-aaf4-397a5c7bb043\",\"name\":\"Lead\",\"color\":\"red\",\"description\":null}]}},\"Sync
+      Date\":{\"id\":\"%3DG~u\",\"name\":\"Sync Date\",\"type\":\"date\",\"date\":{}},\"Last
+      Sync Days\":{\"id\":\"%40%5E%3Au\",\"name\":\"Last Sync Days\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty({{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), (if(({{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      < now()), dateBetween(now(), {{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\"), (-dateBetween({{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\") - 1))))\"}},\"---- Separator ----\":{\"id\":\"%40qHE\",\"name\":\"----
+      Separator ----\",\"type\":\"formula\",\"formula\":{\"expression\":\"format(\\\"Properties
+      below here are for internal use\\\")\"}},\"URL\":{\"id\":\"HNS%3D\",\"name\":\"URL\",\"type\":\"url\",\"url\":{}},\"Address\":{\"id\":\"NKkT\",\"name\":\"Address\",\"type\":\"rich_text\",\"rich_text\":{}},\"Team
+      Member\":{\"id\":\"PvPD\",\"name\":\"Team Member\",\"type\":\"checkbox\",\"checkbox\":{}},\"Employed\":{\"id\":\"QlK%5D\",\"name\":\"Employed\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      (if(({{notion:block_property:PvPD:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      and empty({{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      true, (dateBetween(now(), {{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\") <= 0))), (if(((dateBetween(now(), {{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\") >= 0) and empty({{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      true, (dateBetween(now(), {{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\") <= 0))))\"}},\"Churn Prob\":{\"id\":\"T~sL\",\"name\":\"Churn
+      Prob\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"mqQI\",\"name\":\"80-100%\",\"color\":\"red\",\"description\":null},{\"id\":\"lio?\",\"name\":\"60-80%\",\"color\":\"orange\",\"description\":null},{\"id\":\"LcmD\",\"name\":\"40-60%\",\"color\":\"yellow\",\"description\":null},{\"id\":\"2656618f-c56d-49ac-ba5a-4d5a6b00b0b1\",\"name\":\"20-40%\",\"color\":\"blue\",\"description\":null},{\"id\":\"5631d5f7-d4f9-4d8f-a5ee-e449e792b427\",\"name\":\"0-20%\",\"color\":\"green\",\"description\":null}]}},\"Hiring
+      Date\":{\"id\":\"UnqB\",\"name\":\"Hiring Date\",\"type\":\"date\",\"date\":{}},\"Role\":{\"id\":\"VDIf\",\"name\":\"Role\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"bcd82259-013f-4f13-a43a-2748259e65db\",\"name\":\"Project
+      Manager\",\"color\":\"green\",\"description\":null},{\"id\":\"582f17e9-67be-4ac5-b234-b0c229e4ac4a\",\"name\":\"Software
+      Engineer\",\"color\":\"gray\",\"description\":null},{\"id\":\"1309de51-837b-4275-afef-fa1c02790796\",\"name\":\"UX
+      Designer\",\"color\":\"red\",\"description\":null},{\"id\":\"c34ad2a9-1c18-4dae-a7af-b671df73e9fd\",\"name\":\"Marketing
+      Manager\",\"color\":\"orange\",\"description\":null},{\"id\":\"629c75af-6a97-42ac-9a93-5b9382c0e8ea\",\"name\":\"Data
+      Analyst\",\"color\":\"blue\",\"description\":null},{\"id\":\"88188652-8232-43e0-9e2f-ccd1d631f0ff\",\"name\":\"QA
+      Engineer\",\"color\":\"default\",\"description\":null},{\"id\":\"af9cd9b5-35ba-4e5e-8e5f-34dc5f34dccc\",\"name\":\"Technical
+      Writer\",\"color\":\"pink\",\"description\":null},{\"id\":\"49e3cd1d-4c88-47c6-8a43-3992102da933\",\"name\":\"Business
+      Analyst\",\"color\":\"purple\",\"description\":null},{\"id\":\"60f1ff4e-1658-4891-b286-e1b16dd002ea\",\"name\":\"IT
+      Support Specialist\",\"color\":\"yellow\",\"description\":null}]}},\"Organisation\":{\"id\":\"WeW%7C\",\"name\":\"Organisation\",\"type\":\"relation\",\"relation\":{\"database_id\":\"43bd0020-f0a0-4182-9bfe-9ebb0242d2d3\",\"type\":\"single_property\",\"single_property\":{}}},\"Closest
+      Birthday\":{\"id\":\"YlLd\",\"name\":\"Closest Birthday\",\"type\":\"formula\",\"formula\":{\"expression\":\"if((abs(dateBetween(now(),
+      dateAdd({{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      dateBetween(now(), {{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\") + 1, \\\"years\\\"), \\\"days\\\")) <= 182), dateAdd({{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      dateBetween(now(), {{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\") + 1, \\\"years\\\"), dateAdd({{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      dateBetween(now(), {{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\"), \\\"years\\\"))\"}},\"Years of Experience when hired\":{\"id\":\"Z%3EDh\",\"name\":\"Years
+      of Experience when hired\",\"type\":\"number\",\"number\":{\"format\":\"number\"}},\"Work
+      Experience\":{\"id\":\"%5C%40F%3A\",\"name\":\"Work Experience\",\"type\":\"formula\",\"formula\":{\"expression\":\"if((empty(format({{notion:block_property:Z%3EDh:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}))
+      or empty({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      \\\"\\\", (format(round((dateBetween(now(), dateSubtract({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      {{notion:block_property:Z%3EDh:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\"), \\\"months\\\") / 12) * 10) / 10) + \\\" years\\\"))\"}},\"Office\":{\"id\":\"_EW%7D\",\"name\":\"Office\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"777425b8-2264-443c-8679-94dfe5e35942\",\"name\":\"New
+      York\",\"color\":\"red\",\"description\":null},{\"id\":\"f003520b-0303-4c91-ba6a-71c9e6d0ff8b\",\"name\":\"Paris\",\"color\":\"purple\",\"description\":null},{\"id\":\"fbb86129-419c-4281-98ef-3e3adc30f945\",\"name\":\"Tokyo\",\"color\":\"gray\",\"description\":null},{\"id\":\"4cda1d43-069c-4f6a-805b-3c36cf74acdc\",\"name\":\"Barcelona\",\"color\":\"pink\",\"description\":null},{\"id\":\"bac77c28-cd9d-4bc8-b211-03b462dd08d8\",\"name\":\"Berlin\",\"color\":\"brown\",\"description\":null},{\"id\":\"9654df26-6f36-4fd8-8b48-e187a310ff7d\",\"name\":\"London\",\"color\":\"blue\",\"description\":null}]}},\"Termination
+      Date\":{\"id\":\"_e%3AX\",\"name\":\"Termination Date\",\"type\":\"date\",\"date\":{}},\"Last
+      Sync Weeks\":{\"id\":\"fIaS\",\"name\":\"Last Sync Weeks\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), ((if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      < 0), -1, 1)) * floor(abs({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})
+      / 7)))\"}},\"Working Time\":{\"id\":\"g%5Cv%5B\",\"name\":\"Working Time\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"4e2d8444-963d-4c66-b17b-552ec37f9537\",\"name\":\"50%\",\"color\":\"blue\",\"description\":null},{\"id\":\"dhC~\",\"name\":\"80%\",\"color\":\"gray\",\"description\":null},{\"id\":\"ww}|\",\"name\":\"100%\",\"color\":\"purple\",\"description\":null}]}},\"Annual
+      Review\":{\"id\":\"imne\",\"name\":\"Annual Review\",\"type\":\"formula\",\"formula\":{\"expression\":\"formatDate({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"MMMM\\\")\"}},\"Last Sync\":{\"id\":\"pIKB\",\"name\":\"Last Sync\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty(format({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      \\\"? ago\\\", (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      < 0), (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == -1), \\\"Tomorrow\\\", ((\\\"In \\\" + (if(({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 0), \\\"\\\", (format(abs({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}))
+      + \\\"w\\\")))) + (if((({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      % 7) == 0), \\\"\\\", (format(abs({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})
+      % 7) + \\\"d\\\")))))), (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 0), \\\"Today\\\", (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 1), \\\"Yesterday\\\", (((if(({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 0), \\\"\\\", (format(abs({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}))
+      + \\\"w\\\"))) + (if((({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      % 7) == 0), \\\"\\\", (format(abs({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})
+      % 7) + \\\"d\\\")))) + \\\" ago\\\"))))))))\"}},\"Birthday\":{\"id\":\"wOOq\",\"name\":\"Birthday\",\"type\":\"date\",\"date\":{}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}},\"Title\":{\"id\":\"46e20866-67b7-4cbb-891f-9b440c18da79\",\"name\":\"Title\",\"type\":\"rich_text\",\"rich_text\":{}},\"Email\":{\"id\":\"cc99764e-99e5-40a9-8b6d-5a1691141dee\",\"name\":\"Email\",\"type\":\"email\",\"email\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/d4f1e8cd1a154e1697d9900f12740960\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"4c6e7417-ef05-4b7e-b55e-62ecbb55a38d\",\"cover\":null,\"icon\":null,\"created_time\":\"2023-08-12T13:26:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2023-08-12T14:00:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Wiki
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Wiki
+      DB\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"Verification\":{\"id\":\"Mw%5E%3C\",\"name\":\"Verification\",\"type\":\"verification\",\"verification\":{}},\"Tags\":{\"id\":\"OESf\",\"name\":\"Tags\",\"type\":\"multi_select\",\"multi_select\":{\"options\":[{\"id\":\"4036ff5b-932f-4883-8d0c-6ca1fa6f9cf6\",\"name\":\"Onboarding\",\"color\":\"blue\",\"description\":null},{\"id\":\"869be616-aa64-491d-b56c-161ea3e81b56\",\"name\":\"Design\",\"color\":\"green\",\"description\":null}]}},\"Last
+      edited time\":{\"id\":\"%5EB_%40\",\"name\":\"Last edited time\",\"type\":\"last_edited_time\",\"last_edited_time\":{}},\"Page\":{\"id\":\"title\",\"name\":\"Page\",\"type\":\"title\",\"title\":{}},\"Owner\":{\"id\":\"notion%3A%2F%2Fwiki%2Fowner_property\",\"name\":\"Owner\",\"type\":\"people\",\"people\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/4c6e7417ef054b7eb55e62ecbb55a38d\",\"public_url\":null,\"archived\":false,\"in_trash\":false}],\"next_cursor\":null,\"has_more\":false,\"type\":\"page_or_database\",\"page_or_database\":{},\"request_id\":\"f90e2675-161a-47fd-8794-ee040b81f775\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8b6c3bf3e923361f-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - f90e2675-161a-47fd-8794-ee040b81f775
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"query": "Task DB", "filter": {"property": "object", "value": "database"},
+      "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '93'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/search
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"database\",\"id\":\"4fa8756f-a0da-4efe-9c48-4d6a323b69f8\",\"cover\":null,\"icon\":null,\"created_time\":\"2023-08-12T12:22:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2024-06-01T20:01:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"All
+      Properties DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"All
+      Properties DB\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"Files\":{\"id\":\"%3BCha\",\"name\":\"Files\",\"type\":\"files\",\"files\":{}},\"Select\":{\"id\":\"%3Dzw%7C\",\"name\":\"Select\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"b554ca09-3d4d-4963-b24e-b4789755e79e\",\"name\":\"Option1\",\"color\":\"default\",\"description\":null},{\"id\":\"853aabd5-b24e-479f-9b16-5b1d50995f10\",\"name\":\"Option2\",\"color\":\"red\",\"description\":null}]}},\"Last
+      edited time\":{\"id\":\"%3D%7B%7BM\",\"name\":\"Last edited time\",\"type\":\"last_edited_time\",\"last_edited_time\":{}},\"Created
+      by\":{\"id\":\"Bde%5C\",\"name\":\"Created by\",\"type\":\"created_by\",\"created_by\":{}},\"ID\":{\"id\":\"GIY%3B\",\"name\":\"ID\",\"type\":\"unique_id\",\"unique_id\":{\"prefix\":\"ABC\"}},\"Email\":{\"id\":\"IWgp\",\"name\":\"Email\",\"type\":\"email\",\"email\":{}},\"Date\":{\"id\":\"LG%3AF\",\"name\":\"Date\",\"type\":\"date\",\"date\":{}},\"People\":{\"id\":\"OTkG\",\"name\":\"People\",\"type\":\"people\",\"people\":{}},\"Checkbox\":{\"id\":\"QxPZ\",\"name\":\"Checkbox\",\"type\":\"checkbox\",\"checkbox\":{}},\"Number\":{\"id\":\"WL%40f\",\"name\":\"Number\",\"type\":\"number\",\"number\":{\"format\":\"dollar\"}},\"Status\":{\"id\":\"%5Enaj\",\"name\":\"Status\",\"type\":\"status\",\"status\":{\"options\":[{\"id\":\"dce1e338-da63-4b60-8126-6752aec02589\",\"name\":\"Not
+      started\",\"color\":\"default\",\"description\":null},{\"id\":\"61b541c0-4d17-4059-b158-8b72b6aef724\",\"name\":\"In
+      progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"1b92c97e-00e4-4409-be80-c48e2906e443\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}],\"groups\":[{\"id\":\"efa11b9c-c42f-4a78-a096-20c583573047\",\"name\":\"To-do\",\"color\":\"gray\",\"option_ids\":[\"dce1e338-da63-4b60-8126-6752aec02589\"]},{\"id\":\"6006542b-8e37-4dab-b232-edde3cebb032\",\"name\":\"In
+      progress\",\"color\":\"blue\",\"option_ids\":[\"61b541c0-4d17-4059-b158-8b72b6aef724\"]},{\"id\":\"11dfbcef-680a-4392-a439-568e93683c7d\",\"name\":\"Complete\",\"color\":\"green\",\"option_ids\":[\"1b92c97e-00e4-4409-be80-c48e2906e443\"]}]}},\"AI
+      custom\":{\"id\":\"b%5DMq\",\"name\":\"AI custom\",\"type\":\"rich_text\",\"rich_text\":{}},\"Text\":{\"id\":\"dNkb\",\"name\":\"Text\",\"type\":\"rich_text\",\"rich_text\":{}},\"AI
+      key info\":{\"id\":\"iGrF\",\"name\":\"AI key info\",\"type\":\"rich_text\",\"rich_text\":{}},\"Phone
+      number\":{\"id\":\"k%7DwY\",\"name\":\"Phone number\",\"type\":\"phone_number\",\"phone_number\":{}},\"AI
+      summary\":{\"id\":\"p%5CHX\",\"name\":\"AI summary\",\"type\":\"rich_text\",\"rich_text\":{}},\"Rollup\":{\"id\":\"pwp_\",\"name\":\"Rollup\",\"type\":\"rollup\",\"rollup\":{\"rollup_property_name\":\"Name\",\"relation_property_name\":\"Relation\",\"rollup_property_id\":\"title\",\"relation_property_id\":\"|eR]\",\"function\":\"count\"}},\"Relation
+      two-way\":{\"id\":\"sXu%40\",\"name\":\"Relation two-way\",\"type\":\"relation\",\"relation\":{\"database_id\":\"301bb96e-972c-4d15-bfb3-debcef317109\",\"type\":\"dual_property\",\"dual_property\":{\"synced_property_name\":\"Related
+      to Schema B (1) (Relation two-way)\",\"synced_property_id\":\"J_fD\"}}},\"Last
+      edited by\":{\"id\":\"uaO%5E\",\"name\":\"Last edited by\",\"type\":\"last_edited_by\",\"last_edited_by\":{}},\"Formula\":{\"id\":\"wsPE\",\"name\":\"Formula\",\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:WL%40f:5dd6f15d-e78b-422b-84f6-ade77aa73906:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      * 2\"}},\"URL\":{\"id\":\"ypoy\",\"name\":\"URL\",\"type\":\"url\",\"url\":{}},\"Created
+      time\":{\"id\":\"%7CLPX\",\"name\":\"Created time\",\"type\":\"created_by\",\"created_by\":{}},\"Relation\":{\"id\":\"%7CeR%5D\",\"name\":\"Relation\",\"type\":\"relation\",\"relation\":{\"database_id\":\"301bb96e-972c-4d15-bfb3-debcef317109\",\"type\":\"single_property\",\"single_property\":{}}},\"Multi-Select\":{\"id\":\"~ML%40\",\"name\":\"Multi-Select\",\"type\":\"multi_select\",\"multi_select\":{\"options\":[{\"id\":\"]klO\",\"name\":\"MultiOption1\",\"color\":\"purple\",\"description\":null},{\"id\":\"\\\\vwn\",\"name\":\"MultiOption2\",\"color\":\"yellow\",\"description\":null}]}},\"Title\":{\"id\":\"title\",\"name\":\"Title\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/4fa8756fa0da4efe9c484d6a323b69f8\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"b0cb6b70-e740-496d-9c81-8a298fa2d5e1\",\"cover\":null,\"icon\":null,\"created_time\":\"2023-12-02T16:10:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2023-12-03T10:26:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Task
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Task
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+      personal task list of all the important stuff I have to do\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
+      personal task list of all the important stuff I have to do\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Urgency\":{\"id\":\"JDC%3D\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:ob%5DU:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705\\\", if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(formatDate(now(), \\\"YWD\\\") == formatDate({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"YWD\\\"), \\\"\U0001F539 Today\\\", if(now() > {{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"\U0001F525 \\\" + if(empty(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\")), \\\"\U0001F550 \\\" + if(empty(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))), \\\"\\\", (if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, \\\"-\\\", \\\"\\\") + if((if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7))) == 0, \\\"\\\", format(abs(if(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) < 0, -1, 1) * floor(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) / 7)))) + \\\"w\\\")) + if((if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\")) % 7) == 0, \\\"\\\", format(abs(if(empty({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), dateBetween({{notion:block_property:K%3A%3Fo:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\"))) % 7) + \\\"d\\\"))))))\"}},\"Due Date\":{\"id\":\"K%3A%3Fo\",\"name\":\"Due
+      Date\",\"type\":\"date\",\"date\":{}},\"Status\":{\"id\":\"ob%5DU\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"87cca86b-1377-4ca0-b8f6-1ac78beeff06\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"ce60f469-5d10-4c18-937f-3e8a539f7bff\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"a91749bb-7d95-4a1d-a510-3b2e1f9f1852\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"d9f19f59-2ac7-405e-b2e5-1740e808c9be\",\"name\":\"Done\",\"color\":\"green\",\"description\":null}]}},\"Priority\":{\"id\":\"sGSq\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"131f03a1-028c-4fac-97fa-f2a5aee5a196\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"f73161a0-22a3-460a-8f64-eb24148f01cb\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"bf393d83-8f47-4fb9-88e3-f6a8be3fa324\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/b0cb6b70e740496d9c818a298fa2d5e1\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"d4f1e8cd-1a15-4e16-97d9-900f12740960\",\"cover\":null,\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F91D\"},\"created_time\":\"2023-03-30T07:19:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2023-11-24T11:13:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Contacts
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Contacts
+      DB\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"Database
+      of all my contacts!\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Database
+      of all my contacts!\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Level\":{\"id\":\"%3CVau\",\"name\":\"Level\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"2c039f9c-787a-4a7c-ad3e-027e126170a5\",\"name\":\"Student\",\"color\":\"purple\",\"description\":null},{\"id\":\"GiE^\",\"name\":\"Junior\",\"color\":\"default\",\"description\":null},{\"id\":\"]yHE\",\"name\":\"Advanced\",\"color\":\"blue\",\"description\":null},{\"id\":\"Sg=B\",\"name\":\"Senior\",\"color\":\"orange\",\"description\":null},{\"id\":\"bcd02e10-3ad5-4f7e-aaf4-397a5c7bb043\",\"name\":\"Lead\",\"color\":\"red\",\"description\":null}]}},\"Sync
+      Date\":{\"id\":\"%3DG~u\",\"name\":\"Sync Date\",\"type\":\"date\",\"date\":{}},\"Last
+      Sync Days\":{\"id\":\"%40%5E%3Au\",\"name\":\"Last Sync Days\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty({{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), (if(({{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      < now()), dateBetween(now(), {{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\"), (-dateBetween({{notion:block_property:%3DG~u:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      now(), \\\"days\\\") - 1))))\"}},\"---- Separator ----\":{\"id\":\"%40qHE\",\"name\":\"----
+      Separator ----\",\"type\":\"formula\",\"formula\":{\"expression\":\"format(\\\"Properties
+      below here are for internal use\\\")\"}},\"URL\":{\"id\":\"HNS%3D\",\"name\":\"URL\",\"type\":\"url\",\"url\":{}},\"Address\":{\"id\":\"NKkT\",\"name\":\"Address\",\"type\":\"rich_text\",\"rich_text\":{}},\"Team
+      Member\":{\"id\":\"PvPD\",\"name\":\"Team Member\",\"type\":\"checkbox\",\"checkbox\":{}},\"Employed\":{\"id\":\"QlK%5D\",\"name\":\"Employed\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      (if(({{notion:block_property:PvPD:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      and empty({{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      true, (dateBetween(now(), {{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\") <= 0))), (if(((dateBetween(now(), {{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\") >= 0) and empty({{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      true, (dateBetween(now(), {{notion:block_property:_e%3AX:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"days\\\") <= 0))))\"}},\"Churn Prob\":{\"id\":\"T~sL\",\"name\":\"Churn
+      Prob\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"mqQI\",\"name\":\"80-100%\",\"color\":\"red\",\"description\":null},{\"id\":\"lio?\",\"name\":\"60-80%\",\"color\":\"orange\",\"description\":null},{\"id\":\"LcmD\",\"name\":\"40-60%\",\"color\":\"yellow\",\"description\":null},{\"id\":\"2656618f-c56d-49ac-ba5a-4d5a6b00b0b1\",\"name\":\"20-40%\",\"color\":\"blue\",\"description\":null},{\"id\":\"5631d5f7-d4f9-4d8f-a5ee-e449e792b427\",\"name\":\"0-20%\",\"color\":\"green\",\"description\":null}]}},\"Hiring
+      Date\":{\"id\":\"UnqB\",\"name\":\"Hiring Date\",\"type\":\"date\",\"date\":{}},\"Role\":{\"id\":\"VDIf\",\"name\":\"Role\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"bcd82259-013f-4f13-a43a-2748259e65db\",\"name\":\"Project
+      Manager\",\"color\":\"green\",\"description\":null},{\"id\":\"582f17e9-67be-4ac5-b234-b0c229e4ac4a\",\"name\":\"Software
+      Engineer\",\"color\":\"gray\",\"description\":null},{\"id\":\"1309de51-837b-4275-afef-fa1c02790796\",\"name\":\"UX
+      Designer\",\"color\":\"red\",\"description\":null},{\"id\":\"c34ad2a9-1c18-4dae-a7af-b671df73e9fd\",\"name\":\"Marketing
+      Manager\",\"color\":\"orange\",\"description\":null},{\"id\":\"629c75af-6a97-42ac-9a93-5b9382c0e8ea\",\"name\":\"Data
+      Analyst\",\"color\":\"blue\",\"description\":null},{\"id\":\"88188652-8232-43e0-9e2f-ccd1d631f0ff\",\"name\":\"QA
+      Engineer\",\"color\":\"default\",\"description\":null},{\"id\":\"af9cd9b5-35ba-4e5e-8e5f-34dc5f34dccc\",\"name\":\"Technical
+      Writer\",\"color\":\"pink\",\"description\":null},{\"id\":\"49e3cd1d-4c88-47c6-8a43-3992102da933\",\"name\":\"Business
+      Analyst\",\"color\":\"purple\",\"description\":null},{\"id\":\"60f1ff4e-1658-4891-b286-e1b16dd002ea\",\"name\":\"IT
+      Support Specialist\",\"color\":\"yellow\",\"description\":null}]}},\"Organisation\":{\"id\":\"WeW%7C\",\"name\":\"Organisation\",\"type\":\"relation\",\"relation\":{\"database_id\":\"43bd0020-f0a0-4182-9bfe-9ebb0242d2d3\",\"type\":\"single_property\",\"single_property\":{}}},\"Closest
+      Birthday\":{\"id\":\"YlLd\",\"name\":\"Closest Birthday\",\"type\":\"formula\",\"formula\":{\"expression\":\"if((abs(dateBetween(now(),
+      dateAdd({{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      dateBetween(now(), {{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\") + 1, \\\"years\\\"), \\\"days\\\")) <= 182), dateAdd({{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      dateBetween(now(), {{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\") + 1, \\\"years\\\"), dateAdd({{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      dateBetween(now(), {{notion:block_property:wOOq:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\"), \\\"years\\\"))\"}},\"Years of Experience when hired\":{\"id\":\"Z%3EDh\",\"name\":\"Years
+      of Experience when hired\",\"type\":\"number\",\"number\":{\"format\":\"number\"}},\"Work
+      Experience\":{\"id\":\"%5C%40F%3A\",\"name\":\"Work Experience\",\"type\":\"formula\",\"formula\":{\"expression\":\"if((empty(format({{notion:block_property:Z%3EDh:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}))
+      or empty({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      \\\"\\\", (format(round((dateBetween(now(), dateSubtract({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      {{notion:block_property:Z%3EDh:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"years\\\"), \\\"months\\\") / 12) * 10) / 10) + \\\" years\\\"))\"}},\"Office\":{\"id\":\"_EW%7D\",\"name\":\"Office\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"777425b8-2264-443c-8679-94dfe5e35942\",\"name\":\"New
+      York\",\"color\":\"red\",\"description\":null},{\"id\":\"f003520b-0303-4c91-ba6a-71c9e6d0ff8b\",\"name\":\"Paris\",\"color\":\"purple\",\"description\":null},{\"id\":\"fbb86129-419c-4281-98ef-3e3adc30f945\",\"name\":\"Tokyo\",\"color\":\"gray\",\"description\":null},{\"id\":\"4cda1d43-069c-4f6a-805b-3c36cf74acdc\",\"name\":\"Barcelona\",\"color\":\"pink\",\"description\":null},{\"id\":\"bac77c28-cd9d-4bc8-b211-03b462dd08d8\",\"name\":\"Berlin\",\"color\":\"brown\",\"description\":null},{\"id\":\"9654df26-6f36-4fd8-8b48-e187a310ff7d\",\"name\":\"London\",\"color\":\"blue\",\"description\":null}]}},\"Termination
+      Date\":{\"id\":\"_e%3AX\",\"name\":\"Termination Date\",\"type\":\"date\",\"date\":{}},\"Last
+      Sync Weeks\":{\"id\":\"fIaS\",\"name\":\"Last Sync Weeks\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      toNumber(\\\"\\\"), ((if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      < 0), -1, 1)) * floor(abs({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})
+      / 7)))\"}},\"Working Time\":{\"id\":\"g%5Cv%5B\",\"name\":\"Working Time\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"4e2d8444-963d-4c66-b17b-552ec37f9537\",\"name\":\"50%\",\"color\":\"blue\",\"description\":null},{\"id\":\"dhC~\",\"name\":\"80%\",\"color\":\"gray\",\"description\":null},{\"id\":\"ww}|\",\"name\":\"100%\",\"color\":\"purple\",\"description\":null}]}},\"Annual
+      Review\":{\"id\":\"imne\",\"name\":\"Annual Review\",\"type\":\"formula\",\"formula\":{\"expression\":\"formatDate({{notion:block_property:UnqB:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      \\\"MMMM\\\")\"}},\"Last Sync\":{\"id\":\"pIKB\",\"name\":\"Last Sync\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(empty(format({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      \\\"? ago\\\", (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      < 0), (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == -1), \\\"Tomorrow\\\", ((\\\"In \\\" + (if(({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 0), \\\"\\\", (format(abs({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}))
+      + \\\"w\\\")))) + (if((({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      % 7) == 0), \\\"\\\", (format(abs({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})
+      % 7) + \\\"d\\\")))))), (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 0), \\\"Today\\\", (if(({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 1), \\\"Yesterday\\\", (((if(({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == 0), \\\"\\\", (format(abs({{notion:block_property:fIaS:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}))
+      + \\\"w\\\"))) + (if((({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      % 7) == 0), \\\"\\\", (format(abs({{notion:block_property:%40%5E%3Au:876bd953-63e7-4843-a9d9-a3e0d34da6f8:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})
+      % 7) + \\\"d\\\")))) + \\\" ago\\\"))))))))\"}},\"Birthday\":{\"id\":\"wOOq\",\"name\":\"Birthday\",\"type\":\"date\",\"date\":{}},\"Name\":{\"id\":\"title\",\"name\":\"Name\",\"type\":\"title\",\"title\":{}},\"Title\":{\"id\":\"46e20866-67b7-4cbb-891f-9b440c18da79\",\"name\":\"Title\",\"type\":\"rich_text\",\"rich_text\":{}},\"Email\":{\"id\":\"cc99764e-99e5-40a9-8b6d-5a1691141dee\",\"name\":\"Email\",\"type\":\"email\",\"email\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/d4f1e8cd1a154e1697d9900f12740960\",\"public_url\":null,\"archived\":false,\"in_trash\":false},{\"object\":\"database\",\"id\":\"4c6e7417-ef05-4b7e-b55e-62ecbb55a38d\",\"cover\":null,\"icon\":null,\"created_time\":\"2023-08-12T13:26:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_time\":\"2023-08-12T14:00:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"Wiki
+      DB\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"Wiki
+      DB\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"Verification\":{\"id\":\"Mw%5E%3C\",\"name\":\"Verification\",\"type\":\"verification\",\"verification\":{}},\"Tags\":{\"id\":\"OESf\",\"name\":\"Tags\",\"type\":\"multi_select\",\"multi_select\":{\"options\":[{\"id\":\"4036ff5b-932f-4883-8d0c-6ca1fa6f9cf6\",\"name\":\"Onboarding\",\"color\":\"blue\",\"description\":null},{\"id\":\"869be616-aa64-491d-b56c-161ea3e81b56\",\"name\":\"Design\",\"color\":\"green\",\"description\":null}]}},\"Last
+      edited time\":{\"id\":\"%5EB_%40\",\"name\":\"Last edited time\",\"type\":\"last_edited_time\",\"last_edited_time\":{}},\"Page\":{\"id\":\"title\",\"name\":\"Page\",\"type\":\"title\",\"title\":{}},\"Owner\":{\"id\":\"notion%3A%2F%2Fwiki%2Fowner_property\",\"name\":\"Owner\",\"type\":\"people\",\"people\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/4c6e7417ef054b7eb55e62ecbb55a38d\",\"public_url\":null,\"archived\":false,\"in_trash\":false}],\"next_cursor\":null,\"has_more\":false,\"type\":\"page_or_database\",\"page_or_database\":{},\"request_id\":\"065e20cd-cced-464c-b30e-e2fa76d28f30\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8b6c40b6b9349742-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      x-notion-request-id:
+      - 065e20cd-cced-464c-b30e-e2fa76d28f30
+      x-powered-by:
+      - Express
+    http_version: HTTP/1.1
+    status_code: 200
 version: 1
