@@ -10,12 +10,12 @@ from ultimate_notion.file import FileInfo
 from ultimate_notion.option import Option
 from ultimate_notion.page import Page
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.schema import AggFunc, PageSchema, Property, ReadOnlyPropertyError, SchemaError
+from ultimate_notion.schema import AggFunc, Property, ReadOnlyPropertyError, Schema, SchemaError
 
 
 @pytest.mark.vcr()
 def test_all_createable_props_schema(notion: Session, root_page: Page):
-    class SchemaA(PageSchema, db_title='Schema A'):
+    class SchemaA(Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
         name = Property('Name', schema.Title())
@@ -23,7 +23,7 @@ def test_all_createable_props_schema(notion: Session, root_page: Page):
 
     options = [Option(name='Option1'), Option(name='Option2', color=Color.RED)]
 
-    class SchemaB(PageSchema, db_title='Schema B'):
+    class SchemaB(Schema, db_title='Schema B'):
         """Acutal interesting schema/db"""
 
         checkbox = Property('Checkbox', schema.Checkbox())
@@ -132,13 +132,13 @@ def test_wiki_db_schema(wiki_db: Database):
 
 @pytest.mark.vcr()
 def test_two_way_prop(notion: Session, root_page: Page):
-    class SchemaA(PageSchema, db_title='Schema A'):
+    class SchemaA(Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
         name = Property('Name', schema.Title())
         relation = Property('Relation', schema.Relation())
 
-    class SchemaB(PageSchema, db_title='Schema B'):
+    class SchemaB(Schema, db_title='Schema B'):
         """Only used to create relations in Schema B"""
 
         relation_twoway = Property('Relation two-way', schema.Relation(SchemaA, two_way_prop=SchemaA.relation))
@@ -153,7 +153,7 @@ def test_two_way_prop(notion: Session, root_page: Page):
 
 @pytest.mark.vcr()
 def test_self_ref_relation(notion: Session, root_page: Page):
-    class SchemaA(PageSchema, db_title='Schema A'):
+    class SchemaA(Schema, db_title='Schema A'):
         """Schema A description"""
 
         name = Property('Name', schema.Title())
@@ -168,7 +168,7 @@ def test_self_ref_relation(notion: Session, root_page: Page):
 #       actually generates a one-way relation property.
 # @pytest.mark.vcr()
 # def test_self_ref_two_way_prop(notion: Session, root_page: Page):
-#     class SchemaA(PageSchema, db_title='Schema A'):
+#     class SchemaA(Schema, db_title='Schema A'):
 #         """Schema A description"""
 
 #         name = Property('Name', schema.Title())
@@ -189,26 +189,26 @@ def test_self_ref_relation(notion: Session, root_page: Page):
 
 @pytest.mark.vcr()
 def test_schema_from_dict():
-    class ClassStyleSchema(PageSchema, db_title='Class Style'):
+    class ClassStyleSchema(Schema, db_title='Class Style'):
         name = Property('Name', schema.Title())
         tags = Property('Tags', schema.MultiSelect([]))
 
     dict_style_schema = {'Name': schema.Title(), 'Tags': schema.MultiSelect([])}
-    DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+    DictStyleSchema = Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
     assert DictStyleSchema.is_consistent_with(ClassStyleSchema)
 
     dict_style_schema = {'Name': schema.Title(), 'Tags': schema.Select([])}  # Wrong PropertyType here!
-    DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+    DictStyleSchema = Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
     assert not DictStyleSchema.is_consistent_with(ClassStyleSchema)
 
     dict_style_schema = {'Name': schema.Title(), 'My Tags': schema.MultiSelect([])}  # Wrong property name here!
-    DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+    DictStyleSchema = Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
     assert not DictStyleSchema.is_consistent_with(ClassStyleSchema)
 
     with pytest.raises(SchemaError):
         dict_style_schema = {'Tags': schema.MultiSelect([])}
-        DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+        DictStyleSchema = Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
 
     with pytest.raises(SchemaError):
         dict_style_schema = {'Name1': schema.Title(), 'Name2': schema.Title()}
-        DictStyleSchema = PageSchema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+        DictStyleSchema = Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806

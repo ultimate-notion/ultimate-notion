@@ -15,7 +15,7 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.page import Page
-from ultimate_notion.schema import PageSchema, Property, PropertyType, PropertyValue, ReadOnlyPropertyError, SchemaError
+from ultimate_notion.schema import Property, PropertyType, PropertyValue, ReadOnlyPropertyError, Schema, SchemaError
 from ultimate_notion.text import RichText, camel_case, snake_case
 from ultimate_notion.utils import dict_diff_str
 from ultimate_notion.view import View
@@ -29,7 +29,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     API reference: https://developers.notion.com/docs/working-with-databases
     """
 
-    _schema: type[PageSchema] | None = None
+    _schema: type[Schema] | None = None
 
     def __str__(self):
         if self.title:
@@ -109,7 +109,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Return whether the object is a database."""
         return True
 
-    def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[PageSchema]:
+    def _reflect_schema(self, obj_ref: obj_blocks.Database) -> type[Schema]:
         """Reflection about the database schema."""
         title = str(self)
         cls_name = f'{camel_case(title)}Schema'
@@ -117,19 +117,19 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             snake_case(k): Property(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
             for k, v in obj_ref.properties.items()
         }
-        schema: type[PageSchema] = type(cls_name, (PageSchema,), attrs, db_title=title)
+        schema: type[Schema] = type(cls_name, (Schema,), attrs, db_title=title)
         schema.bind_db(self)
         return schema
 
     @property
-    def schema(self) -> type[PageSchema]:
+    def schema(self) -> type[Schema]:
         """Schema of the database."""
         if not self._schema:
             self._schema = self._reflect_schema(self.obj_ref)
         return self._schema
 
     @schema.setter
-    def schema(self, schema: type[PageSchema]):
+    def schema(self, schema: type[Schema]):
         """Set a custom schema in order to change the Python variables names."""
         if self.schema.is_consistent_with(schema):
             schema.bind_db(self)

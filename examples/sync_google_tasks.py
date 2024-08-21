@@ -30,7 +30,7 @@ class Status(uno.OptionNS):
     done = uno.Option('Done', color=uno.Color.GREEN)
 
 
-class Task(uno.PageSchema, db_title='My synced task db'):
+class Task(uno.Schema, db_title='My synced task db'):
     """My personal task list of all the important stuff I have to do"""
 
     task = uno.Property('Task', uno.PropType.Title())

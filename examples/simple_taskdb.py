@@ -41,7 +41,7 @@ urgency = (
 )
 
 
-class Task(uno.PageSchema, db_title='My task list'):
+class Task(uno.Schema, db_title='My task list'):
     """My personal task list of all the important stuff I have to do"""
 
     task = uno.Property('Task', uno.PropType.Title())

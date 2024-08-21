@@ -19,7 +19,7 @@ def test_schema(article_db: Database):
     ref_schema = article_db.schema
     assert article_db.title == 'Articles'
 
-    assert issubclass(ref_schema, schema.PageSchema)
+    assert issubclass(ref_schema, schema.Schema)
     db_schema = {
         'Name': schema.Title(),
         'Cost': schema.Number(schema.NumberFormat.DOLLAR),
@@ -27,14 +27,14 @@ def test_schema(article_db: Database):
     }
     assert ref_schema.to_dict() == db_schema
 
-    class MySchema(schema.PageSchema, db_title='My Schema'):
+    class MySchema(schema.Schema, db_title='My Schema'):
         name = schema.Property('Name', schema.Title())
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
 
     article_db.schema = MySchema
 
-    class WrongSchema(schema.PageSchema, db_title='My Wrong Schema'):
+    class WrongSchema(schema.Schema, db_title='My Wrong Schema'):
         name = schema.Property('Name', schema.Title())
         cost = schema.Property('Cost', schema.Text())
         desc = schema.Property('Description', schema.Text())
@@ -47,7 +47,7 @@ def test_schema(article_db: Database):
 def test_db_without_title(notion: Session, root_page: Page):
     """Simple database of articles"""
 
-    class Article(schema.PageSchema, db_title=None):
+    class Article(schema.Schema, db_title=None):
         name = schema.Property('Name', schema.Title())
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
@@ -62,7 +62,7 @@ def test_db_without_title(notion: Session, root_page: Page):
 def test_db_with_docstring(notion: Session, root_page: Page):
     """Simple database of articles"""
 
-    class Article(schema.PageSchema, db_title=None):
+    class Article(schema.Schema, db_title=None):
         """My articles"""
 
         name = schema.Property('Name', schema.Title())
