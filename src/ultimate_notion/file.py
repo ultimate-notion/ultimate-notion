@@ -53,7 +53,7 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         return self.url
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this file."""
+        """Called by JupyterLab automatically to display this file."""
         return html_img(self.url, size=2)
 
     @property
@@ -110,7 +110,7 @@ class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
         return hash(str(self))
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this file."""
+        """Called by JupyterLab automatically to display this file."""
         return str(self)
 
     def to_code(self) -> str:

@@ -89,12 +89,12 @@ class SyncGTasks(SyncTask):
 
     def notion_to_dict(self, obj: Page) -> dict[str, Any]:
         """Convert a Notion object to a dictionary."""
-        due_date: datetime | date | None = obj.props[self.due_col].value
+        due_date: datetime | date | None = obj.props[self.due_col]
         if isinstance(due_date, datetime):
             due_date = due_date.date()
         return {
             self.title_col: obj.title,
-            self.completed_col: obj.props[self.completed_col].value == self.completed_val,
+            self.completed_col: obj.props[self.completed_col] == self.completed_val,
             self.due_col: due_date,
         }
 

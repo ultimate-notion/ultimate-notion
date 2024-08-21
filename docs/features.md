@@ -26,7 +26,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] change database attributes like title, description, etc.
 - [x] retrieve all pages of a database
 - [ ] query with filters and sortings to retrieve only specific pages
-- [x] display the content of a database as a table, e.g. in [Jupyter Lab]
+- [x] display the content of a database as a table, e.g. in [JupyterLab]
 - [x] create new pages with properties within the database respecting the schema
 
 ## Pages

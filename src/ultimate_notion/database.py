@@ -38,7 +38,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             return 'Untitled'
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically"""
+        """Called by JupyterLab automatically"""
         return str(self)
 
     def __repr__(self) -> str:

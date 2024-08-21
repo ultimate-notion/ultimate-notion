@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+import pendulum as pnd
 import pytest
 
 from ultimate_notion import Color, Session, props, schema
@@ -81,7 +82,7 @@ def test_all_createable_props_schema(notion: Session, root_page: Page):
 
     kwargs: dict[str, PropertyValue] = {
         'checkbox': props.Checkbox(True),
-        'date': props.Date(datetime.now(tz=timezone.utc).date()),
+        'date': props.Date(pnd.date(2021, 1, 1)),
         'email': props.Email('email@provider.com'),
         'files': props.Files([FileInfo(name='My File', url='https://...')]),
         'multi_select': props.MultiSelect(options[0]),
@@ -99,19 +100,19 @@ def test_all_createable_props_schema(notion: Session, root_page: Page):
     b_item0 = SchemaB.create()  # empty page with not even a title
     writeable_props = [prop_name for prop_name, prop_type in SchemaB.to_dict().items() if not prop_type.readonly]
     for prop_name in writeable_props:
-        assert not b_item0.props[prop_name].value  # False, empty list or None
+        assert not b_item0.props[prop_name]  # False, empty list or None
 
     # creating a page using proper PropertyValues
     b_item1 = db_b.create_page(**kwargs)
 
     # creating a page using raw Python types using the Schema directly
-    b_item2 = SchemaB.create(**{kwarg: prop_value.value for kwarg, prop_value in kwargs.items()})
+    b_item2 = SchemaB.create(**dict(kwargs.items()))
 
     for item in (b_item1, b_item2):
         for kwarg, prop_val in kwargs.items():
-            assert getattr(item.props, kwarg) == prop_val
+            assert getattr(item.props, kwarg) == prop_val.value
             prop: Property = getattr(SchemaB, kwarg)
-            assert item.props[prop.name] == prop_val
+            assert item.props[prop.name] == prop_val.value
 
     db_a.delete()
     db_b.delete()

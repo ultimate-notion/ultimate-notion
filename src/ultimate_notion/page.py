@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeGuard, cast
+from typing import TYPE_CHECKING, Any, TypeGuard
 
 from emoji import is_emoji
 from typing_extensions import Self
@@ -28,19 +28,19 @@ class PageProperty:
     def __init__(self, prop_name: str):
         self._prop_name = prop_name
 
-    def __get__(self, obj: PageProperties, type=None) -> PropertyValue:  # noqa: A002
+    def __get__(self, obj: PagePropertiesNS, type=None) -> Any:  # noqa: A002
         return obj[self._prop_name]
 
-    def __set__(self, obj: PageProperties, value):
+    def __set__(self, obj: PagePropertiesNS, value):
         obj[self._prop_name] = value
 
 
-class PageProperties:
-    """Properties of a page as defined in the schema of the database.
+class PagePropertiesNS:
+    """Namespace of the properties of a page as defined in the schema of the database.
 
     This defines the `.props` namespace of a page `page` and updates the content
     on the Notion server side in case of an assignment.
-    Access the properties with `page.props.property_name` or `page.props["Property Name"]`.
+    Access the properties with `page.props.property_name` or `page.props['Property Name']`.
     """
 
     def __init__(self, page: Page):
@@ -51,13 +51,13 @@ class PageProperties:
         """Return the low-level page properties"""
         return self._page.obj_ref.properties
 
-    def __getitem__(self, prop_name: str) -> PropertyValue:
+    def __getitem__(self, prop_name: str) -> Any:
         prop = self._properties.get(prop_name)
         if prop is None:
             msg = f'No such property: {prop_name}'
             raise AttributeError(msg)
 
-        return cast(PropertyValue, PropertyValue.wrap_obj_ref(prop))
+        return PropertyValue.wrap_obj_ref(prop).value
 
     def __setitem__(self, prop_name: str, value: Any):
         # Todo: use the schema of the database to see which properties are writeable at all.
@@ -91,23 +91,23 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         props: accessor for all page properties
     """
 
-    props: PageProperties
+    props: PagePropertiesNS
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Self:
         obj = super().wrap_obj_ref(obj_ref)
-        obj.props = obj._create_prop_attrs()
+        obj.props = obj._create_page_props_ns()
         return obj
 
-    def _create_prop_attrs(self) -> PageProperties:
-        """Create the attributes for the database properties of this page."""
-        # We have to subclass in order to populate it with the descriptor `PageProperty``
-        # as this only works on the class level and we want a unique class for each property.
-        page_props_cls = type('_PageProperties', (PageProperties,), {})
+    def _create_page_props_ns(self) -> PagePropertiesNS:
+        """Create a namespace for the properties of this page defind by the database."""
+        # We have to subclass in order to populate it with the descriptor `PageProperty`
+        # as this only works on the class level and we want a unique class for each page.
+        page_props_ns_cls = type('_PagePropertiesNS', (PagePropertiesNS,), {})
         if self.parent_db is not None:
             for prop in self.parent_db.schema.get_props():
-                setattr(page_props_cls, prop.attr_name, PageProperty(prop_name=prop.name))
-        return page_props_cls(page=self)
+                setattr(page_props_ns_cls, prop.attr_name, PageProperty(prop_name=prop.name))
+        return page_props_ns_cls(page=self)
 
     def __str__(self) -> str:
         return str(self.title)
@@ -116,7 +116,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return get_repr(self, desc=self.title)
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by Jupyter Lab automatically to display this page."""
+        """Called by JupyterLab automatically to display this page."""
         return self.to_html()
 
     @property
@@ -237,7 +237,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return html
 
     def show(self, *, simple: bool | None = None):
-        """Show the content of the page, rendered in Jupyter Lab"""
+        """Show the content of the page, rendered in JupyterLab"""
         simple = simple if simple is not None else not is_notebook()
         md = self.to_markdown()
 

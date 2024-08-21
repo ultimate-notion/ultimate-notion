@@ -128,7 +128,7 @@ Read book about procastination    Backlog      ✷ Medium    🕐 2w2d    2023-1
 Plan vacation                     Backlog      ✹ High      🕐 3w3d    2023-12-26 17:10:00+01:00
 ```
 
-or in [Jupyter Lab] this will be shown as:
+or in [JupyterLab] this will be shown as:
 
 ![Notion task view](../assets/images/notion-task-view.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
