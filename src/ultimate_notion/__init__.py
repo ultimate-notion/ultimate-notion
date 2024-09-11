@@ -20,6 +20,7 @@ from ultimate_notion.blocks import (
     BulletedItem,
     Callout,
     Code,
+    Column,
     Columns,
     Divider,
     Embed,
@@ -65,6 +66,7 @@ __all__ = [
     'Code',
     'CodeLang',
     'Color',
+    'Column',  # for type hinting
     'Columns',
     'Database',
     'Divider',

@@ -415,7 +415,7 @@ class Quote(ColoredTextBlock[obj_blocks.Quote], ChildrenMixin, wraps=obj_blocks.
         return f'> {self.rich_text.to_markdown()}\n'
 
 
-class Callout(ColoredTextBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
+class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blocks.Callout):
     """Callout block.
 
     !!! note
@@ -860,6 +860,16 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
 
     def __getitem__(self, index: int) -> Column:
         return cast(Column, self.children[index])
+
+    def add_column(self, index: int = -1) -> Self:
+        """Add a new column to the columns block."""
+        if 1 <= index <= len(self.children):
+            new_col = Column.wrap_obj_ref(obj_blocks.Column.build())
+            self.append(new_col, after=self.children[index - 1])
+            return self
+        else:
+            msg = f'Columns can only be inserted from index 1 to {len(self.children)}.'
+            raise ValueError(msg)
 
     def to_markdown(self) -> str:
         cols = []
