@@ -104,8 +104,8 @@ class GenericObject(BaseModel):
         new_obj_dct.update(data)
         new_obj = self.model_validate(new_obj_dct)
 
-        for k, v in new_obj.model_dump().items():
-            # model_dump(exclude_defaults=True) was used before, but that prevented restoring pages
+        for k, v in new_obj.model_dump(exclude_unset=True).items():
+            # exclude_unset avoids overwriting for instance known children that need to be retrieved separately
             logger.debug('updating object data -- %s => %s', k, v)
             setattr(self, k, getattr(new_obj, k))
 
@@ -118,7 +118,7 @@ class GenericObject(BaseModel):
 
     @classmethod
     def build(cls, *args, **kwargs):
-        """Use the standard constructur to build the instance. Will be overridden for more complex types."""
+        """Use the standard constructur to build the instance. Will be overwritten for more complex types."""
         return cls(*args, **kwargs)
 
 

@@ -456,3 +456,34 @@ def test_modify_file_blocks(root_page: Page, notion: Session):
     pdf.caption = uno.RichText(new_caption_text)
     pdf.reload()
     assert pdf.caption == new_caption_text
+
+
+@pytest.mark.vcr()
+def test_modify_column_blocks(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for modifying column blocks')
+    cols = uno.Columns(2)
+    page.append(cols)
+    cols[0].append(left := uno.Paragraph('Column 1'))
+    cols[1].append(right := uno.Paragraph('Column 2'))
+    cols[0].delete()
+    page.reload()
+
+    cols = cast(uno.Columns, page.children[0])
+    col = cast(uno.Column, cols.children[0])
+    paragraph = cast(uno.Paragraph, col.children[0])
+    assert paragraph == right
+    assert left.reload().is_deleted
+
+    with pytest.raises(ValueError):
+        cols.add_column(index=0)
+    with pytest.raises(ValueError):
+        cols.add_column(index=len(cols.children) + 1)
+
+    cols.add_column(index=1)
+    cols[1].append(new_right := uno.Paragraph('New Column 1'))
+    page.reload()
+
+    cols = cast(uno.Columns, page.children[0])
+    left_col, right_col = cast(list[uno.Column], cols.children)
+    assert left_col.children == [right]
+    assert right_col.children == [new_right]

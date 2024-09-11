@@ -109,7 +109,7 @@ class BlocksEndpoint(Endpoint):
             # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
             # blocks after the specified block, where we append the blocks.
             for block, appended_block in zip(blocks, appended_blocks[: len(blocks)], strict=True):
-                block.update(**appended_block.model_dump())
+                block.update(**appended_block.serialize_for_api())
 
             return blocks, cast(list[Block], appended_blocks[len(blocks) :])
 
@@ -407,7 +407,7 @@ class PagesEndpoint(Endpoint):
         `page` may be any suitable `PageRef` type.
         """
 
-        return self.set_attr(page, archived=True)
+        return self.set_attr(page, in_trash=True)
 
     def restore(self, page: Page) -> Page:
         """Restore (unarchive) the specified Page.
@@ -415,7 +415,7 @@ class PagesEndpoint(Endpoint):
         `page` may be any suitable `PageRef` type.
         """
 
-        return self.set_attr(page, archived=False)
+        return self.set_attr(page, in_trash=False)
 
     # https://developers.notion.com/reference/retrieve-a-page
     def retrieve(self, page: Page | UUID | str) -> Page:
@@ -463,7 +463,7 @@ class PagesEndpoint(Endpoint):
         *,
         cover: FileObject | None | T_UNSET = UNSET,
         icon: FileObject | EmojiObject | None | T_UNSET = UNSET,
-        archived: bool | T_UNSET = UNSET,
+        in_trash: bool | T_UNSET = UNSET,
     ) -> Page:
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
@@ -492,9 +492,9 @@ class PagesEndpoint(Endpoint):
                 logger.info('Setting page icon :: %s => %s', page_id, icon)
                 props['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
 
-        if archived is not UNSET:
-            if archived:
-                logger.info('Archiving page :: %s', page_id)
+        if in_trash is not UNSET:
+            if in_trash:
+                logger.info('Deleting page :: %s', page_id)
                 props['archived'] = True
             else:
                 logger.info('Restoring page :: %s', page_id)
