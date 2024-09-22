@@ -115,3 +115,13 @@ def test_rich_text_bases(person: User, root_page: Page, notion: Session):
     notion.cache.clear()
     page = notion.get_page(page.id)
     assert page.children[0].to_markdown() == exp_text
+
+
+def test_rich_text():
+    text = uno.RichText('Simple Text')
+    assert str(text) == 'Simple Text'
+    text += uno.Text(' and a bold text', bold=True)
+    assert str(uno.RichText(text)) == 'Simple Text and a bold text'
+    assert text.to_markdown() == 'Simple Text **and a bold text**'
+    assert uno.RichText(text).to_markdown() == 'Simple Text **and a bold text**'
+    # ToDo: Extend this test!

@@ -156,14 +156,16 @@ class RichText(str):
 
     _rich_texts: list[RichTextBase]
 
-    def __init__(self, plain_text: str):
-        # note that super().__new__ stores the plain text in the object for `str(self)`
+    def __init__(self, text: str):
+        # note that super().__new__ (which is inherited) stores the plain text in the object for `str(self)`
         super().__init__()
 
-        rich_texts: list[RichTextBase] = []
-        for part in chunky(plain_text):
-            rich_texts.append(Text(part))
-        self._rich_texts = rich_texts
+        self._rich_texts: list[RichTextBase] = []
+        if isinstance(text, RichText):
+            self._rich_texts = text._rich_texts
+        else:
+            for part in chunky(text):
+                self._rich_texts.append(Text(part))
 
     @classmethod
     def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> RichText:

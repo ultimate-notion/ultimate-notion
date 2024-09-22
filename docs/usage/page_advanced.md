@@ -162,11 +162,11 @@ cols[1].append(uno.Paragraph('Column 2'))
 ```
 
 Using the some concept, we can also create a table but this time we specify the cells instead of columns.
-Creating a 4x6 table with 4 rows and 6 columns where the first row is a header for the columns, thus we set
-`column_header` to true, which might be a bit counter-intuitive at first:
+Creating a 4x6 table with 4 rows and 6 columns where the first row is a header row and thus we set
+`header_row` to true:
 
 ```python
-table = uno.Table(4, 6, row_header=False, column_header=True)
+table = uno.Table(4, 6, header_row=True, header_col=False)
 
 page.append(table)
 ```
@@ -175,11 +175,20 @@ page.append(table)
 
     We now have an empty table but filling wit with content is currently not implemented 🙈.
 
-To access the rows and cells we can call:
+To access the all rows, i.e. children of the table, we can either use `children` or better `to_list()`:
 
 ```python
-rows = table.rows
-cells_of_first_row = rows[0].cells
+rows = table.children
+assert isinstance(rows[0], uno.blocks.Block)
+rows = table.to_list()
+assert isinstance(rows[0], uno.TableRow)
+```
+
+In order to access a single row or even a cell, we can use indexing like:
+
+```python
+row = table[1]
+cell = table[1, 0]
 ```
 
 ## Advanced blocks

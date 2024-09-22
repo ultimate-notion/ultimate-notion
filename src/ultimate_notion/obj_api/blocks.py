@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Any, cast
 from uuid import UUID
 
-from pydantic import SerializeAsAny
+from pydantic import Field, SerializeAsAny
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
@@ -369,7 +369,7 @@ class TableRow(Block, type='table_row'):
     """A table_row block in Notion."""
 
     class TypeData(GenericObject):
-        cells: list[list[SerializeAsAny[RichTextBaseObject]]] | None = None
+        cells: list[list[SerializeAsAny[RichTextBaseObject]]] = Field(default_factory=list)
 
     table_row: TypeData = TypeData()
 

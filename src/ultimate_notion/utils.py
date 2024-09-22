@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import textwrap
+from collections.abc import Sequence
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
@@ -15,6 +16,7 @@ from typing import Any, TypeVar
 import numpy as np
 import pendulum as pnd
 from packaging.version import Version
+from pydantic import BaseModel
 
 from ultimate_notion import __version__
 
@@ -353,3 +355,35 @@ def temp_timezone(tz: str | pnd.Timezone):
         yield
     finally:
         pnd.set_local_timezone(current_tz)
+
+
+PT = TypeVar('PT', bound=BaseModel)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+def del_nested_attr(obj: PT, attr_paths: str | Sequence[str] | None, *, inplace: bool = False) -> PT:
+    """Remove nested attributes from an object."""
+    if attr_paths is None:
+        return obj
+    if isinstance(attr_paths, str):
+        attr_paths = [attr_paths]
+
+    if not inplace:
+        obj = obj.model_copy(deep=True)
+    for attr_path in attr_paths:
+        attrs = attr_path.split('.')
+
+        curr_obj: Any = obj
+        for lvl, attr in enumerate(attrs[:-1]):
+            curr_obj = getattr(curr_obj, attr, None)
+            if curr_obj is None:
+                msg = f"{attr} does not exist in {'.'.join(attrs[:lvl - 1]) if lvl > 1 else 'the object'}."
+                raise AttributeError(msg)
+
+        last_attr = attrs[-1]
+        if hasattr(curr_obj, last_attr):
+            delattr(curr_obj, last_attr)
+        else:
+            msg = f"{last_attr} does not exist in {'.'.join(attrs[:-2]) if len(attrs) > 1 else 'the object'}."
+            raise AttributeError(msg)
+
+    return obj

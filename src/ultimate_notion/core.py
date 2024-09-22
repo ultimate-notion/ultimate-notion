@@ -56,9 +56,16 @@ class Wrapper(ObjRefWrapper[GT]):
     def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
         """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
         hl_cls = cls._obj_api_map[type(obj_ref)]
-        hl_obj = hl_cls.__new__(hl_cls)
-        hl_obj.obj_ref = obj_ref
-        return cast(Self, hl_obj)
+        # To allow for `Block.wrap_obj_ref` to work call a specific 'wrap_obj_ref' if it exists,
+        # e.g. `RichText.wrap_obj_ref` we need to break a potential recursion in the MRO.
+        if cls.wrap_obj_ref.__func__ is hl_cls.wrap_obj_ref.__func__:  # type: ignore[attr-defined]
+            # ToDo: remove type ignore when https://github.com/python/mypy/issues/14123 is fixed
+            # break recursion
+            hl_obj = hl_cls.__new__(hl_cls)
+            hl_obj.obj_ref = obj_ref
+            return cast(Self, hl_obj)
+        else:
+            return cast(Self, hl_cls.wrap_obj_ref(obj_ref))
 
     @property
     def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT]]:
