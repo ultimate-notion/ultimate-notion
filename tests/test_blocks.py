@@ -474,9 +474,9 @@ def test_modify_column_blocks(root_page: Page, notion: Session):
     assert paragraph == right
     assert left.reload().is_deleted
 
-    with pytest.raises(ValueError):
+    with pytest.raises(IndexError):
         cols.add_column(index=0)
-    with pytest.raises(ValueError):
+    with pytest.raises(IndexError):
         cols.add_column(index=len(cols.children) + 1)
 
     cols.add_column(index=1)
@@ -487,3 +487,43 @@ def test_modify_column_blocks(root_page: Page, notion: Session):
     left_col, right_col = cast(list[uno.Column], cols.children)
     assert left_col.children == [right]
     assert right_col.children == [new_right]
+
+    with pytest.raises(InvalidAPIUsageError):
+        cols.append(uno.Paragraph('This is a paragraph'))
+
+
+@pytest.mark.vcr()
+def test_modify_table(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for modifying table blocks')
+    table = uno.Table(2, 3, header_row=True)
+    table[0, 0] = 'Cell 0, 0'
+    table[0, 1] = 'Cell 0, 1'
+    table[0, 2] = 'Cell 0, 2'
+    table[1] = ('Cell 1, 0', 'Cell 1, 1', 'Cell 1, 2')
+    page.append(table)
+    page.reload()
+
+    assert table[0] == ('Cell 0, 0', 'Cell 0, 1', 'Cell 0, 2')
+    assert table[1, 0] == 'Cell 1, 0'
+    assert table[1, 1] == 'Cell 1, 1'
+    assert table[1, 2] == 'Cell 1, 2'
+
+    table.insert_row(1, ('New Cell 1, 0', 'New Cell 1, 1', 'New Cell 1, 2'))
+    table.append_row(('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2'))
+
+    page.reload()
+    assert table[1] == ('New Cell 1, 0', 'New Cell 1, 1', 'New Cell 1, 2')
+    assert table[2] == ('Cell 1, 0', 'Cell 1, 1', 'Cell 1, 2')
+    assert table[3] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
+
+    table[2].delete()
+    page.reload()
+    assert table[2] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
+
+    table.has_header_col = True
+    page.reload()
+    assert table.has_header_col
+
+    table.has_header_row = True
+    page.reload()
+    assert table.has_header_row

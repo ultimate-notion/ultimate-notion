@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import mimetypes
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, overload
 from uuid import UUID
 
 from tabulate import tabulate
@@ -17,6 +18,7 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.text import RichText, RichTextBase, User, md_comment, text_to_obj_ref
+from ultimate_notion.utils import del_nested_attr
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -180,7 +182,11 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
             raise RuntimeError(msg)
 
         session = get_active_session()
-        child_blocks_objs = session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref))
+        child_blocks_objs = list(session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref)))
+        self.obj_ref.has_children = bool(child_blocks_objs)  # update the property manually to avoid API call
+        if isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children'):
+            self.obj_ref.value.children = child_blocks_objs  # update the children attribute
+
         child_blocks = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
 
         for idx, child_block in enumerate(child_blocks):
@@ -194,10 +200,15 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
     @property
     def children(self) -> list[Block]:
         """Return the children of this block."""
-        if self._children is None:
-            self._children = self._gen_children_cache()
-            self.obj_ref.has_children = bool(self._children)  # update the property manually to avoid API call
-        return self._children[:]  # we copy to allow deleting blocks while iterating over it
+        if self.in_notion:
+            if self._children is None:
+                self._children = self._gen_children_cache()
+            children = self._children.copy()  # we copy to allow deleting blocks while iterating over it
+        elif isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children'):
+            children = [Block.wrap_obj_ref(block) for block in self.obj_ref.value.children]
+        else:
+            children = []
+        return children
 
     def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:
         """Append a block or a list of blocks to the content of this block."""
@@ -245,7 +256,10 @@ BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires
 
 
 class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
-    """General Notion block."""
+    """Abstract Notion block.
+
+    Parent class of all block types.
+    """
 
     def reload(self) -> Self:
         """Reload the block from the API."""
@@ -253,11 +267,12 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
         self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
         return self
 
-    def _update_in_notion(self) -> None:
+    def _update_in_notion(self, *, exclude_attrs: list[str] | None = None) -> None:
         """Update the locally modified block on Notion."""
         if self.in_notion:
             session = get_active_session()
-            self.obj_ref = cast(BT, session.api.blocks.update(self.obj_ref))
+            obj_ref = del_nested_attr(self.obj_ref, exclude_attrs, inplace=False)
+            self.obj_ref = cast(BT, session.api.blocks.update(obj_ref))
 
 
 AnyBlock: TypeAlias = Block[Any]
@@ -265,7 +280,10 @@ AnyBlock: TypeAlias = Block[Any]
 
 
 class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
-    """Abstract Text block."""
+    """Abstract Text block.
+
+    Parent class of all text block types.
+    """
 
     def __init__(self, text: str | RichText | RichTextBase) -> None:
         super().__init__()
@@ -324,7 +342,10 @@ class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
 
 
 class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
-    """Abstract Text block with color."""
+    """Abstract Text block with color.
+
+    Parent class of all text block types with color.
+    """
 
     def __init__(
         self,
@@ -354,7 +375,10 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin, wraps=obj
 
 
 class Heading(ColoredTextBlock[BT], ChildrenMixin, ABC, wraps=obj_blocks.Heading):
-    """Abstract Heading block."""
+    """Abstract Heading block.
+
+    Parent class of all heading block types.
+    """
 
     def __init__(
         self,
@@ -519,7 +543,7 @@ class Divider(Block[obj_blocks.Divider], wraps=obj_blocks.Divider):
 
 
 class TableOfContents(Block[obj_blocks.TableOfContents], wraps=obj_blocks.TableOfContents):
-    """Table of contents block."""
+    """Table of Contents block."""
 
     def __init__(self, *, color: Color | BGColor = Color.DEFAULT):
         super().__init__()
@@ -655,7 +679,10 @@ FT = TypeVar('FT', bound=obj_blocks.FileBase)
 
 
 class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
-    """Abstract Block for file-based blocks."""
+    """Abstract Block for file-based blocks.
+
+    Parent class of all file-based block types.
+    """
 
     def __init__(
         self,
@@ -862,14 +889,18 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
         return cast(Column, self.children[index])
 
     def add_column(self, index: int = -1) -> Self:
-        """Add a new column to the columns block."""
+        """Add a new column to this block of columns."""
         if 1 <= index <= len(self.children):
             new_col = Column.wrap_obj_ref(obj_blocks.Column.build())
-            self.append(new_col, after=self.children[index - 1])
+            super().append(new_col, after=self.children[index - 1])
             return self
         else:
             msg = f'Columns can only be inserted from index 1 to {len(self.children)}.'
-            raise ValueError(msg)
+            raise IndexError(msg)
+
+    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:  # noqa: PLR6301
+        msg = 'Use `add_column` to append a new column.'
+        raise InvalidAPIUsageError(msg)
 
     def to_markdown(self) -> str:
         cols = []
@@ -879,33 +910,87 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
         return '\n'.join(cols)
 
 
-class TableRow(Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
-    """Table row block."""
+class TableRow(tuple[RichText], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
+    """Table row block behaving like a tuple."""
 
-    @property
-    def cells(self) -> list[RichText]:
-        if self.obj_ref.table_row.cells is None:
-            return []
-        else:
-            return [RichText.wrap_obj_ref(cell) for cell in self.obj_ref.table_row.cells]
+    def __new__(cls, *cells: str | RichText | RichTextBase) -> TableRow:
+        return tuple.__new__(cls, cells)
+
+    def __init__(self, *cells: str | RichText | RichTextBase):
+        super().__init__(n_cells=len(cells))
+        for idx, cell in enumerate(cells):
+            self.obj_ref.table_row.cells[idx] = text_to_obj_ref(cell)
+
+    @classmethod
+    def wrap_obj_ref(cls, obj_ref: obj_blocks.TableRow, /) -> TableRow:
+        row = TableRow(*[RichText.wrap_obj_ref(cell) for cell in obj_ref.table_row.cells])
+        row.obj_ref = obj_ref
+        return row
 
     def to_markdown(self) -> str:
-        return ' | '.join([cell.to_markdown() for cell in self.cells])
+        return ' | '.join([cell.to_markdown() for cell in self])
 
 
 class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
     """Table block."""
 
-    def __init__(self, n_rows: int, n_cols: int, *, column_header: bool = False, row_header: bool = False):
+    def __init__(self, n_rows: int, n_cols: int, *, header_col: bool = False, header_row: bool = False):
         super().__init__()
         self.obj_ref.table.table_width = n_cols
-        self.obj_ref.table.has_column_header = column_header
-        self.obj_ref.table.has_row_header = row_header
+        self.obj_ref.table.has_column_header = header_row
+        self.obj_ref.table.has_row_header = header_col
         self.obj_ref.table.children = [obj_blocks.TableRow.build(n_cols) for _ in range(n_rows)]
+        self.obj_ref.has_children = bool(self.obj_ref.table.children)
 
-    def __getitem__(self, index: tuple[int, int]) -> RichText:
-        row_idx, col_idx = index
-        return self.rows[row_idx].cells[col_idx]
+    def _check_index(self, index: int | tuple[int, int]) -> tuple[int, int | None]:
+        if isinstance(index, tuple):
+            row_idx, col_idx = index
+        else:
+            row_idx, col_idx = index, None
+
+        if not (0 <= row_idx < len(self.children)):
+            msg = 'Row index out of range'
+            raise IndexError(msg)
+
+        if col_idx is not None and not (0 <= col_idx < self.width):
+            msg = 'Column index out of range'
+            raise IndexError(msg)
+
+        return row_idx, col_idx
+
+    def __str__(self) -> str:
+        return self.to_markdown()
+
+    @overload
+    def __getitem__(self, index: int) -> TableRow: ...
+
+    @overload
+    def __getitem__(self, index: tuple[int, int]) -> RichText: ...
+
+    def __getitem__(self, index: int | tuple[int, int]) -> RichText | TableRow:
+        row_idx, col_idx = self._check_index(index)
+        row = self.to_list()[row_idx]
+        return row if col_idx is None else row[col_idx]
+
+    def __setitem__(
+        self,
+        index: int | tuple[int, int],
+        value: str | RichText | RichTextBase | Sequence[str | RichText | RichTextBase],
+    ) -> None:
+        row_idx, col_idx = self._check_index(index)
+        row_obj = self.children[row_idx].obj_ref
+        if col_idx is None:
+            if not isinstance(value, Sequence) or len(value) != self.width:
+                msg = 'Value is no sequence or its length does not match the width of table.'
+                raise ValueError(msg)
+            for idx, item in enumerate(value):
+                row_obj.table_row.cells[idx] = text_to_obj_ref(item)
+        elif isinstance(value, str | RichText | RichTextBase):
+            row_obj.table_row.cells[col_idx] = text_to_obj_ref(value)
+        else:
+            msg = 'A single value is needed to set a single cell.'
+            raise ValueError(msg)
+        self._update_in_notion()
 
     @property
     def width(self) -> int:
@@ -920,25 +1005,50 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
         return n_rows, n_cols
 
     @property
-    def has_column_header(self) -> bool:
-        """Return whether the table has a column header."""
+    def has_header_row(self) -> bool:
+        """Return whether the table has a header row."""
         return self.obj_ref.table.has_column_header
 
-    @property
-    def has_row_header(self) -> bool:
-        """Return whether the table has a row header."""
-        return self.obj_ref.table.has_row_header
+    @has_header_row.setter
+    def has_header_row(self, header_row: bool) -> None:
+        self.obj_ref.table.has_column_header = header_row
+        self._update_in_notion(exclude_attrs=['table.table_width', 'table.children'])
 
     @property
-    def rows(self) -> list[TableRow]:
-        """Return the rows of the table."""
-        return [cast(TableRow, row) for row in self.children]
+    def has_header_col(self) -> bool:
+        """Return whether the table has a header column."""
+        return self.obj_ref.table.has_row_header
+
+    @has_header_col.setter
+    def has_header_col(self, header_col: bool) -> None:
+        self.obj_ref.table.has_row_header = header_col
+        self._update_in_notion(exclude_attrs=['table.table_width', 'table.children'])
+
+    def to_list(self) -> list[TableRow]:
+        """Return the table as list of tuples, i.e. TableRows"""
+        return [cast(TableRow, block) for block in self.children]
 
     def to_markdown(self) -> str:
         """Return the table as Markdown."""
-        headers = 'firstrow' if self.has_column_header else [''] * self.width
-        table = [[cell.to_markdown() for cell in row.cells] for row in self.rows]
+        headers = 'firstrow' if self.has_header_row else [''] * self.width
+        table = [[cell.to_markdown() for cell in row] for row in self.to_list()]
         return tabulate(table, headers, tablefmt='github') + '\n'
+
+    def insert_row(self, index: int, values: Sequence[str | RichText | RichTextBase]) -> Self:
+        """Insert a new row at the given index."""
+        if not (1 <= index <= len(self.children)):
+            msg = f'Columns can only be inserted from index 1 to {len(self.children)}.'
+            raise IndexError(msg)
+        if len(values) != self.width:
+            msg = 'Length of passed value does not match width of table.'
+            raise ValueError(msg)
+
+        self.append(TableRow(*values), after=self.children[index - 1])
+        return self
+
+    def append_row(self, values: Sequence[str | RichText | RichTextBase]) -> Self:
+        """Append a new row to the table."""
+        return self.insert_row(len(self.children), values)
 
 
 class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
