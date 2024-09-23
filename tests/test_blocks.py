@@ -36,7 +36,7 @@ def test_append_blocks(root_page: Page, notion: Session):
     page.append([h2, h3, h4])
     page.append(h21, after=h2)
 
-    added_children = [h1, h2, h21, h3, h4]
+    added_children = (h1, h2, h21, h3, h4)
     assert page.children == added_children
     assert all(pchild is achild for pchild, achild in zip(page.children, added_children, strict=True))
 
@@ -47,18 +47,18 @@ def test_delete_blocks(root_page: Page, notion: Session):
     h = uno.Heading1('My new page')
     p = uno.Paragraph('This is a paragraph')
     page.append([h, p])
-    assert page.children == [h, p]
+    assert page.children == (h, p)
     assert not h.is_deleted
     assert not p.is_deleted
 
     p.delete()
-    assert page.children == [h]
+    assert page.children == (h,)
     assert p.is_deleted
 
     h.delete()
     assert h.is_deleted
     page.reload()
-    assert page.children == []
+    assert page.children == ()
 
 
 @pytest.mark.vcr()
@@ -219,9 +219,9 @@ def test_create_child_blocks(root_page: Page, notion: Session):
     page = notion.create_page(parent=root_page, title='Page for creating child blocks')
     subpage = notion.create_page(parent=page, title='Subpage')
     subdb = notion.create_db(parent=page)
-    assert page.children == [subpage, subdb]  # This works as we only compare the IDs
+    assert page.children == (subpage, subdb)  # This works as we only compare the IDs
     page.reload()
-    assert page.children == [subpage, subdb]
+    assert page.children == (subpage, subdb)
     child_page, child_db = page.children
     assert child_page is subpage
     assert child_db is subdb
@@ -229,9 +229,9 @@ def test_create_child_blocks(root_page: Page, notion: Session):
     for child in page.children:
         child.delete()
 
-    assert page.children == []
+    assert page.children == ()
     page.reload()
-    assert page.children == []
+    assert page.children == ()
 
 
 @pytest.mark.vcr()
@@ -257,21 +257,21 @@ def test_create_column_blocks(root_page: Page, notion: Session):
 @pytest.mark.vcr()
 def test_create_table_blocks(root_page: Page, notion: Session):
     page = notion.create_page(parent=root_page, title='Page for creating table blocks')
-    table = uno.Table(2, 2)
+    table = uno.Table(3, 2, header_row=True)
     page.append(table)
-    # ToDo: When modifying is implemented, add more tests
-    # table[0, 0] = uno.Paragraph('Cell 1')
-    # table[0, 1] = uno.Paragraph('Cell 2')
-    # table[1, 0] = uno.Paragraph('Cell 3')
-    # table[1, 1] = uno.Paragraph('Cell 4')
+    table[0] = ('Column 1', 'Column 2')
+    table[1, 0] = 'Cell 1,0'
+    table[1, 1] = 'Cell 1,1'
+    table[2, 0] = 'Cell 2,0'
+    table[2, 1] = 'Cell 2,1'
     output = page.to_markdown()
     exp_output = dedent("""
         # Page for creating table blocks
 
-        |    |    |
-        |----|----|
-        |    |    |
-        |    |    |
+        | Column 1   | Column 2   |
+        |------------|------------|
+        | Cell 1,0   | Cell 1,1   |
+        | Cell 2,0   | Cell 2,1   |
     """)
     for exp, act in zip(exp_output.lstrip('\n').split('\n'), output.split('\n'), strict=True):
         assert exp == act
@@ -333,7 +333,7 @@ def test_nested_blocks(root_page: Page, notion: Session):
     p2.append(uno.Paragraph('Nested Paragraph'))
 
     assert len(page.children) == 3
-    assert cast(ChildrenMixin, page.children[1]).children == [p1]
+    assert cast(ChildrenMixin, page.children[1]).children == (p1,)
     assert len(cast(ChildrenMixin, page.children[2]).children) == 1
 
 
@@ -485,8 +485,8 @@ def test_modify_column_blocks(root_page: Page, notion: Session):
 
     cols = cast(uno.Columns, page.children[0])
     left_col, right_col = cast(list[uno.Column], cols.children)
-    assert left_col.children == [right]
-    assert right_col.children == [new_right]
+    assert left_col.children == (right,)
+    assert right_col.children == (new_right,)
 
     with pytest.raises(InvalidAPIUsageError):
         cols.append(uno.Paragraph('This is a paragraph'))
