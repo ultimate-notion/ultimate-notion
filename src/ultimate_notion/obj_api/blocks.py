@@ -118,7 +118,7 @@ class Paragraph(TextBlock, type='paragraph'):
 
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
         color: Color | BGColor = Color.DEFAULT
 
     paragraph: TypeData = TypeData()
@@ -156,7 +156,7 @@ class Quote(TextBlock, type='quote'):
 
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
         color: Color | Color = Color.DEFAULT
 
     quote: TypeData = TypeData()
@@ -178,7 +178,7 @@ class Callout(TextBlock, type='callout'):
 
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
         icon: SerializeAsAny[FileObject] | EmojiObject = None  # type: ignore
         color: Color | BGColor = BGColor.GRAY
 
@@ -190,7 +190,7 @@ class BulletedListItem(TextBlock, type='bulleted_list_item'):
 
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
         color: Color | BGColor = Color.DEFAULT
 
     bulleted_list_item: TypeData = TypeData()
@@ -201,7 +201,7 @@ class NumberedListItem(TextBlock, type='numbered_list_item'):
 
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
         color: Color | BGColor = Color.DEFAULT
 
     numbered_list_item: TypeData = TypeData()
@@ -213,7 +213,7 @@ class ToDo(TextBlock, type='to_do'):
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         checked: bool = False
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
         color: Color | BGColor = Color.DEFAULT
 
     to_do: TypeData = TypeData()
@@ -224,7 +224,7 @@ class Toggle(TextBlock, type='toggle'):
 
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
         color: Color | BGColor = Color.DEFAULT
 
     toggle: TypeData = TypeData()
@@ -345,7 +345,7 @@ class Column(Block, type='column'):
     class TypeData(GenericObject):
         # note that children will not be populated when getting this block
         # https://developers.notion.com/changelog/column-list-and-column-support
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
     column: TypeData = TypeData()
 
@@ -360,7 +360,7 @@ class ColumnList(Block, type='column_list'):
     class TypeData(GenericObject):
         # note that children will not be populated when getting this block
         # https://developers.notion.com/changelog/column-list-and-column-support
-        children: list[Column] | None = None
+        children: list[Column] = Field(default_factory=list)
 
     column_list: TypeData = TypeData()
 
@@ -388,7 +388,7 @@ class Table(Block, type='table'):
 
         # note that children will not be populated when getting this block
         # https://developers.notion.com/reference/block#table-blocks
-        children: list[TableRow] | None = None
+        children: list[TableRow] = Field(default_factory=list)
 
     table: TypeData = TypeData()
 
@@ -404,7 +404,7 @@ class SyncedBlock(Block, type='synced_block'):
 
     class TypeData(GenericObject):
         synced_from: BlockRef | None = None
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
     synced_block: TypeData = TypeData()
 
@@ -422,6 +422,6 @@ class Template(Block, type='template'):
 
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] | None = None
-        children: list[SerializeAsAny[Block]] | None = None
+        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
     template: TypeData = TypeData()

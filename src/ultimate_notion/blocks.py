@@ -198,20 +198,20 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
         return [cast(Block, session.cache.setdefault(block.id, block)) for block in child_blocks]
 
     @property
-    def children(self) -> list[Block]:
+    def children(self) -> tuple[Block, ...]:
         """Return the children of this block."""
         if self.in_notion:
             if self._children is None:
                 self._children = self._gen_children_cache()
-            children = self._children.copy()  # we copy to allow deleting blocks while iterating over it
+            children = tuple(self._children)  # we copy implicitly to allow deleting blocks while iterating over it
         elif isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children'):
-            children = [Block.wrap_obj_ref(block) for block in self.obj_ref.value.children]
+            children = tuple(Block.wrap_obj_ref(block) for block in self.obj_ref.value.children)
         else:
-            children = []
+            children = ()
         return children
 
-    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:
-        """Append a block or a list of blocks to the content of this block."""
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None) -> Self:
+        """Append a block or a sequence of blocks to the content of this block."""
         if not self.in_notion:
             msg = 'Cannot append blocks to a block that is not in Notion.'
             raise RuntimeError(msg)
@@ -301,7 +301,7 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
         # https://github.com/python/mypy/issues/3004
         # Always pass `RichText` objects to this setter to avoid this error.
         self.obj_ref.value.rich_text = text_to_obj_ref(text)
-        self._update_in_notion()
+        self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
 class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
@@ -364,7 +364,7 @@ class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
     @color.setter
     def color(self, color: Color | BGColor) -> None:
         self.obj_ref.value.color = color
-        self._update_in_notion()
+        self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
 class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin, wraps=obj_blocks.Paragraph):
@@ -404,7 +404,7 @@ class Heading(ColoredTextBlock[BT], ChildrenMixin, ABC, wraps=obj_blocks.Heading
         self.obj_ref.value.is_toggleable = toggleable
         self._update_in_notion()
 
-    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None) -> Self:
         if not self.toggleable:
             msg = 'Cannot append blocks to a non-toggleable heading.'
             raise InvalidAPIUsageError(msg)
@@ -898,7 +898,7 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
             msg = f'Columns can only be inserted from index 1 to {len(self.children)}.'
             raise IndexError(msg)
 
-    def append(self, blocks: Block | list[Block], *, after: Block | None = None) -> Self:  # noqa: PLR6301
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None) -> Self:  # noqa: PLR6301
         msg = 'Use `add_column` to append a new column.'
         raise InvalidAPIUsageError(msg)
 
@@ -910,7 +910,7 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
         return '\n'.join(cols)
 
 
-class TableRow(tuple[RichText], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
+class TableRow(tuple[RichText, ...], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
     """Table row block behaving like a tuple."""
 
     def __new__(cls, *cells: str | RichText | RichTextBase) -> TableRow:
@@ -928,7 +928,7 @@ class TableRow(tuple[RichText], Block[obj_blocks.TableRow], wraps=obj_blocks.Tab
         return row
 
     def to_markdown(self) -> str:
-        return ' | '.join([cell.to_markdown() for cell in self])
+        return ' | '.join(self)
 
 
 class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
@@ -969,7 +969,7 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
 
     def __getitem__(self, index: int | tuple[int, int]) -> RichText | TableRow:
         row_idx, col_idx = self._check_index(index)
-        row = self.to_list()[row_idx]
+        row = self.children[row_idx]
         return row if col_idx is None else row[col_idx]
 
     def __setitem__(
@@ -978,10 +978,11 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
         value: str | RichText | RichTextBase | Sequence[str | RichText | RichTextBase],
     ) -> None:
         row_idx, col_idx = self._check_index(index)
-        row_obj = self.children[row_idx].obj_ref
+        row = self.children[row_idx]
+        row_obj = row.obj_ref
         if col_idx is None:
             if not isinstance(value, Sequence) or len(value) != self.width:
-                msg = 'Value is no sequence or its length does not match the width of table.'
+                msg = 'Value is no sequence or its length does not match the width of the table.'
                 raise ValueError(msg)
             for idx, item in enumerate(value):
                 row_obj.table_row.cells[idx] = text_to_obj_ref(item)
@@ -990,7 +991,14 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
         else:
             msg = 'A single value is needed to set a single cell.'
             raise ValueError(msg)
-        self._update_in_notion()
+        row._update_in_notion()
+        if self._children is not None:  # update cache
+            self._children[row_idx] = TableRow.wrap_obj_ref(row_obj)  # needed to call __new__ on the TableRow
+
+    @property
+    def children(self) -> tuple[TableRow, ...]:
+        """Return all rows of the table."""
+        return tuple(cast(TableRow, block) for block in super().children)
 
     @property
     def width(self) -> int:
@@ -1024,15 +1032,10 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
         self.obj_ref.table.has_row_header = header_col
         self._update_in_notion(exclude_attrs=['table.table_width', 'table.children'])
 
-    def to_list(self) -> list[TableRow]:
-        """Return the table as list of tuples, i.e. TableRows"""
-        return [cast(TableRow, block) for block in self.children]
-
     def to_markdown(self) -> str:
         """Return the table as Markdown."""
         headers = 'firstrow' if self.has_header_row else [''] * self.width
-        table = [[cell.to_markdown() for cell in row] for row in self.to_list()]
-        return tabulate(table, headers, tablefmt='github') + '\n'
+        return tabulate(self.children, headers, tablefmt='github') + '\n'
 
     def insert_row(self, index: int, values: Sequence[str | RichText | RichTextBase]) -> Self:
         """Insert a new row at the given index."""
