@@ -88,7 +88,7 @@ engelbart = Customer.create(name='Doug Engelbart', purchases=[khaki_pants, t_shi
 !!! info
     The keyword-arguments are exactly the class variables from the page schemas `Item` and `Customer` above.
 
-This is how are two databases `item_db` and `customer_db` look like in the Notion UI right now:
+This is how our two databases `item_db` and `customer_db` look like in the Notion UI right now:
 
 ![Notion item database](../assets/images/notion-item-db.png){: style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
 
