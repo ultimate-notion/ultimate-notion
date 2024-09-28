@@ -271,7 +271,8 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
         """Update the locally modified block on Notion."""
         if self.in_notion:
             session = get_active_session()
-            obj_ref = del_nested_attr(self.obj_ref, exclude_attrs, inplace=False)
+            # missing_ok=True to cover `Heading` which behave like `TextBlock` but have no `children` attribute
+            obj_ref = del_nested_attr(self.obj_ref, exclude_attrs, inplace=False, missing_ok=True)
             self.obj_ref = cast(BT, session.api.blocks.update(obj_ref))
 
     def replace(self, blocks: Block | Sequence[Block]) -> None:
