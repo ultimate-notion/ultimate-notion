@@ -360,7 +360,9 @@ def temp_timezone(tz: str | pnd.Timezone):
 PT = TypeVar('PT', bound=BaseModel)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-def del_nested_attr(obj: PT, attr_paths: str | Sequence[str] | None, *, inplace: bool = False) -> PT:
+def del_nested_attr(
+    obj: PT, attr_paths: str | Sequence[str] | None, *, inplace: bool = False, missing_ok: bool = False
+) -> PT:
     """Remove nested attributes from an object."""
     if attr_paths is None:
         return obj
@@ -375,14 +377,14 @@ def del_nested_attr(obj: PT, attr_paths: str | Sequence[str] | None, *, inplace:
         curr_obj: Any = obj
         for lvl, attr in enumerate(attrs[:-1]):
             curr_obj = getattr(curr_obj, attr, None)
-            if curr_obj is None:
+            if curr_obj is None and not missing_ok:
                 msg = f"{attr} does not exist in {'.'.join(attrs[:lvl - 1]) if lvl > 1 else 'the object'}."
                 raise AttributeError(msg)
 
         last_attr = attrs[-1]
         if hasattr(curr_obj, last_attr):
             delattr(curr_obj, last_attr)
-        else:
+        elif not missing_ok:
             msg = f"{last_attr} does not exist in {'.'.join(attrs[:-2]) if len(attrs) > 1 else 'the object'}."
             raise AttributeError(msg)
 
