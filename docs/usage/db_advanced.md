@@ -97,7 +97,7 @@ This is how are two databases `item_db` and `customer_db` look like in the Notio
 !!! note
     The description of the databases corresponds to the the docstring of the schema classes `Item` and `Customer`.
 
-## Fast access of page properties
+## Fast access to page properties
 
 The properties of a page, defined by the properties of the database the page resides in, can be easily accessed with
 the `.props` namespace, e.g.:
