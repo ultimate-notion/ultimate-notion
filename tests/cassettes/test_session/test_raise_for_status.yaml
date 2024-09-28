@@ -23,12 +23,12 @@ interactions:
   response:
     content: '{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
       Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true},"workspace_name":"GitHub
-      Unittests"},"request_id":"393f6b61-dfd1-4e8c-b1ea-5ac0c0801532"}'
+      Unittests"},"request_id":"884590cd-e714-47c6-ae85-47d458b1e812"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 8b6c52158d454dba-FRA
+      - 8ca42f07e96dd39d-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -37,14 +37,30 @@ interactions:
       - application/json; charset=utf-8
       Server:
       - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       Transfer-Encoding:
       - chunked
       Vary:
       - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
       x-notion-request-id:
-      - 393f6b61-dfd1-4e8c-b1ea-5ac0c0801532
-      x-powered-by:
-      - Express
+      - 884590cd-e714-47c6-ae85-47d458b1e812
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
     http_version: HTTP/1.1
     status_code: 200
 version: 1
