@@ -1,4 +1,4 @@
-"""Core building blocks for pages and databases."""
+"""Blocks that make up the content of a page."""
 
 from __future__ import annotations
 
@@ -273,6 +273,42 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
             session = get_active_session()
             obj_ref = del_nested_attr(self.obj_ref, exclude_attrs, inplace=False)
             self.obj_ref = cast(BT, session.api.blocks.update(obj_ref))
+
+    def replace(self, blocks: Block | Sequence[Block]) -> None:
+        """Replace this block with another block or blocks."""
+        if not isinstance(blocks, Sequence):
+            blocks = [blocks]
+
+        for block in blocks:  # do complete sanity check first
+            if block.in_notion:
+                msg = f'Cannot replace with a block {block} that is already in Notion.'
+                raise InvalidAPIUsageError(msg)
+
+        if self.parent is not None and isinstance(self.parent, ChildrenMixin):
+            for block in reversed(blocks):
+                self.parent.append(block, after=self)
+        else:
+            msg = 'Cannot replace a block that has no parent.'
+            raise InvalidAPIUsageError(msg)
+
+        self.delete()
+
+    def insert_after(self, blocks: Block | Sequence[Block]) -> None:
+        """Insert a block or several blocks after this block."""
+        if not isinstance(blocks, Sequence):
+            blocks = [blocks]
+
+        for block in blocks:  # do complete sanity check first
+            if block.in_notion:
+                msg = f'Cannot insert block {block} that is already in Notion.'
+                raise InvalidAPIUsageError(msg)
+
+        if self.parent is not None and isinstance(self.parent, ChildrenMixin):
+            for block in reversed(blocks):
+                self.parent.append(block, after=self)
+        else:
+            msg = 'Cannot insert a block that has no parent.'
+            raise InvalidAPIUsageError(msg)
 
 
 AnyBlock: TypeAlias = Block[Any]
@@ -1055,23 +1091,32 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
 
 
 class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
-    """Link to page block."""
+    """Link to page block.
+
+    !!! note
+        Updating a link to page block is not supported by the Notion API.
+        Use `.replace(new_block)` instead.
+    """
 
     def __init__(self, page: Page):
         super().__init__()
         self.obj_ref.link_to_page = objs.PageRef.build(page.obj_ref)
 
     @property
-    def url(self) -> str:
-        return get_url(objs.get_uuid(self.obj_ref.link_to_page))
-
-    @property
     def page(self) -> Page:
         session = get_active_session()
         return session.get_page(objs.get_uuid(self.obj_ref.link_to_page))
 
+    @page.setter
+    def page(self, page: Page) -> None:  # noqa: PLR6301
+        # Updating a link to page block is not supported by the API and returns the current one.
+        # self.obj_ref.link_to_page = objs.PageRef.build(page.obj_ref)
+        # self._update_in_notion()
+        msg = 'Updating a link to page block is not supported by the API. Use `.replace(new_block)` instead.'
+        raise InvalidAPIUsageError(msg)
+
     def to_markdown(self) -> str:
-        return f'[**↗️ <u>{self.page.title}</u>**]({self.url})\n'
+        return f'[**↗️ <u>{self.page.title}</u>**]({self.page.url})\n'
 
 
 class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks.SyncedBlock):
