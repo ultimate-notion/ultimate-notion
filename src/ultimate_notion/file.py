@@ -21,7 +21,7 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
     obj_ref: objs.FileObject
 
     def __init__(self, *, url: str, name: str | None = None, caption: str | None = None) -> None:
-        caption_obj = Text(caption).obj_ref if caption is not None else []
+        caption_obj = Text(caption).obj_ref if caption is not None else None  # [] is not accepted here by the API!
         if is_notion_hosted(url):
             self.obj_ref = objs.HostedFile.build(url=url, name=name, caption=caption_obj)
         else:

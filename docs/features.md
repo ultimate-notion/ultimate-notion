@@ -59,8 +59,8 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Comments
 
-- [ ] create/delete/modify a comment within a block or page
 - [ ] retrieve comments of a block or page
+- [ ] create/delete/modify a comment within a block or page
 
 ## Adapters
 

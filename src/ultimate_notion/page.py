@@ -209,7 +209,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     def cover(self, cover: FileInfo | str | None):
         """Set the cover fo this page."""
         if isinstance(cover, str):
-            cover = FileInfo(url=cover, name=None)
+            cover = FileInfo(url=str(cover), name=None)
         cover_obj = None if cover is None else cover.obj_ref
         session = get_active_session()
         session.api.pages.set_attr(self.obj_ref, cover=cover_obj)
