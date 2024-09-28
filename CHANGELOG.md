@@ -2,8 +2,9 @@
 
 ## Version 0.6
 
-- Fix: `has_children` doesn't return a wrong value anymore for pages and databases.
 - New: Also use the session cache for blocks.
+- New: Properties of blocks can be updated.
+- Fix: `has_children` doesn't return a wrong value anymore for pages and databases.
 - Fix: Several issues with blocks and duplicated but ID-equivalent objects.
 - Chg: Children of pages are proper pages/databases instead of `ChildPage`/`ChildDatabase`.
 - Chg: Renamed `PageSchema` to `Schema`.

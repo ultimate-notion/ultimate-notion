@@ -227,7 +227,7 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
 
     def _to_markdown(self) -> str:
         """Return the reference to this page as Markdown."""
-        return f'[📄 **<u>{self.title}</u>**]({self.block_url})\n'
+        return f'[📄 **<u>{self.title}</u>**]({self.url})\n'
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
