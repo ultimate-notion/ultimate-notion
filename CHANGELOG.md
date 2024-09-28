@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.6
+## Version 0.6, 2024-09-28
 
 - New: Also use the session cache for blocks.
 - New: Properties of blocks can be updated.

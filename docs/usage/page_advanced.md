@@ -53,7 +53,11 @@ my_page.append([
         'But he has become a poet and now he is fine." - D. Hilbert',
         color=uno.Color.BLUE
         ),
-    uno.Callout('Ultimate Notion rocks!', color=uno.BGColor.PURPLE, icon=uno.Emoji('🚀')),
+    uno.Callout(
+        'Ultimate Notion rocks!',
+        color=uno.BGColor.PURPLE,
+        icon=uno.Emoji('🚀')
+        ),
     uno.Heading2('Showing off some more...'),
     uno.BulletedItem('First bulleted item'),
     uno.BulletedItem('Second bulleted item'),
@@ -139,7 +143,7 @@ Most properties of a block also provide setter, so you can just assign a new val
 Let's assume, we first have to retrieve the page we created above and want to modify the first heading:
 
 ```python
-my_page = notion.get_page(my_page.id)  # or `notion.search_page(...).item()` in practice
+my_page = notion.get_page(my_page.id)  # or `notion.search_page(...).item()`
 
 heading = my_page.children[0]
 assert heading.color == uno.Color.DEFAULT
