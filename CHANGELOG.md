@@ -6,6 +6,7 @@
 - New: Properties of blocks can be updated.
 - Fix: `has_children` doesn't return a wrong value anymore for pages and databases.
 - Fix: Several issues with blocks and duplicated but ID-equivalent objects.
+- Chg: Simplified dealing with rich texts by introducing `text`, `mention` and `math`.
 - Chg: Children of pages are proper pages/databases instead of `ChildPage`/`ChildDatabase`.
 - Chg: Renamed `PageSchema` to `Schema`.
 - Chg: Accessing the properties of a page directly returns the primitive data types.

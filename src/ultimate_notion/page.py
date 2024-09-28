@@ -14,8 +14,8 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.props import PropertyValue, Title
+from ultimate_notion.rich_text import Text, render_md
 from ultimate_notion.templates import page_html
-from ultimate_notion.text import RichText, render_md
 from ultimate_notion.utils import is_notebook
 
 if TYPE_CHECKING:
@@ -162,12 +162,12 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return self.parent_db is not None
 
     @property
-    def title(self) -> RichText:
+    def title(self) -> Text:
         """Title of the page."""
-        return RichText.wrap_obj_ref(self.obj_ref.title)
+        return Text.wrap_obj_ref(self.obj_ref.title)
 
     @title.setter
-    def title(self, text: RichText | str | None):
+    def title(self, text: str | None):
         """Set the title of the page."""
         if text is None:
             text = ''

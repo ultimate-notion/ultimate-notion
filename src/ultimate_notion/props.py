@@ -12,10 +12,10 @@ from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 import pendulum as pnd
 
 import ultimate_notion.obj_api.props as obj_props
+from ultimate_notion import rich_text
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.file import FileInfo
 from ultimate_notion.option import Option
-from ultimate_notion.text import RichText
 from ultimate_notion.user import User
 
 if TYPE_CHECKING:
@@ -69,7 +69,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
         return get_repr(self)
 
     def __str__(self) -> str:
-        if isinstance(self.value, RichText):
+        if isinstance(self.value, rich_text.Text):
             return str(self.value) if self.value else ''
         elif isinstance(self.value, list):
             # workaround as `str` on lists calls `repr` instead of `str`
@@ -81,27 +81,23 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
 class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     """Title property value."""
 
-    def __init__(self, text: str | RichText):
-        if isinstance(text, str):
-            text = RichText.from_plain_text(text)
-        super().__init__(text.obj_ref)
+    def __init__(self, text: str):
+        super().__init__(rich_text.Text(text).obj_ref)
 
     @property
-    def value(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.title)
+    def value(self) -> rich_text.Text:
+        return rich_text.Text.wrap_obj_ref(self.obj_ref.title)
 
 
 class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
     """Rich text property value."""
 
-    def __init__(self, text: str | RichText):
-        if isinstance(text, str):
-            text = RichText.from_plain_text(text)
-        super().__init__(text.obj_ref)
+    def __init__(self, text: str):
+        super().__init__(rich_text.Text(text).obj_ref)
 
     @property
-    def value(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.rich_text)
+    def value(self) -> rich_text.Text:
+        return rich_text.Text.wrap_obj_ref(self.obj_ref.rich_text)
 
 
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):

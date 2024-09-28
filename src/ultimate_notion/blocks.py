@@ -17,7 +17,7 @@ from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
-from ultimate_notion.text import RichText, RichTextBase, User, md_comment, text_to_obj_ref
+from ultimate_notion.rich_text import Text, User, md_comment
 from ultimate_notion.utils import del_nested_attr
 
 if TYPE_CHECKING:
@@ -173,6 +173,12 @@ class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
     as not every object has this property, e.g. a page, database or toggable heading.
     """
 
+    # ToDo: This could be reworked to differentiate between blocks that have a children attribute and those that don't,
+    # like headings and pages. In the former case we would not neet to have a _children attribute and could directly
+    # access the children attribute of the object reference. In the latter case we would need to have a _children.
+    # This would save some memory and appending would work for the former case even for blocks that are not
+    # yet in Notion.
+
     _children: list[Block] | None = None
 
     def _gen_children_cache(self) -> list[Block]:
@@ -267,7 +273,7 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
         self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
         return self
 
-    def _update_in_notion(self, *, exclude_attrs: list[str] | None = None) -> None:
+    def _update_in_notion(self, *, exclude_attrs: Sequence[str] | None = None) -> None:
         """Update the locally modified block on Notion."""
         if self.in_notion:
             session = get_active_session()
@@ -330,22 +336,22 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
     Parent class of all text block types.
     """
 
-    def __init__(self, text: str | RichText | RichTextBase) -> None:
+    def __init__(self, text: str) -> None:
         super().__init__()
-        self.obj_ref.value.rich_text = text_to_obj_ref(text)
+        self.obj_ref.value.rich_text = Text(text).obj_ref
 
     @property
-    def rich_text(self) -> RichText:
+    def rich_text(self) -> Text:
         """Return the text content of this text block."""
         rich_texts = self.obj_ref.value.rich_text
-        return RichText.wrap_obj_ref(rich_texts)
+        return Text.wrap_obj_ref(rich_texts)
 
     @rich_text.setter
-    def rich_text(self, text: str | RichText | RichTextBase) -> None:
+    def rich_text(self, text: str) -> None:
         # Right now this leads to a mypy error, see
         # https://github.com/python/mypy/issues/3004
         # Always pass `RichText` objects to this setter to avoid this error.
-        self.obj_ref.value.rich_text = text_to_obj_ref(text)
+        self.obj_ref.value.rich_text = Text(text).obj_ref
         self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
@@ -354,14 +360,14 @@ class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase,
+        text: str,
         *,
         language: CodeLang = CodeLang.PLAIN_TEXT,
-        caption: str | RichText | RichTextBase | None = None,
+        caption: str | None = None,
     ) -> None:
         super().__init__(text)
         self.obj_ref.value.language = language
-        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
 
     @property
     def language(self) -> CodeLang:
@@ -373,12 +379,12 @@ class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
         self._update_in_notion()
 
     @property
-    def caption(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.value.caption)
+    def caption(self) -> Text:
+        return Text.wrap_obj_ref(self.obj_ref.value.caption)
 
     @caption.setter
-    def caption(self, caption: str | RichText | RichTextBase | None) -> None:
-        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+    def caption(self, caption: str | None) -> None:
+        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
         self._update_in_notion()
 
     def to_markdown(self) -> str:
@@ -394,12 +400,12 @@ class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase,
+        text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
     ) -> None:
         super().__init__(text)
-        self.obj_ref.value.rich_text = text_to_obj_ref(text)
+        self.obj_ref.value.rich_text = Text(text).obj_ref
         self.obj_ref.value.color = color
 
     @property
@@ -427,7 +433,7 @@ class Heading(ColoredTextBlock[BT], ChildrenMixin, ABC, wraps=obj_blocks.Heading
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase,
+        text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
         toggleable: bool = False,
@@ -495,7 +501,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blo
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase,
+        text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
         icon: FileInfo | Emoji | None = None,
@@ -551,7 +557,7 @@ class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin, wraps=obj_block
 
     def __init__(
         self,
-        text: str | RichText | RichTextBase,
+        text: str,
         *,
         checked: bool = False,
         color: Color | BGColor = Color.DEFAULT,
@@ -611,10 +617,10 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
 class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
     """Embed block."""
 
-    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | None = None):
+    def __init__(self, url: str, *, caption: str | None = None):
         super().__init__()
         self.obj_ref.value.url = url
-        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else None
+        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else None
 
     @property
     def url(self) -> str | None:
@@ -627,13 +633,13 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
         self._update_in_notion()
 
     @property
-    def caption(self) -> RichText:
+    def caption(self) -> Text:
         """Return the caption of the embedded item."""
-        return RichText.wrap_obj_ref(self.obj_ref.value.caption)
+        return Text.wrap_obj_ref(self.obj_ref.value.caption)
 
     @caption.setter
-    def caption(self, caption: str | RichText | RichTextBase | None) -> None:
-        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+    def caption(self, caption: str | None) -> None:
+        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
         self._update_in_notion()
 
     def to_markdown(self) -> str:
@@ -646,10 +652,10 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
 class Bookmark(Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
 
-    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | None = None):
+    def __init__(self, url: str, *, caption: str | None = None):
         super().__init__()
         self.obj_ref.value.url = url
-        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else None
+        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else None
 
     @property
     def url(self) -> str | None:
@@ -733,7 +739,7 @@ class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
         self,
         url: str,
         *,
-        caption: str | RichText | RichTextBase | None = None,
+        caption: str | None = None,
         name: str | None = None,
     ):
         super().__init__()
@@ -754,12 +760,12 @@ class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
         return self.file_info.url
 
     @property
-    def caption(self) -> RichText:
+    def caption(self) -> Text:
         return self.file_info.caption
 
     @caption.setter
-    def caption(self, caption: str | RichText | RichTextBase | None) -> None:
-        self.obj_ref.value.caption = text_to_obj_ref(caption) if caption is not None else []
+    def caption(self, caption: str | None) -> None:
+        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
         self._update_in_notion()
 
 
@@ -778,7 +784,7 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
         name: str,
         url: str,
         *,
-        caption: str | RichText | RichTextBase | None = None,
+        caption: str | None = None,
     ):
         super().__init__(url, caption=caption, name=name)
 
@@ -807,7 +813,7 @@ class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
         Only the caption can be modified, the URL is read-only.
     """
 
-    def __init__(self, url: str, *, caption: str | RichText | RichTextBase | None = None):
+    def __init__(self, url: str, *, caption: str | None = None):
         super().__init__(url, caption=caption)
 
     def to_markdown(self) -> str:
@@ -955,20 +961,20 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
         return '\n'.join(cols)
 
 
-class TableRow(tuple[RichText, ...], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
+class TableRow(tuple[Text, ...], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
     """Table row block behaving like a tuple."""
 
-    def __new__(cls, *cells: str | RichText | RichTextBase) -> TableRow:
+    def __new__(cls, *cells: str) -> TableRow:
         return tuple.__new__(cls, cells)
 
-    def __init__(self, *cells: str | RichText | RichTextBase):
+    def __init__(self, *cells: str):
         super().__init__(n_cells=len(cells))
         for idx, cell in enumerate(cells):
-            self.obj_ref.table_row.cells[idx] = text_to_obj_ref(cell)
+            self.obj_ref.table_row.cells[idx] = Text(cell).obj_ref
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.TableRow, /) -> TableRow:
-        row = TableRow(*[RichText.wrap_obj_ref(cell) for cell in obj_ref.table_row.cells])
+        row = TableRow(*[Text.wrap_obj_ref(cell) for cell in obj_ref.table_row.cells])
         row.obj_ref = obj_ref
         return row
 
@@ -1010,9 +1016,9 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
     def __getitem__(self, index: int) -> TableRow: ...
 
     @overload
-    def __getitem__(self, index: tuple[int, int]) -> RichText: ...
+    def __getitem__(self, index: tuple[int, int]) -> Text: ...
 
-    def __getitem__(self, index: int | tuple[int, int]) -> RichText | TableRow:
+    def __getitem__(self, index: int | tuple[int, int]) -> Text | TableRow:
         row_idx, col_idx = self._check_index(index)
         row = self.children[row_idx]
         return row if col_idx is None else row[col_idx]
@@ -1020,7 +1026,7 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
     def __setitem__(
         self,
         index: int | tuple[int, int],
-        value: str | RichText | RichTextBase | Sequence[str | RichText | RichTextBase],
+        value: str | Sequence[str],
     ) -> None:
         row_idx, col_idx = self._check_index(index)
         row = self.children[row_idx]
@@ -1030,9 +1036,9 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
                 msg = 'Value is no sequence or its length does not match the width of the table.'
                 raise ValueError(msg)
             for idx, item in enumerate(value):
-                row_obj.table_row.cells[idx] = text_to_obj_ref(item)
-        elif isinstance(value, str | RichText | RichTextBase):
-            row_obj.table_row.cells[col_idx] = text_to_obj_ref(value)
+                row_obj.table_row.cells[idx] = Text(item).obj_ref
+        elif isinstance(value, str):
+            row_obj.table_row.cells[col_idx] = Text(value).obj_ref
         else:
             msg = 'A single value is needed to set a single cell.'
             raise ValueError(msg)
@@ -1082,7 +1088,7 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
         headers = 'firstrow' if self.has_header_row else [''] * self.width
         return tabulate(self.children, headers, tablefmt='github') + '\n'
 
-    def insert_row(self, index: int, values: Sequence[str | RichText | RichTextBase]) -> Self:
+    def insert_row(self, index: int, values: Sequence[str]) -> Self:
         """Insert a new row at the given index."""
         if not (1 <= index <= len(self.children)):
             msg = f'Columns can only be inserted from index 1 to {len(self.children)}.'
@@ -1094,7 +1100,7 @@ class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
         self.append(TableRow(*values), after=self.children[index - 1])
         return self
 
-    def append_row(self, values: Sequence[str | RichText | RichTextBase]) -> Self:
+    def append_row(self, values: Sequence[str]) -> Self:
         """Append a new row to the table."""
         return self.insert_row(len(self.children), values)
 
@@ -1131,7 +1137,7 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
 class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks.SyncedBlock):
     """Synced block - either original or synced."""
 
-    def __init__(self, blocks: Block | list[Block]):
+    def __init__(self, blocks: Block | Sequence[Block]):
         """Create the original synced block."""
         super().__init__()
         blocks = [blocks] if isinstance(blocks, Block) else blocks

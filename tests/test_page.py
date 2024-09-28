@@ -5,7 +5,7 @@ from textwrap import dedent
 
 import pytest
 
-from ultimate_notion import Emoji, FileInfo, Page, RichText, Session
+from ultimate_notion import Emoji, FileInfo, Page, Session, Text
 from ultimate_notion.blocks import Block
 
 
@@ -130,15 +130,15 @@ def test_title_attr(notion: Session, root_page: Page):
 
     title = 'My new title'
     new_page.title = title  # type: ignore[assignment] # test automatic conversation
-    assert isinstance(new_page.title, RichText)
+    assert isinstance(new_page.title, Text)
     assert new_page.title == title
 
-    new_page.title = RichText(title)
-    assert isinstance(new_page.title, RichText)
+    new_page.title = Text(title)
+    assert isinstance(new_page.title, Text)
     assert new_page.title == title
 
     new_page.reload()
-    assert new_page.title == RichText(title)
+    assert new_page.title == Text(title)
 
     new_page.title = None  # type: ignore[assignment]
     new_page.reload()
