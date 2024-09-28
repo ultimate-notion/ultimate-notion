@@ -279,6 +279,10 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
         if not isinstance(blocks, Sequence):
             blocks = [blocks]
 
+        if self.is_deleted:
+            msg = 'Cannot replace a deleted block.'
+            raise InvalidAPIUsageError(msg)
+
         for block in blocks:  # do complete sanity check first
             if block.in_notion:
                 msg = f'Cannot replace with a block {block} that is already in Notion.'
@@ -297,6 +301,10 @@ class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
         """Insert a block or several blocks after this block."""
         if not isinstance(blocks, Sequence):
             blocks = [blocks]
+
+        if self.is_deleted:
+            msg = 'Cannot insert a block after a deleted block.'
+            raise InvalidAPIUsageError(msg)
 
         for block in blocks:  # do complete sanity check first
             if block.in_notion:

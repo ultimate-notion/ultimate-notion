@@ -546,3 +546,27 @@ def test_insert_after_replace_block(root_page: Page, notion: Session):
 
     assert page.children == (heading, paragraph, new_link)
     assert link.is_deleted
+
+    divider = uno.Divider()
+    table = uno.Table(2, 2)
+
+    paragraph.insert_after([divider, table])
+    assert page.children == (heading, paragraph, divider, table, new_link)
+
+    page.reload()
+
+    assert page.children == (heading, paragraph, divider, table, new_link)
+
+    with pytest.raises(InvalidAPIUsageError):
+        divider.insert_after(divider)
+
+    with pytest.raises(InvalidAPIUsageError):
+        divider.replace(table)
+
+    table.delete()
+
+    with pytest.raises(InvalidAPIUsageError):
+        divider.insert_after(table)
+
+    with pytest.raises(InvalidAPIUsageError):
+        divider.replace(divider)
