@@ -527,3 +527,22 @@ def test_modify_table(root_page: Page, notion: Session):
     table.has_header_row = True
     page.reload()
     assert table.has_header_row
+
+
+@pytest.mark.vcr()
+def test_insert_after_replace_block(root_page: Page, notion: Session):
+    page = notion.create_page(parent=root_page, title='Page for inserting after and replacing blocks')
+    orig_target = notion.create_page(parent=root_page, title='Original Target')
+    new_target = notion.create_page(parent=root_page, title='New Target')
+    page.append([heading := uno.Heading1('My new page'), link := uno.LinkToPage(orig_target)])
+
+    with pytest.raises(InvalidAPIUsageError):
+        link.page = new_target
+
+    heading.insert_after(paragraph := uno.Paragraph('This is a paragraph'))
+    link.replace(new_link := uno.LinkToPage(new_target))
+
+    page.reload()
+
+    assert page.children == (heading, paragraph, new_link)
+    assert link.is_deleted
