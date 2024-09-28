@@ -15,8 +15,8 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.page import Page
+from ultimate_notion.rich_text import Text, camel_case, snake_case
 from ultimate_notion.schema import Property, PropertyType, PropertyValue, ReadOnlyPropertyError, Schema, SchemaError
-from ultimate_notion.text import RichText, camel_case, snake_case
 from ultimate_notion.utils import dict_diff_str
 from ultimate_notion.view import View
 
@@ -50,31 +50,31 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return self.obj_ref.url
 
     @property
-    def title(self) -> str | RichText:
+    def title(self) -> str | Text:
         """Return the title of this database as rich text."""
         title = self.obj_ref.title
         # `str` added as return value but always RichText returned, which inherits from str.
-        return RichText.wrap_obj_ref(title)
+        return Text.wrap_obj_ref(title)
 
     @title.setter
-    def title(self, text: str | RichText):
+    def title(self, text: str | Text):
         """Set the title of this database"""
-        if not isinstance(text, RichText):
-            text = RichText.from_plain_text(text)
+        if not isinstance(text, Text):
+            text = Text.from_plain_text(text)
         session = get_active_session()
         session.api.databases.update(self.obj_ref, title=text.obj_ref)
 
     @property
-    def description(self) -> RichText:
+    def description(self) -> Text:
         """Return the description of this database as rich text."""
         desc = self.obj_ref.description
-        return RichText.wrap_obj_ref(desc)
+        return Text.wrap_obj_ref(desc)
 
     @description.setter
-    def description(self, text: str | RichText):
+    def description(self, text: str | Text):
         """Set the description of this database."""
-        if not isinstance(text, RichText):
-            text = RichText.from_plain_text(text)
+        if not isinstance(text, Text):
+            text = Text.from_plain_text(text)
         session = get_active_session()
         session.api.databases.update(self.obj_ref, description=text.obj_ref)
 

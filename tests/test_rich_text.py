@@ -6,7 +6,7 @@ import pytest
 import ultimate_notion as uno
 from ultimate_notion import Database, Page, Session, User
 from ultimate_notion.blocks import TextBlock
-from ultimate_notion.text import camel_case, decapitalize, is_url, snake_case
+from ultimate_notion.rich_text import camel_case, decapitalize, is_url, snake_case
 
 
 def test_decapitalize():
@@ -80,10 +80,10 @@ def test_rich_text_md(md_text_page: Page):
 
 @pytest.mark.vcr()
 def test_mention(person: User, root_page: Page, md_text_page: Page, all_props_db: Database, notion: Session):
-    user_mention = uno.Mention(person)
-    page_mention = uno.Mention(md_text_page)
-    db_mention = uno.Mention(all_props_db)
-    date_mention = uno.Mention(pnd.datetime(2022, 1, 1))
+    user_mention = uno.mention(person)
+    page_mention = uno.mention(md_text_page)
+    db_mention = uno.mention(all_props_db)
+    date_mention = uno.mention(pnd.datetime(2022, 1, 1))
 
     page = notion.create_page(parent=root_page, title='Mention blocks Test')
     paragraph = uno.Paragraph(user_mention + ' : ' + page_mention + ' : ' + db_mention + ' : ' + date_mention)
@@ -98,11 +98,11 @@ def test_mention(person: User, root_page: Page, md_text_page: Page, all_props_db
 
 @pytest.mark.vcr()
 def test_rich_text_bases(person: User, root_page: Page, notion: Session):
-    text: uno.AnyText = uno.Text('This is an equation: ', color=uno.Color.BLUE)
-    text += uno.Math('E=mc^2', bold=True)
-    text += uno.Text(' and this is a mention: ', href='https://ultimate-notion.com')
-    text += uno.Mention(person)
-    assert isinstance(text, uno.RichText)
+    text = uno.text('This is an equation: ', color=uno.Color.BLUE)
+    text += uno.math('E=mc^2', bold=True)
+    text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com')
+    text += uno.mention(person)
+    assert isinstance(text, uno.Text)
 
     page = notion.create_page(parent=root_page, title='RichText Test')
     page.append(uno.Paragraph(text))
@@ -118,10 +118,10 @@ def test_rich_text_bases(person: User, root_page: Page, notion: Session):
 
 
 def test_rich_text():
-    text = uno.RichText('Simple Text')
+    text = uno.text('Simple Text')
     assert str(text) == 'Simple Text'
-    text += uno.Text(' and a bold text', bold=True)
-    assert str(uno.RichText(text)) == 'Simple Text and a bold text'
+    text += uno.text(' and a bold text', bold=True)
+    assert str(text) == 'Simple Text and a bold text'
     assert text.to_markdown() == 'Simple Text **and a bold text**'
-    assert uno.RichText(text).to_markdown() == 'Simple Text **and a bold text**'
+    assert uno.Text(text).to_markdown() == 'Simple Text **and a bold text**'
     # ToDo: Extend this test!

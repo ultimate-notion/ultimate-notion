@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from ultimate_notion import Database, Page, RichText, Session, schema
+from ultimate_notion import Database, Page, Session, Text, schema
 
 from .conftest import CONTACTS_DB
 
@@ -77,10 +77,10 @@ def test_db_with_docstring(notion: Session, root_page: Page):
 
 @pytest.mark.vcr()
 def test_db_attributes(contacts_db: Database):
-    assert isinstance(contacts_db.title, RichText)
+    assert isinstance(contacts_db.title, Text)
     assert contacts_db.title == CONTACTS_DB
 
-    assert isinstance(contacts_db.description, RichText)
+    assert isinstance(contacts_db.description, Text)
     assert contacts_db.description == 'Database of all my contacts!'
 
     assert isinstance(contacts_db.icon, str)
@@ -106,7 +106,7 @@ def test_title_setter(notion: Session, article_db: Database):
     del notion.cache[article_db.id]
     article_db = notion.get_db(article_db.id)
     assert article_db.title == new_title
-    article_db.title = RichText(old_title)
+    article_db.title = Text(old_title)
     assert article_db.title == old_title
     article_db.title = ''
     assert article_db.title == ''

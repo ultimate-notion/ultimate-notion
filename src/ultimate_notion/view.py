@@ -14,7 +14,7 @@ from ultimate_notion.core import get_repr
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.page import Page
-from ultimate_notion.text import RichText, html_img
+from ultimate_notion.rich_text import html_img
 from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
 
 if TYPE_CHECKING:
@@ -76,7 +76,7 @@ class View:
         """Retrieve a page by index of the view."""
         return self._pages[self._row_indices[idx]]
 
-    def search_page(self, name: str | RichText) -> SList[Page]:
+    def search_page(self, name: str) -> SList[Page]:
         """Retrieve a page from this view by name"""
         pages = [page for page in self.to_pages() if page.title == name]
         return SList(pages)

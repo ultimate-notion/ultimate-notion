@@ -1,11 +1,11 @@
-"""Utilities for working text, markdown & rich text in Notion."""
+"""Utilities for working with rich texts & markdown in Notion."""
 
 from __future__ import annotations
 
 import datetime as dt
 import re
-from collections.abc import Callable, Iterator
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
+from collections.abc import Callable, Iterator, Sequence
+from typing import TYPE_CHECKING, TypeVar, cast
 from urllib.parse import urlparse
 
 import mistune
@@ -18,7 +18,7 @@ from ultimate_notion.core import Wrapper
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.user import User
-from ultimate_notion.utils import flatten, rank
+from ultimate_notion.utils import rank
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -47,7 +47,7 @@ class RichTextBase(Wrapper[T], wraps=objs.RichTextBaseObject):
 
     @property
     def is_text(self) -> bool:
-        return isinstance(self, Text)
+        return isinstance(self, RichText)
 
     @property
     def is_equation(self) -> bool:
@@ -57,52 +57,15 @@ class RichTextBase(Wrapper[T], wraps=objs.RichTextBaseObject):
     def is_mention(self) -> bool:
         return isinstance(self, Mention)
 
-    def __add__(self, other: RichTextBase | RichText | str) -> RichText:
-        if isinstance(other, RichTextBase):
-            return RichText.wrap_obj_ref([self.obj_ref, other.obj_ref])
-        elif isinstance(other, RichText):
-            return RichText.wrap_obj_ref([self.obj_ref, *other.obj_ref])
-        elif isinstance(other, str):
-            return RichText.wrap_obj_ref([self.obj_ref, Text(other).obj_ref])
-        else:
-            msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
-            raise RuntimeError(msg)
-
-
-class Text(RichTextBase[objs.TextObject], wraps=objs.TextObject):
-    """A Text object.
-
-    !!! note
-
-        Use `RichText` instead for longer texts with complex formatting.
-    """
-
-    def __init__(
-        self,
-        text: str,
-        *,
-        bold: bool = False,
-        italic: bool = False,
-        strikethrough: bool = False,
-        code: bool = False,
-        underline: bool = False,
-        color: Color = Color.DEFAULT,
-        href: str | None = None,
-    ):
-        if len(text) > MAX_TEXT_OBJECT_SIZE:
-            msg = f'Text object exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `RichText` instead!'
-            raise ValueError(msg)
-
-        annotations = objs.Annotations(
-            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
-        )
-        super().__init__(text, href=href, style=annotations)
-
 
 class Math(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
     """A inline equation object.
 
     A LaTeX equation in inline mode, e.g. `$ \\mathrm{E=mc^2} $`, but without the `$` signs.
+
+    !!! note
+
+        Only used internally, use the `math` function instead, to create proper `Text` object.
     """
 
     def __init__(
@@ -123,8 +86,30 @@ class Math(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
         super().__init__(expression, href=href, style=annotations)
 
 
+def math(
+    expression: str,
+    *,
+    bold: bool = False,
+    italic: bool = False,
+    strikethrough: bool = False,
+    code: bool = False,
+    underline: bool = False,
+    color: Color = Color.DEFAULT,
+) -> Text:
+    """Create a Text that holds a formula."""
+    math = Math(
+        expression, bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+    )
+    return Text.wrap_obj_ref([math.obj_ref])
+
+
 class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
-    """A Mention object."""
+    """A Mention object.
+
+    !!! note
+
+        Only used internally, use the `mention` function instead, to create proper `RichText` object.
+    """
 
     def __init__(
         self,
@@ -151,7 +136,54 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
         return self.obj_ref.mention.type
 
 
-class RichText(str):
+def mention(
+    target: User | Page | Database | dt.datetime | dt.date | pnd.Interval,
+    *,
+    bold: bool = False,
+    italic: bool = False,
+    strikethrough: bool = False,
+    code: bool = False,
+    underline: bool = False,
+    color: Color = Color.DEFAULT,
+) -> Text:
+    """Create a Text that mentions another object."""
+    mention = Mention(
+        target, bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+    )
+    return Text.wrap_obj_ref([mention.obj_ref])
+
+
+class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
+    """A Text object.
+
+    !!! note
+
+        Only used internally, use `Text` instead.
+    """
+
+    def __init__(
+        self,
+        text: str,
+        *,
+        bold: bool = False,
+        italic: bool = False,
+        strikethrough: bool = False,
+        code: bool = False,
+        underline: bool = False,
+        color: Color = Color.DEFAULT,
+        href: str | None = None,
+    ):
+        if len(text) > MAX_TEXT_OBJECT_SIZE:
+            msg = f'Text object exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `RichText` instead!'
+            raise ValueError(msg)
+
+        annotations = objs.Annotations(
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+        )
+        super().__init__(text, href=href, style=annotations)
+
+
+class Text(str):
     """User-facing class holding several RichTextsBase objects."""
 
     _rich_texts: list[RichTextBase]
@@ -161,14 +193,19 @@ class RichText(str):
         super().__init__()
 
         self._rich_texts: list[RichTextBase] = []
-        if isinstance(text, RichText):
+        if isinstance(text, Text):
             self._rich_texts = text._rich_texts
         else:
             for part in chunky(text):
-                self._rich_texts.append(Text(part))
+                self._rich_texts.append(RichText(part))
+
+    @property
+    def rich_texts(self) -> tuple[RichTextBase, ...]:
+        """Return the rich texts as immutable tuple."""
+        return tuple(self._rich_texts)
 
     @classmethod
-    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> RichText:
+    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> Text:
         obj_refs = [] if obj_refs is None else obj_refs
         rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
         plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
@@ -181,7 +218,7 @@ class RichText(str):
         return [elem.obj_ref for elem in self._rich_texts]
 
     @classmethod
-    def from_markdown(cls, text: str) -> RichText:
+    def from_markdown(cls, text: str) -> Text:
         """Create RichTextList by parsing the markdown."""
         # ToDo: Implement me!
         # ToDo: Handle Equations and Mentions here accordingly
@@ -192,7 +229,7 @@ class RichText(str):
         return rich_texts_to_markdown(self._rich_texts)
 
     @classmethod
-    def from_plain_text(cls, text: str) -> RichText:
+    def from_plain_text(cls, text: str) -> Text:
         """Create RichTextList from plain text.
 
         This method is a more explicit alias for the default constructor.
@@ -215,7 +252,7 @@ class RichText(str):
         return self.to_html()
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, str | RichText):
+        if isinstance(other, str | Text):
             return str(self) == str(other)
         else:
             return NotImplemented
@@ -223,37 +260,45 @@ class RichText(str):
     def __hash__(self):
         return hash(str(self))
 
-    def __add__(self, other: RichTextBase | RichText | str) -> RichText:
-        if isinstance(other, RichTextBase):
-            return RichText.wrap_obj_ref([*self.obj_ref, other.obj_ref])
-        elif isinstance(other, RichText):
-            return RichText.wrap_obj_ref([*self.obj_ref, *other.obj_ref])
-        elif isinstance(other, str):
-            return RichText.wrap_obj_ref([*self.obj_ref, Text(other).obj_ref])
+    def __add__(self, other: str) -> Text:
+        if isinstance(other, str):
+            return Text.wrap_obj_ref([*self.obj_ref, *Text(other).obj_ref])
         else:
             msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
             raise RuntimeError(msg)
 
 
-AnyText: TypeAlias = RichTextBase[Any] | RichText
-"""For type hinting purposes, when working with various text types, e.g. `Text`, `RichText`, `Mention`, `Math`."""
-
-
-def text_to_obj_ref(text: str | RichText | RichTextBase | list[RichTextBase]) -> list[objs.RichTextBaseObject]:
-    """Convert various text representations to a list of rich text objects."""
-    if isinstance(text, RichText):
-        texts = text.obj_ref
-    elif isinstance(text, RichTextBase):
-        texts = [text.obj_ref]
-    elif isinstance(text, list):
-        texts = flatten([rt.obj_ref for rt in text])
-    elif isinstance(text, str):
-        # ToDo: Allow passing markdown text here when the markdown parser is implemented
-        texts = RichText(text).obj_ref
-    else:
-        msg = f'Cannot convert {type(text)} to RichText objects.'
+def text(
+    text: str,
+    *,
+    bold: bool = False,
+    italic: bool = False,
+    strikethrough: bool = False,
+    code: bool = False,
+    underline: bool = False,
+    color: Color = Color.DEFAULT,
+    href: str | None = None,
+) -> Text:
+    """Create a rich text Text object from a normal string with formatting."""
+    if isinstance(text, Text):
+        msg = 'Use the `Text` object directly instead of wrapping it in `text`!'
         raise ValueError(msg)
-    return texts
+
+    return Text.wrap_obj_ref(
+        [
+            RichText(
+                part,
+                bold=bold,
+                italic=italic,
+                strikethrough=strikethrough,
+                code=code,
+                underline=underline,
+                color=color,
+                href=href,
+            ).obj_ref
+            for part in chunky(text)
+        ]
+    )
 
 
 def chunky(text: str, length: int = MAX_TEXT_OBJECT_SIZE) -> Iterator[str]:
@@ -474,16 +519,16 @@ render_md = get_md_renderer()
 """Convert Markdown to HTML."""
 
 
-def join(texts: list[AnyText], *, delim: str | AnyText = ' ') -> RichText:
-    """Join multiple text objects into a single text object with a given delimeter."""
+def join(texts: Sequence[str], *, delim: str = ' ') -> Text:
+    """Join multiple str objects, including Text, into a single Text object with a given delimeter."""
     if len(texts) == 0:
-        return RichText.wrap_obj_ref([])
+        return Text.wrap_obj_ref([])
 
     if isinstance(delim, str):
-        delim_obj = text_to_obj_ref(delim)
+        delim_objs = Text(delim).obj_ref
 
-    all_objs = text_to_obj_ref(texts[0])
+    all_objs = Text(texts[0]).obj_ref
     for text in texts[1:]:
-        all_objs.extend([*delim_obj, *text_to_obj_ref(text)])
+        all_objs.extend([*delim_objs, *Text(text).obj_ref])
 
-    return RichText.wrap_obj_ref(all_objs)
+    return Text.wrap_obj_ref(all_objs)

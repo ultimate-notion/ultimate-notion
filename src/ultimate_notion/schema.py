@@ -25,11 +25,11 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
+from ultimate_notion import rich_text
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.text import RichText, snake_case
 from ultimate_notion.utils import SList, is_notebook
 
 if TYPE_CHECKING:
@@ -66,16 +66,16 @@ class ReadOnlyPropertyError(SchemaError):
 class Schema:
     """Base class for the schema of a database."""
 
-    db_title: RichText | None
-    db_desc: RichText | None
+    db_title: rich_text.Text | None
+    db_desc: rich_text.Text | None
     _database: Database | None = None
 
-    def __init_subclass__(cls, db_title: RichText | str | None, **kwargs: Any):
-        if isinstance(db_title, str):
-            db_title = RichText.from_plain_text(db_title)
+    def __init_subclass__(cls, db_title: str | None, **kwargs: Any):
+        if db_title is not None:
+            db_title = rich_text.Text(db_title)
         cls.db_title = db_title
 
-        cls.db_desc = RichText.from_plain_text(cls.__doc__) if cls.__doc__ is not None else None
+        cls.db_desc = rich_text.Text(cls.__doc__) if cls.__doc__ is not None else None
         super().__init_subclass__(**kwargs)
 
     @classmethod
@@ -94,7 +94,7 @@ class Schema:
         cls_name = f'{cls.__name__}FromDct'
         attrs: dict[str, Any] = {'db_desc': db_desc}
         for prop_name, prop_type in schema_dct.items():
-            attrs[snake_case(prop_name)] = Property(prop_name, prop_type)
+            attrs[rich_text.snake_case(prop_name)] = Property(prop_name, prop_type)
         return type(cls_name, (Schema,), attrs, db_title=db_title)
 
     @classmethod

@@ -21,8 +21,8 @@ from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.obj_api.objects import get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
+from ultimate_notion.rich_text import Text
 from ultimate_notion.schema import DefaultSchema, Schema
-from ultimate_notion.text import RichText
 from ultimate_notion.user import User
 from ultimate_notion.utils import SList
 
@@ -269,7 +269,7 @@ class Session:
             self.cache[page.id] = page
             return page
 
-    def create_page(self, parent: Page, title: RichText | str | None = None) -> Page:
+    def create_page(self, parent: Page, title: Text | str | None = None) -> Page:
         """Create a new page in a parent page."""
         title_obj = title if title is None else Title(title).obj_ref
         page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))

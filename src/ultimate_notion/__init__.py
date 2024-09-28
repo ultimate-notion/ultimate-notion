@@ -49,16 +49,15 @@ from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
 from ultimate_notion.option import Option, OptionNS
 from ultimate_notion.page import Page
+from ultimate_notion.rich_text import Text, join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SelfRef
 from ultimate_notion.session import Session
-from ultimate_notion.text import AnyText, Math, Mention, RichText, Text, join
 from ultimate_notion.user import User
 
 __all__ = [
     'PDF',
     'AggFunc',
     'AnyBlock',  # for type hinting
-    'AnyText',  # for type hinting
     'BGColor',
     'Bookmark',
     'Breadcrumb',
@@ -82,8 +81,6 @@ __all__ = [
     'Image',
     'LinkPreview',
     'LinkToPage',
-    'Math',
-    'Mention',
     'NumberFormat',
     'NumberedItem',
     'Option',
@@ -93,7 +90,6 @@ __all__ = [
     'PropType',
     'Property',
     'Quote',
-    'RichText',
     'Schema',
     'SelfRef',
     'Session',
@@ -101,7 +97,7 @@ __all__ = [
     'Table',
     'TableOfContents',
     'TableRow',
-    'Text',
+    'Text',  # mainly for type hinting
     'ToDoItem',
     'ToggleItem',
     'User',
@@ -110,4 +106,7 @@ __all__ = [
     '__version__',
     'get_active_session',
     'join',
+    'math',
+    'mention',
+    'text',
 ]

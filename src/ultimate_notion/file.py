@@ -9,7 +9,7 @@ from emoji import emojize, is_emoji
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.text import RichText, RichTextBase, html_img, text_to_obj_ref
+from ultimate_notion.rich_text import Text, html_img
 from ultimate_notion.utils import safe_list_get
 
 NOTION_HOSTED_DOMAIN = 'secure.notion-static.com'
@@ -20,10 +20,8 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
 
     obj_ref: objs.FileObject
 
-    def __init__(
-        self, *, url: str, name: str | None = None, caption: str | RichText | RichTextBase | None = None
-    ) -> None:
-        caption_obj = text_to_obj_ref(caption) if caption is not None else None
+    def __init__(self, *, url: str, name: str | None = None, caption: str | None = None) -> None:
+        caption_obj = Text(caption).obj_ref if caption is not None else []
         if is_notion_hosted(url):
             self.obj_ref = objs.HostedFile.build(url=url, name=name, caption=caption_obj)
         else:
@@ -65,12 +63,12 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref.name = name
 
     @property
-    def caption(self) -> RichText:
-        return RichText.wrap_obj_ref(self.obj_ref.caption)
+    def caption(self) -> Text:
+        return Text.wrap_obj_ref(self.obj_ref.caption)
 
     @caption.setter
-    def caption(self, caption: str | RichText | RichTextBase | None) -> None:
-        self.obj_ref.caption = text_to_obj_ref(caption) if caption is not None else []
+    def caption(self, caption: str | None) -> None:
+        self.obj_ref.caption = Text(caption).obj_ref if caption is not None else []
 
     @property
     def url(self) -> str:
