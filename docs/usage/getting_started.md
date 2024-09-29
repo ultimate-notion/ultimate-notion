@@ -19,10 +19,10 @@ install a more recent version.
 
 ## Creating an integration
 
-Now open the web interface of [Notion], select a workspace, click <kbd>Settings & members</kbd>, click <kbd>Connections</kbd>
-and choose <kbd>Develop or manage integrations</kbd>. This should take you to the [My integrations] site. Now select
-<kbd>+ Create new integration</kbd>, provide a name, a logo and select the Notion workspace the integration should be
-associated to. After that click the <kbd>Submit</kbd> button.
+Now open the web interface of [Notion], select a workspace, click <kbd>Settings</kbd> to open the account setting
+window, click <kbd>Connections</kbd> and choose <kbd>Develop or manage integrations</kbd>. This should take you to
+the [My integrations] site. Now select <kbd>+ Create new integration</kbd>, provide a name, a [logo] and select the
+Notion workspace the integration should be associated to. After that click the <kbd>Submit</kbd> button.
 
 ![Notion integration](../assets/images/notion-integration-create.png){: style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
@@ -101,3 +101,4 @@ UUIDs of other entities like blocks, properties, users etc. can only be retrieve
 an `id`-property on most of its objects for that.
 
 [My integrations]: https://www.notion.so/my-integrations
+[logo]: ../assets/images/logo_integration.png
