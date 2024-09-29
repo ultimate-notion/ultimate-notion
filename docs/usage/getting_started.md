@@ -27,7 +27,7 @@ Notion workspace the integration should be associated to. After that click the <
 ![Notion integration](../assets/images/notion-integration-create.png){: style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 This brings you to the Secrets-site where you need to copy and save the *Internal Integration Token*, which always starts
-with `secret_`. This token will be used by Ultimate Notion for authentication.
+with `ntn_` or `secret_` when created before September 25, 2024. This token will be used by Ultimate Notion for authentication.
 
 ## Granting access to an integration
 

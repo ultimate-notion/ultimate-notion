@@ -65,7 +65,7 @@ Check out the environment setup of hatch in [pyproject.toml](pyproject.toml) for
 If you are using [VS Code], it's quite convenient to create a file  `.vscode/.env` with
 
 ```ini
-NOTION_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+NOTION_TOKEN=TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
 ULTIMATE_NOTION_CONFIG=/path/to/repo/.ultimate-notion/config.toml
 ```
 

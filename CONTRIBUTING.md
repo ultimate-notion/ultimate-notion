@@ -88,7 +88,7 @@ This often provides additional considerations and avoids unnecessary work.
    [VS Code] find your virtual environments. If you are using [VS Code],
    then it's quite convenient to add a file `.vscode/.env` in your checkout with:
    ```ini
-   NOTION_TOKEN=secret_YOUR_TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
+   NOTION_TOKEN=TOKEN_TO_YOUR_TEST_NOTION_ACCOUNT
    ULTIMATE_NOTION_CONFIG=/path/to/repo/.ultimate-notion/config.toml
    ```
    These settings will also be respected by [pytest] using [pytest-dotenv].
