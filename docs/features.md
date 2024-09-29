@@ -40,27 +40,27 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] read page properties defined by a database schema
 - [x] change page properties
 - [x] navigate pages using parent and children links
-- [x] read the blocks within a page
-- [x] add/remove the blocks within a page
+- [x] retrieve the blocks within a page
+- [x] add or remove blocks within a page
 - [x] view the content of a page as [Markdown]
 
 ## Blocks
 
-- [x] create/delete/modify a block
+- [x] create a new block and append it to a page or a parent block
+- [x] delete a block
+- [x] change the content of a block
 - [x] navigate blocks using references of parent and children
-- [x] create blocks within a page or another parent block
 
 ## Users
 
+- [x] retrieve all users
 - [x] retrieve a user by their ID
 - [x] retrieve own bot user, i.e. self-identify
-- [x] retrieve all users
-- [x] read the attributes of a user
 
 ## Comments
 
-- [ ] retrieve comments of a block or page
-- [ ] create/delete/modify a comment within a block or page
+- [ ] create a comment in a page or existing discussion thread
+- [ ] retrieve unresolved comments from a page or block
 
 ## Adapters
 
