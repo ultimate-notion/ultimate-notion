@@ -6,13 +6,11 @@ Blocks are the base for all Notion content.
 from __future__ import annotations
 
 from abc import ABC
-from datetime import datetime
 from typing import Any, cast
-from uuid import UUID
 
 from pydantic import Field, SerializeAsAny
 
-from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
+from ultimate_notion.obj_api.core import GenericObject, NotionEntity, TypedObject
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     Annotations,
@@ -31,21 +29,14 @@ from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import PropertyType
 
 
-class DataObject(NotionObject):
-    """The base type for all Notion API records."""
+class DataObject(NotionEntity, ABC):
+    """The base type for all Notion objects that hold actual data."""
 
-    id: UUID = None  # type: ignore
-
-    parent: SerializeAsAny[ParentRef] = None  # type: ignore
     has_children: bool = False
 
     in_trash: bool = False  # used to be `archived`
     archived: bool = False  # ToDo: Deprecated but still partially used in Notion. Check to remove in v1.0!
 
-    created_time: datetime = None  # type: ignore
-    created_by: UserRef = None  # type: ignore
-
-    last_edited_time: datetime = None  # type: ignore
     last_edited_by: UserRef = None  # type: ignore
 
 

@@ -27,7 +27,7 @@ import pendulum as pnd
 from pydantic import Field, SerializeAsAny
 from typing_extensions import Self
 
-from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject, extract_id
+from ultimate_notion.obj_api.core import GenericObject, NotionEntity, NotionObject, TypedObject, extract_id
 from ultimate_notion.obj_api.enums import BGColor, Color
 
 if TYPE_CHECKING:
@@ -140,14 +140,14 @@ class LinkObject(GenericObject):
     url: str = None  # type: ignore
 
 
-class ObjectReference(GenericObject):
+class ObjectRef(GenericObject):
     """A general-purpose object reference in the Notion API."""
 
     id: UUID
 
     @classmethod
     def build(cls, ref: ParentRef | GenericObject | UUID | str) -> Self:
-        """Compose an ObjectReference from the given reference.
+        """Compose a reference to an object from the given reference.
 
         `ref` may be a `UUID`, `str`, `ParentRef` or `GenericObject` with an `id`.
 
@@ -180,7 +180,7 @@ def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
 
     Only meant for internal use.
     """
-    return ObjectReference.build(obj).id
+    return ObjectRef.build(obj).id
 
 
 class ParentRef(TypedObject, ABC, polymorphic_base=True):
@@ -201,7 +201,7 @@ class DatabaseRef(ParentRef, type='database_id'):
     @classmethod
     def build(cls, db_ref: Database | str | UUID) -> DatabaseRef:
         """Compose a DatabaseRef from the given reference object."""
-        ref = ObjectReference.build(db_ref)
+        ref = ObjectRef.build(db_ref)
         return DatabaseRef.model_construct(database_id=ref.id)
 
 
@@ -213,7 +213,7 @@ class PageRef(ParentRef, type='page_id'):
     @classmethod
     def build(cls, page_ref: Page | str | UUID) -> PageRef:
         """Compose a PageRef from the given reference object."""
-        ref = ObjectReference.build(page_ref)
+        ref = ObjectRef.build(page_ref)
         return PageRef.model_construct(page_id=ref.id)
 
 
@@ -225,7 +225,7 @@ class BlockRef(ParentRef, type='block_id'):
     @classmethod
     def build(cls, block_ref: Block | str | UUID) -> BlockRef:
         """Compose a BlockRef from the given reference object."""
-        ref = ObjectReference.build(block_ref)
+        ref = ObjectRef.build(block_ref)
         return BlockRef.model_construct(block_id=ref.id)
 
 
@@ -396,12 +396,12 @@ class MentionUser(MentionBase, type='user'):
 class MentionPage(MentionBase, type='page'):
     """Nested page data for `Mention` properties."""
 
-    page: SerializeAsAny[ObjectReference]
+    page: SerializeAsAny[ObjectRef]
 
     @classmethod
     def build(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
-        page_ref = ObjectReference.build(page)
+        page_ref = ObjectRef.build(page)
         mention = cls.model_construct(page=page_ref)
         # note that `href` is always `None` for page mentions
         return MentionObject.model_construct(
@@ -412,12 +412,12 @@ class MentionPage(MentionBase, type='page'):
 class MentionDatabase(MentionBase, type='database'):
     """Nested database information for `Mention` properties."""
 
-    database: SerializeAsAny[ObjectReference]
+    database: SerializeAsAny[ObjectRef]
 
     @classmethod
     def build(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
-        db_ref = ObjectReference.build(db)
+        db_ref = ObjectRef.build(db)
         mention = cls.model_construct(database=db_ref)
         # note that `href` is always `None` for database mentions
         return MentionObject.model_construct(
@@ -510,7 +510,7 @@ class HostedFile(FileObject, type='file'):
 
 
 class ExternalFile(FileObject, type='external'):
-    """An external file object."""
+    """A Notion external file object."""
 
     class TypeData(GenericObject):
         url: str
@@ -521,3 +521,10 @@ class ExternalFile(FileObject, type='external'):
     def build(cls, url: str, *, name: str | None = None, caption: list[RichTextBaseObject] | None = None) -> Self:
         """Create a new `ExternalFile` from the given URL."""
         return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url))
+
+
+class Comment(NotionEntity, object='comment'):
+    """A Notion comment object."""
+
+    discussion_id: UUID
+    rich_text: list[RichTextBaseObject]
