@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
+import datetime as dt
+from abc import ABC
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
 from uuid import UUID
 
 from typing_extensions import Self
 
 from ultimate_notion.obj_api import core as obj_core
+from ultimate_notion.obj_api import objects as objs
 
 GT = TypeVar('GT', bound=obj_core.GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 if TYPE_CHECKING:
     from ultimate_notion.session import Session
+    from ultimate_notion.user import User
 
 
 class InvalidAPIUsageError(Exception):
@@ -32,7 +36,7 @@ class ObjRefWrapper(Protocol[GT]):
     obj_ref: GT
 
 
-class Wrapper(ObjRefWrapper[GT]):
+class Wrapper(ObjRefWrapper[GT], ABC):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
     obj_ref: GT
@@ -70,6 +74,98 @@ class Wrapper(ObjRefWrapper[GT]):
     @property
     def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT]]:
         return {v: k for k, v in self._obj_api_map.items()}
+
+
+NO = TypeVar('NO', bound=obj_core.NotionObject)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+class NotionObject(Wrapper[NO], ABC, wraps=obj_core.NotionObject):
+    """A top-level Notion API resource."""
+
+    @property
+    def id(self) -> UUID | str:
+        """Return the ID of the block."""
+        return self.obj_ref.id
+
+    @property
+    def in_notion(self) -> bool:
+        """Return whether the block was created in Notion."""
+        return self.obj_ref.id is not None
+
+
+NE = TypeVar('NE', bound=obj_core.NotionEntity)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
+    def __eq__(self, other: object) -> bool:
+        if other is None:
+            return False
+        elif not isinstance(other, NotionEntity):
+            msg = f'Cannot compare {self.__class__.__name__} with {type(other).__name__}'
+            raise RuntimeError(msg)
+        else:
+            return self.id == other.id
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+    @property
+    def id(self) -> UUID:
+        """Return the ID of the entity."""
+        return self.obj_ref.id
+
+    @property
+    def created_time(self) -> dt.datetime:
+        """Return the time when the block was created."""
+        return self.obj_ref.created_time
+
+    @property
+    def created_by(self) -> User:
+        """Return the user who created the block."""
+        session = get_active_session()
+        return session.get_user(self.obj_ref.created_by.id)
+
+    @property
+    def last_edited_time(self) -> dt.datetime:
+        """Return the time when the block was last edited."""
+        return self.obj_ref.last_edited_time
+
+    @property
+    def parent(self) -> NotionEntity | None:
+        """Return the parent Notion entity or None if the workspace is the parent."""
+        session = get_active_session()
+        parent = self.obj_ref.parent
+
+        if isinstance(parent, objs.WorkspaceRef):
+            return None
+        elif isinstance(parent, objs.PageRef):
+            return session.get_page(page_ref=parent.page_id)
+        elif isinstance(parent, objs.DatabaseRef):
+            return session.get_db(db_ref=parent.database_id)
+        elif isinstance(parent, objs.BlockRef):
+            return session.get_block(block_ref=parent.block_id)
+        else:
+            msg = f'Unknown parent reference {type(parent)}'
+            raise RuntimeError(msg)
+
+    @property
+    def ancestors(self) -> tuple[NotionEntity, ...]:
+        """Return all ancestors from the workspace to the actual record (excluding)."""
+        match parent := self.parent:
+            case None:
+                return ()
+            case _:
+                return (*parent.ancestors, parent)
+
+    @property
+    def is_page(self) -> bool:
+        """Return whether the object is a page."""
+        return False
+
+    @property
+    def is_db(self) -> bool:
+        """Return whether the object is a database."""
+        return False
 
 
 def get_active_session() -> Session:

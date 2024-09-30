@@ -21,7 +21,7 @@ from ultimate_notion.obj_api.objects import (
     EmojiObject,
     FileObject,
     GenericObject,
-    ObjectReference,
+    ObjectRef,
     PageRef,
     ParentRef,
     RichTextBaseObject,
@@ -92,7 +92,7 @@ class BlocksEndpoint(Endpoint):
             if `after` was specified. Use this to update the blocks with the latest version from the server.
             """
 
-            parent_id = ObjectReference.build(parent).id
+            parent_id = ObjectRef.build(parent).id
             children = [block.serialize_for_api() for block in blocks if block is not None]
 
             logger.info('Appending %d blocks to %s ...', len(children), parent_id)
@@ -120,7 +120,7 @@ class BlocksEndpoint(Endpoint):
             `parent` may be any suitable `ObjectReference` type.
             """
 
-            parent_id = ObjectReference.build(parent).id
+            parent_id = ObjectRef.build(parent).id
 
             logger.info('Listing blocks for %s...', parent_id)
 
@@ -146,7 +146,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = str(ObjectReference.build(block).id)
+        block_id = str(ObjectRef.build(block).id)
         logger.info('Deleting block :: %s', block_id)
 
         data = self.raw_api.delete(block_id)
@@ -159,7 +159,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = str(ObjectReference.build(block).id)
+        block_id = str(ObjectRef.build(block).id)
         logger.info('Restoring block :: %s', block_id)
 
         data = self.raw_api.update(block_id, archived=False)
@@ -173,7 +173,7 @@ class BlocksEndpoint(Endpoint):
         `block` may be any suitable `ObjectReference` type.
         """
 
-        block_id = str(ObjectReference.build(block).id)
+        block_id = str(ObjectRef.build(block).id)
         logger.info('Retrieving block :: %s', block_id)
 
         data = self.raw_api.retrieve(block_id)
