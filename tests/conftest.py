@@ -57,6 +57,7 @@ MD_PAGE_TEST_PAGE = 'Markdown Page Test'
 MD_SUBPAGE_TEST_PAGE = 'Markdown SubPage Test'
 TASK_DB = 'Task DB'
 UNFURL_TEST_PAGE = 'Embed/Inline & Unfurl'
+COMMENT_PAGE = 'Comments'
 
 # Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
 TEST_CFG_FILE = get_cfg_file()
@@ -348,12 +349,24 @@ def unfurl_page(notion: Session) -> Page:
     return notion.search_page(UNFURL_TEST_PAGE).item()
 
 
+@vcr_fixture(scope='module')
+def comment_page(notion: Session) -> Page:
+    """Return a page with comments."""
+    return notion.search_page(COMMENT_PAGE).item()
+
+
 @pytest.fixture(scope='module')
 def static_pages(  # noqa: PLR0917
-    root_page: Page, intro_page: Page, md_text_page: Page, md_page: Page, md_subpage: Page, unfurl_page: Page
+    root_page: Page,
+    intro_page: Page,
+    md_text_page: Page,
+    md_page: Page,
+    md_subpage: Page,
+    unfurl_page: Page,
+    comment_page: Page,
 ) -> set[Page]:
     """Return all static pages for the unit tests."""
-    return {intro_page, root_page, md_text_page, md_page, md_subpage, unfurl_page}
+    return {intro_page, root_page, md_text_page, md_page, md_subpage, unfurl_page, comment_page}
 
 
 @vcr_fixture(scope='module')

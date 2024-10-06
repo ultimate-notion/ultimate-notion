@@ -14,7 +14,7 @@ from ultimate_notion.obj_api.enums import VState
 from ultimate_notion.obj_api.objects import (
     DateRange,
     FileObject,
-    ObjectReference,
+    ObjectRef,
     RichTextBaseObject,
     TypedObject,
     User,
@@ -175,13 +175,13 @@ class Formula(PropertyValue, type='formula'):
 class Relation(PropertyValue, type='relation'):
     """A Notion relation property value."""
 
-    relation: list[ObjectReference] = None  # type: ignore
+    relation: list[ObjectRef] = None  # type: ignore
     has_more: bool = False
 
     @classmethod
     def build(cls, pages):
         """Return a `Relation` property with the specified pages."""
-        return cls.model_construct(relation=[ObjectReference.build(page) for page in pages])
+        return cls.model_construct(relation=[ObjectRef.build(page) for page in pages])
 
 
 class RollupObject(TypedObject, ABC, polymorphic_base=True):

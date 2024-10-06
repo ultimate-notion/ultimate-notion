@@ -4,13 +4,26 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Any, ClassVar
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, ValidatorFunctionWrapHandler, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SerializeAsAny,
+    ValidatorFunctionWrapHandler,
+    field_validator,
+    model_validator,
+)
 from typing_extensions import Self
 
 from ultimate_notion.utils import is_stable_release
+
+if TYPE_CHECKING:
+    from ultimate_notion.obj_api.objects import ParentRef, UserRef
+
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +136,11 @@ class GenericObject(BaseModel):
 
 
 class NotionObject(GenericObject):
-    """A top-level Notion API resource."""
+    """A top-level Notion API resource.
+
+    Many objects in the Notion API follow a standard pattern with a `object` property, which
+    defines the general object type, e.g. `page`, `database`, `user`, `block`, ...
+    """
 
     object: str
     """`object` is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ..."""
@@ -158,6 +175,18 @@ class NotionObject(GenericObject):
             raise ValueError(msg)
 
         return val
+
+
+class NotionEntity(NotionObject):
+    """A materialized entity, which was created by a user."""
+
+    id: UUID = None  # type: ignore
+    parent: SerializeAsAny[ParentRef] = None  # type: ignore
+
+    created_time: datetime = None  # type: ignore
+    created_by: UserRef = None  # type: ignore
+
+    last_edited_time: datetime = None  # type: ignore
 
 
 class TypedObject(GenericObject):

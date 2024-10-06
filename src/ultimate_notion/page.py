@@ -8,7 +8,7 @@ from emoji import is_emoji
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject
-from ultimate_notion.core import get_active_session, get_repr
+from ultimate_notion.core import NotionEntity, get_active_session, get_repr
 from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -280,11 +280,11 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         return self
 
 
-def is_db_guard(obj: DataObject | None) -> TypeGuard[Database]:
+def is_db_guard(obj: NotionEntity | None) -> TypeGuard[Database]:
     """Return whether the object is a database as type guard."""
     return obj is not None and obj.is_db
 
 
-def is_page_guard(obj: DataObject | None) -> TypeGuard[Page]:
+def is_page_guard(obj: NotionEntity | None) -> TypeGuard[Page]:
     """Return whether the object is a page as type guard."""
     return obj is not None and obj.is_page

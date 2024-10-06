@@ -5,14 +5,12 @@ from __future__ import annotations
 import mimetypes
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from datetime import datetime
 from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, overload
-from uuid import UUID
 
 from tabulate import tabulate
 from typing_extensions import Self
 
-from ultimate_notion.core import InvalidAPIUsageError, Wrapper, get_active_session, get_url
+from ultimate_notion.core import InvalidAPIUsageError, NotionEntity, get_active_session, get_url
 from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -25,28 +23,11 @@ if TYPE_CHECKING:
     from ultimate_notion.page import Page
 
 
-T = TypeVar('T', bound=obj_blocks.DataObject)  # ToDo: Use new syntax when requires-python >= 3.12
+DO = TypeVar('DO', bound=obj_blocks.DataObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
+class DataObject(NotionEntity[DO], wraps=obj_blocks.DataObject):
     """The base type for all data-related types, i.e, pages, databases and blocks."""
-
-    def __eq__(self, other: object) -> bool:
-        if other is None:
-            return False
-        elif not isinstance(other, DataObject):
-            msg = f'Cannot compare {self.__class__.__name__} with {type(other).__name__}'
-            raise RuntimeError(msg)
-        else:
-            return self.id == other.id
-
-    def __hash__(self) -> int:
-        return hash(self.id)
-
-    @property
-    def id(self) -> UUID:
-        """Return the ID of the block."""
-        return self.obj_ref.id
 
     @property
     def block_url(self) -> str:
@@ -60,58 +41,10 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         return get_url(self.id)
 
     @property
-    def in_notion(self) -> bool:
-        """Return whether the block was created in Notion."""
-        return self.obj_ref.id is not None
-
-    @property
-    def created_time(self) -> datetime:
-        """Return the time when the block was created."""
-        return self.obj_ref.created_time
-
-    @property
-    def created_by(self) -> User:
-        """Return the user who created the block."""
-        session = get_active_session()
-        return session.get_user(self.obj_ref.created_by.id)
-
-    @property
-    def last_edited_time(self) -> datetime:
-        """Return the time when the block was last edited."""
-        return self.obj_ref.last_edited_time
-
-    @property
     def last_edited_by(self) -> User:
         """Return the user who last edited the block."""
         session = get_active_session()
         return session.get_user(self.obj_ref.last_edited_by.id)
-
-    @property
-    def parent(self) -> DataObject | None:
-        """Return the parent record or None if the workspace is the parent."""
-        session = get_active_session()
-        parent = self.obj_ref.parent
-
-        if isinstance(parent, objs.WorkspaceRef):
-            return None
-        elif isinstance(parent, objs.PageRef):
-            return session.get_page(page_ref=parent.page_id)
-        elif isinstance(parent, objs.DatabaseRef):
-            return session.get_db(db_ref=parent.database_id)
-        elif isinstance(parent, objs.BlockRef):
-            return session.get_block(block_ref=parent.block_id)
-        else:
-            msg = f'Unknown parent reference {type(parent)}'
-            raise RuntimeError(msg)
-
-    @property
-    def ancestors(self) -> tuple[DataObject, ...]:
-        """Return all ancestors from the workspace to the actual record (excluding)."""
-        match parent := self.parent:
-            case None:
-                return ()
-            case _:
-                return (*parent.ancestors, parent)
 
     @property
     def has_children(self) -> bool:
@@ -133,7 +66,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         Pages and databases are moved to the trash, blocks are deleted permanently.
         """
         session = get_active_session()
-        self.obj_ref = cast(T, session.api.blocks.delete(self.id))
+        self.obj_ref = cast(DO, session.api.blocks.delete(self.id))
         self._delete_me_from_parent()
         return self
 
@@ -141,16 +74,6 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
     def is_deleted(self) -> bool:
         """Return wether the object is in trash."""
         return self.obj_ref.in_trash or self.obj_ref.archived
-
-    @property
-    def is_page(self) -> bool:
-        """Return whether the object is a page."""
-        return False
-
-    @property
-    def is_db(self) -> bool:
-        """Return whether the object is a database."""
-        return False
 
     @abstractmethod
     def to_markdown(self) -> str:
@@ -166,7 +89,7 @@ class DataObject(Wrapper[T], wraps=obj_blocks.DataObject):
         return self.to_markdown()
 
 
-class ChildrenMixin(DataObject[T], wraps=obj_blocks.DataObject):
+class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
     """Mixin for data objects that can have children
 
     Note that we don't use the `children` property of some Notion objects, e.g. paragraph, quote, etc.,
@@ -608,7 +531,7 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
     """Breadcrumb block."""
 
     def to_markdown(self) -> str:
-        def is_page(obj: DataObject) -> TypeGuard[Page]:
+        def is_page(obj: NotionEntity) -> TypeGuard[Page]:
             return obj.is_page
 
         return ' / '.join(ancestor.title for ancestor in self.ancestors if is_page(ancestor)) + '\n'
