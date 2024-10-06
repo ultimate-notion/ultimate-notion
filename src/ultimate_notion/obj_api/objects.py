@@ -238,6 +238,12 @@ class WorkspaceRef(ParentRef, type='workspace'):
 class UserRef(NotionObject, object='user'):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
 
+    @classmethod
+    def build(cls, user_ref: User | str | UUID) -> UserRef:
+        """Compose a PageRef from the given reference object."""
+        ref = ObjectRef.build(user_ref)
+        return UserRef.model_construct(id=ref.id)
+
 
 class User(UserRef, TypedObject, MentionMixin, polymorphic_base=True):
     """Represents a User in Notion."""
