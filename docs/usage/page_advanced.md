@@ -362,6 +362,47 @@ Let's take a look how our fancy text page looks like in the end.
 
 ![Fancy text page](../assets/images/notion-fancy-text-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
+## Working with comments
+
+In Notion there are two kinds of comments, page comments at the top of the page and inline comments, which
+are associated to a block within a page. Page comments are organized in a single discussion, i.e. thread of comments
+whereas inline comments associated to a single block can have several discussions at once.
+Besides this structural difference also the capabilities provided by the Notion API differ between page
+and inline comments. While you can read both kinds of comments and also append comments to existing discussions,
+you can only start new page discussions but not inline discussions.
+
+### Page comments
+
+We can get the single discussion thread of a page by calling the `comments` property of the page.
+This will return a [Discussion] container object for the pages [Comments], which behaves like a list,
+so you can use indexing, get the length, etc.
+To create a new comment we can just use the `append` method of the [Discussion] object.
+Here is an example:
+
+```python
+new_page = notion.create_page(parent=root_page, title='Page with page comments')
+discussion = page.comments
+
+assert len(discussion) == 0
+discussion.append('My first page comment!')
+
+assert len(discussion) == 1
+assert discussion[0].text == 'My first page comment!'
+```
+
+### Inline comments
+
+Since inline comments are organized in different discussion threads, we use the `discussions`
+property of a block to retrieve a list of [Discussion] container objects. We can now work
+with these discussions and append new comments. Here is an example:
+
+```python
+page = notion.search_page('Comments').item()
+heading_block = page.children[0]
+discussion = heading_block.discussions[0]
+discussion.append('My first appended inline comment!')
+```
+
 [Notion blocks]: https://www.notion.so/help/category/write-edit-and-customize
 [blocks module]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks
 [Paragraph block]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Paragraph
@@ -373,3 +414,5 @@ Let's take a look how our fancy text page looks like in the end.
 [mention]: ../../reference/ultimate_notion/rich_text/#ultimate_notion.rich_text.mention
 [text]: ../../reference/ultimate_notion/rich_text/#ultimate_notion.rich_text.text
 [update-a-block endpoint]: https://developers.notion.com/reference/update-a-block
+[Discussion]: ../../reference/ultimate_notion/comment/#ultimate_notion.comment.Discussion
+[Comments]: ../../reference/ultimate_notion/comment/#ultimate_notion.comment.Comment
