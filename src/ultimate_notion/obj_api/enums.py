@@ -5,6 +5,20 @@ from __future__ import annotations
 from enum import Enum
 
 
+class SortDirection(str, Enum):
+    """Sort direction options."""
+
+    ASCENDING = 'ascending'
+    DESCENDING = 'descending'
+
+
+class TimestampKind(str, Enum):
+    """Possible timestamp types."""
+
+    CREATED_TIME = 'created_time'
+    LAST_EDITED_TIME = 'last_edited_time'
+
+
 class VState(str, Enum):
     """Verification states for pages in wiki databases."""
 
