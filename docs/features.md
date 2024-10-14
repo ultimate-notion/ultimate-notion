@@ -12,7 +12,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 - [x] high-level and pythonic interface for the Notion API
 - [x] caching to avoid unnecessary calls to the Notion API
-- [ ] 100% feature parity with the low-level Notion API
+- [ ] 100% feature parity with the [official Notion API]
 
 ## Databases
 
@@ -59,8 +59,8 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Comments
 
-- [ ] create a comment in a page or existing discussion thread
-- [ ] retrieve unresolved comments from a page or block
+- [x] create a comment in a page or existing discussion thread
+- [x] retrieve unresolved comments from a page or block
 
 ## Adapters
 
@@ -87,6 +87,8 @@ Some features that the Notion UI provides are not possible to implement due to l
 - moving pages is not possible as a [page’s parent cannot be changed].
 - setting a [reminder] based on date and/or time.
 - modifying the url of file-like block, e.g. `File`, `Image`, etc.
+- creating inline comments to start a new discussion thread.
+- resolving comments or listing unresolved comments.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
@@ -100,3 +102,4 @@ If you think those limitations should be fixed, [let the developers of Notion kn
 [Google Sheets API]: https://developers.google.com/sheets
 [page’s parent cannot be changed]: https://developers.notion.com/reference/patch-page
 [reminder]: https://www.notion.so/help/comments-mentions-and-reminders#reminders
+[official Notion API]: https://developers.notion.com/reference/

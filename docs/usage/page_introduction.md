@@ -95,7 +95,7 @@ f'Task "{task.title}" was {task.props["Status"]} on {task.props["Due Date"]}'
 
 The properties of a page provide access to the actual low-level Python object like `int`, `float`, `datetime`,
 the `str` subtype [RichText] and so on. There are a few exceptions though, like [Select], [MultiSelect] and [Status],
-where an [Option] object given you access to its name, color and description.
+where an [Option] object gives you access to its name, color and description.
 
 To change a page property, we can just assign a new value to the corresponding property, e.g.:
 
