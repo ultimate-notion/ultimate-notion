@@ -166,7 +166,7 @@ def test_page_to_markdown(md_page: Page):
 
     exp_output = dedent(
         """
-        # Markdown Page Test
+        # Markdown Test
 
         ## Headline 1
         ### Headline 2
@@ -230,7 +230,7 @@ def test_page_to_markdown(md_page: Page):
         Column
         ```{toc}
         ```
-        Tests / Markdown Page Test
+        Tests / Markdown Test
 
         [📄 **<u>Markdown SubPage Test</u>**](https://www.notion.so/Markdown-SubPage-Test-67ad5240b1b944679b073ef3ebbbc755)
 
