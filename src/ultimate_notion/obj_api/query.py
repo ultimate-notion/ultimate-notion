@@ -5,13 +5,13 @@ from __future__ import annotations
 import logging
 from abc import ABC
 from datetime import date, datetime
-from enum import Enum
 from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
 from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject
+from ultimate_notion.obj_api.enums import SortDirection, TimestampKind
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
 
 if TYPE_CHECKING:
@@ -154,13 +154,6 @@ class SearchFilter(QueryFilter):
     value: str
 
 
-class TimestampKind(str, Enum):
-    """Possible timestamp types."""
-
-    CREATED_TIME = 'created_time'
-    LAST_EDITED_TIME = 'last_edited_time'
-
-
 class TimestampFilter(QueryFilter):
     """Represents a timestamp filter in Notion."""
 
@@ -200,13 +193,6 @@ class CompoundFilter(QueryFilter):
 
     and_: list[QueryFilter] | None = Field(None, alias='and')
     or_: list[QueryFilter] | None = Field(None, alias='or')
-
-
-class SortDirection(str, Enum):
-    """Sort direction options."""
-
-    ASCENDING = 'ascending'
-    DESCENDING = 'descending'
 
 
 class DBSort(GenericObject):
