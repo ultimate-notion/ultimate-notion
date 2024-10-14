@@ -45,4 +45,4 @@ def test_append_block_comments(comment_page: uno.Page):
     assert len(discussion) == curr_len + 1
 
     comment_page.reload()
-    assert len(discussions) == curr_len + 1
+    assert len(discussion) == curr_len + 1

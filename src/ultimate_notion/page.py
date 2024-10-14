@@ -237,10 +237,9 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
 
             This functionality requires that your integration was granted *read* comment capabilities.
         """
-        if len(comments := self._discussions) > 0:
-            return SList(comments).item()
-        else:
-            return Discussion([], parent=self)  # empty discussion to create new comments
+        if not self._discussions:  # create an empty discussion thread
+            self._comments = [Discussion([], parent=self)]
+        return SList(self._discussions).item()
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown.
