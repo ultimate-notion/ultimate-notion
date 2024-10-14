@@ -15,6 +15,8 @@ interactions:
       - '90'
       content-type:
       - application/json
+      cookie:
+      - secret...
       host:
       - api.notion.com
       notion-version:
@@ -24,12 +26,14 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/search
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"10f974f3-b388-81ba-adaf-d189e7161101","created_time":"2024-09-28T19:37:00.000Z","last_edited_time":"2024-09-29T16:44:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Comments","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Comments","href":null}]}},"url":"https://www.notion.so/Comments-10f974f3b38881baadafd189e7161101","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"869ec7a3-9aae-4ddc-806c-3b63ca0944a4"}'
+    content: '{"object":"list","results":[{"object":"page","id":"11f974f3-b388-81a2-9cc1-e5758e467ac2","created_time":"2024-10-14T16:32:00.000Z","last_edited_time":"2024-10-14T16:32:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
+      with page comments","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
+      with page comments","href":null}]}},"url":"https://www.notion.so/Page-with-page-comments-11f974f3b38881a29cc1e5758e467ac2","public_url":null},{"object":"page","id":"10f974f3-b388-81ba-adaf-d189e7161101","created_time":"2024-09-28T19:37:00.000Z","last_edited_time":"2024-10-14T10:05:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Comments","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Comments","href":null}]}},"url":"https://www.notion.so/Comments-10f974f3b38881baadafd189e7161101","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"8c8a95c2-9637-46ce-9378-731d018ac810"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 8cb4f9bdbf24d27e-FRA
+      - 8d28fc681c6d8ee0-SOF
       Connection:
       - keep-alive
       Content-Encoding:
@@ -38,12 +42,6 @@ interactions:
       - application/json; charset=utf-8
       Server:
       - cloudflare
-      Set-Cookie:
-      - __cf_bm=nrB7OTJIDPCQPVaa31Eee_KTLHy6.h4K7M7noTIZApw-1727707305-1.0.1.1-fWEU2m2RwF_QV6KbeBnNe4XxdvCzn.ExxWLTX917E3lWa.lir8_flEddppajbJegLleZc9WnqBgthofm6RuoUw;
-        path=/; expires=Mon, 30-Sep-24 15:11:45 GMT; domain=.notion.com; HttpOnly;
-        Secure; SameSite=None
-      - _cfuvid=NibjCwkd5_lVzV726FquEB4S3It2mqCHZKdbGFA5bxg-1727707305377-0.0.1.1-604800000;
-        path=/; domain=.notion.com; HttpOnly; Secure; SameSite=None
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Transfer-Encoding:
@@ -63,7 +61,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 869ec7a3-9aae-4ddc-806c-3b63ca0944a4
+      - 8c8a95c2-9637-46ce-9378-731d018ac810
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:

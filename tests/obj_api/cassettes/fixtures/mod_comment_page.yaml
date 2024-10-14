@@ -15,6 +15,8 @@ interactions:
       - '90'
       content-type:
       - application/json
+      cookie:
+      - secret...
       host:
       - api.notion.com
       notion-version:
@@ -24,12 +26,12 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/search
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"10f974f3-b388-81ba-adaf-d189e7161101","created_time":"2024-09-28T19:37:00.000Z","last_edited_time":"2024-09-29T16:44:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Comments","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Comments","href":null}]}},"url":"https://www.notion.so/Comments-10f974f3b38881baadafd189e7161101","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"8bf37ddb-aea6-4edc-906d-15f4069129cf"}'
+    content: '{"object":"list","results":[{"object":"page","id":"10f974f3-b388-81ba-adaf-d189e7161101","created_time":"2024-09-28T19:37:00.000Z","last_edited_time":"2024-10-14T10:05:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Comments","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Comments","href":null}]}},"url":"https://www.notion.so/Comments-10f974f3b38881baadafd189e7161101","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"de21503f-c273-44f0-923b-1e52da922329"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 8cb4f9c8bdbf71e2-FRA
+      - 8d28fdc7fd2fd0ff-SOF
       Connection:
       - keep-alive
       Content-Encoding:
@@ -38,12 +40,6 @@ interactions:
       - application/json; charset=utf-8
       Server:
       - cloudflare
-      Set-Cookie:
-      - __cf_bm=dzYxylSRd3TOSpbk4YIDrH.x28ktMeYwfMpYOiYg8wg-1727707306-1.0.1.1-owTlZHXynZ2k2dE0R7IEYiqbk0FeXoNKno5r6PMsDTS2Zh2t22r7cWNQO1mz7W4dviMh94eLj2IhNqP9hAAaVA;
-        path=/; expires=Mon, 30-Sep-24 15:11:46 GMT; domain=.notion.com; HttpOnly;
-        Secure; SameSite=None
-      - _cfuvid=0RO45.MI7GEMwQhZJLCmLg3FrTqS7G7xX8CniWImyQE-1727707306994-0.0.1.1-604800000;
-        path=/; domain=.notion.com; HttpOnly; Secure; SameSite=None
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Transfer-Encoding:
@@ -63,7 +59,141 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 8bf37ddb-aea6-4edc-906d-15f4069129cf
+      - de21503f-c273-44f0-923b-1e52da922329
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"query": "Comments", "filter": {"property": "object", "value": "page"},
+      "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '90'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/search
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"10f974f3-b388-81ba-adaf-d189e7161101","created_time":"2024-09-28T19:37:00.000Z","last_edited_time":"2024-10-14T10:05:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Comments","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Comments","href":null}]}},"url":"https://www.notion.so/Comments-10f974f3b38881baadafd189e7161101","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"377b46b8-c3af-4d08-981f-fbecf918dbba"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8d28fed3f84ad0e2-SOF
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 377b46b8-c3af-4d08-981f-fbecf918dbba
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"query": "Comments", "filter": {"property": "object", "value": "page"},
+      "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '90'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/search
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"10f974f3-b388-81ba-adaf-d189e7161101","created_time":"2024-09-28T19:37:00.000Z","last_edited_time":"2024-10-14T10:05:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Comments","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Comments","href":null}]}},"url":"https://www.notion.so/Comments-10f974f3b38881baadafd189e7161101","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"d34f2e3e-9e6e-4f55-8977-b91b2646628f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8d290000a8cfd0d0-SOF
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - d34f2e3e-9e6e-4f55-8977-b91b2646628f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
