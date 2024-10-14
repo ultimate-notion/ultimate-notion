@@ -21,6 +21,15 @@ from ultimate_notion.utils import is_notebook
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
 
+MAX_ITEMS_PER_PROPERTY = 25
+"""Maximum number of items rertrieved per property.
+
+Only a certain number of items for each property are retrieved by default.
+The high-level API will retrieve the rest on demand automatically.
+
+Source: https://developers.notion.com/reference/retrieve-a-page
+"""
+
 
 class PageProperty:
     """Property of a page implementing the descriptor protocol."""
@@ -42,6 +51,9 @@ class PagePropertiesNS:
     on the Notion server side in case of an assignment.
     Access the properties with `page.props.property_name` or `page.props['Property Name']`.
     """
+
+    # ToDo: Implement here the logic that retrieves more than MAX_ITEMS_PER_PROPERTY items
+    #       if the property exceeds this.
 
     def __init__(self, page: Page):
         self._page = page
