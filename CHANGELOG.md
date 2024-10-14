@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.7
+
+- New: Reading and inserting comments is implemented.
+- Chg: `SList` is part of the public API now, i.e. is in the `ultimate_notion` namespace.
+- Fix: Added missing `link_to_page` subtype `comment_id`.
+
 ## Version 0.6, 2024-09-28
 
 - New: Also use the session cache for blocks.

@@ -17,6 +17,7 @@ from pydantic import SerializeAsAny, TypeAdapter
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
+    Comment,
     DatabaseRef,
     EmojiObject,
     FileObject,
@@ -36,6 +37,7 @@ if TYPE_CHECKING:
     from notion_client import Client as NCClient
     from notion_client.api_endpoints import BlocksChildrenEndpoint as NCBlocksChildrenEndpoint
     from notion_client.api_endpoints import BlocksEndpoint as NCBlocksEndpoint
+    from notion_client.api_endpoints import CommentsEndpoint as NCCommentsEndpoint
     from notion_client.api_endpoints import DatabasesEndpoint as NCDatabasesEndpoint
     from notion_client.api_endpoints import PagesEndpoint as NCPagesEndpoint
     from notion_client.api_endpoints import PagesPropertiesEndpoint as NCPagesPropertiesEndpoint
@@ -44,14 +46,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 T_UNSET: TypeAlias = Literal['UNSET']
 UNSET: T_UNSET = 'UNSET'
-
-
-class SessionError(Exception):
-    """Raised when there are issues with the Notion session."""
-
-    def __init__(self, message):
-        """Initialize the `SessionError` with a supplied message."""
-        super().__init__(message)
 
 
 class NotionAPI:
@@ -64,6 +58,7 @@ class NotionAPI:
         self.pages = PagesEndpoint(self)
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
+        self.comments = CommentsEndpoint(self)
 
 
 class Endpoint:
@@ -98,14 +93,14 @@ class BlocksEndpoint(Endpoint):
             children = [block.serialize_for_api() for block in blocks if block is not None]
             logger.info('Appending %d blocks to %s ...', len(children), parent_id)
 
-            endpoint_iter = EndpointIterator(endpoint=self.raw_api.append)
+            block_iter = EndpointIterator(endpoint=self.raw_api.append)
             if after is None:
-                appended_blocks = list(endpoint_iter(block_id=parent_id, children=children))
+                appended_blocks = list(block_iter(block_id=parent_id, children=children))
                 if len(appended_blocks) != len(blocks):
                     msg = 'Number of appended blocks does not match the number of provided blocks.'
                     raise ValueError(msg)
             else:
-                appended_blocks = list(endpoint_iter(block_id=parent_id, children=children, after=str(after.id)))
+                appended_blocks = list(block_iter(block_id=parent_id, children=children, after=str(after.id)))
 
             # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
             # blocks after the specified block, where we append the blocks.
@@ -119,8 +114,8 @@ class BlocksEndpoint(Endpoint):
             """Return all Blocks contained by the specified parent."""
             parent_id = ObjectRef.build(parent).id
             logger.info('Listing blocks for %s...', parent_id)
-            blocks = EndpointIterator(endpoint=self.raw_api.list)
-            return cast(Iterator[Block], blocks(block_id=parent_id))
+            block_iter = EndpointIterator(endpoint=self.raw_api.list)
+            return cast(Iterator[Block], block_iter(block_id=parent_id))
 
     def __init__(self, *args, **kwargs):
         """Initialize the `blocks` endpoint for the Notion API."""
@@ -362,12 +357,16 @@ class PagesEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/retrieve-a-page
     def retrieve(self, page: Page | UUID | str) -> Page:
-        """Return the requested Page."""
+        """Return the requested Page.
+
+        !!! warning
+
+            This method will only retrieve up to 25 items per property.
+            Use `pages.properties.retrieve` to retrieve all items of a specific property.
+        """
         page_id = str(PageRef.build(page).page_id)
         logger.info('Retrieving page :: %s', page_id)
         data = self.raw_api.retrieve(page_id)
-        # ToDo: would it make sense to (optionally) expand the full properties here?
-        # e.g. call the PropertiesEndpoint to make sure all data is retrieved
         return Page.model_validate(data)
 
     # https://developers.notion.com/reference/patch-page
@@ -444,8 +443,8 @@ class UsersEndpoint(Endpoint):
     def list(self) -> Iterator[User]:
         """Return an iterator for all users in the workspace."""
         logger.info('Listing known users...')
-        users = EndpointIterator(endpoint=self.raw_api.list)
-        return cast(Iterator[User], users())
+        user_iter = EndpointIterator(endpoint=self.raw_api.list)
+        return cast(Iterator[User], user_iter())
 
     # https://developers.notion.com/reference/get-user
     def retrieve(self, user: User | UUID | str) -> User:
@@ -461,3 +460,37 @@ class UsersEndpoint(Endpoint):
         logger.info('Retrieving current integration bot')
         data = self.raw_api.me()
         return User.model_validate(data)
+
+
+class CommentsEndpoint(Endpoint):
+    """Interface to the API 'comments' endpoint."""
+
+    @property
+    def raw_api(self) -> NCCommentsEndpoint:
+        """Return the underlying endpoint in the Notion SDK"""
+        return self.api.client.comments
+
+    # https://developers.notion.com/reference/create-a-comment
+    def create(self, page: Page | UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:
+        """Create a comment on the specified Page."""
+        page_ref = PageRef.build(page).serialize_for_api()
+        logger.info('Creating comment on page :: %s', page_ref)
+        rich_text_json = [rt.serialize_for_api() for rt in rich_text]
+        data = self.raw_api.create(parent=page_ref, rich_text=rich_text_json)
+        return Comment.model_validate(data)
+
+    # https://developers.notion.com/reference/create-a-comment
+    def append(self, discussion_id: UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:
+        """Append a comment to the specified discussion."""
+        logger.info('Appending a comment to discussion :: %s', discussion_id)
+        rich_text_json = [rt.serialize_for_api() for rt in rich_text]
+        data = self.raw_api.create(discussion_id=str(discussion_id), rich_text=rich_text_json)
+        return Comment.model_validate(data)
+
+    # https://developers.notion.com/reference/retrieve-a-comment
+    def list(self, block: Block | Page | UUID | str) -> Iterator[Comment]:
+        """Return all comments on the specified page or block."""
+        block_id = str(ObjectRef.build(block).id)
+        logger.info('Listing comments on page :: %s', block_id)
+        comment_iter = EndpointIterator(endpoint=self.raw_api.list)
+        return cast(Iterator[Comment], comment_iter(block_id=block_id))

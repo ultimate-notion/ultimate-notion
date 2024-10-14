@@ -53,6 +53,7 @@ from ultimate_notion.rich_text import Text, join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SelfRef
 from ultimate_notion.session import Session
 from ultimate_notion.user import User
+from ultimate_notion.utils import SList
 
 __all__ = [
     'PDF',
@@ -90,6 +91,7 @@ __all__ = [
     'PropType',
     'Property',
     'Quote',
+    'SList',
     'Schema',
     'SelfRef',
     'Session',
