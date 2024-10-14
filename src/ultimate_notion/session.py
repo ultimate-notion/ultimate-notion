@@ -32,10 +32,6 @@ _log = logging.getLogger(__name__)
 class SessionError(Exception):
     """Raised when there are issues with the Notion session."""
 
-    def __init__(self, message):
-        """Initialize the `SessionError` with a supplied message."""
-        super().__init__(message)
-
 
 class Session:
     """A session for the Notion API.
@@ -155,7 +151,7 @@ class Session:
         if use_cache and block_uuid in self.cache:
             return cast(Block, self.cache[block_uuid])
         else:
-            block = Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
+            block: Block = Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
             self.cache[block.id] = block
             return block
 
