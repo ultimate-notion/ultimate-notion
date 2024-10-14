@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING, Any, TypeGuard
 from emoji import is_emoji
 from typing_extensions import Self
 
-from ultimate_notion.blocks import ChildrenMixin, DataObject
+from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject
+from ultimate_notion.comment import Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_repr
 from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -16,7 +17,7 @@ from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text, render_md
 from ultimate_notion.templates import page_html
-from ultimate_notion.utils import is_notebook
+from ultimate_notion.utils import SList, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -96,7 +97,7 @@ class PagePropertiesNS:
         return {prop_name: self[prop_name] for prop_name in self}
 
 
-class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
+class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
     """A Notion page.
 
     Attributes:
@@ -226,6 +227,21 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
         session = get_active_session()
         session.api.pages.set_attr(self.obj_ref, cover=cover_obj)
 
+    @property
+    def comments(self) -> Discussion:
+        """Return the discussion thread of this page.
+
+        A page can only have a single discussion thread in contrast to inline comments.
+
+        !!! note
+
+            This functionality requires that your integration was granted *read* comment capabilities.
+        """
+        if len(comments := self._discussions) > 0:
+            return SList(comments).item()
+        else:
+            return Discussion([], parent=self)  # empty discussion to create new comments
+
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown.
 
@@ -281,14 +297,15 @@ class Page(ChildrenMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
             session = get_active_session()
             session.api.pages.restore(self.obj_ref)
             if isinstance(self.parent, ChildrenMixin):
-                self.parent._children = None  # this forces a new retrieval of children next time
+                self.parent._children = None  # forces a new retrieval of the parent's children next time
         return self
 
     def reload(self) -> Self:
         """Reload this page."""
         session = get_active_session()
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
-        self._children = None  # this forces a new retrieval of children next time
+        self._children = None  # forces a new retrieval of children next time
+        self._comments = None  # forces a new retrieval of comments next time
         return self
 
 

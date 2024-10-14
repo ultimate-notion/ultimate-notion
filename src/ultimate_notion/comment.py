@@ -2,29 +2,99 @@
 
 from __future__ import annotations
 
-from typing import TypeVar
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, overload
+from uuid import UUID
 
-from ultimate_notion.blocks import DataObject
-from ultimate_notion.core import NotionEntity
-from ultimate_notion.obj_api import blocks as obj_blocks
+from typing_extensions import Self
+
+from ultimate_notion.core import InvalidAPIUsageError, NotionEntity, get_active_session
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.rich_text import Text
+from ultimate_notion.user import User
+
+if TYPE_CHECKING:
+    from ultimate_notion.blocks import DataObject
 
 
 class Comment(NotionEntity[objs.Comment], wraps=objs.Comment):
-    """A comment on a page, block, or database."""
+    """A comment on a page, block, or database behaving like a normal string."""
+
+    @property
+    def text(self) -> Text:
+        """The text of the comment."""
+        return Text.wrap_obj_ref(self.obj_ref.rich_text)
+
+    @property
+    def user(self) -> User:
+        """The user who created the comment."""
+        return self.created_by
+
+    @property
+    def discussion_id(self) -> UUID:
+        """The ID of the discussion thread that this comment belongs to."""
+        return self.obj_ref.discussion_id
+
+    def __str__(self) -> str:
+        return str(self.text)
+
+    def __repr__(self) -> str:
+        return f'Comment("{self.user}", "{self.text}")'
 
 
-class Discussion(list[Comment]):
-    """An list of comments, i.e. a discussion thread."""
+class Discussion(Sequence[Comment]):
+    """A list of comments, i.e. a discussion thread."""
 
-    def append(self, text: str) -> None:
-        return super().append(object)
+    def __init__(self, comments: Sequence[Comment], *, parent: DataObject) -> None:
+        self._comments = list(comments)
+        self._parent = parent
 
+    @overload
+    def __getitem__(self, index: int, /) -> Comment: ...
 
-DO = TypeVar('DO', bound=obj_blocks.DataObject)  # ToDo: Use new syntax when requires-python >= 3.12
+    @overload
+    def __getitem__(self, index: slice, /) -> Sequence[Comment]: ...
 
+    def __getitem__(self, index: int | slice, /) -> Comment | Sequence[Comment]:
+        return self._comments[index]
 
-class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
-    """Mixin for objects that can have comments and discussions."""
+    def __len__(self) -> int:
+        return len(self._comments)
 
-    _comments: list[Discussion] | None = None
+    def __repr__(self) -> str:
+        return f'Discussion({self._comments})'
+
+    def __str__(self) -> str:
+        return '\n'.join(f'{self.user}: {self.text}' for self in self._comments)
+
+    def append(self, text: str) -> Self:
+        """Add a comment to the discussion.
+
+        !!! note
+
+            This functionality requires that your integration was granted *insert* comment capabilities.
+
+        """
+        if self._parent.is_deleted:
+            msg = 'Cannot add a comment to a deleted parent.'
+            raise RuntimeError(msg)
+
+        if not self._parent.in_notion:
+            msg = 'Cannot add a comment to a parent that is not in Notion.'
+            raise RuntimeError(msg)
+
+        text = Text(text)
+        session = get_active_session()
+
+        if self._parent.is_page:
+            comment = session.api.comments.create(page=self._parent.id, rich_text=text.obj_ref)
+        elif self:  # parent is a block that already has comments
+            comment = session.api.comments.append(
+                rich_text=text.obj_ref, discussion_id=self._comments[-1].discussion_id
+            )
+        else:
+            msg = 'Cannot create a new discussion thread for a block, only append to an existing discussion.'
+            raise InvalidAPIUsageError(msg)
+
+        self._comments.append(Comment.wrap_obj_ref(comment))
+        return self

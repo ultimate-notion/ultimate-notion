@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import mimetypes
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
@@ -10,6 +11,7 @@ from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, over
 from tabulate import tabulate
 from typing_extensions import Self
 
+from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import InvalidAPIUsageError, NotionEntity, get_active_session, get_url
 from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -116,7 +118,7 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
         if isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children'):
             self.obj_ref.value.children = child_blocks_objs  # update the children attribute
 
-        child_blocks = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
+        child_blocks: list[Block] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
 
         for idx, child_block in enumerate(child_blocks):
             if isinstance(child_block, ChildPage):
@@ -181,14 +183,54 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
         return self
 
 
+class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
+    """Mixin for objects that can have comments and discussions."""
+
+    _comments: list[Discussion] | None = None
+
+    @staticmethod
+    def _group_by_discussions(comments: list[Comment]) -> list[list[Comment]]:
+        comments.sort(key=lambda comment: comment.discussion_id)
+        grouped = [list(group) for _, group in itertools.groupby(comments, key=lambda comment: comment.discussion_id)]
+        grouped.sort(key=lambda group: group[0].created_time)
+        return grouped
+
+    def _generate_comments_cache(self) -> list[Discussion]:
+        """Generate the comments cache."""
+        if self.is_deleted:
+            msg = 'Cannot retrieve comments of a deleted block from Notion.'
+            raise RuntimeError(msg)
+
+        session = get_active_session()
+        comment_objs = session.api.comments.list(self.obj_ref.id)
+        comments = [Comment.wrap_obj_ref(comment_obj) for comment_obj in comment_objs]
+        return [Discussion(comment_thread, parent=self) for comment_thread in self._group_by_discussions(comments)]
+
+    @property
+    def _discussions(self) -> tuple[Discussion, ...]:
+        """Return comments of this block or page as list of discussions, i.e. threads of comments."""
+        if self.in_notion:
+            if self._comments is None:
+                self._comments = self._generate_comments_cache()
+            comments = tuple(self._comments)
+        else:
+            comments = ()
+        return comments
+
+
 BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Block(DataObject[BT], ABC, wraps=obj_blocks.Block):
+class Block(CommentMixin, DataObject[BT], ABC, wraps=obj_blocks.Block):
     """Abstract Notion block.
 
     Parent class of all block types.
     """
+
+    @property
+    def discussions(self) -> tuple[Discussion, ...]:
+        """Return comments of this block as list of discussions, i.e. threads of comments."""
+        return self._discussions
 
     def reload(self) -> Self:
         """Reload the block from the API."""

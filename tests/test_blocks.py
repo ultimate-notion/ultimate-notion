@@ -6,10 +6,9 @@ from typing import cast
 import pytest
 
 import ultimate_notion as uno
-from ultimate_notion import Session
+from ultimate_notion import Page, Session
 from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.core import InvalidAPIUsageError
-from ultimate_notion.page import Page
 
 
 @pytest.mark.vcr()

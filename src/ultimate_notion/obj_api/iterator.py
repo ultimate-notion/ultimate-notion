@@ -11,7 +11,7 @@ from pydantic.functional_validators import BeforeValidator
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
-from ultimate_notion.obj_api.objects import User
+from ultimate_notion.obj_api.objects import Comment, User
 from ultimate_notion.obj_api.props import PropertyItem
 
 MAX_PAGE_SIZE = 100
@@ -43,6 +43,9 @@ def convert_to_notion_obj(obj: dict[str, Any]) -> Block | Page | Database | Prop
 
     if obj['object'] == UserList.build().type:
         return User.model_validate(obj)
+
+    if obj['object'] == CommentList.build().type:
+        return Comment.model_validate(obj)
 
     return GenericObject.model_validate(obj)
 
@@ -101,6 +104,12 @@ class PropertyItemList(ObjectList, type='property_item'):
         next_url: str | None = None
 
     property_item: TypeData = TypeData()
+
+
+class CommentList(ObjectList, type='comment'):
+    """A list of Comment objects returned by the Notion API."""
+
+    comment: Any = Field(default_factory=dict)
 
 
 class EndpointIterator:

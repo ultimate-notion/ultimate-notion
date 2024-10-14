@@ -477,7 +477,7 @@ class MentionTemplateData(TypedObject):
 class MentionTemplate(MentionBase, type='template_mention'):
     """Nested template data for `Mention` properties."""
 
-    template_mention: MentionTemplateData
+    template_mention: SerializeAsAny[MentionTemplateData]
 
 
 class MentionTemplateDate(MentionTemplateData, type='template_mention_date'):
