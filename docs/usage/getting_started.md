@@ -45,7 +45,7 @@ Ultimate Notion looks up the environment variable `ULTIMATE_NOTION_CONFIG` for a
 If this variable is not set, it defaults to `~/.ultimate-notion/config.toml` under MacOS/Linux and
 `$HOME/.ultimate-notion/config.toml` under Windows systems. If no configuration file is found, a default one is created
 automatically that will set the Notion token to be looked up using the environment variable `NOTION_TOKEN`.
-Alternatively, you can set the your token directly in the configuration file.
+Alternatively, you can set your token directly in the configuration file.
 
 ## Loading a Notion page
 

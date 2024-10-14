@@ -166,7 +166,7 @@ Our page now looks like this so far:
 
 ## Nested blocks
 
-A really useful feature of Notion blocks is that most of them can be nested
+A really useful feature of Notion blocks is that most of them can be nested.
 Therefore some blocks, like paragaphs, quotes, toggable headings and so on, can have `children`
 and thus also have an `append` method, just like a page.
 
