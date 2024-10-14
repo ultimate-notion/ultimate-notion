@@ -169,7 +169,7 @@ class NotionObject(GenericObject):
     def _verify_object_matches_expected(cls, val):
         """Make sure that the deserialized object matches the name in this class."""
 
-        obj_attr = cls().object
+        obj_attr = cls.model_fields.get('object').default
         if val != obj_attr:
             msg = f'Invalid object for {obj_attr} - {val}'
             raise ValueError(msg)
