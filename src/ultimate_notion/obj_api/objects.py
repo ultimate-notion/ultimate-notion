@@ -235,6 +235,18 @@ class WorkspaceRef(ParentRef, type='workspace'):
     workspace: bool = True
 
 
+class CommentRef(ParentRef, type='comment_id'):
+    """Reference a comment."""
+
+    comment_id: UUID
+
+    @classmethod
+    def build(cls, comment_ref: Comment | str | UUID) -> CommentRef:
+        """Compose a CommentRef from the given reference object."""
+        ref = ObjectRef.build(comment_ref)
+        return CommentRef.model_construct(comment_id=ref.id)
+
+
 class UserRef(NotionObject, object='user'):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
 
