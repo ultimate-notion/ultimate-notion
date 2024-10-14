@@ -52,7 +52,7 @@ class Session:
 
         Args:
             cfg: configuration object
-            **kwargs: Arguments for the [Notion SDK Client][https://ramnes.github.io/notion-sdk-py/reference/client/]
+            **kwargs: Arguments for the [Notion SDK Client](https://ramnes.github.io/notion-sdk-py/reference/client/)
         """
         if cfg is None:
             cfg = get_or_create_cfg()
