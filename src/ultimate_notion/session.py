@@ -265,8 +265,8 @@ class Session:
             self.cache[page.id] = page
             return page
 
-    def create_page(self, parent: Page, title: Text | str | None = None) -> Page:
-        """Create a new page in a parent page."""
+    def create_page(self, parent: Page | Database, title: Text | str | None = None) -> Page:
+        """Create a new page in a parent page or database."""
         title_obj = title if title is None else Title(title).obj_ref
         page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
         self.cache[page.id] = page
