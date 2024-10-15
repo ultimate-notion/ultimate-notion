@@ -10,6 +10,7 @@ from __future__ import annotations
 import pytest
 
 from ultimate_notion import Database, Page, Session, Text, schema
+from ultimate_notion.obj_api.query import MAX_PAGE_SIZE
 
 from .conftest import CONTACTS_DB
 
@@ -157,6 +158,19 @@ def test_parent_subdbs(notion: Session, root_page: Page):
     assert parent.subdbs == [db1, db2]
     assert all(isinstance(db, Database) for db in parent.subdbs)
     assert db1.ancestors == (root_page, parent)
+
+
+@pytest.mark.vcr()
+def test_more_than_max_page_size_pages(notion: Session, root_page: Page):
+    db = notion.create_db(root_page)
+    num_pages = int(1.1 * MAX_PAGE_SIZE)
+    db.title = f'DB test with {num_pages} pages'
+    for i in range(1, num_pages + 1):
+        db.create_page(name=f'Page {i}')
+
+    db.reload()
+    assert len(db.fetch_all()) == num_pages
+    db.delete()
 
 
 @pytest.mark.vcr()
