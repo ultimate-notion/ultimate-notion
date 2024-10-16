@@ -10,11 +10,13 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import pendulum as pnd
+from typing_extensions import Self
 
 import ultimate_notion.obj_api.props as obj_props
-from ultimate_notion import rich_text
+from ultimate_notion import rich_text as rt
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.file import FileInfo
+from ultimate_notion.obj_api.enums import VState
 from ultimate_notion.option import Option
 from ultimate_notion.user import User
 
@@ -69,7 +71,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
         return get_repr(self)
 
     def __str__(self) -> str:
-        if isinstance(self.value, rich_text.Text):
+        if isinstance(self.value, rt.Text):
             return str(self.value) if self.value else ''
         elif isinstance(self.value, list):
             # workaround as `str` on lists calls `repr` instead of `str`
@@ -82,22 +84,22 @@ class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     """Title property value."""
 
     def __init__(self, text: str):
-        super().__init__(rich_text.Text(text).obj_ref)
+        super().__init__(rt.Text(text).obj_ref)
 
     @property
-    def value(self) -> rich_text.Text:
-        return rich_text.Text.wrap_obj_ref(self.obj_ref.title)
+    def value(self) -> rt.Text:
+        return rt.Text.wrap_obj_ref(self.obj_ref.title)
 
 
 class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
     """Rich text property value."""
 
     def __init__(self, text: str):
-        super().__init__(rich_text.Text(text).obj_ref)
+        super().__init__(rt.Text(text).obj_ref)
 
     @property
-    def value(self) -> rich_text.Text:
-        return rich_text.Text.wrap_obj_ref(self.obj_ref.rich_text)
+    def value(self) -> rt.Text:
+        return rt.Text.wrap_obj_ref(self.obj_ref.rich_text)
 
 
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
@@ -265,16 +267,23 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     readonly = True
 
     @property
-    def value(self) -> str | float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[PropertyValue] | None:
+    def value(
+        self,
+    ) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | tuple[Any, ...] | None:
         # ToDo: Write a unit test for this!
         if self.obj_ref.rollup is None:
             return None
 
         rollup_val = self.obj_ref.rollup.value
         if isinstance(rollup_val, obj_props.RollupArray):
-            return [PropertyValue.wrap_obj_ref(prop) for prop in rollup_val]
+            return tuple(PropertyValue.wrap_obj_ref(prop).value for prop in rollup_val.array)
+        elif isinstance(rollup_val, obj_props.RollupNumber):
+            return rollup_val.number
+        elif isinstance(rollup_val, obj_props.RollupDate):
+            return rollup_val.date.to_pendulum() if rollup_val.date is not None else None
         else:
-            return rollup_val
+            msg = f'Unknown rollup value type: {type(rollup_val)}'
+            raise ValueError(msg)
 
 
 class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):
@@ -288,6 +297,11 @@ class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
 
     readonly = True
 
+    @property
+    def value(self) -> User:
+        session = get_active_session()
+        return session.get_user(self.obj_ref.created_by.id)
+
 
 class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.LastEditedTime):
     """Last-edited-time property value."""
@@ -300,6 +314,11 @@ class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEd
 
     readonly = True
 
+    @property
+    def value(self) -> User:
+        session = get_active_session()
+        return session.get_user(self.obj_ref.last_edited_by.id)
+
 
 class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
     """Unique ID property value."""
@@ -310,5 +329,33 @@ class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
     """Verification property value of pages in wiki databases."""
 
+    # ToDo: Write a unit test for this!
+
     readonly = True
-    # ToDo: Implement properties to retrieve user, etc. and convert user to actual high-level User object
+
+    @property
+    def value(self) -> Self:
+        return self
+
+    @property
+    def state(self) -> VState:
+        return self.obj_ref.verification.state
+
+    @property
+    def verified_by(self) -> User | None:
+        if self.obj_ref.verification.verified_by is None:
+            return None
+        else:
+            session = get_active_session()
+            return session.get_user(self.obj_ref.verification.verified_by.id)
+
+    @property
+    def date(self) -> dt.datetime | None:
+        return self.obj_ref.verification.date
+
+
+PAGINATED_PROP_VALS = (People, Relations, Text, Title)
+"""Property values that are potentially paginated and need to be fetched from the server seperately.
+
+Source: https://developers.notion.com/reference/retrieve-a-page#limits
+"""
