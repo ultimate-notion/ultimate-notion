@@ -9,49 +9,49 @@ from __future__ import annotations
 
 import pytest
 
-from ultimate_notion import Database, Page, Session, Text, schema
+import ultimate_notion as uno
 from ultimate_notion.obj_api.query import MAX_PAGE_SIZE
 
 from .conftest import CONTACTS_DB
 
 
 @pytest.mark.vcr()
-def test_schema(article_db: Database):
+def test_schema(article_db: uno.Database):
     ref_schema = article_db.schema
     assert article_db.title == 'Articles'
 
-    assert issubclass(ref_schema, schema.Schema)
+    assert issubclass(ref_schema, uno.Schema)
     db_schema = {
-        'Name': schema.Title(),
-        'Cost': schema.Number(schema.NumberFormat.DOLLAR),
-        'Description': schema.Text(),
+        'Name': uno.PropType.Title(),
+        'Cost': uno.PropType.Number(uno.NumberFormat.DOLLAR),
+        'Description': uno.PropType.Text(),
     }
     assert ref_schema.to_dict() == db_schema
 
-    class MySchema(schema.Schema, db_title='My Schema'):
-        name = schema.Property('Name', schema.Title())
-        cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
-        desc = schema.Property('Description', schema.Text())
+    class MySchema(uno.Schema, db_title='My Schema'):
+        name = uno.Property('Name', uno.PropType.Title())
+        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+        desc = uno.Property('Description', uno.PropType.Text())
 
     article_db.schema = MySchema
 
-    class WrongSchema(schema.Schema, db_title='My Wrong Schema'):
-        name = schema.Property('Name', schema.Title())
-        cost = schema.Property('Cost', schema.Text())
-        desc = schema.Property('Description', schema.Text())
+    class WrongSchema(uno.Schema, db_title='My Wrong Schema'):
+        name = uno.Property('Name', uno.PropType.Title())
+        cost = uno.Property('Cost', uno.PropType.Text())
+        desc = uno.Property('Description', uno.PropType.Text())
 
-    with pytest.raises(schema.SchemaError):
+    with pytest.raises(uno.SchemaError):
         article_db.schema = WrongSchema
 
 
 @pytest.mark.vcr()
-def test_db_without_title(notion: Session, root_page: Page):
+def test_db_without_title(notion: uno.Session, root_page: uno.Page):
     """Simple database of articles"""
 
-    class Article(schema.Schema, db_title=None):
-        name = schema.Property('Name', schema.Title())
-        cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
-        desc = schema.Property('Description', schema.Text())
+    class Article(uno.Schema, db_title=None):
+        name = uno.Property('Name', uno.PropType.Title())
+        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+        desc = uno.Property('Description', uno.PropType.Text())
 
     db = notion.create_db(parent=root_page, schema=Article)
     assert db.title == ''
@@ -60,15 +60,15 @@ def test_db_without_title(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_db_with_docstring(notion: Session, root_page: Page):
+def test_db_with_docstring(notion: uno.Session, root_page: uno.Page):
     """Simple database of articles"""
 
-    class Article(schema.Schema, db_title=None):
+    class Article(uno.Schema, db_title=None):
         """My articles"""
 
-        name = schema.Property('Name', schema.Title())
-        cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
-        desc = schema.Property('Description', schema.Text())
+        name = uno.Property('Name', uno.PropType.Title())
+        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+        desc = uno.Property('Description', uno.PropType.Text())
 
     db = notion.create_db(parent=root_page, schema=Article)
     assert db.title == ''
@@ -77,11 +77,11 @@ def test_db_with_docstring(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_db_attributes(contacts_db: Database):
-    assert isinstance(contacts_db.title, Text)
+def test_db_attributes(contacts_db: uno.Database):
+    assert isinstance(contacts_db.title, uno.Text)
     assert contacts_db.title == CONTACTS_DB
 
-    assert isinstance(contacts_db.description, Text)
+    assert isinstance(contacts_db.description, uno.Text)
     assert contacts_db.description == 'Database of all my contacts!'
 
     assert isinstance(contacts_db.icon, str)
@@ -97,7 +97,7 @@ def test_db_attributes(contacts_db: Database):
 
 
 @pytest.mark.vcr()
-def test_title_setter(notion: Session, article_db: Database):
+def test_title_setter(notion: uno.Session, article_db: uno.Database):
     old_title = 'Articles'
     assert article_db.title == old_title
     new_title = 'My most favorite articles'
@@ -107,14 +107,14 @@ def test_title_setter(notion: Session, article_db: Database):
     del notion.cache[article_db.id]
     article_db = notion.get_db(article_db.id)
     assert article_db.title == new_title
-    article_db.title = Text(old_title)
+    article_db.title = uno.Text(old_title)
     assert article_db.title == old_title
     article_db.title = ''
     assert article_db.title == ''
 
 
 @pytest.mark.vcr()
-def test_description_setter(notion: Session, article_db: Database):
+def test_description_setter(notion: uno.Session, article_db: uno.Database):
     assert article_db.description == ''
 
     new_description = 'My most favorite articles'
@@ -130,7 +130,7 @@ def test_description_setter(notion: Session, article_db: Database):
 
 
 @pytest.mark.vcr()
-def test_delete_restore_db(notion: Session, root_page: Page):
+def test_delete_restore_db(notion: uno.Session, root_page: uno.Page):
     db = notion.create_db(root_page)
     assert not db.is_deleted
     db.delete()
@@ -140,7 +140,7 @@ def test_delete_restore_db(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_reload_db(notion: Session, root_page: Page):
+def test_reload_db(notion: uno.Session, root_page: uno.Page):
     db = notion.create_db(root_page)
     old_obj_id = id(db.obj_ref)
     db.reload()
@@ -148,7 +148,7 @@ def test_reload_db(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_parent_subdbs(notion: Session, root_page: Page):
+def test_parent_subdbs(notion: uno.Session, root_page: uno.Page):
     parent = notion.create_page(root_page, title='Parent')
     db1 = notion.create_db(parent)
     db2 = notion.create_db(parent)
@@ -156,12 +156,12 @@ def test_parent_subdbs(notion: Session, root_page: Page):
     assert db1.parent == parent
     assert db2.parent == parent
     assert parent.subdbs == [db1, db2]
-    assert all(isinstance(db, Database) for db in parent.subdbs)
+    assert all(isinstance(db, uno.Database) for db in parent.subdbs)
     assert db1.ancestors == (root_page, parent)
 
 
 @pytest.mark.vcr()
-def test_more_than_max_page_size_pages(notion: Session, root_page: Page):
+def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page):
     db = notion.create_db(root_page)
     num_pages = int(1.1 * MAX_PAGE_SIZE)
     db.title = f'DB test with {num_pages} pages'
@@ -174,6 +174,6 @@ def test_more_than_max_page_size_pages(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_new_task_db(new_task_db: Database):
+def test_new_task_db(new_task_db: uno.Database):
     # ToDo: Implement a proper test
     pass

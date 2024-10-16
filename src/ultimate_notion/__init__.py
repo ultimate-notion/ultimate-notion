@@ -50,7 +50,7 @@ from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, Num
 from ultimate_notion.option import Option, OptionNS
 from ultimate_notion.page import Page
 from ultimate_notion.rich_text import Text, join, math, mention, text
-from ultimate_notion.schema import Property, PropType, Schema, SelfRef
+from ultimate_notion.schema import Property, PropType, Schema, SchemaError, SelfRef
 from ultimate_notion.session import Session
 from ultimate_notion.user import User
 from ultimate_notion.utils import SList
@@ -93,6 +93,7 @@ __all__ = [
     'Quote',
     'SList',
     'Schema',
+    'SchemaError',
     'SelfRef',
     'Session',
     'SyncedBlock',
