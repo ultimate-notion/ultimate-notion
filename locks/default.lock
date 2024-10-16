@@ -8,6 +8,7 @@
 # - pytest-recording>=0.13.1
 # - pytest-dotenv
 # - pytest-sugar
+# - pytest-clarity
 # - hypothesis
 # - jupyterlab
 # - pre-commit
@@ -213,6 +214,8 @@ jupyterlab-server==2.27.3
     # via jupyterlab
 kiwisolver==1.4.7
     # via matplotlib
+markdown-it-py==3.0.0
+    # via rich
 markupsafe==2.1.5
     # via
     #   jinja2
@@ -223,6 +226,8 @@ matplotlib-inline==0.1.7
     # via
     #   ipykernel
     #   ipython
+mdurl==0.1.2
+    # via markdown-it-py
 mistune==3.0.2
     # via
     #   hatch.envs.default
@@ -287,6 +292,8 @@ platformdirs==4.3.6
     #   virtualenv
 pluggy==1.5.0
     # via pytest
+pprintpp==0.4.0
+    # via pytest-clarity
 pre-commit==4.0.0
     # via hatch.envs.default
 prometheus-client==0.21.0
@@ -324,6 +331,7 @@ pygments==2.18.0
     # via
     #   ipython
     #   nbconvert
+    #   rich
 pyparsing==3.1.4
     # via
     #   httplib2
@@ -331,11 +339,14 @@ pyparsing==3.1.4
 pytest==8.3.3
     # via
     #   hatch.envs.default
+    #   pytest-clarity
     #   pytest-cov
     #   pytest-dotenv
     #   pytest-mock
     #   pytest-recording
     #   pytest-sugar
+pytest-clarity==1.0.1
+    # via hatch.envs.default
 pytest-cov==5.0.0
     # via hatch.envs.default
 pytest-dotenv==0.5.2
@@ -390,6 +401,8 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
+rich==13.9.2
+    # via pytest-clarity
 rpds-py==0.20.0
     # via
     #   jsonschema
@@ -463,6 +476,7 @@ typing-extensions==4.12.2
     #   multidict
     #   pydantic
     #   pydantic-core
+    #   rich
 tzdata==2024.2
     # via
     #   pandas
