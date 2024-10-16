@@ -1,5 +1,7 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/ultimate-notion/ultimate-notion/master/docs/assets/images/logo_with_text.svg" alt="Ultimate-Notion logo" width="500" role="img">
+<img
+src="https://raw.githubusercontent.com/ultimate-notion/ultimate-notion/master/docs/assets/images/logo_with_text.svg"
+alt="Ultimate-Notion logo" width="500" role="img">
 </div>
 <br/>
 
