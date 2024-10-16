@@ -23,3 +23,5 @@ __all__ = ['NotionAPI']
 
 # ToDo: Recheck every model if `= None` really is needed. Maybe come up with an even smarter way
 #       to differentiate between a model for sending and receiving data.
+#       Idea: Use a sentinel value, e.g. API_RESPONSE = object() as default value for fields that are only given
+#       by the API and not sent to the API. This way we can differentiate between the two cases.

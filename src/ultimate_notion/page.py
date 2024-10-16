@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, TypeGuard
 
 from emoji import is_emoji
@@ -41,7 +42,7 @@ class PageProperty:
     def __get__(self, obj: PagePropertiesNS, type=None) -> Any:  # noqa: A002
         return obj[self._prop_name]
 
-    def __set__(self, obj: PagePropertiesNS, value):
+    def __set__(self, obj: PagePropertiesNS, value: Any):
         obj[self._prop_name] = value
 
 
@@ -66,6 +67,7 @@ class PagePropertiesNS:
 
     def __getitem__(self, prop_name: str) -> Any:
         prop = self._properties.get(prop_name)
+
         if prop is None:
             msg = f'No such property: {prop_name}'
             raise AttributeError(msg)
@@ -75,6 +77,7 @@ class PagePropertiesNS:
     def __setitem__(self, prop_name: str, value: Any):
         # Todo: use the schema of the database to see which properties are writeable at all.
         db = self._page.parent_db
+
         if db is None:
             msg = f'Trying to set a property but page {self._page} is not bound to any database'
             raise RuntimeError(msg)
@@ -84,11 +87,11 @@ class PagePropertiesNS:
             prop_type = db.schema.to_dict()[prop_name]
             value = prop_type.prop_value(value)
 
-        # update the property on the server (which will update the local data)
         session = get_active_session()
+        # update the property on the server (which will update the local data)
         session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         """Iterator of property names."""
         yield from self._properties.keys()
 
