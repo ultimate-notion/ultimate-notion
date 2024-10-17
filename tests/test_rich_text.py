@@ -100,16 +100,16 @@ def test_mention(person: User, root_page: Page, md_text_page: Page, all_props_db
 def test_rich_text_bases(person: User, root_page: Page, notion: Session):
     text = uno.text('This is an equation: ', color=uno.Color.BLUE)
     text += uno.math('E=mc^2', bold=True)
-    text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com')
+    text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com/')
     text += uno.mention(person)
-    assert isinstance(text, uno.Text)
-
-    page = notion.create_page(parent=root_page, title='RichText Test')
-    page.append(uno.Paragraph(text))
     exp_text = (
         'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) '
         '[@Florian Wilhelm]()'
     )
+    assert text.to_markdown() == exp_text
+
+    page = notion.create_page(parent=root_page, title='RichText Test')
+    page.append(uno.Paragraph(text))
     assert page.children[0].to_markdown() == exp_text
 
     notion.cache.clear()
@@ -123,5 +123,5 @@ def test_rich_text():
     text += uno.text(' and a bold text', bold=True)
     assert str(text) == 'Simple Text and a bold text'
     assert text.to_markdown() == 'Simple Text **and a bold text**'
-    assert uno.Text(text).to_markdown() == 'Simple Text **and a bold text**'
+    assert uno.text(text).to_markdown() == 'Simple Text and a bold text'  # converted to plain text
     # ToDo: Extend this test!
