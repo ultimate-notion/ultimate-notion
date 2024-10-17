@@ -184,7 +184,10 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
 
 
 class Text(str):
-    """User-facing class holding several RichTextsBase objects."""
+    """User-facing class holding several RichTextsBase objects.
+
+    Rather use the constructor function `text` to create a `Text` object from a normal string with formatting.
+    """
 
     _rich_texts: list[RichTextBase]
 
@@ -279,10 +282,14 @@ def text(
     color: Color = Color.DEFAULT,
     href: str | None = None,
 ) -> Text:
-    """Create a rich text Text object from a normal string with formatting."""
+    """Create a rich text Text object from a normal string with formatting.
+
+    !!! warning
+
+        If a `Text` object is passed, the original formatting will be lost!
+    """
     if isinstance(text, Text):
-        msg = 'Use the `Text` object directly instead of wrapping it in `text`!'
-        raise ValueError(msg)
+        text = text.to_plain_text()
 
     return Text.wrap_obj_ref(
         [
@@ -383,7 +390,7 @@ def md_spans(rich_texts: list[RichTextBase]) -> np.ndarray:
                 if getattr(annotations, md_style) is True:
                     spans[i, j] = spans[i, j - 1] + 1
 
-        # handle the case of overlapping spans, i.e. **abc ~~def** ghi~~ -> **abc ~~def~~** ~~ghi~~
+        # handle the case of overlapping spans, e.g. **abc ~~def** ghi~~ -> **abc ~~def~~** ~~ghi~~
         curr_ranks = rank(-spans[:, j])
         for i in np.where(curr_ranks < old_ranks)[0]:
             spans[i, j] = 1 if spans[i, j] > 0 else 0  # start a new span if an encompassing span ends
