@@ -78,21 +78,13 @@ def test_db_with_docstring(notion: uno.Session, root_page: uno.Page):
 
 @pytest.mark.vcr()
 def test_db_attributes(contacts_db: uno.Database):
-    assert isinstance(contacts_db.title, uno.Text)
     assert contacts_db.title == CONTACTS_DB
-
-    assert isinstance(contacts_db.description, uno.Text)
     assert contacts_db.description == 'Database of all my contacts!'
-
     assert isinstance(contacts_db.icon, str)
     assert contacts_db.icon == '🤝'
-
     assert contacts_db.cover is None
-
     assert contacts_db.url.startswith('https://www.notion.so/d')
-
     assert not contacts_db.is_deleted
-
     assert not contacts_db.is_inline
 
 
@@ -107,7 +99,7 @@ def test_title_setter(notion: uno.Session, article_db: uno.Database):
     del notion.cache[article_db.id]
     article_db = notion.get_db(article_db.id)
     assert article_db.title == new_title
-    article_db.title = uno.Text(old_title)
+    article_db.title = uno.text(old_title)
     assert article_db.title == old_title
     article_db.title = ''
     assert article_db.title == ''
