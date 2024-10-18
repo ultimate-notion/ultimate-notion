@@ -6,7 +6,7 @@ import logging
 from collections.abc import Awaitable, Callable, Iterator
 from typing import Annotated, Any
 
-from pydantic import Field
+from pydantic import ConfigDict, Field, ValidationInfo, field_validator
 from pydantic.functional_validators import BeforeValidator
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
@@ -19,35 +19,22 @@ MAX_PAGE_SIZE = 100
 logger = logging.getLogger(__name__)
 
 
-def convert_to_notion_obj(obj: dict[str, Any]) -> Block | Page | Database | PropertyItem | User | GenericObject:
+def convert_to_notion_obj(data: dict[str, Any]) -> Block | Page | Database | PropertyItem | User | GenericObject:
     """Convert a dictionary to the corresponding subtype of Notion Object.
 
     Used in the ObjectList below the convert the results from the Notion API.
     """
+    obj_field = 'object'
 
-    if 'object' not in obj:
+    if obj_field not in data:
         msg = 'Unknown object in results'
         raise ValueError(msg)
 
-    if obj['object'] == BlockList.build().type:  # .build() as the model is not constructed at that point.
-        return Block.model_validate(obj)
-
-    if obj['object'] == PageList.build().type:
-        return Page.model_validate(obj)
-
-    if obj['object'] == DatabaseList.build().type:
-        return Database.model_validate(obj)
-
-    if obj['object'] == PropertyItemList.build().type:
-        return PropertyItem.model_validate(obj)
-
-    if obj['object'] == UserList.build().type:
-        return User.model_validate(obj)
-
-    if obj['object'] == CommentList.build().type:
-        return Comment.model_validate(obj)
-
-    return GenericObject.model_validate(obj)
+    model_mapping: dict[str, NotionObject] = {
+        model.model_fields[obj_field].default: model for model in (Block, Page, Database, PropertyItem, User, Comment)
+    }
+    model_class = model_mapping.get(data[obj_field], GenericObject)
+    return model_class.model_validate(data)
 
 
 class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True):
@@ -61,34 +48,39 @@ class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True
     next_cursor: str | None = None
 
 
-class BlockList(ObjectList, type='block'):
+class EmptyTypeDataMixin:
+    @field_validator('*')
+    @classmethod
+    def check_empty_dict_fields(cls: ObjectList, v: Any, field: ValidationInfo) -> Any:
+        list_type = cls.model_fields['type'].default
+        if field.field_name == list_type and v != {}:
+            msg = f'The field {field.field_name} is expected to be an empty dictionary.'
+            raise ValueError(msg)
+        return v
+
+
+class BlockList(ObjectList, EmptyTypeDataMixin, type='block'):
     """A list of Block objects returned by the Notion API."""
 
-    block: Any = Field(default_factory=dict)
+    block: dict
 
 
-class PageList(ObjectList, type='page'):
-    """A list of Page objects returned by the Notion API."""
-
-    page: Any = Field(default_factory=dict)
-
-
-class DatabaseList(ObjectList, type='database'):
-    """A list of Database objects returned by the Notion API."""
-
-    database: Any = Field(default_factory=dict)
-
-
-class PageOrDatabaseList(ObjectList, type='page_or_database'):
+class PageOrDatabaseList(ObjectList, EmptyTypeDataMixin, type='page_or_database'):
     """A list of Page or Database objects returned by the Notion API."""
 
-    page_or_database: Any = Field(default_factory=dict)
+    page_or_database: dict
 
 
-class UserList(ObjectList, type='user'):
+class UserList(ObjectList, EmptyTypeDataMixin, type='user'):
     """A list of User objects returned by the Notion API."""
 
-    user: Any = Field(default_factory=dict)
+    user: dict
+
+
+class CommentList(ObjectList, EmptyTypeDataMixin, type='comment'):
+    """A list of Comment objects returned by the Notion API."""
+
+    comment: dict
 
 
 class PropertyItemList(ObjectList, type='property_item'):
@@ -99,17 +91,12 @@ class PropertyItemList(ObjectList, type='property_item'):
     """
 
     class TypeData(GenericObject):
-        id: str = None  # type: ignore
-        type: str = None  # type: ignore
-        next_url: str | None = None
+        model_config = ConfigDict(extra='allow')  # for additional `type` field
+        id: str
+        type: str
+        next_url: str | None  # not clear what this is for
 
-    property_item: TypeData = TypeData()
-
-
-class CommentList(ObjectList, type='comment'):
-    """A list of Comment objects returned by the Notion API."""
-
-    comment: Any = Field(default_factory=dict)
+    property_item: TypeData
 
 
 class EndpointIterator:
@@ -141,11 +128,11 @@ class EndpointIterator:
 
             result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
 
-            api_list = ObjectList.model_validate(result_page)
+            obj_list = ObjectList.model_validate(result_page)
 
-            for obj in api_list.results:
+            for obj in obj_list.results:
                 self.total_items += 1
                 yield obj
 
-            self.next_cursor = api_list.next_cursor
-            self.has_more = api_list.has_more and self.next_cursor is not None
+            self.next_cursor = obj_list.next_cursor
+            self.has_more = obj_list.has_more and self.next_cursor is not None

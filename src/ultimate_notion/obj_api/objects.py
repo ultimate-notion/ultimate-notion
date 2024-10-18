@@ -407,8 +407,8 @@ class MentionUser(MentionBase, type='user'):
     def build(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         mention = cls.model_construct(user=user)
-        # note that `href` is always `None` for user mentions
-        return MentionObject.model_construct(plain_text=user.name, href=None, annotations=style, mention=mention)
+        # note that `href` is always `None` for user mentions, also we prepend the '@' to mimic server side
+        return MentionObject.model_construct(plain_text=f'@{user.name}', href=None, annotations=style, mention=mention)
 
 
 class MentionPage(MentionBase, type='page'):

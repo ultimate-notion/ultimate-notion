@@ -219,7 +219,7 @@ class TypedObject(GenericObject):
     def __pydantic_init_subclass__(cls, *, type: str | None = None, **kwargs):  # noqa: A002, PLW3201
         """Register the subtypes of the TypedObject subclass.
 
-        Needed since `model_fields` are not available during __init_subclass__.
+        This is needed since `model_fields` is not available during __init_subclass__.
         See: https://github.com/pydantic/pydantic/issues/5369
         """
         type_name = cls.__name__ if type is None else type

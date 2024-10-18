@@ -360,12 +360,12 @@ def test_modify_basic_blocks(root_page: Page, notion: Session):
     page.append(children)
 
     paragraph.color = uno.Color.PINK
-    paragraph.rich_text = uno.Text('Pink paragraph')
+    paragraph.rich_text = uno.text('Pink paragraph')
     paragraph.reload()
     assert paragraph.color == uno.Color.PINK
 
     code.language = uno.CodeLang.JAVASCRIPT
-    code.caption = uno.Text('JavaScript Code')
+    code.caption = uno.text('JavaScript Code')
 
     heading.append(uno.Paragraph('This is a nested paragraph'))
     with pytest.raises(InvalidAPIUsageError):
@@ -379,7 +379,7 @@ def test_modify_basic_blocks(root_page: Page, notion: Session):
     todo.checked = False
 
     embed.url = 'https://notion.so'
-    embed.caption = uno.Text('Notion Homepage')
+    embed.caption = uno.text('Notion Homepage')
 
     bookmark.url = 'https://notion.so'
 
@@ -393,7 +393,7 @@ def test_modify_basic_blocks(root_page: Page, notion: Session):
 
     child_code = cast(uno.Code, page.children[1])
     assert child_code.language == uno.CodeLang.JAVASCRIPT
-    assert child_code.caption == uno.Text('JavaScript Code')
+    assert child_code.caption == uno.text('JavaScript Code')
     child_code.caption = None  # type: ignore[assignment]
     child_code.reload()
     assert child_code.caption == ''
@@ -441,7 +441,7 @@ def test_modify_file_blocks(root_page: Page, notion: Session):
 
     assert image.caption == 'Path on meadow'
     new_caption_text = 'Flowers on meadow'
-    image.caption = uno.Text(new_caption_text)
+    image.caption = uno.text(new_caption_text)
     image.reload()
     assert image.caption == new_caption_text
 
@@ -449,10 +449,10 @@ def test_modify_file_blocks(root_page: Page, notion: Session):
     new_caption_text = 'Rick Roll but not really'
     video.caption = new_caption_text  # type: ignore[assignment]
     video.reload()
-    assert video.caption == uno.Text(new_caption_text)
+    assert video.caption == uno.text(new_caption_text)
 
     new_caption_text = 'Dummy PDF'
-    pdf.caption = uno.Text(new_caption_text)
+    pdf.caption = uno.text(new_caption_text)
     pdf.reload()
     assert pdf.caption == new_caption_text
 

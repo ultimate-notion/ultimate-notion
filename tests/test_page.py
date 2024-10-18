@@ -5,16 +5,18 @@ from textwrap import dedent
 
 import pytest
 
-from ultimate_notion import Emoji, FileInfo, Page, Session, Text
+import ultimate_notion as uno
 from ultimate_notion.blocks import Block
+
+# from ultimate_notion.page import MAX_ITEMS_PER_PROPERTY
 
 
 @pytest.mark.vcr()
 def test_parent(page_hierarchy):
     root_page, l1_page, l2_page = page_hierarchy
-    assert isinstance(root_page, Page)
-    assert isinstance(l1_page, Page)
-    assert isinstance(l2_page, Page)
+    assert isinstance(root_page, uno.Page)
+    assert isinstance(l1_page, uno.Page)
+    assert isinstance(l2_page, uno.Page)
 
     assert root_page.parent is None
     assert l2_page.parent == l1_page
@@ -23,13 +25,13 @@ def test_parent(page_hierarchy):
 
 
 @pytest.mark.vcr()
-def test_ancestors(page_hierarchy: tuple[Page, ...]):
+def test_ancestors(page_hierarchy: tuple[uno.Page, ...]):
     root_page, l1_page, l2_page = page_hierarchy
     assert l2_page.ancestors == (root_page, l1_page)
 
 
 @pytest.mark.vcr()
-def test_delete_restore_page(notion: Session, root_page: Page):
+def test_delete_restore_page(notion: uno.Session, root_page: uno.Page):
     page = notion.create_page(root_page)
     assert not page.is_deleted
     page.delete()
@@ -39,7 +41,7 @@ def test_delete_restore_page(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_reload_page(notion: Session, root_page: Page):
+def test_reload_page(notion: uno.Session, root_page: uno.Page):
     page = notion.create_page(root_page)
     old_obj_id = id(page.obj_ref)
     page.reload()
@@ -47,7 +49,7 @@ def test_reload_page(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_parent_subpages(notion: Session, root_page: Page):
+def test_parent_subpages(notion: uno.Session, root_page: uno.Page):
     parent = notion.create_page(root_page, title='Parent')
     child1 = notion.create_page(parent, title='Child 1')
     child2 = notion.create_page(parent, title='Child 2')
@@ -55,45 +57,45 @@ def test_parent_subpages(notion: Session, root_page: Page):
     assert child1.parent == parent
     assert child2.parent == parent
     assert parent.subpages == [child1, child2]
-    assert all(isinstance(page, Page) for page in parent.subpages)
+    assert all(isinstance(page, uno.Page) for page in parent.subpages)
     assert child1.ancestors == (root_page, parent)
 
 
 @pytest.mark.vcr()
-def test_parent_children(intro_page: Page):
+def test_parent_children(intro_page: uno.Page):
     assert all(isinstance(block, Block) for block in intro_page.children)
 
 
 @pytest.mark.vcr()
-def test_icon_attr(notion: Session, root_page: Page):
+def test_icon_attr(notion: uno.Session, root_page: uno.Page):
     new_page = notion.create_page(parent=root_page, title='My new page with icon')
 
     assert new_page.icon is None
     emoji_icon = '🐍'
     new_page.icon = emoji_icon  # type: ignore[assignment] # test automatic conversation
-    assert isinstance(new_page.icon, Emoji)
+    assert isinstance(new_page.icon, uno.Emoji)
     assert new_page.icon == emoji_icon
 
-    new_page.icon = Emoji(emoji_icon)
-    assert isinstance(new_page.icon, Emoji)
+    new_page.icon = uno.Emoji(emoji_icon)
+    assert isinstance(new_page.icon, uno.Emoji)
     assert new_page.icon == emoji_icon
 
     # clear cache and retrieve the page again to be sure it was udpated on the server side
     del notion.cache[new_page.id]
     new_page = notion.get_page(new_page.id)
-    assert new_page.icon == Emoji(emoji_icon)
+    assert new_page.icon == uno.Emoji(emoji_icon)
 
     notion_icon = 'https://www.notion.so/icons/snake_purple.svg'
     new_page.icon = notion_icon  # test automatic conversation
-    assert isinstance(new_page.icon, FileInfo)
+    assert isinstance(new_page.icon, uno.FileInfo)
     assert new_page.icon == notion_icon
 
-    new_page.icon = FileInfo(url=notion_icon)
-    assert isinstance(new_page.icon, FileInfo)
+    new_page.icon = uno.FileInfo(url=notion_icon)
+    assert isinstance(new_page.icon, uno.FileInfo)
     assert new_page.icon == notion_icon
 
     new_page.reload()
-    assert new_page.icon == FileInfo(url=notion_icon)
+    assert new_page.icon == uno.FileInfo(url=notion_icon)
 
     new_page.icon = None
     new_page.reload()
@@ -101,21 +103,21 @@ def test_icon_attr(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_cover_attr(notion: Session, root_page: Page):
+def test_cover_attr(notion: uno.Session, root_page: uno.Page):
     new_page = notion.create_page(parent=root_page, title='My new page with cover')
 
     assert new_page.cover is None
     cover_file = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
     new_page.cover = cover_file  # type: ignore[assignment] # test automatic conversation
-    assert isinstance(new_page.cover, FileInfo)
+    assert isinstance(new_page.cover, uno.FileInfo)
     assert new_page.cover == cover_file
 
-    new_page.cover = FileInfo(url=cover_file)
-    assert isinstance(new_page.cover, FileInfo)
+    new_page.cover = uno.FileInfo(url=cover_file)
+    assert isinstance(new_page.cover, uno.FileInfo)
     assert new_page.cover == cover_file
 
     new_page.reload()
-    assert new_page.cover == FileInfo(url=cover_file)
+    assert new_page.cover == uno.FileInfo(url=cover_file)
 
     new_page.cover = None
     new_page.reload()
@@ -123,22 +125,20 @@ def test_cover_attr(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_title_attr(notion: Session, root_page: Page):
+def test_title_attr(notion: uno.Session, root_page: uno.Page):
     new_page = notion.create_page(parent=root_page)
 
     assert new_page.title == ''
 
     title = 'My new title'
     new_page.title = title  # type: ignore[assignment] # test automatic conversation
-    assert isinstance(new_page.title, Text)
     assert new_page.title == title
 
-    new_page.title = Text(title)
-    assert isinstance(new_page.title, Text)
+    new_page.title = uno.text(title)
     assert new_page.title == title
 
     new_page.reload()
-    assert new_page.title == Text(title)
+    assert new_page.title == uno.text(title)
 
     new_page.title = None  # type: ignore[assignment]
     new_page.reload()
@@ -150,7 +150,7 @@ def test_title_attr(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_created_edited_by(notion: Session, root_page: Page):
+def test_created_edited_by(notion: uno.Session, root_page: uno.Page):
     myself = notion.whoami()
     florian = notion.search_user('Florian Wilhelm').item()
     assert root_page.created_by == florian
@@ -158,7 +158,7 @@ def test_created_edited_by(notion: Session, root_page: Page):
 
 
 @pytest.mark.vcr()
-def test_page_to_markdown(md_page: Page):
+def test_page_to_markdown(md_page: uno.Page):
     def remove_query_string(line: str) -> str:
         line = re.sub(r'\?.*?\]', ']', line)
         line = re.sub(r'prod.*?\)', ')', line)
@@ -252,7 +252,7 @@ def test_page_to_markdown(md_page: Page):
 
 
 @pytest.mark.vcr()
-def test_parent_db(notion: Session, root_page: Page):
+def test_parent_db(notion: uno.Session, root_page: uno.Page):
     db = notion.create_db(root_page)
     db.title = 'Parent DB'
     page_in_db = db.create_page()
@@ -264,7 +264,66 @@ def test_parent_db(notion: Session, root_page: Page):
     assert page_not_in_db.parent_db is None
 
 
+# @pytest.mark.vcr()
+# def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page: uno.Page):
+#     class Item(uno.Schema, db_title='Item DB for max relation items'):
+#         """Database of all items"""
+
+#         name = uno.Property('Name', uno.PropType.Title())
+#         price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+#         bought_by = uno.Property('Bought by', uno.PropType.Relation())
+
+#     class Customer(uno.Schema, db_title='Customer DB for max relation items'):
+#         """Database for customers"""
+
+#         name = uno.Property('Name', uno.PropType.Title())
+#         purchases = uno.Property('Items Purchased', uno.PropType.Relation(Item, two_way_prop=Item.bought_by))
+
+#     item_db = notion.create_db(parent=root_page, schema=Item)
+#     customer_db = notion.create_db(parent=root_page, schema=Customer)
+#     customer = customer_db.create_page(name='Customer 1')
+
+#     n_prop_items = MAX_ITEMS_PER_PROPERTY + 5
+#     for i in range(1, n_prop_items + 1):
+#         item_db.create_page(name=f'Item {i}', price=i * 10, bought_by=customer)
+
+#     customer.reload()  # reload to get the updated relation
+#     assert len(customer.props.purchases) == n_prop_items
+
+
+# @pytest.mark.vcr()
+# def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page: uno.Page):
+#     # According to the Notion API (see below), this test should fail but it doesn't.
+#     # Source: https://developers.notion.com/reference/retrieve-a-page#limits
+#     class Item(uno.Schema, db_title='Item DB for max text items'):
+#         """Database of all items"""
+
+#         name = uno.Property('Name', uno.PropType.Title())
+#         desc = uno.Property('Description', uno.PropType.Text())
+
+#     notion.create_db(parent=root_page, schema=Item)
+
+# generate a text that will have internally more than MAX_ITEMS_PER_PROPERTY RichText parts
+# n_prop_items = 2 * MAX_ITEMS_PER_PROPERTY
+# factor = 100
+# text_parts = []
+# for i in range(1, n_prop_items + 1):
+#     if i % 2 == 1:
+#         text_parts.append(uno.text('A' * factor, bold=True, color=uno.Color.YELLOW))
+#     else:
+#         text_parts.append(uno.text('B' * factor, bold=False, color=uno.Color.RED))
+# text = uno.join(text_parts, delim='')
+
+# item = Item.create(name=text, desc=text)
+# item.reload()  # reload to get the updated text
+
+# assert len(item.props.name) == n_prop_items * factor
+# assert len(item.props.name.obj_ref) == n_prop_items
+# assert len(item.props.desc) == n_prop_items * factor
+# assert len(item.props.desc.obj_ref) == n_prop_items
+
+
 @pytest.mark.vcr()
-def test_unfurl_blocks(notion: Session, unfurl_page: Page):
+def test_unfurl_blocks(notion: uno.Session, unfurl_page: uno.Page):
     pass
     # ToDo: Implement test

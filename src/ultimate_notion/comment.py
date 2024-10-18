@@ -50,13 +50,13 @@ class Discussion(Sequence[Comment]):
         self._parent = parent
 
     @overload
-    def __getitem__(self, index: int, /) -> Comment: ...
+    def __getitem__(self, idx: int, /) -> Comment: ...
 
     @overload
-    def __getitem__(self, index: slice, /) -> Sequence[Comment]: ...
+    def __getitem__(self, idx: slice, /) -> Sequence[Comment]: ...
 
-    def __getitem__(self, index: int | slice, /) -> Comment | Sequence[Comment]:
-        return self._comments[index]
+    def __getitem__(self, idx: int | slice, /) -> Comment | Sequence[Comment]:
+        return self._comments[idx]
 
     def __len__(self) -> int:
         return len(self._comments)

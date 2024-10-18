@@ -310,7 +310,8 @@ An example illustrates this:
 page = notion.create_page(parent=root_page, title='Page with fancy text')
 
 rt = uno.text('This is a ') + uno.text('bold', bold=True) + uno.text(' word.\n')
-assert isinstance(rt, uno.Text)
+assert isinstance(rt, str)  # str with special capabilities!
+assert rt.to_markdown() == 'This is a **bold** word.\n'
 
 rt += 'We can even add a normal string to it.\n'
 rt += uno.text('Now some ') + uno.text('inline formula: ', color=uno.Color.RED)

@@ -205,13 +205,13 @@ class RollupDate(RollupObject, type='date'):
 class RollupArray(RollupObject, type='array'):
     """A Notion rollup array property value."""
 
-    array: list[PropertyValue]
+    array: list[SerializeAsAny[PropertyValue]]
 
 
 class Rollup(PropertyValue, type='rollup'):
     """A Notion rollup property value."""
 
-    rollup: RollupObject | None = None
+    rollup: SerializeAsAny[RollupObject] | None = None
 
 
 class CreatedTime(PropertyValue, type='created_time'):

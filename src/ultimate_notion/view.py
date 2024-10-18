@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, overload
 
 import numpy as np
 import pandas as pd
@@ -30,7 +30,7 @@ class Col(str):
     # ToDo: Implement me, in order to allow Spark-like sorting/filtering, e.g. `Col(Name) == "Florian"` in View
 
 
-class View:
+class View(Sequence[Page]):
     def __init__(self, database: Database, pages: list[Page], query: DBQueryBuilder):
         self.database = database
         self._query = query
@@ -72,7 +72,16 @@ class View:
             cols.insert(0, self._index_name)
         return cols
 
-    def get_page(self, idx: int) -> Page:
+    @overload
+    def __getitem__(self, idx: int, /) -> Page: ...
+
+    @overload
+    def __getitem__(self, idx: slice, /) -> Sequence[Page]: ...
+
+    def __getitem__(self, idx: int | slice, /) -> Page | Sequence[Page]:
+        return tuple(self._pages[self._row_indices[idx]])
+
+    def get_page(self, idx: int, /) -> Page:
         """Retrieve a page by index of the view."""
         return self._pages[self._row_indices[idx]]
 
@@ -81,7 +90,8 @@ class View:
         pages = [page for page in self.to_pages() if page.title == name]
         return SList(pages)
 
-    def get_row(self, idx: int) -> tuple[Any, ...]:
+    def get_row(self, idx: int, /) -> tuple[Any, ...]:
+        """Retrieve a row i.e. all properties of a page by index of the view."""
         page = self.get_page(idx)
         row: list[Any] = []
         for col in self.columns:

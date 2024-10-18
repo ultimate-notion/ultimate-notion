@@ -215,6 +215,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Create a page with properties according to the schema within the corresponding database."""
 
         # ToDo: let pydantic_model check the kwargs and raise an error if something is wrong
+        #       this would also generate a nice error message for the user!
         schema_kwargs = {prop.attr_name: prop for prop in self.schema.get_props()}
         if not set(kwargs).issubset(set(schema_kwargs)):
             add_kwargs = set(kwargs) - set(schema_kwargs)
@@ -235,7 +236,8 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
 
         session = get_active_session()
-        page = Page.wrap_obj_ref(session.api.pages.create(parent=self.obj_ref, properties=schema_dct))
+        page_obj = session.api.pages.create(parent=self.obj_ref, properties=schema_dct)
+        page = Page.wrap_obj_ref(page_obj)
         return page
 
     def query(self):
