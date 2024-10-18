@@ -155,17 +155,15 @@ class Session:
             self.cache[block.id] = block
             return block
 
+    # ToDo: Provide a title and description for the database that overwrites the values from the schema
     def create_db(self, parent: Page, schema: type[Schema] | None = None) -> Database:
-        """Create a new database within a page.
-
-        Implementation:
-
-            1. initialize external forward relations, i.e. relations pointing to other databases
-            2. create the database using a Notion API call and potential external forward relations
-            3. initialize self-referencing forward relations
-            4. create properties with self-referencing forward relations using an update call
-            5. update the backward references, i.e. two-way relations, using an update call
-        """
+        """Create a new database within a page."""
+        # Implementation:
+        # 1. initialize external forward relations, i.e. relations pointing to other databases
+        # 2. create the database using a Notion API call and potential external forward relations
+        # 3. initialize self-referencing forward relations
+        # 4. create properties with self-referencing forward relations using an update call
+        # 5. update the backward references, i.e. two-way relations, using an update call
         if schema:
             schema._init_fwd_rels()
             schema_dct = {prop.name: prop.type.obj_ref for prop in schema._get_init_props()}
