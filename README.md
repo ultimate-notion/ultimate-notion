@@ -53,6 +53,12 @@ Check out the official [Ultimate Notion documentation] for more details.
 Especially the page about [creating a Notion integration] to get the token.
 The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pages].
 
+## Getting help
+
+If you are stuck with a problem and need help or just want to brag about what you did,
+the [Discussion] area is the right place for you. Here, you can ask questions, provide
+suggesions and discuss with other users.
+
 ## Contributing
 
 After having cloned this repository:
@@ -92,6 +98,7 @@ Ultimate Notion highly depends on [notion-sdk-py].
 [VS Code]: https://code.visualstudio.com/
 [PyPI]: https://pypi.org/
 [VCR.py]: https://vcrpy.readthedocs.io/
+[Discussion]: https://github.com/ultimate-notion/ultimate-notion/discussions
 
 [Tests-image]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml/badge.svg
 [Tests-link]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/run-tests.yml
