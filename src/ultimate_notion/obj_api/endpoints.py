@@ -12,10 +12,10 @@ from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias, cast
 from uuid import UUID
 
-from pydantic import SerializeAsAny, TypeAdapter
+from pydantic import SerializeAsAny
 
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
-from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
+from ultimate_notion.obj_api.iterator import EndpointIterator
 from ultimate_notion.obj_api.objects import (
     Comment,
     DatabaseRef,
@@ -290,11 +290,13 @@ class PagesEndpoint(Endpoint):
             return self.api.client.pages.properties
 
         # https://developers.notion.com/reference/retrieve-a-page-property
-        def retrieve(self, page_id, property_id):
+        def retrieve(self, page: Page | UUID | str, property: PropertyValue | str) -> Iterator[PropertyItem]:  # noqa: A002
             """Return the Property on a specific Page with the given ID"""
+            page_id = str(PageRef.build(page).page_id)
+            property_id = property.id if isinstance(property, PropertyValue) else property
             logger.info('Retrieving property :: %s [%s]', property_id, page_id)
-            data = self.raw_api.retrieve(page_id, property_id)
-            return TypeAdapter(PropertyItem | PropertyItemList).validate_python(data)
+            prop_iter = EndpointIterator(endpoint=self.raw_api.retrieve)
+            return cast(Iterator[PropertyItem], prop_iter(page_id=page_id, property_id=property_id))
 
     def __init__(self, *args, **kwargs):
         """Initialize the `pages` endpoint for the Notion API"""
