@@ -54,9 +54,6 @@ class PagePropertiesNS:
     Access the properties with `page.props.property_name` or `page.props['Property Name']`.
     """
 
-    # ToDo: Implement here the logic that retrieves more than MAX_ITEMS_PER_PROPERTY items
-    #       if the property exceeds this.
-
     def __init__(self, page: Page):
         self._page = page
 
@@ -71,6 +68,12 @@ class PagePropertiesNS:
         if prop is None:
             msg = f'No such property: {prop_name}'
             raise AttributeError(msg)
+
+        if isinstance(prop, obj_props.PAGINATED_LIST_PROP_VALS) and not self._page._props_retrieved_flag[prop_name]:
+            # retrieve the full list of items
+            session = get_active_session()
+            prop = list(session.api.pages.properties.retrieve(self._page.obj_ref, prop))
+            self._page._props_retrieved_flag[prop_name] = True
 
         return PropertyValue.wrap_obj_ref(prop).value
 
@@ -108,11 +111,13 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
     """
 
     props: PagePropertiesNS
+    _props_retrieved_flag: dict[str, bool]
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Self:
         obj = super().wrap_obj_ref(obj_ref)
         obj.props = obj._create_page_props_ns()
+        obj._init_props_retrieved_flag()
         return obj
 
     def _create_page_props_ns(self) -> PagePropertiesNS:
@@ -124,6 +129,10 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             for prop in self.parent_db.schema.get_props():
                 setattr(page_props_ns_cls, prop.attr_name, PageProperty(prop_name=prop.name))
         return page_props_ns_cls(page=self)
+
+    def _init_props_retrieved_flag(self) -> None:
+        """Create a flag for each property whether it was already retrieved."""
+        self._props_retrieved_flag = dict.fromkeys(self.obj_ref.properties, False)
 
     def __str__(self) -> str:
         return str(self.title)
@@ -308,6 +317,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
         self._children = None  # forces a new retrieval of children next time
         self._comments = None  # forces a new retrieval of comments next time
+        self._init_props_retrieved_flag()  # forces a new retrieval of certain properties next time
         return self
 
 
