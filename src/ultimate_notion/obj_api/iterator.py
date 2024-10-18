@@ -6,7 +6,7 @@ import logging
 from collections.abc import Awaitable, Callable, Iterator
 from typing import Annotated, Any
 
-from pydantic import ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import ConfigDict, Field
 from pydantic.functional_validators import BeforeValidator
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
@@ -48,39 +48,36 @@ class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True
     next_cursor: str | None = None
 
 
-class EmptyTypeDataMixin:
-    @field_validator('*')
-    @classmethod
-    def check_empty_dict_fields(cls: ObjectList, v: Any, field: ValidationInfo) -> Any:
-        list_type = cls.model_fields['type'].default
-        if field.field_name == list_type and v != {}:
-            msg = f'The field {field.field_name} is expected to be an empty dictionary.'
-            raise ValueError(msg)
-        return v
-
-
-class BlockList(ObjectList, EmptyTypeDataMixin, type='block'):
+class BlockList(ObjectList, type='block'):
     """A list of Block objects returned by the Notion API."""
 
-    block: dict
+    class TypeData(GenericObject): ...
+
+    block: TypeData
 
 
-class PageOrDatabaseList(ObjectList, EmptyTypeDataMixin, type='page_or_database'):
+class PageOrDatabaseList(ObjectList, type='page_or_database'):
     """A list of Page or Database objects returned by the Notion API."""
 
-    page_or_database: dict
+    class TypeData(GenericObject): ...
+
+    page_or_database: TypeData
 
 
-class UserList(ObjectList, EmptyTypeDataMixin, type='user'):
+class UserList(ObjectList, type='user'):
     """A list of User objects returned by the Notion API."""
 
-    user: dict
+    class TypeData(GenericObject): ...
+
+    user: TypeData
 
 
-class CommentList(ObjectList, EmptyTypeDataMixin, type='comment'):
+class CommentList(ObjectList, type='comment'):
     """A list of Comment objects returned by the Notion API."""
 
-    comment: dict
+    class TypeData(GenericObject): ...
+
+    comment: TypeData
 
 
 class PropertyItemList(ObjectList, type='property_item'):
