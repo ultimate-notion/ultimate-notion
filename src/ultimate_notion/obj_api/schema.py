@@ -18,25 +18,21 @@ class PropertyType(TypedObject, polymorphic_base=True):
     id: str | None = None
     name: str | None = None
 
-    @classmethod
-    def build(cls):
-        """Build the property value from given value, e.g. native Python or nested type.
-
-        In practice, this is like calling __init__ with the corresponding keyword.
-        """
-        return cls.model_construct()
-
 
 class Title(PropertyType, type='title'):
     """Defines the title configuration for a database property."""
 
-    title: Any = Field(default_factory=dict)
+    class TypeData(GenericObject): ...
+
+    title: TypeData = TypeData()
 
 
 class RichText(PropertyType, type='rich_text'):
     """Defines the rich text configuration for a database property."""
 
-    rich_text: Any = Field(default_factory=dict)
+    class TypeData(GenericObject): ...
+
+    rich_text: TypeData = TypeData()
 
 
 class Number(PropertyType, type='number'):
