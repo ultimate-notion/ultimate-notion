@@ -266,16 +266,35 @@ class Verification(PropertyValue, type='verification'):
     verification: TypeData = TypeData()
 
 
-class PropertyItem(NotionObject, PropertyValue, object='property_item'):
+class PropertyItem(NotionObject, TypedObject, polymorphic_base=True, object='property_item'):
     """A `PropertyItem` returned by the Notion API.
 
-    Basic property items have a similar schema to corresponding property values.  As a
-    result, these items share the `PropertyValue` type definitions.
-
-    This class provides a placeholder for parsing property items, however objects
-    parse by this class will likely be `PropertyValue`'s instead.
+    Basic property items have a similar schema to corresponding property values.
 
     Notion-API: https://developers.notion.com/reference/property-item-object
     """
 
     id: str
+
+
+class RelationPropertyItem(PropertyItem, type='relation'):
+    """A `RelationPropertyItem` returned by the Notion API.
+
+    Relation property items contain a list of references to other objects in the database.
+    """
+
+    relation: ObjectRef
+
+
+PAGINATED_STR_PROP_VALS = (RichText, Title)
+"""String-like property values that are potentially paginated when exceeding a threshold of
+inline page or person mentions and need to be fetched seperately from the server.
+
+Source: https://developers.notion.com/reference/retrieve-a-page#limits
+"""
+PAGINATED_LIST_PROP_VALS = (People, Relation, Rollup)
+"""List-like property values that are potentially paginated when exceeding a threshold of
+contained references and need to be fetched seperately from the server.
+
+Source: https://developers.notion.com/reference/retrieve-a-page#limits
+"""
