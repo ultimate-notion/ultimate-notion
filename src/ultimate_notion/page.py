@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any, TypeGuard, cast
 
 from emoji import is_emoji
@@ -46,12 +46,13 @@ class PageProperty:
         obj[self._prop_name] = value
 
 
-class PagePropertiesNS:
+class PagePropertiesNS(Mapping[str, PropertyValue]):
     """Namespace of the properties of a page as defined in the schema of the database.
 
     This defines the `.props` namespace of a page `page` and updates the content
     on the Notion server side in case of an assignment.
     Access the properties with `page.props.property_name` or `page.props['Property Name']`.
+    You can also convert it to a dictionary with `dict(page.props)`.
     """
 
     def __init__(self, page: Page):
@@ -98,9 +99,14 @@ class PagePropertiesNS:
         """Iterator of property names."""
         yield from self._properties.keys()
 
-    def to_dict(self) -> dict[str, PropertyValue]:
-        """All page properties as dictionary."""
-        return {prop_name: self[prop_name] for prop_name in self}
+    def __len__(self) -> int:
+        return len(self._properties)
+
+    def __repr__(self) -> str:
+        return repr(dict(self))
+
+    def __str__(self) -> str:
+        return str(dict(self))
 
 
 class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
