@@ -284,17 +284,3 @@ class RelationPropertyItem(PropertyItem, type='relation'):
     """
 
     relation: ObjectRef
-
-
-PAGINATED_STR_PROP_VALS = (RichText, Title)
-"""String-like property values that are potentially paginated when exceeding a threshold of
-inline page or person mentions and need to be fetched seperately from the server.
-
-Source: https://developers.notion.com/reference/retrieve-a-page#limits
-"""
-PAGINATED_LIST_PROP_VALS = (People, Relation, Rollup)
-"""List-like property values that are potentially paginated when exceeding a threshold of
-contained references and need to be fetched seperately from the server.
-
-Source: https://developers.notion.com/reference/retrieve-a-page#limits
-"""

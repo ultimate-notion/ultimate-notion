@@ -28,6 +28,7 @@ MAX_TEXT_OBJECT_SIZE = 2000
 """The max text size according to the Notion API is 2000 characters."""
 
 
+# ToDo: Split all the markdown stuff into a separate module!
 MD_STYLES = ('bold', 'italic', 'strikethrough', 'code', 'link')
 """Markdown styles supported by Notion."""
 MD_STYLE_MAP = {
@@ -245,6 +246,11 @@ class Text(str):
         This method is a more explicit variant then just using the object.
         """
         return str(self)
+
+    @property
+    def mentions(self) -> tuple[Mention]:
+        """Return all mentions in the text."""
+        return tuple(elem for elem in self._rich_texts if elem.is_mention)
 
     def to_html(self) -> str:
         """Return rich text as HTML."""

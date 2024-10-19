@@ -248,7 +248,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 
 
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
-    """Relation property value."""
+    """Relation property values."""
 
     def __init__(self, pages: Page | list[Page]):
         if not isinstance(pages, list):
@@ -269,14 +269,14 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     @property
     def value(
         self,
-    ) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | tuple[Any, ...] | None:
+    ) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None:
         # ToDo: Write a unit test for this!
         if self.obj_ref.rollup is None:
             return None
 
         rollup_val = self.obj_ref.rollup.value
         if isinstance(rollup_val, obj_props.RollupArray):
-            return tuple(PropertyValue.wrap_obj_ref(prop).value for prop in rollup_val.array)
+            return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_val.array]
         elif isinstance(rollup_val, obj_props.RollupNumber):
             return rollup_val.number
         elif isinstance(rollup_val, obj_props.RollupDate):
@@ -352,10 +352,3 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
     @property
     def date(self) -> dt.datetime | None:
         return self.obj_ref.verification.date
-
-
-PAGINATED_PROP_VALS = (People, Relations, Text, Title)
-"""Property values that are potentially paginated and need to be fetched from the server seperately.
-
-Source: https://developers.notion.com/reference/retrieve-a-page#limits
-"""
