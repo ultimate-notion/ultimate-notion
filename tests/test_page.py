@@ -291,7 +291,7 @@ def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page
 
 
 @pytest.mark.vcr()
-def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page: uno.Page):
+def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page: uno.Page, person: uno.User):
     # According to the Notion API (see below), this test should fail but it doesn't.
     # Source: https://developers.notion.com/reference/retrieve-a-page#limits
     class Item(uno.Schema, db_title='Item DB for max text items'):
@@ -301,12 +301,11 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
         desc = uno.Property('Description', uno.PropType.Text())
 
     notion.create_db(parent=root_page, schema=Item)
-    user = notion.search_user('Florian Wilhelm').item()
 
     # generate a text that will have internally more than MAX_ITEMS_PER_PROPERTY mentions parts
     n_mentions = 2 * MAX_ITEMS_PER_PROPERTY
     text = uno.text('Who is the best programmer? ;-) ')
-    text += uno.join([uno.mention(user) for _ in range(n_mentions)], delim=', ')
+    text += uno.join([uno.mention(person) for _ in range(n_mentions)], delim=', ')
 
     item = Item.create(name=text, desc=text)
     item.reload()  # reload to clear cache and retrieve the page again

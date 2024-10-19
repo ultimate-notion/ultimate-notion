@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ultimate_notion.obj_api import props as obj_props
 
 

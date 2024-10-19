@@ -4,7 +4,6 @@ import pendulum as pnd
 import pytest
 
 import ultimate_notion as uno
-from ultimate_notion import Database, Page, Session, User
 from ultimate_notion.blocks import TextBlock
 from ultimate_notion.rich_text import camel_case, decapitalize, is_url, snake_case
 
@@ -50,7 +49,7 @@ def test_is_url():
 
 
 @pytest.mark.vcr()
-def test_rich_text_md(md_text_page: Page):
+def test_rich_text_md(md_text_page: uno.Page):
     """These markdowns were tested with https://stackedit.io/app#"""
     correct_mds = [
         'here is something **very** *simpel* and <u>underlined</u> as well as `code`',
@@ -79,7 +78,9 @@ def test_rich_text_md(md_text_page: Page):
 
 
 @pytest.mark.vcr()
-def test_mention(person: User, root_page: Page, md_text_page: Page, all_props_db: Database, notion: Session):
+def test_mention(
+    person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.Database, notion: uno.Session
+):
     user_mention = uno.mention(person)
     page_mention = uno.mention(md_text_page)
     db_mention = uno.mention(all_props_db)
@@ -97,7 +98,7 @@ def test_mention(person: User, root_page: Page, md_text_page: Page, all_props_db
 
 
 @pytest.mark.vcr()
-def test_rich_text_bases(person: User, root_page: Page, notion: Session):
+def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Session):
     text = uno.text('This is an equation: ', color=uno.Color.BLUE)
     text += uno.math('E=mc^2', bold=True)
     text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com/')

@@ -4,18 +4,18 @@ from __future__ import annotations
 
 import pytest
 
-from ultimate_notion import Page, Session
+import ultimate_notion as uno
 
 from .conftest import CONTACTS_DB
 
 
 @pytest.mark.vcr()
-def test_raise_for_status(notion: Session):
+def test_raise_for_status(notion: uno.Session):
     notion.raise_for_status()
 
 
 @pytest.mark.vcr()
-def test_search_get_db(notion: Session):
+def test_search_get_db(notion: uno.Session):
     db_by_name = notion.search_db(CONTACTS_DB).item()
     assert db_by_name.title == CONTACTS_DB
 
@@ -24,7 +24,7 @@ def test_search_get_db(notion: Session):
 
 
 @pytest.mark.vcr()
-def test_whoami_get_user(notion: Session):
+def test_whoami_get_user(notion: uno.Session):
     me = notion.whoami()
     assert me.name == 'Github Unittests'
     user = notion.get_user(me.id)
@@ -34,7 +34,7 @@ def test_whoami_get_user(notion: Session):
 
 
 @pytest.mark.vcr()
-def test_get_page_by_id(notion: Session, intro_page: Page):
+def test_get_page_by_id(notion: uno.Session, intro_page: uno.Page):
     del notion.cache[intro_page.id]
     page_by_id = notion.get_page(intro_page.id)
     assert page_by_id.title == 'Getting Started'
@@ -42,7 +42,7 @@ def test_get_page_by_id(notion: Session, intro_page: Page):
 
 
 @pytest.mark.vcr()
-def test_all_users(notion: Session):
+def test_all_users(notion: uno.Session):
     users = notion.all_users()
     me = notion.whoami()
     assert me in users

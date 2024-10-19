@@ -44,7 +44,7 @@ from ultimate_notion.blocks import (
     Video,
 )
 from ultimate_notion.core import get_active_session
-from ultimate_notion.database import Database
+from ultimate_notion.database import Database, ReadOnlyPropertyError
 from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
 from ultimate_notion.option import Option, OptionNS
@@ -91,6 +91,7 @@ __all__ = [
     'PropType',
     'Property',
     'Quote',
+    'ReadOnlyPropertyError',
     'SList',
     'Schema',
     'SchemaError',
