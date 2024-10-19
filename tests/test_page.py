@@ -7,8 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion.blocks import Block
-
-# from ultimate_notion.page import MAX_ITEMS_PER_PROPERTY
+from ultimate_notion.page import MAX_ITEMS_PER_PROPERTY
 
 
 @pytest.mark.vcr()
@@ -264,63 +263,56 @@ def test_parent_db(notion: uno.Session, root_page: uno.Page):
     assert page_not_in_db.parent_db is None
 
 
-# @pytest.mark.vcr()
-# def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page: uno.Page):
-#     class Item(uno.Schema, db_title='Item DB for max relation items'):
-#         """Database of all items"""
+@pytest.mark.vcr()
+def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page: uno.Page):
+    class Item(uno.Schema, db_title='Item DB for max relation items'):
+        """Database of all items"""
 
-#         name = uno.Property('Name', uno.PropType.Title())
-#         price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-#         bought_by = uno.Property('Bought by', uno.PropType.Relation())
+        name = uno.Property('Name', uno.PropType.Title())
+        price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+        bought_by = uno.Property('Bought by', uno.PropType.Relation())
 
-#     class Customer(uno.Schema, db_title='Customer DB for max relation items'):
-#         """Database for customers"""
+    class Customer(uno.Schema, db_title='Customer DB for max relation items'):
+        """Database for customers"""
 
-#         name = uno.Property('Name', uno.PropType.Title())
-#         purchases = uno.Property('Items Purchased', uno.PropType.Relation(Item, two_way_prop=Item.bought_by))
+        name = uno.Property('Name', uno.PropType.Title())
+        purchases = uno.Property('Items Purchased', uno.PropType.Relation(Item, two_way_prop=Item.bought_by))
 
-#     item_db = notion.create_db(parent=root_page, schema=Item)
-#     customer_db = notion.create_db(parent=root_page, schema=Customer)
-#     customer = customer_db.create_page(name='Customer 1')
+    item_db = notion.create_db(parent=root_page, schema=Item)
+    customer_db = notion.create_db(parent=root_page, schema=Customer)
+    customer = customer_db.create_page(name='Customer 1')
 
-#     n_prop_items = MAX_ITEMS_PER_PROPERTY + 5
-#     for i in range(1, n_prop_items + 1):
-#         item_db.create_page(name=f'Item {i}', price=i * 10, bought_by=customer)
+    n_prop_items = MAX_ITEMS_PER_PROPERTY + 5
+    for i in range(1, n_prop_items + 1):
+        item_db.create_page(name=f'Item {i}', price=i * 10, bought_by=customer)
 
-#     customer.reload()  # reload to get the updated relation
-#     assert len(customer.props.purchases) == n_prop_items
+    customer.reload()  # reload to get the updated relation
+    assert len(customer.props.purchases) == n_prop_items  # type: ignore[attr-defined]
 
 
-# @pytest.mark.vcr()
-# def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page: uno.Page):
-#     # According to the Notion API (see below), this test should fail but it doesn't.
-#     # Source: https://developers.notion.com/reference/retrieve-a-page#limits
-#     class Item(uno.Schema, db_title='Item DB for max text items'):
-#         """Database of all items"""
+@pytest.mark.vcr()
+def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page: uno.Page):
+    # According to the Notion API (see below), this test should fail but it doesn't.
+    # Source: https://developers.notion.com/reference/retrieve-a-page#limits
+    class Item(uno.Schema, db_title='Item DB for max text items'):
+        """Database of all items"""
 
-#         name = uno.Property('Name', uno.PropType.Title())
-#         desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.Property('Name', uno.PropType.Title())
+        desc = uno.Property('Description', uno.PropType.Text())
 
-#     notion.create_db(parent=root_page, schema=Item)
+    notion.create_db(parent=root_page, schema=Item)
+    user = notion.search_user('Florian Wilhelm').item()
 
-# generate a text that will have internally more than MAX_ITEMS_PER_PROPERTY RichText parts
-# n_prop_items = 2 * MAX_ITEMS_PER_PROPERTY
-# factor = 100
-# text_parts = []
-# for i in range(1, n_prop_items + 1):
-#     if i % 2 == 1:
-#         text_parts.append(uno.text('A' * factor, bold=True, color=uno.Color.YELLOW))
-#     else:
-#         text_parts.append(uno.text('B' * factor, bold=False, color=uno.Color.RED))
-# text = uno.join(text_parts, delim='')
+    # generate a text that will have internally more than MAX_ITEMS_PER_PROPERTY mentions parts
+    n_mentions = 2 * MAX_ITEMS_PER_PROPERTY
+    text = uno.text('Who is the best programmer? ;-) ')
+    text += uno.join([uno.mention(user) for _ in range(n_mentions)], delim=', ')
 
-# item = Item.create(name=text, desc=text)
-# item.reload()  # reload to get the updated text
+    item = Item.create(name=text, desc=text)
+    item.reload()  # reload to clear cache and retrieve the page again
 
-# assert len(item.props.name) == n_prop_items * factor
-# assert len(item.props.name.obj_ref) == n_prop_items
-# assert len(item.props.desc) == n_prop_items * factor
-# assert len(item.props.desc.obj_ref) == n_prop_items
+    assert len(item.props.name.mentions) == n_mentions
+    assert len(item.props.desc.mentions) == n_mentions
 
 
 @pytest.mark.vcr()
