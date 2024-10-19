@@ -267,22 +267,19 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     readonly = True
 
     @property
-    def value(
-        self,
-    ) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None:
-        # ToDo: Write a unit test for this!
+    def value(self) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None:
         if self.obj_ref.rollup is None:
             return None
 
-        rollup_val = self.obj_ref.rollup.value
-        if isinstance(rollup_val, obj_props.RollupArray):
-            return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_val.array]
-        elif isinstance(rollup_val, obj_props.RollupNumber):
-            return rollup_val.number
-        elif isinstance(rollup_val, obj_props.RollupDate):
-            return rollup_val.date.to_pendulum() if rollup_val.date is not None else None
+        rollup_type = self.obj_ref.rollup
+        if isinstance(rollup_type, obj_props.RollupArray):
+            return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_type.array]
+        elif isinstance(rollup_type, obj_props.RollupNumber):
+            return rollup_type.number
+        elif isinstance(rollup_type, obj_props.RollupDate):
+            return rollup_type.date.to_pendulum() if rollup_type.date is not None else None
         else:
-            msg = f'Unknown rollup value type: {type(rollup_val)}'
+            msg = f'Unknown rollup value type: {type(rollup_type)}'
             raise ValueError(msg)
 
 

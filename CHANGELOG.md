@@ -6,6 +6,8 @@
 - Chg: `SList` is part of the public API now, i.e. is in the `ultimate_notion` namespace.
 - Fix: Added missing `link_to_page` subtype `comment_id`.
 - Chg: Remove `Text` as direct import, use `text` instead.
+- Chg: `.props` namespace of a page now behaves like a mapping, i.e. read-only dictionary.
+- Fix: Added missing `.value` function of several `PropertyValue`s.
 
 ## Version 0.6, 2024-09-28
 
