@@ -142,9 +142,9 @@ class NotionObject(GenericObject):
     defines the general object type, e.g. `page`, `database`, `user`, `block`, ...
     """
 
-    object: str
+    object: str = Field(default=None)  # type: ignore # avoids mypy plugin errors as this is set in __init_subclass__
     """`object` is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ..."""
-    id: UUID | str = Field(union_mode='left_to_right', default=None)
+    id: UUID | str = Field(union_mode='left_to_right', default=None)  # type: ignore
     """`id` is an `UUID` if possible or a string (possibly not unique) depending on the object"""
     request_id: UUID | None = None
     """`request_id` is a UUID that is used to track requests in the Notion API"""
@@ -207,7 +207,7 @@ class TypedObject(GenericObject):
         }
     """
 
-    type: str
+    type: str = Field(default=None)  # type: ignore  # avoids mypy plugin errors as this is set in __init_subclass__
     """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
 

@@ -87,6 +87,7 @@ exclude = [
 ##################
 
 [tool.mypy]
+plugins = ["pydantic.mypy"]
 files = ["src/ultimate_notion", "tests", "examples"]
 disallow_untyped_defs = false
 follow_imports = "normal"

@@ -113,7 +113,7 @@ class GTask(GObject):
     position_: str = Field(alias='position')
     status: Status = Status.NEEDS_ACTION
     links: list[Link] | None = None
-    web_view_link: HttpUrl = Field(alias='webViewLink', default=None)  # ToDo: Remove default None later!
+    web_view_link: HttpUrl = Field(alias='webViewLink')
 
     @property
     def tasklist_id(self) -> str:

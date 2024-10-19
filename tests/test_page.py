@@ -310,8 +310,8 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
     item = Item.create(name=text, desc=text)
     item.reload()  # reload to clear cache and retrieve the page again
 
-    assert len(item.props.name.mentions) == n_mentions
-    assert len(item.props.desc.mentions) == n_mentions
+    assert len(item.props.name.mentions) == n_mentions  # type: ignore[attr-defined]
+    assert len(item.props.desc.mentions) == n_mentions  # type: ignore[attr-defined]
 
 
 @pytest.mark.vcr()

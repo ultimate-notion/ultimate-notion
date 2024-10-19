@@ -25,7 +25,6 @@ from uuid import UUID
 
 import pendulum as pnd
 from pydantic import Field, SerializeAsAny
-from typing_extensions import Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionEntity, NotionObject, TypedObject, extract_id
 from ultimate_notion.obj_api.enums import BGColor, Color
@@ -43,7 +42,7 @@ class SelectOption(GenericObject):
     description: list[RichTextBaseObject] | None = None  # ToDo: Undocumented in the Notion API
 
     @classmethod
-    def build(cls, name, color=Color.DEFAULT) -> Self:
+    def build(cls, name, color=Color.DEFAULT) -> SelectOption:
         """Create a `SelectOption` object from the given name and color."""
         return cls.model_construct(name=name, color=color)
 
@@ -78,7 +77,7 @@ class DateRange(GenericObject, MentionMixin):
     time_zone: str | None = None
 
     @classmethod
-    def build(cls, dt_spec: dt.datetime | dt.date | pnd.Interval) -> Self:
+    def build(cls, dt_spec: dt.datetime | dt.date | pnd.Interval) -> DateRange:
         """Compose a DateRange object from the given properties."""
 
         if isinstance(dt_spec, pnd.Interval):
@@ -146,7 +145,7 @@ class ObjectRef(GenericObject):
     id: UUID
 
     @classmethod
-    def build(cls, ref: ParentRef | GenericObject | UUID | str) -> Self:
+    def build(cls, ref: ParentRef | GenericObject | UUID | str) -> ObjectRef:
         """Compose a reference to an object from the given reference.
 
         `ref` may be a `UUID`, `str`, `ParentRef` or `GenericObject` with an `id`.
@@ -345,7 +344,7 @@ class TextObject(RichTextBaseObject, type='text'):
     text: TypeData = TypeData()
 
     @classmethod
-    def build(cls, text: str, *, href: str | None = None, style: Annotations | None = None) -> Self:
+    def build(cls, text: str, *, href: str | None = None, style: Annotations | None = None) -> TextObject:
         """Compose a TextObject from the given properties.
 
         Args:
@@ -374,7 +373,7 @@ class EquationObject(RichTextBaseObject, type='equation'):
     equation: TypeData
 
     @classmethod
-    def build(cls, expression: str, *, href: str | None = None, style: Annotations | None = None) -> Self:
+    def build(cls, expression: str, *, href: str | None = None, style: Annotations | None = None) -> EquationObject:
         """Compose a TextObject from the given properties.
 
         Args:
@@ -522,9 +521,9 @@ class HostedFile(FileObject, type='file'):
         name: str | None = None,
         caption: list[RichTextBaseObject] | None = None,
         expiry_time: dt.datetime | None = None,
-    ) -> Self:
+    ) -> HostedFile:
         """Create a new `HostedFile` from the given URL."""
-        return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url, expiry_time=expiry_time))
+        return cls.model_construct(name=name, caption=caption, file=cls.TypeData(url=url, expiry_time=expiry_time))
 
 
 class ExternalFile(FileObject, type='external'):
@@ -536,7 +535,9 @@ class ExternalFile(FileObject, type='external'):
     external: TypeData
 
     @classmethod
-    def build(cls, url: str, *, name: str | None = None, caption: list[RichTextBaseObject] | None = None) -> Self:
+    def build(
+        cls, url: str, *, name: str | None = None, caption: list[RichTextBaseObject] | None = None
+    ) -> ExternalFile:
         """Create a new `ExternalFile` from the given URL."""
         return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url))
 
