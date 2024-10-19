@@ -291,6 +291,10 @@ class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedT
 
     readonly = True
 
+    @property
+    def value(self) -> pnd.DateTime:
+        return pnd.instance(self.obj_ref.created_time)
+
 
 class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
     """Created-by property value."""
@@ -308,6 +312,10 @@ class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.La
 
     readonly = True
 
+    @property
+    def value(self) -> pnd.DateTime:
+        return pnd.instance(self.obj_ref.last_edited_time)
+
 
 class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEditedBy):
     """Last-edited-by property value."""
@@ -324,6 +332,10 @@ class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
     """Unique ID property value."""
 
     readonly = True
+
+    @property
+    def value(self) -> str:
+        return f'{self.obj_ref.unique_id.prefix}-{self.obj_ref.unique_id.number}'
 
 
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
