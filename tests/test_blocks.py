@@ -6,13 +6,12 @@ from typing import cast
 import pytest
 
 import ultimate_notion as uno
-from ultimate_notion import Page, Session
 from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.core import InvalidAPIUsageError
 
 
 @pytest.mark.vcr()
-def test_append_blocks(root_page: Page, notion: Session):
+def test_append_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for appending blocks')
     h1 = uno.Heading1('My new page')
     page.append(h1)
@@ -41,7 +40,7 @@ def test_append_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_delete_blocks(root_page: Page, notion: Session):
+def test_delete_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for deleting blocks')
     h = uno.Heading1('My new page')
     p = uno.Paragraph('This is a paragraph')
@@ -61,7 +60,7 @@ def test_delete_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_create_basic_blocks(root_page: Page, notion: Session):
+def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating basic blocks')
     children: list[uno.AnyBlock] = [
         uno.Heading1('My new page'),
@@ -174,7 +173,7 @@ def test_create_basic_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_create_file_blocks(root_page: Page, notion: Session):
+def test_create_file_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating file blocks')
     children: list[uno.AnyBlock] = [
         uno.File('robots.txt', 'https://www.google.de/robots.txt'),
@@ -214,7 +213,7 @@ def test_create_file_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_create_child_blocks(root_page: Page, notion: Session):
+def test_create_child_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating child blocks')
     subpage = notion.create_page(parent=page, title='Subpage')
     subdb = notion.create_db(parent=page)
@@ -234,7 +233,7 @@ def test_create_child_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_create_column_blocks(root_page: Page, notion: Session):
+def test_create_column_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating column blocks')
     cols = uno.Columns(2)
     page.append(cols)
@@ -254,7 +253,7 @@ def test_create_column_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_create_table_blocks(root_page: Page, notion: Session):
+def test_create_table_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating table blocks')
     table = uno.Table(3, 2, header_row=True)
     page.append(table)
@@ -277,7 +276,7 @@ def test_create_table_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_create_link_blocks(root_page: Page, notion: Session):
+def test_create_link_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating link blocks')
     target_page = notion.create_page(parent=root_page, title='Target Page')
     link = uno.LinkToPage(target_page)
@@ -288,7 +287,7 @@ def test_create_link_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_create_sync_blocks(root_page: Page, notion: Session):
+def test_create_sync_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating sync blocks')
     orig_block = uno.SyncedBlock(uno.Paragraph('This is a synced paragraph'))
     with pytest.raises(RuntimeError):
@@ -315,7 +314,7 @@ def test_create_sync_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_nested_blocks(root_page: Page, notion: Session):
+def test_nested_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for creating nested blocks')
     h1 = uno.Heading1('Non-toggleable Heading')
     p1 = uno.Paragraph('This is a paragraph')
@@ -337,7 +336,7 @@ def test_nested_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_has_children(root_page: Page, notion: Session):
+def test_has_children(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for checking children')
     assert not page.has_children
     page.append(uno.Paragraph('This is a paragraph'))
@@ -345,7 +344,7 @@ def test_has_children(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_modify_basic_blocks(root_page: Page, notion: Session):
+def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for modifying basic blocks')
     children: list[uno.AnyBlock] = [
         paragraph := uno.Paragraph('Red paragraph', color=uno.Color.RED),
@@ -418,7 +417,7 @@ def test_modify_basic_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_modify_file_blocks(root_page: Page, notion: Session):
+def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for modifying file blocks')
     children: list[uno.AnyBlock] = [
         file := uno.File('robots.txt', 'https://www.google.de/robots.txt'),
@@ -458,7 +457,7 @@ def test_modify_file_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_modify_column_blocks(root_page: Page, notion: Session):
+def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for modifying column blocks')
     cols = uno.Columns(2)
     page.append(cols)
@@ -492,7 +491,7 @@ def test_modify_column_blocks(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_modify_table(root_page: Page, notion: Session):
+def test_modify_table(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for modifying table blocks')
     table = uno.Table(2, 3, header_row=True)
     table[0, 0] = 'Cell 0, 0'
@@ -529,7 +528,7 @@ def test_modify_table(root_page: Page, notion: Session):
 
 
 @pytest.mark.vcr()
-def test_insert_after_replace_block(root_page: Page, notion: Session):
+def test_insert_after_replace_block(root_page: uno.Page, notion: uno.Session):
     page = notion.create_page(parent=root_page, title='Page for inserting after and replacing blocks')
     orig_target = notion.create_page(parent=root_page, title='Original Target')
     new_target = notion.create_page(parent=root_page, title='New Target')

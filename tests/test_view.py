@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
 
-if TYPE_CHECKING:
-    from ultimate_notion.database import Database
+import ultimate_notion as uno
 
 
 @pytest.mark.vcr()
-def test_select(contacts_db: Database):
+def test_select(contacts_db: uno.Database):
     view = contacts_db.fetch_all()
 
     sub_view = view.select('Name', 'Role')
@@ -25,7 +22,7 @@ def test_select(contacts_db: Database):
 
 
 @pytest.mark.vcr()
-def test_rows(contacts_db: Database):
+def test_rows(contacts_db: uno.Database):
     view = contacts_db.fetch_all()
     rows = view.to_rows()
     assert len(rows) == len(view)
@@ -37,7 +34,7 @@ def test_rows(contacts_db: Database):
 
 
 @pytest.mark.vcr()
-def test_index(contacts_db: Database):
+def test_index(contacts_db: uno.Database):
     view = contacts_db.fetch_all()
     assert not view.has_index
     view = view.with_index('my_index')
@@ -52,7 +49,7 @@ def test_index(contacts_db: Database):
 
 
 @pytest.mark.vcr()
-def test_clone(contacts_db: Database):
+def test_clone(contacts_db: uno.Database):
     view = contacts_db.fetch_all()
     assert len(view) == 10
     short_view = view.limit(3)
@@ -61,7 +58,7 @@ def test_clone(contacts_db: Database):
 
 
 @pytest.mark.vcr()
-def test_reverse(contacts_db: Database):
+def test_reverse(contacts_db: uno.Database):
     short_view = contacts_db.fetch_all().limit(3)
     row_0 = short_view.get_row(0)
     row_2 = short_view.get_row(2)
@@ -71,7 +68,7 @@ def test_reverse(contacts_db: Database):
 
 
 @pytest.mark.vcr()
-def test_to_pandas(task_db: Database):
+def test_to_pandas(task_db: uno.Database):
     view = task_db.fetch_all()
     df = view.to_pandas()
     assert len(view) == len(df)
