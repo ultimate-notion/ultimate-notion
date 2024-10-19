@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from abc import ABC
 from typing import Any, cast
+from uuid import UUID
 
 from pydantic import Field, SerializeAsAny
 
@@ -90,6 +91,8 @@ class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
 
     Calling the block will expose the nested data in the object.
     """
+
+    id: UUID = None  # type: ignore
 
 
 class UnsupportedBlock(Block, type='unsupported'):

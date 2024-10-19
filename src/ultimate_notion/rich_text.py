@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 from collections.abc import Callable, Iterator, Sequence
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TYPE_CHECKING, TypeGuard, TypeVar, cast
 from urllib.parse import urlparse
 
 import mistune
@@ -248,9 +248,13 @@ class Text(str):
         return str(self)
 
     @property
-    def mentions(self) -> tuple[Mention]:
+    def mentions(self) -> tuple[Mention, ...]:
         """Return all mentions in the text."""
-        return tuple(elem for elem in self._rich_texts if elem.is_mention)
+
+        def is_mention(rt: RichTextBase) -> TypeGuard[Mention]:
+            return rt.is_mention
+
+        return tuple(rt for rt in self._rich_texts if is_mention(rt))
 
     def to_html(self) -> str:
         """Return rich text as HTML."""

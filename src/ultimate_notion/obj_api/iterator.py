@@ -30,9 +30,8 @@ def convert_to_notion_obj(data: dict[str, Any]) -> Block | Page | Database | Pro
         msg = 'Unknown object in results'
         raise ValueError(msg)
 
-    model_mapping: dict[str, NotionObject] = {
-        model.model_fields[obj_field].default: model for model in (Block, Page, Database, PropertyItem, User, Comment)
-    }
+    models: tuple[type[NotionObject], ...] = (Block, Page, Database, PropertyItem, User, Comment)
+    model_mapping = {model.model_fields[obj_field].default: model for model in models}
     model_class = model_mapping.get(data[obj_field], GenericObject)
     return model_class.model_validate(data)
 
