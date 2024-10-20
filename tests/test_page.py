@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import time
 from textwrap import dedent
 
 import pytest
@@ -287,6 +288,7 @@ def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page
         item_db.create_page(name=f'Item {i}', price=i * 10, bought_by=customer)
 
     customer.reload()  # reload to get the updated relation
+    time.sleep(3)  # wait for the changes to be applied on the server side
     assert len(customer.props.purchases) == n_prop_items  # type: ignore[attr-defined]
 
 
