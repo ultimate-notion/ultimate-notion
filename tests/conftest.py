@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import logging
 import os
 import shutil
 import tempfile
@@ -31,6 +32,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
+import pydantic
 import pytest
 from _pytest.fixtures import SubRequest
 from google.auth.exceptions import RefreshError
@@ -62,6 +64,8 @@ COMMENT_PAGE = 'Comments'
 # Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
 TEST_CFG_FILE = get_cfg_file()
 
+logging.basicConfig(level=logging.WARNING)
+
 
 def pytest_addoption(parser: Parser):
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
@@ -72,6 +76,16 @@ def pytest_addoption(parser: Parser):
         default=False,
         help='Run tests that check the latest release on PyPI.',
     )
+
+
+def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: pytest.TestReport) -> None:
+    """Handle exceptions raised in the tests and provide a bit more output for some exceptions."""
+    exc_value = call.excinfo.value
+
+    if isinstance(exc_value, pydantic.ValidationError):
+        input_errors = '\n'.join(str(e['input']) for e in exc_value.errors())
+        msg = f'Following erroneous inputs to the pydantic model {exc_value.title}:\n{input_errors}'
+        logging.error(msg)
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
