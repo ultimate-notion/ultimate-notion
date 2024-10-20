@@ -46,7 +46,7 @@ class PageProperty:
         obj[self._prop_name] = value
 
 
-class PagePropertiesNS(Mapping[str, PropertyValue]):
+class PagePropertiesNS(Mapping[str, Any]):
     """Namespace of the properties of a page as defined in the schema of the database.
 
     This defines the `.props` namespace of a page `page` and updates the content
@@ -59,12 +59,12 @@ class PagePropertiesNS(Mapping[str, PropertyValue]):
         self._page = page
 
     @property
-    def _properties(self) -> dict[str, obj_props.PropertyValue]:
+    def _prop_vals(self) -> dict[str, obj_props.PropertyValue]:
         """Return the low-level page properties"""
         return self._page.obj_ref.properties
 
     def __getitem__(self, prop_name: str) -> Any:
-        prop = self._properties.get(prop_name)
+        prop = self._prop_vals.get(prop_name)
 
         if prop is None:
             msg = f'No such property: {prop_name}'
@@ -97,10 +97,11 @@ class PagePropertiesNS(Mapping[str, PropertyValue]):
 
     def __iter__(self) -> Iterator[str]:
         """Iterator of property names."""
-        yield from self._properties.keys()
+        yield from self._prop_vals.keys()
 
     def __len__(self) -> int:
-        return len(self._properties)
+        """Return the number of properties."""
+        return len(self._prop_vals)
 
     def __repr__(self) -> str:
         return repr(dict(self))
