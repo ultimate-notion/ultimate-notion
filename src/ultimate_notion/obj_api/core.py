@@ -212,8 +212,8 @@ class TypedObject(GenericObject):
     _polymorphic_base: ClassVar[bool] = False
 
     def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs):  # noqa: A002
-        cls._polymorphic_base = polymorphic_base
         super().__init_subclass__(**kwargs)
+        cls._polymorphic_base = polymorphic_base
 
     @classmethod
     def __pydantic_init_subclass__(cls, *, type: str | None = None, **kwargs):  # noqa: A002, PLW3201
@@ -222,9 +222,9 @@ class TypedObject(GenericObject):
         This is needed since `model_fields` is not available during __init_subclass__.
         See: https://github.com/pydantic/pydantic/issues/5369
         """
+        super().__pydantic_init_subclass__(type=type, **kwargs)
         type_name = cls.__name__ if type is None else type
         cls._register_type(type_name)
-        super().__pydantic_init_subclass__(**kwargs)
 
     @classmethod
     def _register_type(cls, name):
@@ -246,7 +246,6 @@ class TypedObject(GenericObject):
             raise ValueError(msg)
 
         logger.debug('registered new subtype: %s => %s', name, cls)
-
         cls._typemap[name] = cls
 
     @model_validator(mode='wrap')
