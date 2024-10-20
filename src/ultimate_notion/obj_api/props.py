@@ -21,11 +21,21 @@ from ultimate_notion.obj_api.objects import (
 )
 from ultimate_notion.obj_api.schema import AggFunc, SelectOption
 
+MAX_ITEMS_PER_PROPERTY = 25
+"""Maximum number of items rertrieved per property.
+
+Only a certain number of items for each property are retrieved by default.
+The high-level API will retrieve the rest on demand automatically.
+
+Source: https://developers.notion.com/reference/retrieve-a-page
+"""
+
 
 class PropertyValue(TypedObject, polymorphic_base=True):
     """Base class for Notion property values."""
 
     id: str = None  # type: ignore
+    _is_fetched: bool = False  # fetched separately as property item from the server
 
     @classmethod
     def build(cls, value):
@@ -371,3 +381,11 @@ class UniqueIDPropertyItem(PropertyItem, UniqueID, type='unique_id'):
 
 class VerificationPropertyItem(PropertyItem, Verification, type='verification'):
     """A `PropertyItem` returned by the Notion API containing the `Verification` property."""
+
+
+PAGINATED_PROP_VALS = (RichText, Title, People, Relation, Rollup)
+f"""Property values that are potentially paginated when exceeding {MAX_ITEMS_PER_PROPERTY} of
+inline page/person mentions or items and need to be fetched seperately from the server.
+
+Source: https://developers.notion.com/reference/retrieve-a-page#limits
+"""
