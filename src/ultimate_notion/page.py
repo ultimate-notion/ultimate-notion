@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any, TypeGuard, cast
+from typing import TYPE_CHECKING, Any, TypeGuard
 
 from emoji import is_emoji
 from typing_extensions import Self
@@ -15,6 +15,7 @@ from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
+from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text, render_md
 from ultimate_notion.templates import page_html
@@ -22,15 +23,6 @@ from ultimate_notion.utils import SList, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-
-MAX_ITEMS_PER_PROPERTY = 25
-"""Maximum number of items rertrieved per property.
-
-Only a certain number of items for each property are retrieved by default.
-The high-level API will retrieve the rest on demand automatically.
-
-Source: https://developers.notion.com/reference/retrieve-a-page
-"""
 
 
 class PageProperty:
@@ -71,12 +63,21 @@ class PagePropertiesNS(Mapping[str, Any]):
             raise AttributeError(msg)
 
         if isinstance(prop, obj_props.Relation) and prop.has_more:  # retrieve the full list of items
-            session = get_active_session()
-            prop_items = session.api.pages.properties.retrieve(self._page.obj_ref, prop)
-            prop.relation = [cast(obj_props.RelationPropertyItem, item).relation for item in prop_items]
             prop.has_more = False
-
-        return PropertyValue.wrap_obj_ref(prop).value
+            return self._page.fetch_property(prop_name)
+            # session = get_active_session()
+            # prop_items = session.api.pages.properties.retrieve(self._page.obj_ref, prop)
+            # prop.relation = [cast(obj_props.RelationPropertyItem, item).relation for item in prop_items]
+        elif isinstance(prop, obj_props.People) and len(prop.people) == MAX_ITEMS_PER_PROPERTY and not prop._is_fetched:
+            return self._page.fetch_property(prop_name)
+        elif (
+            isinstance(prop, obj_props.RichText | obj_props.Title)
+            and len(Text.wrap_obj_ref(prop.value).mentions) == MAX_ITEMS_PER_PROPERTY
+            and not prop._is_fetched
+        ):
+            return self._page.fetch_property(prop_name)
+        else:
+            return PropertyValue.wrap_obj_ref(prop).value
 
     def __setitem__(self, prop_name: str, value: Any):
         # Todo: use the schema of the database to see which properties are writeable at all.
@@ -253,6 +254,26 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         if not self._discussions:  # create an empty discussion thread
             self._comments = [Discussion([], parent=self)]
         return SList(self._discussions).item()
+
+    def fetch_property(self, prop_name: str) -> PropertyValue:
+        """Fetch the property value from the API.
+
+        Use this method only if you want to retrieve a specific property value that
+        might have been updated on the server side without reloading the whole page.
+        In all other cases, use the `props` namespace of the page.
+        """
+        session = get_active_session()
+        prop_obj = self.props._prop_vals[prop_name]
+        prop_items = session.api.pages.properties.retrieve(self.obj_ref, prop_obj)
+        prop_values = (item.value for item in prop_items)
+
+        if isinstance(prop_obj, obj_props.PAGINATED_PROP_VALS):
+            prop_obj.value = list(prop_values)
+        else:  # we should have only one property-item in the iterator
+            prop_obj.value = SList(prop_values).item()  # guaranteed to have only one item
+
+        prop_obj._is_fetched = True
+        return PropertyValue.wrap_obj_ref(prop_obj).value
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown.

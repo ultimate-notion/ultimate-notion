@@ -8,6 +8,9 @@
 - Chg: Remove `Text` as direct import, use `text` instead.
 - Chg: `.props` namespace of a page now behaves like a mapping, i.e. read-only dictionary.
 - Fix: Added missing `.value` function of several `PropertyValue`s.
+- Add: Page method `fetch_property` to allow fetching a single property without reloading the whole page.
+- Fix: Resolving page properties correctly if they contain more than 25 references.
+- Fix: `PropertiesEndpoint.retrieve` now actually works and either returns a single property item or a list.
 
 ## Version 0.6, 2024-09-28
 

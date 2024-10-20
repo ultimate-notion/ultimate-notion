@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion.blocks import Block
-from ultimate_notion.page import MAX_ITEMS_PER_PROPERTY
+from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 
 
 @pytest.mark.vcr()
