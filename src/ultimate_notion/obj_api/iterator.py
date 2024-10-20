@@ -96,16 +96,26 @@ class PropertyItemList(ObjectList, type='property_item'):
 
 
 class EndpointIterator:
-    """Functor to iterate over results from a paginated API response."""
+    """Functor to iterate over results from a potentially paginated API response.
+
+    In most cases `notion_obj` should be `ObjectList`. For some endpoints, like `PropertiesEndpoint`, and
+    endpoint returns a list of property items or s single property item. In this case, `model_validate` should be
+    `TypeAdapter(PropertyItemList | PropertyItem).validate_python` or whatever you expect to be returned.
+    """
 
     has_more: bool | None = None
     page_num: int = -1
     total_items: int = -1
     next_cursor: str | None = None
 
-    def __init__(self, endpoint: Callable[..., Any | Awaitable[Any]]):
+    def __init__(
+        self,
+        endpoint: Callable[..., Any | Awaitable[Any]],
+        model_validate: Callable[[Any], NotionObject] = ObjectList.model_validate,
+    ):
         """Initialize an object list iterator for the specified endpoint."""
         self._endpoint = endpoint
+        self._model_validate = model_validate
 
     def __call__(self, **kwargs: Any) -> Iterator[NotionObject]:
         """Return a generator for this endpoint using the given parameters."""
@@ -124,11 +134,15 @@ class EndpointIterator:
 
             result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
 
-            obj_list = ObjectList.model_validate(result_page)
+            obj_or_list = self._model_validate(result_page)
 
-            for obj in obj_list.results:
-                self.total_items += 1
-                yield obj
+            if isinstance(obj_or_list, ObjectList):
+                for obj in obj_or_list.results:
+                    self.total_items += 1
+                    yield obj
 
-            self.next_cursor = obj_list.next_cursor
-            self.has_more = obj_list.has_more and self.next_cursor is not None
+                self.next_cursor = obj_or_list.next_cursor
+                self.has_more = obj_or_list.has_more and self.next_cursor is not None
+            else:
+                yield obj_or_list
+                self.has_more = False
