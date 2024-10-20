@@ -277,10 +277,97 @@ class PropertyItem(NotionObject, TypedObject, polymorphic_base=True, object='pro
     id: str
 
 
-class RelationPropertyItem(PropertyItem, type='relation'):
-    """A `RelationPropertyItem` returned by the Notion API.
+class TitlePropertyItem(PropertyItem, type='title'):
+    """A `PropertyItem` returned by the Notion API containing the `Title` property."""
 
-    Relation property items contain a list of references to other objects in the database.
-    """
+    title: SerializeAsAny[RichTextBaseObject]
+
+
+class RichTextPropertyItem(PropertyItem, type='rich_text'):
+    """A `PropertyItem` returned by the Notion API containing the `RichText` property."""
+
+    rich_text: SerializeAsAny[RichTextBaseObject]
+
+
+class NumberPropertyItem(PropertyItem, Number, type='number'):
+    """A `PropertyItem` returned by the Notion API containing the `Number` property."""
+
+
+class CheckboxPropertyItem(PropertyItem, Checkbox, type='checkbox'):
+    """A `PropertyItem` returned by the Notion API containing the `Checkbox` property."""
+
+
+class DatePropertyItem(PropertyItem, Date, type='date'):
+    """A `PropertyItem` returned by the Notion API containing the `Date` property."""
+
+
+class StatusPropertyItem(PropertyItem, Status, type='status'):
+    """A `PropertyItem` returned by the Notion API containing the `Status` property."""
+
+
+class SelectPropertyItem(PropertyItem, Select, type='select'):
+    """A `PropertyItem` returned by the Notion API containing the `Select` property."""
+
+
+class MultiSelectPropertyItem(PropertyItem, MultiSelect, type='multi_select'):
+    """A `PropertyItem` returned by the Notion API containing the `MultiSelect` property."""
+
+
+class PeoplePropertyItem(PropertyItem, type='people'):
+    """A `PropertyItem` returned by the Notion API containing the `People` property."""
+
+    people: User
+
+
+class URLPropertyItem(PropertyItem, URL, type='url'):
+    """A `PropertyItem` returned by the Notion API containing the `URL` property."""
+
+
+class EmailPropertyItem(PropertyItem, Email, type='email'):
+    """A `PropertyItem` returned by the Notion API containing the `Email` property."""
+
+
+class PhoneNumberPropertyItem(PropertyItem, PhoneNumber, type='phone_number'):
+    """A `PropertyItem` returned by the Notion API containing the `PhoneNumber` property."""
+
+
+class FilesPropertyItem(PropertyItem, Files, type='files'):
+    """A `FilesPropertyItem` returned by the Notion API containing the `Files` property."""
+
+
+class FormulaPropertyItem(PropertyItem, Formula, type='formula'):
+    """A `PropertyItem` returned by the Notion API containing the `Formula` property."""
+
+
+class RelationPropertyItem(PropertyItem, type='relation'):
+    """A `PropertyItem` returned by the Notion API containing many `Relation` properties."""
 
     relation: ObjectRef
+
+
+class RollupPropertyItem(PropertyItem, Rollup, type='rollup'):
+    """A `PropertyItem` returned by the Notion API containing the `Rollup` property."""
+
+
+class CreatedTimePropertyItem(PropertyItem, CreatedTime, type='created_time'):
+    """A `PropertyItem` returned by the Notion API containing the `CreatedTime` property."""
+
+
+class CreatedByPropertyItem(PropertyItem, CreatedBy, type='created_by'):
+    """A `PropertyItem` returned by the Notion API containing the `CreatedBy` property."""
+
+
+class LastEditedTimePropertyItem(PropertyItem, LastEditedTime, type='last_edited_time'):
+    """A `PropertyItem` returned by the Notion API containing the `LastEditedTime` property."""
+
+
+class LastEditedByPropertyItem(PropertyItem, LastEditedBy, type='last_edited_by'):
+    """A `PropertyItem` returned by the Notion API containing the `LastEditedBy` property."""
+
+
+class UniqueIDPropertyItem(PropertyItem, UniqueID, type='unique_id'):
+    """A `PropertyItem` returned by the Notion API containing the `UniqueID` property."""
+
+
+class VerificationPropertyItem(PropertyItem, Verification, type='verification'):
+    """A `PropertyItem` returned by the Notion API containing the `Verification` property."""

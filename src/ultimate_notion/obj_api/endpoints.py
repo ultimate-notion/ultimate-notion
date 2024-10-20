@@ -12,10 +12,10 @@ from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias, cast
 from uuid import UUID
 
-from pydantic import SerializeAsAny
+from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
-from ultimate_notion.obj_api.iterator import EndpointIterator
+from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
     Comment,
     DatabaseRef,
@@ -295,7 +295,10 @@ class PagesEndpoint(Endpoint):
             page_id = str(PageRef.build(page).page_id)
             property_id = property.id if isinstance(property, PropertyValue) else property
             logger.info('Retrieving property :: %s [%s]', property_id, page_id)
-            prop_iter = EndpointIterator(endpoint=self.raw_api.retrieve)
+            prop_iter = EndpointIterator(
+                endpoint=self.raw_api.retrieve,
+                model_validate=TypeAdapter(PropertyItemList | PropertyItem).validate_python,
+            )
             return cast(Iterator[PropertyItem], prop_iter(page_id=page_id, property_id=property_id))
 
     def __init__(self, *args, **kwargs):
