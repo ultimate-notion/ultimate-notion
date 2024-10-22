@@ -64,18 +64,17 @@ class PagePropertiesNS(Mapping[str, Any]):
 
         if isinstance(prop, obj_props.Relation) and prop.has_more:  # retrieve the full list of items
             prop.has_more = False
-            return self._page.fetch_property(prop_name)
-            # session = get_active_session()
-            # prop_items = session.api.pages.properties.retrieve(self._page.obj_ref, prop)
-            # prop.relation = [cast(obj_props.RelationPropertyItem, item).relation for item in prop_items]
-        elif isinstance(prop, obj_props.People) and len(prop.people) == MAX_ITEMS_PER_PROPERTY and not prop._is_fetched:
-            return self._page.fetch_property(prop_name)
+            return self._page.get_property(prop_name)
+        elif (
+            isinstance(prop, obj_props.People) and len(prop.people) == MAX_ITEMS_PER_PROPERTY and not prop._is_retrieved
+        ):
+            return self._page.get_property(prop_name)
         elif (
             isinstance(prop, obj_props.RichText | obj_props.Title)
             and len(Text.wrap_obj_ref(prop.value).mentions) == MAX_ITEMS_PER_PROPERTY
-            and not prop._is_fetched
+            and not prop._is_retrieved
         ):
-            return self._page.fetch_property(prop_name)
+            return self._page.get_property(prop_name)
         else:
             return PropertyValue.wrap_obj_ref(prop).value
 
@@ -255,12 +254,12 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             self._comments = [Discussion([], parent=self)]
         return SList(self._discussions).item()
 
-    def fetch_property(self, prop_name: str) -> PropertyValue:
-        """Fetch the property value from the API.
+    def get_property(self, prop_name: str) -> Any:
+        """Directly retrieve the property value from the API.
 
         Use this method only if you want to retrieve a specific property value that
         might have been updated on the server side without reloading the whole page.
-        In all other cases, use the `props` namespace of the page.
+        In all other cases, use the `props` namespace of the page to avoid unnecessary API calls.
         """
         session = get_active_session()
         prop_obj = self.props._prop_vals[prop_name]
@@ -272,7 +271,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         else:  # we should have only one property-item in the iterator
             prop_obj.value = SList(prop_values).item()  # guaranteed to have only one item
 
-        prop_obj._is_fetched = True
+        prop_obj._is_retrieved = True
         return PropertyValue.wrap_obj_ref(prop_obj).value
 
     def to_markdown(self) -> str:
