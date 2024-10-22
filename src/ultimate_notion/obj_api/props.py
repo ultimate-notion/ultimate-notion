@@ -35,7 +35,7 @@ class PropertyValue(TypedObject, polymorphic_base=True):
     """Base class for Notion property values."""
 
     id: str = None  # type: ignore
-    _is_fetched: bool = False  # fetched separately as property item from the server
+    _is_retrieved: bool = False  # fetched separately as property item from the server
 
     @classmethod
     def build(cls, value):
