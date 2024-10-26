@@ -13,8 +13,8 @@ from ultimate_notion.core import get_active_session, get_repr
 from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.page import Page
+from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case, snake_case
 from ultimate_notion.schema import Property, PropertyType, PropertyValue, ReadOnlyPropertyError, Schema, SchemaError
 from ultimate_notion.utils import dict_diff_str
@@ -172,25 +172,14 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         self.schema._set_obj_refs()
         return self
 
-    @staticmethod
-    def _pages_from_query(query: DBQueryBuilder) -> list[Page]:
-        # ToDo: Remove when self.query is implemented!
-        cache = get_active_session().cache
-        pages = []
-        for page_obj in query.execute():
-            if page_obj.id in cache:
-                page = cast(Page, cache[page_obj.id])
-                page.obj_ref = page_obj  # updates the page content
-            else:
-                page = Page.wrap_obj_ref(page_obj)
-            pages.append(page)
-        return pages
+    @property
+    def query(self) -> Query:
+        """Return a Query object to build and execute a database query."""
+        return Query(database=self)
 
     def fetch_all(self) -> View:
         """Fetch all pages and return a view."""
-        session = get_active_session()
-        query = session.api.databases.query(self.obj_ref)  # ToDo: use self.query when implemented
-        return View(database=self, pages=self._pages_from_query(query), query=query)
+        return self.query.execute()
 
     def __len__(self) -> int:
         """Return the number of pages in this database."""
@@ -239,10 +228,6 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         page_obj = session.api.pages.create(parent=self.obj_ref, properties=schema_dct)
         page = Page.wrap_obj_ref(page_obj)
         return page
-
-    def query(self):
-        """Query a (large) database for pages in a more specific way."""
-        raise NotImplementedError
 
     def to_markdown(self) -> str:
         """Return the content of this database as Markdown."""

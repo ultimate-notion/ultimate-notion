@@ -187,8 +187,6 @@ class LastEditedTimeFilter(TimestampFilter):
 class CompoundFilter(QueryFilter):
     """Represents a compound filter in Notion."""
 
-    # ToDo: Split this up in a And and Or Filter
-
     model_config = ConfigDict(populate_by_name=True)
 
     and_: list[QueryFilter] | None = Field(None, alias='and')
@@ -277,14 +275,6 @@ class QueryBuilder(ABC):
             query.update(self.params)
 
         return EndpointIterator(self.endpoint)(**query)
-
-    def first(self):
-        """Execute the current query and return the first result only."""
-
-        try:
-            return next(self.execute())
-        except StopIteration:
-            logger.debug('iterator returned empty result set')
 
 
 class SearchQueryBuilder(QueryBuilder):

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import numpy as np
 import pandas as pd
@@ -12,26 +12,19 @@ from tabulate import tabulate
 
 from ultimate_notion.core import get_repr
 from ultimate_notion.file import FileInfo
-from ultimate_notion.obj_api.query import DBQueryBuilder
 from ultimate_notion.page import Page
 from ultimate_notion.rich_text import html_img
 from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
+    from ultimate_notion.query import Query
 
-ColType: TypeAlias = str | list[str]
 T = TypeVar('T')
 
 
-class Col(str):
-    """Column in a view, behaving like a string with some special attributes."""
-
-    # ToDo: Implement me, in order to allow Spark-like sorting/filtering, e.g. `Col(Name) == "Florian"` in View
-
-
 class View(Sequence[Page]):
-    def __init__(self, database: Database, pages: list[Page], query: DBQueryBuilder):
+    def __init__(self, database: Database, pages: list[Page], query: Query):
         self.database = database
         self._query = query
         self._title_col = database.schema.get_title_prop().name
@@ -335,5 +328,5 @@ class View(Sequence[Page]):
     def reload(self) -> View:
         """Reload all pages by re-executing the query that generated the view."""
         view = self.clone()
-        view._pages = np.array(self.database._pages_from_query(query=self._query))
+        view._pages = np.array(self._query.execute().to_pages())
         return view

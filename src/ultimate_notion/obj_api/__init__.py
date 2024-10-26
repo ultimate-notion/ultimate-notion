@@ -17,10 +17,6 @@ from ultimate_notion.obj_api.endpoints import NotionAPI
 
 __all__ = ['NotionAPI']
 
-# ToDo: add here everything needed also obj_names for concistency. And make sure we only important from here t
-# o establish an API.
-
-
 # ToDo: Recheck every model if `= None` really is needed. Maybe come up with an even smarter way
 #       to differentiate between a model for sending and receiving data.
 #       Idea: Use a sentinel value, e.g. API_RESPONSE = object() as default value for fields that are only given
