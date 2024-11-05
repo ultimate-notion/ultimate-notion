@@ -399,7 +399,7 @@ def static_dbs(all_props_db: Database, wiki_db: Database, contacts_db: Database,
 def new_task_db(notion: Session, root_page: Page) -> Iterator[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
-        Option('In Progres', color=uno.Color.BLUE),
+        Option('In Progress', color=uno.Color.BLUE),
         Option('Blocked', color=uno.Color.RED),
         Option('Done', color=uno.Color.GREEN),
         Option('Rejected', color=uno.Color.BROWN),

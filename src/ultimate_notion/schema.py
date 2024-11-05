@@ -20,6 +20,8 @@ the method `_remap_obj_refs` rewires this when a schema is used to create a data
 
 from __future__ import annotations
 
+from abc import ABCMeta
+from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from tabulate import tabulate
@@ -63,7 +65,128 @@ class ReadOnlyPropertyError(SchemaError):
         super().__init__(msg)
 
 
-class Schema:
+T = TypeVar('T', bound=obj_schema.PropertyType)
+
+
+class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
+    """Base class for Notion property objects.
+
+    Property types define the value types of properties in a database, e.g. number, date, text, etc.
+    """
+
+    obj_ref: T
+    """Reference to the low-level object representation of this property type"""
+    allowed_at_creation = True
+    """If the Notion API allows to create a new database with a property of this type"""
+    prop_ref: Property | None = None
+    """Back reference to the property having this type"""
+
+    @property
+    def id(self) -> str | None:
+        """Return identifier of this property type."""
+        return self.obj_ref.id
+
+    @property
+    def name(self) -> str | None:
+        """Return name of this property type."""
+        return self.obj_ref.name
+
+    @property
+    def prop_value(self) -> type[PropertyValue]:
+        """Return the corresponding property value of this property type."""
+        return PropertyValue._type_value_map[self.obj_ref.type]
+
+    @property
+    def readonly(self) -> bool:
+        """Return if this property type is read-only."""
+        return self.prop_value.readonly
+
+    def __init__(self, *args, **kwargs):
+        obj_api_type = self._obj_api_map_inv[self.__class__]
+        self.obj_ref = obj_api_type.build(*args, **kwargs)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, PropertyType):
+            return NotImplemented
+        return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
+
+    def __hash__(self) -> int:
+        return hash(self.obj_ref.type) + hash(self.obj_ref.value)
+
+    def __repr__(self) -> str:
+        return get_repr(self, name='PropertyType', desc=self.__class__.__name__)
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
+
+
+class Property:
+    """Database property/column with a name and a certain property type for defining a Notion database schema.
+
+    This is implemented as a descriptor.
+    """
+
+    _name: str
+    _type: PropertyType
+    # properties below are set by __set_name__
+    _schema: type[Schema]
+    _attr_name: str  # Python attribute name of the property in the schema
+
+    def __init__(self, name: str, type: PropertyType) -> None:  # noqa: A002
+        self._name = name
+        self._type = type
+
+    def __set_name__(self, owner: type[Schema], name: str):
+        self._schema = owner
+        self._attr_name = name
+        self._type.prop_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
+
+    def __repr__(self) -> str:
+        return get_repr(self, name='Property', desc=self.type)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, new_name: str):
+        raise NotImplementedError
+
+    @property
+    def type(self) -> PropertyType:
+        return self._type
+
+    @type.setter
+    def type(self, new_type: PropertyType):
+        raise NotImplementedError
+
+    @property
+    def attr_name(self) -> str:
+        return self._attr_name
+
+
+class SchemaRepr(ABCMeta):
+    """Metaclass for the schema of a database.
+
+    This makes the schema class itself more user-friendly by providing a custom `__repr__` method
+    and letting it behave like a dictionary for the properties athough it is a class, not an instance.
+    """
+
+    def __repr__(cls: Schema) -> str:
+        # We can only overwrite __repr__ for a class in a metaclass
+        return cls.as_table(tablefmt='simple')
+
+    def __getitem__(cls: Schema, prop_name: str) -> PropertyType:
+        return cls.get_prop(prop_name).type
+
+    def __len__(cls: Schema) -> int:
+        return len(cls.get_props())
+
+    def __iter__(cls: Schema) -> Iterator[PropertyType]:
+        return (prop.type for prop in cls.get_props())
+
+
+class Schema(metaclass=SchemaRepr):
     """Base class for the schema of a database."""
 
     db_title: rich_text.Text | None
@@ -114,7 +237,7 @@ class Schema:
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
-        """Convert this schema to a dictionary."""
+        """Convert this schema to a dictionary of property names and corresponding types."""
         return {prop.name: prop.type for prop in cls.get_props()}
 
     @classmethod
@@ -272,106 +395,6 @@ class Schema:
             obj_ref = db_props_dct.get(prop_name)
             if obj_ref:
                 prop_type.obj_ref = obj_ref
-
-
-T = TypeVar('T', bound=obj_schema.PropertyType)
-
-
-class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
-    """Base class for Notion property objects.
-
-    Property types define the value types of properties in a database, e.g. number, date, text, etc.
-    """
-
-    obj_ref: T
-    """Reference to the low-level object representation of this property type"""
-    allowed_at_creation = True
-    """If the Notion API allows to create a new database with a property of this type"""
-    prop_ref: Property | None = None
-    """Back reference to the property having this type"""
-
-    @property
-    def id(self) -> str | None:
-        """Return identifier of this property type."""
-        return self.obj_ref.id
-
-    @property
-    def name(self) -> str | None:
-        """Return name of this property type."""
-        return self.obj_ref.name
-
-    @property
-    def prop_value(self) -> type[PropertyValue]:
-        """Return the corresponding property value of this property type."""
-        return PropertyValue._type_value_map[self.obj_ref.type]
-
-    @property
-    def readonly(self) -> bool:
-        """Return if this property type is read-only."""
-        return self.prop_value.readonly
-
-    def __init__(self, *args, **kwargs):
-        obj_api_type = self._obj_api_map_inv[self.__class__]
-        self.obj_ref = obj_api_type.build(*args, **kwargs)
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, PropertyType):
-            return NotImplemented
-        return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
-
-    def __hash__(self) -> int:
-        return hash(self.obj_ref.type) + hash(self.obj_ref.value)
-
-    def __repr__(self) -> str:
-        return get_repr(self, name='PropertyType', desc=self.__class__.__name__)
-
-    def __str__(self) -> str:
-        return self.__class__.__name__
-
-
-class Property:
-    """Database property/column with a name and a certain property type for defining a Notion database schema.
-
-    This is implemented as a descriptor.
-    """
-
-    _name: str
-    _type: PropertyType
-    # properties below are set by __set_name__
-    _schema: type[Schema]
-    _attr_name: str  # Python attribute name of the property in the schema
-
-    def __init__(self, name: str, type: PropertyType) -> None:  # noqa: A002
-        self._name = name
-        self._type = type
-
-    def __set_name__(self, owner: type[Schema], name: str):
-        self._schema = owner
-        self._attr_name = name
-        self._type.prop_ref = self  # link back to allow access to _schema, _py_name e.g. for relations
-
-    def __repr__(self) -> str:
-        return get_repr(self, name='Property', desc=self.type)
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @name.setter
-    def name(self, new_name: str):
-        raise NotImplementedError
-
-    @property
-    def type(self) -> PropertyType:
-        return self._type
-
-    @type.setter
-    def type(self, new_type: PropertyType):
-        raise NotImplementedError
-
-    @property
-    def attr_name(self) -> str:
-        return self._attr_name
 
 
 class Title(PropertyType[obj_schema.Title], wraps=obj_schema.Title):

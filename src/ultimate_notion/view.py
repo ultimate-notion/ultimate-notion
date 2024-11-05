@@ -85,6 +85,7 @@ class View(Sequence[Page]):
 
     def get_row(self, idx: int, /) -> tuple[Any, ...]:
         """Retrieve a row i.e. all properties of a page by index of the view."""
+        # ToDo: Return pydantic models instead of tuples.
         page = self.get_page(idx)
         row: list[Any] = []
         for col in self.columns:

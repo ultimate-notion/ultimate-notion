@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from abc import ABC
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
 from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
@@ -83,12 +83,14 @@ class DateCondition(GenericObject):
     is_empty: bool | None = None
     is_not_empty: bool | None = None
 
-    past_week: Any | None = None
-    past_month: Any | None = None
-    past_year: Any | None = None
-    next_week: Any | None = None
-    next_month: Any | None = None
-    next_year: Any | None = None
+    class EmptyObject(GenericObject): ...
+
+    past_week: EmptyObject | None = None
+    past_month: EmptyObject | None = None
+    past_year: EmptyObject | None = None
+    next_week: EmptyObject | None = None
+    next_month: EmptyObject | None = None
+    next_year: EmptyObject | None = None
 
 
 class PeopleCondition(GenericObject):
@@ -251,18 +253,6 @@ class QueryBuilder(ABC):
     def __init__(self, endpoint: NCEndpoint, **params: str | None):
         self.endpoint = endpoint
         self.params = {param: value for param, value in params.items() if value is not None}
-
-    def start_at(self, cursor_id: UUID):
-        """Set the start cursor to a specific page ID."""
-
-        self.query.start_cursor = cursor_id
-        return self
-
-    def limit(self, count: int):
-        """Limit the number of results to the given count."""
-
-        self.query.page_size = count
-        return self
 
     def execute(self):
         """Execute the current query and return an iterator for the results."""
