@@ -49,6 +49,7 @@ from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
 from ultimate_notion.option import Option, OptionNS
 from ultimate_notion.page import Page
+from ultimate_notion.query import prop
 from ultimate_notion.rich_text import join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SchemaError, SelfRef
 from ultimate_notion.session import Session
@@ -67,7 +68,7 @@ __all__ = [
     'Code',
     'CodeLang',
     'Color',
-    'Column',  # for type hinting
+    'Column',
     'Columns',
     'Database',
     'Divider',
@@ -111,5 +112,6 @@ __all__ = [
     'join',
     'math',
     'mention',
+    'prop',
     'text',
 ]
