@@ -322,6 +322,15 @@ def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
         raise TypeError(msg)
 
 
+def is_dt_str(dt_str: str) -> bool:
+    """Check if the given string is a valid datetime string."""
+    try:
+        parse_dt_str(dt_str)
+        return True
+    except (ValueError, TypeError):
+        return False
+
+
 def to_pendulum(dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> pnd.DateTime | pnd.Date | pnd.Interval:
     """Convert a datetime or date object to a pendulum object."""
     if isinstance(dt_spec, pnd.DateTime | pnd.Date | pnd.Interval):

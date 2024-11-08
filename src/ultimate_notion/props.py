@@ -16,7 +16,7 @@ import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.file import FileInfo
-from ultimate_notion.obj_api.enums import VState
+from ultimate_notion.obj_api.enums import FormulaType, VState
 from ultimate_notion.option import Option
 from ultimate_notion.user import User
 
@@ -245,6 +245,10 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     def value(self) -> str | float | int | pnd.DateTime | pnd.Date | pnd.Interval | None:
         # returns all values of subclasses of `FormulaResult`
         return self.obj_ref.formula.value if self.obj_ref.formula else None
+
+    @property
+    def value_type(self) -> FormulaType | None:
+        return FormulaType(self.obj_ref.formula.type) if self.obj_ref.formula else None
 
 
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
