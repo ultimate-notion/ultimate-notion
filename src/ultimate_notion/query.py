@@ -12,8 +12,10 @@ from typing_extensions import Self
 from ultimate_notion import schema
 from ultimate_notion.core import get_active_session
 from ultimate_notion.obj_api import query as obj_query
-from ultimate_notion.obj_api.enums import SortDirection
+from ultimate_notion.obj_api.enums import FormulaType, SortDirection
 from ultimate_notion.page import Page
+from ultimate_notion.user import User
+from ultimate_notion.utils import is_dt_str
 from ultimate_notion.view import View
 
 if TYPE_CHECKING:
@@ -21,18 +23,26 @@ if TYPE_CHECKING:
 
 
 class Property(BaseModel):
-    """Represents a property of a page."""
+    """Represents a property of a page.
 
-    prop_name: str
-    sort_direction: SortDirection = Field(default=SortDirection.ASCENDING)
+    !!! note
+
+        We override some magic methods to allow for more natural query building in an unorthodox way.
+        This is done to avoid the need for a custom query builder class and to keep the API simple.
+        Be aware that for instance the comparison operator == will not return boolean values but
+        instances of the corresponding condition classes.
+    """
+
+    name: str
+    sort: SortDirection = Field(default=SortDirection.ASCENDING)
 
     def __hash__(self) -> int:
-        return hash(self.prop_name)
+        return hash(self.name)
 
-    def __eq__(self, other: Any) -> Equals:
+    def __eq__(self, other: Any) -> Equals:  # type: ignore[override]
         return Equals(prop=self, value=other)
 
-    def __ne__(self, other: Any) -> EqualsNot:
+    def __ne__(self, other: Any) -> EqualsNot:  # type: ignore[override]
         return EqualsNot(prop=self, value=other)
 
     def __gt__(self, value: Any) -> GreaterThan:
@@ -59,76 +69,83 @@ class Property(BaseModel):
     def ends_with(self, value: str) -> EndsWith:
         return EndsWith(prop=self, value=value)
 
-    def is_empty(self) -> IsEmpty:
-        return IsEmpty(prop=self)
+    def is_empty(self, value: FormulaType | None = None) -> IsEmpty:
+        return IsEmpty(prop=self, value=value)
 
-    def is_not_empty(self) -> IsNotEmpty:
-        return IsNotEmpty(prop=self)
-
-    def before(self, value: dt.datetime) -> Before:
-        return Before(prop=self, value=value)
-
-    def after(self, value: dt.datetime) -> After:
-        return After(prop=self, value=value)
-
-    def on_or_before(self, value: dt.datetime) -> OnOrBefore:
-        return OnOrBefore(prop=self, value=value)
-
-    def on_or_after(self, value: dt.datetime) -> OnOrAfter:
-        return OnOrAfter(prop=self, value=value)
+    def is_not_empty(self, value: FormulaType | None = None) -> IsNotEmpty:
+        return IsNotEmpty(prop=self, value=value)
 
     def this_week(self) -> ThisWeek:
-        return ThisWeek(prop=self)
+        return ThisWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def past_week(self) -> PastWeek:
-        return PastWeek(prop=self)
+        return PastWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def past_month(self) -> PastMonth:
-        return PastMonth(prop=self)
+        return PastMonth(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def past_year(self) -> PastYear:
-        return PastYear(prop=self)
+        return PastYear(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def next_week(self) -> NextWeek:
-        return NextWeek(prop=self)
+        return NextWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def next_month(self) -> NextMonth:
-        return NextMonth(prop=self)
+        return NextMonth(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def next_year(self) -> NextYear:
-        return NextYear(prop=self)
+        return NextYear(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def asc(self) -> Self:
-        self.sort_direction = SortDirection.ASCENDING
+        self.sort = SortDirection.ASCENDING
         return self
 
     def desc(self) -> Self:
-        self.sort_direction = SortDirection.DESCENDING
+        self.sort = SortDirection.DESCENDING
         return self
 
     def __repr__(self) -> str:
-        return f"prop('{self.prop_name}')"
+        return f"prop('{self.name}')"
 
     def __str__(self) -> str:
         return repr(self)
 
 
-# ToDo: Also add last_edited_time, created_time, filters
-
-
 def prop(prop_name: str, /) -> Property:
     """Create a column object."""
-    return Property(prop_name=prop_name)
+    return Property(name=prop_name)
 
 
 class Condition(BaseModel, ABC):
     """Base class for filter query conditions."""
 
     def __and__(self, other: Condition) -> Condition:
-        return And(left=self, right=other)
+        match other:
+            case And(terms=terms) if isinstance(self, And):
+                return And(terms=[self.terms, *terms])
+            case And(terms=terms):
+                return And(terms=[self, *terms])
+            case _ if isinstance(self, And):
+                return And(terms=[self.terms, other])
+            case _:
+                return And(terms=[self, other])
+
+    def __iand__(self, other: Condition) -> Condition:
+        return self & other
 
     def __or__(self, other: Condition) -> Condition:
-        return Or(left=self, right=other)
+        match other:
+            case Or(terms=terms) if isinstance(self, Or):
+                return Or(terms=[self.terms, *terms])
+            case Or(terms=terms):
+                return Or(terms=[self, *terms])
+            case _ if isinstance(self, Or):
+                return Or(terms=[self.terms, other])
+            case _:
+                return Or(terms=[self, other])
+
+    def __ior__(self, other: Condition) -> Condition:
+        return self | other
 
     @abstractmethod
     def __repr__(self) -> str: ...
@@ -136,223 +153,372 @@ class Condition(BaseModel, ABC):
     def __str__(self) -> str:
         return repr(self)
 
+    @abstractmethod
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter: ...
 
-class Equals(Condition):
+
+class PropertyCondition(Condition, ABC):
     prop: Property
     value: Any
 
-    _conditions = ()
+    def _prop_type(self, db: Database) -> schema.PropertyType:
+        return db.schema[self.prop.name]
 
-    def serialize_for_api(self, db: Database) -> dict[str, Any]:
-        prop_type = db.schema[self.prop.prop_name]
-        kwargs = {'property': self.prop.prop_name}
+
+class Equals(PropertyCondition):
+    _condition_kw = 'equals'
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        kwargs: dict[str, Any] = {'property': self.prop.name}
+        prop_type = self._prop_type(db)
+
         match prop_type:
             case schema.Text() | schema.Title() | schema.PhoneNumber():
-                kwargs['rich_text'] = obj_query.TextCondition(equals=self.value)
-            case schema.Number(_):
-                kwargs['number'] = obj_query.NumberCondition(equals=self.value)
-            case schema.Select():
-                kwargs['select'] = obj_query.SelectCondition(equals=str(self.value))
-            case schema.MultiSelect():
-                kwargs['multi_select'] = obj_query.MultiSelectCondition(equals=str(self.value))
-            case schema.Date():
-                kwargs['date'] = obj_query.DateCondition(equals=self.value)
+                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.Number():
+                kwargs['number'] = obj_query.NumberCondition(**{self._condition_kw: self.value})
             case schema.Checkbox():
-                kwargs['checkbox'] = obj_query.CheckboxCondition(equals=bool(self.value))
-            case schema.Formula(_):
-                # ToDo: Match the type here.
-                kwargs['formula'] = obj_query.FormulaCondition(equals=self.value)
+                kwargs['checkbox'] = obj_query.CheckboxCondition(**{self._condition_kw: bool(self.value)})
+            case schema.Select():
+                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.Date():
+                kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
+            case schema.CreatedTime():
+                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                return obj_query.CreatedTimeFilter(created_time=date_condition)
+            case schema.LastEditedTime():
+                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
+            case schema.Formula():
+                match self.value:
+                    case str():
+                        condition: type[obj_query.Condition]
+                        if is_dt_str(self.value):
+                            condition = obj_query.DateCondition
+                            formula_type = 'date'
+                        else:
+                            condition = obj_query.TextCondition
+                            formula_type = 'string'
+                    case dt.datetime():
+                        condition = obj_query.DateCondition
+                        formula_type = 'date'
+                    case bool():
+                        condition = obj_query.CheckboxCondition
+                        formula_type = 'checkbox'
+                    case int() | float():
+                        condition = obj_query.NumberCondition
+                        formula_type = 'number'
+                    case _:
+                        msg = f'Invalid value type `{type(self.value)}` for {self} condition.'
+                        raise ValueError(msg)
+
+                formula_condition = condition(**{self._condition_kw: self.value})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type: formula_condition})
             case _:
-                msg = f'Unsupported property type `{prop_type}` for == condition.'
+                msg = f'Invalid property type `{prop_type}` for {self} condition.'
                 raise ValueError(msg)
-        obj_filter = obj_query.PropertyFilter(**kwargs)
-        return obj_filter.serialize_for_api()
+
+        return obj_query.PropertyFilter(**kwargs)
 
     def __repr__(self) -> str:
         return f'({self.prop} == {self.value})'
 
 
-class EqualsNot(Condition):
-    prop: Property
-    value: Any
+class EqualsNot(Equals):
+    _condition_kw = 'does_not_equal'
 
     def __repr__(self) -> str:
         return f'({self.prop} != {self.value})'
 
 
-class Contains(Condition):
-    prop: Property
-    value: Any
+class Contains(PropertyCondition):
+    _condition_kw = 'contains'
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        kwargs: dict[str, Any] = {'property': self.prop.name}
+        prop_type = self._prop_type(db)
+
+        match prop_type:
+            case schema.Text() | schema.Title() | schema.PhoneNumber():
+                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.MultiSelect():
+                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.People() if isinstance(self.value, User):
+                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value.id})
+            case schema.Relation() if isinstance(self.value, Page):
+                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value.id})
+            case schema.Formula():
+                if isinstance(self.value, str):
+                    formula_condition = obj_query.TextCondition(**{self._condition_kw: self.value})
+                    kwargs['formula'] = obj_query.FormulaCondition(string=formula_condition)
+                else:
+                    msg = f'Invalid value type `{type(self.value)}` for {self} condition.'
+                    raise ValueError(msg)
+
+            case _:
+                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                raise ValueError(msg)
+
+        return obj_query.PropertyFilter(**kwargs)
 
     def __repr__(self) -> str:
-        return f'{self.prop}.contains({self.value})'
+        return f'{self.prop}.{self._condition_kw}({self.value})'
 
 
-class ContainsNot(Condition):
-    prop: Property
-    value: str
+class ContainsNot(Contains):
+    _condition_kw = 'does_not_contain'
+
+
+class StartsWith(PropertyCondition):
+    _condition_kw = 'starts_with'
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        kwargs: dict[str, Any] = {'property': self.prop.name}
+        prop_type = self._prop_type(db)
+
+        match prop_type:
+            case schema.Text() | schema.Title() | schema.PhoneNumber():
+                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.MultiSelect():
+                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.People() if isinstance(self.value, User):
+                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value.id})
+            case schema.Relation() if isinstance(self.value, Page):
+                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value.id})
+            case schema.Formula():
+                if isinstance(self.value, str):
+                    formula_condition = obj_query.TextCondition(**{self._condition_kw: self.value})
+                    kwargs['formula'] = obj_query.FormulaCondition(string=formula_condition)
+                else:
+                    msg = f'Invalid value type `{type(self.value)}` for {self} condition.'
+                    raise ValueError(msg)
+
+            case _:
+                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                raise ValueError(msg)
+
+        return obj_query.PropertyFilter(**kwargs)
 
     def __repr__(self) -> str:
-        return f'{self.prop}.does_not_contain({self.value})'
+        return f'{self.prop}.{self._condition_kw}({self.value})'
 
 
-class StartsWith(Condition):
-    prop: Property
-    value: str
+class EndsWith(StartsWith):
+    _condition_kw = 'ends_with'
+
+
+class IsEmpty(PropertyCondition):
+    _condition_kw = 'is_empty'
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        kwargs: dict[str, Any] = {'property': self.prop.name}
+        prop_type = self._prop_type(db)
+
+        match prop_type:
+            case schema.Text() | schema.Title() | schema.PhoneNumber():
+                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.Number():
+                kwargs['number'] = obj_query.NumberCondition(**{self._condition_kw: self.value})
+            case schema.Select():
+                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.MultiSelect():
+                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.Date():
+                kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
+            case schema.People():
+                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value})
+            case schema.Files():
+                kwargs['files'] = obj_query.FilesCondition(**{self._condition_kw: self.value})
+            case schema.Relation():
+                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value})
+            case schema.CreatedTime():
+                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                return obj_query.CreatedTimeFilter(created_time=date_condition)
+            case schema.LastEditedTime():
+                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
+            case schema.Formula():
+                value = FormulaType(self.value)
+                condition: type[obj_query.Condition]
+
+                match value:
+                    case None:
+                        msg = (
+                            f'The property {self.prop.name} is a formula and we need its type, i.e. `number`, ',
+                            '`string` or `date`, for `.is_empty()` and `.is_not_empty()` conditions to infer ',
+                            'the proper API call.',
+                        )
+                        raise ValueError(msg)
+
+                    case FormulaType.DATE:
+                        condition = obj_query.DateCondition
+                        formula_type = 'date'
+                    case FormulaType.NUMBER:
+                        condition = obj_query.NumberCondition
+                        formula_type = 'number'
+                    case FormulaType.STRING:
+                        condition = obj_query.TextCondition
+                        formula_type = 'string'
+                    case _:
+                        msg = f'Invalid value type `{type(self.value)}` for {self} condition.'
+                        raise ValueError(msg)
+
+                formula_condition = condition(**{self._condition_kw: self.value})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type: formula_condition})
+            case _:
+                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                raise ValueError(msg)
+
+        return obj_query.PropertyFilter(**kwargs)
 
     def __repr__(self) -> str:
-        return f'{self.prop}.starts_with({self.value})'
+        return f'{self.prop}.{self._condition_kw}()'
 
 
-class EndsWith(Condition):
-    prop: Property
-    value: str
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.ends_with({self.value})'
+class IsNotEmpty(IsEmpty):
+    _condition_kw = 'is_not_empty'
 
 
-class IsEmpty(Condition):
-    prop: Property
+class InEquality(PropertyCondition, ABC):
+    _num_condition_kw: str
+    _date_condition_kw: str
 
-    def __repr__(self) -> str:
-        return f"{self.prop} == ''"
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        kwargs: dict[str, Any] = {'property': self.prop.name}
+        prop_type = self._prop_type(db)
+
+        match prop_type:
+            case schema.Number():
+                kwargs['number'] = obj_query.NumberCondition(**{self._num_condition_kw: self.value})
+            case schema.Date():
+                kwargs['date'] = obj_query.DateCondition(**{self._date_condition_kw: self.value})
+            case schema.Formula():
+                condition: type[obj_query.Condition]
+                formula_condition: obj_query.Condition
+
+                match self.value:
+                    case str() | dt.datetime():
+                        condition = obj_query.DateCondition
+                        formula_type = 'date'
+                        formula_condition = condition(**{self._date_condition_kw: self.value})
+                    case int() | float():
+                        condition = obj_query.NumberCondition
+                        formula_type = 'number'
+                        formula_condition = condition(**{self._num_condition_kw: self.value})
+                    case _:
+                        msg = f'Invalid value type `{type(self.value)}` for {self} condition.'
+                        raise ValueError(msg)
+
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type: formula_condition})
+            case _:
+                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                raise ValueError(msg)
+
+        return obj_query.PropertyFilter(**kwargs)
+
+    @abstractmethod
+    def __repr__(self) -> str: ...
 
 
-class IsNotEmpty(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f"{self.prop} != ''"
-
-
-class GreaterThan(Condition):
-    prop: Property
-    value: Any
+class GreaterThan(InEquality):
+    _num_condition_kw = 'greater_than'
+    _date_condition_kw = 'after'
 
     def __repr__(self) -> str:
         return f'({self.prop} > {self.value})'
 
 
-class LessThan(Condition):
-    prop: Property
-    value: Any
+class LessThan(InEquality):
+    _num_condition_kw = 'less_than'
+    _date_condition_kw = 'before'
 
     def __repr__(self) -> str:
         return f'({self.prop} < {self.value})'
 
 
-class GreaterThanOrEqualTo(Condition):
-    prop: Property
-    value: Any
+class GreaterThanOrEqualTo(InEquality):
+    _num_condition_kw = 'greater_than_or_equal_to'
+    _date_condition_kw = 'on_or_after'
 
     def __repr__(self) -> str:
         return f'({self.prop} >= {self.value})'
 
 
-class LessThanOrEqualTo(Condition):
-    prop: Property
-    value: Any
+class LessThanOrEqualTo(InEquality):
+    _num_condition_kw = 'less_than_or_equal_to'
+    _date_condition_kw = 'on_or_before'
 
     def __repr__(self) -> str:
         return f'({self.prop} <= {self.value})'
 
 
-class Before(Condition):
-    prop: Property
-    value: Any
+class DateCondition(PropertyCondition, ABC):
+    _condition_kw: str
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        kwargs: dict[str, Any] = {'property': self.prop.name}
+        prop_type = self._prop_type(db)
+        match prop_type:
+            case schema.Date():
+                kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
+            case schema.Formula():
+                condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                kwargs['formula'] = obj_query.FormulaCondition(date=condition)
+            case _:
+                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                raise ValueError(msg)
+        return obj_query.PropertyFilter(**kwargs)
 
     def __repr__(self) -> str:
-        return f'({self.prop} < {self.value})'
+        return f'{self.prop}.{self._condition_kw}()'
 
 
-class After(Condition):
-    prop: Property
-    value: Any
-
-    def __repr__(self) -> str:
-        return f'({self.prop} > {self.value})'
+class PastWeek(DateCondition):
+    _condition_kw = 'past_week'
 
 
-class OnOrBefore(Condition):
-    prop: Property
-    value: Any
-
-    def __repr__(self) -> str:
-        return f'({self.prop} <= {self.value})'
+class PastMonth(DateCondition):
+    _condition_kw = 'past_month'
 
 
-class OnOrAfter(Condition):
-    prop: Property
-    value: Any
-
-    def __repr__(self) -> str:
-        return f'({self.prop} >= {self.value})'
+class PastYear(DateCondition):
+    _condition_kw = 'past_year'
 
 
-class PastWeek(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.past_week()'
+class ThisWeek(DateCondition):
+    _condition_kw = 'this_week'
 
 
-class PastMonth(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.past_month()'
+class NextWeek(DateCondition):
+    _condition_kw = 'next_week'
 
 
-class PastYear(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.past_year()'
+class NextMonth(DateCondition):
+    _condition_kw = 'next_month'
 
 
-class ThisWeek(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.this_week()'
-
-
-class NextWeek(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.next_week()'
-
-
-class NextMonth(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.next_month()'
-
-
-class NextYear(Condition):
-    prop: Property
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.next_year()'
+class NextYear(DateCondition):
+    _condition_kw = 'next_year'
 
 
 class And(Condition):
-    left: Condition
-    right: Condition
+    terms: list[Condition]
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        return obj_query.CompoundFilter(and_=[term.create_obj_ref(db) for term in self.terms])
 
     def __repr__(self) -> str:
-        return f'({self.left} AND {self.right})'
+        return f"({' & '.join(str(term) for term in self.terms)})"
 
 
 class Or(Condition):
-    left: Condition
-    right: Condition
+    terms: list[Condition]
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        return obj_query.CompoundFilter(or_=[term.create_obj_ref(db) for term in self.terms])
 
     def __repr__(self) -> str:
-        return f'({self.left} OR {self.right})'
+        return f"({' | '.join(str(term) for term in self.terms)})"
 
 
 class Query:
@@ -369,11 +535,9 @@ class Query:
         session = get_active_session()
         query_obj = session.api.databases.query(self.database.obj_ref)
         if self._filter:
-            query_obj.filter(self._filter.serialize_for_api(self.database))
+            query_obj.filter(self._filter.create_obj_ref(self.database))
         if self._sorts:
-            query_obj.sort(
-                [obj_query.DBSort(property=prop.prop_name, direction=prop.sort_direction) for prop in self._sorts]
-            )
+            query_obj.sort([obj_query.DBSort(property=prop.name, direction=prop.sort) for prop in self._sorts])
         pages = [cast(Page, session.cache.setdefault(page.id, Page.wrap_obj_ref(page))) for page in query_obj.execute()]
         return View(database=self.database, pages=pages, query=self)
 
@@ -397,5 +561,5 @@ class Query:
             the second is the secondary sort, and so on. Calling this method multiple times
             will overwrite the previous sorts.
         """
-        self._sorts = [prop if isinstance(prop, Property) else Property(prop) for prop in props]
+        self._sorts = [prop if isinstance(prop, Property) else Property(name=prop) for prop in props]
         return self

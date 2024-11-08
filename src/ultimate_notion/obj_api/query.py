@@ -20,7 +20,11 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class TextCondition(GenericObject):
+class Condition(GenericObject):
+    """Base class for all conditions in Notion."""
+
+
+class TextCondition(Condition):
     """Represents text criteria in Notion."""
 
     equals: str | None = None
@@ -33,7 +37,7 @@ class TextCondition(GenericObject):
     is_not_empty: bool | None = None
 
 
-class NumberCondition(GenericObject):
+class NumberCondition(Condition):
     """Represents number criteria in Notion."""
 
     equals: float | int | None = None
@@ -46,14 +50,14 @@ class NumberCondition(GenericObject):
     is_not_empty: bool | None = None
 
 
-class CheckboxCondition(GenericObject):
+class CheckboxCondition(Condition):
     """Represents checkbox criteria in Notion."""
 
     equals: bool | None = None
     does_not_equal: bool | None = None
 
 
-class SelectCondition(GenericObject):
+class SelectCondition(Condition):
     """Represents select criteria in Notion."""
 
     equals: str | None = None
@@ -62,7 +66,7 @@ class SelectCondition(GenericObject):
     is_not_empty: bool | None = None
 
 
-class MultiSelectCondition(GenericObject):
+class MultiSelectCondition(Condition):
     """Represents a multi_select criteria in Notion."""
 
     contains: str | None = None
@@ -71,7 +75,7 @@ class MultiSelectCondition(GenericObject):
     is_not_empty: bool | None = None
 
 
-class DateCondition(GenericObject):
+class DateCondition(Condition):
     """Represents date criteria in Notion."""
 
     equals: date | datetime | None = None
@@ -85,6 +89,7 @@ class DateCondition(GenericObject):
 
     class EmptyObject(GenericObject): ...
 
+    this_week: EmptyObject | None = None
     past_week: EmptyObject | None = None
     past_month: EmptyObject | None = None
     past_year: EmptyObject | None = None
@@ -93,7 +98,7 @@ class DateCondition(GenericObject):
     next_year: EmptyObject | None = None
 
 
-class PeopleCondition(GenericObject):
+class PeopleCondition(Condition):
     """Represents people criteria in Notion."""
 
     contains: UUID | None = None
@@ -102,14 +107,14 @@ class PeopleCondition(GenericObject):
     is_not_empty: bool | None = None
 
 
-class FilesCondition(GenericObject):
+class FilesCondition(Condition):
     """Represents files criteria in Notion."""
 
     is_empty: bool | None = None
     is_not_empty: bool | None = None
 
 
-class RelationCondition(GenericObject):
+class RelationCondition(Condition):
     """Represents relation criteria in Notion."""
 
     contains: UUID | None = None
@@ -118,7 +123,7 @@ class RelationCondition(GenericObject):
     is_not_empty: bool | None = None
 
 
-class FormulaCondition(GenericObject):
+class FormulaCondition(Condition):
     """Represents formula criteria in Notion."""
 
     string: TextCondition | None = None
@@ -168,22 +173,12 @@ class CreatedTimeFilter(TimestampFilter):
     created_time: DateCondition
     timestamp: TimestampKind = TimestampKind.CREATED_TIME
 
-    @classmethod
-    def build(cls, value):
-        """Create a new `CreatedTimeFilter` using the given constraint."""
-        return CreatedTimeFilter(created_time=value)
-
 
 class LastEditedTimeFilter(TimestampFilter):
     """Represents a last_edited_time filter in Notion."""
 
     last_edited_time: DateCondition
     timestamp: TimestampKind = TimestampKind.LAST_EDITED_TIME
-
-    @classmethod
-    def build(cls, value):
-        """Create a new `LastEditedTimeFilter` using the given constraint."""
-        return LastEditedTimeFilter(last_edited_time=value)
 
 
 class CompoundFilter(QueryFilter):

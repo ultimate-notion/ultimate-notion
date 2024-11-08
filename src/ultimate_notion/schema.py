@@ -172,17 +172,29 @@ class SchemaRepr(ABCMeta):
     and letting it behave like a dictionary for the properties athough it is a class, not an instance.
     """
 
-    def __repr__(cls: Schema) -> str:
+    def __repr__(cls) -> str:
         # We can only overwrite __repr__ for a class in a metaclass
+        if not issubclass(cls, Schema):
+            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
+            raise TypeError(msg)
         return cls.as_table(tablefmt='simple')
 
-    def __getitem__(cls: Schema, prop_name: str) -> PropertyType:
+    def __getitem__(cls, prop_name: str) -> PropertyType:
+        if not issubclass(cls, Schema):
+            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
+            raise TypeError(msg)
         return cls.get_prop(prop_name).type
 
-    def __len__(cls: Schema) -> int:
+    def __len__(cls) -> int:
+        if not issubclass(cls, Schema):
+            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
+            raise TypeError(msg)
         return len(cls.get_props())
 
-    def __iter__(cls: Schema) -> Iterator[PropertyType]:
+    def __iter__(cls) -> Iterator[PropertyType]:
+        if not issubclass(cls, Schema):
+            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
+            raise TypeError(msg)
         return (prop.type for prop in cls.get_props())
 
 

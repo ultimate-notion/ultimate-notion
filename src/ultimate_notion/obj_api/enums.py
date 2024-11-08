@@ -41,6 +41,15 @@ class Color(str, Enum):
     RED = 'red'
 
 
+class FormulaType(str, Enum):
+    """Formula types for formulas."""
+
+    NUMBER = 'number'
+    STRING = 'string'
+    BOOLEAN = 'boolean'
+    DATE = 'date'
+
+
 class BGColor(str, Enum):
     """Background colors for most textual blocks, e.g. paragraphs, callouts, etc."""
 
