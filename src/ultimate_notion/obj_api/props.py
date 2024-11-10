@@ -1,4 +1,4 @@
-"""Wrapper for property values of pages"""
+"""Property values of a page in Notion directly mapped to Python objects."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import pendulum as pnd
 from pydantic import SerializeAsAny, field_validator, model_serializer
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject
-from ultimate_notion.obj_api.enums import VState
+from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
 from ultimate_notion.obj_api.objects import (
     DateRange,
     FileObject,
@@ -152,25 +152,25 @@ class FormulaResult(TypedObject, ABC, polymorphic_base=True):
     """
 
 
-class StringFormula(FormulaResult, type='string'):
+class StringFormula(FormulaResult, type=FormulaType.STRING.value):
     """A Notion string formula result."""
 
     string: str | None = None
 
 
-class NumberFormula(FormulaResult, type='number'):
+class NumberFormula(FormulaResult, type=FormulaType.NUMBER.value):
     """A Notion number formula result."""
 
     number: float | int | None = None
 
 
-class DateFormula(FormulaResult, type='date'):
+class DateFormula(FormulaResult, type=FormulaType.DATE.value):
     """A Notion date formula result."""
 
     date: DateRange | None = None
 
 
-class BooleanFormula(FormulaResult, type='boolean'):
+class BooleanFormula(FormulaResult, type=FormulaType.BOOLEAN.value):
     """A Notion boolean formula result."""
 
     boolean: bool | None = None
@@ -200,22 +200,38 @@ class RollupObject(TypedObject, ABC, polymorphic_base=True):
     function: AggFunc | None = None
 
 
-class RollupNumber(RollupObject, type='number'):
+class RollupNumber(RollupObject, type=RollupType.NUMBER.value):
     """A Notion rollup number property value."""
 
     number: float | int | None = None
 
 
-class RollupDate(RollupObject, type='date'):
+class RollupDate(RollupObject, type=RollupType.DATE.value):
     """A Notion rollup date property value."""
 
     date: DateRange | None = None
 
 
-class RollupArray(RollupObject, type='array'):
+class RollupArray(RollupObject, type=RollupType.ARRAY.value):
     """A Notion rollup array property value."""
 
     array: list[SerializeAsAny[PropertyValue]]
+
+
+class RollupIncomplete(RollupObject, type=RollupType.INCOMPLETE.value):
+    """A Notion incomplete rollup property value."""
+
+    class TypeData(GenericObject): ...
+
+    incomplete: TypeData
+
+
+class RollupUnsupported(RollupObject, type=RollupType.UNSUPPORTED.value):
+    """A Notion unsupported rollup property value."""
+
+    class TypeData(GenericObject): ...
+
+    unsupported: TypeData
 
 
 class Rollup(PropertyValue, type='rollup'):

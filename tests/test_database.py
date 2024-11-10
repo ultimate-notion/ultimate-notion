@@ -161,7 +161,7 @@ def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page)
         db.create_page(name=f'Page {i}')
 
     db.reload()
-    assert len(db.fetch_all()) == num_pages
+    assert len(db.get_all_pages()) == num_pages
     db.delete()
 
 

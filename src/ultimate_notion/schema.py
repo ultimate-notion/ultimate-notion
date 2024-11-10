@@ -594,11 +594,15 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         """Determines if this relation is self referencing the same schema."""
         return (self._schema is SelfRef) or (self.prop_ref is not None and self._schema is self.prop_ref._schema)
 
-    def _make_obj_ref(self):
+    def _make_obj_ref(self) -> None:
         """Initialize the low-level object references for this relation.
 
         This function is used only internally and called during the forward initialization.
         """
+        if self.schema is None:
+            msg = 'The target schema of the relation is not bound to a database'
+            raise RelationError(msg)
+
         try:
             db = self.schema.get_db()
         except SchemaNotBoundError as e:
@@ -610,24 +614,33 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         else:
             self.obj_ref = obj_schema.SinglePropertyRelation.build(db.id)
 
-    def _update_bwd_rel(self):
+    def _update_bwd_rel(self) -> None:
         """Change the default name of a two-way relation target to the defined one."""
         if self.prop_ref is None:
             msg = 'Trying to inialize a backward relation for one-way relation that is not bound to a property'
             raise SchemaError(msg)
 
-        if not (isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation)):
+        if not isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
             msg = f'Trying to inialize backward relation for one-way relation {self.prop_ref.name}'
             raise SchemaError(msg)
 
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
-        two_way_prop_name = self._two_way_prop.name
+        two_way_prop_name = self._two_way_prop.name if self._two_way_prop else None
+
         if obj_synced_property_name != two_way_prop_name:
             session = get_active_session()
 
+            if self.schema is None:
+                msg = 'The target schema of the relation is not bound to a database'
+                raise RelationError(msg)
+
             # change the old default name in the target schema to what was passed during initialization
             other_db = self.schema.get_db()
-            prop_id = self.obj_ref.relation.dual_property.synced_property_id
+
+            if (prop_id := self.obj_ref.relation.dual_property.synced_property_id) is None:
+                msg = 'No synced property ID found in the relation object'
+                raise SchemaError(msg)
+
             schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_prop_name)}
             session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
@@ -644,12 +657,23 @@ class RollupError(SchemaError):
 class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
     """Defines the rollup property in a database."""
 
+    _relation: Property
+    _property: Property
+
     def __init__(self, relation: Property, property: Property, calculate: AggFunc):  # noqa: A002
         if not isinstance(relation.type, Relation):
             msg = f'Relation {relation} must be of type Relation'
             raise RollupError(msg)
+
+        self._relation = relation
+        self._property = property
         # ToDo: One could check here if property really is a property in the database where relation points to
         super().__init__(relation.name, property.name, calculate)
+
+    @property
+    def prop_type(self) -> PropertyType:
+        """Return the type of the property that is rolled up."""
+        return self._property.type
 
 
 class CreatedTime(PropertyType[obj_schema.CreatedTime], wraps=obj_schema.CreatedTime):

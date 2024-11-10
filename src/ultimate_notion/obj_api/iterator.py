@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Awaitable, Callable, Iterator
-from typing import Annotated, Any
+from typing import Annotated, Any, Generic, TypeVar, cast
 
 from pydantic import ConfigDict, Field
 from pydantic.functional_validators import BeforeValidator
@@ -95,7 +95,10 @@ class PropertyItemList(ObjectList, type='property_item'):
     property_item: TypeData
 
 
-class EndpointIterator:
+T = TypeVar('T', bound=NotionObject)
+
+
+class EndpointIterator(Generic[T]):
     """Functor to iterate over results from a potentially paginated API response.
 
     In most cases `notion_obj` should be `ObjectList`. For some endpoints, like `PropertiesEndpoint`, and
@@ -117,7 +120,7 @@ class EndpointIterator:
         self._endpoint = endpoint
         self._model_validate = model_validate
 
-    def __call__(self, **kwargs: Any) -> Iterator[NotionObject]:
+    def __call__(self, **kwargs: Any) -> Iterator[T]:
         """Return a generator for this endpoint using the given parameters."""
 
         self.has_more = True
@@ -139,10 +142,10 @@ class EndpointIterator:
             if isinstance(obj_or_list, ObjectList):
                 for obj in obj_or_list.results:
                     self.total_items += 1
-                    yield obj
+                    yield cast(T, obj)
 
                 self.next_cursor = obj_or_list.next_cursor
                 self.has_more = obj_or_list.has_more and self.next_cursor is not None
             else:
-                yield obj_or_list
+                yield cast(T, obj_or_list)
                 self.has_more = False

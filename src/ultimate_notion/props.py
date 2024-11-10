@@ -1,5 +1,5 @@
 """
-Page properties especially for pages within databases.
+Page property values especially for pages within databases.
 The names of the properties reflect the name in the Notion UI.
 """
 
@@ -16,7 +16,7 @@ import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.file import FileInfo
-from ultimate_notion.obj_api.enums import FormulaType, VState
+from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
 from ultimate_notion.option import Option
 from ultimate_notion.user import User
 
@@ -285,6 +285,10 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
         else:
             msg = f'Unknown rollup value type: {type(rollup_type)}'
             raise ValueError(msg)
+
+    @property
+    def value_type(self) -> RollupType | None:
+        return RollupType(self.obj_ref.rollup.type) if self.obj_ref.rollup else None
 
 
 class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):

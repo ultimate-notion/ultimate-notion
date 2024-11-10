@@ -50,6 +50,24 @@ class FormulaType(str, Enum):
     DATE = 'date'
 
 
+class RollupType(str, Enum):
+    """Rollup types for rollups."""
+
+    NUMBER = 'number'
+    DATE = 'date'
+    ARRAY = 'array'
+    INCOMPLETE = 'incomplete'
+    UNSUPPORTED = 'unsupported'
+
+
+class ArrayQuantifier(str, Enum):
+    """Array quantifiers for rollups."""
+
+    ANY = 'any'
+    EVERY = 'every'
+    NONE = 'none'
+
+
 class BGColor(str, Enum):
     """Background colors for most textual blocks, e.g. paragraphs, callouts, etc."""
 

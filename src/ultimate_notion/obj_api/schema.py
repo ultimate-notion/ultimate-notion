@@ -191,7 +191,7 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
     """
 
     class TypeData(GenericObject):
-        synced_property_name: str | None = None
+        synced_property_name: str = None  # type: ignore
         synced_property_id: str | None = None
 
     dual_property: TypeData = TypeData()
@@ -218,10 +218,10 @@ class Rollup(PropertyType, type='rollup'):
     class TypeData(GenericObject):
         function: AggFunc = AggFunc.COUNT
 
-        relation_property_name: str | None = None
+        relation_property_name: str = None  # type: ignore
         relation_property_id: str | None = None
 
-        rollup_property_name: str | None = None
+        rollup_property_name: str = None  # type: ignore
         rollup_property_id: str | None = None
 
         # leads to better error messages, see

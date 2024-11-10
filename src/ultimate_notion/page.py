@@ -51,12 +51,12 @@ class PagePropertiesNS(Mapping[str, Any]):
         self._page = page
 
     @property
-    def _prop_vals(self) -> dict[str, obj_props.PropertyValue]:
+    def _obj_prop_vals(self) -> dict[str, obj_props.PropertyValue]:
         """Return the low-level page properties"""
         return self._page.obj_ref.properties
 
     def __getitem__(self, prop_name: str) -> Any:
-        prop = self._prop_vals.get(prop_name)
+        prop = self._obj_prop_vals.get(prop_name)
 
         if prop is None:
             msg = f'No such property: {prop_name}'
@@ -97,11 +97,11 @@ class PagePropertiesNS(Mapping[str, Any]):
 
     def __iter__(self) -> Iterator[str]:
         """Iterator of property names."""
-        yield from self._prop_vals.keys()
+        yield from self._obj_prop_vals.keys()
 
     def __len__(self) -> int:
         """Return the number of properties."""
-        return len(self._prop_vals)
+        return len(self._obj_prop_vals)
 
     def __repr__(self) -> str:
         return repr(dict(self))
@@ -262,7 +262,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         In all other cases, use the `props` namespace of the page to avoid unnecessary API calls.
         """
         session = get_active_session()
-        prop_obj = self.props._prop_vals[prop_name]
+        prop_obj = self.props._obj_prop_vals[prop_name]
         prop_items = session.api.pages.properties.retrieve(self.obj_ref, prop_obj)
         prop_values = (item.value for item in prop_items)
 

@@ -26,13 +26,9 @@ T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 class EmptyListError(Exception):
     """Custom exception for an empty list in SList."""
 
-    ...
-
 
 class MultipleItemsError(Exception):
     """Custom exception for a list with multiple items in SList."""
-
-    ...
 
 
 class SList(list[T]):

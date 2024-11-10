@@ -11,6 +11,8 @@
 - Add: Page method `get_property` to allow fetching a single property without reloading the whole page.
 - Fix: Resolving page properties correctly if they contain more than 25 references.
 - Fix: `PropertiesEndpoint.retrieve` now actually works and either returns a single property item or a list.
+- Chg: Renamed `db.fetch_all()` to `db.get_all_pages()`.
+- New: Query databases with a PySpark/Polars inspired DSL, e.g. `uno.prop('Name') == 'Linus Torvalds'`, implemented.
 
 ## Version 0.6, 2024-09-28
 
