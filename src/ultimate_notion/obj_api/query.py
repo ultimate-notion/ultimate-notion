@@ -4,23 +4,24 @@ from __future__ import annotations
 
 import logging
 from abc import ABC
+from collections.abc import Awaitable, Callable, Iterator
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Literal
+from typing import Any, Generic, Literal, TypeAlias, TypeVar
 from uuid import UUID
 
 from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
 
+from ultimate_notion.obj_api.blocks import DataObject
 from ultimate_notion.obj_api.core import GenericObject
 from ultimate_notion.obj_api.enums import SortDirection, TimestampKind
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
 
-if TYPE_CHECKING:
-    from notion_client.api_endpoints import Endpoint as NCEndpoint
+NCEndpointCall: TypeAlias = Callable[..., Any | Awaitable[Any]]  # ToDo: `type` instead of `TypeAlias` in Python 3.12
 
 logger = logging.getLogger(__name__)
 
 
-class Condition(GenericObject):
+class Condition(GenericObject, ABC):
     """Base class for all conditions in Notion."""
 
 
@@ -132,14 +133,22 @@ class FormulaCondition(Condition):
     date: DateCondition | None = None
 
 
+class RollupCondition(Condition):
+    """Represents rollup criteria in Notion."""
+
+    any: RollupArrayCondition | None = None
+    every: RollupArrayCondition | None = None
+    none: RollupArrayCondition | None = None
+    date: DateCondition | None = None
+    number: NumberCondition | None = None
+
+
 class QueryFilter(GenericObject):
     """Base class for query filters."""
 
 
-class PropertyFilter(QueryFilter):
-    """Represents a database property filter in Notion."""
-
-    property: str
+class RollupArrayCondition(Condition):
+    """Represents a rollup array filter in Notion."""
 
     rich_text: TextCondition | None = None
     phone_number: TextCondition | None = None
@@ -152,6 +161,13 @@ class PropertyFilter(QueryFilter):
     files: FilesCondition | None = None
     relation: RelationCondition | None = None
     formula: FormulaCondition | None = None
+
+
+class PropertyFilter(QueryFilter, RollupArrayCondition):
+    """Represents a database property filter in Notion."""
+
+    property: str
+    rollup: RollupCondition | None = None
 
 
 class SearchFilter(QueryFilter):
@@ -238,18 +254,21 @@ class DBQuery(Query):
     sorts: list[DBSort] | None = None
 
 
-class QueryBuilder(ABC):
+T = TypeVar('T', bound=DataObject)
+
+
+class QueryBuilder(Generic[T], ABC):
     """General query builder for the Notion search & database query API"""
 
     query: Query
-    endpoint: NCEndpoint
+    endpoint_call: NCEndpointCall
     params: dict[str, str]
 
-    def __init__(self, endpoint: NCEndpoint, **params: str | None):
-        self.endpoint = endpoint
+    def __init__(self, endpoint: NCEndpointCall, **params: str | None):
+        self.endpoint_call = endpoint
         self.params = {param: value for param, value in params.items() if value is not None}
 
-    def execute(self):
+    def execute(self, **nc_params: int | str) -> Iterator[T]:
         """Execute the current query and return an iterator for the results."""
         logger.debug('executing query - %s', self.query)
 
@@ -259,7 +278,7 @@ class QueryBuilder(ABC):
         if self.params:
             query.update(self.params)
 
-        return EndpointIterator(self.endpoint)(**query)
+        return EndpointIterator(self.endpoint_call)(**query, **nc_params)
 
 
 class SearchQueryBuilder(QueryBuilder):
@@ -272,9 +291,9 @@ class SearchQueryBuilder(QueryBuilder):
 
     query: SearchQuery
 
-    def __init__(self, endpoint, text: str | None = None):
+    def __init__(self, endpoint_call: NCEndpointCall, text: str | None = None):
         self.query = SearchQuery()
-        super().__init__(endpoint=endpoint, query=text)
+        super().__init__(endpoint=endpoint_call, query=text)
 
     def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder:
         """Filter for pages or databases only"""
@@ -304,7 +323,7 @@ class DBQueryBuilder(QueryBuilder):
 
     query: DBQuery
 
-    def __init__(self, endpoint, db_id: str):
+    def __init__(self, endpoint: Callable[..., Any | Awaitable[Any]], db_id: str):
         self.query = DBQuery()
         super().__init__(endpoint=endpoint, database_id=db_id)
 

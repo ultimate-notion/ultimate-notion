@@ -8,7 +8,7 @@ is just referred to as `raw_api`.
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias, cast
 from uuid import UUID
 
@@ -31,7 +31,7 @@ from ultimate_notion.obj_api.objects import (
 )
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DBQueryBuilder, SearchQueryBuilder
-from ultimate_notion.obj_api.schema import PropertyType
+from ultimate_notion.obj_api.schema import PropertyType, RenameProp
 
 if TYPE_CHECKING:
     from notion_client import Client as NCClient
@@ -93,7 +93,7 @@ class BlocksEndpoint(Endpoint):
             children = [block.serialize_for_api() for block in blocks if block is not None]
             logger.info('Appending %d blocks to %s ...', len(children), parent_id)
 
-            block_iter = EndpointIterator(endpoint=self.raw_api.append)
+            block_iter = EndpointIterator[Block](endpoint=self.raw_api.append)
             if after is None:
                 appended_blocks = list(block_iter(block_id=parent_id, children=children))
                 if len(appended_blocks) != len(blocks):
@@ -107,15 +107,15 @@ class BlocksEndpoint(Endpoint):
             for block, appended_block in zip(blocks, appended_blocks[: len(blocks)], strict=True):
                 block.update(**appended_block.serialize_for_api())
 
-            return blocks, cast(list[Block], appended_blocks[len(blocks) :])
+            return blocks, appended_blocks[len(blocks) :]
 
         # https://developers.notion.com/reference/get-block-children
         def list(self, parent: ParentRef | GenericObject | UUID | str) -> Iterator[Block]:
             """Return all Blocks contained by the specified parent."""
             parent_id = ObjectRef.build(parent).id
             logger.info('Listing blocks for %s...', parent_id)
-            block_iter = EndpointIterator(endpoint=self.raw_api.list)
-            return cast(Iterator[Block], block_iter(block_id=parent_id))
+            block_iter = EndpointIterator[Block](endpoint=self.raw_api.list)
+            return block_iter(block_id=parent_id)
 
     def __init__(self, *args, **kwargs):
         """Initialize the `blocks` endpoint for the Notion API."""
@@ -181,7 +181,7 @@ class DatabasesEndpoint(Endpoint):
     @staticmethod
     def _build_request(
         parent: SerializeAsAny[ParentRef] | None = None,
-        schema: dict[str, PropertyType] | None = None,
+        schema: Mapping[str, PropertyType | RenameProp] | None = None,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
     ) -> dict[str, Any]:
@@ -210,7 +210,7 @@ class DatabasesEndpoint(Endpoint):
 
     # https://developers.notion.com/reference/create-a-database
     def create(
-        self, parent: Page, schema: dict[str, PropertyType], title: list[RichTextBaseObject] | None = None
+        self, parent: Page, schema: Mapping[str, PropertyType], title: list[RichTextBaseObject] | None = None
     ) -> Database:
         """Add a database to the given Page parent."""
         parent_ref = PageRef.build(parent)
@@ -232,7 +232,7 @@ class DatabasesEndpoint(Endpoint):
         db: Database,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
-        schema: dict[str, PropertyType] | None = None,
+        schema: Mapping[str, PropertyType | RenameProp] | None = None,
     ) -> Database:
         """Update the Database object on the server.
 
@@ -295,11 +295,11 @@ class PagesEndpoint(Endpoint):
             page_id = str(PageRef.build(page).page_id)
             property_id = property.id if isinstance(property, PropertyValue) else property
             logger.info('Retrieving property :: %s [%s]', property_id, page_id)
-            prop_iter = EndpointIterator(
+            prop_iter = EndpointIterator[PropertyItem](
                 endpoint=self.raw_api.retrieve,
                 model_validate=TypeAdapter(PropertyItemList | PropertyItem).validate_python,
             )
-            return cast(Iterator[PropertyItem], prop_iter(page_id=page_id, property_id=property_id))
+            return prop_iter(page_id=page_id, property_id=property_id)
 
     def __init__(self, *args, **kwargs):
         """Initialize the `pages` endpoint for the Notion API"""
@@ -433,7 +433,7 @@ class SearchEndpoint(Endpoint):
     # https://developers.notion.com/reference/post-search
     def __call__(self, text=None) -> SearchQueryBuilder:
         """Perform a search with the optional text"""
-        return SearchQueryBuilder(endpoint=self.api.client.search, text=text)
+        return SearchQueryBuilder(endpoint_call=self.api.client.search, text=text)
 
 
 class UsersEndpoint(Endpoint):
@@ -448,8 +448,8 @@ class UsersEndpoint(Endpoint):
     def list(self) -> Iterator[User]:
         """Return an iterator for all users in the workspace."""
         logger.info('Listing known users...')
-        user_iter = EndpointIterator(endpoint=self.raw_api.list)
-        return cast(Iterator[User], user_iter())
+        user_iter = EndpointIterator[User](endpoint=self.raw_api.list)
+        return user_iter()
 
     # https://developers.notion.com/reference/get-user
     def retrieve(self, user: User | UUID | str) -> User:
@@ -497,5 +497,5 @@ class CommentsEndpoint(Endpoint):
         """Return all comments on the specified page or block."""
         block_id = str(ObjectRef.build(block).id)
         logger.info('Listing comments on page :: %s', block_id)
-        comment_iter = EndpointIterator(endpoint=self.raw_api.list)
-        return cast(Iterator[Comment], comment_iter(block_id=block_id))
+        comment_iter = EndpointIterator[Comment](endpoint=self.raw_api.list)
+        return comment_iter(block_id=block_id)

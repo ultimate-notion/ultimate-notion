@@ -111,4 +111,4 @@ with uno.Session() as notion:
         priority=Priority.low,
     )
 
-    task_db.fetch_all().show()
+    task_db.get_all_pages().show()

@@ -177,13 +177,13 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Return a Query object to build and execute a database query."""
         return Query(database=self)
 
-    def fetch_all(self) -> View:
-        """Fetch all pages and return a view."""
+    def get_all_pages(self) -> View:
+        """Retrieve all pages and return a view."""
         return self.query.execute()
 
     def __len__(self) -> int:
         """Return the number of pages in this database."""
-        return len(self.fetch_all())
+        return len(self.get_all_pages())
 
     @property
     def is_empty(self) -> bool:

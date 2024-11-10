@@ -40,10 +40,10 @@ Assume we have a page acting like a task in a database similar to the [Task List
 
 ![Notion task database](../assets/images/notion-task-db.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-We search for `Task DB`, fetch all pages in a [View] and select the `Run first Marathon`-page:
+We search for `Task DB`, retrieve all pages in a [View] and select the `Run first Marathon`-page:
 
 ```python
-task_view = notion.search_db('Task DB').item().fetch_all()
+task_view = notion.search_db('Task DB').item().get_all_pages()
 task = task_view.search_page('Run first Marathon').item()
 ```
 

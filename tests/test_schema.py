@@ -126,7 +126,7 @@ def test_all_props_schema(all_props_db: uno.Database):
 def test_wiki_db_schema(wiki_db: uno.Database):
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
-    wiki_db.fetch_all()
+    wiki_db.get_all_pages()
 
 
 @pytest.mark.vcr()

@@ -57,7 +57,7 @@ class SyncGTasks(SyncTask):
         ]
         for page_id in cached_pages:
             del cache[page_id]
-        return self.notion_db.fetch_all().to_pages()
+        return self.notion_db.get_all_pages().to_pages()
 
     def get_other_objects(self) -> list[GTask]:
         """Get all Google Taks from Tasklist."""

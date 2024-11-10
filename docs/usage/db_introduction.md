@@ -104,12 +104,12 @@ Assume we have a simple database listing tasks like this:
 
 ![Notion task database](../assets/images/notion-task-db.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-To access the tasks, i.e. the pages within this database, we can use the [fetch_all] method to
+To access the tasks, i.e. the pages within this database, we can use the [get_all_pages] method to
 generate a [View]. It's as simple as:
 
 ```python
 task_db = notion.search_db('Task DB').item()
-task_view = task_db.fetch_all()
+task_view = task_db.get_all_pages()
 ```
 
 To get a quick overview of our tasks, we can use [show]. On the console, this will print:
@@ -170,7 +170,7 @@ Find out about more about the functionality of [View] by reading the API referen
 keep in mind that some methods are just stubs.
 
 [Database object]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
-[fetch_all]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.fetch_all
+[get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.get_all_pages
 [title]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.title
 [icon]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.icon
 [description]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.description
