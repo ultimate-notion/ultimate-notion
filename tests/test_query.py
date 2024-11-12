@@ -9,78 +9,112 @@ import ultimate_notion as uno
 from ultimate_notion import schema
 
 
+def test_query_condition_associative_rule():
+    cond = (uno.prop('Name') == 'John') & (uno.prop('Age') > 18)
+    assert str(cond) == "(prop('Name') == 'John') & (prop('Age') > 18)"
+
+    cond = uno.prop('Name') == 'John'
+    cond &= uno.prop('Age') > 18
+    assert str(cond) == "(prop('Name') == 'John') & (prop('Age') > 18)"
+
+    cond = (uno.prop('Name') == 'John') & (uno.prop('Age') > 18) & (uno.prop('Points') >= 20)
+    assert str(cond) == "(prop('Name') == 'John') & (prop('Age') > 18) & (prop('Points') >= 20)"
+
+    cond = (uno.prop('Name') == 'John') & ((uno.prop('Age') > 18) & (uno.prop('Points') >= 20))
+    assert str(cond) == "(prop('Name') == 'John') & (prop('Age') > 18) & (prop('Points') >= 20)"
+
+    cond = (uno.prop('Name') == 'John') & ((uno.prop('Age') > 18) | (uno.prop('Points') >= 20))
+    assert str(cond) == "(prop('Name') == 'John') & ((prop('Age') > 18) | (prop('Points') >= 20))"
+
+    cond = ((uno.prop('Name') == 'John') & (uno.prop('Age') > 18)) & (
+        (uno.prop('Points') >= 20) & (uno.prop('Status') == 'Active')
+    )
+    assert (
+        str(cond)
+        == "(prop('Name') == 'John') & (prop('Age') > 18) & (prop('Points') >= 20) & (prop('Status') == 'Active')"
+    )
+
+    cond = (uno.prop('Name') == 'John') | (uno.prop('Age') > 18)
+    assert str(cond) == "(prop('Name') == 'John') | (prop('Age') > 18)"
+
+    cond = uno.prop('Name') == 'John'
+    cond |= uno.prop('Age') > 18
+    assert str(cond) == "(prop('Name') == 'John') | (prop('Age') > 18)"
+
+    cond = (uno.prop('Name') == 'John') | (uno.prop('Age') > 18) | (uno.prop('Points') >= 20)
+    assert str(cond) == "(prop('Name') == 'John') | (prop('Age') > 18) | (prop('Points') >= 20)"
+
+    cond = (uno.prop('Name') == 'John') | ((uno.prop('Age') > 18) | (uno.prop('Points') >= 20))
+    assert str(cond) == "(prop('Name') == 'John') | (prop('Age') > 18) | (prop('Points') >= 20)"
+
+    cond = (uno.prop('Name') == 'John') | ((uno.prop('Age') > 18) & (uno.prop('Points') >= 20))
+    assert str(cond) == "(prop('Name') == 'John') | ((prop('Age') > 18) & (prop('Points') >= 20))"
+
+    cond = ((uno.prop('Name') == 'John') | (uno.prop('Age') > 18)) | (
+        (uno.prop('Points') >= 20) | (uno.prop('Status') == 'Active')
+    )
+    assert (
+        str(cond)
+        == "(prop('Name') == 'John') | (prop('Age') > 18) | (prop('Points') >= 20) | (prop('Status') == 'Active')"
+    )
+
+
 @pytest.mark.vcr()
 def test_query_new_task_db(new_task_db: uno.Database):
     all_pages = new_task_db.query.execute()
     assert len(all_pages) == 0
 
-    status_col = 'Status'
     Task = new_task_db.schema  # noqa: N806
+    status_col = 'Status'
     status_options = cast(schema.Select, Task[status_col]).options
 
-    task1 = Task.create(task='Task 1', status=status_options['Done'])
-    task2 = Task.create(task='Task 2', status=status_options['Backlog'])
+    task1 = Task.create(task='Task 1', status=status_options['Done'], due_date='2024-01-01')
+    task2 = Task.create(task='Task 2', status=status_options['Backlog'], due_date='2024-01-02')
+    task3 = Task.create(task='Task 3', status=status_options['In Progress'], due_date='2024-01-03')
 
-    while len(new_task_db.query.execute()) != 2:
+    while len(new_task_db.query.execute()) != 3:
         time.sleep(1)
 
-    filter_cond = uno.prop(status_col) == status_options['Done']
+    # Test equality condition
+    filter_cond: uno.Condition = uno.prop(status_col) == status_options['Done']
     query = new_task_db.query.filter(filter_cond)
     query_result = query.execute()
     assert query_result.to_pages() == [task1]
 
+    # Test sorting
     query_result = new_task_db.query.sort(uno.prop('Task').desc()).execute()
     assert query_result.to_pages() == [task2, task1]
 
+    # Test inequality condition
+    filter_cond = uno.prop(status_col) != status_options['Done']
+    query = new_task_db.query.filter(filter_cond).sort(uno.prop('Created').asc())
+    query_result = query.execute()
+    assert query_result.to_pages() == [task2, task3]
 
-# @pytest.mark.vcr()
-# def test_query_conditions(new_task_db: uno.Database):
-#     Task = new_task_db.schema
-#     status_col = 'Status'
-#     status_options = cast(schema.Select, Task[status_col]).options
+    # Test greater than condition
+    filter_cond = uno.prop('Task') > '2024-01-01'
+    query = new_task_db.query.filter(filter_cond)
+    query_result = query.execute()
+    assert set(query_result.to_pages()) == {task2, task3}
 
-#     task1 = Task.create(task='Task 1', status=status_options['Done'])
-#     task2 = Task.create(task='Task 2', status=status_options['Backlog'])
-#     task3 = Task.create(task='Task 3', status=status_options['In Progress'])
+    # Test less than condition
+    filter_cond = uno.prop('Task') < '2024-01-02'
+    query = new_task_db.query.filter(filter_cond)
+    query_result = query.execute()
+    assert query_result.to_pages() == [task1]
 
-#     while len(new_task_db.query.execute()) != 3:
-#         time.sleep(1)
+    # Test greater than or equal to condition
+    filter_cond = uno.prop('Task') >= '2024-01-02'
+    query = new_task_db.query.filter(filter_cond)
+    query_result = query.execute()
+    assert set(query_result.to_pages()) == {task2, task3}
 
-#     # Test equality condition
-#     filter_cond = uno.prop(status_col) == status_options['Done']
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert query_result.to_pages() == [task1]
+    # Test less than or equal to condition
+    filter_cond = uno.prop('Task') <= '2024-01-02'
+    query = new_task_db.query.filter(filter_cond)
+    query_result = query.execute()
+    assert set(query_result.to_pages()) == {task1, task2}
 
-#     # Test inequality condition
-#     filter_cond = uno.prop(status_col) != status_options['Done']
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task2, task3}
-
-#     # Test greater than condition
-#     filter_cond = uno.prop('Task') > 'Task 1'
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task2, task3}
-
-#     # Test less than condition
-#     filter_cond = uno.prop('Task') < 'Task 3'
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task1, task2}
-
-#     # Test greater than or equal to condition
-#     filter_cond = uno.prop('Task') >= 'Task 2'
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task2, task3}
-
-#     # Test less than or equal to condition
-#     filter_cond = uno.prop('Task') <= 'Task 2'
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task1, task2}
 
 #     # Test contains condition
 #     filter_cond = uno.prop('Task').contains('Task')

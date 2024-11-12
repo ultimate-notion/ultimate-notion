@@ -505,6 +505,7 @@ def new_task_db(notion: Session, root_page: Page) -> Iterator[Database]:
         done = schema.Property('Done', schema.Formula(done_formula))
         repeats = schema.Property('Repeats', schema.Select(repeats_options))
         url = schema.Property('URL', schema.URL())
+        created = schema.Property('Created', schema.CreatedTime())
         # ToDo: Reintroduce after the problem with adding a two-way relation property is fixed in the Notion API
         # parent = schema.Property('Parent Task', schema.Relation(schema.SelfRef))
         # subs = schema.Property('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_prop=parent))
