@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime as dt
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, cast
 
@@ -154,14 +155,17 @@ class EmptyDBError(Exception):
 class Condition(BaseModel, ABC):
     """Base class for filter query conditions."""
 
+    is_method: bool = False  # to distinguish between method and operator conditions for parenthesizing
+
     def __and__(self, other: Condition) -> Condition:
+        # This logic reduces the number of parentheses by combining ANDs (associative rule)
         match other:
             case And(terms=terms) if isinstance(self, And):
-                return And(terms=[self.terms, *terms])
+                return And(terms=[*self.terms, *terms])
             case And(terms=terms):
                 return And(terms=[self, *terms])
             case _ if isinstance(self, And):
-                return And(terms=[self.terms, other])
+                return And(terms=[*self.terms, other])
             case _:
                 return And(terms=[self, other])
 
@@ -169,13 +173,14 @@ class Condition(BaseModel, ABC):
         return self & other
 
     def __or__(self, other: Condition) -> Condition:
+        # This logic reduces the number of parentheses by combining ORs (associative rule)
         match other:
             case Or(terms=terms) if isinstance(self, Or):
-                return Or(terms=[self.terms, *terms])
+                return Or(terms=[*self.terms, *terms])
             case Or(terms=terms):
                 return Or(terms=[self, *terms])
             case _ if isinstance(self, Or):
-                return Or(terms=[self.terms, other])
+                return Or(terms=[*self.terms, other])
             case _:
                 return Or(terms=[self, other])
 
@@ -246,6 +251,14 @@ class PropertyCondition(Condition, ABC):
         else:
             msg = f'The property {self.prop.name} is not a rollup property or is missing a type.'
             raise ValueError(msg)
+
+    @property
+    def _value_str(self) -> str:
+        match self.value:
+            case str() | dt.datetime():
+                return f"'{self.value}'"
+            case _:
+                return f'{self.value}'
 
 
 class Equals(PropertyCondition):
@@ -326,18 +339,19 @@ class Equals(PropertyCondition):
         return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
 
     def __repr__(self) -> str:
-        return f'({self.prop} == {self.value})'
+        return f'{self.prop} == {self._value_str}'
 
 
 class EqualsNot(Equals):
     _condition_kw = 'does_not_equal'
 
     def __repr__(self) -> str:
-        return f'({self.prop} != {self.value})'
+        return f'{self.prop} != {self._value_str}'
 
 
 class Contains(PropertyCondition):
     _condition_kw = 'contains'
+    is_method: bool = True
 
     def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
@@ -395,15 +409,17 @@ class Contains(PropertyCondition):
         return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
 
     def __repr__(self) -> str:
-        return f'{self.prop}.{self._condition_kw}({self.value})'
+        return f'{self.prop}.{self._condition_kw}({self._value_str})'
 
 
 class ContainsNot(Contains):
     _condition_kw = 'does_not_contain'
+    is_method: bool = True
 
 
 class StartsWith(PropertyCondition):
     _condition_kw = 'starts_with'
+    is_method: bool = True
 
     def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
@@ -459,15 +475,17 @@ class StartsWith(PropertyCondition):
         return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
 
     def __repr__(self) -> str:
-        return f'{self.prop}.{self._condition_kw}({self.value})'
+        return f'{self.prop}.{self._condition_kw}({self._value_str})'
 
 
 class EndsWith(StartsWith):
     _condition_kw = 'ends_with'
+    is_method: bool = True
 
 
 class IsEmpty(PropertyCondition):
     _condition_kw = 'is_empty'
+    is_method: bool = True
 
     def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
@@ -554,6 +572,7 @@ class IsEmpty(PropertyCondition):
 
 class IsNotEmpty(IsEmpty):
     _condition_kw = 'is_not_empty'
+    is_method: bool = True
 
 
 class InEquality(PropertyCondition, ABC):
@@ -634,7 +653,7 @@ class GreaterThan(InEquality):
     _date_condition_kw = 'after'
 
     def __repr__(self) -> str:
-        return f'({self.prop} > {self.value})'
+        return f'{self.prop} > {self._value_str}'
 
 
 class LessThan(InEquality):
@@ -642,7 +661,7 @@ class LessThan(InEquality):
     _date_condition_kw = 'before'
 
     def __repr__(self) -> str:
-        return f'({self.prop} < {self.value})'
+        return f'{self.prop} < {self._value_str}'
 
 
 class GreaterThanOrEqualTo(InEquality):
@@ -650,7 +669,7 @@ class GreaterThanOrEqualTo(InEquality):
     _date_condition_kw = 'on_or_after'
 
     def __repr__(self) -> str:
-        return f'({self.prop} >= {self.value})'
+        return f'{self.prop} >= {self._value_str}'
 
 
 class LessThanOrEqualTo(InEquality):
@@ -658,11 +677,12 @@ class LessThanOrEqualTo(InEquality):
     _date_condition_kw = 'on_or_before'
 
     def __repr__(self) -> str:
-        return f'({self.prop} <= {self.value})'
+        return f'{self.prop} <= {self._value_str}'
 
 
 class DateCondition(PropertyCondition, ABC):
     _condition_kw: str
+    is_method: bool = True
 
     def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
@@ -760,7 +780,8 @@ class And(Condition):
         return obj_query.CompoundFilter(and_=[term.create_obj_ref(db) for term in self.terms])
 
     def __repr__(self) -> str:
-        return f"({' & '.join(str(term) for term in self.terms)})"
+        terms = [f'({term})' if not term.is_method else str(term) for term in self.terms]
+        return ' & '.join(str(term) for term in terms)
 
 
 class Or(Condition):
@@ -770,7 +791,8 @@ class Or(Condition):
         return obj_query.CompoundFilter(or_=[term.create_obj_ref(db) for term in self.terms])
 
     def __repr__(self) -> str:
-        return f"({' | '.join(str(term) for term in self.terms)})"
+        terms = [f'({term})' if not term.is_method else str(term) for term in self.terms]
+        return ' | '.join(str(term) for term in terms)
 
 
 class Query:
@@ -823,3 +845,7 @@ class Query:
         """
         self._sorts = [prop if isinstance(prop, Property) else Property(name=prop) for prop in props]
         return self
+
+    def __repr__(self) -> str:
+        sorts = ', '.join(f'{prop}.{prop.sort}()' for prop in self._sorts) if self._sorts else ''
+        return f"Query(database='{self.database.title}', sort='{sorts}', filter='{self._filter}')"
