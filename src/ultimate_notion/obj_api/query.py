@@ -11,7 +11,7 @@ from uuid import UUID
 
 from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
 
-from ultimate_notion.obj_api.blocks import DataObject
+from ultimate_notion.obj_api.blocks import Database, Page
 from ultimate_notion.obj_api.core import GenericObject
 from ultimate_notion.obj_api.enums import SortDirection, TimestampKind
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
@@ -254,19 +254,20 @@ class DBQuery(Query):
     sorts: list[DBSort] | None = None
 
 
-T = TypeVar('T', bound=DataObject)
+T = TypeVar('T', bound=Page | Database)
 
 
 class QueryBuilder(Generic[T], ABC):
     """General query builder for the Notion search & database query API"""
 
     query: Query
-    endpoint_call: NCEndpointCall
+    endpoint: NCEndpointCall
     params: dict[str, str]
 
-    def __init__(self, endpoint: NCEndpointCall, **params: str | None):
-        self.endpoint_call = endpoint
-        self.params = {param: value for param, value in params.items() if value is not None}
+    def __init__(self, endpoint: NCEndpointCall, query: Query, params: dict[str, str | None]):
+        self.endpoint = endpoint
+        self.query = query
+        self.params = {k: v for k, v in params.items() if v is not None}  # API doesn't like "undefined" values
 
     def execute(self, **nc_params: int | str) -> Iterator[T]:
         """Execute the current query and return an iterator for the results."""
@@ -278,10 +279,10 @@ class QueryBuilder(Generic[T], ABC):
         if self.params:
             query.update(self.params)
 
-        return EndpointIterator(self.endpoint_call)(**query, **nc_params)
+        return EndpointIterator[T](self.endpoint)(**query, **nc_params)
 
 
-class SearchQueryBuilder(QueryBuilder):
+class SearchQueryBuilder(QueryBuilder[T]):
     """Search query builder to search for pages and databases
 
     By default and not changed by `sort`, then the most recently edited results are returned first.
@@ -291,9 +292,8 @@ class SearchQueryBuilder(QueryBuilder):
 
     query: SearchQuery
 
-    def __init__(self, endpoint_call: NCEndpointCall, text: str | None = None):
-        self.query = SearchQuery()
-        super().__init__(endpoint=endpoint_call, query=text)
+    def __init__(self, endpoint: NCEndpointCall, text: str | None = None):
+        super().__init__(endpoint=endpoint, query=SearchQuery(), params={'query': text})
 
     def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder:
         """Filter for pages or databases only"""
@@ -305,17 +305,20 @@ class SearchQueryBuilder(QueryBuilder):
         else:  # db_only
             value = 'database'
 
-        self.query.filter = SearchFilter(property='object', value=value)
-        return self
+        builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
+        builder.query.filter = SearchFilter(property='object', value=value)
+        return builder
 
     def sort(self, *, ascending: bool) -> SearchQueryBuilder:
         """Add the given sort elements to the query."""
         direction = SortDirection.ASCENDING if ascending else SortDirection.DESCENDING
-        self.query.sort = SearchSort(timestamp=TimestampKind.LAST_EDITED_TIME, direction=direction)
-        return self
+
+        builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
+        builder.query.sort = SearchSort(timestamp=TimestampKind.LAST_EDITED_TIME, direction=direction)
+        return builder
 
 
-class DBQueryBuilder(QueryBuilder):
+class DBQueryBuilder(QueryBuilder[Page]):
     """Query builder to query a database.
 
     Notion API: https://developers.notion.com/reference/post-search
@@ -323,19 +326,20 @@ class DBQueryBuilder(QueryBuilder):
 
     query: DBQuery
 
-    def __init__(self, endpoint: Callable[..., Any | Awaitable[Any]], db_id: str):
-        self.query = DBQuery()
-        super().__init__(endpoint=endpoint, database_id=db_id)
+    def __init__(self, endpoint: NCEndpointCall, db_id: str):
+        super().__init__(endpoint=endpoint, query=DBQuery(), params={'database_id': db_id})
 
     def filter(self, condition: QueryFilter) -> DBQueryBuilder:
         """Add the given filter to the query."""
-        self.query.filter = condition
-        return self
+        builder = DBQueryBuilder(self.endpoint, db_id=self.params['database_id'])
+        builder.query.filter = condition
+        return builder
 
     def sort(self, sort_orders: DBSort | list[DBSort]) -> DBQueryBuilder:
         """Add the given sort elements to the query."""
         if isinstance(sort_orders, DBSort):
             sort_orders = [sort_orders]
 
-        self.query.sorts = sort_orders
-        return self
+        builder = DBQueryBuilder(self.endpoint, db_id=self.params['database_id'])
+        builder.query.sorts = sort_orders
+        return builder

@@ -227,6 +227,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session = get_active_session()
         page_obj = session.api.pages.create(parent=self.obj_ref, properties=schema_dct)
         page = Page.wrap_obj_ref(page_obj)
+        session.cache[page.id] = page
         return page
 
     def to_markdown(self) -> str:

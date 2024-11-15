@@ -16,6 +16,8 @@ from notion_client.errors import APIResponseError
 from ultimate_notion.blocks import Block, DataObject
 from ultimate_notion.config import Config, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
+from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.obj_api.objects import get_uuid
@@ -201,7 +203,7 @@ class Session:
             reverse: search in the reverse order, i.e. the least recently edited results first
             deleted: include deleted databases in search
         """
-        query = self.api.search(db_name).filter(db_only=True)
+        query: obj_query.SearchQueryBuilder[obj_blocks.Database] = self.api.search(db_name).filter(db_only=True)
         if reverse:
             query.sort(ascending=True)
         dbs = [cast(Database, self.cache.setdefault(db.id, Database.wrap_obj_ref(db))) for db in query.execute()]
@@ -243,7 +245,7 @@ class Session:
             exact: perform an exact search, not only a substring match
             reverse: search in the reverse order, i.e. the least recently edited results first
         """
-        query = self.api.search(title).filter(page_only=True)
+        query: obj_query.SearchQueryBuilder[obj_blocks.Page] = self.api.search(title).filter(page_only=True)
         if reverse:
             query.sort(ascending=True)
         pages = [
