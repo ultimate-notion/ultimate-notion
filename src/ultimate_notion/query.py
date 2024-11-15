@@ -36,7 +36,7 @@ class Property(BaseModel):
     sort: SortDirection = Field(default=SortDirection.ASCENDING)
 
     def __hash__(self) -> int:
-        return hash(self.name)
+        return hash((self.name, self.sort))
 
     def __eq__(self, other: Any) -> Equals:  # type: ignore[override]
         return Equals(prop=self, value=other)
@@ -56,6 +56,12 @@ class Property(BaseModel):
     def __le__(self, value: Any) -> LessThanOrEqualTo:
         return LessThanOrEqualTo(prop=self, value=value)
 
+    def __repr__(self) -> str:
+        return f"prop('{self.name}')"
+
+    def __str__(self) -> str:
+        return repr(self)
+
     def contains(self, value: str) -> Contains:
         return Contains(prop=self, value=value)
 
@@ -69,10 +75,10 @@ class Property(BaseModel):
         return EndsWith(prop=self, value=value)
 
     def is_empty(self) -> IsEmpty:
-        return IsEmpty(prop=self, value=None)
+        return IsEmpty(prop=self, value=True)
 
     def is_not_empty(self) -> IsNotEmpty:
-        return IsNotEmpty(prop=self, value=None)
+        return IsNotEmpty(prop=self, value=True)
 
     def this_week(self) -> ThisWeek:
         return ThisWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
@@ -102,12 +108,6 @@ class Property(BaseModel):
     def desc(self) -> Self:
         self.sort = SortDirection.DESCENDING
         return self
-
-    def __repr__(self) -> str:
-        return f"prop('{self.name}')"
-
-    def __str__(self) -> str:
-        return repr(self)
 
     @property
     def any(self) -> RollupArrayProperty:
@@ -276,7 +276,7 @@ class Equals(PropertyCondition):
                 kwargs['checkbox'] = obj_query.CheckboxCondition(**{self._condition_kw: bool(self.value)})
             case schema.Select():
                 kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})
-            case schema.Date():
+            case schema.Date() if self._condition_kw == 'equals':  # date has no `does_not_equal` condition
                 kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
             case schema.Formula():
                 condition: obj_query.Condition
@@ -289,13 +289,13 @@ class Equals(PropertyCondition):
                     case FormulaType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for {self} condition.'
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
 
             case _:
-                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
 
         return kwargs
@@ -329,7 +329,7 @@ class Equals(PropertyCondition):
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for {self} condition.'
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
@@ -372,12 +372,12 @@ class Contains(PropertyCondition):
                     case FormulaType.STRING:
                         condition = obj_query.TextCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for {self} condition.'
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
             case _:
-                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
 
         return kwargs
@@ -399,7 +399,7 @@ class Contains(PropertyCondition):
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.prop_type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                     case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for {self} condition.'
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
@@ -438,12 +438,12 @@ class StartsWith(PropertyCondition):
                     case FormulaType.STRING:
                         condition = obj_query.TextCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for {self} condition.'
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
             case _:
-                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
 
         return kwargs
@@ -465,7 +465,7 @@ class StartsWith(PropertyCondition):
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.prop_type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                     case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for {self} condition.'
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
@@ -518,12 +518,12 @@ class IsEmpty(PropertyCondition):
                     case FormulaType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for {self} condition.'
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
             case _:
-                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
 
         return kwargs
@@ -557,7 +557,7 @@ class IsEmpty(PropertyCondition):
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for {self} condition.'
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
@@ -596,12 +596,12 @@ class InEquality(PropertyCondition, ABC):
                     case FormulaType.DATE:
                         condition = obj_query.DateCondition(**{self._num_condition_kw: self.value})
                     case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for {self} condition.'
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
             case _:
-                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
 
         return kwargs
@@ -635,7 +635,7 @@ class InEquality(PropertyCondition, ABC):
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._date_condition_kw: self.value})
                     case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for {self} condition.'
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
@@ -695,12 +695,12 @@ class DateCondition(PropertyCondition, ABC):
                     case FormulaType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for {self} condition.'
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
             case _:
-                msg = f'Invalid property type `{prop_type}` for {self} condition.'
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
 
         return kwargs
@@ -732,7 +732,7 @@ class DateCondition(PropertyCondition, ABC):
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for {self} condition.'
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise ValueError(msg)
 
                 kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
@@ -812,12 +812,14 @@ class Query:
 
         if self._filter:
             try:
-                query_obj.filter(self._filter.create_obj_ref(self.database))
+                query_obj = query_obj.filter(self._filter.create_obj_ref(self.database))
             except EmptyDBError:
                 return View(database=self.database, pages=[], query=self)
 
         if self._sorts:
-            query_obj.sort([obj_query.DBSort(property=prop.name, direction=prop.sort) for prop in self._sorts])
+            query_obj = query_obj.sort(
+                [obj_query.DBSort(property=prop.name, direction=prop.sort) for prop in self._sorts]
+            )
 
         pages = [cast(Page, session.cache.setdefault(page.id, Page.wrap_obj_ref(page))) for page in query_obj.execute()]
         return View(database=self.database, pages=pages, query=self)
@@ -849,3 +851,6 @@ class Query:
     def __repr__(self) -> str:
         sorts = ', '.join(f'{prop}.{prop.sort}()' for prop in self._sorts) if self._sorts else ''
         return f"Query(database='{self.database.title}', sort='{sorts}', filter='{self._filter}')"
+
+    def __str__(self) -> str:
+        return repr(self)
