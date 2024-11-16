@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from typing import cast
+
 import pendulum as pnd
 import pytest
 
 import ultimate_notion as uno
+from ultimate_notion import schema
 
 
 def test_query_condition_associative_rule():
@@ -426,3 +429,19 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
 
     pages = db.query.filter(uno.prop(prop_name).does_not_contain(page_florian)).execute().to_pages()
     assert set(pages) == {page_empty, page_florian}
+
+
+@pytest.mark.vcr()
+def test_query_new_task_db(new_task_db: uno.Database):
+    all_pages = new_task_db.query.execute()
+    assert len(all_pages) == 0
+
+    Task = new_task_db.schema  # noqa: N806
+    status_col = 'Status'
+    status_options = cast(schema.Select, Task[status_col]).options
+
+    task1 = Task.create(task='Task 1', status=status_options['Done'], due_date='2024-01-01')  # noqa: F841
+    task2 = Task.create(task='Task 2', status=status_options['Backlog'], due_date='2024-01-02')  # noqa: F841
+    task3 = Task.create(task='Task 3', status=status_options['In Progress'], due_date='2024-01-03')  # noqa: F841
+
+    assert str(new_task_db.query) == "Query(database='My Tasks', sort=(), filter=None)"
