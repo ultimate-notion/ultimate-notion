@@ -215,7 +215,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         for kwarg, value in kwargs.items():
             prop = schema_kwargs[kwarg]
             prop_value_cls = prop.type.prop_value  # map schema to page property
-            # ToDo: Check at that point in case of selectoption if the option is already defined in Schema!
+            # ToDo: Check at that point in case of select option if the option is already defined in Schema!
 
             if prop_value_cls.readonly:
                 raise ReadOnlyPropertyError(prop)

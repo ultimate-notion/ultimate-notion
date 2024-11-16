@@ -45,7 +45,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
     def _obj_api_type(self) -> type[obj_props.PropertyValue]:
         return self._obj_api_map_inv[self.__class__]
 
-    def __init__(self, values):
+    def __init__(self, values: Any | list[Any]):
         if isinstance(values, list):
             values = [value.obj_ref if isinstance(value, Wrapper) else value for value in values]
         else:
@@ -121,7 +121,7 @@ class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
 class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
     """Date(-time) property value."""
 
-    def __init__(self, dt_spec: dt.datetime | dt.date | pnd.Interval):
+    def __init__(self, dt_spec: str | dt.datetime | dt.date | pnd.Interval):
         self.obj_ref = obj_props.Date.build(dt_spec)
 
     @property

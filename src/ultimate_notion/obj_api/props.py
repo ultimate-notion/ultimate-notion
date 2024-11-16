@@ -86,7 +86,7 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, dt_spec: dt.datetime | dt.date | pnd.Interval):
+    def build(cls, dt_spec: str | dt.datetime | dt.date | pnd.Interval):
         """Create a new Date from the native values."""
         return cls.model_construct(date=DateRange.build(dt_spec))
 

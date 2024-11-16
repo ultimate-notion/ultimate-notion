@@ -851,7 +851,7 @@ class Query:
 
     def __repr__(self) -> str:
         sorts = ', '.join(f'{prop}.{prop.sort}()' for prop in self._sorts) if self._sorts else ''
-        return f"Query(database='{self.database.title}', sort='{sorts}', filter='{self._filter}')"
+        return f"Query(database='{self.database}', sort=({sorts}), filter={self._filter})"
 
     def __str__(self) -> str:
         return repr(self)

@@ -28,6 +28,7 @@ from pydantic import Field, SerializeAsAny
 
 from ultimate_notion.obj_api.core import GenericObject, NotionEntity, NotionObject, TypedObject, extract_id
 from ultimate_notion.obj_api.enums import BGColor, Color
+from ultimate_notion.utils import parse_dt_str
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Block, Database, Page
@@ -66,7 +67,6 @@ class MentionMixin(ABC):
     @abstractmethod
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         """Return a mention object for this object."""
-        ...
 
 
 class DateRange(GenericObject, MentionMixin):
@@ -77,34 +77,33 @@ class DateRange(GenericObject, MentionMixin):
     time_zone: str | None = None
 
     @classmethod
-    def build(cls, dt_spec: dt.datetime | dt.date | pnd.Interval) -> DateRange:
+    def build(cls, dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> DateRange:
         """Compose a DateRange object from the given properties."""
 
-        if isinstance(dt_spec, pnd.Interval):
-            time_zone = dt_spec.start.timezone_name if isinstance(dt_spec.start, pnd.DateTime) else None
-            start = dt_spec.start
-            end = dt_spec.end
-        elif isinstance(dt_spec, pnd.DateTime):
-            time_zone = dt_spec.timezone_name
-            start = dt_spec.naive()
-            end = None
-        elif isinstance(dt_spec, pnd.Date):
-            time_zone = None
-            start = dt_spec
-            end = None
-        elif isinstance(dt_spec, dt.datetime):
-            # we just don't trust the timezone of the naive datetime and convert to utc
-            time_zone = 'UTC'
-            start = dt_spec.astimezone(dt.timezone.utc)
-            end = None
-        elif isinstance(dt_spec, dt.date):
-            time_zone = None
-            start = dt_spec
-            end = None
-        else:
-            msg = f"Unsupported type for 'dt_spec': {type(dt_spec)}"
-            raise TypeError(msg)
-        return cls.model_construct(start=start, end=end, time_zone=time_zone)
+        if isinstance(dt_spec, str):
+            dt_spec = parse_dt_str(dt_spec)
+
+        match dt_spec:
+            case pnd.Interval():
+                return cls.model_construct(
+                    time_zone=dt_spec.start.timezone_name if isinstance(dt_spec.start, pnd.DateTime) else None,
+                    start=dt_spec.start,
+                    end=dt_spec.end,
+                )
+
+            case pnd.DateTime():
+                return cls.model_construct(time_zone=dt_spec.timezone_name, start=dt_spec.naive(), end=None)
+
+            case dt.datetime():
+                # We don't trust the timezone of naive datetime and convert to UTC
+                return cls.model_construct(time_zone='UTC', start=dt_spec.astimezone(dt.timezone.utc), end=None)
+
+            case pnd.Date() | dt.date():
+                return cls.model_construct(time_zone=None, start=dt_spec, end=None)
+
+            case _:
+                msg = f"Unsupported type for 'dt_spec': {type(dt_spec)}"
+                raise TypeError(msg)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionDate.build(self, style=style)
@@ -148,30 +147,25 @@ class ObjectRef(GenericObject):
     def build(cls, ref: ParentRef | GenericObject | UUID | str) -> ObjectRef:
         """Compose a reference to an object from the given reference.
 
-        `ref` may be a `UUID`, `str`, `ParentRef` or `GenericObject` with an `id`.
-
         Strings may be either UUID's or URL's to Notion content.
         """
 
-        if isinstance(ref, cls):
-            return ref.model_copy(deep=True)
-
-        if isinstance(ref, ParentRef):
-            # ParentRef's are typed-objects with a nested UUID
-            return cls.model_construct(id=ref.value)
-
-        if isinstance(ref, GenericObject) and hasattr(ref, 'id'):
-            # re-compose the ObjectReference from the internal ID
-            return cls.build(ref.id)
-
-        if isinstance(ref, UUID):
-            return cls.model_construct(id=ref)
-
-        if isinstance(ref, str) and (id_str := extract_id(ref)) is not None:
-            return cls.model_construct(id=UUID(id_str))
-
-        msg = f'Cannot interpret {ref} of type {type(ref)} as reference to an object.'
-        raise ValueError(msg)
+        match ref:
+            case ObjectRef():
+                return ref.model_copy(deep=True)
+            case ParentRef():
+                # ParentRefs are typed objects with a nested UUID
+                return cls.model_construct(id=ref.value)
+            case GenericObject() if hasattr(ref, 'id'):
+                # Re-compose the ObjectReference from the internal ID
+                return cls.build(ref.id)
+            case UUID():
+                return cls.model_construct(id=ref)
+            case str() if (id_str := extract_id(ref)) is not None:
+                return cls.model_construct(id=UUID(id_str))
+            case _:
+                msg = f'Cannot interpret {ref} of type {type(ref)} as a reference to an object.'
+                raise ValueError(msg)
 
 
 def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
