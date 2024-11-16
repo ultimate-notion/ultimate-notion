@@ -17,9 +17,6 @@ from ultimate_notion.config import get_cfg
 
 _logger = logging.getLogger(__name__)
 
-all_tasks: set[SyncTask] = set()
-"""All tasks that have been created so far."""
-
 ID: TypeAlias = str
 
 
@@ -353,6 +350,10 @@ class SyncTask(ABC):
 
             if self._run_every_secs is None and self._in_total_times is None:
                 break
+
+
+all_tasks: set[SyncTask] = set()
+"""All tasks that have been created so far."""
 
 
 def run_all_tasks(*, debug: bool | None = None):
