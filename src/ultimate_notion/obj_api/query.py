@@ -202,8 +202,8 @@ class CompoundFilter(QueryFilter):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    and_: list[QueryFilter] | None = Field(None, alias='and')
-    or_: list[QueryFilter] | None = Field(None, alias='or')
+    and_: list[SerializeAsAny[QueryFilter]] | None = Field(None, alias='and')
+    or_: list[SerializeAsAny[QueryFilter]] | None = Field(None, alias='or')
 
 
 class DBSort(GenericObject):
