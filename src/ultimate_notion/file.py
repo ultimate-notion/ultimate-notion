@@ -10,7 +10,6 @@ from emoji import emojize, is_emoji
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.rich_text import Text, html_img
-from ultimate_notion.utils import safe_list_get
 
 NOTION_HOSTED_DOMAIN = 'secure.notion-static.com'
 
@@ -134,4 +133,4 @@ def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject) -> FileInfo | Emoji:
 
 def is_notion_hosted(url: str) -> bool:
     """Check if the URL is hosted on Notion."""
-    return safe_list_get(urlparse(url).path.split('/'), 1, default='') == NOTION_HOSTED_DOMAIN
+    return urlparse(url).netloc == NOTION_HOSTED_DOMAIN

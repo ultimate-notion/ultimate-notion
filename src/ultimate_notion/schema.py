@@ -32,7 +32,7 @@ from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.utils import SList, is_notebook
+from ultimate_notion.utils import EmptyListError, SList, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -245,7 +245,11 @@ class Schema(metaclass=SchemaRepr):
     @classmethod
     def get_prop(cls, prop_name: str) -> Property:
         """Get a specific property from this schema assuming that property names are unique."""
-        return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
+        try:
+            return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
+        except EmptyListError as e:
+            msg = f'Property `{prop_name}` not found in schema `{cls.__name__}`'
+            raise SchemaError(msg) from e
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
@@ -420,7 +424,7 @@ class Text(PropertyType[obj_schema.RichText], wraps=obj_schema.RichText):
 class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
     """Defines a number property in a database."""
 
-    def __init__(self, number_format: NumberFormat):
+    def __init__(self, number_format: NumberFormat = NumberFormat.NUMBER):
         super().__init__(number_format)
 
 
@@ -514,6 +518,10 @@ class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
 
     def __init__(self, expression: str):
         super().__init__(expression)
+
+    @property
+    def expression(self) -> str:
+        return self.obj_ref.formula.expression
 
 
 class RelationError(SchemaError):
