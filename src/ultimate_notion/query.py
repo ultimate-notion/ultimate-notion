@@ -128,18 +128,6 @@ class RollupArrayProperty(Property):
 
     quantifier: ArrayQuantifier
 
-    @property
-    def any(self) -> RollupArrayProperty:
-        return self
-
-    @property
-    def none(self) -> RollupArrayProperty:
-        return self
-
-    @property
-    def every(self) -> RollupArrayProperty:
-        return self
-
     def __repr__(self) -> str:
         return f"prop('{self.name}').{self.quantifier.value}"
 
@@ -801,26 +789,34 @@ class Query:
 
     database: Database
     _filter: Condition | None = None
-    _sorts: list[Property] | None = None
+    _sorts: list[Property]
 
     def __init__(self, database: Database):
         self.database = database
+        self._sorts = []
+
+    def _filter_obj_ref(self) -> obj_query.QueryFilter | None:
+        if self._filter is None:
+            return None
+        else:
+            return self._filter.create_obj_ref(self.database)
+
+    def _sorts_obj_ref(self) -> list[obj_query.DBSort]:
+        return [obj_query.DBSort(property=prop.name, direction=prop.sort) for prop in self._sorts]
 
     def execute(self) -> View:
         """Execute the query and return the resulting pages as a view."""
         session = get_active_session()
         query_obj = session.api.databases.query(self.database.obj_ref)
 
-        if self._filter:
-            try:
-                query_obj = query_obj.filter(self._filter.create_obj_ref(self.database))
-            except EmptyDBError:
-                return View(database=self.database, pages=[], query=self)
+        try:
+            if filter_obj := self._filter_obj_ref():
+                query_obj = query_obj.filter(filter_obj)
+        except EmptyDBError:
+            return View(database=self.database, pages=[], query=self)
 
-        if self._sorts:
-            query_obj = query_obj.sort(
-                [obj_query.DBSort(property=prop.name, direction=prop.sort) for prop in self._sorts]
-            )
+        if sort_objs := self._sorts_obj_ref():
+            query_obj = query_obj.sort(sort_objs)
 
         pages = [cast(Page, session.cache.setdefault(page.id, Page.wrap_obj_ref(page))) for page in query_obj.execute()]
         return View(database=self.database, pages=pages, query=self)
