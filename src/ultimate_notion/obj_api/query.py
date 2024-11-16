@@ -71,7 +71,7 @@ class MultiSelectCondition(Condition):
     """Represents a multi_select criteria in Notion."""
 
     contains: str | None = None
-    does_not_contains: str | None = None
+    does_not_contain: str | None = None
     is_empty: bool | None = None
     is_not_empty: bool | None = None
 
@@ -272,14 +272,9 @@ class QueryBuilder(Generic[T], ABC):
     def execute(self, **nc_params: int | str) -> Iterator[T]:
         """Execute the current query and return an iterator for the results."""
         logger.debug('executing query - %s', self.query)
-
-        # the API doesn't like "undefined" values...
         query = self.query.serialize_for_api()
-
-        if self.params:
-            query.update(self.params)
-
-        return EndpointIterator[T](self.endpoint)(**query, **nc_params)
+        query |= self.params | nc_params
+        return EndpointIterator[T](self.endpoint)(**query)
 
 
 class SearchQueryBuilder(QueryBuilder[T]):

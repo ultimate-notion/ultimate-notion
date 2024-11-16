@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-import time
-from typing import cast
-
 import pendulum as pnd
 import pytest
 
 import ultimate_notion as uno
-from ultimate_notion import schema
 
 
 def test_query_condition_associative_rule():
@@ -125,51 +121,54 @@ def test_date_query(root_page: uno.Page, notion: uno.Session):
     page_ny = db.create_page(name='next year', date=now.add(years=1))
     all_pages = {page_no_date, page_tw, page_pw, page_pm, page_py, page_nw, page_nm, page_ny}
 
-    pages = db.query.filter(uno.prop('Date').is_empty()).execute().to_pages()
+    # Test schema.Date()
+    prop_name = 'Date'
+    pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
     assert set(pages) == {page_no_date}
 
-    pages = db.query.filter(uno.prop('Date').is_not_empty()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
     assert set(pages) == {page_tw, page_pw, page_pm, page_py, page_nw, page_nm, page_ny}
 
-    pages = db.query.filter(uno.prop('Date') == now).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name) == now).execute().to_pages()
     assert set(pages) == {page_tw}
 
     with pytest.raises(ValueError):  # as inequality is not supported for date
-        pages = db.query.filter(uno.prop('Date') != now).execute().to_pages()
+        pages = db.query.filter(uno.prop(prop_name) != now).execute().to_pages()
 
-    pages = db.query.filter(uno.prop('Date') < now).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name) < now).execute().to_pages()
     assert set(pages) == {page_pw, page_pm, page_py}
 
-    pages = db.query.filter(uno.prop('Date') <= now).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name) <= now).execute().to_pages()
     assert set(pages) == {page_tw, page_pw, page_pm, page_py}
 
-    pages = db.query.filter(uno.prop('Date') > now).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name) > now).execute().to_pages()
     assert set(pages) == {page_nw, page_nm, page_ny}
 
-    pages = db.query.filter(uno.prop('Date') >= now).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name) >= now).execute().to_pages()
     assert set(pages) == {page_tw, page_nw, page_nm, page_ny}
 
-    pages = db.query.filter(uno.prop('Date').this_week()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).this_week()).execute().to_pages()
     assert set(pages) == {page_tw}
 
-    pages = db.query.filter(uno.prop('Date').past_week()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).past_week()).execute().to_pages()
     assert set(pages) == {page_pw, page_tw}
 
-    pages = db.query.filter(uno.prop('Date').past_month()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).past_month()).execute().to_pages()
     assert set(pages) == {page_pm, page_pw, page_tw}
 
-    pages = db.query.filter(uno.prop('Date').past_year()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).past_year()).execute().to_pages()
     assert set(pages) == {page_py, page_pm, page_pw, page_tw}
 
-    pages = db.query.filter(uno.prop('Date').next_week()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).next_week()).execute().to_pages()
     assert set(pages) == {page_tw, page_nw}
 
-    pages = db.query.filter(uno.prop('Date').next_month()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).next_month()).execute().to_pages()
     assert set(pages) == {page_tw, page_nw, page_nm}
 
-    pages = db.query.filter(uno.prop('Date').next_year()).execute().to_pages()
+    pages = db.query.filter(uno.prop(prop_name).next_year()).execute().to_pages()
     assert set(pages) == {page_tw, page_nw, page_nm, page_ny}
 
+    # Test schema.CreatedTime() and schema.LastEditedTime() conditions
     for prop_name in ('Created', 'Last Edited'):
         # We cannot really set those two props to a specific date, so we just test the conditions
         pages = db.query.filter(uno.prop(prop_name) <= now.add(minutes=5)).execute().to_pages()
@@ -189,117 +188,241 @@ def test_date_query(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_query_new_task_db(new_task_db: uno.Database):
-    all_pages = new_task_db.query.execute()
-    assert len(all_pages) == 0
+def test_text_query(root_page: uno.Page, notion: uno.Session):
+    class DB(uno.Schema, db_title='Text Query DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        name = uno.Property('Name', uno.PropType.Text())
+        phone = uno.Property('Phone', uno.PropType.PhoneNumber())
+        email = uno.Property('Email', uno.PropType.Email())
+        url = uno.Property('URL', uno.PropType.URL())
 
-    Task = new_task_db.schema  # noqa: N806
-    status_col = 'Status'
-    status_options = cast(schema.Select, Task[status_col]).options
+    db = notion.create_db(parent=root_page, schema=DB)
+    page_empty = db.create_page()
+    page_john_doe = db.create_page(
+        title='John', name='John Doe', phone='123-456-7890', email='john.doe@gmail.com', url='https://john.doe.com'
+    )
+    page_jane_doe = db.create_page(
+        title='Jane', name='Jane Doe', phone='123-456-7890', email='jane.doe@gmail.com', url='https://jane.doe.de'
+    )
 
-    task1 = Task.create(task='Task 1', status=status_options['Done'], due_date='2024-01-01')
-    task2 = Task.create(task='Task 2', status=status_options['Backlog'], due_date='2024-01-02')
-    task3 = Task.create(task='Task 3', status=status_options['In Progress'], due_date='2024-01-03')
+    for prop_name in ('Title', 'Name', 'Phone', 'Email', 'URL'):
+        pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
+        assert set(pages) == {page_empty}
 
-    while len(new_task_db.query.execute()) != 3:
-        time.sleep(1)
+        pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
+        assert set(pages) == {page_john_doe, page_jane_doe}
 
-    # Test equality condition
-    filter_cond: uno.Condition = uno.prop(status_col) == status_options['Done']
-    query = new_task_db.query.filter(filter_cond)
-    query_result = query.execute()
-    assert query_result.to_pages() == [task1]
+        pages = db.query.filter(uno.prop(prop_name) == 'John Doe').execute().to_pages()
+        if prop_name == 'Name':
+            assert set(pages) == {page_john_doe}
+        else:
+            assert set(pages) == set()
 
-    # Test sorting
-    query_result = new_task_db.query.sort(uno.prop('Task').desc()).execute()
-    assert query_result.to_pages() == [task2, task1]
+        pages = db.query.filter(uno.prop(prop_name) != 'John Doe').execute().to_pages()
+        if prop_name == 'Name':
+            assert set(pages) == {page_jane_doe, page_empty}
+        else:
+            assert set(pages) == {page_john_doe, page_jane_doe, page_empty}
 
-    # Test inequality condition
-    filter_cond = uno.prop(status_col) != status_options['Done']
-    query = new_task_db.query.filter(filter_cond).sort(uno.prop('Created').asc())
-    query_result = query.execute()
-    assert query_result.to_pages() == [task2, task3]
+        pages = db.query.filter(uno.prop(prop_name).contains('Doe')).execute().to_pages()
+        if prop_name in {'Name', 'Email', 'URL'}:
+            assert set(pages) == {page_john_doe, page_jane_doe}
+        else:
+            assert set(pages) == set()
 
-    # Test greater than condition
-    filter_cond = uno.prop('Task') > '2024-01-01'
-    query = new_task_db.query.filter(filter_cond)
-    query_result = query.execute()
-    assert set(query_result.to_pages()) == {task2, task3}
+        pages = db.query.filter(uno.prop(prop_name).does_not_contain('Doe')).execute().to_pages()
+        if prop_name in {'Name', 'Email', 'URL'}:
+            assert set(pages) == {page_empty}
+        else:
+            assert set(pages) == {page_john_doe, page_jane_doe, page_empty}
 
-    # Test less than condition
-    filter_cond = uno.prop('Task') < '2024-01-02'
-    query = new_task_db.query.filter(filter_cond)
-    query_result = query.execute()
-    assert query_result.to_pages() == [task1]
+        pages = db.query.filter(uno.prop(prop_name).starts_with('John')).execute().to_pages()
+        if prop_name in {'Name', 'Title', 'Email'}:
+            assert set(pages) == {page_john_doe}
+        else:
+            assert set(pages) == set()
 
-    # Test greater than or equal to condition
-    filter_cond = uno.prop('Task') >= '2024-01-02'
-    query = new_task_db.query.filter(filter_cond)
-    query_result = query.execute()
-    assert set(query_result.to_pages()) == {task2, task3}
-
-    # Test less than or equal to condition
-    filter_cond = uno.prop('Task') <= '2024-01-02'
-    query = new_task_db.query.filter(filter_cond)
-    query_result = query.execute()
-    assert set(query_result.to_pages()) == {task1, task2}
+        pages = db.query.filter(uno.prop(prop_name).ends_with('Doe')).execute().to_pages()
+        if prop_name == 'Name':
+            assert set(pages) == {page_john_doe, page_jane_doe}
+        else:
+            assert set(pages) == set()
 
 
-#     # Test contains condition
-#     filter_cond = uno.prop('Task').contains('Task')
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task1, task2, task3}
+@pytest.mark.vcr()
+def test_number_query(root_page: uno.Page, notion: uno.Session):
+    class DB(uno.Schema, db_title='Number Query DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        number = uno.Property('Number', uno.PropType.Number())
 
-#     # Test does not contain condition
-#     filter_cond = uno.prop('Task').does_not_contain('1')
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task2, task3}
+    db = notion.create_db(parent=root_page, schema=DB)
+    page_empty = db.create_page()
+    page_1 = db.create_page(title='1', number=1)
+    page_2 = db.create_page(title='1', number=2)
+    page_42 = db.create_page(title='42', number=42)
 
-#     # Test starts with condition
-#     filter_cond = uno.prop('Task').starts_with('Task')
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task1, task2, task3}
+    prop_name = 'Number'
+    pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
+    assert set(pages) == {page_empty}
 
-#     # Test ends with condition
-#     filter_cond = uno.prop('Task').ends_with('1')
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert query_result.to_pages() == [task1]
+    pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
+    assert set(pages) == {page_1, page_2, page_42}
 
-#     # Test is empty condition
-#     filter_cond = uno.prop('Task').is_empty()
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert query_result.to_pages() == []
+    pages = db.query.filter(uno.prop(prop_name) == 42).execute().to_pages()
+    assert set(pages) == {page_42}
 
-#     # Test is not empty condition
-#     filter_cond = uno.prop('Task').is_not_empty()
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task1, task2, task3}
+    pages = db.query.filter(uno.prop(prop_name) != 42).execute().to_pages()
+    assert set(pages) == {page_1, page_2, page_empty}
 
-#     # Test date conditions
-#     filter_cond = uno.prop('Created Time').this_week()
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert set(query_result.to_pages()) == {task1, task2, task3}
+    pages = db.query.filter(uno.prop(prop_name) > 1).execute().to_pages()
+    assert set(pages) == {page_2, page_42}
 
-#     filter_cond = uno.prop('Created Time').past_week()
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert query_result.to_pages() == []
+    pages = db.query.filter(uno.prop(prop_name) >= 1).execute().to_pages()
+    assert set(pages) == {page_1, page_2, page_42}
 
-#     filter_cond = uno.prop('Created Time').next_week()
-#     query = new_task_db.query.filter(filter_cond)
-#     query_result = query.execute()
-#     assert query_result.to_pages() == []
+    pages = db.query.filter(uno.prop(prop_name) < 42).execute().to_pages()
+    assert set(pages) == {page_1, page_2}
 
-#     # Test sorting
-#     query_result = new_task_db.query.sort(uno.prop('Task').desc()).execute()
-#     assert query_result.to_pages() == [task3, task2, task1]
+    pages = db.query.filter(uno.prop(prop_name) <= 42).execute().to_pages()
+    assert set(pages) == {page_1, page_2, page_42}
 
-#     query_result = new_task_db.query.sort(uno.prop('Task').asc()).execute()
-#     assert query_result.to_pages() == [task1, task2, task3]
+
+@pytest.mark.vcr()
+def test_select_query(root_page: uno.Page, notion: uno.Session):
+    status_options = [
+        backlog := uno.Option('Backlog', color=uno.Color.GRAY),
+        ongoing := uno.Option('In Progress', color=uno.Color.BLUE),
+        done := uno.Option('Done', color=uno.Color.GREEN),
+    ]
+
+    class DB(uno.Schema, db_title='(Multi)-Select Query DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        select = uno.Property('Select', uno.PropType.Select(status_options))
+        multi_select = uno.Property('Multi-Select', uno.PropType.MultiSelect(status_options))
+
+    db = notion.create_db(parent=root_page, schema=DB)
+    page_empty = db.create_page()
+    page_1 = db.create_page(title='Done', select=done, multi_select=[done, ongoing])
+    page_2 = db.create_page(title='In Progress', select=ongoing, multi_select=[backlog, ongoing])
+    page_3 = db.create_page(title='Backlog', select=backlog, multi_select=[backlog])
+
+    # Test Select
+    prop_name = 'Select'
+    pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
+    assert set(pages) == {page_empty}
+
+    pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
+    assert set(pages) == {page_1, page_2, page_3}
+
+    pages = db.query.filter(uno.prop(prop_name) == 'Done').execute().to_pages()
+    assert set(pages) == {page_1}
+
+    pages = db.query.filter(uno.prop(prop_name) != 'Done').execute().to_pages()
+    assert set(pages) == {page_2, page_3, page_empty}
+
+    pages = db.query.filter(uno.prop(prop_name) == done).execute().to_pages()
+    assert set(pages) == {page_1}
+
+    pages = db.query.filter(uno.prop(prop_name) != done).execute().to_pages()
+    assert set(pages) == {page_2, page_3, page_empty}
+
+    # Test MultiSelect
+    prop_name = 'Multi-Select'
+    pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
+    assert set(pages) == {page_empty}
+
+    pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
+    assert set(pages) == {page_1, page_2, page_3}
+
+    pages = db.query.filter(uno.prop(prop_name).contains('Done')).execute().to_pages()
+    assert set(pages) == {page_1}
+
+    pages = db.query.filter(uno.prop(prop_name).does_not_contain('Done')).execute().to_pages()
+    assert set(pages) == {page_2, page_3, page_empty}
+
+    pages = db.query.filter(uno.prop(prop_name).contains(done)).execute().to_pages()
+    assert set(pages) == {page_1}
+
+    pages = db.query.filter(uno.prop(prop_name).does_not_contain(done)).execute().to_pages()
+    assert set(pages) == {page_2, page_3, page_empty}
+
+
+@pytest.mark.vcr()
+def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session):
+    class DB(uno.Schema, db_title='Files & Checkbox Query DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        files = uno.Property('Files', uno.PropType.Files())
+        check = uno.Property('Checkbox', uno.PropType.Checkbox())
+
+    db = notion.create_db(parent=root_page, schema=DB)
+
+    page_empty = db.create_page()
+
+    page_files = db.create_page(
+        title='Files', files=[uno.FileInfo(name='image', url='https://some-site.com/image.png')]
+    )
+    page_check = db.create_page(title='Checkbox', check=True)
+
+    # Test Files
+    prop_name = 'Files'
+    pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
+    assert set(pages) == {page_empty, page_check}
+
+    pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
+    assert set(pages) == {page_files}
+
+    # Test Checkbox
+    prop_name = 'Checkbox'
+    pages = db.query.filter(uno.prop(prop_name) == True).execute().to_pages()  # noqa: E712
+    assert set(pages) == {page_check}
+
+    pages = db.query.filter(uno.prop(prop_name) == False).execute().to_pages()  # noqa: E712
+    assert set(pages) == {page_empty, page_files}
+
+    pages = db.query.filter(uno.prop(prop_name) != False).execute().to_pages()  # noqa: E712
+    assert set(pages) == {page_check}
+
+    pages = db.query.filter(uno.prop(prop_name) != True).execute().to_pages()  # noqa: E712
+    assert set(pages) == {page_empty, page_files}
+
+
+@pytest.mark.vcr()
+def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person: uno.User):
+    class DB(uno.Schema, db_title='People & Relation Query DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        people = uno.Property('People', uno.PropType.People())
+        relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
+
+    db = notion.create_db(parent=root_page, schema=DB)
+
+    page_empty = db.create_page()
+    page_florian = db.create_page(title='Florian', people=[person])
+    page_fan = db.create_page(title='Fan', relation=page_florian)
+
+    # Test People
+    prop_name = 'People'
+    pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
+    assert set(pages) == {page_empty, page_fan}
+
+    pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
+    assert set(pages) == {page_florian}
+
+    pages = db.query.filter(uno.prop(prop_name).contains(person)).execute().to_pages()
+    assert set(pages) == {page_florian}
+
+    pages = db.query.filter(uno.prop(prop_name).does_not_contain(person)).execute().to_pages()
+    assert set(pages) == {page_empty, page_fan}
+
+    # Test Relation
+    prop_name = 'Relation'
+    pages = db.query.filter(uno.prop(prop_name).is_empty()).execute().to_pages()
+    assert set(pages) == {page_empty, page_florian}
+
+    pages = db.query.filter(uno.prop(prop_name).is_not_empty()).execute().to_pages()
+    assert set(pages) == {page_fan}
+
+    pages = db.query.filter(uno.prop(prop_name).contains(page_florian)).execute().to_pages()
+    assert set(pages) == {page_fan}
+
+    pages = db.query.filter(uno.prop(prop_name).does_not_contain(page_florian)).execute().to_pages()
+    assert set(pages) == {page_empty, page_florian}

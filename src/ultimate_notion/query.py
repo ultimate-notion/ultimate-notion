@@ -19,6 +19,7 @@ from ultimate_notion.view import View
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
+    from ultimate_notion.option import Option
     from ultimate_notion.schema import PropertyType
 
 
@@ -62,10 +63,10 @@ class Property(BaseModel):
     def __str__(self) -> str:
         return repr(self)
 
-    def contains(self, value: str) -> Contains:
+    def contains(self, value: str | User | Page | Option) -> Contains:
         return Contains(prop=self, value=value)
 
-    def does_not_contain(self, value: str) -> ContainsNot:
+    def does_not_contain(self, value: str | User | Page | Option) -> ContainsNot:
         return ContainsNot(prop=self, value=value)
 
     def starts_with(self, value: str) -> StartsWith:
