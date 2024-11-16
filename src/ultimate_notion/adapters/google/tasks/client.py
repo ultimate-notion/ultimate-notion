@@ -78,9 +78,9 @@ class GObject(BaseModel):
     self_link: HttpUrl = Field(..., alias='selfLink')
     _resource: Resource
 
-    def __init__(self, _resource: Resource, **data: str):
+    def __init__(self, resource: Resource, **data: str):
         super().__init__(**data)
-        self._resource = _resource
+        self._resource = resource
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, GObject):
@@ -93,7 +93,7 @@ class GObject(BaseModel):
 
     def _update(self, resp: dict[str, str]):
         """Updates this object with the given response from the API."""
-        new_obj_dct = dict(resp, _resource=self._resource)
+        new_obj_dct = dict(resp, resource=self._resource)
         new_obj = self.model_validate(new_obj_dct)
 
         for k in new_obj.model_dump(by_alias=False):
@@ -132,7 +132,7 @@ class GTask(GObject):
     def tasklist(self) -> GTaskList:
         """Returns the task list this task belongs to."""
         tasklist = self._resource.tasklists().get(tasklist=self.tasklist_id).execute()
-        return GTaskList(_resource=self._resource, **tasklist)
+        return GTaskList(resource=self._resource, **tasklist)
 
     def delete(self) -> GTask:
         """Deletes this task."""
@@ -217,7 +217,7 @@ class GTask(GObject):
             return None
         resource = self._resource.tasks()
         resp = resource.get(tasklist=self.tasklist_id, task=self.parent_id).execute()
-        return GTask(_resource=self._resource, **resp)
+        return GTask(resource=self._resource, **resp)
 
     @parent.setter
     def parent(self, parent: GTask | None):
@@ -262,7 +262,7 @@ class GTaskList(GObject):
                 showDeleted=show_deleted,
             ).execute()
             items = results.get('items', [])
-            tasks.extend([GTask(_resource=self._resource, **item) for item in items])
+            tasks.extend([GTask(resource=self._resource, **item) for item in items])
 
             page_token = results.get('nextPageToken')
             if page_token is None:
@@ -292,7 +292,7 @@ class GTaskList(GObject):
         """Returns the task with the given ID."""
         resource = self._resource.tasks()
         task = resource.get(tasklist=self.id, task=task_id).execute()
-        return GTask(_resource=self._resource, **task)
+        return GTask(resource=self._resource, **task)
 
     def create_task(self, title: str, due: date | datetime | None = None) -> GTask:
         """Creates a new task."""
@@ -302,7 +302,7 @@ class GTaskList(GObject):
         if due is not None:
             body['due'] = due.isoformat()
         task = resource.insert(tasklist=self.id, body=body).execute()
-        return GTask(_resource=self._resource, **task)
+        return GTask(resource=self._resource, **task)
 
     @property
     def is_default(self) -> bool:
@@ -340,6 +340,11 @@ class GTaskList(GObject):
 
 class GTasksClient:
     """Google API to easily handle Google Tasks."""
+
+    read_only: bool
+    _scopes: list[str]
+    _config: Config
+    resource: Resource
 
     def __init__(self, config: Config | None = None, *, read_only: bool = False):
         self.read_only = read_only
@@ -393,7 +398,7 @@ class GTasksClient:
         while True:
             results = self.resource.tasklists().list(maxResults=max_results, pageToken=page_token).execute()
             items = results.get('items', [])
-            tasklists.extend([GTaskList(_resource=self.resource, **item) for item in items])
+            tasklists.extend([GTaskList(resource=self.resource, **item) for item in items])
 
             page_token = results.get('nextPageToken')
             if not page_token:
@@ -407,7 +412,7 @@ class GTasksClient:
         If no ID is given, the default task list is returned.
         """
         tasklist = self.resource.tasklists().get(tasklist=tasklist_id).execute()
-        return GTaskList(_resource=self.resource, **tasklist)
+        return GTaskList(resource=self.resource, **tasklist)
 
     def search_tasklist(self, title: str) -> SList[GTaskList]:
         """Returns the task list with the given title."""
@@ -417,7 +422,7 @@ class GTasksClient:
     def create_tasklist(self, title: str) -> GTaskList:
         """Creates a new task list."""
         tasklist = self.resource.tasklists().insert(body={'title': title}).execute()
-        return GTaskList(_resource=self.resource, **tasklist)
+        return GTaskList(resource=self.resource, **tasklist)
 
     def get_or_create_tasklist(self, title: str) -> GTaskList:
         """Returns the task list with the given title or creates it if it doesn't exist yet."""

@@ -3,6 +3,8 @@
 Notion-API: https://developers.notion.com/reference/intro
 """
 
+from __future__ import annotations
+
 from importlib.metadata import PackageNotFoundError, version
 
 try:
@@ -11,6 +13,9 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = 'unknown'
 finally:
     del version, PackageNotFoundError
+
+# ToDo: Activate when beartype 0.19.1 fixes https://github.com/beartype/beartype/issues/444
+# from beartype.claw import beartype_this_package
 
 from ultimate_notion.blocks import (
     PDF,
@@ -116,3 +121,8 @@ __all__ = [
     'prop',
     'text',
 ]
+
+
+# ToDo: Activate when beartype 0.19.1 fixes https://github.com/beartype/beartype/issues/444
+# activate fast near-real-time hybrid runtime-static type-checking
+# beartype_this_package()
