@@ -340,6 +340,12 @@ def wiki_db(notion: Session) -> Database:
 
 
 @vcr_fixture(scope='module')
+def formula_db(notion: Session) -> Database:
+    """Return manually created wiki db."""
+    return notion.search_db('Formula DB').item()
+
+
+@vcr_fixture(scope='module')
 def md_text_page(notion: Session) -> Page:
     """Return a page with markdown text content."""
     return notion.search_page(MD_TEXT_TEST_PAGE).item()

@@ -277,11 +277,10 @@ class Equals(PropertyCondition):
                         condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
                     case FormulaType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
-                    case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise ValueError(msg)
+                    case FormulaType.BOOLEAN:
+                        condition = obj_query.CheckboxCondition(**{self._condition_kw: bool(self.value)})
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
 
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
@@ -364,7 +363,7 @@ class Contains(PropertyCondition):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
@@ -416,12 +415,6 @@ class StartsWith(PropertyCondition):
         match prop_type:
             case schema.Text() | schema.Title() | schema.PhoneNumber() | schema.Email() | schema.URL():
                 kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
-            case schema.MultiSelect():
-                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
-            case schema.People() if isinstance(self.value, User):
-                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value.id})
-            case schema.Relation() if isinstance(self.value, Page):
-                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value.id})
             case schema.Formula():
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.STRING:
@@ -430,7 +423,7 @@ class StartsWith(PropertyCondition):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
@@ -510,7 +503,7 @@ class IsEmpty(PropertyCondition):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
@@ -581,14 +574,14 @@ class InEquality(PropertyCondition, ABC):
 
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.NUMBER:
-                        condition = obj_query.NumberCondition(**{self._date_condition_kw: self.value})
+                        condition = obj_query.NumberCondition(**{self._num_condition_kw: self.value})
                     case FormulaType.DATE:
-                        condition = obj_query.DateCondition(**{self._num_condition_kw: self.value})
+                        condition = obj_query.DateCondition(**{self._date_condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)
@@ -687,7 +680,7 @@ class DateCondition(PropertyCondition, ABC):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise ValueError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.value: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise ValueError(msg)

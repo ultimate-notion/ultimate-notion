@@ -7,6 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import schema
+from ultimate_notion.utils import parse_dt_str
 
 
 def test_query_condition_associative_rule():
@@ -464,3 +465,43 @@ def test_query_new_task_db(new_task_db: uno.Database):
 
     query = new_task_db.query.filter((uno.prop('Due Date') == '2024-01-02') | (uno.prop('Status') == 'In Progress'))
     assert set(query.execute()) == {task2, task3}
+
+
+@pytest.mark.vcr()
+def test_query_formula(formula_db: uno.Database):
+    item_1, item_2 = formula_db.get_all_pages()
+    query = formula_db.query.filter(uno.prop('String') == 'Item 1')
+    assert set(query.execute()) == {item_1}
+
+    query = formula_db.query.filter(uno.prop('Number') == 1)
+    assert set(query.execute()) == {item_2}
+
+    query = formula_db.query.filter(uno.prop('Checkbox') == True)  # noqa: E712
+    assert set(query.execute()) == {item_1}
+
+    query = formula_db.query.filter(uno.prop('Date') == parse_dt_str('2024-11-25 14:08:00+00:00'))
+    assert set(query.execute()) == {item_1, item_2}
+
+    query = formula_db.query.filter(uno.prop('String').contains('1'))
+    assert set(query.execute()) == {item_1}
+
+    query = formula_db.query.filter(uno.prop('String').starts_with('Item'))
+    assert set(query.execute()) == {item_1, item_2}
+
+    query = formula_db.query.filter(uno.prop('String').is_empty())
+    assert set(query.execute()) == set()
+
+    query = formula_db.query.filter(uno.prop('Number').is_empty())
+    assert set(query.execute()) == set()
+
+    query = formula_db.query.filter(uno.prop('Date').is_empty())
+    assert set(query.execute()) == set()
+
+    query = formula_db.query.filter(uno.prop('Number') <= 42)
+    assert set(query.execute()) == {item_1, item_2}
+
+    query = formula_db.query.filter(uno.prop('Date') >= '2024-11-23')
+    assert set(query.execute()) == {item_1, item_2}
+
+    query = formula_db.query.filter(uno.prop('Date').past_week())
+    assert set(query.execute()) == set()
