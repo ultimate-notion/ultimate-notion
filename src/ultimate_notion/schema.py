@@ -248,7 +248,7 @@ class Schema(metaclass=SchemaRepr):
         try:
             return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
         except EmptyListError as e:
-            msg = f'Property `{prop_name}` not found in schema `{cls.__name__}`'
+            msg = f'Property `{prop_name}` not found in database `{cls._database}`.'
             raise SchemaError(msg) from e
 
     @classmethod

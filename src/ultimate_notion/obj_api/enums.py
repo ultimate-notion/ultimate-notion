@@ -42,12 +42,23 @@ class Color(str, Enum):
 
 
 class FormulaType(str, Enum):
-    """Formula types for formulas."""
+    """Formula types for formulas.
 
-    NUMBER = 'number'
-    STRING = 'string'
-    BOOLEAN = 'boolean'
-    DATE = 'date'
+    The type of the formula as well as the mapping to the Notion API keyword when filtering in a query.
+    """
+
+    NUMBER = 'number', 'number'
+    STRING = 'string', 'string'
+    BOOLEAN = 'boolean', 'checkbox'  # inconsistency in the Notion API
+    DATE = 'date', 'date'
+
+    formula_kwarg: str
+
+    def __new__(cls, value: str, formula_kwarg: str = '') -> FormulaType:
+        obj = str.__new__(cls, value)
+        obj._value_ = value
+        obj.formula_kwarg = formula_kwarg
+        return obj
 
 
 class RollupType(str, Enum):
