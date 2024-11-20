@@ -33,12 +33,13 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         return self
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, str):
-            return str(self) == other
-        elif isinstance(other, FileInfo):
-            return str(self) == str(other)
-        else:
-            return NotImplemented
+        match other:
+            case str():
+                return str(self) == other
+            case FileInfo():
+                return str(self) == str(other)
+            case _:
+                return NotImplemented
 
     def __hash__(self):
         return hash(str(self))
@@ -96,12 +97,13 @@ class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
         return self.obj_ref.emoji
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, str):
-            return str(self) == other
-        elif isinstance(other, Emoji):
-            return str(self) == str(other)
-        else:
-            return NotImplemented
+        match other:
+            case str():
+                return str(self) == other
+            case Emoji():
+                return str(self) == str(other)
+            case _:
+                return NotImplemented
 
     def __hash__(self):
         return hash(str(self))
@@ -122,13 +124,14 @@ class Emoji(Wrapper[objs.EmojiObject], str, wraps=objs.EmojiObject):
 
 def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject) -> FileInfo | Emoji:
     """Wrap the icon object into the corresponding class."""
-    if isinstance(icon_obj, objs.ExternalFile):
-        return FileInfo.wrap_obj_ref(icon_obj)
-    elif isinstance(icon_obj, objs.EmojiObject):
-        return Emoji.wrap_obj_ref(icon_obj)
-    else:
-        msg = f'unknown icon object of {type(icon_obj)}'
-        raise RuntimeError(msg)
+    match icon_obj:
+        case objs.ExternalFile():
+            return FileInfo.wrap_obj_ref(icon_obj)
+        case objs.EmojiObject():
+            return Emoji.wrap_obj_ref(icon_obj)
+        case _:
+            msg = f'unknown icon object of {type(icon_obj)}'
+            raise RuntimeError(msg)
 
 
 def is_notion_hosted(url: str) -> bool:

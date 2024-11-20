@@ -81,16 +81,16 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def icon(self) -> FileInfo | Emoji | None:
         """Return the icon of this database as file or emoji."""
-        icon = self.obj_ref.icon
-        if isinstance(icon, objs.FileObject):
-            return FileInfo.wrap_obj_ref(icon)
-        elif isinstance(icon, objs.EmojiObject):
-            return Emoji.wrap_obj_ref(icon)
-        elif icon is None:
-            return None
-        else:
-            msg = f'unknown icon object of {type(icon)}'
-            raise RuntimeError(msg)
+        match self.obj_ref.icon:
+            case objs.FileObject() as icon:
+                return FileInfo.wrap_obj_ref(icon)
+            case objs.EmojiObject() as icon:
+                return Emoji.wrap_obj_ref(icon)
+            case None:
+                return None
+            case _:
+                msg = f'Unknown icon object of {type(self.obj_ref.icon)}'
+                raise RuntimeError(msg)
 
     @property
     def cover(self) -> FileInfo | None:
