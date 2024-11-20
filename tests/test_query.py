@@ -468,7 +468,7 @@ def test_query_new_task_db(new_task_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_query_formula(formula_db: uno.Database):
+def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.Database):
     item_1, item_2 = formula_db.get_all_pages()
     query = formula_db.query.filter(uno.prop('String') == 'Item 1')
     assert set(query.execute()) == {item_1}
@@ -504,4 +504,13 @@ def test_query_formula(formula_db: uno.Database):
     assert set(query.execute()) == {item_1, item_2}
 
     query = formula_db.query.filter(uno.prop('Date').past_week())
+    assert set(query.execute()) == set()
+
+    class DB(uno.Schema, db_title='Empty Formula DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        formula = uno.Property('Formula', uno.PropType.Formula('prop("Title")'))
+
+    db = notion.create_db(parent=root_page, schema=DB)
+
+    query = db.query.filter(uno.prop('Formula').is_empty())
     assert set(query.execute()) == set()
