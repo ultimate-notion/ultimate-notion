@@ -136,17 +136,18 @@ class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
         session = get_active_session()
         parent = self.obj_ref.parent
 
-        if isinstance(parent, objs.WorkspaceRef):
-            return None
-        elif isinstance(parent, objs.PageRef):
-            return session.get_page(page_ref=parent.page_id)
-        elif isinstance(parent, objs.DatabaseRef):
-            return session.get_db(db_ref=parent.database_id)
-        elif isinstance(parent, objs.BlockRef):
-            return session.get_block(block_ref=parent.block_id)
-        else:
-            msg = f'Unknown parent reference {type(parent)}'
-            raise RuntimeError(msg)
+        match parent:
+            case objs.WorkspaceRef():
+                return None
+            case objs.PageRef(page_id=page_id):
+                return session.get_page(page_ref=page_id)
+            case objs.DatabaseRef(database_id=database_id):
+                return session.get_db(db_ref=database_id)
+            case objs.BlockRef(block_id=block_id):
+                return session.get_block(block_ref=block_id)
+            case _:
+                msg = f'Unknown parent reference {type(parent)}'
+                raise RuntimeError(msg)
 
     @property
     def ancestors(self) -> tuple[NotionEntity, ...]:

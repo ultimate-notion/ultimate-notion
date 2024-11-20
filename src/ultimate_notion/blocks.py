@@ -496,12 +496,14 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blo
         self._update_in_notion()
 
     def to_markdown(self) -> str:
-        if isinstance(icon := self.icon, Emoji):
-            return f'{icon} {self.rich_text.to_markdown()}\n'
-        elif isinstance(icon := self.icon, FileInfo):
-            return f'![icon]({icon.url}) {self.rich_text.to_markdown()}\n'
-        else:
-            return f'{self.rich_text.to_markdown()}\n'
+        match self.icon:
+            case Emoji():
+                return f'{self.icon} {self.rich_text.to_markdown()}\n'
+            case FileInfo():
+                return f'![icon]({self.icon.url}) {self.rich_text.to_markdown()}\n'
+            case _:
+                msg = f'Invalid icon type {type(self.icon)}'
+                raise ValueError(msg)
 
 
 class BulletedItem(ColoredTextBlock[obj_blocks.BulletedListItem], ChildrenMixin, wraps=obj_blocks.BulletedListItem):

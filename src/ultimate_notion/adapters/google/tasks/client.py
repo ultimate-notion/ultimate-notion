@@ -445,12 +445,13 @@ class GTasksClient:
 
 def assert_datetime(dt: date | datetime | None) -> datetime | None:
     """Asserts that the given object is a datetime object or None."""
-    if dt is None:
-        return None
-    elif isinstance(dt, datetime):
-        return dt
-    elif isinstance(dt, date):
-        return datetime.combine(dt, time(tzinfo=timezone.utc))
-    else:
-        msg = f'Expected a datetime object or None, but got {type(dt)}!'
-        raise TypeError(msg)
+    match dt:
+        case None:
+            return None
+        case datetime():
+            return dt
+        case date():
+            return datetime.combine(dt, time(tzinfo=timezone.utc))
+        case _:
+            msg = f'Expected a datetime object or None, but got {type(dt)}!'
+            raise TypeError(msg)

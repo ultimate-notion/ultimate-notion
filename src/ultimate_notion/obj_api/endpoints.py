@@ -324,13 +324,16 @@ class PagesEndpoint(Endpoint):
             msg = "'parent' must be provided"
             raise ValueError(msg)
 
-        if isinstance(parent, Page):
-            parent = PageRef.build(parent)
-        elif isinstance(parent, Database):
-            parent = DatabaseRef.build(parent)
-        elif not isinstance(parent, ParentRef):
-            msg = "Unsupported 'parent'"
-            raise ValueError(msg)
+        match parent:
+            case ParentRef():
+                pass
+            case Page():
+                parent = PageRef.build(parent)
+            case Database():
+                parent = DatabaseRef.build(parent)
+            case _:
+                msg = f'Unsupported parent of type {type(parent)}'
+                raise ValueError(msg)
 
         request: dict[str, Any] = {'parent': parent.serialize_for_api()}
 
