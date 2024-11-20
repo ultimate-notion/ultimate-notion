@@ -341,7 +341,7 @@ def wiki_db(notion: Session) -> Database:
 
 @vcr_fixture(scope='module')
 def formula_db(notion: Session) -> Database:
-    """Return manually created wiki db."""
+    """Return manually formula db."""
     return notion.search_db('Formula DB').item()
 
 
