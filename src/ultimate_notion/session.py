@@ -14,7 +14,7 @@ from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
 from ultimate_notion.blocks import Block, DataObject
-from ultimate_notion.config import Config, get_cfg_file, get_or_create_cfg
+from ultimate_notion.config import Config, activate_debug_mode, get_cfg_file, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import query as obj_query
@@ -29,6 +29,15 @@ from ultimate_notion.user import User
 from ultimate_notion.utils import SList
 
 _log = logging.getLogger(__name__)
+
+
+def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
+    """Create a Notion client with the given authentication token."""
+    if (auth := cfg.ultimate_notion.token) is None:
+        msg = f'No Notion token found! Check {get_cfg_file()}.'
+        raise RuntimeError(msg)
+
+    return notion_client.Client(auth=auth, **kwargs)
 
 
 class SessionError(Exception):
@@ -56,13 +65,7 @@ class Session:
             cfg: configuration object
             **kwargs: Arguments for the [Notion SDK Client](https://ramnes.github.io/notion-sdk-py/reference/client/)
         """
-        if cfg is None:
-            cfg = get_or_create_cfg()
-        auth = cfg.ultimate_notion.token
-
-        if auth is None:
-            msg = f'No Notion token found! Check {get_cfg_file()}.'
-            raise RuntimeError(msg)
+        cfg = get_or_create_cfg() if cfg is None else cfg
 
         _log.info('Initializing Notion session...')
         Session._initialize_once(self)
@@ -70,7 +73,10 @@ class Session:
         # Same sane default as notion_client defines its own logger
         kwargs.setdefault('logger', logging.getLogger(f'{__name__}.client'))
         kwargs.setdefault('log_level', logging.NOTSET)
-        self.client = notion_client.Client(auth=auth, **kwargs)
+        if cfg.ultimate_notion.debug:
+            activate_debug_mode()
+
+        self.client = create_notion_client(cfg, **kwargs)
         self.api = NotionAPI(self.client)
 
     @classmethod

@@ -1,5 +1,6 @@
 """Handling the configuration for all adapters"""
 
+import logging
 import os
 import re
 from pathlib import Path
@@ -14,6 +15,7 @@ DEFAULT_ULTIMATE_NOTION_CFG_PATH: str = '.ultimate-notion/config.toml'
 """Default path within $HOME to the configuration file of Ultimate Notion"""
 ENV_NOTION_TOKEN = 'NOTION_TOKEN'  # same as in `notion-sdk-py` package
 """Name of the environment variable to look up the Notion token"""
+ENV_ULTIMATE_NOTION_DEBUG = 'ULTIMATE_NOTION_DEBUG'
 
 DEFAULT_CFG = f"""\
 # Configuration for Ultimate Notion
@@ -23,6 +25,7 @@ DEFAULT_CFG = f"""\
 
 [ultimate_notion]
 sync_state_dir = "sync_states"
+debug = "${{env:{ENV_ULTIMATE_NOTION_DEBUG}|false}}"
 token = "${{env:{ENV_NOTION_TOKEN}}}"
 
 [google]
@@ -35,6 +38,7 @@ class UNOCfg(BaseModel):
     """Configuration related to Ultimate Notion itself."""
 
     token: str | None = None
+    debug: bool = False
     sync_state_dir: Path = Path('sync_states')
     cfg_path: FilePath  # will be set automatically
 
@@ -127,3 +131,18 @@ def get_or_create_cfg() -> Config:
         cfg_path.parent.mkdir(parents=True, exist_ok=True)
         cfg_path.write_text(DEFAULT_CFG)
     return get_cfg()
+
+
+def activate_debug_mode() -> None:
+    """Activates debug mode by setting up logging and notifying the user."""
+
+    from ultimate_notion import __version__  # noqa: PLC0415
+
+    if not logging.getLogger().hasHandlers():
+        logging.basicConfig(level=logging.DEBUG)
+
+    logger = logging.getLogger('ultimate_notion')
+    logger.setLevel(logging.DEBUG)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f'Ultimate Notion {__version__} is running in debug mode.')

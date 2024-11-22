@@ -42,7 +42,7 @@ from vcr import mode as vcr_mode
 import ultimate_notion as uno
 from ultimate_notion import Database, Option, Page, Session, User, schema
 from ultimate_notion.adapters.google.tasks import GTasksClient
-from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, get_cfg_file, get_or_create_cfg
+from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, ENV_ULTIMATE_NOTION_DEBUG, get_cfg_file, get_or_create_cfg
 from ultimate_notion.utils import temp_timezone
 
 if TYPE_CHECKING:
@@ -64,8 +64,6 @@ COMMENT_PAGE = 'Comments'
 # Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
 TEST_CFG_FILE = get_cfg_file()
 
-logging.basicConfig(level=logging.WARNING)
-
 
 def pytest_addoption(parser: Parser):
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
@@ -75,6 +73,12 @@ def pytest_addoption(parser: Parser):
         action='store_true',
         default=False,
         help='Run tests that check the latest release on PyPI.',
+    )
+    parser.addoption(
+        '--debug-uno',
+        action='store_true',
+        default=False,
+        help='Enable DEBUG logging for Ultimate Notion.',
     )
 
 
@@ -107,6 +111,13 @@ def exec_pyfile(file_path: str) -> None:
     """Executes a Python module as a script, as if it was called from the command line."""
     code = compile(Path(file_path).read_text(encoding='utf-8'), file_path, 'exec')
     exec(code, {'__MODULE__': '__main__'})  # noqa: S102
+
+
+@pytest.fixture(scope='session', autouse=True)
+def activate_debug_mode(request: SubRequest) -> None:
+    """Activates debug mode if set accordingly in the config file"""
+    if request.config.getoption('--debug-uno'):
+        os.environ[ENV_ULTIMATE_NOTION_DEBUG] = '1'
 
 
 @pytest.fixture(scope='session')
@@ -155,7 +166,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
     """Return a custom configuration file for the tests."""
     if request.config.getoption('--record-mode') == 'none':  # corresponds to `vcr-only`
         with tempfile.TemporaryDirectory() as tmp_dir_path:
-            cfg_path = tmp_dir_path / Path('config.cfg')
+            cfg_path = tmp_dir_path / Path('config.toml')
             with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
                 get_or_create_cfg()
                 client_secret_path = tmp_dir_path / Path('client_secret.json')
@@ -181,7 +192,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
         # make sure that the token is valid forever to avoid problems with the Google API
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             shutil.copytree(cfg_path.parent, tmp_dir_path, dirs_exist_ok=True)
-            cfg_path = tmp_dir_path / Path('config.cfg')
+            cfg_path = tmp_dir_path / Path('config.toml')
             # make sure that the token is valid forever to avoid problems with the Google API in the tests using VCR
             with open(tmp_dir_path / Path('token.json'), 'r+', encoding='utf-8') as fh:
                 token_data = json.load(fh)
@@ -192,7 +203,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
                 yield cfg_path
 
     else:
-        # Note: pytest-dotenv will use ~/.vscode/.env as default and load the local
+        # Note: pytest-dotenv will use ../.vscode/.env as default and load the local
         # ultimate-notion configuration file for development here.
         cfg_path = get_cfg_file()
         with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):

@@ -14,6 +14,7 @@
 - Chg: Renamed `db.fetch_all()` to `db.get_all_pages()`.
 - New: Query databases with a PySpark/Polars inspired DSL, e.g. `uno.prop('Name') == 'Linus Torvalds'`, implemented.
 - Fix: Database pages created with `db.create_page` are now added to the session cache.
+- New: Easily activate a debug mode within the config file.
 
 ## Version 0.6, 2024-09-28
 

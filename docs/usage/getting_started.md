@@ -27,7 +27,8 @@ Notion workspace the integration should be associated to. After that click the <
 ![Notion integration](../assets/images/notion-integration-create.png){: style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 This brings you to the Secrets-site where you need to copy and save the *Internal Integration Token*, which always starts
-with `ntn_` or `secret_` when created before September 25, 2024. This token will be used by Ultimate Notion for authentication.
+with `ntn_` or `secret_` when created before September 25, 2024. This token will be used by Ultimate Notion for
+authentication and must be provided in the [configuration](configuration.md).
 
 ## Granting access to an integration
 
@@ -38,14 +39,6 @@ search and select your created integration. A pop-up that you need to confirm wi
 will have access to the selected page as well as all its children.
 
 ![Notion integration](../assets/images/notion-integration-add.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
-
-## Ultimate Notion configuration
-
-Ultimate Notion looks up the environment variable `ULTIMATE_NOTION_CONFIG` for a configuration [TOML]-file.
-If this variable is not set, it defaults to `~/.ultimate-notion/config.toml` under MacOS/Linux and
-`$HOME/.ultimate-notion/config.toml` under Windows systems. If no configuration file is found, a default one is created
-automatically that will set the Notion token to be looked up using the environment variable `NOTION_TOKEN`.
-Alternatively, you can set your token directly in the configuration file.
 
 ## Loading a Notion page
 

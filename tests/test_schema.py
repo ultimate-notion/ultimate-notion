@@ -40,7 +40,9 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
         relation_twoway = uno.Property(
             'Relation two-way', uno.PropType.Relation(SchemaA, two_way_prop=SchemaA.relation)
         )
-        rollup = uno.Property('Rollup', uno.PropType.Rollup(relation, SchemaA.name, uno.AggFunc.COUNT))
+        rollup = uno.Property(
+            'Rollup', uno.PropType.Rollup(relation_prop=relation, rollup_prop=SchemaA.name, calculate=uno.AggFunc.COUNT)
+        )
         select = uno.Property('Select', uno.PropType.Select(options))
         # status = uno.Property('Status', schema.Status()) # 2023-08-11: is not yet supported by Notion API
         text = uno.Property('Text', uno.PropType.Text())
