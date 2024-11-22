@@ -514,3 +514,15 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
 
     query = db.query.filter(uno.prop('Formula').is_empty())
     assert set(query.execute()) == set()
+
+
+@pytest.mark.vcr()
+def test_query_rollup(root_page: uno.Page, notion: uno.Session):
+    class DB(uno.Schema, db_title='Rollup Query DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
+        rollup = uno.Property('Rollup', uno.PropType.Rollup(relation_prop=relation, rollup_prop=title))
+
+    # db = notion.create_db(parent=root_page, schema=DB)
+    # item_1 = db.create_page(title='Item 1')
+    # page_fan = db.create_page(title='Fan', relation=page_florian)

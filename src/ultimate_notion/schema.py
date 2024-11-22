@@ -330,7 +330,7 @@ class Schema(metaclass=SchemaRepr):
     @classmethod
     def get_db(cls) -> Database:
         """Get the database that is bound to this schema."""
-        if cls.is_bound() and cls._database is not None:
+        if cls._database is not None:  # is_bound() cannot be used here due to type checker
             return cls._database
         else:
             raise SchemaNotBoundError(cls)
@@ -663,25 +663,42 @@ class RollupError(SchemaError):
 
 
 class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
-    """Defines the rollup property in a database."""
+    """Defines the rollup property in a database.
 
-    _relation: Property
-    _property: Property
+    If the relation propery is a self-referencing relation, i.e. `uno.PropType.Relation(uno.SelfRef)` in the schema,
+    then the `property` must be a `str` of the corresponding property name.
+    """
 
-    def __init__(self, relation: Property, property: Property, calculate: AggFunc):  # noqa: A002
-        if not isinstance(relation.type, Relation):
-            msg = f'Relation {relation} must be of type Relation'
+    def __init__(self, relation_prop: Property, rollup_prop: Property, calculate: AggFunc = AggFunc.SHOW_ORIGINAL):
+        if not isinstance(relation_prop.type, Relation):
+            msg = f'Relation `{relation_prop.name}` must be of type Relation'
             raise RollupError(msg)
 
-        self._relation = relation
-        self._property = property
         # ToDo: One could check here if property really is a property in the database where relation points to
-        super().__init__(relation.name, property.name, calculate)
+        super().__init__(relation_prop.name, rollup_prop.name, calculate)
 
     @property
-    def prop_type(self) -> PropertyType:
-        """Return the type of the property that is rolled up."""
-        return self._property.type
+    def relation_prop(self) -> Property:
+        """Return the relation property object of the rollup."""
+        if self.prop_ref is not None:
+            db = self.prop_ref._schema.get_db()
+            return db.schema.get_prop(self.obj_ref.rollup.relation_property_name)
+        else:
+            msg = 'Rollup property not bound to a `Property` object'
+            raise RollupError(msg)
+
+    @property
+    def rollup_prop(self) -> Property:
+        """Return the rollup property object of the rollup."""
+        if self.prop_ref is not None:
+            return self.prop_ref._schema.get_prop(self.obj_ref.rollup.rollup_property_name)
+        else:
+            msg = 'Rollup property not bound to a `Property` object'
+            raise RollupError(msg)
+
+    @property
+    def calculate(self) -> AggFunc:
+        return self.obj_ref.rollup.function
 
 
 class CreatedTime(PropertyType[obj_schema.CreatedTime], wraps=obj_schema.CreatedTime):
