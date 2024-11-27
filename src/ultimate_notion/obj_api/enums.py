@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from enum import Enum
 
+# ToDo: Let Enums inherit form StrEnum instead of Enum & str, when we require Python >= 3.11
+
 
 class SortDirection(str, Enum):
     """Sort direction options."""

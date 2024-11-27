@@ -18,7 +18,7 @@ from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
 
 NCEndpointCall: TypeAlias = Callable[..., Any | Awaitable[Any]]  # ToDo: `type` instead of `TypeAlias` in Python 3.12
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class Condition(GenericObject, ABC):
@@ -271,7 +271,6 @@ class QueryBuilder(Generic[T], ABC):
 
     def execute(self, **nc_params: int | str) -> Iterator[T]:
         """Execute the current query and return an iterator for the results."""
-        logger.debug('executing query - %s', self.query)
         query = self.query.serialize_for_api()
         query |= self.params | nc_params
         return EndpointIterator[T](self.endpoint)(**query)
@@ -289,6 +288,16 @@ class SearchQueryBuilder(QueryBuilder[T]):
 
     def __init__(self, endpoint: NCEndpointCall, text: str | None = None):
         super().__init__(endpoint=endpoint, query=SearchQuery(), params={'query': text})
+
+    def execute(self, **nc_params: int | str) -> Iterator[T]:
+        match self.filter:
+            case SearchFilter(property='object', value='page'):
+                _logger.debug(f'Searching for pages with title: {self.params["query"]}')
+            case SearchFilter(property='object', value='database'):
+                _logger.debug(f'Searching for databases with title: {self.params["query"]}')
+            case None:
+                _logger.debug(f'Searching for pages and databases with title: {self.params["query"]}')
+        return super().execute(**nc_params)
 
     def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder:
         """Filter for pages or databases only"""
@@ -323,6 +332,10 @@ class DBQueryBuilder(QueryBuilder[Page]):
 
     def __init__(self, endpoint: NCEndpointCall, db_id: str):
         super().__init__(endpoint=endpoint, query=DBQuery(), params={'database_id': db_id})
+
+    def execute(self, **nc_params: int | str) -> Iterator[Page]:
+        _logger.debug(f'Searching for pages in database with id: {self.params["database_id"]}')
+        return super().execute(**nc_params)
 
     def filter(self, condition: QueryFilter) -> DBQueryBuilder:
         """Add the given filter to the query."""
