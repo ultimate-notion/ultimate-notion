@@ -25,6 +25,8 @@ def test_search_get_db(notion: uno.Session):
 
 @pytest.mark.vcr()
 def test_whoami_get_user(notion: uno.Session):
+    # Remove all users from the cache to test the function
+    uno.Session.cache = {item_id: user for item_id, user in notion.cache.items() if not isinstance(user, uno.User)}
     me = notion.whoami()
     assert me.name == 'Github Unittests'
     user = notion.get_user(me.id)
@@ -43,6 +45,8 @@ def test_get_page_by_id(notion: uno.Session, intro_page: uno.Page):
 
 @pytest.mark.vcr()
 def test_all_users(notion: uno.Session):
+    # Remove all users from the cache to test the function
+    uno.Session.cache = {item_id: user for item_id, user in notion.cache.items() if not isinstance(user, uno.User)}
     users = notion.all_users()
     me = notion.whoami()
     assert me in users
