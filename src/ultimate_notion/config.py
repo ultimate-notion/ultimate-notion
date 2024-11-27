@@ -3,6 +3,7 @@
 import logging
 import os
 import re
+import sys
 from pathlib import Path
 
 import tomli
@@ -139,9 +140,9 @@ def activate_debug_mode() -> None:
     from ultimate_notion import __version__  # noqa: PLC0415
 
     if not logging.getLogger().hasHandlers():
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
-    logger = logging.getLogger('ultimate_notion')
+    logger = logging.getLogger(__package__)
     logger.setLevel(logging.DEBUG)
 
     if logger.isEnabledFor(logging.DEBUG):

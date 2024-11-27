@@ -9,14 +9,15 @@ from types import TracebackType
 from typing import Any, ClassVar, cast
 from uuid import UUID
 
+import httpx
 import notion_client
-from httpx import ConnectError
 from notion_client.errors import APIResponseError
 
 from ultimate_notion.blocks import Block, DataObject
-from ultimate_notion.config import Config, activate_debug_mode, get_cfg_file, get_or_create_cfg
+from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
@@ -28,16 +29,7 @@ from ultimate_notion.schema import DefaultSchema, Schema
 from ultimate_notion.user import User
 from ultimate_notion.utils import SList
 
-_log = logging.getLogger(__name__)
-
-
-def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
-    """Create a Notion client with the given authentication token."""
-    if (auth := cfg.ultimate_notion.token) is None:
-        msg = f'No Notion token found! Check {get_cfg_file()}.'
-        raise RuntimeError(msg)
-
-    return notion_client.Client(auth=auth, **kwargs)
+_logger = logging.getLogger(__name__)
 
 
 class SessionError(Exception):
@@ -58,7 +50,7 @@ class Session:
     _own_bot_id: UUID | None = None
     cache: ClassVar[dict[UUID, DataObject | User]] = {}
 
-    def __init__(self, cfg: Config | None = None, **kwargs: Any):
+    def __init__(self, cfg: Config | None = None, *, client: notion_client.Client | None = None, **kwargs: Any):
         """Initialize the `Session` object and the raw `api` endpoints.
 
         Args:
@@ -67,16 +59,13 @@ class Session:
         """
         cfg = get_or_create_cfg() if cfg is None else cfg
 
-        _log.info('Initializing Notion session...')
+        _logger.info('Initializing Notion session...')
         Session._initialize_once(self)
 
-        # Same sane default as notion_client defines its own logger
-        kwargs.setdefault('logger', logging.getLogger(f'{__name__}.client'))
-        kwargs.setdefault('log_level', logging.NOTSET)
         if cfg.ultimate_notion.debug:
             activate_debug_mode()
 
-        self.client = create_notion_client(cfg, **kwargs)
+        self.client = create_notion_client(cfg, **kwargs) if client is None else client
         self.api = NotionAPI(self.client)
 
     @classmethod
@@ -118,14 +107,14 @@ class Session:
         exc_value: BaseException,
         traceback: TracebackType,
     ) -> None:
-        _log.info('Closing connection to Notion...')
+        _logger.info('Closing connection to Notion...')
         self.client.close()
         Session._active_session = None
         Session.cache.clear()
 
     def close(self):
         """Close the session and release resources."""
-        _log.info('Closing connection to Notion...')
+        _logger.info('Closing connection to Notion...')
         self.client.close()
         Session._active_session = None
         Session.cache.clear()
@@ -146,7 +135,7 @@ class Session:
         """
         try:
             self.whoami()
-        except ConnectError as err:
+        except httpx.ConnectError as err:
             msg = 'Unable to connect to Notion'
             raise SessionError(msg) from err
         except APIResponseError as err:
@@ -235,7 +224,7 @@ class Session:
         if len(dbs) == 0:
             db = self.create_db(parent, schema)
             while not [db for db in self.search_db(schema.db_title) if db.parent == parent]:
-                _log.debug(f'Waiting for database {db.id} to be fully created...')
+                _logger.info(f'Waiting for database {db.id} to be fully created...')
                 time.sleep(1)
             return db
         else:
@@ -296,7 +285,7 @@ class Session:
             try:
                 user_obj = self.api.users.retrieve(user_uuid)
             except APIResponseError:
-                _log.warning(f'User with id {user_uuid} not found!')
+                _logger.warning(f'User with id {user_uuid} not found!')
                 user_obj = UnknownUserObj(id=user_uuid, object='user', type='unknown')
             user = User.wrap_obj_ref(user_obj)
             self.cache[user.id] = user

@@ -287,14 +287,6 @@ class TypedObject(GenericObject):
             msg = f'Unsupported sub-type: {type_name}'
             raise ValueError(msg)
 
-        logger.debug(
-            'initializing typed object %s :: %s => %s -- %s',
-            cls,
-            type_name,
-            sub_cls,
-            value,
-        )
-
         return sub_cls(**value)
 
     @property
