@@ -10,6 +10,8 @@ import tomli
 from pydantic import BaseModel, FilePath, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
+_logger = logging.getLogger(__name__)
+
 ENV_ULTIMATE_NOTION_CFG: str = 'ULTIMATE_NOTION_CONFIG'
 """Name of the environment variable to look up the path for the config"""
 DEFAULT_ULTIMATE_NOTION_CFG_PATH: str = '.ultimate-notion/config.toml'
@@ -102,6 +104,7 @@ def resolve_env_value(value: str) -> str:
 def get_cfg() -> Config:
     """Returns the configuration as an object."""
     cfg_path = get_cfg_file()
+    _logger.info(f'Loading configuration from path `{cfg_path}`.')
     with open(cfg_path, 'rb') as fh:
         cfg_dict = tomli.load(fh)
 

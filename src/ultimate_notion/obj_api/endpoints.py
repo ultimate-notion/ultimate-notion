@@ -91,7 +91,7 @@ class BlocksEndpoint(Endpoint):
             """
             parent_id = ObjectRef.build(parent).id
             children = [block.serialize_for_api() for block in blocks if block is not None]
-            _logger.debug(f'Appending {len(children)} blocks to parent with id: {parent_id}')
+            _logger.debug(f'Appending {len(children)} blocks to parent with id `{parent_id}`.')
 
             block_iter = EndpointIterator[Block](endpoint=self.raw_api.append)
             if after is None:
@@ -113,7 +113,7 @@ class BlocksEndpoint(Endpoint):
         def list(self, parent: ParentRef | GenericObject | UUID | str) -> Iterator[Block]:
             """Return all Blocks contained by the specified parent."""
             parent_id = ObjectRef.build(parent).id
-            _logger.debug(f'Listing all blocks for parent with id: {parent_id}')
+            _logger.debug(f'Listing all blocks for parent with id `{parent_id}`.')
             block_iter = EndpointIterator[Block](endpoint=self.raw_api.list)
             return block_iter(block_id=parent_id)
 
@@ -131,14 +131,14 @@ class BlocksEndpoint(Endpoint):
     def delete(self, block: Block | UUID | str) -> Block:
         """Delete (archive) the specified Block."""
         block_id = str(ObjectRef.build(block).id)
-        _logger.debug(f'Deleting block with id: {block_id}')
+        _logger.debug(f'Deleting block with id `{block_id}`.')
         data = self.raw_api.delete(block_id)
         return Block.model_validate(data)
 
     def restore(self, block: Block | UUID | str) -> Block:
         """Restore (unarchive) the specified Block."""
         block_id = str(ObjectRef.build(block).id)
-        _logger.debug(f'Restoring block with id: {block_id}')
+        _logger.debug(f'Restoring block with id `{block_id}`.')
         data = self.raw_api.update(block_id, archived=False)
         return Block.model_validate(data)
 
@@ -146,7 +146,7 @@ class BlocksEndpoint(Endpoint):
     def retrieve(self, block: Block | UUID | str) -> Block:
         """Return the requested Block."""
         block_id = str(ObjectRef.build(block).id)
-        _logger.debug(f'Retrieving block with id: {block_id}')
+        _logger.debug(f'Retrieving block with id `{block_id}`.')
         data = self.raw_api.retrieve(block_id)
         return Block.model_validate(data)
 
@@ -156,7 +156,7 @@ class BlocksEndpoint(Endpoint):
 
         The block info will be updated to the latest version from the server.
         """
-        _logger.debug(f'Updating block with id: {block.id}')
+        _logger.debug(f'Updating block with id `{block.id}`.')
         params = block.serialize_for_api()
 
         if isinstance(block, FileBase):
@@ -214,7 +214,7 @@ class DatabasesEndpoint(Endpoint):
     ) -> Database:
         """Add a database to the given Page parent."""
         parent_ref = PageRef.build(parent)
-        _logger.debug(f'Creating new database below page with id: {parent_ref.page_id}')
+        _logger.debug(f'Creating new database below page with id `{parent_ref.page_id}`.')
         request = self._build_request(parent_ref, schema, title)
         data = self.raw_api.create(**request)
         return Database.model_validate(data)
@@ -223,7 +223,7 @@ class DatabasesEndpoint(Endpoint):
     def retrieve(self, dbref: Database | str | UUID) -> Database:
         """Return the Database with the given ID."""
         db_id = DatabaseRef.build(dbref).database_id
-        _logger.debug(f'Retrieving database with id: {db_id}')
+        _logger.debug(f'Retrieving database with id `{db_id}`.')
         data = self.raw_api.retrieve(str(db_id))
         return Database.model_validate(data)
 
@@ -240,7 +240,7 @@ class DatabasesEndpoint(Endpoint):
 
         API reference: https://developers.notion.com/reference/update-a-database
         """
-        _logger.debug(f'Updating info of database with id: {db.id}')
+        _logger.debug(f'Updating info of database with id `{db.id}`.')
 
         if request := self._build_request(schema=schema, title=title, description=description):
             # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
@@ -253,7 +253,7 @@ class DatabasesEndpoint(Endpoint):
     def delete(self, db: Database) -> Database:
         """Delete (archive) the specified Database."""
         db_id = DatabaseRef.build(db).database_id
-        _logger.debug(f'Deleting database with id: {db_id}')
+        _logger.debug(f'Deleting database with id `{db_id}`.')
         block_obj = self.api.blocks.delete(str(db_id))
         # block.update(**data) is not possible as the API returns a block, not a database
         db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
@@ -263,7 +263,7 @@ class DatabasesEndpoint(Endpoint):
     def restore(self, db: Database) -> Database:
         """Restore (unarchive) the specified Database."""
         db_id = DatabaseRef.build(db).database_id
-        _logger.debug(f'Restoring database with id: {db_id}')
+        _logger.debug(f'Restoring database with id `{db_id}`.')
         block_obj = self.api.blocks.restore(str(db_id))
         # block.update(**data) is not possible as the API returns a block, not a database
         db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
@@ -274,7 +274,7 @@ class DatabasesEndpoint(Endpoint):
     def query(self, db: Database | UUID | str) -> DBQueryBuilder:
         """Initialize a new Query object with the target data class."""
         db_id = DatabaseRef.build(db).database_id
-        _logger.debug(f'Initializing query for db with id: {db_id}')
+        _logger.debug(f'Initializing query for db with id `{db_id}`.')
         return DBQueryBuilder(endpoint=self.raw_api.query, db_id=str(db_id))
 
 
@@ -294,7 +294,7 @@ class PagesEndpoint(Endpoint):
             """Return the Property on a specific Page with the given ID"""
             page_id = str(PageRef.build(page).page_id)
             property_id = property.id if isinstance(property, PropertyValue) else property
-            _logger.debug(f'Retrieving property with id: {property_id} from page with id: {page_id}')
+            _logger.debug(f'Retrieving property with id `{property_id}` from page with id `{page_id}`.')
             prop_iter = EndpointIterator[PropertyItem](
                 endpoint=self.raw_api.retrieve,
                 model_validate=TypeAdapter(PropertyItemList | PropertyItem).validate_python,
@@ -351,7 +351,7 @@ class PagesEndpoint(Endpoint):
         if children is not None:
             request['children'] = [child.serialize_for_api() for child in children if child is not None]
 
-        _logger.debug(f'Creating new page below page with id: {parent_id}')
+        _logger.debug(f'Creating new page below page with id `{parent_id}`.')
         data = self.raw_api.create(**request)
         return Page.model_validate(data)
 
@@ -373,14 +373,14 @@ class PagesEndpoint(Endpoint):
             Use `pages.properties.retrieve` to retrieve all items of a specific property.
         """
         page_id = str(PageRef.build(page).page_id)
-        _logger.debug(f'Retrieving page with id: {page_id}')
+        _logger.debug(f'Retrieving page with id `{page_id}`.')
         data = self.raw_api.retrieve(page_id)
         return Page.model_validate(data)
 
     # https://developers.notion.com/reference/patch-page
     def update(self, page: Page, **properties: PropertyValue) -> Page:
         """Update the Page object properties on the server."""
-        _logger.debug(f'Updating info on page with id: {page.id}')
+        _logger.debug(f'Updating info on page with id `{page.id}`.')
         props = {name: value.serialize_for_api() if value is not None else None for name, value in properties.items()}
         data = cast(dict[str, Any], self.raw_api.update(page.id.hex, properties=props))
         return page.update(**data)
@@ -404,26 +404,26 @@ class PagesEndpoint(Endpoint):
 
         if cover is not UNSET:
             if cover is None:
-                _logger.debug(f'Removing cover from page with id: {page_id}')
+                _logger.debug(f'Removing cover from page with id `{page_id}`.')
                 props['cover'] = None
             else:
-                _logger.debug(f'Setting cover on page with id: {page_id}')
+                _logger.debug(f'Setting cover on page with id `{page_id}`.')
                 props['cover'] = cover.serialize_for_api()  # type: ignore[union-attr]
 
         if icon is not UNSET:
             if icon is None:
-                _logger.debug(f'Removing icon from page with id: {page_id}')
+                _logger.debug(f'Removing icon from page with id `{page_id}`.')
                 props['icon'] = None
             else:
-                _logger.debug(f'Setting icon on page with id: {page_id}')
+                _logger.debug(f'Setting icon on page with id `{page_id}`.')
                 props['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
 
         if in_trash is not UNSET:
             if in_trash:
-                _logger.debug(f'Deleting page with id: {page_id}')
+                _logger.debug(f'Deleting page with id `{page_id}`.')
                 props['archived'] = True
             else:
-                _logger.debug(f'Restoring page with id: {page_id}')
+                _logger.debug(f'Restoring page with id `{page_id}`.')
                 props['archived'] = False
 
         data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **props))
@@ -450,7 +450,7 @@ class UsersEndpoint(Endpoint):
     # https://developers.notion.com/reference/get-users
     def list(self) -> Iterator[User]:
         """Return an iterator for all users in the workspace."""
-        _logger.debug('Retrieving all known users')
+        _logger.debug('Retrieving all known users.')
         user_iter = EndpointIterator[User](endpoint=self.raw_api.list)
         return user_iter()
 
@@ -458,7 +458,7 @@ class UsersEndpoint(Endpoint):
     def retrieve(self, user: User | UUID | str) -> User:
         """Return the User with the given ID."""
         user_id = str(UserRef.build(user).id)
-        _logger.debug(f'Retrieving user with id: {user_id}')
+        _logger.debug(f'Retrieving user with id `{user_id}`.')
         data = self.raw_api.retrieve(user_id)
         return User.model_validate(data)
 
@@ -482,7 +482,7 @@ class CommentsEndpoint(Endpoint):
     def create(self, page: Page | UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:
         """Create a comment on the specified Page."""
         page_ref = PageRef.build(page)
-        _logger.debug(f'Creating a comment on page with id: {page_ref.page_id}')
+        _logger.debug(f'Creating a comment on page with id `{page_ref.page_id}.')
         rich_text_json = [rt.serialize_for_api() for rt in rich_text]
         data = self.raw_api.create(parent=page_ref.serialize_for_api(), rich_text=rich_text_json)
         return Comment.model_validate(data)
@@ -490,7 +490,7 @@ class CommentsEndpoint(Endpoint):
     # https://developers.notion.com/reference/create-a-comment
     def append(self, discussion_id: UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:
         """Append a comment to the specified discussion."""
-        _logger.debug(f'Appending a comment to discussion with id: {discussion_id}')
+        _logger.debug(f'Appending a comment to discussion with id `{discussion_id}`.')
         rich_text_json = [rt.serialize_for_api() for rt in rich_text]
         data = self.raw_api.create(discussion_id=str(discussion_id), rich_text=rich_text_json)
         return Comment.model_validate(data)
@@ -499,6 +499,6 @@ class CommentsEndpoint(Endpoint):
     def list(self, block: Block | Page | UUID | str) -> Iterator[Comment]:
         """Return all comments on the specified page or block."""
         block_id = str(ObjectRef.build(block).id)
-        _logger.debug(f'Listing comments on block with id: {block_id}')
+        _logger.debug(f'Listing comments on block with id `{block_id}`.')
         comment_iter = EndpointIterator[Comment](endpoint=self.raw_api.list)
         return comment_iter(block_id=block_id)

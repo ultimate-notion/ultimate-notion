@@ -59,7 +59,6 @@ class Session:
         """
         cfg = get_or_create_cfg() if cfg is None else cfg
 
-        _logger.info('Initializing Notion session...')
         Session._initialize_once(self)
 
         if cfg.ultimate_notion.debug:
@@ -70,6 +69,7 @@ class Session:
 
     @classmethod
     def _initialize_once(cls, instance: Session):
+        _logger.info('Initializing Notion session.')
         with Session._lock:
             if Session._active_session and Session._active_session is not instance:
                 msg = 'Cannot initialize multiple Sessions at once'
@@ -107,14 +107,11 @@ class Session:
         exc_value: BaseException,
         traceback: TracebackType,
     ) -> None:
-        _logger.info('Closing connection to Notion...')
-        self.client.close()
-        Session._active_session = None
-        Session.cache.clear()
+        self.close()
 
     def close(self):
         """Close the session and release resources."""
-        _logger.info('Closing connection to Notion...')
+        _logger.info('Closing connection to Notion.')
         self.client.close()
         Session._active_session = None
         Session.cache.clear()
@@ -133,6 +130,7 @@ class Session:
 
         Raises SessionError if there is a problem, otherwise returns None.
         """
+        _logger.info('Checking connection to Notion.')
         try:
             self.whoami()
         except httpx.ConnectError as err:
@@ -146,11 +144,14 @@ class Session:
         """Retrieve a single block by an object reference."""
         block_uuid = get_uuid(block_ref)
         if use_cache and block_uuid in self.cache:
-            return cast(Block, self.cache[block_uuid])
+            _logger.info(f'Retrieving cached block with id `{block_uuid}`.')
+            block = cast(Block, self.cache[block_uuid])
         else:
-            block: Block = Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
+            _logger.info(f'Retrieving block with id `{block_uuid}`.')
+            block = Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
             self.cache[block.id] = block
-            return block
+        _logger.info(f'Retrieved `{type(block)}` block.')
+        return block
 
     # ToDo: Provide a title and description for the database that overwrites the values from the schema
     def create_db(self, parent: Page, schema: type[Schema] | None = None) -> Database:
@@ -162,6 +163,7 @@ class Session:
         # 4. create properties with self-referencing forward relations using an update call
         # 5. update the backward references, i.e. two-way relations, using an update call
         if schema:
+            _logger.info(f'Creating database `{schema.db_title}` in page `{parent.title}` with schema:\n{schema}')
             schema._init_fwd_rels()
             schema_dct = {prop.name: prop.type.obj_ref for prop in schema._get_init_props()}
             title = schema.db_title.obj_ref if schema.db_title is not None else None
@@ -169,6 +171,7 @@ class Session:
             if schema.db_desc:
                 db_obj = self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
         else:
+            _logger.info(f'Creating database in page `{parent.title}` with default schema.')
             schema_dct = {prop.name: prop.type.obj_ref for prop in DefaultSchema._get_init_props()}
             db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
 
@@ -198,6 +201,7 @@ class Session:
             reverse: search in the reverse order, i.e. the least recently edited results first
             deleted: include deleted databases in search
         """
+        _logger.info(f'Searching for database with name `{db_name}`.')
         query: obj_query.SearchQueryBuilder[obj_blocks.Database] = self.api.search(db_name).filter(db_only=True)
         if reverse:
             query.sort(ascending=True)
@@ -212,11 +216,14 @@ class Session:
         """Retrieve Notion database by uuid"""
         db_uuid = get_uuid(db_ref)
         if use_cache and db_uuid in self.cache:
-            return cast(Database, self.cache[db_uuid])
+            _logger.info(f'Retrieving cached database with id `{db_uuid}`.')
+            db = cast(Database, self.cache[db_uuid])
         else:
+            _logger.info(f'Retrieving database with id `{db_uuid}`.')
             db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
             self.cache[db.id] = db
-            return db
+        _logger.info(f'Retrieved database `{db.title}`.')
+        return db
 
     def get_or_create_db(self, parent: Page, schema: type[Schema]) -> Database:
         """Get or create the database."""
@@ -224,7 +231,7 @@ class Session:
         if len(dbs) == 0:
             db = self.create_db(parent, schema)
             while not [db for db in self.search_db(schema.db_title) if db.parent == parent]:
-                _logger.info(f'Waiting for database {db.id} to be fully created...')
+                _logger.info(f'Waiting for database `{db.title}` to be fully created.')
                 time.sleep(1)
             return db
         else:
@@ -240,6 +247,7 @@ class Session:
             exact: perform an exact search, not only a substring match
             reverse: search in the reverse order, i.e. the least recently edited results first
         """
+        _logger.info(f'Searching for page with title `{title}`.')
         query: obj_query.SearchQueryBuilder[obj_blocks.Page] = self.api.search(title).filter(page_only=True)
         if reverse:
             query.sort(ascending=True)
@@ -254,14 +262,18 @@ class Session:
         """Retrieve a page by uuid."""
         page_uuid = get_uuid(page_ref)
         if use_cache and page_uuid in self.cache:
-            return cast(Page, self.cache[page_uuid])
+            _logger.info(f'Retrieving cached page with id `{page_uuid}`.')
+            page = cast(Page, self.cache[page_uuid])
         else:
+            _logger.info(f'Retrieving page with id `{page_uuid}`.')
             page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
             self.cache[page.id] = page
-            return page
+        _logger.info(f'Retrieved page `{page.title}`.')
+        return page
 
     def create_page(self, parent: Page | Database, title: Text | str | None = None) -> Page:
         """Create a new page in a parent page or database."""
+        _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
         page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
         self.cache[page.id] = page
@@ -280,8 +292,10 @@ class Session:
         self.whoami()  # make sure cache is filled with the uuid of the bot integration
 
         if use_cache and user_uuid in self.cache:
-            return cast(User, self.cache[user_uuid])
+            _logger.info(f'Retrieving cached user with id `{user_uuid}`.')
+            user = cast(User, self.cache[user_uuid])
         else:
+            _logger.info(f'Retrieving user with id `{user_uuid}`.')
             try:
                 user_obj = self.api.users.retrieve(user_uuid)
             except APIResponseError:
@@ -289,18 +303,23 @@ class Session:
                 user_obj = UnknownUserObj(id=user_uuid, object='user', type='unknown')
             user = User.wrap_obj_ref(user_obj)
             self.cache[user.id] = user
-            return user
+
+        _logger.info(f'Retrieved user `{user}`.')
+        return user
 
     def search_user(self, name: str) -> SList[User]:
         """Search a user by name."""
+        _logger.info(f'Searching for user with name `{name}`.')
         return SList(user for user in self.all_users() if user.name == name)
 
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace."""
+        _logger.info('Retrieving all users.')
         return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
 
     def whoami(self) -> User:
         """Return the user object of this bot."""
+        _logger.info('Retrieving user of this integration.')
         if self._own_bot_id is None:
             user = self.api.users.me()
             self._own_bot_id = user.id
