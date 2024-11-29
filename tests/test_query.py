@@ -503,7 +503,7 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
     query = formula_db.query.filter(uno.prop('Date') >= '2024-11-23')
     assert set(query.execute()) == {item_1, item_2}
 
-    query = formula_db.query.filter(uno.prop('Date').past_week())
+    query = formula_db.query.filter(uno.prop('Date').next_week())
     assert set(query.execute()) == set()
 
     class DB(uno.Schema, db_title='Empty Formula DB Test'):

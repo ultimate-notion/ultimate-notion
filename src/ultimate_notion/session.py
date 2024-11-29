@@ -115,6 +115,7 @@ class Session:
         self.client.close()
         Session._active_session = None
         Session.cache.clear()
+        Session._own_bot_id = None
 
     def is_closed(self) -> bool:
         """Determine if the session is closed or not."""
