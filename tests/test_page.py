@@ -7,6 +7,7 @@ from textwrap import dedent
 import pytest
 
 import ultimate_notion as uno
+from tests.conftest import assert_eventually
 from ultimate_notion.blocks import Block
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 
@@ -289,7 +290,8 @@ def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page
 
     customer.reload()  # reload to get the updated relation
     time.sleep(3)  # wait for the changes to be applied on the server side
-    assert len(customer.props.purchases) == n_prop_items  # type: ignore[attr-defined]
+
+    assert_eventually(lambda: len(customer.props.purchases) == n_prop_items)  # type: ignore[attr-defined]
 
 
 @pytest.mark.vcr()

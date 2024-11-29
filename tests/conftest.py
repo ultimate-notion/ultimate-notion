@@ -26,6 +26,7 @@ import logging
 import os
 import shutil
 import tempfile
+import time
 from collections.abc import Iterator
 from functools import wraps
 from pathlib import Path
@@ -43,7 +44,7 @@ import ultimate_notion as uno
 from ultimate_notion import Database, Option, Page, Session, User, schema
 from ultimate_notion.adapters.google.tasks import GTasksClient
 from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, ENV_ULTIMATE_NOTION_DEBUG, get_cfg_file, get_or_create_cfg
-from ultimate_notion.utils import temp_timezone
+from ultimate_notion.utils import temp_attr, temp_timezone
 
 if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
@@ -251,7 +252,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
 
         @wraps(func)
         @pytest.fixture(scope=scope, autouse=autouse)
-        def generator_wrapper(request: SubRequest, vcr_config: dict[str, str], notion: Session):
+        def generator_wrapper(request: SubRequest, vcr_config: dict[str, str], notion_cached: Session):
             vcr, cassette_name = setup_vcr(request, vcr_config)
             fixture_args = [request.getfixturevalue(arg) for arg in args]
             # This opens and closes the cassette for each iteration of the generator
@@ -269,7 +270,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
 
         @wraps(func)
         @pytest.fixture(scope=scope, autouse=autouse)
-        def function_wrapper(request: SubRequest, vcr_config: dict[str, str], notion: Session):
+        def function_wrapper(request: SubRequest, vcr_config: dict[str, str], notion_cached: Session):
             vcr, cassette_name = setup_vcr(request, vcr_config)
             fixture_args = [request.getfixturevalue(arg) for arg in args]
 
@@ -285,32 +286,39 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
 
 
 @pytest.fixture(scope='module')
-def notion() -> Iterator[Session]:
+def notion_cached() -> Iterator[Session]:
     """Return the notion session used for live testing."""
     with uno.Session() as notion:
         yield notion
 
 
+@pytest.fixture(scope='function')
+def notion(notion_cached) -> Iterator[Session]:
+    """Return a fresh notion session without state for testing."""
+    with temp_attr(notion_cached, cache={}, _own_bot_id=None):
+        yield notion_cached
+
+
 @pytest.fixture(scope='module')
-def person(notion: Session) -> User:
+def person(notion_cached: Session) -> User:
     """Return a user object for testing."""
-    return notion.search_user('Florian Wilhelm').item()
+    return notion_cached.search_user('Florian Wilhelm').item()
 
 
 @vcr_fixture(scope='module')
-def contacts_db(notion: Session) -> Database:
+def contacts_db(notion_cached: Session) -> Database:
     """Return a test database."""
-    return notion.search_db(CONTACTS_DB).item()
+    return notion_cached.search_db(CONTACTS_DB).item()
 
 
 @vcr_fixture(scope='module')
-def root_page(notion: Session) -> Page:
+def root_page(notion_cached: Session) -> Page:
     """Return the page reference used as parent page for live testing."""
-    return notion.search_page(TESTS_PAGE).item()
+    return notion_cached.search_page(TESTS_PAGE).item()
 
 
 @pytest.fixture(scope='function')
-def article_db(notion: Session, root_page: Page) -> Iterator[Database]:
+def article_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
     """Simple database of articles."""
 
     class Article(schema.Schema, db_title='Articles'):
@@ -318,72 +326,72 @@ def article_db(notion: Session, root_page: Page) -> Iterator[Database]:
         cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
         desc = schema.Property('Description', schema.Text())
 
-    db = notion.create_db(parent=root_page, schema=Article)
+    db = notion_cached.create_db(parent=root_page, schema=Article)
     yield db
     db.delete()
 
 
 @pytest.fixture(scope='function')
-def page_hierarchy(notion: Session, root_page: Page) -> Iterator[tuple[Page, Page, Page]]:
+def page_hierarchy(notion_cached: Session, root_page: Page) -> Iterator[tuple[Page, Page, Page]]:
     """Simple hierarchy of 3 pages nested in eachother: root -> l1 -> l2."""
-    l1_page = notion.create_page(parent=root_page, title='level_1')
-    l2_page = notion.create_page(parent=l1_page, title='level_2')
+    l1_page = notion_cached.create_page(parent=root_page, title='level_1')
+    l2_page = notion_cached.create_page(parent=l1_page, title='level_2')
     yield root_page, l1_page, l2_page
     l2_page.delete(), l1_page.delete()
 
 
 @vcr_fixture(scope='module')
-def intro_page(notion: Session) -> Page:
+def intro_page(notion_cached: Session) -> Page:
     """Return the default 'Getting Started' page."""
-    return notion.search_page(GETTING_STARTED_PAGE).item()
+    return notion_cached.search_page(GETTING_STARTED_PAGE).item()
 
 
 @vcr_fixture(scope='module')
-def all_props_db(notion: Session) -> Database:
+def all_props_db(notion_cached: Session) -> Database:
     """Return manually created database with all properties, also AI properties."""
-    return notion.search_db(ALL_PROPS_DB).item()
+    return notion_cached.search_db(ALL_PROPS_DB).item()
 
 
 @vcr_fixture(scope='module')
-def wiki_db(notion: Session) -> Database:
+def wiki_db(notion_cached: Session) -> Database:
     """Return manually created wiki db."""
-    return notion.search_db(WIKI_DB).item()
+    return notion_cached.search_db(WIKI_DB).item()
 
 
 @vcr_fixture(scope='module')
-def formula_db(notion: Session) -> Database:
-    """Return manually formula db."""
-    return notion.search_db('Formula DB').item()
+def formula_db(notion_cached: Session) -> Database:
+    """Return manually created formula db."""
+    return notion_cached.search_db('Formula DB').item()
 
 
 @vcr_fixture(scope='module')
-def md_text_page(notion: Session) -> Page:
+def md_text_page(notion_cached: Session) -> Page:
     """Return a page with markdown text content."""
-    return notion.search_page(MD_TEXT_TEST_PAGE).item()
+    return notion_cached.search_page(MD_TEXT_TEST_PAGE).item()
 
 
 @vcr_fixture(scope='module')
-def md_page(notion: Session) -> Page:
+def md_page(notion_cached: Session) -> Page:
     """Return a page with markdown content."""
-    return notion.search_page(MD_PAGE_TEST_PAGE).item()
+    return notion_cached.search_page(MD_PAGE_TEST_PAGE).item()
 
 
 @vcr_fixture(scope='module')
-def md_subpage(notion: Session) -> Page:
+def md_subpage(notion_cached: Session) -> Page:
     """Return a page with markdown content."""
-    return notion.search_page(MD_SUBPAGE_TEST_PAGE).item()
+    return notion_cached.search_page(MD_SUBPAGE_TEST_PAGE).item()
 
 
 @vcr_fixture(scope='module')
-def unfurl_page(notion: Session) -> Page:
+def unfurl_page(notion_cached: Session) -> Page:
     """Return a page with embed/inline & unfurl content."""
-    return notion.search_page(UNFURL_TEST_PAGE).item()
+    return notion_cached.search_page(UNFURL_TEST_PAGE).item()
 
 
 @vcr_fixture(scope='module')
-def comment_page(notion: Session) -> Page:
+def comment_page(notion_cached: Session) -> Page:
     """Return a page with comments."""
-    return notion.search_page(COMMENT_PAGE).item()
+    return notion_cached.search_page(COMMENT_PAGE).item()
 
 
 @pytest.fixture(scope='module')
@@ -401,19 +409,21 @@ def static_pages(  # noqa: PLR0917
 
 
 @vcr_fixture(scope='module')
-def task_db(notion: Session) -> Database:
+def task_db(notion_cached: Session) -> Database:
     """Return manually created wiki db."""
-    return notion.search_db(TASK_DB).item()
+    return notion_cached.search_db(TASK_DB).item()
 
 
 @vcr_fixture(scope='module')
-def static_dbs(all_props_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database) -> set[Database]:
+def static_dbs(
+    all_props_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database, formula_db: Database
+) -> set[Database]:
     """Return all static pages for the unit tests."""
-    return {all_props_db, wiki_db, contacts_db, task_db}
+    return {all_props_db, wiki_db, contacts_db, task_db, formula_db}
 
 
 @pytest.fixture(scope='function')
-def new_task_db(notion: Session, root_page: Page) -> Iterator[Database]:
+def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
         Option('In Progress', color=uno.Color.BLUE),
@@ -526,13 +536,13 @@ def new_task_db(notion: Session, root_page: Page) -> Iterator[Database]:
         # parent = schema.Property('Parent Task', schema.Relation(schema.SelfRef))
         # subs = schema.Property('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_prop=parent))
 
-    db = notion.create_db(parent=root_page, schema=Tasklist)
+    db = notion_cached.create_db(parent=root_page, schema=Tasklist)
     yield db
     db.delete()
 
 
 @vcr_fixture(scope='module', autouse=True)
-def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]):
+def notion_cleanups(notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]):
     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
 
     Be careful! This fixture opens a Notion session, which might lead to problems if you run it in parallel with other.
@@ -540,10 +550,10 @@ def notion_cleanups(notion: Session, root_page: Page, static_pages: set[Page], s
     """
 
     def clean():
-        for db in notion.search_db():
+        for db in notion_cached.search_db():
             if db.ancestors[0] == root_page and db not in static_dbs:
                 db.delete()
-        for page in notion.search_page():
+        for page in notion_cached.search_page():
             if page in static_pages:
                 continue
             ancestors = page.ancestors
@@ -586,3 +596,22 @@ def tz_berlin() -> Iterator[str]:
     tz = 'Europe/Berlin'
     with temp_timezone(tz):
         yield tz
+
+
+def assert_eventually(assertion_func, retries=5, delay=3):
+    """
+    Retry the provided assertion function for a given number of attempts with a delay.
+
+    Args:
+        assertion_func (Callable): The function containing the assertion logic.
+        retries (int): Number of retries before failing.
+        delay (int): Delay in seconds between retries.
+    """
+    for attempt in range(retries):
+        try:
+            assertion_func()
+            return
+        except AssertionError:
+            if attempt < retries - 1:
+                time.sleep(delay)
+    assertion_func()

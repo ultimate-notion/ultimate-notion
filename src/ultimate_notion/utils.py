@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import textwrap
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
@@ -394,3 +394,23 @@ def del_nested_attr(
             raise AttributeError(msg)
 
     return obj
+
+
+@contextmanager
+def temp_attr(obj: object, **kwargs: Any) -> Generator[None, None, None]:
+    """
+    Temporarily sets multiple attributes of an object to specified values,
+    and restores their original values after the context exits.
+
+    Args:
+        obj (object): The object whose attributes will be modified.
+        **kwargs (Any): The attributes and their temporary values to modify.
+    """
+    orig_values = {attr: getattr(obj, attr, None) for attr in kwargs}
+    for attr, new_value in kwargs.items():
+        setattr(obj, attr, new_value)
+    try:
+        yield
+    finally:
+        for attr, original_value in orig_values.items():
+            setattr(obj, attr, original_value)
