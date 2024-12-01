@@ -16,7 +16,7 @@ from ultimate_notion.obj_api.props import PropertyItem
 
 MAX_PAGE_SIZE = 100
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def convert_to_notion_obj(data: dict[str, Any]) -> Block | Page | Database | PropertyItem | User | GenericObject:
@@ -135,6 +135,8 @@ class EndpointIterator(Generic[T]):
         while self.has_more:
             self.page_num += 1
 
+            msg = f'Fetching page `{self.page_num}` of endpoint with cursor `{self.next_cursor}`.'
+            _logger.debug(msg)
             result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
 
             obj_or_list = self._model_validate(result_page)
@@ -149,3 +151,5 @@ class EndpointIterator(Generic[T]):
             else:
                 yield cast(T, obj_or_list)
                 self.has_more = False
+
+            _logger.debug(f'Fetched `{self.total_items}` items in total over `{self.page_num}` pages.')
