@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, cast
 
@@ -21,6 +22,9 @@ if TYPE_CHECKING:
     from ultimate_notion.database import Database
     from ultimate_notion.option import Option
     from ultimate_notion.schema import PropertyType
+
+
+_logger = logging.getLogger(__name__)
 
 
 class Property(BaseModel):
@@ -799,6 +803,8 @@ class Query:
 
     def execute(self) -> View:
         """Execute the query and return the resulting pages as a view."""
+        sorts = ', '.join(f'{prop}.{prop.sort}()' for prop in self._sorts) if self._sorts else ''
+        _logger.info(f'Querying database `{self.database}` with filter `{self._filter}` and sorts `{sorts}`.')
         session = get_active_session()
         query_obj = session.api.databases.query(self.database.obj_ref)
 
