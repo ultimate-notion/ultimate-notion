@@ -198,15 +198,19 @@ def test_schema_from_dict():
 
     dict_style_schema = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.MultiSelect([])}
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-    assert DictStyleSchema.is_consistent_with(ClassStyleSchema)
+    DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
     dict_style_schema = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.Select([])}  # Wrong PropertyType!
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-    assert not DictStyleSchema.is_consistent_with(ClassStyleSchema)
+
+    with pytest.raises(uno.SchemaError):
+        DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
     dict_style_schema = {'Name': uno.PropType.Title(), 'My Tags': uno.PropType.MultiSelect([])}  # Wrong property!
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-    assert not DictStyleSchema.is_consistent_with(ClassStyleSchema)
+
+    with pytest.raises(uno.SchemaError):
+        DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
     with pytest.raises(uno.SchemaError):
         dict_style_schema = {'Tags': uno.PropType.MultiSelect([])}

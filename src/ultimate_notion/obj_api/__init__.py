@@ -32,19 +32,16 @@ _logger = logging.getLogger(__name__)
 def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
     """Create a Notion client with the given authentication token."""
 
-    class LoggingTransport(httpx.BaseTransport):
-        """A transport that logs the request and response."""
+    class LoggingClient(httpx.Client):
+        """A client that logs the request and response."""
 
-        def __init__(self, transport=None):
-            self._transport = transport or httpx.HTTPTransport()
-
-        def handle_request(self, request):
+        def send(self, request: httpx.Request, **kwargs: Any) -> httpx.Response:
             msg = f'Request: {request.method} {request.url}'
             if request.content:
                 msg += f'\n{request.content.decode("utf-8") if isinstance(request.content, bytes) else request.content}'
             _logger.debug(msg)
 
-            response = self._transport.handle_request(request)
+            response = super().send(request, **kwargs)
 
             msg = f'Response: {response.status_code} {request.url}'
             response.read()  # Ensure that the response content is fully loaded. Memory schouldn't be an issue here.
@@ -63,7 +60,7 @@ def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
     # Same sane default as notion_client defines its own logger
     kwargs.setdefault('logger', logging.getLogger('notion_client'))
     kwargs.setdefault('log_level', logging.NOTSET)
-    return notion_client.Client(auth=auth, client=httpx.Client(transport=LoggingTransport()), **kwargs)
+    return notion_client.Client(auth=auth, client=LoggingClient(), **kwargs)
 
 
 __all__ = ['NotionAPI', 'create_notion_client']

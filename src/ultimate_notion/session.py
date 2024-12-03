@@ -179,8 +179,9 @@ class Session:
         db: Database = Database.wrap_obj_ref(db_obj)
 
         if schema:
-            db.schema = schema  # schema is thus bound
+            db._set_schema(schema, during_init=True)  # schema is thus bound to the database
             schema._init_self_refs()
+            schema._init_self_ref_rollups()
             schema._update_bwd_rels()
 
         self.cache[db.id] = db
