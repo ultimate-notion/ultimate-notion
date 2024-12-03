@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from textwrap import dedent
 from typing import cast
 
 from pydantic import BaseModel
@@ -17,7 +16,6 @@ from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case, snake_case
 from ultimate_notion.schema import Property, PropertyType, PropertyValue, ReadOnlyPropertyError, Schema, SchemaError
-from ultimate_notion.utils import dict_diff_str
 from ultimate_notion.view import View
 
 
@@ -121,6 +119,12 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         schema.bind_db(self)
         return schema
 
+    def _set_schema(self, schema: type[Schema], *, during_init: bool):
+        """Set a custom schema in order to change the Python variables names."""
+        self.schema.assert_consistency_with(schema, during_init=during_init)
+        schema.bind_db(self)
+        self._schema = schema
+
     @property
     def schema(self) -> type[Schema]:
         """Schema of the database."""
@@ -131,17 +135,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @schema.setter
     def schema(self, schema: type[Schema]):
         """Set a custom schema in order to change the Python variables names."""
-        if self.schema.is_consistent_with(schema):
-            schema.bind_db(self)
-            self._schema = schema
-        else:
-            props_added, props_removed, props_changed = dict_diff_str(self.schema.to_dict(), schema.to_dict())
-            msg = f"""Provided schema is not consistent with the current schema of the database:
-                      Properties added: {props_added}
-                      Properties removed: {props_removed}
-                      Properties changed: {props_changed}
-                   """
-            raise SchemaError(dedent(msg))
+        self._set_schema(schema, during_init=False)
 
     @property
     def is_inline(self) -> bool:

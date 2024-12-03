@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from abc import ABCMeta
 from collections.abc import Iterator
+from textwrap import dedent
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from tabulate import tabulate
@@ -32,7 +33,7 @@ from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.utils import EmptyListError, SList, is_notebook
+from ultimate_notion.utils import EmptyListError, SList, dict_diff_str, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -100,6 +101,11 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     def readonly(self) -> bool:
         """Return if this property type is read-only."""
         return self.prop_value.readonly
+
+    @property
+    def _is_init(self) -> bool:
+        """Determines if the property type is already initialized"""
+        return hasattr(self, 'obj_ref')
 
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
@@ -310,22 +316,31 @@ class Schema(metaclass=SchemaRepr):
         return SList(prop for prop in cls.get_props() if isinstance(prop.type, Title)).item()
 
     @classmethod
-    def is_consistent_with(cls, other_schema: type[Schema]) -> bool:
-        """Is this schema consistent with another ignoring backward relations if not in other schema."""
+    def assert_consistency_with(cls, other_schema: type[Schema], *, during_init: bool = False) -> None:
+        """Assert that this schema is consistent with another schema."""
         own_schema_dct = cls.to_dict()
         other_schema_dct = other_schema.to_dict()
 
-        if own_schema_dct == other_schema_dct:
-            # backward relation was initialized in the other schema
-            return True
+        if during_init:
+            # backward relation was not yet initialised in the other schema (during the creation of the data model)
+            # or self-referencing relation was not yet initialised
+            other_schema_dct = {
+                name: prop_type
+                for name, prop_type in other_schema_dct.items()
+                if not (
+                    (isinstance(prop_type, Relation) and not prop_type.schema)
+                    or (isinstance(prop_type, Rollup) and prop_type.is_self_ref)
+                )
+            }
 
-        # backward relation was not yet initialised in the other schema (during the creation of the data model)
-        other_schema_no_backrels_dct = {
-            name: prop_type
-            for name, prop_type in other_schema_dct.items()
-            if not (isinstance(prop_type, Relation) and not prop_type.schema)
-        }
-        return other_schema_no_backrels_dct == own_schema_dct
+        if other_schema_dct != own_schema_dct:
+            props_added, props_removed, props_changed = dict_diff_str(own_schema_dct, other_schema_dct)
+            msg = f"""Provided schema is not consistent with the current schema of the database:
+                      Properties added: {props_added}
+                      Properties removed: {props_removed}
+                      Properties changed: {props_changed}
+                   """
+            raise SchemaError(dedent(msg))
 
     @classmethod
     def get_db(cls) -> Database:
@@ -382,15 +397,28 @@ class Schema(metaclass=SchemaRepr):
             prop_type._schema = cls  # replace placeholder `SelfRef` with this schema
             prop_type._make_obj_ref()
 
-        self_refs_dct = {prop.name: prop.type.obj_ref for prop in cls._get_self_refs()} or None
+        new_props_schema = {prop.name: prop.type.obj_ref for prop in cls._get_self_refs()} or None
         session = get_active_session()
-        db.obj_ref = session.api.databases.update(db.obj_ref, schema=self_refs_dct)
+        db.obj_ref = session.api.databases.update(db.obj_ref, schema=new_props_schema)
+        cls._set_obj_refs()
+
+    @classmethod
+    def _init_self_ref_rollups(cls):
+        """Initialise all rollup properties that reference the same schema."""
+        if not cls._has_self_refs():
+            return
+        db = cls.get_db()  # raises if not bound!
+
+        self_ref_rollups = [prop for prop in cls.get_props() if isinstance(prop.type, Rollup) and prop.type.is_self_ref]
+        new_props_schema = {prop.name: prop.type.obj_ref for prop in self_ref_rollups} or None
+        session = get_active_session()
+        db.obj_ref = session.api.databases.update(db.obj_ref, schema=new_props_schema)
         cls._set_obj_refs()
 
     @classmethod
     def _get_init_props(cls) -> list[Property]:
         """Get all properties that are initialized by now."""
-        return [prop for prop in cls.get_props() if hasattr(prop.type, 'obj_ref')]
+        return [prop for prop in cls.get_props() if prop.type._is_init]
 
     @classmethod
     def _update_bwd_rels(cls):
@@ -539,6 +567,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
     _two_way_prop: Property | None = None  # other property, i.e. of the target database
 
     def __init__(self, schema: type[Schema] | None = None, *, two_way_prop: Property | None = None):
+        # Note that we don't call super().__init__ here since we only know how to build the obj_ref later.
         if two_way_prop and not schema:
             msg = '`schema` needs to be provided if `two_way_prop` is set'
             raise RuntimeError(msg)
@@ -678,11 +707,23 @@ class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
         super().__init__(relation_prop.name, rollup_prop.name, calculate)
 
     @property
+    def _is_init(self) -> bool:
+        """Determines if the relation of the rollup is already initialized."""
+        try:
+            return self.relation_prop.type._is_init
+        except SchemaError:  # DB is not bound yet
+            return False
+
+    @property
+    def is_self_ref(self) -> bool:
+        """Determines if this rollup is self-referencing the same schema."""
+        return cast(Relation, self.relation_prop.type).is_self_ref
+
+    @property
     def relation_prop(self) -> Property:
         """Return the relation property object of the rollup."""
         if self.prop_ref is not None:
-            db = self.prop_ref._schema.get_db()
-            return db.schema.get_prop(self.obj_ref.rollup.relation_property_name)
+            return self.prop_ref._schema.get_prop(self.obj_ref.rollup.relation_property_name)
         else:
             msg = 'Rollup property not bound to a `Property` object'
             raise RollupError(msg)
