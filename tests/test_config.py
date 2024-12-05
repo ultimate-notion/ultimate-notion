@@ -2,8 +2,11 @@ import os
 from pathlib import Path
 from unittest.mock import patch
 
+from pytest import LogCaptureFixture
+
 from ultimate_notion.config import (
     ENV_NOTION_TOKEN,
+    activate_debug_mode,
     get_cfg_file,
     get_or_create_cfg,
     resolve_env_value,
@@ -35,3 +38,8 @@ def test_resolve_env_value():
     with patch.dict(os.environ, {'VAR': 'value'}):
         assert resolve_env_value('${env:VAR}') == 'value'
         assert resolve_env_value('${env:VAR|default}') == 'value'
+
+
+def test_debug_mode(caplog: LogCaptureFixture):
+    activate_debug_mode()
+    assert 'is running in debug mode.' in caplog.text

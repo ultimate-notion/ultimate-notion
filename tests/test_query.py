@@ -7,6 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import schema
+from ultimate_notion.query import FilterQueryError
 from ultimate_notion.utils import parse_dt_str
 
 
@@ -491,14 +492,26 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
     query = formula_db.query.filter(uno.prop('String').is_empty())
     assert set(query.execute()) == set()
 
+    with pytest.raises(FilterQueryError):
+        formula_db.query.filter(uno.prop('String') <= 69).execute()
+
     query = formula_db.query.filter(uno.prop('Number').is_empty())
     assert set(query.execute()) == set()
+
+    with pytest.raises(FilterQueryError):
+        formula_db.query.filter(uno.prop('Number').this_week()).execute()
 
     query = formula_db.query.filter(uno.prop('Date').is_empty())
     assert set(query.execute()) == set()
 
     query = formula_db.query.filter(uno.prop('Number') <= 42)
     assert set(query.execute()) == {item_1, item_2}
+
+    with pytest.raises(FilterQueryError):
+        formula_db.query.filter(uno.prop('Number').contains('42')).execute()
+
+    with pytest.raises(FilterQueryError):
+        formula_db.query.filter(uno.prop('Number').starts_with('42')).execute()
 
     query = formula_db.query.filter(uno.prop('Date') >= '2024-11-23')
     assert set(query.execute()) == {item_1, item_2}
@@ -516,12 +529,115 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
     assert set(query.execute()) == set()
 
 
-# @pytest.mark.vcr()
-# def test_query_rollup(root_page: uno.Page, notion: uno.Session):
-#     class DB(uno.Schema, db_title='Rollup Query DB Test'):
-#         title = uno.Property('Title', uno.PropType.Title())
-#         relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
-#         rollup = uno.Property('Rollup', uno.PropType.Rollup(relation_prop=relation, rollup_prop=title))
+@pytest.mark.vcr()
+def test_query_rollup(root_page: uno.Page, notion: uno.Session):
+    rollup_title_prop = 'Rollup Title'
+    rollup_number_prop = 'Rollup Number'
+    rollup_number_prop_arr = 'Rollup Number Array'
+    rollup_date_prop = 'Rollup Date'
+    rollup_date_arr_prop = 'Rollup Date Array'
 
-#     db = notion.create_db(parent=root_page, schema=DB)
-#     item_1 = db.create_page(title='Item 1')
+    class DB(uno.Schema, db_title='Rollup Query DB Test'):
+        title = uno.Property('Title', uno.PropType.Title())
+        relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
+        date = uno.Property('Date', uno.PropType.Date())
+        number = uno.Property('Number', uno.PropType.Number())
+        rollup_title = uno.Property(
+            rollup_title_prop,
+            uno.PropType.Rollup(relation_prop=relation, rollup_prop=title, calculate=uno.AggFunc.SHOW_ORIGINAL),
+        )
+        rollup_date = uno.Property(
+            rollup_date_prop,
+            uno.PropType.Rollup(relation_prop=relation, rollup_prop=date, calculate=uno.AggFunc.EARLIEST_DATE),
+        )
+        rollup_date_arr = uno.Property(
+            rollup_date_arr_prop,
+            uno.PropType.Rollup(relation_prop=relation, rollup_prop=date, calculate=uno.AggFunc.SHOW_ORIGINAL),
+        )
+        rollup_number = uno.Property(
+            rollup_number_prop,
+            uno.PropType.Rollup(relation_prop=relation, rollup_prop=number, calculate=uno.AggFunc.MAX),
+        )
+        rollup_number_arr = uno.Property(
+            rollup_number_prop_arr,
+            uno.PropType.Rollup(relation_prop=relation, rollup_prop=number, calculate=uno.AggFunc.SHOW_ORIGINAL),
+        )
+
+    db = notion.create_db(parent=root_page, schema=DB)
+    item_1 = db.create_page(title='Item 1', number=42, date='2024-11-25 14:08:00+00:00')
+    item_2 = db.create_page(title='Item 2', number=72, date='1981-11-23 08:02:00+01:00', relation=item_1)
+    item_3 = db.create_page(title='Item 3', number=12, date='2024-11-25 14:08:00+00:00', relation=(item_1, item_2))
+
+    # Array Rollup
+    query = db.query.filter(uno.prop(rollup_title_prop).any == 'Item 1')
+    assert set(query.execute()) == {item_2, item_3}
+
+    query = db.query.filter(uno.prop(rollup_title_prop).any.contains('Item 1'))
+    assert set(query.execute()) == {item_2, item_3}
+
+    query = db.query.filter(uno.prop(rollup_title_prop).every.starts_with('Item'))
+    assert set(query.execute()) == {item_2, item_3}
+
+    query = db.query.filter(uno.prop(rollup_title_prop).none.is_empty())
+    assert set(query.execute()) == {item_1, item_2, item_3}
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_title_prop).contains('Item 1')).execute()
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_title_prop).starts_with('Item 1')).execute()
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_title_prop).is_empty()).execute()
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_title_prop) <= 42).execute()
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_title_prop).this_week()).execute()
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_title_prop) == 42).execute()
+
+    # Date Rollup
+    query = db.query.filter(uno.prop(rollup_date_prop).is_empty())
+    assert set(query.execute()) == {item_1}
+
+    query = db.query.filter(uno.prop(rollup_date_prop) == '2024-11-25')
+    assert set(query.execute()) == {item_2}
+
+    query = db.query.filter(uno.prop(rollup_date_prop) < '2024-11-25')
+    assert set(query.execute()) == {item_3}
+
+    query = db.query.filter(uno.prop(rollup_date_prop).past_week())
+    assert set(query.execute()) == set()
+
+    query = db.query.filter(uno.prop(rollup_date_prop).any <= '1981-11-25')
+    assert set(query.execute()) == {item_3}
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_date_prop).contains('1981')).execute()
+
+    # Date Array Rollup
+    query = db.query.filter(uno.prop(rollup_date_arr_prop).any.past_week())
+    assert set(query.execute()) == set()
+
+    # Number Rollup
+    query = db.query.filter(uno.prop(rollup_number_prop).is_empty())
+    assert set(query.execute()) == {item_1}
+
+    query = db.query.filter(uno.prop(rollup_number_prop) == 42)
+    assert set(query.execute()) == {item_2}
+
+    query = db.query.filter(uno.prop(rollup_number_prop) > 42)
+    assert set(query.execute()) == {item_3}
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_number_prop).this_week()).execute()
+
+    with pytest.raises(FilterQueryError):
+        db.query.filter(uno.prop(rollup_number_prop).starts_with('4')).execute()
+
+    # Number Array Rollup
+    query = db.query.filter(uno.prop(rollup_number_prop_arr).any <= 42)
+    assert set(query.execute()) == {item_2, item_3}

@@ -452,8 +452,8 @@ class Text(PropertyType[obj_schema.RichText], wraps=obj_schema.RichText):
 class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
     """Defines a number property in a database."""
 
-    def __init__(self, number_format: NumberFormat = NumberFormat.NUMBER):
-        super().__init__(number_format)
+    def __init__(self, number_format: NumberFormat | str = NumberFormat.NUMBER):
+        super().__init__(NumberFormat(number_format))
 
 
 class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
@@ -698,10 +698,14 @@ class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
     then the `property` must be a `str` of the corresponding property name.
     """
 
-    def __init__(self, relation_prop: Property, rollup_prop: Property, calculate: AggFunc = AggFunc.SHOW_ORIGINAL):
+    def __init__(
+        self, relation_prop: Property, rollup_prop: Property, calculate: AggFunc | str = AggFunc.SHOW_ORIGINAL
+    ):
         if not isinstance(relation_prop.type, Relation):
             msg = f'Relation `{relation_prop.name}` must be of type Relation'
             raise RollupError(msg)
+
+        calculate = AggFunc.from_alias(calculate) if not isinstance(calculate, AggFunc) else calculate
 
         # ToDo: One could check here if property really is a property in the database where relation points to
         super().__init__(relation_prop.name, rollup_prop.name, calculate)

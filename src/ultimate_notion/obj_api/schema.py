@@ -216,7 +216,7 @@ class Rollup(PropertyType, type='rollup'):
     """Defines the rollup configuration for a database property."""
 
     class TypeData(GenericObject):
-        function: AggFunc = AggFunc.COUNT
+        function: AggFunc = AggFunc.COUNT_ALL
 
         relation_property_name: str = None  # type: ignore
         relation_property_id: str | None = None
