@@ -24,7 +24,7 @@ T = TypeVar('T')
 
 
 class View(Sequence[Page]):
-    def __init__(self, database: Database, pages: list[Page], query: Query):
+    def __init__(self, database: Database, pages: Sequence[Page], query: Query):
         self.database = database
         self._query = query
         self._title_col = database.schema.get_title_prop().name

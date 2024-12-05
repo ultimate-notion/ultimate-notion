@@ -175,37 +175,61 @@ class CodeLang(str, Enum):
 
 
 class AggFunc(str, Enum):
-    """Aggregation functions for formulas."""
+    """Aggregation functions for formulas.
 
-    COUNT = 'count'
-    COUNT_VALUES = 'count_values'
-    COUNT_PER_GROUP = 'count_per_group'
+    The categories naming corresonds mostly to the naming in the Notion App but
+    also eliminates some inconsistencies. The first part of the tuple is the
+    string used in the Notion API, the second part is an alias corresoinding to
+    the defined category num.
+    """
 
-    EMPTY = 'empty'
-    NOT_EMPTY = 'not_empty'
+    SHOW_ORIGINAL = 'show_original', 'show_original'
+    SHOW_UNIQUE = 'show_unique', 'show_unique'
 
-    CHECKED = 'checked'
-    UNCHECKED = 'unchecked'
+    # Count
+    COUNT_ALL = 'count', 'count_all'
+    COUNT_VALUES = 'count_values', 'count_values'
+    COUNT_UNIQUE_VALUES = 'unique', 'count_unique_values'
+    COUNT_EMPTY = 'empty', 'count_empty'
+    COUNT_NOT_EMPTY = 'not_empty', 'count_not_empty'
+    COUNT_CHECKED = 'checked', 'count_checked'  # just called 'checked' in the Notion App
+    COUNT_UNCHECKED = 'unchecked', 'count_unchecked'  # just called 'unchecked' in the Notion App
+    COUNT_PER_GROUP = 'count_per_group', 'count_per_group'  # only for type 'status'
 
-    PERCENT_EMPTY = 'percent_empty'
-    PERCENT_NOT_EMPTY = 'percent_not_empty'
-    PERCENT_CHECKED = 'percent_checked'
-    PERCENT_PER_GROUP = 'percent_per_group'
+    # Percent
+    PERCENT_EMPTY = 'percent_empty', 'percent_empty'
+    PERCENT_NOT_EMPTY = 'percent_not_empty', 'percent_not_empty'
+    PERCENT_CHECKED = 'percent_checked', 'percent_checked'
+    PERCENT_PER_GROUP = 'percent_per_group', 'percent_per_group'  # only for type 'status'
 
-    AVERAGE = 'average'
-    MIN = 'min'
-    MAX = 'max'
-    MEDIAN = 'median'
-    RANGE = 'range'
-    SUM = 'sum'
+    # Date
+    DATE_RANGE = 'date_range', 'date_range'
+    EARLIEST_DATE = 'earliest_date', 'earliest_date'
+    LATEST_DATE = 'latest_date', 'latest_date'
 
-    DATE_RANGE = 'date_range'
-    EARLIEST_DATE = 'earliest_date'
-    LATEST_DATE = 'latest_date'
+    # More options, e.g. for numbers
+    SUM = 'sum', 'sum'
+    AVERAGE = 'average', 'average'
+    MEDIAN = 'median', 'median'
+    MIN = 'min', 'min'
+    MAX = 'max', 'max'
+    RANGE = 'range', 'range'
 
-    SHOW_ORIGINAL = 'show_original'
-    SHOW_UNIQUE = 'show_unique'
-    UNIQUE = 'unique'
+    alias: str
+
+    def __new__(cls, value: str, alias: str = '') -> AggFunc:
+        obj = str.__new__(cls, value)
+        obj._value_ = value
+        obj.alias = alias
+        return obj
+
+    @classmethod
+    def from_alias(cls, alias: str) -> AggFunc:
+        for item in cls:
+            if item.alias == alias:
+                return item
+        msg = f'{alias} is not a valid {cls.__name__}'
+        raise ValueError(msg)
 
 
 class NumberFormat(str, Enum):

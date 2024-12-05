@@ -135,10 +135,13 @@ class EndpointIterator(Generic[T]):
         while self.has_more:
             self.page_num += 1
 
-            msg = f'Fetching page `{self.page_num}` of endpoint with cursor `{self.next_cursor}`.'
+            if self.next_cursor is None:
+                msg = f'Fetching page `{self.page_num}` of endpoint.'
+            else:
+                msg = f'Fetching page `{self.page_num}` of endpoint with cursor `{self.next_cursor}`.'
             _logger.debug(msg)
-            result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
 
+            result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
             obj_or_list = self._model_validate(result_page)
 
             if isinstance(obj_or_list, ObjectList):

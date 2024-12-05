@@ -27,6 +27,14 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
+class EmptyDBError(Exception):
+    """A special exception that tells us that a database is empty during probing."""
+
+
+class FilterQueryError(ValueError):
+    """An exception that is raised when a filter query is invalid."""
+
+
 class Property(BaseModel):
     """Represents a property of a page.
 
@@ -141,10 +149,6 @@ def prop(prop_name: str, /) -> Property:
     return Property(name=prop_name)
 
 
-class EmptyDBError(Exception):
-    """A special exception that tells us that a database is empty during probing."""
-
-
 class Condition(BaseModel, ABC):
     """Base class for filter query conditions."""
 
@@ -226,11 +230,11 @@ class PropertyCondition(Condition, ABC):
 
         if not isinstance(prop, props.Formula):
             msg = f'The property {self.prop.name} is not a formula property.'
-            raise ValueError(msg)
+            raise FilterQueryError(msg)
 
         if not (prop_type := prop.value_type):
             msg = f'The property {self.prop.name} does not have a formula type set.'
-            raise ValueError(msg)
+            raise FilterQueryError(msg)
 
         return prop_type
 
@@ -243,7 +247,7 @@ class PropertyCondition(Condition, ABC):
             return prop_type
         else:
             msg = f'The property {self.prop.name} is not a rollup property or is missing a type.'
-            raise ValueError(msg)
+            raise FilterQueryError(msg)
 
     @property
     def _value_str(self) -> str:
@@ -288,7 +292,7 @@ class Equals(PropertyCondition):
 
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise ValueError(msg)
+                raise FilterQueryError(msg)
 
         return kwargs
 
@@ -312,19 +316,22 @@ class Equals(PropertyCondition):
                                 f'The property {self.prop.name} must be a rollup array property, '
                                 'use one of the properties `any`, `every` and `none`.'
                             )
-                            raise ValueError(msg)
+                            raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
+                        rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
-                kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
@@ -365,12 +372,12 @@ class Contains(PropertyCondition):
                         condition = obj_query.TextCondition(**{self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise ValueError(msg)
+                raise FilterQueryError(msg)
 
         return kwargs
 
@@ -386,15 +393,15 @@ class Contains(PropertyCondition):
                                 f'The property {self.prop.name} must be a rollup array property, '
                                 'use one of the properties `any`, `every` and `none`.'
                             )
-                            raise ValueError(msg)
+                            raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
-                kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
+                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
@@ -425,12 +432,12 @@ class StartsWith(PropertyCondition):
                         condition = obj_query.TextCondition(**{self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise ValueError(msg)
+                raise FilterQueryError(msg)
 
         return kwargs
 
@@ -446,15 +453,15 @@ class StartsWith(PropertyCondition):
                                 f'The property {self.prop.name} must be a rollup array property, '
                                 'use one of the properties `any`, `every` and `none`.'
                             )
-                            raise ValueError(msg)
+                            raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
-                kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
+                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
@@ -505,12 +512,12 @@ class IsEmpty(PropertyCondition):
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise ValueError(msg)
+                raise FilterQueryError(msg)
 
         return kwargs
 
@@ -534,19 +541,22 @@ class IsEmpty(PropertyCondition):
                                 f'The property {self.prop.name} must be a rollup array property, '
                                 'use one of the properties `any`, `every` and `none`.'
                             )
-                            raise ValueError(msg)
+                            raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
+                        rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
-                kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
@@ -583,12 +593,12 @@ class InEquality(PropertyCondition, ABC):
                         condition = obj_query.DateCondition(**{self._date_condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise ValueError(msg)
+                raise FilterQueryError(msg)
 
         return kwargs
 
@@ -612,19 +622,22 @@ class InEquality(PropertyCondition, ABC):
                                 f'The property {self.prop.name} must be a rollup array property, '
                                 'use one of the properties `any`, `every` and `none`.'
                             )
-                            raise ValueError(msg)
+                            raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
+                        rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition(**{self._num_condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._date_condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
-                kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
@@ -682,12 +695,12 @@ class DateCondition(PropertyCondition, ABC):
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
                 kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise ValueError(msg)
+                raise FilterQueryError(msg)
 
         return kwargs
 
@@ -711,17 +724,19 @@ class DateCondition(PropertyCondition, ABC):
                                 f'The property {self.prop.name} must be a rollup array property, '
                                 'use one of the properties `any`, `every` and `none`.'
                             )
-                            raise ValueError(msg)
+                            raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
                         condition = obj_query.RollupArrayCondition(**kwargs)
+                        rollup_kwarg = self.prop.quantifier.value
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise ValueError(msg)
+                        raise FilterQueryError(msg)
 
-                kwargs['rollup'] = obj_query.RollupCondition(**{rollup_type.value: condition})
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 

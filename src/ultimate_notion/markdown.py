@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, TypeGuard
 
 import mistune
@@ -28,7 +28,7 @@ MD_STYLE_MAP = {
 """Mapping from markdown style to markdown symbol."""
 
 
-def md_spans(rich_texts: list[RichTextBase]) -> np.ndarray:
+def md_spans(rich_texts: Sequence[RichTextBase]) -> np.ndarray:
     """Convert rich text to markdown spans.
 
     An span is a sequence of rich texts with the same markdown style expressed as a row in the returned array.
@@ -80,7 +80,7 @@ def sorted_md_spans(md_spans: np.ndarray) -> Iterator[tuple[int, int, str]]:
     return reversed(sorted_spans)
 
 
-def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
+def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
     """Convert a list of rich texts to markdown."""
 
     def has_only_ws_chars(text: str) -> bool:
@@ -159,6 +159,7 @@ def rich_texts_to_markdown(rich_texts: list[RichTextBase]) -> str:
             md_rich_texts[left] = '<u>' + md_rich_texts[left]
             md_rich_texts[right] += '</u>'
 
+    rich_texts = list(rich_texts)
     md_rich_texts = [rich_text.obj_ref.plain_text for rich_text in rich_texts]
     add_mentions(md_rich_texts, rich_texts)
     add_all_md_styles(md_rich_texts, rich_texts)

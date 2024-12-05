@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime as dt
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import pendulum as pnd
@@ -45,8 +46,8 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
     def _obj_api_type(self) -> type[obj_props.PropertyValue]:
         return self._obj_api_map_inv[self.__class__]
 
-    def __init__(self, values: Any | list[Any]):
-        if isinstance(values, list):
+    def __init__(self, values: Any | Sequence[Any]):
+        if isinstance(values, Sequence) and not isinstance(values, str | bytes):
             values = [value.obj_ref if isinstance(value, Wrapper) else value for value in values]
         else:
             values = values.obj_ref if isinstance(values, Wrapper) else values
@@ -170,8 +171,8 @@ class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
 class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSelect):
     """Multi-select property value."""
 
-    def __init__(self, options: str | Option | list[str | Option]):
-        if not isinstance(options, list):
+    def __init__(self, options: str | Option | Sequence[str | Option]):
+        if not isinstance(options, Sequence) and not isinstance(options, str):
             options = [options]
         options = [Option(option) if isinstance(option, str) else option for option in options]
         super().__init__(options)
@@ -187,8 +188,8 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
 class People(PropertyValue[obj_props.People], wraps=obj_props.People):
     """People property value."""
 
-    def __init__(self, users: User | list[User]):
-        if not isinstance(users, list):
+    def __init__(self, users: User | Sequence[User]):
+        if not isinstance(users, Sequence):
             users = [users]
         super().__init__(users)
 
@@ -225,8 +226,8 @@ class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNum
 class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
     """Files property value."""
 
-    def __init__(self, files: FileInfo | list[FileInfo]):
-        if not isinstance(files, list):
+    def __init__(self, files: FileInfo | Sequence[FileInfo]):
+        if not isinstance(files, Sequence):
             files = [files]
 
         super().__init__(files)
@@ -254,8 +255,8 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
     """Relation property values."""
 
-    def __init__(self, pages: Page | list[Page]):
-        if not isinstance(pages, list):
+    def __init__(self, pages: Page | Sequence[Page]):
+        if not isinstance(pages, Sequence):
             pages = [pages]
         super().__init__(pages)
 
@@ -367,5 +368,8 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
             return session.get_user(self.obj_ref.verification.verified_by.id)
 
     @property
-    def date(self) -> dt.datetime | None:
-        return self.obj_ref.verification.date
+    def date(self) -> pnd.DateTime | None:
+        if self.obj_ref.verification.date is None:
+            return None
+        else:
+            return pnd.instance(self.obj_ref.verification.date)
