@@ -158,6 +158,7 @@ class RollupArrayCondition(Condition):
     files: FilesCondition | None = None
     relation: RelationCondition | None = None
     formula: FormulaCondition | None = None
+    unique_id: IdCondition | None = None
 
 
 class RollupCondition(Condition):
