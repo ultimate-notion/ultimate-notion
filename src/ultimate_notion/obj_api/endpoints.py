@@ -389,8 +389,8 @@ class PagesEndpoint(Endpoint):
         self,
         page: Page,
         *,
-        cover: FileObject | None | T_UNSET = UNSET,
-        icon: FileObject | EmojiObject | None | T_UNSET = UNSET,
+        cover: FileObject | T_UNSET | None = UNSET,
+        icon: FileObject | EmojiObject | T_UNSET | None = UNSET,
         in_trash: bool | T_UNSET = UNSET,
     ) -> Page:
         """Set specific page attributes (such as cover, icon, etc.) on the server.
