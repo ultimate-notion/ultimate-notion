@@ -641,3 +641,14 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session):
     # Number Array Rollup
     query = db.query.filter(uno.prop(rollup_number_prop_arr).any <= 42)
     assert set(query.execute()) == {item_2, item_3}
+
+
+@pytest.mark.vcr()
+def test_id_prop(all_props_db: uno.Database):
+    all_pages = all_props_db.get_all_pages()
+
+    query = all_props_db.query.filter(uno.prop('ID') != 42)
+    assert set(query.execute()) == set(all_pages)
+
+    query = all_props_db.query.filter(uno.prop('ID') > -1)
+    assert set(query.execute()) == set(all_pages)
