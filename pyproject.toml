@@ -304,6 +304,7 @@ upgrade-pkg = "PIP_COMPILE_UPGRADE_PACKAGE='{args}' hatch env run --env {env_nam
 dependencies = [
     "mkdocs",
     "mkdocs-material[imaging]",
+    "cairosvg",  # for mkdocs-material but should be included in [image] :-/
     # Plugins
     "mkdocs-include-markdown-plugin",
     "mkdocs-gen-files",
