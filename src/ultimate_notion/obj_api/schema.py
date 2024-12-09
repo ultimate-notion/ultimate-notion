@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
 from uuid import UUID
 
 from pydantic import Field, SerializeAsAny, field_validator
@@ -172,7 +171,9 @@ class PropertyRelation(TypedObject, polymorphic_base=True):
 class SinglePropertyRelation(PropertyRelation, type='single_property'):
     """Defines a one-way relation configuration for a database property."""
 
-    single_property: Any = Field(default_factory=dict)
+    class TypeData(GenericObject): ...
+
+    single_property: TypeData = TypeData()
 
     @classmethod
     def build(cls, dbref):

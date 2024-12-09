@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC
-from collections.abc import Awaitable, Callable, Iterator
+from collections.abc import Awaitable, Callable, Iterator, Mapping
 from datetime import date, datetime
 from typing import Any, Generic, Literal, TypeAlias, TypeVar
 from uuid import UUID
@@ -276,7 +276,7 @@ class QueryBuilder(Generic[T], ABC):
     endpoint: NCEndpointCall
     params: dict[str, str]
 
-    def __init__(self, endpoint: NCEndpointCall, query: Query, params: dict[str, str | None]):
+    def __init__(self, endpoint: NCEndpointCall, query: Query, params: Mapping[str, str | None]):
         self.endpoint = endpoint
         self.query = query
         self.params = {k: v for k, v in params.items() if v is not None}  # API doesn't like "undefined" values
