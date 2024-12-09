@@ -88,7 +88,7 @@ assert len(pages) == num_of_articles / len(Topic)
     in Python, this may lead to unexpected exceptions, e.g. `TypeError: unsupported operand type(s) for &`,
     since `&` may operate on a property instead of a condition.
 
-Using the Notion UI, we would define an *Advanced filter* on a view like this:
+Using the Notion UI to get the same result, we would define an *Advanced filter* on a view like this:
 
 ![View filter](../assets/images/notion-view-filter.png){: style="height:300px; display:block; margin-left:auto; margin-right:auto;"}
 

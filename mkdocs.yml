@@ -128,13 +128,13 @@ plugins:
 
 markdown_extensions:
   # Built-in
-  - markdown.extensions.abbr:
-  - markdown.extensions.admonition:
-  - markdown.extensions.attr_list:
-  - markdown.extensions.footnotes:
-  - markdown.extensions.meta:
-  - markdown.extensions.tables:
-  - markdown.extensions.toc:
+  - abbr:
+  - admonition:
+  - attr_list:
+  - footnotes:
+  - meta:
+  - tables:
+  - toc:
       permalink: true
   # Extra
   - pymdownx.arithmatex:
@@ -144,8 +144,8 @@ markdown_extensions:
   - pymdownx.critic:
   - pymdownx.details:
   - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.highlight:
       guess_lang: false
       linenums_style: pymdownx-inline
