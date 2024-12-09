@@ -51,6 +51,17 @@ class NumberCondition(Condition):
     is_not_empty: bool | None = None
 
 
+class IdCondition(Condition):
+    """Represents ID criteria in Notion."""
+
+    equals: float | int | None = None
+    does_not_equal: float | int | None = None
+    greater_than: float | int | None = None
+    less_than: float | int | None = None
+    greater_than_or_equal_to: float | int | None = None
+    less_than_or_equal_to: float | int | None = None
+
+
 class CheckboxCondition(Condition):
     """Represents checkbox criteria in Notion."""
 
@@ -133,20 +144,6 @@ class FormulaCondition(Condition):
     date: DateCondition | None = None
 
 
-class RollupCondition(Condition):
-    """Represents rollup criteria in Notion."""
-
-    any: RollupArrayCondition | None = None
-    every: RollupArrayCondition | None = None
-    none: RollupArrayCondition | None = None
-    date: DateCondition | None = None
-    number: NumberCondition | None = None
-
-
-class QueryFilter(GenericObject):
-    """Base class for query filters."""
-
-
 class RollupArrayCondition(Condition):
     """Represents a rollup array filter in Notion."""
 
@@ -161,6 +158,20 @@ class RollupArrayCondition(Condition):
     files: FilesCondition | None = None
     relation: RelationCondition | None = None
     formula: FormulaCondition | None = None
+
+
+class RollupCondition(Condition):
+    """Represents rollup criteria in Notion."""
+
+    any: RollupArrayCondition | None = None
+    every: RollupArrayCondition | None = None
+    none: RollupArrayCondition | None = None
+    date: DateCondition | None = None
+    number: NumberCondition | None = None
+
+
+class QueryFilter(GenericObject):
+    """Base class for query filters."""
 
 
 class PropertyFilter(QueryFilter, RollupArrayCondition):
@@ -340,6 +351,8 @@ class DBQueryBuilder(QueryBuilder[Page]):
     def filter(self, condition: QueryFilter) -> DBQueryBuilder:
         """Add the given filter to the query."""
         builder = DBQueryBuilder(self.endpoint, db_id=self.params['database_id'])
+        if self.query.sorts is not None:
+            builder.query.sorts = [sort.model_copy(deep=True) for sort in self.query.sorts]
         builder.query.filter = condition
         return builder
 
@@ -349,5 +362,7 @@ class DBQueryBuilder(QueryBuilder[Page]):
             sort_orders = [sort_orders]
 
         builder = DBQueryBuilder(self.endpoint, db_id=self.params['database_id'])
+        if self.query.filter is not None:
+            builder.query.filter = self.query.filter.model_copy(deep=True)
         builder.query.sorts = sort_orders
         return builder

@@ -22,6 +22,12 @@ def test_db_advanced():
 
 @pytest.mark.vcr()
 @pytest.mark.skipif(sys.platform == 'win32', reason=WIN_SKIP_REASON)
+def test_db_querying():
+    check_md_file(fpath='docs/usage/db_querying.md', memory=True)
+
+
+@pytest.mark.vcr()
+@pytest.mark.skipif(sys.platform == 'win32', reason=WIN_SKIP_REASON)
 def test_page_introduction():
     check_md_file(fpath='docs/usage/page_introduction.md', memory=True)
 

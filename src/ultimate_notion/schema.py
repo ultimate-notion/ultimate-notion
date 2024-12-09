@@ -513,8 +513,8 @@ class Date(PropertyType[obj_schema.Date], wraps=obj_schema.Date):
     """Defines a date property in a database."""
 
 
-class People(PropertyType[obj_schema.People], wraps=obj_schema.People):
-    """Defines a people property in a database."""
+class Person(PropertyType[obj_schema.People], wraps=obj_schema.People):
+    """Defines a person/people property in a database."""
 
 
 class Files(PropertyType[obj_schema.Files], wraps=obj_schema.Files):
@@ -533,7 +533,7 @@ class URL(PropertyType[obj_schema.URL], wraps=obj_schema.URL):
     """Defines a URL property in a database."""
 
 
-class PhoneNumber(PropertyType[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNumber):
+class Phone(PropertyType[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNumber):
     """Defines a phone number property in a database."""
 
 
@@ -799,12 +799,12 @@ class PropType:
     MultiSelect = MultiSelect
     Status = Status
     Date = Date
-    People = People
+    People = Person
     Files = Files
     Checkbox = Checkbox
     Email = Email
     URL = URL
-    PhoneNumber = PhoneNumber
+    PhoneNumber = Phone
     Formula = Formula
     Relation = Relation
     Rollup = Rollup

@@ -14,13 +14,13 @@ from ultimate_notion import props, schema
 from ultimate_notion.core import get_active_session
 from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.enums import ArrayQuantifier, FormulaType, RollupType, SortDirection
+from ultimate_notion.option import Option
 from ultimate_notion.page import Page
 from ultimate_notion.user import User
 from ultimate_notion.view import View
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-    from ultimate_notion.option import Option
     from ultimate_notion.schema import PropertyType
 
 
@@ -145,7 +145,7 @@ class RollupArrayProperty(Property):
 
 
 def prop(prop_name: str, /) -> Property:
-    """Create a column object."""
+    """Create a property object."""
     return Property(name=prop_name)
 
 
@@ -252,10 +252,105 @@ class PropertyCondition(Condition, ABC):
     @property
     def _value_str(self) -> str:
         match self.value:
-            case str() | dt.datetime():
+            case str() | dt.datetime() | Option():
                 return f"'{self.value}'"
             case _:
                 return f'{self.value}'
+
+
+class IsEmpty(PropertyCondition):
+    _condition_kw = 'is_empty'
+    is_method: bool = True
+
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+        kwargs: dict[str, obj_query.Condition] = {}
+
+        match prop_type:
+            case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
+                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.Number():
+                kwargs['number'] = obj_query.NumberCondition(**{self._condition_kw: self.value})
+            case schema.Select():
+                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.MultiSelect():
+                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.Date():
+                kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
+            case schema.Person():
+                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value})
+            case schema.Files():
+                kwargs['files'] = obj_query.FilesCondition(**{self._condition_kw: self.value})
+            case schema.Relation():
+                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value})
+            case schema.Formula():
+                condition: obj_query.Condition
+
+                match formula_type := self._get_formula_type(db):
+                    case FormulaType.STRING:
+                        condition = obj_query.TextCondition(**{self._condition_kw: self.value})
+                    case FormulaType.NUMBER:
+                        condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
+                    case FormulaType.DATE:
+                        condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                    case _:
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
+                        raise FilterQueryError(msg)
+
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+            case _:
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
+                raise FilterQueryError(msg)
+
+        return kwargs
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        prop_type = self._get_prop_type(db)
+
+        match prop_type:
+            case schema.CreatedTime():
+                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                return obj_query.CreatedTimeFilter(created_time=date_condition)
+            case schema.LastEditedTime():
+                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
+            case schema.Rollup():
+                condition: obj_query.Condition
+
+                match rollup_type := self._get_rollup_type(db):
+                    case RollupType.ARRAY:
+                        if not isinstance(self.prop, RollupArrayProperty):
+                            msg = (
+                                f'The property {self.prop.name} must be a rollup array property, '
+                                'use one of the properties `any`, `every` and `none`.'
+                            )
+                            raise FilterQueryError(msg)
+
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        rollup_kwarg = self.prop.quantifier.value
+                    case RollupType.NUMBER:
+                        condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
+                    case RollupType.DATE:
+                        condition = obj_query.DateCondition(**{self._condition_kw: self.value})
+                        rollup_kwarg = rollup_type.value
+                    case _:
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
+                        raise FilterQueryError(msg)
+
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
+            case _:
+                kwargs = self._create_obj_ref_kwargs(db, prop_type)
+
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+
+    def __repr__(self) -> str:
+        return f'{self.prop}.{self._condition_kw}()'
+
+
+class IsNotEmpty(IsEmpty):
+    _condition_kw = 'is_not_empty'
+    is_method: bool = True
 
 
 class Equals(PropertyCondition):
@@ -265,8 +360,10 @@ class Equals(PropertyCondition):
         kwargs: dict[str, obj_query.Condition] = {}
 
         match prop_type:
-            case schema.Text() | schema.Title() | schema.PhoneNumber() | schema.Email() | schema.URL():
+            case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
                 kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.ID():
+                kwargs['unique_id'] = obj_query.IdCondition(**{self._condition_kw: self.value})
             case schema.Number():
                 kwargs['number'] = obj_query.NumberCondition(**{self._condition_kw: self.value})
             case schema.Checkbox():
@@ -348,229 +445,6 @@ class EqualsNot(Equals):
         return f'{self.prop} != {self._value_str}'
 
 
-class Contains(PropertyCondition):
-    _condition_kw = 'contains'
-    is_method: bool = True
-
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
-        kwargs: dict[str, obj_query.Condition] = {}
-
-        match prop_type:
-            case schema.Text() | schema.Title() | schema.PhoneNumber() | schema.Email() | schema.URL():
-                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
-            case schema.MultiSelect():
-                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
-            case schema.People() if isinstance(self.value, User):
-                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value.id})
-            case schema.Relation() if isinstance(self.value, Page):
-                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value.id})
-            case schema.Formula():
-                condition: obj_query.Condition
-
-                match formula_type := self._get_formula_type(db):
-                    case FormulaType.STRING:
-                        condition = obj_query.TextCondition(**{self._condition_kw: self.value})
-                    case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise FilterQueryError(msg)
-
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
-            case _:
-                msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise FilterQueryError(msg)
-
-        return kwargs
-
-    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
-        prop_type = self._get_prop_type(db)
-
-        match prop_type:
-            case schema.Rollup():
-                match rollup_type := self._get_rollup_type(db):
-                    case RollupType.ARRAY:
-                        if not isinstance(self.prop, RollupArrayProperty):
-                            msg = (
-                                f'The property {self.prop.name} must be a rollup array property, '
-                                'use one of the properties `any`, `every` and `none`.'
-                            )
-                            raise FilterQueryError(msg)
-
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
-                    case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise FilterQueryError(msg)
-
-                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
-            case _:
-                kwargs = self._create_obj_ref_kwargs(db, prop_type)
-
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.{self._condition_kw}({self._value_str})'
-
-
-class ContainsNot(Contains):
-    _condition_kw = 'does_not_contain'
-    is_method: bool = True
-
-
-class StartsWith(PropertyCondition):
-    _condition_kw = 'starts_with'
-    is_method: bool = True
-
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
-        kwargs: dict[str, obj_query.Condition] = {}
-
-        match prop_type:
-            case schema.Text() | schema.Title() | schema.PhoneNumber() | schema.Email() | schema.URL():
-                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
-            case schema.Formula():
-                match formula_type := self._get_formula_type(db):
-                    case FormulaType.STRING:
-                        condition = obj_query.TextCondition(**{self._condition_kw: self.value})
-                    case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise FilterQueryError(msg)
-
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
-            case _:
-                msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise FilterQueryError(msg)
-
-        return kwargs
-
-    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
-        prop_type = self._get_prop_type(db)
-
-        match prop_type:
-            case schema.Rollup():
-                match rollup_type := self._get_rollup_type(db):
-                    case RollupType.ARRAY:
-                        if not isinstance(self.prop, RollupArrayProperty):
-                            msg = (
-                                f'The property {self.prop.name} must be a rollup array property, '
-                                'use one of the properties `any`, `every` and `none`.'
-                            )
-                            raise FilterQueryError(msg)
-
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
-                    case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise FilterQueryError(msg)
-
-                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
-            case _:
-                kwargs = self._create_obj_ref_kwargs(db, prop_type)
-
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.{self._condition_kw}({self._value_str})'
-
-
-class EndsWith(StartsWith):
-    _condition_kw = 'ends_with'
-    is_method: bool = True
-
-
-class IsEmpty(PropertyCondition):
-    _condition_kw = 'is_empty'
-    is_method: bool = True
-
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
-        kwargs: dict[str, obj_query.Condition] = {}
-
-        match prop_type:
-            case schema.Text() | schema.Title() | schema.PhoneNumber() | schema.Email() | schema.URL():
-                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
-            case schema.Number():
-                kwargs['number'] = obj_query.NumberCondition(**{self._condition_kw: self.value})
-            case schema.Select():
-                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})
-            case schema.MultiSelect():
-                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
-            case schema.Date():
-                kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
-            case schema.People():
-                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value})
-            case schema.Files():
-                kwargs['files'] = obj_query.FilesCondition(**{self._condition_kw: self.value})
-            case schema.Relation():
-                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value})
-            case schema.Formula():
-                condition: obj_query.Condition
-
-                match formula_type := self._get_formula_type(db):
-                    case FormulaType.STRING:
-                        condition = obj_query.TextCondition(**{self._condition_kw: self.value})
-                    case FormulaType.NUMBER:
-                        condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
-                    case FormulaType.DATE:
-                        condition = obj_query.DateCondition(**{self._condition_kw: self.value})
-                    case _:
-                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
-                        raise FilterQueryError(msg)
-
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
-            case _:
-                msg = f'Invalid property type `{prop_type}` for condition {self}.'
-                raise FilterQueryError(msg)
-
-        return kwargs
-
-    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
-        prop_type = self._get_prop_type(db)
-
-        match prop_type:
-            case schema.CreatedTime():
-                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
-                return obj_query.CreatedTimeFilter(created_time=date_condition)
-            case schema.LastEditedTime():
-                date_condition = obj_query.DateCondition(**{self._condition_kw: self.value})
-                return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
-            case schema.Rollup():
-                condition: obj_query.Condition
-
-                match rollup_type := self._get_rollup_type(db):
-                    case RollupType.ARRAY:
-                        if not isinstance(self.prop, RollupArrayProperty):
-                            msg = (
-                                f'The property {self.prop.name} must be a rollup array property, '
-                                'use one of the properties `any`, `every` and `none`.'
-                            )
-                            raise FilterQueryError(msg)
-
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
-                        rollup_kwarg = self.prop.quantifier.value
-                    case RollupType.NUMBER:
-                        condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
-                        rollup_kwarg = rollup_type.value
-                    case RollupType.DATE:
-                        condition = obj_query.DateCondition(**{self._condition_kw: self.value})
-                        rollup_kwarg = rollup_type.value
-                    case _:
-                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
-                        raise FilterQueryError(msg)
-
-                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
-            case _:
-                kwargs = self._create_obj_ref_kwargs(db, prop_type)
-
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
-
-    def __repr__(self) -> str:
-        return f'{self.prop}.{self._condition_kw}()'
-
-
-class IsNotEmpty(IsEmpty):
-    _condition_kw = 'is_not_empty'
-    is_method: bool = True
-
-
 class InEquality(PropertyCondition, ABC):
     _num_condition_kw: str
     _date_condition_kw: str
@@ -581,6 +455,8 @@ class InEquality(PropertyCondition, ABC):
         match prop_type:
             case schema.Number():
                 kwargs['number'] = obj_query.NumberCondition(**{self._num_condition_kw: self.value})
+            case schema.ID():
+                kwargs['unique_id'] = obj_query.IdCondition(**{self._num_condition_kw: self.value})
             case schema.Date():
                 kwargs['date'] = obj_query.DateCondition(**{self._date_condition_kw: self.value})
             case schema.Formula():
@@ -677,6 +553,134 @@ class LessThanOrEqualTo(InEquality):
 
     def __repr__(self) -> str:
         return f'{self.prop} <= {self._value_str}'
+
+
+class Contains(PropertyCondition):
+    _condition_kw = 'contains'
+    is_method: bool = True
+
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+        kwargs: dict[str, obj_query.Condition] = {}
+
+        match prop_type:
+            case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
+                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.MultiSelect():
+                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
+            case schema.Person() if isinstance(self.value, User):
+                kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value.id})
+            case schema.Relation() if isinstance(self.value, Page):
+                kwargs['relation'] = obj_query.RelationCondition(**{self._condition_kw: self.value.id})
+            case schema.Formula():
+                condition: obj_query.Condition
+
+                match formula_type := self._get_formula_type(db):
+                    case FormulaType.STRING:
+                        condition = obj_query.TextCondition(**{self._condition_kw: self.value})
+                    case _:
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
+                        raise FilterQueryError(msg)
+
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+            case _:
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
+                raise FilterQueryError(msg)
+
+        return kwargs
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        prop_type = self._get_prop_type(db)
+
+        match prop_type:
+            case schema.Rollup():
+                match rollup_type := self._get_rollup_type(db):
+                    case RollupType.ARRAY:
+                        if not isinstance(self.prop, RollupArrayProperty):
+                            msg = (
+                                f'The property {self.prop.name} must be a rollup array property, '
+                                'use one of the properties `any`, `every` and `none`.'
+                            )
+                            raise FilterQueryError(msg)
+
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        condition = obj_query.RollupArrayCondition(**kwargs)
+                    case _:
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
+                        raise FilterQueryError(msg)
+
+                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
+            case _:
+                kwargs = self._create_obj_ref_kwargs(db, prop_type)
+
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+
+    def __repr__(self) -> str:
+        return f'{self.prop}.{self._condition_kw}({self._value_str})'
+
+
+class ContainsNot(Contains):
+    _condition_kw = 'does_not_contain'
+    is_method: bool = True
+
+
+class StartsWith(PropertyCondition):
+    _condition_kw = 'starts_with'
+    is_method: bool = True
+
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+        kwargs: dict[str, obj_query.Condition] = {}
+
+        match prop_type:
+            case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
+                kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
+            case schema.Formula():
+                match formula_type := self._get_formula_type(db):
+                    case FormulaType.STRING:
+                        condition = obj_query.TextCondition(**{self._condition_kw: self.value})
+                    case _:
+                        msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
+                        raise FilterQueryError(msg)
+
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+            case _:
+                msg = f'Invalid property type `{prop_type}` for condition {self}.'
+                raise FilterQueryError(msg)
+
+        return kwargs
+
+    def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
+        prop_type = self._get_prop_type(db)
+
+        match prop_type:
+            case schema.Rollup():
+                match rollup_type := self._get_rollup_type(db):
+                    case RollupType.ARRAY:
+                        if not isinstance(self.prop, RollupArrayProperty):
+                            msg = (
+                                f'The property {self.prop.name} must be a rollup array property, '
+                                'use one of the properties `any`, `every` and `none`.'
+                            )
+                            raise FilterQueryError(msg)
+
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        condition = obj_query.RollupArrayCondition(**kwargs)
+                    case _:
+                        msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
+                        raise FilterQueryError(msg)
+
+                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
+            case _:
+                kwargs = self._create_obj_ref_kwargs(db, prop_type)
+
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+
+    def __repr__(self) -> str:
+        return f'{self.prop}.{self._condition_kw}({self._value_str})'
+
+
+class EndsWith(StartsWith):
+    _condition_kw = 'ends_with'
+    is_method: bool = True
 
 
 class DateCondition(PropertyCondition, ABC):
