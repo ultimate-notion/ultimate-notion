@@ -89,6 +89,7 @@ Some features that the Notion UI provides are not possible to implement due to l
 - modifying the url of file-like block, e.g. `File`, `Image`, etc.
 - creating inline comments to start a new discussion thread.
 - resolving comments or listing unresolved comments.
+- locking or unlocking a page or database.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 

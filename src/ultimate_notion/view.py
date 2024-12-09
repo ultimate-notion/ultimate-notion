@@ -72,7 +72,11 @@ class View(Sequence[Page]):
     def __getitem__(self, idx: slice, /) -> Sequence[Page]: ...
 
     def __getitem__(self, idx: int | slice, /) -> Page | Sequence[Page]:
-        return tuple(self._pages[self._row_indices[idx]])
+        pages = self._pages[self._row_indices[idx]]
+        if isinstance(idx, slice):
+            return tuple(pages)
+        else:
+            return pages
 
     def get_page(self, idx: int, /) -> Page:
         """Retrieve a page by index of the view."""

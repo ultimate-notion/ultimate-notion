@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import textwrap
-from collections.abc import Generator, Sequence
+from collections.abc import Generator, Mapping, Sequence
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
@@ -45,12 +45,12 @@ class SList(list[T]):
             raise MultipleItemsError(msg)
 
 
-def flatten(nested_list: list[list[T]], /) -> list[T]:
+def flatten(nested_list: Sequence[Sequence[T]], /) -> list[T]:
     """Flatten a nested list."""
     return list(chain.from_iterable(nested_list))
 
 
-def safe_list_get(lst: list[T], idx: int, *, default: T | None = None) -> T | None:
+def safe_list_get(lst: Sequence[T], idx: int, *, default: T | None = None) -> T | None:
     """Get the element at the index of the list or return the default value."""
     try:
         return lst[idx]
@@ -110,7 +110,7 @@ def store_retvals(func):
     return wrapped
 
 
-def find_indices(elements: np.ndarray | list[Any], total_set: np.ndarray | list[Any]) -> np.ndarray:
+def find_indices(elements: np.ndarray | Sequence[Any], total_set: np.ndarray | Sequence[Any]) -> np.ndarray:
     """Finds the indices of the elements in the total set."""
     if not isinstance(total_set, np.ndarray):
         total_set = np.array(total_set)
@@ -129,7 +129,7 @@ def find_index(elem: Any, lst: list[Any]) -> int | None:
         return None
 
 
-def deepcopy_with_sharing(obj: Any, shared_attributes: list[str], memo: dict[int, Any] | None = None):
+def deepcopy_with_sharing(obj: Any, shared_attributes: Sequence[str], memo: dict[int, Any] | None = None):
     """Like `deepcopy` but specified attributes are shared.
 
     Deepcopy an object, except for a given list of attributes, which should
@@ -194,7 +194,7 @@ KT = TypeVar('KT')  # ToDo: Use new syntax when requires-python >= 3.12
 VT = TypeVar('VT')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
+def dict_diff(dct1: Mapping[KT, VT], dct2: Mapping[KT, VT]) -> tuple[list[KT], list[KT], dict[KT, tuple[VT, VT]]]:
     """Returns the added keys, removed keys and keys of changed values of both dictionaries."""
     set1, set2 = set(dct1.keys()), set(dct2.keys())
     keys_added = list(set2 - set1)
@@ -203,7 +203,7 @@ def dict_diff(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[list[KT], list[KT
     return keys_added, keys_removed, values_changed
 
 
-def dict_diff_str(dct1: dict[KT, VT], dct2: dict[KT, VT]) -> tuple[str, str, str]:
+def dict_diff_str(dct1: Mapping[KT, VT], dct2: Mapping[KT, VT]) -> tuple[str, str, str]:
     """Returns the added keys, removed keys and keys of changed values of both dictionaries as strings for printing."""
     keys_added, keys_removed, values_changed = dict_diff(dct1, dct2)
     keys_added_str = ', '.join([str(k) for k in keys_added]) or 'None'
@@ -295,12 +295,6 @@ def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
                 return dt_spec.in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
             case pnd.Date():
                 return dt_spec  # as it is a date and has no tz information
-            case dt.datetime() if dt_spec.tzinfo is None:
-                return pnd.instance(dt_spec, tz='local')
-            case dt.datetime():
-                return pnd.instance(dt_spec).in_tz('UTC')  # to avoid unnamed timezones we convert to UTC
-            case dt.date():
-                return pnd.instance(dt_spec)
             case _:
                 msg = f'Unexpected type {type(dt_spec)} for {dt_spec}'
                 raise TypeError(msg)

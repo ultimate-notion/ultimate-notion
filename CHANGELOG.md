@@ -16,6 +16,8 @@
 - Fix: Database pages created with `db.create_page` are now added to the session cache.
 - New: Easily activate a debug mode within the config file.
 - Fix: Rollup property defined on a self-referencing relation works now.
+- Doc: Added a page about querying a database.
+- Chg: Renamed property types `People` to `Person` and `PhoneNumber` to `Phone`.
 
 ## Version 0.6, 2024-09-28
 
@@ -59,8 +61,8 @@
 
 ## Version 0.3, 2023-12-26
 
-- Chg: `RichText` is now a subtype of `str` for more convenient & consistent usage.
-- Docs: Added more documentation about using databases.
+- Chg: `RichText` is now a subtype of `str` for a more convenient & consistent usage.
+- Doc: Added more documentation about using databases.
 - Chg: `icon` attribute of database now returns `Emoji` instead of `str`.
 - New: Allow setting the `icon` and `cover` attribute of a page.
 - New: Allow setting the `title` of a non-database page.

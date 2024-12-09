@@ -11,7 +11,7 @@ from ultimate_notion import utils
 
 
 def test_find_indices():
-    elems = np.array([7, 2, 4])
+    elems = [7, 2, 4]
     total_set = np.array([1, 2, 7, 3, 6, 4])
     idx = utils.find_indices(elems, total_set)
     assert_array_equal(idx, np.array([2, 1, 5]))
@@ -126,3 +126,16 @@ def test_to_pendulum(tz_berlin):
 
     with pytest.raises(TypeError):
         utils.to_pendulum(pnd.duration(days=21))
+
+
+def test_flatten():
+    assert utils.flatten([[1], [2, 3], [4, 5, 6]]) == [1, 2, 3, 4, 5, 6]
+
+
+def test_safe_list_get():
+    lst = [1, 2, 3]
+    assert utils.safe_list_get(lst, 0) == 1
+    assert utils.safe_list_get(lst, 1) == 2
+    assert utils.safe_list_get(lst, 2) == 3
+    assert utils.safe_list_get(lst, 3) is None
+    assert utils.safe_list_get(lst, 3, default=42) == 42

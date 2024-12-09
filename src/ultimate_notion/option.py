@@ -56,7 +56,14 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         return super().__hash__()
 
 
-class OptionNS:
+class OptionNSType(type):
+    """Metaclass to implement `len` for type `OptionNS` itself, not an instance of it."""
+
+    def __len__(cls):
+        return len(cls.to_list())
+
+
+class OptionNS(metaclass=OptionNSType):
     """Option namespace to simplify working with (Multi-)Select options."""
 
     @classmethod
