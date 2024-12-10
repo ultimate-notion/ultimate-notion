@@ -21,7 +21,8 @@ notion = uno.Session.get_or_create()
 root_page = notion.search_page('Tests', exact=True).item()
 ```
 
-We then create a database `Article` with various properties and populate it with some pages:
+We create a database `Article` with properties name, topic and release date.
+Then we populate the database with some pages:
 
 ```python
 class Topic(uno.OptionNS):
@@ -75,7 +76,7 @@ and pass it to the [Query][query object] object using its `filter` and `sort` me
 respectively:
 
 ```python
-condition = (uno.prop('Topic') == Topic.TECH) & (uno.prop('Released').this_week())
+condition = (uno.prop('Topic') == Topic.TECH) & uno.prop('Released').this_week()
 sort_directions = uno.prop('Released').desc(), uno.prop('Name').asc()
 
 pages = article_db.query.filter(condition).sort(*sort_directions).execute()
@@ -84,7 +85,7 @@ assert len(pages) == num_of_articles / len(Topic)
 
 !!! danger
     A common mistake when defining conditions is to forget the parentheses when using
-    `&` and `|` to compose several conditions. Due to the precedence rules for operators
+    `&` and `|` to compose several conditions. Due to the precedence rules for operators, e.g. `==`, `!=`,
     in Python, this may lead to unexpected exceptions, e.g. `TypeError: unsupported operand type(s) for &`,
     since `&` may operate on a property instead of a condition.
 
@@ -104,7 +105,7 @@ For debugging your conditions, it is extremely helpful that you can just use `st
 get a human-readible expression of your condition:
 
 ```python
-condition = (uno.prop('Topic') == Topic.TECH) & (uno.prop('Released').this_week())
+condition = (uno.prop('Topic') == Topic.TECH) & uno.prop('Released').this_week()
 assert str(condition) == "(prop('Topic') == 'Tech') & prop('Released').this_week()"
 ```
 
@@ -122,15 +123,15 @@ In Notion, there are various property types:
 * **string types**, i.e. [Text], [Phone], [E-Mail], [URL], [Title] as well as
   [Formula], when the formula returns a string as [formula type],
 * **number types**, i.e. [Number], and [Formula], if the formula returns a number, as well as
-  [Rollup], if resulting in a number given its [aggregration] function,
+  [Rollup], if its [aggregration] function returns a number,
 * **boolean types**, i.e. [Checkbox] and [Formula], if the formula returns true or false,
 * **date types**, i.e. [Date], [CreatedTime], [LastEditedTime] and [Formula], if the formula returns
-  a date, as well as [Rollup], if resulting in a date given its [aggregration] function,
+  a date, as well as [Rollup], if its [aggregration] function returns a date,
 * **categorical type**, i.e. [Select],
 * **multi-categorial types**, i.e. [MultiSelect], [Relation], [Person],
 * **files type**, i.e. [Files],
 * **id type**, i.e. [ID],
-* **array types**, i.e. [Rollup], if resulting in an array of any of the other types,
+* **array types**, i.e. [Rollup], if it returns an array of any of the other types,
   e.g. array of numbers, array of strings, etc., given its [aggregration] function and the corresponding
   rollup property.
 

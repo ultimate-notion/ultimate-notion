@@ -799,12 +799,12 @@ class PropType:
     MultiSelect = MultiSelect
     Status = Status
     Date = Date
-    People = Person
+    Person = Person
     Files = Files
     Checkbox = Checkbox
     Email = Email
     URL = URL
-    PhoneNumber = Phone
+    Phone = Phone
     Formula = Formula
     Relation = Relation
     Rollup = Rollup

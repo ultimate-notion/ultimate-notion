@@ -198,7 +198,7 @@ def test_text_query(root_page: uno.Page, notion: uno.Session):
     class DB(uno.Schema, db_title='Text Query DB Test'):
         title = uno.Property('Title', uno.PropType.Title())
         name = uno.Property('Name', uno.PropType.Text())
-        phone = uno.Property('Phone', uno.PropType.PhoneNumber())
+        phone = uno.Property('Phone', uno.PropType.Phone())
         email = uno.Property('Email', uno.PropType.Email())
         url = uno.Property('URL', uno.PropType.URL())
 
@@ -396,7 +396,7 @@ def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session):
 def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person: uno.User):
     class DB(uno.Schema, db_title='People & Relation Query DB Test'):
         title = uno.Property('Title', uno.PropType.Title())
-        people = uno.Property('People', uno.PropType.People())
+        people = uno.Property('People', uno.PropType.Person())
         relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
 
     db = notion.create_db(parent=root_page, schema=DB)

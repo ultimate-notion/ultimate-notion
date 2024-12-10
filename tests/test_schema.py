@@ -34,8 +34,8 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
         last_edited_time = uno.Property('Last edited time', uno.PropType.LastEditedTime())
         multi_select = uno.Property('Multi-select', uno.PropType.MultiSelect(options))
         number = uno.Property('Number', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        people = uno.Property('People', uno.PropType.People())
-        phone_number = uno.Property('Phone number', uno.PropType.PhoneNumber())
+        people = uno.Property('People', uno.PropType.Person())
+        phone_number = uno.Property('Phone number', uno.PropType.Phone())
         relation = uno.Property('Relation', uno.PropType.Relation(SchemaA))
         relation_twoway = uno.Property(
             'Relation two-way', uno.PropType.Relation(SchemaA, two_way_prop=SchemaA.relation)
