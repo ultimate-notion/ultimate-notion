@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.7
+## Version 0.7, 2024-12-10
 
 - New: Reading and inserting comments is implemented.
 - Chg: `SList` is part of the public API now, i.e. is in the `ultimate_notion` namespace.

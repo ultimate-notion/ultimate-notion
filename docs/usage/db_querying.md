@@ -87,17 +87,17 @@ assert len(pages) == num_of_articles / len(Topic)
     A common mistake is to forget the parentheses when using `&` and `|` to compose
     several conditions. Due to the precedence rules for operators, e.g. `==`, `!=`,
     in Python, this may lead to an unexpected exception, e.g. `TypeError: unsupported operand type(s) for &`,
-    since `&` may operate on a property instead of a condition.
+    since `&` operates on a property instead of a condition.
 
 Using the Notion UI to get the same result, we would define an *Advanced filter* on a view like this:
 
 ![View filter](../assets/images/notion-view-filter.png){: style="height:300px; display:block; margin-left:auto; margin-right:auto;"}
 
 It should also be noted that the methods `filter` and `sort` of [Query][query object] return a
-new [Query][query object] object to allow for method chaining. This allows potentially to
-call `filter` and `sort` several times. When `filter` is called more than once, the new passed
+new [Query][query object] object to make method chaining possible. This allows potentially to
+call `filter` and `sort` several times. When `filter` is called more than once, the newly passed
 condition is *added* to the existing condition using a logical and, i.e. `&`. In case
-`sort` is passed several times the new sorting will override the existing one.
+`sort` is passed several times, the new sorting will override the existing one.
 It should also be noted that the default sort order is *ascending* and thus `asc()` can be omitted,
 only `desc()` needs to be called explicitely.
 
@@ -111,14 +111,14 @@ assert str(cond) == "(prop('Topic') == 'Tech') & prop('Released').this_week()"
 
 ## Conditions & property types
 
-Not all conditions work with every property type, e.g. `this_week()` is obviously only
+Not all conditions work with every property type. For instance, `this_week()` is obviously only
 meaningful if the property is of type [Date]. If the conditions and their corresponding
 property types match or not, is evaluated when the query is executed, since only then we have
 access to a database schema. Keep this in mind when constructing
 filter conditions as a semantically correct condition can turn out to be wrong when also
 the corresponding property types are taken into account.
 
-In Notion, there are various property types:
+In Notion, there are various classes of property types:
 
 * **string types**, i.e. [Text], [Phone], [E-Mail], [URL], [Title] as well as
   [Formula], when the formula returns a string as [formula type],
@@ -137,7 +137,7 @@ In Notion, there are various property types:
 
 The following table lists all condition operators and methods as well as their corresponding types to define conditions:
 
-| Condition              | Meaning                          | Property Types                                            |
+| Condition              | Meaning                          | Property Types                                  |
 |------------------------|----------------------------------|-------------------------------------------------|
 | `is_empty()`           | is empty                         | string, number, (multi-)categorical, date, file |
 | `is_not_empty()`       | is not empty                     | string, number, (multi-)categorical, date, file |
@@ -164,17 +164,19 @@ The following table lists all condition operators and methods as well as their c
 
 Note that the array type works a little bit different than the others. Imagine you have a rollup with aggregation
 `uno.AggFunc.SHOW_ORIGINAL` defined on a date property. The result of the rollup property will thus be a, possible empty,
-array of dates. Imagine a database of readers with a `has_read` relation to our `Article` database to reference all articles
-that a reader has already read. We could now define a rollup, named `article dates`, on the `has_read` relation for
-the `released` property of the `Article` database with no aggregation, i.e. just showing the original values as elements
-of an array. The condition, which filters for all readers having read an article that was relased this week, looks like this:
+array of dates. Imagine a database of readers with a `has_read` relation to our `Article` database in order to reference
+all articles that a reader has already read. We could now define a rollup, named `article dates`, on the `has_read`
+relation for the `released` property of the `Article` database with no aggregation, i.e. just showing the original
+values as elements of an array. The condition, which filters for all readers having read at least one article that was relased
+this week, looks like this:
 
 ```python
 recent_article_readers_condition = uno.prop('article dates').any.this_week()
 ```
 
-Appending one of the array quantifiers, i.e. `none`, `any`, `every`, generates a [RollupArrayProperty], which then expects
-one of the other condition operators and methods depending on the type of the elements of the array.
+Appending an array quantifier, i.e. `none`, `any`, `every`, generates a [RollupArrayProperty], which then expects
+one of the other condition operators and methods. The possible operators or method depends on the type of the
+elements of the array.
 
 [PySpark]: https://spark.apache.org/docs/latest/api/python/index.html
 [Polars]: https://pola.rs/
