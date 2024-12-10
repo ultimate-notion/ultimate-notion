@@ -1,0 +1,3311 @@
+interactions:
+- request:
+    body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
+      "title": [{"type": "text", "plain_text": "Rollup Query DB Test", "annotations":
+      {"bold": false, "italic": false, "strikethrough": false, "underline": false,
+      "code": false, "color": "default"}, "text": {"content": "Rollup Query DB Test"}}],
+      "properties": {"Title": {"type": "title", "title": {}}, "Date": {"type": "date",
+      "date": {}}, "Number": {"type": "number", "number": {"format": "number"}}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '479'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases
+  response:
+    content: '{"object":"database","id":"158974f3-b388-81b4-aa18-e3982b224bf1","cover":null,"icon":null,"created_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-12-10T10:58:00.000Z","title":[{"type":"text","text":{"content":"Rollup
+      Query DB Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Rollup
+      Query DB Test","href":null}],"description":[],"is_inline":false,"properties":{"Date":{"id":"EA%3Bg","name":"Date","type":"date","date":{}},"Number":{"id":"OLxX","name":"Number","type":"number","number":{"format":"number"}},"Title":{"id":"title","name":"Title","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/158974f3b38881b4aa18e3982b224bf1","public_url":null,"archived":false,"in_trash":false,"request_id":"55ca76a1-cc75-41d2-ac76-f9e65cc7b3d3"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb7fc2d11dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 55ca76a1-cc75-41d2-ac76-f9e65cc7b3d3
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"properties": {"Relation": {"type": "relation", "relation": {"type": "single_property",
+      "database_id": "158974f3-b388-81b4-aa18-e3982b224bf1", "single_property": {}}}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '169'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: PATCH
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1
+  response:
+    content: '{"object":"database","id":"158974f3-b388-81b4-aa18-e3982b224bf1","cover":null,"icon":null,"created_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-12-10T10:58:00.000Z","title":[{"type":"text","text":{"content":"Rollup
+      Query DB Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Rollup
+      Query DB Test","href":null}],"description":[],"is_inline":false,"properties":{"Date":{"id":"EA%3Bg","name":"Date","type":"date","date":{}},"Relation":{"id":"EAZ%5D","name":"Relation","type":"relation","relation":{"database_id":"158974f3-b388-81b4-aa18-e3982b224bf1","type":"single_property","single_property":{}}},"Number":{"id":"OLxX","name":"Number","type":"number","number":{"format":"number"}},"Title":{"id":"title","name":"Title","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/158974f3b38881b4aa18e3982b224bf1","public_url":null,"archived":false,"in_trash":false,"request_id":"f567b04b-f7fb-4f10-a5be-584d4a0ef4b4"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8006f5edbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - f567b04b-f7fb-4f10-a5be-584d4a0ef4b4
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"properties": {"Rollup Title": {"type": "rollup", "rollup": {"function":
+      "show_original", "relation_property_name": "Relation", "rollup_property_name":
+      "Title"}}, "Rollup Date": {"type": "rollup", "rollup": {"function": "earliest_date",
+      "relation_property_name": "Relation", "rollup_property_name": "Date"}}, "Rollup
+      Date Array": {"type": "rollup", "rollup": {"function": "show_original", "relation_property_name":
+      "Relation", "rollup_property_name": "Date"}}, "Rollup Number": {"type": "rollup",
+      "rollup": {"function": "max", "relation_property_name": "Relation", "rollup_property_name":
+      "Number"}}, "Rollup Number Array": {"type": "rollup", "rollup": {"function":
+      "show_original", "relation_property_name": "Relation", "rollup_property_name":
+      "Number"}}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '758'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: PATCH
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1
+  response:
+    content: '{"object":"database","id":"158974f3-b388-81b4-aa18-e3982b224bf1","cover":null,"icon":null,"created_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_time":"2024-12-10T10:58:00.000Z","title":[{"type":"text","text":{"content":"Rollup
+      Query DB Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Rollup
+      Query DB Test","href":null}],"description":[],"is_inline":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","name":"Rollup Title","type":"rollup","rollup":{"rollup_property_name":"Title","relation_property_name":"Relation","rollup_property_id":"title","relation_property_id":"EAZ]","function":"show_original"}},"Rollup
+      Number Array":{"id":"A%3FP%5E","name":"Rollup Number Array","type":"rollup","rollup":{"rollup_property_name":"Number","relation_property_name":"Relation","rollup_property_id":"OLxX","relation_property_id":"EAZ]","function":"show_original"}},"Date":{"id":"EA%3Bg","name":"Date","type":"date","date":{}},"Relation":{"id":"EAZ%5D","name":"Relation","type":"relation","relation":{"database_id":"158974f3-b388-81b4-aa18-e3982b224bf1","type":"single_property","single_property":{}}},"Rollup
+      Date Array":{"id":"IBO~","name":"Rollup Date Array","type":"rollup","rollup":{"rollup_property_name":"Date","relation_property_name":"Relation","rollup_property_id":"EA;g","relation_property_id":"EAZ]","function":"show_original"}},"Number":{"id":"OLxX","name":"Number","type":"number","number":{"format":"number"}},"Rollup
+      Number":{"id":"_N%3Fu","name":"Rollup Number","type":"rollup","rollup":{"rollup_property_name":"Number","relation_property_name":"Relation","rollup_property_id":"OLxX","relation_property_id":"EAZ]","function":"max"}},"Rollup
+      Date":{"id":"lOLm","name":"Rollup Date","type":"rollup","rollup":{"rollup_property_name":"Date","relation_property_name":"Relation","rollup_property_id":"EA;g","relation_property_id":"EAZ]","function":"earliest_date"}},"Title":{"id":"title","name":"Title","type":"title","title":{}}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"url":"https://www.notion.so/158974f3b38881b4aa18e3982b224bf1","public_url":null,"archived":false,"in_trash":false,"request_id":"b59b45a2-c51c-4456-b576-394fdbeae086"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb804fac8dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - b59b45a2-c51c-4456-b576-394fdbeae086
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"parent": {"type": "database_id", "database_id": "158974f3-b388-81b4-aa18-e3982b224bf1"},
+      "properties": {"Title": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Item 1", "annotations": {"bold": false, "italic": false, "strikethrough": false,
+      "underline": false, "code": false, "color": "default"}, "text": {"content":
+      "Item 1"}}]}, "Number": {"type": "number", "number": 42}, "Date": {"type": "date",
+      "date": {"start": "2024-11-25T14:08:00", "time_zone": "UTC"}}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '478'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"158974f3-b388-8187-abb3-e7866432cafc","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Rollup
+      Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":42},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":null,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":null,"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}},"url":"https://www.notion.so/Item-1-158974f3b3888187abb3e7866432cafc","public_url":null,"request_id":"9dd34670-b2da-43c1-891c-485efb3285b5"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb80c5da9dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 9dd34670-b2da-43c1-891c-485efb3285b5
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"parent": {"type": "database_id", "database_id": "158974f3-b388-81b4-aa18-e3982b224bf1"},
+      "properties": {"Title": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Item 2", "annotations": {"bold": false, "italic": false, "strikethrough": false,
+      "underline": false, "code": false, "color": "default"}, "text": {"content":
+      "Item 2"}}]}, "Number": {"type": "number", "number": 72}, "Date": {"type": "date",
+      "date": {"start": "1981-11-23T07:02:00", "time_zone": "UTC"}}, "Relation": {"type":
+      "relation", "relation": [{"id": "158974f3-b388-8187-abb3-e7866432cafc"}], "has_more":
+      false}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '593'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null,"request_id":"e24294ef-8837-4fff-b54a-fde989cbe518"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb810a9b4dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - e24294ef-8837-4fff-b54a-fde989cbe518
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"parent": {"type": "database_id", "database_id": "158974f3-b388-81b4-aa18-e3982b224bf1"},
+      "properties": {"Title": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Item 3", "annotations": {"bold": false, "italic": false, "strikethrough": false,
+      "underline": false, "code": false, "color": "default"}, "text": {"content":
+      "Item 3"}}]}, "Number": {"type": "number", "number": 12}, "Date": {"type": "date",
+      "date": {"start": "2024-11-25T14:08:00", "time_zone": "UTC"}}, "Relation": {"type":
+      "relation", "relation": [{"id": "158974f3-b388-8187-abb3-e7866432cafc"}, {"id":
+      "158974f3-b388-81f3-b876-c79621f8bbf9"}], "has_more": false}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '641'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null,"request_id":"3bc1f878-f748-4e4f-b0b4-8bdc0b0c708f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8197fdbdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 3bc1f878-f748-4e4f-b0b4-8bdc0b0c708f
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"8612e46f-71d7-459b-a48c-a5185e6058cc"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb81d1895dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 8612e46f-71d7-459b-a48c-a5185e6058cc
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Title", "rollup": {"any": {"rich_text":
+      {"equals": "Item 1"}}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '114'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null},{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"0885e274-7cd3-4656-8609-e3fa81ad70c3"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb81f4dd5dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 0885e274-7cd3-4656-8609-e3fa81ad70c3
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"7535cf8c-80b5-4d4d-8cdc-606b6ca5a87f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb821bc5ddbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 7535cf8c-80b5-4d4d-8cdc-606b6ca5a87f
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Title", "rollup": {"any": {"rich_text":
+      {"contains": "Item 1"}}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '116'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null},{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"2adff0aa-c5b3-477e-b97d-c0310ed87e82"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb82d8a68dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 2adff0aa-c5b3-477e-b97d-c0310ed87e82
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"fd71ae16-198e-42e2-b7be-b8aaeebd44e8"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb82f8fabdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - fd71ae16-198e-42e2-b7be-b8aaeebd44e8
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Title", "rollup": {"every": {"rich_text":
+      {"starts_with": "Item"}}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '119'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null},{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"300c41b1-efdb-424a-a738-42300e4ab4f0"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8319cccdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 300c41b1-efdb-424a-a738-42300e4ab4f0
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"eff7dcb3-0dc0-4d30-b495-bc87f0164aa9"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb833ca40dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - eff7dcb3-0dc0-4d30-b495-bc87f0164aa9
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Title", "rollup": {"none": {"rich_text":
+      {"is_empty": true}}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '113'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null},{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null},{"object":"page","id":"158974f3-b388-8187-abb3-e7866432cafc","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Rollup
+      Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":42},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":null,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":null,"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}},"url":"https://www.notion.so/Item-1-158974f3b3888187abb3e7866432cafc","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"c8a4f2a1-9c53-4f4e-8722-54069f0b4d62"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb835bedbdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - c8a4f2a1-9c53-4f4e-8722-54069f0b4d62
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"6be8150e-2403-45c7-a0f7-5ebe57af792d"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8390f29dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 6be8150e-2403-45c7-a0f7-5ebe57af792d
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"e6b16149-8f6d-4c40-8ee2-ec1e25e95031"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb83b7d85dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - e6b16149-8f6d-4c40-8ee2-ec1e25e95031
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"7d2d8ab8-5bb2-4c4a-a8c9-6d675efd1327"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb83d7ad4dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 7d2d8ab8-5bb2-4c4a-a8c9-6d675efd1327
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"d5392bfc-084e-470f-a3e1-1675e215d043"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb83f780bdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - d5392bfc-084e-470f-a3e1-1675e215d043
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"f570460d-67bb-4103-893f-8f6df1a2dfee"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8454ec4dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - f570460d-67bb-4103-893f-8f6df1a2dfee
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"9a04f1d8-8192-422f-bf7d-c80d9af17ab2"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb849a9a5dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 9a04f1d8-8192-422f-bf7d-c80d9af17ab2
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"702874fb-71b5-4e46-9ae4-b407aca9e10c"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb85aff2bdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 702874fb-71b5-4e46-9ae4-b407aca9e10c
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Date", "rollup": {"date": {"is_empty":
+      true}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '97'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-8187-abb3-e7866432cafc","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Rollup
+      Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":42},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":null,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":null,"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}},"url":"https://www.notion.so/Item-1-158974f3b3888187abb3e7866432cafc","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"c4fe7386-ceb1-4c33-964b-36818ca5ba24"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb85d7d67dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - c4fe7386-ceb1-4c33-964b-36818ca5ba24
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"ca3603bb-4cf5-4347-8a6b-08b94b5e89be"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb85fbae8dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - ca3603bb-4cf5-4347-8a6b-08b94b5e89be
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Date", "rollup": {"date": {"equals": "2024-11-25"}}},
+      "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '103'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"87db3fcf-c155-4240-b95f-d31c8fdfdaf2"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb862195fdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 87db3fcf-c155-4240-b95f-d31c8fdfdaf2
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"00c27347-aaf6-4675-a846-3ab71190ee7e"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb864c808dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 00c27347-aaf6-4675-a846-3ab71190ee7e
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Date", "rollup": {"date": {"before": "2024-11-25"}}},
+      "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '103'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"0e9f44ef-1e38-4f98-aa8f-e513d29b5fec"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb866bcf5dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 0e9f44ef-1e38-4f98-aa8f-e513d29b5fec
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"2db09302-1c70-4f84-956b-eecdd3842ce8"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb86a9ed7dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 2db09302-1c70-4f84-956b-eecdd3842ce8
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Date", "rollup": {"date": {"past_week":
+      {}}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '96'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"4ff7c0dd-bfdd-49e1-9490-ed4eb53d2020"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb86e7899dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 4ff7c0dd-bfdd-49e1-9490-ed4eb53d2020
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"3ae2f058-d041-412c-9cd3-510652f3dd29"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8703d18dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 3ae2f058-d041-412c-9cd3-510652f3dd29
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Date", "rollup": {"date": {"on_or_before":
+      "1981-11-25"}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '109'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"ab3f17bf-725d-47ff-90ad-7daaab2a5b01"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8731c30dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - ab3f17bf-725d-47ff-90ad-7daaab2a5b01
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"edd5d199-9d61-4cfd-b5e3-c2cef7257b5c"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb875bb1ddbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - edd5d199-9d61-4cfd-b5e3-c2cef7257b5c
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"0c91a4ea-3db7-43b9-8fcd-9852430327d4"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8786a76dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 0c91a4ea-3db7-43b9-8fcd-9852430327d4
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Date Array", "rollup": {"any": {"date":
+      {"past_week": {}}}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '111'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"15350898-a35f-4f1e-a9b9-6e539a437544"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb87bba61dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 15350898-a35f-4f1e-a9b9-6e539a437544
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"dd1a74fc-4e98-4a28-a452-4cb142358ca8"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb87f4ac0dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - dd1a74fc-4e98-4a28-a452-4cb142358ca8
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Number", "rollup": {"number": {"is_empty":
+      true}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '101'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-8187-abb3-e7866432cafc","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Rollup
+      Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":42},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":null,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":null,"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}},"url":"https://www.notion.so/Item-1-158974f3b3888187abb3e7866432cafc","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"b970ae67-c31a-459b-847f-38225ff76944"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb881780bdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - b970ae67-c31a-459b-847f-38225ff76944
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"9df20cb6-dcb2-412c-8069-c9fee2c48f8a"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8859a2edbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 9df20cb6-dcb2-412c-8069-c9fee2c48f8a
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Number", "rollup": {"number": {"equals":
+      42}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '97'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"ba47ec04-6ada-4b46-b3a7-382041012d09"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb887f87bdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - ba47ec04-6ada-4b46-b3a7-382041012d09
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"32d2ecfd-8ffb-43aa-b1f2-1df05695970c"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb88a2e37dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 32d2ecfd-8ffb-43aa-b1f2-1df05695970c
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Number", "rollup": {"number": {"greater_than":
+      42}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '103'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"b836e4a5-e7dc-4c32-b2ce-346bee793fbe"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb88c8c8cdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - b836e4a5-e7dc-4c32-b2ce-346bee793fbe
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"5a79311d-a253-4e1c-968d-861cb86914b0"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb892cc8adbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 5a79311d-a253-4e1c-968d-861cb86914b0
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"10eb76df-437a-4800-ab54-e0336508a7a4"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb894ca0ddbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 10eb76df-437a-4800-ab54-e0336508a7a4
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"page_size": 1}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '16'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null}],"next_cursor":"158974f3-b388-81f3-b876-c79621f8bbf9","has_more":true,"type":"page_or_database","page_or_database":{},"request_id":"1ca4327c-c29f-48e3-99be-4a0e094a154c"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb896df1fdbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 1ca4327c-c29f-48e3-99be-4a0e094a154c
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"filter": {"property": "Rollup Number Array", "rollup": {"any": {"number":
+      {"less_than_or_equal_to": 42}}}}, "page_size": 100}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '127'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/databases/158974f3-b388-81b4-aa18-e3982b224bf1/query
+  response:
+    content: '{"object":"list","results":[{"object":"page","id":"158974f3-b388-819e-8cf1-e220e2f16d83","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]},{"type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42},{"type":"number","number":72}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"},{"id":"158974f3-b388-81f3-b876-c79621f8bbf9"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}},{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":12},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":72,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-158974f3b388819e8cf1e220e2f16d83","public_url":null},{"object":"page","id":"158974f3-b388-81f3-b876-c79621f8bbf9","created_time":"2024-12-10T10:58:00.000Z","last_edited_time":"2024-12-10T10:58:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"158974f3-b388-81b4-aa18-e3982b224bf1"},"archived":false,"in_trash":false,"properties":{"Rollup
+      Title":{"id":"%3DKpl","type":"rollup","rollup":{"type":"array","array":[{"type":"title","title":[{"type":"text","text":{"content":"Item
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      1","href":null}]}],"function":"show_original"}},"Rollup Number Array":{"id":"A%3FP%5E","type":"rollup","rollup":{"type":"array","array":[{"type":"number","number":42}],"function":"show_original"}},"Date":{"id":"EA%3Bg","type":"date","date":{"start":"1981-11-23T07:02:00.000+00:00","end":null,"time_zone":null}},"Relation":{"id":"EAZ%5D","type":"relation","relation":[{"id":"158974f3-b388-8187-abb3-e7866432cafc"}],"has_more":false},"Rollup
+      Date Array":{"id":"IBO~","type":"rollup","rollup":{"type":"array","array":[{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null}}],"function":"show_original"}},"Number":{"id":"OLxX","type":"number","number":72},"Rollup
+      Number":{"id":"_N%3Fu","type":"rollup","rollup":{"type":"number","number":42,"function":"max"}},"Rollup
+      Date":{"id":"lOLm","type":"rollup","rollup":{"type":"date","date":{"start":"2024-11-25T14:08:00.000+00:00","end":null,"time_zone":null},"function":"earliest_date"}},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+      2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-158974f3b38881f3b876c79621f8bbf9","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"bc283244-20b7-4473-93ad-0659cb596a4e"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8efcb8992d40dbcd-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - bc283244-20b7-4473-93ad-0659cb596a4e
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
