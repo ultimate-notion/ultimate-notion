@@ -12,7 +12,8 @@ from tabulate import tabulate
 from typing_extensions import Self
 
 from ultimate_notion.comment import Comment, Discussion
-from ultimate_notion.core import InvalidAPIUsageError, NotionEntity, get_active_session, get_url
+from ultimate_notion.core import NotionEntity, get_active_session, get_url
+from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.file import Emoji, FileInfo, wrap_icon
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks

@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import schema
-from ultimate_notion.query import FilterQueryError
+from ultimate_notion.errors import FilterQueryError
 from ultimate_notion.utils import parse_dt_str
 
 

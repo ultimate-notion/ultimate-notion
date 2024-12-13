@@ -16,6 +16,7 @@ from notion_client.errors import APIResponseError
 from ultimate_notion.blocks import Block, DataObject
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
+from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
@@ -30,18 +31,6 @@ from ultimate_notion.user import User
 from ultimate_notion.utils import SList
 
 _logger = logging.getLogger(__name__)
-
-
-class SessionError(Exception):
-    """Raised when there are issues with the Notion session."""
-
-
-class UnknownUserError(Exception):
-    """Raised when the user is unknown."""
-
-
-class UnknownPageError(Exception):
-    """Raised when the page is unknown."""
 
 
 class Session:
