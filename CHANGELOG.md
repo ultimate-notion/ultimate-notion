@@ -3,6 +3,7 @@
 ## Version 0.8
 
 - New: Added support for creating inline databases by Tzumx
+- Chg: Have a proper hierarchy of Ultimate Notion exception classes.
 
 ## Version 0.7.1, 2025-01-05
 

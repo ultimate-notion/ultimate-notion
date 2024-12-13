@@ -10,6 +10,7 @@ from __future__ import annotations
 import pytest
 
 import ultimate_notion as uno
+from ultimate_notion.errors import SchemaError
 from ultimate_notion.obj_api.query import MAX_PAGE_SIZE
 
 from .conftest import CONTACTS_DB
@@ -40,7 +41,7 @@ def test_schema(article_db: uno.Database):
         cost = uno.Property('Cost', uno.PropType.Text())
         desc = uno.Property('Description', uno.PropType.Text())
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         article_db.schema = WrongSchema
 
 

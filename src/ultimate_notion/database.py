@@ -9,13 +9,14 @@ from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject
 from ultimate_notion.core import get_active_session, get_repr
+from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
 from ultimate_notion.file import Emoji, FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case, snake_case
-from ultimate_notion.schema import Property, PropertyType, PropertyValue, ReadOnlyPropertyError, Schema, SchemaError
+from ultimate_notion.schema import Property, PropertyType, PropertyValue, Schema
 from ultimate_notion.view import View
 
 
