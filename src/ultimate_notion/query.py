@@ -12,6 +12,7 @@ from typing_extensions import Self
 
 from ultimate_notion import props, schema
 from ultimate_notion.core import get_active_session
+from ultimate_notion.errors import EmptyDBError, FilterQueryError
 from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.enums import ArrayQuantifier, FormulaType, RollupType, SortDirection
 from ultimate_notion.option import Option
@@ -25,14 +26,6 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__name__)
-
-
-class EmptyDBError(Exception):
-    """A special exception that tells us that a database is empty during probing."""
-
-
-class FilterQueryError(ValueError):
-    """An exception that is raised when a filter query is invalid."""
 
 
 class Property(BaseModel):

@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.8
+
+- Chg: Have a proper hierarchy of Ultimate Notion exception classes.
+
 ## Version 0.7.1, 2025-01-05
 
 - Fix: Added missing tomli dependency, issue #62.

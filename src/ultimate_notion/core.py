@@ -19,14 +19,6 @@ if TYPE_CHECKING:
     from ultimate_notion.user import User
 
 
-class InvalidAPIUsageError(Exception):
-    """Raised when the API is used in an invalid way."""
-
-    def __init__(self, message='This part of the API is not intended to be used in this manner'):
-        self.message = message
-        super().__init__(self.message)
-
-
 class ObjRefWrapper(Protocol[GT]):
     """Wrapper for objects that have an obj_ref attribute.
 
