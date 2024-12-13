@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion.blocks import ChildrenMixin
-from ultimate_notion.core import InvalidAPIUsageError
+from ultimate_notion.errors import InvalidAPIUsageError
 
 
 @pytest.mark.vcr()

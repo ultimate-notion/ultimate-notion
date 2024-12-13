@@ -30,6 +30,7 @@ from tabulate import tabulate
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion import rich_text
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
+from ultimate_notion.errors import SchemaError, SchemaNotBoundError
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
@@ -38,32 +39,6 @@ from ultimate_notion.utils import EmptyListError, SList, dict_diff_str, is_noteb
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
-
-
-class SchemaError(Exception):
-    """Raised when there are issues with the schema of a database."""
-
-    def __init__(self, message):
-        """Initialize the `SchemaError` with a supplied message."""
-        super().__init__(message)
-
-
-class SchemaNotBoundError(SchemaError):
-    """Raised when the schema is not bound to a database."""
-
-    def __init__(self, schema: type[Schema]):
-        self.schema = schema
-        msg = f'Schema {schema.__name__} is not bound to any database'
-        super().__init__(msg)
-
-
-class ReadOnlyPropertyError(SchemaError):
-    """Raised when an attempt is made to write to a write-protected property."""
-
-    def __init__(self, prop: Property):
-        self.prop = prop
-        msg = f"Argument {prop.attr_name} refers to the read-only propert '{prop.name}' of type {prop.type}"
-        super().__init__(msg)
 
 
 T = TypeVar('T', bound=obj_schema.PropertyType)

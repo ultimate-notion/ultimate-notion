@@ -7,6 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import props
+from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
 
 
@@ -54,28 +55,28 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         SchemaB.create(non_existent_attr_name=None)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(created_time=datetime.now(tz=timezone.utc))
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(last_edited_time=datetime.now(tz=timezone.utc))
 
     florian = notion.search_user('Florian Wilhelm').item()
     myself = notion.whoami()
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(created_by=myself)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(last_edited_by=myself)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(formula=3)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(rollup=3)
 
     a_item1 = db_a.create_page(name='Item 1')
@@ -204,19 +205,19 @@ def test_schema_from_dict():
     dict_style_schema = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.Select([])}  # Wrong PropertyType!
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
     dict_style_schema = {'Name': uno.PropType.Title(), 'My Tags': uno.PropType.MultiSelect([])}  # Wrong property!
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         dict_style_schema = {'Tags': uno.PropType.MultiSelect([])}
         DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         dict_style_schema = {'Name1': uno.PropType.Title(), 'Name2': uno.PropType.Title()}
         DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
