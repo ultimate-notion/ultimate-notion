@@ -15,7 +15,7 @@ actual `PropertyType`, e.g. `Text`, `Number`.
 The source of truth is always the `obj_ref` and a `PropertyType` holds only auxilliary
 information if actually needed. Since the object references `obj_ref` must always point
 to the actual `obj_api.blocks.Database.properties` value if the schema is bound to an database,
-the method `_remap_obj_refs` rewires this when a schema is used to create a database.
+the method `_set_obj_refs` rewires this when a schema is used to create a database.
 """
 
 from __future__ import annotations
@@ -171,40 +171,30 @@ class Property:
         return self._attr_name
 
 
-class SchemaRepr(ABCMeta):
+class SchemaType(ABCMeta):
     """Metaclass for the schema of a database.
 
     This makes the schema class itself more user-friendly by providing a custom `__repr__` method
     and letting it behave like a dictionary for the properties athough it is a class, not an instance.
     """
 
-    def __repr__(cls) -> str:
+    # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
+
+    def __repr__(cls: type[Schema]) -> str:  # type: ignore[misc]
         # We can only overwrite __repr__ for a class in a metaclass
-        if not issubclass(cls, Schema):
-            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
-            raise TypeError(msg)
         return cls.as_table(tablefmt='simple')
 
-    def __getitem__(cls, prop_name: str) -> PropertyType:
-        if not issubclass(cls, Schema):
-            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
-            raise TypeError(msg)
+    def __getitem__(cls: type[Schema], prop_name: str) -> PropertyType:  # type: ignore[misc]
         return cls.get_prop(prop_name).type
 
-    def __len__(cls) -> int:
-        if not issubclass(cls, Schema):
-            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
-            raise TypeError(msg)
+    def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
         return len(cls.get_props())
 
-    def __iter__(cls) -> Iterator[PropertyType]:
-        if not issubclass(cls, Schema):
-            msg = 'Metaclass SchemaRepr can only be used with subclasses of Schema'
-            raise TypeError(msg)
+    def __iter__(cls: type[Schema]) -> Iterator[PropertyType]:  # type: ignore[misc]
         return (prop.type for prop in cls.get_props())
 
 
-class Schema(metaclass=SchemaRepr):
+class Schema(metaclass=SchemaType):
     """Base class for the schema of a database."""
 
     db_title: rich_text.Text | None
