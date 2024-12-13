@@ -29,8 +29,11 @@ def test_whoami_get_user(notion: uno.Session):
     assert me.name == 'Github Unittests'
     user = notion.get_user(me.id)
     assert user.id == me.id
-    user = notion.get_user(me.id, use_cache=False)
+    user = notion.get_user(me.id, use_cache=False, raise_on_unknown=False)
     assert user.name == 'Github Unittests'
+    with pytest.raises(uno.UnknownUserError):
+        unknown_id = 'f3f2e850-b5d4-11ef-ac7e-96584d5248b2'
+        notion.get_user(unknown_id, use_cache=False)
 
 
 @pytest.mark.vcr()
@@ -38,6 +41,9 @@ def test_get_page_by_id(notion: uno.Session, intro_page: uno.Page):
     page_by_id = notion.get_page(intro_page.id)
     assert page_by_id.title == 'Getting Started'
     assert page_by_id == intro_page
+    with pytest.raises(uno.UnknownPageError):
+        unknown_id = 'f3f2e850-b5d4-11ef-ac7e-96584d5248b2'
+        notion.get_page(unknown_id)
 
 
 @pytest.mark.vcr()

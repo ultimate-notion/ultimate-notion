@@ -57,7 +57,7 @@ from ultimate_notion.page import Page
 from ultimate_notion.query import Condition, prop
 from ultimate_notion.rich_text import join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SchemaError, SelfRef
-from ultimate_notion.session import Session
+from ultimate_notion.session import Session, SessionError, UnknownPageError, UnknownUserError
 from ultimate_notion.user import User
 from ultimate_notion.utils import SList
 
@@ -104,12 +104,15 @@ __all__ = [
     'SchemaError',
     'SelfRef',
     'Session',
+    'SessionError',
     'SyncedBlock',
     'Table',
     'TableOfContents',
     'TableRow',
     'ToDoItem',
     'ToggleItem',
+    'UnknownPageError',
+    'UnknownUserError',
     'User',
     'VState',
     'Video',

@@ -27,10 +27,10 @@ import os
 import shutil
 import tempfile
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock, patch
 
 import pydantic
@@ -548,7 +548,9 @@ def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
 
 
 @vcr_fixture(scope='module', autouse=True)
-def notion_cleanups(notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]):
+def notion_cleanups(
+    notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]
+) -> Iterator[None]:
     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
 
     Be careful! This fixture opens a Notion session, which might lead to problems if you run it in parallel with other.
@@ -576,7 +578,7 @@ def notion_cleanups(notion_cached: Session, root_page: Page, static_pages: set[P
     clean()
 
 
-def delete_all_taskslists():
+def delete_all_taskslists() -> None:
     """Delete all taskslists except of the default one."""
     gtasks = GTasksClient(read_only=False)
     try:
@@ -602,12 +604,11 @@ def tz_berlin() -> Iterator[str]:
         yield tz
 
 
-def assert_eventually(assertion_func, retries=5, delay=3):
-    """
-    Retry the provided assertion function for a given number of attempts with a delay.
+def assert_eventually(assertion_func: Callable[[], Any], retries: int = 5, delay: int = 3) -> None:
+    """Retry the provided assertion function for a given number of attempts with a delay.
 
     Args:
-        assertion_func (Callable): The function containing the assertion logic.
+        assertion_func (Callable): The lambda containing the assertion logic without parameters.
         retries (int): Number of retries before failing.
         delay (int): Delay in seconds between retries.
     """
