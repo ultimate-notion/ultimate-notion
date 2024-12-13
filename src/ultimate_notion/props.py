@@ -196,7 +196,7 @@ class People(PropertyValue[obj_props.People], wraps=obj_props.People):
     @property
     def value(self) -> list[User]:
         session = get_active_session()
-        return [session.get_user(user.id) for user in self.obj_ref.people]
+        return [session.get_user(user.id, raise_on_unknown=False) for user in self.obj_ref.people]
 
 
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
@@ -310,7 +310,7 @@ class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
     @property
     def value(self) -> User:
         session = get_active_session()
-        return session.get_user(self.obj_ref.created_by.id)
+        return session.get_user(self.obj_ref.created_by.id, raise_on_unknown=False)
 
 
 class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.LastEditedTime):
@@ -331,7 +331,7 @@ class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEd
     @property
     def value(self) -> User:
         session = get_active_session()
-        return session.get_user(self.obj_ref.last_edited_by.id)
+        return session.get_user(self.obj_ref.last_edited_by.id, raise_on_unknown=False)
 
 
 class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
@@ -365,7 +365,7 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
             return None
         else:
             session = get_active_session()
-            return session.get_user(self.obj_ref.verification.verified_by.id)
+            return session.get_user(self.obj_ref.verification.verified_by.id, raise_on_unknown=False)
 
     @property
     def date(self) -> pnd.DateTime | None:

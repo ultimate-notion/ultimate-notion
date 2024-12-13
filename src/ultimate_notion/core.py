@@ -123,7 +123,7 @@ class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
     def created_by(self) -> User:
         """Return the user who created the block."""
         session = get_active_session()
-        return session.get_user(self.obj_ref.created_by.id)
+        return session.get_user(self.obj_ref.created_by.id, raise_on_unknown=False)
 
     @property
     def last_edited_time(self) -> dt.datetime:

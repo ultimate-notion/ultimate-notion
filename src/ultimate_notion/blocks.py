@@ -81,7 +81,6 @@ class DataObject(NotionEntity[DO], wraps=obj_blocks.DataObject):
     @abstractmethod
     def to_markdown(self) -> str:
         """Return the content of the block as Markdown."""
-        ...
 
     def _to_markdown(self) -> str:
         """Return the content of the block as Markdown.
