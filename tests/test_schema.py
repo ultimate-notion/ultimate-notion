@@ -12,7 +12,7 @@ from ultimate_notion.props import PropertyValue
 
 
 @pytest.mark.vcr()
-def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
+def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -121,20 +121,20 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_all_props_schema(all_props_db: uno.Database):
+def test_all_props_schema(all_props_db: uno.Database) -> None:
     schema_dct = all_props_db.schema.to_dict()
     assert len(schema_dct) == 26
 
 
 @pytest.mark.vcr()
-def test_wiki_db_schema(wiki_db: uno.Database):
+def test_wiki_db_schema(wiki_db: uno.Database) -> None:
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
     wiki_db.get_all_pages()
 
 
 @pytest.mark.vcr()
-def test_two_way_prop(notion: uno.Session, root_page: uno.Page):
+def test_two_way_prop(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -157,7 +157,7 @@ def test_two_way_prop(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_self_ref_relation(notion: uno.Session, root_page: uno.Page):
+def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Schema A description"""
 
@@ -193,7 +193,7 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_schema_from_dict():
+def test_schema_from_dict() -> None:
     class ClassStyleSchema(uno.Schema, db_title='Class Style'):
         name = uno.Property('Name', uno.PropType.Title())
         tags = uno.Property('Tags', uno.PropType.MultiSelect([]))

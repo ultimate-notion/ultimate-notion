@@ -13,7 +13,7 @@ from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 
 
 @pytest.mark.vcr()
-def test_parent(page_hierarchy):
+def test_parent(page_hierarchy) -> None:
     root_page, l1_page, l2_page = page_hierarchy
     assert isinstance(root_page, uno.Page)
     assert isinstance(l1_page, uno.Page)
@@ -26,13 +26,13 @@ def test_parent(page_hierarchy):
 
 
 @pytest.mark.vcr()
-def test_ancestors(page_hierarchy: tuple[uno.Page, ...]):
+def test_ancestors(page_hierarchy: tuple[uno.Page, ...]) -> None:
     root_page, l1_page, l2_page = page_hierarchy
     assert l2_page.ancestors == (root_page, l1_page)
 
 
 @pytest.mark.vcr()
-def test_delete_restore_page(notion: uno.Session, root_page: uno.Page):
+def test_delete_restore_page(notion: uno.Session, root_page: uno.Page) -> None:
     page = notion.create_page(root_page)
     assert not page.is_deleted
     page.delete()
@@ -42,7 +42,7 @@ def test_delete_restore_page(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_reload_page(notion: uno.Session, root_page: uno.Page):
+def test_reload_page(notion: uno.Session, root_page: uno.Page) -> None:
     page = notion.create_page(root_page)
     old_obj_id = id(page.obj_ref)
     page.reload()
@@ -50,7 +50,7 @@ def test_reload_page(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_parent_subpages(notion: uno.Session, root_page: uno.Page):
+def test_parent_subpages(notion: uno.Session, root_page: uno.Page) -> None:
     parent = notion.create_page(root_page, title='Parent')
     child1 = notion.create_page(parent, title='Child 1')
     child2 = notion.create_page(parent, title='Child 2')
@@ -63,12 +63,12 @@ def test_parent_subpages(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_parent_children(intro_page: uno.Page):
+def test_parent_children(intro_page: uno.Page) -> None:
     assert all(isinstance(block, Block) for block in intro_page.children)
 
 
 @pytest.mark.vcr()
-def test_icon_attr(notion: uno.Session, root_page: uno.Page):
+def test_icon_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.create_page(parent=root_page, title='My new page with icon')
 
     assert new_page.icon is None
@@ -104,7 +104,7 @@ def test_icon_attr(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_cover_attr(notion: uno.Session, root_page: uno.Page):
+def test_cover_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.create_page(parent=root_page, title='My new page with cover')
 
     assert new_page.cover is None
@@ -126,7 +126,7 @@ def test_cover_attr(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_title_attr(notion: uno.Session, root_page: uno.Page):
+def test_title_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.create_page(parent=root_page)
 
     assert new_page.title == ''
@@ -151,7 +151,7 @@ def test_title_attr(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_created_edited_by(notion: uno.Session, root_page: uno.Page):
+def test_created_edited_by(notion: uno.Session, root_page: uno.Page) -> None:
     myself = notion.whoami()
     florian = notion.search_user('Florian Wilhelm').item()
     assert root_page.created_by == florian
@@ -159,7 +159,7 @@ def test_created_edited_by(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_page_to_markdown(md_page: uno.Page):
+def test_page_to_markdown(md_page: uno.Page) -> None:
     def remove_query_string(line: str) -> str:
         line = re.sub(r'\?.*?\]', ']', line)
         line = re.sub(r'prod.*?\)', ')', line)
@@ -253,7 +253,7 @@ def test_page_to_markdown(md_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_parent_db(notion: uno.Session, root_page: uno.Page):
+def test_parent_db(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_db(root_page)
     db.title = 'Parent DB'
     page_in_db = db.create_page()
@@ -266,7 +266,7 @@ def test_parent_db(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page: uno.Page):
+def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page: uno.Page) -> None:
     class Item(uno.Schema, db_title='Item DB for max relation items'):
         """Database of all items"""
 
@@ -295,7 +295,7 @@ def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page
 
 
 @pytest.mark.vcr()
-def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page: uno.Page, person: uno.User):
+def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page: uno.Page, person: uno.User) -> None:
     # According to the Notion API (see below), this test should fail but it doesn't.
     # Source: https://developers.notion.com/reference/retrieve-a-page#limits
     class Item(uno.Schema, db_title='Item DB for max text items'):
@@ -319,6 +319,6 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
 
 
 @pytest.mark.vcr()
-def test_unfurl_blocks(notion: uno.Session, unfurl_page: uno.Page):
+def test_unfurl_blocks(notion: uno.Session, unfurl_page: uno.Page) -> None:
     pass
     # ToDo: Implement test

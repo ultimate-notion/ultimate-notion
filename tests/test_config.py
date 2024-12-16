@@ -13,11 +13,11 @@ from ultimate_notion.config import (
 )
 
 
-def test_get_cfg_file(custom_config: Path):
+def test_get_cfg_file(custom_config: Path) -> None:
     assert get_cfg_file() == custom_config
 
 
-def test_get_or_create_cfg(custom_config: Path):
+def test_get_or_create_cfg(custom_config: Path) -> None:
     with patch.dict(os.environ, {ENV_NOTION_TOKEN: 'my-token'}):
         cfg = get_or_create_cfg()
 
@@ -28,7 +28,7 @@ def test_get_or_create_cfg(custom_config: Path):
     assert isinstance(cfg.google.token_json, Path)
 
 
-def test_resolve_env_value():
+def test_resolve_env_value() -> None:
     assert resolve_env_value('${env:NON_EXISTENT_ENV_VAR}') is None
     assert resolve_env_value('${env:NON_EXISTENT_ENV_VAR|default}') == 'default'
     assert resolve_env_value('${env:NON_EXISTENT_ENV_VAR|}') == ''
@@ -40,6 +40,6 @@ def test_resolve_env_value():
         assert resolve_env_value('${env:VAR|default}') == 'value'
 
 
-def test_debug_mode(caplog: LogCaptureFixture):
+def test_debug_mode(caplog: LogCaptureFixture) -> None:
     activate_debug_mode()
     assert 'is running in debug mode.' in caplog.text

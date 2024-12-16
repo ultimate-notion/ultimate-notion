@@ -67,7 +67,7 @@ ALL_BLOCKS_PAGE = 'All Blocks Page Test'
 TEST_CFG_FILE = get_cfg_file()
 
 
-def pytest_addoption(parser: Parser):
+def pytest_addoption(parser: Parser) -> None:
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
     parser.addoption(
         '--check-latest-release',
@@ -93,7 +93,7 @@ def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: 
         logging.error(msg)
 
 
-def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     marker_name = 'check_latest_release'
     flag_name = f'--{marker_name.replace("_", "-")}'
     if config.getoption(flag_name):
@@ -122,7 +122,7 @@ def activate_debug_mode(request: SubRequest) -> None:
 
 
 @pytest.fixture(scope='session')
-def vcr_config():
+def vcr_config() -> dict[str, Any]:
     """Configure pytest-recording."""
     secret_params = [
         'client_id',
@@ -211,7 +211,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
-def vcr_fixture(scope: str, *, autouse: bool = False):
+def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
     """Return a VCR fixture for module/session-level fixtures"""
     if scope not in {'module', 'session'}:
         msg = f'Use this only for module or session scope, not {scope}!'
