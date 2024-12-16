@@ -13,25 +13,25 @@ from ultimate_notion.config import get_cfg
 
 
 @pytest.fixture(scope='module', autouse=True)
-def notion_cleanups():
+def notion_cleanups() -> None:
     """Overwrites fixture from conftest.py to avoid an open session."""
 
 
 @pytest.mark.vcr()
 @pytest.mark.skipif(sys.platform == 'win32', reason='Does not run on Windows')
-def test_getting_started():
+def test_getting_started() -> None:
     exec_pyfile('examples/getting_started.py')
 
 
 @pytest.mark.vcr()
 @pytest.mark.skipif(sys.platform == 'win32', reason='Does not run on Windows')
-def test_simple_taskdb():
+def test_simple_taskdb() -> None:
     exec_pyfile('examples/simple_taskdb.py')
 
 
 @pytest.mark.vcr()
 @pytest.mark.skipif(sys.platform == 'win32', reason='Does not run on Windows')
-def test_sync_google_tasks(custom_config: Path):
+def test_sync_google_tasks(custom_config: Path) -> None:
     # assures deterministic tests by removing possible states
     shutil.rmtree(get_cfg().ultimate_notion.sync_state_dir)
     delete_all_taskslists()
