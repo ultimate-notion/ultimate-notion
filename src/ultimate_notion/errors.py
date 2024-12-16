@@ -1,4 +1,4 @@
-"""Errors/exceptions for the Ultimate Notion API."""
+"""Errors/exceptions of the Ultimate Notion API."""
 
 from __future__ import annotations
 

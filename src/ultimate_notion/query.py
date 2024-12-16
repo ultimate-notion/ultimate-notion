@@ -44,22 +44,22 @@ class Property(BaseModel):
     def __hash__(self) -> int:
         return hash((self.name, self.sort))
 
-    def __eq__(self, other: Any) -> Equals:  # type: ignore[override]
+    def __eq__(self, other: Any) -> Condition:  # type: ignore[override]
         return Equals(prop=self, value=other)
 
-    def __ne__(self, other: Any) -> EqualsNot:  # type: ignore[override]
+    def __ne__(self, other: Any) -> Condition:  # type: ignore[override]
         return EqualsNot(prop=self, value=other)
 
-    def __gt__(self, value: Any) -> GreaterThan:
+    def __gt__(self, value: Any) -> Condition:
         return GreaterThan(prop=self, value=value)
 
-    def __lt__(self, value: Any) -> LessThan:
+    def __lt__(self, value: Any) -> Condition:
         return LessThan(prop=self, value=value)
 
-    def __ge__(self, value: Any) -> GreaterThanOrEqualTo:
+    def __ge__(self, value: Any) -> Condition:
         return GreaterThanOrEqualTo(prop=self, value=value)
 
-    def __le__(self, value: Any) -> LessThanOrEqualTo:
+    def __le__(self, value: Any) -> Condition:
         return LessThanOrEqualTo(prop=self, value=value)
 
     def __repr__(self) -> str:
@@ -68,43 +68,43 @@ class Property(BaseModel):
     def __str__(self) -> str:
         return repr(self)
 
-    def contains(self, value: str | User | Page | Option) -> Contains:
+    def contains(self, value: str | User | Page | Option) -> Condition:
         return Contains(prop=self, value=value)
 
-    def does_not_contain(self, value: str | User | Page | Option) -> ContainsNot:
+    def does_not_contain(self, value: str | User | Page | Option) -> Condition:
         return ContainsNot(prop=self, value=value)
 
-    def starts_with(self, value: str) -> StartsWith:
+    def starts_with(self, value: str) -> Condition:
         return StartsWith(prop=self, value=value)
 
-    def ends_with(self, value: str) -> EndsWith:
+    def ends_with(self, value: str) -> Condition:
         return EndsWith(prop=self, value=value)
 
-    def is_empty(self) -> IsEmpty:
+    def is_empty(self) -> Condition:
         return IsEmpty(prop=self, value=True)
 
-    def is_not_empty(self) -> IsNotEmpty:
+    def is_not_empty(self) -> Condition:
         return IsNotEmpty(prop=self, value=True)
 
-    def this_week(self) -> ThisWeek:
+    def this_week(self) -> Condition:
         return ThisWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
 
-    def past_week(self) -> PastWeek:
+    def past_week(self) -> Condition:
         return PastWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
 
-    def past_month(self) -> PastMonth:
+    def past_month(self) -> Condition:
         return PastMonth(prop=self, value=obj_query.DateCondition.EmptyObject())
 
-    def past_year(self) -> PastYear:
+    def past_year(self) -> Condition:
         return PastYear(prop=self, value=obj_query.DateCondition.EmptyObject())
 
-    def next_week(self) -> NextWeek:
+    def next_week(self) -> Condition:
         return NextWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
 
-    def next_month(self) -> NextMonth:
+    def next_month(self) -> Condition:
         return NextMonth(prop=self, value=obj_query.DateCondition.EmptyObject())
 
-    def next_year(self) -> NextYear:
+    def next_year(self) -> Condition:
         return NextYear(prop=self, value=obj_query.DateCondition.EmptyObject())
 
     def asc(self) -> Self:

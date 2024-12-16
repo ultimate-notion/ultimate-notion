@@ -299,7 +299,13 @@ def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
         case pnd.Date():
             return dt_spec
         case pnd.Interval():
-            return pnd.Interval(start=set_tz(dt_spec.start), end=set_tz(dt_spec.end))
+            # We extend the interval to the full day if only a date is given
+            start, end = set_tz(dt_spec.start), set_tz(dt_spec.end)
+            if not isinstance(dt_spec.start, pnd.DateTime):
+                start = pnd.datetime(start.year, start.month, start.day, 0, 0, 0)
+            if not isinstance(dt_spec.end, pnd.DateTime):
+                end = pnd.datetime(end.year, end.month, end.day, 23, 59, 59)
+            return pnd.Interval(start=start, end=end)
         case _:
             msg = f'Unexpected parsing result of type {type(dt_spec)} for {dt_str}'
             raise TypeError(msg)
