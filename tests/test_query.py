@@ -11,7 +11,7 @@ from ultimate_notion.errors import FilterQueryError
 from ultimate_notion.utils import parse_dt_str
 
 
-def test_query_condition_associative_rule():
+def test_query_condition_associative_rule() -> None:
     cond = (uno.prop('Name') == 'John') & (uno.prop('Age') > 18)
     assert str(cond) == "(prop('Name') == 'John') & (prop('Age') > 18)"
 
@@ -57,7 +57,7 @@ def test_query_condition_associative_rule():
     assert str(cond) == exp_str
 
 
-def test_all_query_conditions():
+def test_all_query_conditions() -> None:
     cond = (
         (uno.prop('Name') == 'John')
         & (uno.prop('Name') != 'Doe')
@@ -91,7 +91,7 @@ def test_all_query_conditions():
     assert str(cond) == exp_str
 
 
-def test_property():
+def test_property() -> None:
     prop = uno.prop('Name')
     assert str(prop) == "prop('Name')"
 
@@ -107,7 +107,7 @@ def test_property():
 
 
 @pytest.mark.vcr()
-def test_date_query(root_page: uno.Page, notion: uno.Session):
+def test_date_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Date Query DB Test'):
         name = uno.Property('Name', uno.PropType.Title())
         date = uno.Property('Date', uno.PropType.Date())
@@ -194,7 +194,7 @@ def test_date_query(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_text_query(root_page: uno.Page, notion: uno.Session):
+def test_text_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Text Query DB Test'):
         title = uno.Property('Title', uno.PropType.Title())
         name = uno.Property('Name', uno.PropType.Text())
@@ -256,7 +256,7 @@ def test_text_query(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_number_query(root_page: uno.Page, notion: uno.Session):
+def test_number_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Number Query DB Test'):
         title = uno.Property('Title', uno.PropType.Title())
         number = uno.Property('Number', uno.PropType.Number())
@@ -294,7 +294,7 @@ def test_number_query(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_select_query(root_page: uno.Page, notion: uno.Session):
+def test_select_query(root_page: uno.Page, notion: uno.Session) -> None:
     status_options = [
         backlog := uno.Option('Backlog', color=uno.Color.GRAY),
         ongoing := uno.Option('In Progress', color=uno.Color.BLUE),
@@ -354,7 +354,7 @@ def test_select_query(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session):
+def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Files & Checkbox Query DB Test'):
         title = uno.Property('Title', uno.PropType.Title())
         files = uno.Property('Files', uno.PropType.Files())
@@ -393,7 +393,7 @@ def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person: uno.User):
+def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person: uno.User) -> None:
     class DB(uno.Schema, db_title='People & Relation Query DB Test'):
         title = uno.Property('Title', uno.PropType.Title())
         people = uno.Property('People', uno.PropType.Person())
@@ -435,7 +435,7 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
 
 
 @pytest.mark.vcr()
-def test_query_new_task_db(new_task_db: uno.Database):
+def test_query_new_task_db(new_task_db: uno.Database) -> None:
     all_pages = new_task_db.query.execute()
     assert len(all_pages) == 0
 
@@ -469,7 +469,7 @@ def test_query_new_task_db(new_task_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.Database):
+def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.Database) -> None:
     item_1, item_2 = formula_db.get_all_pages()
     query = formula_db.query.filter(uno.prop('String') == 'Item 1')
     assert set(query.execute()) == {item_1}
@@ -530,7 +530,7 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
 
 
 @pytest.mark.vcr()
-def test_query_rollup(root_page: uno.Page, notion: uno.Session):
+def test_query_rollup(root_page: uno.Page, notion: uno.Session) -> None:
     rollup_title_prop = 'Rollup Title'
     rollup_number_prop = 'Rollup Number'
     rollup_number_prop_arr = 'Rollup Number Array'
@@ -644,7 +644,7 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_id_prop(all_props_db: uno.Database):
+def test_id_prop(all_props_db: uno.Database) -> None:
     all_pages = all_props_db.get_all_pages()
 
     query = all_props_db.query.filter(uno.prop('ID') != 42)

@@ -7,7 +7,7 @@ from ultimate_notion.blocks import TextBlock
 
 
 @pytest.mark.vcr()
-def test_rich_text_md(md_text_page: uno.Page):
+def test_rich_text_md(md_text_page: uno.Page) -> None:
     """These markdowns were tested with https://stackedit.io/app#"""
     correct_mds = [
         'here is something **very** *simpel* and <u>underlined</u> as well as `code`',

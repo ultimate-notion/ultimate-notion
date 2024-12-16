@@ -8,7 +8,7 @@ import ultimate_notion as uno
 
 
 @pytest.mark.vcr()
-def test_select(contacts_db: uno.Database):
+def test_select(contacts_db: uno.Database) -> None:
     view = contacts_db.get_all_pages()
 
     sub_view = view.select('Name', 'Role')
@@ -22,7 +22,7 @@ def test_select(contacts_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_rows(contacts_db: uno.Database):
+def test_rows(contacts_db: uno.Database) -> None:
     view = contacts_db.get_all_pages()
     rows = view.to_rows()
     assert len(rows) == len(view)
@@ -34,7 +34,7 @@ def test_rows(contacts_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_index(contacts_db: uno.Database):
+def test_index(contacts_db: uno.Database) -> None:
     view = contacts_db.get_all_pages()
     assert not view.has_index
     view = view.with_index('my_index')
@@ -49,7 +49,7 @@ def test_index(contacts_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_clone(contacts_db: uno.Database):
+def test_clone(contacts_db: uno.Database) -> None:
     view = contacts_db.get_all_pages()
     assert len(view) == 10
     short_view = view.limit(3)
@@ -58,7 +58,7 @@ def test_clone(contacts_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_reverse(contacts_db: uno.Database):
+def test_reverse(contacts_db: uno.Database) -> None:
     short_view = contacts_db.get_all_pages().limit(3)
     row_0 = short_view.get_row(0)
     row_2 = short_view.get_row(2)
@@ -68,7 +68,7 @@ def test_reverse(contacts_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_to_pandas(task_db: uno.Database):
+def test_to_pandas(task_db: uno.Database) -> None:
     view = task_db.get_all_pages()
     df = view.to_pandas()
     assert len(view) == len(df)

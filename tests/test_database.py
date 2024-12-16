@@ -17,7 +17,7 @@ from .conftest import CONTACTS_DB
 
 
 @pytest.mark.vcr()
-def test_schema(article_db: uno.Database):
+def test_schema(article_db: uno.Database) -> None:
     ref_schema = article_db.schema
     assert article_db.title == 'Articles'
 
@@ -60,7 +60,7 @@ def test_db_inline(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_db_without_title(notion: uno.Session, root_page: uno.Page):
+def test_db_without_title(notion: uno.Session, root_page: uno.Page) -> None:
     """Simple database of articles"""
 
     class Article(uno.Schema, db_title=None):
@@ -75,7 +75,7 @@ def test_db_without_title(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_db_with_docstring(notion: uno.Session, root_page: uno.Page):
+def test_db_with_docstring(notion: uno.Session, root_page: uno.Page) -> None:
     """Simple database of articles"""
 
     class Article(uno.Schema, db_title=None):
@@ -92,7 +92,7 @@ def test_db_with_docstring(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_db_attributes(contacts_db: uno.Database):
+def test_db_attributes(contacts_db: uno.Database) -> None:
     assert contacts_db.title == CONTACTS_DB
     assert contacts_db.description == 'Database of all my contacts!'
     assert isinstance(contacts_db.icon, str)
@@ -104,7 +104,7 @@ def test_db_attributes(contacts_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_title_setter(notion: uno.Session, article_db: uno.Database):
+def test_title_setter(notion: uno.Session, article_db: uno.Database) -> None:
     old_title = 'Articles'
     assert article_db.title == old_title
     new_title = 'My most favorite articles'
@@ -121,7 +121,7 @@ def test_title_setter(notion: uno.Session, article_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_description_setter(notion: uno.Session, article_db: uno.Database):
+def test_description_setter(notion: uno.Session, article_db: uno.Database) -> None:
     assert article_db.description == ''
 
     new_description = 'My most favorite articles'
@@ -137,7 +137,7 @@ def test_description_setter(notion: uno.Session, article_db: uno.Database):
 
 
 @pytest.mark.vcr()
-def test_delete_restore_db(notion: uno.Session, root_page: uno.Page):
+def test_delete_restore_db(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_db(root_page)
     assert not db.is_deleted
     db.delete()
@@ -147,7 +147,7 @@ def test_delete_restore_db(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_reload_db(notion: uno.Session, root_page: uno.Page):
+def test_reload_db(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_db(root_page)
     old_obj_id = id(db.obj_ref)
     db.reload()
@@ -155,7 +155,7 @@ def test_reload_db(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_parent_subdbs(notion: uno.Session, root_page: uno.Page):
+def test_parent_subdbs(notion: uno.Session, root_page: uno.Page) -> None:
     parent = notion.create_page(root_page, title='Parent')
     db1 = notion.create_db(parent)
     db2 = notion.create_db(parent)
@@ -168,7 +168,7 @@ def test_parent_subdbs(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page):
+def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_db(root_page)
     num_pages = int(1.1 * MAX_PAGE_SIZE)
     db.title = f'DB test with {num_pages} pages'
@@ -181,6 +181,6 @@ def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page)
 
 
 @pytest.mark.vcr()
-def test_new_task_db(new_task_db: uno.Database):
+def test_new_task_db(new_task_db: uno.Database) -> None:
     # ToDo: Implement a proper test
     pass
