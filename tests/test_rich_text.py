@@ -7,7 +7,7 @@ import ultimate_notion as uno
 from ultimate_notion.rich_text import camel_case, decapitalize, is_url, snake_case
 
 
-def test_decapitalize():
+def test_decapitalize() -> None:
     assert decapitalize('') == ''
     assert decapitalize('34f') == '34f'
     assert decapitalize('small') == 'small'
@@ -15,7 +15,7 @@ def test_decapitalize():
     assert decapitalize('SMall') == 'sMall'
 
 
-def test_snake_case():
+def test_snake_case() -> None:
     assert snake_case('Notion is cool') == 'notion_is_cool'
     assert snake_case('Notion is cool ') == 'notion_is_cool'
     assert snake_case('Notion is cool! ') == 'notion_is_cool'
@@ -27,7 +27,7 @@ def test_snake_case():
     assert snake_case('') == ''
 
 
-def test_camel_case():
+def test_camel_case() -> None:
     assert camel_case('Notion is cool') == 'NotionIsCool'
     assert camel_case('Notion is cool ') == 'NotionIsCool'
     assert camel_case('Notion is cool! ') == 'NotionIsCool'
@@ -39,7 +39,7 @@ def test_camel_case():
     assert camel_case('') == ''
 
 
-def test_is_url():
+def test_is_url() -> None:
     assert is_url('https://www.example.com')
     assert is_url('http://www.example.com')
     assert not is_url('http://')
@@ -50,7 +50,7 @@ def test_is_url():
 @pytest.mark.vcr()
 def test_mention(
     person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.Database, notion: uno.Session
-):
+) -> None:
     user_mention = uno.mention(person)
     page_mention = uno.mention(md_text_page)
     db_mention = uno.mention(all_props_db)
@@ -68,7 +68,7 @@ def test_mention(
 
 
 @pytest.mark.vcr()
-def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Session):
+def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Session) -> None:
     text = uno.text('This is an equation: ', color=uno.Color.BLUE)
     text += uno.math('E=mc^2', bold=True)
     text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com/')
@@ -88,7 +88,7 @@ def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Sess
     assert page.children[0].to_markdown() == exp_text
 
 
-def test_rich_text():
+def test_rich_text() -> None:
     text = uno.text('Simple Text')
     assert str(text) == 'Simple Text'
     text += uno.text(' and a bold text', bold=True)

@@ -6,7 +6,7 @@ import ultimate_notion as uno
 
 
 @pytest.mark.vcr()
-def test_list_comments(comment_page: uno.Page):
+def test_list_comments(comment_page: uno.Page) -> None:
     comments = comment_page.comments
     assert len(comments) == 5
     comment = comments[4]
@@ -15,7 +15,7 @@ def test_list_comments(comment_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_new_page_comment(root_page: uno.Page, notion: uno.Session):
+def test_new_page_comment(root_page: uno.Page, notion: uno.Session) -> None:
     comment_page = notion.create_page(parent=root_page, title='Page for page comments')
     assert len(comment_page.comments) == 0
 
@@ -30,7 +30,7 @@ def test_new_page_comment(root_page: uno.Page, notion: uno.Session):
 
 
 @pytest.mark.vcr()
-def test_append_block_comments(comment_page: uno.Page):
+def test_append_block_comments(comment_page: uno.Page) -> None:
     # Note that this test is quite fragile as we can only add comments to a block that already has comments.
     # Also it's not possible to delete/resolve comments via the API, so we can't clean up after ourselves.
     block = uno.SList(child for child in comment_page.children if isinstance(child, uno.Heading1)).item()

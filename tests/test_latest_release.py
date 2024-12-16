@@ -13,27 +13,27 @@ from tests.conftest import exec_pyfile
 
 
 @pytest.fixture(scope='module', autouse=True)
-def notion_cleanups():
+def notion_cleanups() -> None:
     """Overwrites fixture from conftest.py to avoid an open session."""
 
 
 @pytest.mark.check_latest_release
-def test_getting_started():
+def test_getting_started() -> None:
     exec_pyfile('examples/getting_started.py')
 
 
 @pytest.mark.check_latest_release
-def test_create_simple_task_db():
+def test_create_simple_task_db() -> None:
     exec_pyfile('examples/simple_taskdb.py')
 
 
 @pytest.mark.check_latest_release
-def test_page_to_markdown(md_page: uno.Page):
+def test_page_to_markdown(md_page: uno.Page) -> None:
     md_page.to_markdown()  # just check if it runs without errors
 
 
 @pytest.mark.check_latest_release
-def test_create_page(root_page: uno.Page, notion: uno.Session):
+def test_create_page(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='New page test for latest release')
     h1 = uno.Heading1('My new page')
     page.append(h1)
