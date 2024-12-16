@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from typing import Any
 
 import numpy as np
 import pendulum as pnd
@@ -91,7 +92,8 @@ def test_parse_dt_str(tz_berlin) -> None:
     )
     date_interval_str = '2021-01-01/2021-01-03'
     date_interval = utils.parse_dt_str(date_interval_str)
-    assert date_interval == pnd.interval(start=pnd.date(2021, 1, 1), end=pnd.date(2021, 1, 3))
+    exp_start, exp_end = pnd.datetime(2021, 1, 1, 0, 0, 0), pnd.datetime(2021, 1, 3, 23, 59, 59)
+    assert date_interval == pnd.interval(start=exp_start, end=exp_end)
 
 
 def test_to_pendulum(tz_berlin) -> None:
@@ -110,7 +112,11 @@ def test_to_pendulum(tz_berlin) -> None:
     assert isinstance(date_only, pnd.Date)
     assert isinstance(date_only, dt.date)
 
-    interval = pnd.interval(start=pnd.parse('2021-01-01'), end=pnd.parse('2021-01-03'))
+    start = pnd.parse('2021-01-01 10:30')
+    end = pnd.parse('2021-01-03 10:30')
+    assert isinstance(start, pnd.DateTime)
+    assert isinstance(end, pnd.DateTime)
+    interval = pnd.interval(start=start, end=end)
     assert utils.to_pendulum(interval) == interval
 
     dt_datetime = dt.datetime(2021, 1, 1, 12, 0, 0)  # noqa: DTZ001
@@ -125,7 +131,7 @@ def test_to_pendulum(tz_berlin) -> None:
     assert datetime == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
 
     with pytest.raises(TypeError):
-        utils.to_pendulum(pnd.duration(days=21))
+        utils.to_pendulum(pnd.duration(days=21))  # type: ignore
 
 
 def test_flatten() -> None:

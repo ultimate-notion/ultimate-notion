@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import cast
 
-from pydantic import BaseModel
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject
@@ -190,16 +189,15 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         msg = 'Use .is_empty instead of bool(db) to check if a database is empty.'
         raise RuntimeError(msg)
 
-    def pydantic_model(self) -> BaseModel:
-        """Return a Pydantic model for this database."""
-        # Check https://github.com/ultimate-notion/ultimate-notion/issues/32 for details
-        raise NotImplementedError
-
     def create_page(self, **kwargs) -> Page:
         """Create a page with properties according to the schema within the corresponding database."""
+        # attr_name_to_name = {prop.attr_name: prop.name for prop in self.schema.get_props()}
+        # schema_dct = {attr_name_to_name[attr_name]: value for attr_name, value in kwargs.items()}
 
         # ToDo: let pydantic_model check the kwargs and raise an error if something is wrong
+        # ToDo: Check at that point in case of select option if the option is already defined in Schema!
         #       this would also generate a nice error message for the user!
+
         schema_kwargs = {prop.attr_name: prop for prop in self.schema.get_props()}
         if not set(kwargs).issubset(set(schema_kwargs)):
             add_kwargs = set(kwargs) - set(schema_kwargs)
@@ -210,7 +208,6 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         for kwarg, value in kwargs.items():
             prop = schema_kwargs[kwarg]
             prop_value_cls = prop.type.prop_value  # map schema to page property
-            # ToDo: Check at that point in case of select option if the option is already defined in Schema!
 
             if prop_value_cls.readonly:
                 raise ReadOnlyPropertyError(prop)
@@ -218,6 +215,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             prop_value = value if isinstance(value, PropertyValue) else prop_value_cls(value)
 
             schema_dct[schema_kwargs[kwarg].name] = prop_value.obj_ref
+        # if ro_props := set(kwargs) & {prop.attr_name for prop in self.schema.get_readonly_props()}:
+        #     raise ReadOnlyPropertyError(ro_props.pop())
+
+        # schema_dct = {scheattr_name, value in kwargs.items()}
 
         session = get_active_session()
         page_obj = session.api.pages.create(parent=self.obj_ref, properties=schema_dct)
