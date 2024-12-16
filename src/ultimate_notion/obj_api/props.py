@@ -61,9 +61,6 @@ class PropertyValue(TypedObject, polymorphic_base=True):
 
     def serialize_for_api(self):
         """Serialize the object for sending it to the Notion API."""
-        # TODO: read-only fields should not be sent to the API
-        # https://github.com/jheddings/notional/issues/9
-
         # We include "null" values as those are used to delete properties
         dump_dct = self.model_dump(mode='json', exclude_none=True, by_alias=True)
         dump_dct.setdefault(dump_dct['type'], None)
@@ -73,6 +70,7 @@ class PropertyValue(TypedObject, polymorphic_base=True):
 class Title(PropertyValue, type='title'):
     """Notion title type."""
 
+    # ToDo: Check again if we cannot have here an empty list or no default value.
     title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
 
 

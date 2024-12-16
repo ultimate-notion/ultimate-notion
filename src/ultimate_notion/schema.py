@@ -21,20 +21,22 @@ the method `_set_obj_refs` rewires this when a schema is used to create a databa
 from __future__ import annotations
 
 from abc import ABCMeta
+from collections import Counter
 from collections.abc import Iterator
 from textwrap import dedent
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
+from pydantic import BaseModel, ConfigDict, Field, create_model
 from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion import rich_text
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
-from ultimate_notion.errors import SchemaError, SchemaNotBoundError
+from ultimate_notion.errors import EmptyListError, MultipleItemsError, SchemaError, SchemaNotBoundError
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.utils import EmptyListError, SList, dict_diff_str, is_notebook
+from ultimate_notion.utils import SList, dict_diff_str, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -127,22 +129,27 @@ class Property:
 
     @property
     def name(self) -> str:
+        """Return the name of this property."""
         return self._name
 
     @name.setter
     def name(self, new_name: str):
+        """Set the name of this property."""
         raise NotImplementedError
 
     @property
     def type(self) -> PropertyType:
+        """Return the property type of this property."""
         return self._type
 
     @type.setter
     def type(self, new_type: PropertyType):
+        """Set the property type of this property."""
         raise NotImplementedError
 
     @property
     def attr_name(self) -> str:
+        """Return the Python attribute name of the property in the schema."""
         return self._attr_name
 
 
@@ -180,9 +187,26 @@ class Schema(metaclass=SchemaType):
         if db_title is not None:
             db_title = rich_text.Text(db_title)
         cls.db_title = db_title
-
         cls.db_desc = rich_text.Text(cls.__doc__) if cls.__doc__ is not None else None
+        cls._validate()
         super().__init_subclass__(**kwargs)
+
+    @classmethod
+    def _validate(cls) -> None:
+        """Validate the schema before creating a database."""
+        try:
+            cls.get_title_prop()
+        except EmptyListError as e:
+            msg = 'A property with property type `Title` is mandatory'
+            raise SchemaError(msg) from e
+        except MultipleItemsError as e:
+            msg = 'Only one property with property type `Title` is allowed'
+            raise SchemaError(msg) from e
+
+        counter = Counter(prop.name for prop in cls.get_props())
+        if duplicates := [prop for prop, count in counter.items() if count > 1]:
+            msg = f'Properties {", ".join(duplicates)} are defined more than once'
+            raise SchemaError(msg)
 
     @classmethod
     def from_dict(
@@ -221,6 +245,33 @@ class Schema(metaclass=SchemaType):
         except EmptyListError as e:
             msg = f'Property `{prop_name}` not found in database `{cls._database}`.'
             raise SchemaError(msg) from e
+
+    @classmethod
+    def get_ro_props(cls) -> list[Property]:
+        """Get all read-only properties of this schema."""
+        return [prop for prop in cls.get_props() if prop.type.readonly]
+
+    @classmethod
+    def get_rw_props(cls) -> list[Property]:
+        """Get all writeable properties of this schema."""
+        return [prop for prop in cls.get_props() if not prop.type.readonly]
+
+    @classmethod
+    def to_pydantic_model(cls, *, with_ro_props: bool = False) -> BaseModel:
+        """Return a Pydantic model of this schema for validation.
+
+        This is useful for instance when writing a web API that receives data that should be validated
+        before it is passed to Ultimate Notion.
+
+        If `with_ro_props` is set to `True`, read-only properties are included in the model
+        """
+        # ToDo: One could also validate the categories in Select and MultiSelect using pydantic
+        kwargs: dict[str, Any] = {
+            prop.attr_name: (prop.type.prop_value.py_type, Field(default=None)) for prop in cls.get_rw_props()
+        }
+        if with_ro_props:
+            kwargs |= {prop.attr_name: (prop.type.prop_value.py_type, Field()) for prop in cls.get_ro_props()}
+        return create_model(f'{cls.db_title}Model', __config__=ConfigDict(arbitrary_types_allowed=True), **kwargs)
 
     @classmethod
     def to_dict(cls) -> dict[str, PropertyType]:
@@ -523,6 +574,8 @@ class RelationError(SchemaError):
 
 class SelfRef(Schema, db_title=None):
     """Target schema for self-referencing database relations."""
+
+    _ = Property('title', Title())  # mandatory title property, used for nothing.
 
 
 class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
