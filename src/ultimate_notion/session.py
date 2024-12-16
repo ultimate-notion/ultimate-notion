@@ -16,6 +16,7 @@ from notion_client.errors import APIResponseError
 from ultimate_notion.blocks import Block, DataObject
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
+from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
@@ -30,10 +31,6 @@ from ultimate_notion.user import User
 from ultimate_notion.utils import SList
 
 _logger = logging.getLogger(__name__)
-
-
-class SessionError(Exception):
-    """Raised when there are issues with the Notion session."""
 
 
 class Session:
@@ -109,7 +106,7 @@ class Session:
     ) -> None:
         self.close()
 
-    def close(self):
+    def close(self) -> None:
         """Close the session and release resources."""
         _logger.info('Closing connection to Notion.')
         self.client.close()
@@ -126,7 +123,7 @@ class Session:
         else:
             return False
 
-    def raise_for_status(self):
+    def raise_for_status(self) -> None:
         """Confirm that the session is active and raise otherwise.
 
         Raises SessionError if there is a problem, otherwise returns None.
@@ -268,7 +265,12 @@ class Session:
             page = cast(Page, self.cache[page_uuid])
         else:
             _logger.info(f'Retrieving page with id `{page_uuid}`.')
-            page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
+            try:
+                page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
+            except APIResponseError as e:
+                msg = f'Page with id {page_uuid} not found!'
+                _logger.warning(msg)
+                raise UnknownPageError(msg) from e
             self.cache[page.id] = page
         _logger.info(f'Retrieved page `{page.title}`.')
         return page
@@ -281,8 +283,11 @@ class Session:
         self.cache[page.id] = page
         return page
 
-    def get_user(self, user_ref: UUID | str, *, use_cache: bool = True) -> User:
+    def get_user(self, user_ref: UUID | str, *, use_cache: bool = True, raise_on_unknown: bool = True) -> User:
         """Get a user by uuid.
+
+        In case the user is not found and `raise_on_unknown` is `False`, an `User` object is returned
+        with the name `Unknown User`, where the property `is_unknown` is set to `True`.
 
         !!! warning
 
@@ -300,8 +305,11 @@ class Session:
             _logger.info(f'Retrieving user with id `{user_uuid}`.')
             try:
                 user_obj = self.api.users.retrieve(user_uuid)
-            except APIResponseError:
-                _logger.warning(f'User with id {user_uuid} not found!')
+            except APIResponseError as e:
+                msg = f'User with id {user_uuid} not found!'
+                _logger.warning(msg)
+                if raise_on_unknown:
+                    raise UnknownUserError(msg) from e
                 user_obj = UnknownUserObj(id=user_uuid, object='user', type='unknown')
             user = User.wrap_obj_ref(user_obj)
             self.cache[user.id] = user

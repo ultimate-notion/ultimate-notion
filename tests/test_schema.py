@@ -7,11 +7,13 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import props
+from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
+from ultimate_notion.schema import PropertyType
 
 
 @pytest.mark.vcr()
-def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
+def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -54,28 +56,28 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         SchemaB.create(non_existent_attr_name=None)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(created_time=datetime.now(tz=timezone.utc))
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(last_edited_time=datetime.now(tz=timezone.utc))
 
     florian = notion.search_user('Florian Wilhelm').item()
     myself = notion.whoami()
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(created_by=myself)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(last_edited_by=myself)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(formula=3)
 
-    with pytest.raises(uno.ReadOnlyPropertyError):
+    with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(rollup=3)
 
     a_item1 = db_a.create_page(name='Item 1')
@@ -106,8 +108,8 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
     # creating a page using proper PropertyValues
     b_item1 = db_b.create_page(**kwargs)
 
-    # creating a page using raw Python types using the Schema directly
-    b_item2 = SchemaB.create(**dict(kwargs.items()))
+    # creating a page using raw Python types and the Schema directly
+    b_item2 = SchemaB.create(**{name: prop.value for name, prop in kwargs.items()})
 
     for item in (b_item1, b_item2):
         for kwarg, prop_val in kwargs.items():
@@ -120,20 +122,20 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_all_props_schema(all_props_db: uno.Database):
+def test_all_props_schema(all_props_db: uno.Database) -> None:
     schema_dct = all_props_db.schema.to_dict()
     assert len(schema_dct) == 25
 
 
 @pytest.mark.vcr()
-def test_wiki_db_schema(wiki_db: uno.Database):
+def test_wiki_db_schema(wiki_db: uno.Database) -> None:
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
     wiki_db.get_all_pages()
 
 
 @pytest.mark.vcr()
-def test_two_way_prop(notion: uno.Session, root_page: uno.Page):
+def test_two_way_prop(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -156,7 +158,7 @@ def test_two_way_prop(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_self_ref_relation(notion: uno.Session, root_page: uno.Page):
+def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Schema A description"""
 
@@ -192,31 +194,68 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page):
 
 
 @pytest.mark.vcr()
-def test_schema_from_dict():
+def test_schema_from_dict() -> None:
     class ClassStyleSchema(uno.Schema, db_title='Class Style'):
         name = uno.Property('Name', uno.PropType.Title())
         tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
 
-    dict_style_schema = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.MultiSelect([])}
+    dict_style_schema: dict[str, PropertyType] = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.MultiSelect([])}
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
     DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
     dict_style_schema = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.Select([])}  # Wrong PropertyType!
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
     dict_style_schema = {'Name': uno.PropType.Title(), 'My Tags': uno.PropType.MultiSelect([])}  # Wrong property!
     DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         DictStyleSchema.assert_consistency_with(ClassStyleSchema)
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         dict_style_schema = {'Tags': uno.PropType.MultiSelect([])}
         DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
 
-    with pytest.raises(uno.SchemaError):
+    with pytest.raises(SchemaError):
         dict_style_schema = {'Name1': uno.PropType.Title(), 'Name2': uno.PropType.Title()}
         DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
+
+
+def test_title_missing_or_too_many() -> None:
+    with pytest.raises(SchemaError):
+
+        class MissingTitleSchema(uno.Schema, db_title='Missing Title'):
+            tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
+
+    with pytest.raises(SchemaError):
+
+        class TwoTitleSchema(uno.Schema, db_title='Two Titles'):
+            title = uno.Property('Title', uno.PropType.Title())
+            name = uno.Property('Name', uno.PropType.Title())
+
+
+def test_unique_property_names() -> None:
+    with pytest.raises(SchemaError):
+
+        class AmbiguousPropSchema(uno.Schema, db_title='Ambiguous Properties'):
+            tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
+            select = uno.Property('Tags', uno.PropType.Select([]))
+
+
+def test_to_pydantic_model() -> None:
+    class Schema(uno.Schema, db_title='Schema'):
+        name = uno.Property('Name', uno.PropType.Title())
+        tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
+        created_on = uno.Property('Created on', uno.PropType.CreatedTime())
+
+    rw_props_model = Schema.to_pydantic_model(with_ro_props=False)
+    rw_props_item = rw_props_model.model_construct(name='Name', tags=['Tag1', 'Tag2'])
+    assert len(rw_props_item.model_fields) == 2
+
+    all_props_model = Schema.to_pydantic_model(with_ro_props=True)
+    created_on = pnd.parse('2021-01-01T12:00:00Z')
+    all_props_item = all_props_model.model_construct(name='Name', tags=['Tag1', 'Tag2'], created_on=created_on)
+    assert len(all_props_item.model_fields) == 3

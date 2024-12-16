@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.8
+
+- Chg: Have a proper hierarchy of Ultimate Notion exception classes
+
 ## Version 0.7, 2024-12-10
 
 - New: Reading and inserting comments is implemented.

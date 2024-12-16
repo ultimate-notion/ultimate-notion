@@ -19,14 +19,6 @@ if TYPE_CHECKING:
     from ultimate_notion.user import User
 
 
-class InvalidAPIUsageError(Exception):
-    """Raised when the API is used in an invalid way."""
-
-    def __init__(self, message='This part of the API is not intended to be used in this manner'):
-        self.message = message
-        super().__init__(self.message)
-
-
 class ObjRefWrapper(Protocol[GT]):
     """Wrapper for objects that have an obj_ref attribute.
 
@@ -123,7 +115,7 @@ class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
     def created_by(self) -> User:
         """Return the user who created the block."""
         session = get_active_session()
-        return session.get_user(self.obj_ref.created_by.id)
+        return session.get_user(self.obj_ref.created_by.id, raise_on_unknown=False)
 
     @property
     def last_edited_time(self) -> dt.datetime:

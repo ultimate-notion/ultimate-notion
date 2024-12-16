@@ -27,10 +27,10 @@ import os
 import shutil
 import tempfile
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock, patch
 
 import pydantic
@@ -66,7 +66,7 @@ COMMENT_PAGE = 'Comments'
 TEST_CFG_FILE = get_cfg_file()
 
 
-def pytest_addoption(parser: Parser):
+def pytest_addoption(parser: Parser) -> None:
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
     parser.addoption('--overwrite-fixtures', action='store_true', default=False, help='Overwrite existing fixtures.')
     parser.addoption(
@@ -93,7 +93,7 @@ def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: 
         logging.error(msg)
 
 
-def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     marker_name = 'check_latest_release'
     flag_name = f'--{marker_name.replace("_", "-")}'
     if config.getoption(flag_name):
@@ -122,7 +122,7 @@ def activate_debug_mode(request: SubRequest) -> None:
 
 
 @pytest.fixture(scope='session')
-def vcr_config():
+def vcr_config() -> dict[str, Any]:
     """Configure pytest-recording."""
     secret_params = [
         'client_id',
@@ -211,7 +211,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
-def vcr_fixture(scope: str, *, autouse: bool = False):
+def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
     """Return a VCR fixture for module/session-level fixtures"""
     if scope not in {'module', 'session'}:
         msg = f'Use this only for module or session scope, not {scope}!'
@@ -542,7 +542,9 @@ def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
 
 
 @vcr_fixture(scope='module', autouse=True)
-def notion_cleanups(notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]):
+def notion_cleanups(
+    notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]
+) -> Iterator[None]:
     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
 
     Be careful! This fixture opens a Notion session, which might lead to problems if you run it in parallel with other.
@@ -570,7 +572,7 @@ def notion_cleanups(notion_cached: Session, root_page: Page, static_pages: set[P
     clean()
 
 
-def delete_all_taskslists():
+def delete_all_taskslists() -> None:
     """Delete all taskslists except of the default one."""
     gtasks = GTasksClient(read_only=False)
     try:
@@ -598,12 +600,11 @@ def tz_berlin() -> Iterator[str]:
         yield tz
 
 
-def assert_eventually(assertion_func, retries=5, delay=3):
-    """
-    Retry the provided assertion function for a given number of attempts with a delay.
+def assert_eventually(assertion_func: Callable[[], Any], retries: int = 5, delay: int = 3) -> None:
+    """Retry the provided assertion function for a given number of attempts with a delay.
 
     Args:
-        assertion_func (Callable): The function containing the assertion logic.
+        assertion_func (Callable): The lambda containing the assertion logic without parameters.
         retries (int): Number of retries before failing.
         delay (int): Delay in seconds between retries.
     """
