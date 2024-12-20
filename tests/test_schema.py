@@ -252,10 +252,11 @@ def test_to_pydantic_model() -> None:
         created_on = uno.Property('Created on', uno.PropType.CreatedTime())
 
     rw_props_model = Schema.to_pydantic_model(with_ro_props=False)
-    rw_props_item = rw_props_model.model_construct(name='Name', tags=['Tag1', 'Tag2'])
+    rw_props_item = rw_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2']})
     assert len(rw_props_item.model_fields) == 2
+    assert isinstance(rw_props_item.name, PropertyValue)  # type: ignore[attr-defined]
 
     all_props_model = Schema.to_pydantic_model(with_ro_props=True)
     created_on = pnd.parse('2021-01-01T12:00:00Z')
-    all_props_item = all_props_model.model_construct(name='Name', tags=['Tag1', 'Tag2'], created_on=created_on)
+    all_props_item = all_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2'], 'Created on': created_on})
     assert len(all_props_item.model_fields) == 3

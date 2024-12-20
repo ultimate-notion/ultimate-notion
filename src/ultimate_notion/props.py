@@ -8,7 +8,6 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from types import UnionType
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import pendulum as pnd
@@ -62,13 +61,6 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
 
     @property
     @abstractmethod
-    def py_type(self) -> type[Any] | UnionType:
-        """Python type of the property value which is accepted by the constructor of the property."""
-        # This will be overridden by most subclasses with a simple attribute but some also define a property
-        # with a getter. Thus, it has to be in the base class a property too, otherwise mypy complains.
-
-    @property
-    @abstractmethod
     def value(self) -> Any:
         """Return the actual Python value object of this property."""
 
@@ -97,8 +89,6 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
 class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     """Title property value."""
 
-    py_type = str
-
     def __init__(self, text: str):
         super().__init__(rt.Text(text).obj_ref)
 
@@ -109,8 +99,6 @@ class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
 
 class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
     """Rich text property value."""
-
-    py_type = str
 
     def __init__(self, text: str):
         super().__init__(rt.Text(text).obj_ref)
@@ -123,8 +111,6 @@ class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
     """Number property value."""
 
-    py_type = int | float | None
-
     @property
     def value(self) -> int | float | None:
         return self.obj_ref.number
@@ -133,8 +119,6 @@ class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
 class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
     """Simple checkbox type; represented as a boolean."""
 
-    py_type = bool
-
     @property
     def value(self) -> bool | None:
         return self.obj_ref.checkbox
@@ -142,8 +126,6 @@ class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
 
 class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
     """Date(-time) property value."""
-
-    py_type = dt.datetime | dt.date | pnd.Interval | str
 
     def __init__(self, dt_spec: str | dt.datetime | dt.date | pnd.Interval):
         self.obj_ref = obj_props.Date.build(dt_spec)
@@ -159,8 +141,6 @@ class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
 
 class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
     """Status property value."""
-
-    py_type = str | Option
 
     def __init__(self, option: str | Option):
         if isinstance(option, str):
@@ -179,8 +159,6 @@ class Status(PropertyValue[obj_props.Status], wraps=obj_props.Status):
 class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
     """Single select property value."""
 
-    py_type = str | Option
-
     def __init__(self, option: str | Option):
         if isinstance(option, str):
             option = Option(option)
@@ -197,8 +175,6 @@ class Select(PropertyValue[obj_props.Select], wraps=obj_props.Select):
 
 class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSelect):
     """Multi-select property value."""
-
-    py_type = str | Option | Sequence[str | Option]
 
     def __init__(self, options: str | Option | Sequence[str | Option]):
         if not isinstance(options, Sequence) and not isinstance(options, str):
@@ -217,8 +193,6 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
 class People(PropertyValue[obj_props.People], wraps=obj_props.People):
     """People property value."""
 
-    py_type = User | Sequence[User]
-
     def __init__(self, users: User | Sequence[User]):
         if not isinstance(users, Sequence):
             users = [users]
@@ -233,8 +207,6 @@ class People(PropertyValue[obj_props.People], wraps=obj_props.People):
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
     """URL property value."""
 
-    py_type = str | None
-
     @property
     def value(self) -> str | None:
         return self.obj_ref.url
@@ -242,8 +214,6 @@ class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
 
 class Email(PropertyValue[obj_props.Email], wraps=obj_props.Email):
     """Email property value."""
-
-    py_type = str | None
 
     @property
     def value(self) -> str | None:
@@ -253,8 +223,6 @@ class Email(PropertyValue[obj_props.Email], wraps=obj_props.Email):
 class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
     """Phone property value."""
 
-    py_type = str | None
-
     @property
     def value(self) -> str | None:
         return self.obj_ref.phone_number
@@ -262,8 +230,6 @@ class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNum
 
 class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
     """Files property value."""
-
-    py_type = FileInfo | Sequence[FileInfo]
 
     def __init__(self, files: FileInfo | Sequence[FileInfo]):
         if not isinstance(files, Sequence):
@@ -278,13 +244,6 @@ class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
 
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
     """Relation property values."""
-
-    @property
-    def py_type(self) -> UnionType:
-        # to avoid a circular import since page depends on props.
-        from ultimate_notion.page import Page  # noqa: PLC0415
-
-        return Page | Sequence[Page]
 
     def __init__(self, pages: Page | Sequence[Page]):
         if not isinstance(pages, Sequence):
@@ -305,7 +264,6 @@ class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
 class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     """Formula property value."""
 
-    py_type = str | float | int | pnd.DateTime | pnd.Date | pnd.Interval | None
     readonly = True
 
     @property
@@ -321,7 +279,6 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     """Rollup property value."""
 
-    py_type = float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None
     readonly = True
 
     @property
@@ -348,7 +305,6 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):
     """Created-time property value."""
 
-    py_type = pnd.DateTime
     readonly = True
 
     @property
@@ -359,7 +315,6 @@ class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedT
 class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
     """Created-by property value."""
 
-    py_type = User
     readonly = True
 
     @property
@@ -371,7 +326,6 @@ class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
 class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.LastEditedTime):
     """Last-edited-time property value."""
 
-    py_type = pnd.DateTime
     readonly = True
 
     @property
@@ -382,7 +336,6 @@ class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.La
 class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEditedBy):
     """Last-edited-by property value."""
 
-    py_type = User
     readonly = True
 
     @property
@@ -394,7 +347,6 @@ class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEd
 class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
     """Unique ID property value."""
 
-    py_type = str
     readonly = True
 
     @property
@@ -407,10 +359,6 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
 
     # ToDo: Write a unit test for this!
     readonly = True
-
-    @property
-    def py_type(self) -> type[Self]:
-        return self.__class__
 
     @property
     def value(self) -> Self:
