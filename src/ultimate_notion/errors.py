@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ultimate_notion.schema import Property, Schema
+    from ultimate_notion.schema import Schema
 
 
 class UltimateNotionError(Exception):
@@ -59,8 +59,3 @@ class SchemaNotBoundError(SchemaError):
 
 class ReadOnlyPropertyError(SchemaError):
     """Raised when an attempt is made to write to a write-protected property."""
-
-    def __init__(self, prop: Property):
-        self.prop = prop
-        msg = f"Argument {prop.attr_name} refers to the read-only propert '{prop.name}' of type {prop.type}"
-        super().__init__(msg)

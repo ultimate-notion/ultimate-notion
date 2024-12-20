@@ -48,6 +48,11 @@ class Wrapper(ObjRefWrapper[GT], ABC):
         obj_api_type: type[obj_core.GenericObject] = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(*args, **kwargs)
 
+    def __pydantic_serializer__(self):  # noqa: PLW3201
+        """Return the Pydantic serializers for this object."""
+        # This is used only when creating a pydantic model from a schema.
+        return self.obj_ref.__pydantic_serializer__
+
     @classmethod
     def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
         """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""

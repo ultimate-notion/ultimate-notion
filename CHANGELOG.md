@@ -4,6 +4,8 @@
 
 - New: Added support for creating inline databases by Tzumx
 - Chg: Have a proper hierarchy of Ultimate Notion exception classes.
+- New: The schema of a database provides a `to_pydantic_model` class for evaluating input.
+- New: More schema validations like checking for a title property and distinct property names.
 
 ## Version 0.7.1, 2025-01-05
 
