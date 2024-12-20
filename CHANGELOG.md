@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.8
+
+- Chg: Have a proper hierarchy of Ultimate Notion exception classes.
+- New: The schema of a database provides a `to_pydantic_model` class for evaluating input.
+- New: More schema validations like checking for a title property and distinct property names.
+
 ## Version 0.7, 2024-12-10
 
 - New: Reading and inserting comments is implemented.

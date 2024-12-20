@@ -8,7 +8,8 @@ from uuid import UUID
 
 from typing_extensions import Self
 
-from ultimate_notion.core import InvalidAPIUsageError, NotionEntity, get_active_session
+from ultimate_notion.core import NotionEntity, get_active_session
+from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.rich_text import Text
 from ultimate_notion.user import User

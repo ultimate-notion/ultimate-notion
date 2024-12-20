@@ -18,6 +18,6 @@ from ultimate_notion.props import Date
         max_value=datetime(3099, 12, 31),  # noqa: DTZ001, hypothesis doesn't want tzinfo
     ),
 )
-def test_date_with_datetime(d1, d2):
+def test_date_with_datetime(d1, d2) -> None:
     # ToDo: Implement actual test
     Date(d1)

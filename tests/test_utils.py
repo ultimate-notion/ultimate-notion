@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from typing import Any
 
 import numpy as np
 import pendulum as pnd
@@ -10,8 +11,8 @@ from numpy.testing import assert_array_equal
 from ultimate_notion import utils
 
 
-def test_find_indices():
-    elems = [7, 2, 4]
+def test_find_indices() -> None:
+    elems: list[int] | np.ndarray[Any, np.dtype[np.integer]] = [7, 2, 4]
     total_set = np.array([1, 2, 7, 3, 6, 4])
     idx = utils.find_indices(elems, total_set)
     assert_array_equal(idx, np.array([2, 1, 5]))
@@ -22,7 +23,7 @@ def test_find_indices():
     assert_array_equal(idx, np.array([2, 1, 5]))
 
 
-def test_slist():
+def test_slist() -> None:
     lst = utils.SList(range(3))
     assert isinstance(lst, list)
     with pytest.raises(utils.MultipleItemsError):
@@ -35,7 +36,7 @@ def test_slist():
         lst.item()
 
 
-def test_deepcopy_with_sharing():
+def test_deepcopy_with_sharing() -> None:
     class Class:
         def __init__(self):
             self.shared = {'a': 1}
@@ -47,14 +48,14 @@ def test_deepcopy_with_sharing():
     assert obj.shared is copy.shared
 
 
-def test_find_index():
+def test_find_index() -> None:
     test_set = [2, 4, 72, 23]
     assert utils.find_index(4, test_set) == 1
     assert utils.find_index(23, test_set) == 3
     assert utils.find_index(42, test_set) is None
 
 
-def test_rank():
+def test_rank() -> None:
     assert_array_equal(utils.rank(np.array([1, 3, 2, 4])), np.array([0, 2, 1, 3]))
     assert_array_equal(utils.rank(np.array([1, 3, 2, 2])), np.array([0, 2, 1, 1]))
     assert_array_equal(utils.rank(np.array([3, 1, 2, 2])), np.array([2, 0, 1, 1]))
@@ -62,7 +63,7 @@ def test_rank():
     assert_array_equal(utils.rank(np.array([7, 7, 11, 9])), np.array([0, 0, 2, 1]))
 
 
-def test_is_stable_version():
+def test_is_stable_version() -> None:
     assert utils.is_stable_version('1.2.3') is True
     assert utils.is_stable_version('1.2.3a') is False
     assert utils.is_stable_version('1.2.3b') is False
@@ -74,7 +75,7 @@ def test_is_stable_version():
     assert utils.is_stable_version('1.2.3.post1.dev') is False
 
 
-def test_parse_dt_str(tz_berlin):
+def test_parse_dt_str(tz_berlin) -> None:
     assert utils.parse_dt_str('2021-01-01') == pnd.date(2021, 1, 1)
     assert utils.parse_dt_str('2021-01-01 12:00:00') == pnd.datetime(2021, 1, 1, 12, 0, 0, tz=tz_berlin)
     assert utils.parse_dt_str('2021-01-01 12:00:00+02:00') == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
@@ -91,10 +92,11 @@ def test_parse_dt_str(tz_berlin):
     )
     date_interval_str = '2021-01-01/2021-01-03'
     date_interval = utils.parse_dt_str(date_interval_str)
-    assert date_interval == pnd.interval(start=pnd.date(2021, 1, 1), end=pnd.date(2021, 1, 3))
+    exp_start, exp_end = pnd.datetime(2021, 1, 1, 0, 0, 0), pnd.datetime(2021, 1, 3, 23, 59, 59)
+    assert date_interval == pnd.interval(start=exp_start, end=exp_end)
 
 
-def test_to_pendulum(tz_berlin):
+def test_to_pendulum(tz_berlin) -> None:
     date_and_time = utils.to_pendulum('2021-01-01 12:00:00')
     assert isinstance(date_and_time, pnd.DateTime)
     assert isinstance(date_and_time, dt.datetime)
@@ -110,7 +112,11 @@ def test_to_pendulum(tz_berlin):
     assert isinstance(date_only, pnd.Date)
     assert isinstance(date_only, dt.date)
 
-    interval = pnd.interval(start=pnd.parse('2021-01-01'), end=pnd.parse('2021-01-03'))
+    start = pnd.parse('2021-01-01 10:30')
+    end = pnd.parse('2021-01-03 10:30')
+    assert isinstance(start, pnd.DateTime)
+    assert isinstance(end, pnd.DateTime)
+    interval = pnd.interval(start=start, end=end)
     assert utils.to_pendulum(interval) == interval
 
     dt_datetime = dt.datetime(2021, 1, 1, 12, 0, 0)  # noqa: DTZ001
@@ -125,14 +131,14 @@ def test_to_pendulum(tz_berlin):
     assert datetime == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
 
     with pytest.raises(TypeError):
-        utils.to_pendulum(pnd.duration(days=21))
+        utils.to_pendulum(pnd.duration(days=21))  # type: ignore
 
 
-def test_flatten():
+def test_flatten() -> None:
     assert utils.flatten([[1], [2, 3], [4, 5, 6]]) == [1, 2, 3, 4, 5, 6]
 
 
-def test_safe_list_get():
+def test_safe_list_get() -> None:
     lst = [1, 2, 3]
     assert utils.safe_list_get(lst, 0) == 1
     assert utils.safe_list_get(lst, 1) == 2
