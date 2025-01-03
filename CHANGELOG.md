@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.8
+
+- Fix: Added missing tomli dependency, issue #62.
+
 ## Version 0.7, 2024-12-10
 
 - New: Reading and inserting comments is implemented.
