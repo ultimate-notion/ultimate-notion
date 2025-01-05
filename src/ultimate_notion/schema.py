@@ -779,6 +779,12 @@ class Verification(PropertyType[obj_schema.Verification], wraps=obj_schema.Verif
     allowed_at_creation = False
 
 
+class Button(PropertyType[obj_schema.Button], wraps=obj_schema.Button):
+    """Defines a button property in a database."""
+
+    allowed_at_creation = False
+
+
 class DefaultSchema(Schema, db_title=None):
     """Default database schema of Notion.
 

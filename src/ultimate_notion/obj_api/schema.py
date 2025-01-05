@@ -290,7 +290,15 @@ class Verification(PropertyType, type='verification'):
     verification: TypeData = TypeData()
 
 
+class Button(PropertyType, type='button'):
+    """Button database property."""
+
+    class TypeData(GenericObject): ...
+
+    button: TypeData = TypeData()
+
+
 class RenameProp(GenericObject):
-    """Use to rename a property during a database update."""
+    """Property to rename a property during a database update."""
 
     name: str
