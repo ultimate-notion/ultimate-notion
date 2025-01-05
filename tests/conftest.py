@@ -69,7 +69,6 @@ TEST_CFG_FILE = get_cfg_file()
 
 def pytest_addoption(parser: Parser):
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
-    parser.addoption('--overwrite-fixtures', action='store_true', default=False, help='Overwrite existing fixtures.')
     parser.addoption(
         '--check-latest-release',
         action='store_true',
@@ -238,10 +237,9 @@ def vcr_fixture(scope: str, *, autouse: bool = False):
                 vcr.use_cassette.return_value.__enter__.return_value = None
             else:
                 mode = request.config.getoption('--record-mode')
-                overwrite_fixtures = request.config.getoption('--overwrite-fixtures')
                 if mode == 'rewrite':
                     # This avoids rewriting the fixture cassettes every time we rewrite for a new test!
-                    mode = 'all' if overwrite_fixtures else 'once'
+                    mode = 'once'
                 elif mode is None:
                     mode = 'none'
                 vcr = VCR(record_mode=vcr_mode(mode), **vcr_config)
@@ -589,11 +587,9 @@ def delete_all_taskslists():
         msg = (
             "We tampered with the token's expiry date to allow for VCR testing but you seem to try to "
             'connect to the Google API now.\n'
-            'Delete `token.json` and perform the authentication flow again with:\n'
-            'hatch run python examples/sync_google_tasks.py\n'
-            f'and copy the token over to {TEST_CFG_FILE.parent}. Then use:\n'
+            f"Delete `{TEST_CFG_FILE.parent / 'token.json'}` and run:\n"
             'hatch run vcr-rewrite -k ...\n'
-            'to rewrite the VCR cassettes.'
+            'to perform the authentication flow before rewriting the VCR cassettes.'
         )
         raise RuntimeError(msg) from e
 
