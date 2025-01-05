@@ -1,4 +1,14 @@
-"""Property values of a page in Notion directly mapped to Python objects."""
+"""Property values of a page in Notion directly mapped to Python objects.
+
+`PropertyValue` objects are directly returned from the Notion API using the [retrieve a page] endpoint.
+They are used to represent the values of a page's properties. In contrast the `PropertyItem` objects
+are returned from the [retrieve a page property item] endpoint and differ from the `PropertyValue` objects
+by having a field `object = 'property_item'`. So they are considered *proper* objects in the Notion API
+instead of just types like the `PropertyValue` objects.
+
+[retrieve a page]: https://developers.notion.com/reference/retrieve-a-page
+[retrieve a page property item]: https://developers.notion.com/reference/retrieve-a-page-property
+"""
 
 from __future__ import annotations
 
@@ -29,6 +39,10 @@ The high-level API will retrieve the rest on demand automatically.
 
 Source: https://developers.notion.com/reference/retrieve-a-page
 """
+
+###################
+# Property Values #
+###################
 
 
 class PropertyValue(TypedObject, polymorphic_base=True):
@@ -292,6 +306,19 @@ class Verification(PropertyValue, type='verification'):
     verification: TypeData = TypeData()
 
 
+class Button(PropertyValue, type='button'):
+    """A Notion button property value."""
+
+    class TypeData(GenericObject): ...
+
+    button: TypeData = TypeData()
+
+
+##################
+# Property Items #
+##################
+
+
 class PropertyItem(NotionObject, TypedObject, polymorphic_base=True, object='property_item'):
     """A `PropertyItem` returned by the Notion API.
 
@@ -397,6 +424,10 @@ class UniqueIDPropertyItem(PropertyItem, UniqueID, type='unique_id'):
 
 class VerificationPropertyItem(PropertyItem, Verification, type='verification'):
     """A `PropertyItem` returned by the Notion API containing the `Verification` property."""
+
+
+class ButtonPropertyItem(PropertyItem, Button, type='button'):
+    """A `PropertyItem` returned by the Notion API containing the `Button` property."""
 
 
 PAGINATED_PROP_VALS = (RichText, Title, People, Relation, Rollup)

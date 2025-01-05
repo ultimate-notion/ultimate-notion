@@ -568,3 +568,10 @@ def test_insert_after_replace_block(root_page: uno.Page, notion: uno.Session):
 
     with pytest.raises(InvalidAPIUsageError):
         divider.replace(divider)
+
+
+@pytest.mark.vcr()
+def test_all_blocks(all_blocks_page: uno.Page):
+    blocks = all_blocks_page.children
+    assert len(blocks) >= 1
+    # ToDo: Add more tests for all blocks

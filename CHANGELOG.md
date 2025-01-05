@@ -1,8 +1,9 @@
 # Changelog
 
-## Version 0.8
+## Version 0.7.1, 2025-01-05
 
 - Fix: Added missing tomli dependency, issue #62.
+- Fix: Support button property of databases to fix error when retrieving a page or database, issue #63.
 
 ## Version 0.7, 2024-12-10
 
