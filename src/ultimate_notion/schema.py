@@ -287,12 +287,6 @@ class Schema(metaclass=SchemaType):
             kwargs |= {
                 prop.attr_name: Annotated[prop.type.prop_value, Field(alias=prop.name)] for prop in cls.get_ro_props()
             }
-            validators |= {
-                f'{prop.attr_name}_validator': field_validator(prop.attr_name, mode='before')(
-                    partial(pytype_to_prop_value, prop_value=prop.type.prop_value)
-                )
-                for prop in cls.get_ro_props()
-            }
 
         model = create_model(
             f'{cls.db_title}Model',
