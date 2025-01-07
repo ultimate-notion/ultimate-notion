@@ -283,19 +283,18 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 
     @property
     def value(self) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None:
-        if self.obj_ref.rollup is None:
-            return None
-
-        rollup_type = self.obj_ref.rollup
-        if isinstance(rollup_type, obj_props.RollupArray):
-            return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_type.array]
-        elif isinstance(rollup_type, obj_props.RollupNumber):
-            return rollup_type.number
-        elif isinstance(rollup_type, obj_props.RollupDate):
-            return rollup_type.date.to_pendulum() if rollup_type.date is not None else None
-        else:
-            msg = f'Unknown rollup value type: {type(rollup_type)}'
-            raise ValueError(msg)
+        match rollup_type := self.obj_ref.rollup:
+            case None:
+                return None
+            case obj_props.RollupArray():
+                return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_type.array]
+            case obj_props.RollupNumber():
+                return rollup_type.number
+            case obj_props.RollupDate():
+                return rollup_type.date.to_pendulum() if rollup_type.date is not None else None
+            case _:
+                msg = f'Unknown rollup value type: {type(rollup_type)}'
+                raise ValueError(msg)
 
     @property
     def value_type(self) -> RollupType | None:
@@ -350,8 +349,16 @@ class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
     readonly = True
 
     @property
+    def number(self) -> int:
+        return self.obj_ref.unique_id.number
+
+    @property
+    def prefix(self) -> str | None:
+        return self.obj_ref.unique_id.prefix
+
+    @property
     def value(self) -> str:
-        return f'{self.obj_ref.unique_id.prefix}-{self.obj_ref.unique_id.number}'
+        return f'{self.prefix}-{self.number}'
 
 
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
