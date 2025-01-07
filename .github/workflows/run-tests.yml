@@ -28,16 +28,20 @@ jobs:
       fail-fast: true # kill everything after first error to save resources
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
         exclude:
           - os: windows-latest
             python-version: '3.11'
           - os: windows-latest
             python-version: '3.12'
+          - os: windows-latest
+            python-version: '3.13'
           - os: macos-latest
             python-version: '3.11'
           - os: macos-latest
             python-version: '3.12'
+          - os: macos-latest
+            python-version: '3.13'
 
     steps:
     - name: Checkout
