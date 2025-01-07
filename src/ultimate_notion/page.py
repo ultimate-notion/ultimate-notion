@@ -55,28 +55,29 @@ class PagePropertiesNS(Mapping[str, Any]):
         """Return the low-level page properties"""
         return self._page.obj_ref.properties
 
-    def __getitem__(self, prop_name: str) -> Any:
+    def _get_property(self, prop_name: str) -> PropertyValue:
         prop = self._obj_prop_vals.get(prop_name)
 
         if prop is None:
             msg = f'No such property: {prop_name}'
             raise AttributeError(msg)
 
-        if isinstance(prop, obj_props.Relation) and prop.has_more:  # retrieve the full list of items
-            prop.has_more = False
-            return self._page.get_property(prop_name)
-        elif (
-            isinstance(prop, obj_props.People) and len(prop.people) == MAX_ITEMS_PER_PROPERTY and not prop._is_retrieved
-        ):
-            return self._page.get_property(prop_name)
-        elif (
-            isinstance(prop, obj_props.RichText | obj_props.Title)
-            and len(Text.wrap_obj_ref(prop.value).mentions) == MAX_ITEMS_PER_PROPERTY
-            and not prop._is_retrieved
-        ):
-            return self._page.get_property(prop_name)
-        else:
-            return PropertyValue.wrap_obj_ref(prop).value
+        def has_len_max_mention(prop: obj_props.RichText | obj_props.Title) -> bool:
+            return len(Text.wrap_obj_ref(prop.value).mentions) == MAX_ITEMS_PER_PROPERTY
+
+        match prop:
+            case obj_props.Relation() if prop.has_more:
+                prop.has_more = False
+                return self._page._get_property(prop_name)
+            case obj_props.People() if len(prop.people) == MAX_ITEMS_PER_PROPERTY and not prop._is_retrieved:
+                return self._page._get_property(prop_name)
+            case obj_props.RichText() | obj_props.Title() if has_len_max_mention(prop) and not prop._is_retrieved:
+                return self._page._get_property(prop_name)
+            case _:
+                return PropertyValue.wrap_obj_ref(prop)
+
+    def __getitem__(self, prop_name: str) -> Any:
+        return self._get_property(prop_name).value
 
     def __setitem__(self, prop_name: str, value: Any):
         # Todo: use the schema of the database to see which properties are writeable at all.
@@ -253,13 +254,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             self._comments = [Discussion([], parent=self)]
         return SList(self._discussions).item()
 
-    def get_property(self, prop_name: str) -> Any:
-        """Directly retrieve the property value from the API.
-
-        Use this method only if you want to retrieve a specific property value that
-        might have been updated on the server side without reloading the whole page.
-        In all other cases, use the `props` namespace of the page to avoid unnecessary API calls.
-        """
+    def _get_property(self, prop_name: str) -> PropertyValue:
         session = get_active_session()
         prop_obj = self.props._obj_prop_vals[prop_name]
         prop_items = session.api.pages.properties.retrieve(self.obj_ref, prop_obj)
@@ -271,7 +266,16 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             prop_obj.value = SList(prop_values).item()  # guaranteed to have only one item
 
         prop_obj._is_retrieved = True
-        return PropertyValue.wrap_obj_ref(prop_obj).value
+        return PropertyValue.wrap_obj_ref(prop_obj)
+
+    def get_property(self, prop_name: str) -> Any:
+        """Directly retrieve the property value from the API.
+
+        Use this method only if you want to retrieve a specific property value that
+        might have been updated on the server side without reloading the whole page.
+        In all other cases, use the `props` namespace of the page to avoid unnecessary API calls.
+        """
+        return self._get_property(prop_name).value
 
     def to_markdown(self) -> str:
         """Return the content of the page as Markdown.
