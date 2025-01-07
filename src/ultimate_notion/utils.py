@@ -289,7 +289,7 @@ def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
             case pnd.Date():
                 return dt_spec  # as it is a date and has no tz information
             case _:
-                msg = f'Unexpected type {type(dt_spec)} for {dt_spec}'
+                msg = f'Unexpected type `{type(dt_spec)}` for `{dt_spec}`'
                 raise TypeError(msg)
 
     dt_spec = pnd.parse(dt_str, exact=True, tz=None)

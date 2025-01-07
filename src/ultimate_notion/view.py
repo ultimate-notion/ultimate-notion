@@ -88,21 +88,21 @@ class View(Sequence[Page]):
         return SList(pages)
 
     def get_row(self, idx: int, /) -> tuple[Any, ...]:
-        """Retrieve a row i.e. all properties of a page by index of the view."""
-        # ToDo: Return pydantic models instead of tuples.
+        """Retrieve a row, i.e. all properties of a page defined by an index."""
         page = self.get_page(idx)
         row: list[Any] = []
         for col in self.columns:
-            if col == self._title_col:
-                row.append(page.title)
-            elif col == self._id_name:
-                row.append(page.id)
-            elif col == self._index_name:
-                row.append(idx)
-            elif col == self._icon_name:
-                row.append(page.icon)
-            else:
-                row.append(page.props[col])
+            match col:
+                case self._title_col:
+                    row.append(page.title)
+                case self._id_name:
+                    row.append(page.id)
+                case self._index_name:
+                    row.append(idx)
+                case self._icon_name:
+                    row.append(page.icon)
+                case _:
+                    row.append(page.props[col])
         return tuple(row)
 
     def to_pages(self) -> list[Page]:
