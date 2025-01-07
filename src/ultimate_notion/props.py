@@ -81,9 +81,9 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
             return str(self.value) if self.value else ''
 
 
-############################
-# Writeable Poperty Values #
-############################
+#############################
+# Writeable Property Values #
+#############################
 
 
 class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
@@ -256,9 +256,9 @@ class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
         return [session.get_page(ref_obj.id) for ref_obj in self.obj_ref.relation]
 
 
-############################
-# Read-Only Poperty Values #
-############################
+#############################
+# Read-Only Property Values #
+#############################
 
 
 class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
