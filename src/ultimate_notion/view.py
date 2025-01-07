@@ -7,7 +7,7 @@ from html import escape as htmlescape
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import numpy as np
-import pandas as pd
+from pydantic import BaseModel
 from tabulate import tabulate
 
 from ultimate_notion.core import get_repr
@@ -17,7 +17,11 @@ from ultimate_notion.rich_text import html_img
 from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
 
 if TYPE_CHECKING:
+    import pandas as pd
+    import polars as pl
+
     from ultimate_notion.database import Database
+    from ultimate_notion.props import PropertyValue
     from ultimate_notion.query import Query
 
 T = TypeVar('T')
@@ -88,21 +92,21 @@ class View(Sequence[Page]):
         return SList(pages)
 
     def get_row(self, idx: int, /) -> tuple[Any, ...]:
-        """Retrieve a row i.e. all properties of a page by index of the view."""
-        # ToDo: Return pydantic models instead of tuples.
+        """Retrieve a row, i.e. all properties of a page defined by an index."""
         page = self.get_page(idx)
         row: list[Any] = []
         for col in self.columns:
-            if col == self._title_col:
-                row.append(page.title)
-            elif col == self._id_name:
-                row.append(page.id)
-            elif col == self._index_name:
-                row.append(idx)
-            elif col == self._icon_name:
-                row.append(page.icon)
-            else:
-                row.append(page.props[col])
+            match col:
+                case self._title_col:
+                    row.append(page.title)
+                case self._id_name:
+                    row.append(page.id)
+                case self._index_name:
+                    row.append(idx)
+                case self._icon_name:
+                    row.append(page.icon)
+                case _:
+                    row.append(page.props[col])
         return tuple(row)
 
     def to_pages(self) -> list[Page]:
@@ -112,11 +116,34 @@ class View(Sequence[Page]):
     def to_rows(self) -> list[tuple[Any, ...]]:
         return [self.get_row(idx) for idx in range(len(self))]
 
+    def to_pydantic(self) -> list[BaseModel]:
+        """Convert the view to a list of Pydantic models."""
+        model = self.database.schema.to_pydantic_model(with_ro_props=True)
+        is_prop_ro = {prop.name: prop.type.readonly for prop in self.database.schema.get_props()}
+
+        def get_prop(page: Page, prop: str) -> PropertyValue | Any:
+            prop_value = page.props._get_property(prop)
+            return prop_value if is_prop_ro[prop] else prop_value.value
+
+        models: list[BaseModel] = []
+        for page in self.to_pages():
+            models.append(model(**{col: get_prop(page, col) for col in self.columns}))
+
+        return models
+
     def to_pandas(self) -> pd.DataFrame:
-        """Convert the view to a pandas dataframe."""
+        """Convert the view to a Pandas dataframe."""
+        import pandas as pd  # noqa: PLC0415
+
         # remove index as pandas uses its own
         view = self.without_index() if self.has_index else self
         return pd.DataFrame(view.to_rows(), columns=view.columns)
+
+    def to_polars(self) -> pl.DataFrame:
+        """Convert the view to a Polars dataframe."""
+        # Todo: Implement this!
+        view = self.without_index() if self.has_index else self
+        return view
 
     def _html_for_icon(self, rows: list[Any], cols: list[str]) -> list[Any]:
         # escape everything as we ask tabulate not to do it

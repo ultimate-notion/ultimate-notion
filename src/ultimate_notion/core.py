@@ -19,14 +19,6 @@ if TYPE_CHECKING:
     from ultimate_notion.user import User
 
 
-class InvalidAPIUsageError(Exception):
-    """Raised when the API is used in an invalid way."""
-
-    def __init__(self, message='This part of the API is not intended to be used in this manner'):
-        self.message = message
-        super().__init__(self.message)
-
-
 class ObjRefWrapper(Protocol[GT]):
     """Wrapper for objects that have an obj_ref attribute.
 
@@ -55,6 +47,11 @@ class Wrapper(ObjRefWrapper[GT], ABC):
         """Default constructor that also builds `obj_ref`."""
         obj_api_type: type[obj_core.GenericObject] = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(*args, **kwargs)
+
+    def __pydantic_serializer__(self):  # noqa: PLW3201
+        """Return the Pydantic serializers for this object."""
+        # This is used only when creating a pydantic model from a schema.
+        return self.obj_ref.__pydantic_serializer__
 
     @classmethod
     def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
@@ -123,7 +120,7 @@ class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
     def created_by(self) -> User:
         """Return the user who created the block."""
         session = get_active_session()
-        return session.get_user(self.obj_ref.created_by.id)
+        return session.get_user(self.obj_ref.created_by.id, raise_on_unknown=False)
 
     @property
     def last_edited_time(self) -> dt.datetime:

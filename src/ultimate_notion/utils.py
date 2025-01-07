@@ -19,16 +19,9 @@ from packaging.version import Version
 from pydantic import BaseModel
 
 from ultimate_notion import __version__
+from ultimate_notion.errors import EmptyListError, MultipleItemsError
 
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
-
-
-class EmptyListError(Exception):
-    """Custom exception for an empty list in SList."""
-
-
-class MultipleItemsError(Exception):
-    """Custom exception for a list with multiple items in SList."""
 
 
 class SList(list[T]):
@@ -296,7 +289,7 @@ def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
             case pnd.Date():
                 return dt_spec  # as it is a date and has no tz information
             case _:
-                msg = f'Unexpected type {type(dt_spec)} for {dt_spec}'
+                msg = f'Unexpected type `{type(dt_spec)}` for `{dt_spec}`'
                 raise TypeError(msg)
 
     dt_spec = pnd.parse(dt_str, exact=True, tz=None)
@@ -306,7 +299,13 @@ def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
         case pnd.Date():
             return dt_spec
         case pnd.Interval():
-            return pnd.Interval(start=set_tz(dt_spec.start), end=set_tz(dt_spec.end))
+            # We extend the interval to the full day if only a date is given
+            start, end = set_tz(dt_spec.start), set_tz(dt_spec.end)
+            if not isinstance(dt_spec.start, pnd.DateTime):
+                start = pnd.datetime(start.year, start.month, start.day, 0, 0, 0)
+            if not isinstance(dt_spec.end, pnd.DateTime):
+                end = pnd.datetime(end.year, end.month, end.day, 23, 59, 59)
+            return pnd.Interval(start=start, end=end)
         case _:
             msg = f'Unexpected parsing result of type {type(dt_spec)} for {dt_str}'
             raise TypeError(msg)

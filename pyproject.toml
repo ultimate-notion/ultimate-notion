@@ -22,6 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Office/Business",
     "Topic :: Software Development :: Libraries",
@@ -37,11 +38,10 @@ dependencies = [
     "numpy~=1.24",
     "emoji~=2.8",
     "tomli~=2.2",
-    "pandas~=2.0",
     "pydantic~=2.0",
     "mistune~=3.0",  # markdown parser
     "packaging",
-    "pendulum",
+    "pendulum~=3.0",
     "typing_extensions", # for Python 3.10 compatibility, check if still needed when pumbing `requires-python`
 ]
 dynamic = ["version"]
@@ -53,7 +53,13 @@ google = [
    "google-auth-httplib2",
    "google-auth-oauthlib",
 ]
-all = ["ultimate-notion[google]"]
+pandas = [
+    "pandas~=2.0",
+]
+polars = [
+    "polars~=1.17",
+]
+all = ["ultimate-notion[google,polars,pandas]"]
 
 [project.urls]
 Homepage = "https://ultimate-notion.com"
@@ -289,10 +295,10 @@ dependencies = [
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
 debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
 vcr-off = "test --disable-recording {args}"
-test-prod = "pytest --disable-recording --check-latest-release {args}"
 vcr-only = "test --record-mode none --block-network {args}"
 vcr-rewrite = "test --record-mode=rewrite {args}"
 vcr-drop-cassettes = "find ./tests -type d -name 'cassettes' -exec rm -rf {{}} +"
+test-release = "vcr-off --check-latest-release {args}"
 ci = "vcr-only --cov-report lcov {args} --debug-uno"
 doctest = "pytest docs/examples/"
 md2py = "python -c \"from ultimate_notion.utils import convert_md_to_py; convert_md_to_py('{args}')\""

@@ -81,6 +81,11 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
             return str(self.value) if self.value else ''
 
 
+#############################
+# Writeable Property Values #
+#############################
+
+
 class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     """Title property value."""
 
@@ -196,7 +201,7 @@ class People(PropertyValue[obj_props.People], wraps=obj_props.People):
     @property
     def value(self) -> list[User]:
         session = get_active_session()
-        return [session.get_user(user.id) for user in self.obj_ref.people]
+        return [session.get_user(user.id, raise_on_unknown=False) for user in self.obj_ref.people]
 
 
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):
@@ -237,6 +242,25 @@ class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
         return [FileInfo.wrap_obj_ref(file) for file in self.obj_ref.files]
 
 
+class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
+    """Relation property values."""
+
+    def __init__(self, pages: Page | Sequence[Page]):
+        if not isinstance(pages, Sequence):
+            pages = [pages]
+        super().__init__(pages)
+
+    @property
+    def value(self) -> list[Page]:
+        session = get_active_session()
+        return [session.get_page(ref_obj.id) for ref_obj in self.obj_ref.relation]
+
+
+#############################
+# Read-Only Property Values #
+#############################
+
+
 class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     """Formula property value."""
 
@@ -252,20 +276,6 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
         return FormulaType(self.obj_ref.formula.type) if self.obj_ref.formula else None
 
 
-class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
-    """Relation property values."""
-
-    def __init__(self, pages: Page | Sequence[Page]):
-        if not isinstance(pages, Sequence):
-            pages = [pages]
-        super().__init__(pages)
-
-    @property
-    def value(self) -> list[Page]:
-        session = get_active_session()
-        return [session.get_page(ref_obj.id) for ref_obj in self.obj_ref.relation]
-
-
 class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     """Rollup property value."""
 
@@ -273,19 +283,18 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 
     @property
     def value(self) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None:
-        if self.obj_ref.rollup is None:
-            return None
-
-        rollup_type = self.obj_ref.rollup
-        if isinstance(rollup_type, obj_props.RollupArray):
-            return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_type.array]
-        elif isinstance(rollup_type, obj_props.RollupNumber):
-            return rollup_type.number
-        elif isinstance(rollup_type, obj_props.RollupDate):
-            return rollup_type.date.to_pendulum() if rollup_type.date is not None else None
-        else:
-            msg = f'Unknown rollup value type: {type(rollup_type)}'
-            raise ValueError(msg)
+        match rollup_type := self.obj_ref.rollup:
+            case None:
+                return None
+            case obj_props.RollupArray():
+                return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_type.array]
+            case obj_props.RollupNumber():
+                return rollup_type.number
+            case obj_props.RollupDate():
+                return rollup_type.date.to_pendulum() if rollup_type.date is not None else None
+            case _:
+                msg = f'Unknown rollup value type: {type(rollup_type)}'
+                raise ValueError(msg)
 
     @property
     def value_type(self) -> RollupType | None:
@@ -310,7 +319,7 @@ class CreatedBy(PropertyValue[obj_props.CreatedBy], wraps=obj_props.CreatedBy):
     @property
     def value(self) -> User:
         session = get_active_session()
-        return session.get_user(self.obj_ref.created_by.id)
+        return session.get_user(self.obj_ref.created_by.id, raise_on_unknown=False)
 
 
 class LastEditedTime(PropertyValue[obj_props.LastEditedTime], wraps=obj_props.LastEditedTime):
@@ -331,7 +340,7 @@ class LastEditedBy(PropertyValue[obj_props.LastEditedBy], wraps=obj_props.LastEd
     @property
     def value(self) -> User:
         session = get_active_session()
-        return session.get_user(self.obj_ref.last_edited_by.id)
+        return session.get_user(self.obj_ref.last_edited_by.id, raise_on_unknown=False)
 
 
 class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
@@ -340,15 +349,22 @@ class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
     readonly = True
 
     @property
+    def number(self) -> int:
+        return self.obj_ref.unique_id.number
+
+    @property
+    def prefix(self) -> str | None:
+        return self.obj_ref.unique_id.prefix
+
+    @property
     def value(self) -> str:
-        return f'{self.obj_ref.unique_id.prefix}-{self.obj_ref.unique_id.number}'
+        return f'{self.prefix}-{self.number}'
 
 
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
     """Verification property value of pages in wiki databases."""
 
     # ToDo: Write a unit test for this!
-
     readonly = True
 
     @property
@@ -365,7 +381,7 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
             return None
         else:
             session = get_active_session()
-            return session.get_user(self.obj_ref.verification.verified_by.id)
+            return session.get_user(self.obj_ref.verification.verified_by.id, raise_on_unknown=False)
 
     @property
     def date(self) -> pnd.DateTime | None:
