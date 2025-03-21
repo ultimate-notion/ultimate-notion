@@ -184,6 +184,8 @@ class DatabasesEndpoint(Endpoint):
         schema: Mapping[str, PropertyType | RenameProp] | None = None,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
+        *,
+        inline: bool = False,
     ) -> dict[str, Any]:
         """Build a request payload from the given items.
 
@@ -206,16 +208,24 @@ class DatabasesEndpoint(Endpoint):
                 name: value.serialize_for_api() if value is not None else None for name, value in schema.items()
             }
 
+        if inline:
+            request['is_inline'] = True
+
         return request
 
     # https://developers.notion.com/reference/create-a-database
     def create(
-        self, parent: Page, schema: Mapping[str, PropertyType], title: list[RichTextBaseObject] | None = None
+        self,
+        parent: Page,
+        schema: Mapping[str, PropertyType],
+        title: list[RichTextBaseObject] | None = None,
+        *,
+        inline: bool = False,
     ) -> Database:
         """Add a database to the given Page parent."""
         parent_ref = PageRef.build(parent)
         _logger.debug(f'Creating new database below page with id `{parent_ref.page_id}`.')
-        request = self._build_request(parent_ref, schema, title)
+        request = self._build_request(parent_ref, schema, title, inline=inline)
         data = self.raw_api.create(**request)
         return Database.model_validate(data)
 
