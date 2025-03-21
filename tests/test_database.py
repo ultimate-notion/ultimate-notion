@@ -45,6 +45,20 @@ def test_schema(article_db: uno.Database):
 
 
 @pytest.mark.vcr()
+def test_db_inline(notion: uno.Session, root_page: uno.Page):
+    """Simple inline database of articles"""
+
+    class Article(uno.Schema, db_title=None):
+        name = uno.Property('Name', uno.PropType.Title())
+        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+        desc = uno.Property('Description', uno.PropType.Text())
+
+    db = notion.create_db(parent=root_page, schema=Article, inline=True)
+    assert db.is_inline
+    db.delete()
+
+
+@pytest.mark.vcr()
 def test_db_without_title(notion: uno.Session, root_page: uno.Page):
     """Simple database of articles"""
 
