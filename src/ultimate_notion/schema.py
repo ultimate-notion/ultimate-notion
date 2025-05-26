@@ -507,6 +507,7 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
 
     @property
     def options(self) -> dict[str, Option]:
+        """Return the options of this select property."""
         return {option.name: Option.wrap_obj_ref(option) for option in self.obj_ref.select.options}
 
 
@@ -522,6 +523,7 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
 
     @property
     def options(self) -> dict[str, Option]:
+        """Return the options of this multi-select property."""
         return {option.name: Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options}
 
 
@@ -541,10 +543,12 @@ class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
 
     @property
     def options(self) -> list[Option]:
+        """Return the options of this status property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.status.options]
 
     @property
     def groups(self) -> list[OptionGroup]:
+        """Return the option groups of this status property."""
         return [OptionGroup.wrap_obj_ref(group, options=self.options) for group in self.obj_ref.status.groups]
 
 
@@ -588,6 +592,7 @@ class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
 
     @property
     def expression(self) -> str:
+        """Return the expression of this formula property."""
         return self.obj_ref.formula.expression
 
 
@@ -784,6 +789,7 @@ class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
 
     @property
     def calculate(self) -> AggFunc:
+        """Return the aggregation function of the rollup."""
         return self.obj_ref.rollup.function
 
 
