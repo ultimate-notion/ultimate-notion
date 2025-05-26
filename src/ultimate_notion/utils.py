@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import re
 import textwrap
 from collections.abc import Generator, Mapping, Sequence
 from contextlib import contextmanager
@@ -277,7 +278,9 @@ def is_stable_release() -> bool:
 
 
 def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
-    """Parse a string to a pendulum object using the local timezone if none provided or UTC otherwise."""
+    """Parse typical Notion date/datetime/interval strings to pendulum objects.
+
+    If no timezone is provided assume local timezone and convert everything else to UTC for consistency."""
 
     def set_tz(dt_spec: pnd.DateTime | pnd.Date | dt.datetime | dt.date) -> pnd.DateTime | pnd.Date:
         """Set the timezone of the datetime specifier object if necessary."""
@@ -292,7 +295,19 @@ def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
                 msg = f'Unexpected type `{type(dt_spec)}` for `{dt_spec}`'
                 raise TypeError(msg)
 
-    dt_spec = pnd.parse(dt_str, exact=True, tz=None)
+    # Handle strings with "Europe/Berlin" and "UTC" style timezone
+    if match := re.match(r'(.+)\s+([A-Za-z/]+)$', dt_str.strip()):
+        dt_part, tz_part = match.groups()
+        dt_spec = pnd.parse(dt_part, exact=True, tz=None)
+        match dt_spec:
+            case pnd.DateTime():
+                dt_spec = dt_spec.in_tz(tz_part)
+            case _:
+                msg = f'Expected a datetime string but got {dt_str}'
+                raise ValueError(msg)
+    else:
+        dt_spec = pnd.parse(dt_str, exact=True, tz=None)
+
     match dt_spec:
         case pnd.DateTime():
             return set_tz(dt_spec)

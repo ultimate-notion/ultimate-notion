@@ -79,6 +79,8 @@ def test_parse_dt_str(tz_berlin) -> None:
     assert utils.parse_dt_str('2021-01-01') == pnd.date(2021, 1, 1)
     assert utils.parse_dt_str('2021-01-01 12:00:00') == pnd.datetime(2021, 1, 1, 12, 0, 0, tz=tz_berlin)
     assert utils.parse_dt_str('2021-01-01 12:00:00+02:00') == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
+    assert utils.parse_dt_str('2021-01-01 12:00:00 UTC') == pnd.datetime(2021, 1, 1, 12, 0, 0, tz='UTC')
+    assert utils.parse_dt_str('2021-01-01 12:00:00 Europe/Berlin') == pnd.datetime(2021, 1, 1, 11, 0, 0, tz='UTC')
 
     datetime_interval_str = '2021-01-01 12:00:00/2021-01-03 12:00:00'
     datetime_interval = utils.parse_dt_str(datetime_interval_str)
