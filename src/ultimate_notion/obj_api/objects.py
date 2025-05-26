@@ -110,20 +110,17 @@ class DateRange(GenericObject, MentionMixin):
 
     def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
         """Convert the DateRange to a pendulum object."""
-        if self.time_zone is None:
-            if self.end is None:
-                return pnd.instance(self.start)
-            else:
-                return pnd.Interval(start=pnd.instance(self.start), end=pnd.instance(self.end))
+        # self.time_zone is None for pure dates.
+        start = str(self.start) if self.time_zone is None else f'{self.start} {self.time_zone}'
+        if self.end is None:
+            return parse_dt_str(start)
         else:
-            pnd_start = pnd.instance(self.start)
-            pnd_start = pnd_start.in_tz(self.time_zone) if isinstance(pnd_start, pnd.DateTime) else pnd_start
-            if self.end is None:
-                return pnd_start
-            else:
-                pnd_end = pnd.instance(self.end)
-                pnd_end = pnd_end.in_tz(self.time_zone) if isinstance(pnd_end, pnd.DateTime) else pnd_end
-                return pnd.Interval(start=pnd_start, end=pnd_end)
+            end = str(self.end) if self.time_zone is None else f'{self.end} {self.time_zone}'
+            start_dt, end_dt = parse_dt_str(start), parse_dt_str(end)
+            if isinstance(start_dt, pnd.Interval) or isinstance(end_dt, pnd.Interval):
+                msg = f"Unsupported type for 'start' or 'end': {type(start)}, {type(end)}"
+                raise TypeError(msg)
+            return pnd.Interval(start=start_dt, end=end_dt)
 
     def __str__(self) -> str:
         # ToDo: Implement the possibility to configure date format globally, maybe in the config?
