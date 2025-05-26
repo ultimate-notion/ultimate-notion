@@ -51,6 +51,10 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] change the content of a block
 - [x] navigate blocks using references of parent and children
 
+## Files
+
+- [ ] upload files to Notion
+
 ## Users
 
 - [x] retrieve all users
@@ -70,26 +74,27 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Notion API Limitations
 
-Some features that the Notion UI provides are not possible to implement due to limitations of the API itself.
+Some features that the Notion UI provides are impossible to implement due to limitations of the Notion API itself.
+These limitations include:
 
-- creating a [Status] property or updating the options as well as option groups. Sending an Status property within a create
-  database call is currently accepted but just ignored, i.e. a database without the property will show up.
+- creating a [Status] property or updating the options as well as option groups. Sending an Status property within a
+  create database call is currently accepted but just ignored, i.e. a database without the property will show up.
 - creating a [Unique ID] property or updating its properties like the prefix. This property type is not even mentioned
   as one of the [database properties].
-- creating a [Wiki database] which has a special [Verification] property.
+- creating a [Wiki database], which has a special [Verification] property.
 - [updating the database schema] with respect to the options of a select/multi-select property, the formula of a
   formula property, and synced content.
-- referencing in a formula expression another formula property, e.g. `prop("other formula")`. Use substitution instead.
+- referencing in a formula expression another formula property, e.g. `prop("other formula")`. Use a substitution instead.
 - creating a two-way relation with the same source and target database, i.e. self-referencing. The update database call
-  is currently accepted but only a one-way relation created, which seems to be a bug.
-- uploading files as icons or in general uploading files.
+  is currently accepted but only a one-way relation created, which seems to be a bug within the Notion API itself.
 - setting the icon and cover of a database.
-- moving pages is not possible as a [page’s parent cannot be changed].
+- moving pages since a [page’s parent cannot be changed].
 - setting a [reminder] based on date and/or time.
-- modifying the url of file-like block, e.g. `File`, `Image`, etc.
+- modifying the url of file-like blocks, e.g. `File`, `Image`, etc.
 - creating inline comments to start a new discussion thread.
 - resolving comments or listing unresolved comments.
 - locking or unlocking a page or database.
+- working with database button properties.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
