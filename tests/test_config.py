@@ -1,8 +1,9 @@
+import logging
 import os
 from pathlib import Path
 from unittest.mock import patch
 
-from pytest import LogCaptureFixture
+from pytest import LogCaptureFixture, MonkeyPatch
 
 from ultimate_notion.config import (
     ENV_NOTION_TOKEN,
@@ -40,6 +41,9 @@ def test_resolve_env_value() -> None:
         assert resolve_env_value('${env:VAR|default}') == 'value'
 
 
-def test_debug_mode(caplog: LogCaptureFixture) -> None:
+def test_debug_mode(caplog: LogCaptureFixture, monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setattr(logging, 'basicConfig', lambda **kwargs: None)
+    test_logger = logging.getLogger('test_logger')
+    monkeypatch.setattr(logging, 'getLogger', lambda *args: test_logger)
     activate_debug_mode()
     assert 'is running in debug mode.' in caplog.text
