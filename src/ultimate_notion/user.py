@@ -38,30 +38,47 @@ class User(Wrapper[objs.User], wraps=objs.User):
 
     @property
     def id(self):
+        """Return the ID of this user."""
         return self.obj_ref.id
 
     @property
     def name(self):
+        """Return the name of this user."""
         return self.obj_ref.name
 
     @property
     def is_person(self) -> bool:
+        """Return True if this user is a person."""
         return isinstance(self.obj_ref, objs.Person)
 
     @property
     def is_bot(self) -> bool:
+        """Return True if this user is a bot."""
         return isinstance(self.obj_ref, objs.Bot)
 
     @property
     def is_unknown(self) -> bool:
+        """Return True if this user is an unknown user."""
         return isinstance(self.obj_ref, objs.UnknownUser)
 
     @property
     def avatar_url(self):
+        """Return the avatar URL of this user."""
         return self.obj_ref.avatar_url
 
     @property
+    def workspace_info(self) -> dict[str, str | int] | None:
+        """Return the workspace info of this bot, if available."""
+        if isinstance(self.obj_ref, objs.Bot):
+            info = self.obj_ref.bot.workspace_limits.model_dump()
+            info['name'] = self.obj_ref.bot.workspace_name
+            return info
+        else:
+            return None
+
+    @property
     def email(self) -> str | None:
+        """Return the e-mail address of this user, if available."""
         if isinstance(self.obj_ref, objs.Person):
             return self.obj_ref.person.email
         else:  # it's a bot or unknown without an e-mail

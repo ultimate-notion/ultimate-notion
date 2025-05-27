@@ -267,12 +267,19 @@ class Person(User, type='person'):
     person: TypeData = TypeData()
 
 
+class WorkSpaceLimits(GenericObject):
+    """Limits for a Notion workspace."""
+
+    max_file_upload_size_in_bytes: int = None  # type: ignore
+
+
 class Bot(User, type='bot'):
     """Represents a Bot in Notion."""
 
     class TypeData(GenericObject):
         owner: WorkspaceRef = None  # type: ignore
         workspace_name: str = None  # type: ignore
+        workspace_limits: WorkSpaceLimits = WorkSpaceLimits()
 
     bot: TypeData = TypeData()
 
