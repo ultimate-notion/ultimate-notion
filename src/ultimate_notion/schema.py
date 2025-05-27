@@ -27,7 +27,7 @@ from functools import partial
 from textwrap import dedent
 from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast
 
-from pydantic import BaseModel, ConfigDict, Field, create_model, field_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
 
 import ultimate_notion.obj_api.schema as obj_schema
@@ -177,6 +177,26 @@ class SchemaType(ABCMeta):
         return (prop.type for prop in cls.get_props())
 
 
+class SchemaModel(BaseModel):
+    """Base Pydantic model for custom schemas."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True, extra='forbid')
+    _db_title: str | None = PrivateAttr(default=None)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert the Pydantic model to a dictionary."""
+        result = {}
+        for name, field in self.model_fields.items():
+            alias = field.alias or name
+            result[alias] = field.obj_ref if isinstance(field, PropertyType) else field.default
+        return result
+
+    def __repr__(self):
+        base = super().__repr__()
+        attrs = base[len(self.__class__.__name__) :]
+        return f'{self.__class__.__name__}[{self._db_title}]{attrs}'
+
+
 class Schema(metaclass=SchemaType):
     """Base class for the schema of a database."""
 
@@ -258,7 +278,7 @@ class Schema(metaclass=SchemaType):
         return [prop for prop in cls.get_props() if not prop.type.readonly]
 
     @classmethod
-    def to_pydantic_model(cls, *, with_ro_props: bool = False) -> type[BaseModel]:
+    def to_pydantic_model(cls, *, with_ro_props: bool = False) -> type[SchemaModel]:
         """Return a Pydantic model of this schema for validation.
 
         This is useful for instance when writing a web API that receives data that should be validated
@@ -270,7 +290,8 @@ class Schema(metaclass=SchemaType):
 
         # ToDo: Validate the categories in Select and MultiSelect using pydantic!
         def pytype_to_prop_value(py_type: Any, *, prop_value: type[PropertyValue]) -> PropertyValue:
-            return prop_value(py_type)
+            """Convert a Python type to a PropertyValue."""
+            return py_type if isinstance(py_type, PropertyValue) else prop_value(py_type)
 
         kwargs: dict[str, Any] = {
             prop.attr_name: Annotated[prop.type.prop_value, Field(default=None, alias=prop.name)]
@@ -287,13 +308,20 @@ class Schema(metaclass=SchemaType):
             kwargs |= {
                 prop.attr_name: Annotated[prop.type.prop_value, Field(alias=prop.name)] for prop in cls.get_ro_props()
             }
+            validators |= {
+                f'{prop.attr_name}_validator': field_validator(prop.attr_name, mode='before')(
+                    partial(pytype_to_prop_value, prop_value=prop.type.prop_value)
+                )
+                for prop in cls.get_ro_props()
+            }
 
         model = create_model(
-            f'{cls.db_title}Model',
-            __config__=ConfigDict(arbitrary_types_allowed=True, extra='forbid'),
+            SchemaModel.__name__,
             __validators__=validators,
+            __base__=SchemaModel,
             **kwargs,
         )
+        model._db_title = cls.db_title
         return model
 
     @classmethod
