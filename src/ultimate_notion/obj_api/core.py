@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from ultimate_notion.obj_api.objects import ParentRef, UserRef
 
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 BASE_URL_PATTERN = r'https://(www.)?notion.so/'
 UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
@@ -119,7 +119,7 @@ class GenericObject(BaseModel):
 
         for k, v in new_obj.model_dump(exclude_unset=True).items():
             # exclude_unset avoids overwriting for instance known children that need to be retrieved separately
-            logger.debug('updating object data -- %s => %s', k, v)
+            _logger.debug('updating object data: %s => %s', k, v)
             setattr(self, k, getattr(new_obj, k))
 
         return self
@@ -245,7 +245,7 @@ class TypedObject(GenericObject):
             msg = f'Duplicate subtype for class - {name} :: {cls}'
             raise ValueError(msg)
 
-        logger.debug('registered new subtype: %s => %s', name, cls)
+        _logger.debug('registered new subtype: %s => %s', name, cls)
         cls._typemap[name] = cls
 
     @model_validator(mode='wrap')
@@ -274,7 +274,7 @@ class TypedObject(GenericObject):
         type_name = value.get('type')
 
         if type_name is None:
-            logger.warning(f'Missing type in data {value}. Most likely a User object without type')
+            _logger.warning(f'Missing type in data {value}. Most likely a User object without type')
             msg = f"Missing 'type' in data {value}"
             if value['object'] == 'user':
                 type_name = 'unknown'  # for the unofficial type objects.UnknownUser
