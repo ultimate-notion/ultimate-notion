@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject
@@ -204,15 +204,13 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         schema_kwargs = {attr_to_name[attr]: value for attr, value in kwargs.items()}
         validator = self.schema.to_pydantic_model(with_ro_props=False)
         try:
-            py_page: BaseModel = validator(**schema_kwargs)
+            schema = validator(**schema_kwargs)
         except ValidationError as e:
-            msg = f'Invalid keyword arguments or overwriting read-only properties:\n{e}'
+            msg = f'Invalid keyword arguments or read-only properties are overwritten:\n{e}'
             raise SchemaError(msg) from e
 
         session = get_active_session()
-        page_obj = session.api.pages.create(
-            parent=self.obj_ref, properties=py_page.model_dump(mode='json', by_alias=True)
-        )
+        page_obj = session.api.pages.create(parent=self.obj_ref, properties=schema.to_dict())
         page = Page.wrap_obj_ref(page_obj)
         session.cache[page.id] = page
         return page
