@@ -37,6 +37,12 @@ interactions:
       - application/json; charset=utf-8
       Server:
       - cloudflare
+      Set-Cookie:
+      - __cf_bm=5WmkoPPRHXt8U4mgTABU5i5RpBC6YRgzvFtHSHSIdeA-1734099471-1.0.1.1-VHQfGtqkeCcqvuZ29rmasa1p0Hp0VRPguJ_VUTMh95Zb0AAlaIGOQVgCLrt0w04vmoq8BBtF3Of5jzXmjNzpMQ;
+        path=/; expires=Fri, 13-Dec-24 14:47:51 GMT; domain=.notion.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=uDb6aQfPoZVFqlTFiUyvSR25Bzz5tD_F79yvAuS2EyY-1734099471184-0.0.1.1-604800000;
+        path=/; domain=.notion.com; HttpOnly; Secure; SameSite=None
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Transfer-Encoding:
@@ -129,4 +135,65 @@ interactions:
       - '0'
     http_version: HTTP/1.1
     status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/pages/f3f2e850-b5d4-11ef-ac7e-96584d5248b2
+  response:
+    content: '{"object":"error","status":400,"code":"validation_error","message":"path
+      failed validation: path.page_id should be a valid uuid, instead was `\"f3f2e850-b5d4-11ef-ac7e-96584d5248b2\"`.","request_id":"6462ceb6-7d2c-4f53-8892-e7bfa018be9f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 8f169482af3dd295-FRA
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '238'
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Vary:
+      - Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 6462ceb6-7d2c-4f53-8892-e7bfa018be9f
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 400
 version: 1
