@@ -22,8 +22,7 @@
 # - notion-client~=2.2
 # - numpy~=1.24
 # - packaging
-# - pandas~=2.0
-# - pendulum
+# - pendulum~=3.0
 # - pydantic~=2.0
 # - tabulate>=0.9
 # - tomli~=2.2
@@ -31,6 +30,8 @@
 # - google-api-python-client
 # - google-auth-httplib2
 # - google-auth-oauthlib
+# - pandas~=2.0
+# - polars~=1.17
 #
 
 annotated-types==0.7.0
@@ -290,6 +291,8 @@ platformdirs==4.3.6
     #   virtualenv
 pluggy==1.5.0
     # via pytest
+polars==1.30.0
+    # via hatch.envs.default
 pre-commit==4.0.1
     # via hatch.envs.default
 prometheus-client==0.21.1
@@ -363,7 +366,7 @@ python-dotenv==1.0.1
     # via pytest-dotenv
 python-json-logger==2.0.7
     # via jupyter-events
-pytz==2024.2
+pytz==2025.2
     # via pandas
 pyyaml==6.0.2
     # via

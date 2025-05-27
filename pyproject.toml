@@ -268,7 +268,7 @@ requires = ["hatch-pip-compile~=1.11.3"]
 type = "pip-compile"
 python = "3.10"
 post-install-commands = ["pre-commit install"]
-features = ["google"]  # state them explicitly, not just "all", to avoid installing ultimate-notion from PyPI!
+features = ["google", "polars", "pandas"]  # state them explicitly, not just "all", to avoid installing ultimate-notion from PyPI!
 pip-compile-installer = "pip"  # or "uv"
 pip-compile-constraint = "default"  # keep locks between default & others consistent
 pip-compile-resolver = "pip-compile" # or "uv"
@@ -350,7 +350,6 @@ build-check = [
 # skip-install = true # mypy gives more feedback if project is installed locally, strange but true
 dependencies = [
     "mypy==1.10",
-    "pyright~=1.1",  # currently only for testing, not used in CI
     "ruff==0.8.2", # make sure this is consistent with .pre-commit-config.yaml, thus pinned!
 ]
 [tool.hatch.envs.lint.scripts]
@@ -371,6 +370,13 @@ fix = [
 all = [
     "style",
     "typing",
+]
+
+# Environment with all dev requirements to be used in VSCode for example
+[tool.hatch.envs.vscode]
+extra-dependencies = [
+    "mypy",
+    "ruff",
 ]
 
 # Production environment taking latest Ultimate Notion from PyPI
