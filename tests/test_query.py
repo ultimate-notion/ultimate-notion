@@ -441,7 +441,7 @@ def test_query_new_task_db(new_task_db: uno.Database) -> None:
 
     Task = new_task_db.schema  # noqa: N806
     status_col = 'Status'
-    status_options = cast(schema.Select, Task[status_col]).options
+    status_options = {option.name: option for option in cast(schema.Select, Task[status_col]).options}
 
     task1 = Task.create(task='Task 1', status=status_options['Done'], due_date='2024-01-01')
     task2 = Task.create(task='Task 2', status=status_options['Backlog'], due_date='2024-01-02')
