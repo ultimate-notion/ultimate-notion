@@ -120,22 +120,28 @@ Here is an example on how to change the task status, which is a select property.
 get the list of all options by accessing the the corresponding column type of the property with:
 
 ```python
-options = task.parent_db.schema.status.type.options
+options = {opt.name: opt for opt in task.parent_db.schema.status.type.options}
 ```
 
 This generates a dictionary of [Option] objects:
 
 ```console
-{'backlog': <Option: 'Backlog' at 0x13513d570>,
- 'in_progress': <Option: 'In Progress' at 0x13513d630>,
- 'blocked': <Option: 'Blocked' at 0x13513d420>,
- 'done': <Option: 'Done' at 0x1350fa140>}
+{'Backlog': <Option: 'Backlog' at 0x13513d570>,
+ 'In Progress': <Option: 'In Progress' at 0x13513d630>,
+ 'Blocked': <Option: 'Blocked' at 0x13513d420>,
+ 'Done': <Option: 'Done' at 0x1350fa140>}
 ```
 
 We now assign the `In Progress` option to our task with:
 
 ```python
 task.props.status = options['In Progress']
+```
+
+Alternatively, we could also just use the string:
+
+```python
+task.props.status = 'Blocked'
 ```
 
 !!! info

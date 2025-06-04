@@ -534,9 +534,9 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
         super().__init__(option_objs)
 
     @property
-    def options(self) -> dict[str, Option]:
+    def options(self) -> list[Option]:
         """Return the options of this select property."""
-        return {option.name: Option.wrap_obj_ref(option) for option in self.obj_ref.select.options}
+        return [Option.wrap_obj_ref(option) for option in self.obj_ref.select.options]
 
 
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
@@ -550,9 +550,9 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
         super().__init__(option_objs)
 
     @property
-    def options(self) -> dict[str, Option]:
+    def options(self) -> list[Option]:
         """Return the options of this multi-select property."""
-        return {option.name: Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options}
+        return [Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options]
 
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):

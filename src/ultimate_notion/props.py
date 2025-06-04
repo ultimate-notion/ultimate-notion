@@ -38,7 +38,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
 
     def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
         super().__init_subclass__(wraps=wraps, **kwargs)
-        # at that time the model is not yet constructed, thus no direct field acces with .type.
+        # When this is called, the model is not yet constructed, thus no direct field access with .type.
         type_name = wraps.model_fields['type'].get_default()
         cls._type_value_map[type_name] = cls
 
@@ -190,8 +190,8 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
             return None
 
 
-class People(PropertyValue[obj_props.People], wraps=obj_props.People):
-    """People property value."""
+class Person(PropertyValue[obj_props.People], wraps=obj_props.People):
+    """Person/People property value."""
 
     def __init__(self, users: User | Sequence[User]):
         if not isinstance(users, Sequence):
@@ -220,7 +220,7 @@ class Email(PropertyValue[obj_props.Email], wraps=obj_props.Email):
         return self.obj_ref.email
 
 
-class PhoneNumber(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
+class Phone(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
     """Phone property value."""
 
     @property

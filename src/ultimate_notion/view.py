@@ -10,11 +10,21 @@ import numpy as np
 from pydantic import BaseModel
 from tabulate import tabulate
 
+from ultimate_notion import props, schema
 from ultimate_notion.core import get_repr
 from ultimate_notion.file import FileInfo
+from ultimate_notion.obj_api.enums import FormulaType, RollupType
 from ultimate_notion.page import Page
+from ultimate_notion.props import Option
 from ultimate_notion.rich_text import html_img
-from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook
+from ultimate_notion.schema import PropertyType
+from ultimate_notion.utils import (
+    SList,
+    deepcopy_with_sharing,
+    find_index,
+    find_indices,
+    is_notebook,
+)
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -96,17 +106,16 @@ class View(Sequence[Page]):
         page = self.get_page(idx)
         row: list[Any] = []
         for col in self.columns:
-            match col:
-                case self._title_col:
-                    row.append(page.title)
-                case self._id_name:
-                    row.append(page.id)
-                case self._index_name:
-                    row.append(idx)
-                case self._icon_name:
-                    row.append(page.icon)
-                case _:
-                    row.append(page.props[col])
+            if col == self._title_col:
+                row.append(page.title)
+            elif col == self._id_name:
+                row.append(page.id)
+            elif col == self._index_name:
+                row.append(idx)
+            elif col == self._icon_name:
+                row.append(page.icon)
+            else:
+                row.append(page.props[col])
         return tuple(row)
 
     def to_pages(self) -> list[Page]:
@@ -131,19 +140,55 @@ class View(Sequence[Page]):
 
         return models
 
+    def _get_row_values(self) -> list[list[Any]]:
+        return [[elem.name if isinstance(elem, Option) else elem for elem in row] for row in self.to_rows()]
+
     def to_pandas(self) -> pd.DataFrame:
         """Convert the view to a Pandas dataframe."""
         import pandas as pd  # noqa: PLC0415
 
         # remove index as pandas uses its own
         view = self.without_index() if self.has_index else self
-        return pd.DataFrame(view.to_rows(), columns=view.columns)
+        data = self._get_row_values()
+        return pd.DataFrame(data, columns=view.columns)
+
+    def _probe_col_type(self, col: str) -> PropertyValue | None:
+        """Probe the type of a column by checking the values in the column."""
+        for page in self.to_pages():
+            prop_value = page.props._get_property(col)
+            if prop_value.value is not None:
+                return prop_value
+
+    def _to_polars_schema(self) -> dict[str, pl.DataType]:
+        """Create a Polars schema for the view."""
+        import polars as pl  # noqa: PLC0415
+
+        db_schema = self.database.schema.to_dict()
+        pl_schema: dict[str, pl.DataType] = {}
+        for col in self.columns:
+            if col in db_schema:
+                prop_type: PropertyType | PropertyValue = db_schema[col]
+                if isinstance(prop_type, schema.Rollup | schema.Relation | schema.Formula):
+                    prop_type = probed_type if (probed_type := self._probe_col_type(col)) is not None else prop_type
+                pl_schema[col] = prop_type_to_polars(prop_type)
+            elif col == self._icon_name:
+                pl_schema[col] = pl.String()
+            elif col == self._index_name:
+                pl_schema[col] = pl.Int64()
+            elif col == self._id_name:
+                pl_schema[col] = pl.String()
+            else:
+                msg = f'Column `{col}` not found in database schema.'
+                raise RuntimeError(msg)
+        return pl_schema
 
     def to_polars(self) -> pl.DataFrame:
         """Convert the view to a Polars dataframe."""
-        # Todo: Implement this!
-        view = self.without_index() if self.has_index else self
-        return view
+        import polars as pl  # noqa: PLC0415
+
+        data = self._get_row_values()
+        schema = self._to_polars_schema()
+        return pl.DataFrame(data=data, schema=schema, orient='row')
 
     def _html_for_icon(self, rows: list[Any], cols: list[str]) -> list[Any]:
         # escape everything as we ask tabulate not to do it
@@ -362,3 +407,73 @@ class View(Sequence[Page]):
         view = self.clone()
         view._pages = np.array(self._query.execute().to_pages())
         return view
+
+
+def prop_type_to_polars(prop_valtype: PropertyType | PropertyValue) -> pl.DataType:
+    """Convert a Notion property type to a Polars data type."""
+    import polars as pl  # noqa: PLC0415
+
+    match prop_valtype:
+        case schema.Title() | schema.Text() | props.Title() | props.Text():
+            return pl.String()
+        case schema.ID() | props.ID():
+            return pl.String()
+        case schema.Verification() | props.Verification():
+            return pl.Object()
+        case schema.Number() | props.Number():
+            return pl.Float64()
+        case schema.Select() as prop:
+            return pl.Enum([opt.name for opt in prop.options])
+        case props.Select():
+            return pl.Categorical()
+        case schema.MultiSelect() as prop:
+            return pl.List(pl.Enum([opt.name for opt in prop.options]))
+        case schema.MultiSelect():
+            return pl.List(pl.Categorical)
+        case schema.Checkbox() | props.Checkbox():
+            return pl.Boolean()
+        case schema.Date() | props.Date():
+            return pl.Datetime(time_unit='ms')
+        case schema.Files() | schema.Person() | props.Files() | props.Person():
+            return pl.List(pl.Object())
+        case schema.CreatedTime() | schema.LastEditedTime() | props.CreatedTime() | props.LastEditedTime():
+            return pl.Datetime(time_unit='ms')
+        case schema.CreatedBy() | schema.LastEditedBy() | props.CreatedBy() | props.LastEditedBy():
+            return pl.Object()
+        case schema.URL() | schema.Email() | schema.Phone() | props.URL() | props.Email() | props.Phone():
+            return pl.String()
+        case schema.Status() as prop:
+            return pl.Enum([opt.name for opt in prop.options])
+        case props.Status():
+            return pl.Categorical()
+        case props.Formula() as prop:
+            match prop.value_type:
+                case FormulaType.NUMBER:
+                    return pl.Float64()
+                case FormulaType.STRING:
+                    return pl.String()
+                case FormulaType.BOOLEAN:
+                    return pl.Boolean()
+                case FormulaType.DATE:
+                    return pl.Datetime(time_unit='ms')
+                case _:
+                    msg = f'Unsupported formula type: {prop.value_type}'
+                    raise ValueError(msg)
+        case props.Rollup() as prop:
+            match prop.value_type:
+                case RollupType.NUMBER:
+                    return pl.Float64()
+                case RollupType.DATE:
+                    return pl.Datetime(time_unit='ms')
+                case RollupType.ARRAY:
+                    return pl.List(pl.Object())
+                case _:
+                    msg = f'Unsupported rollup type: {prop.value_type}'
+                    raise ValueError(msg)
+
+        case schema.Relation() | schema.Rollup() | schema.Formula():
+            # fallback as we cannot convert due to a lack of actual type information in the schema types
+            return pl.Object()
+        case _:
+            msg = f'Unsupported property type or value: {prop_valtype}'
+            raise ValueError(msg)

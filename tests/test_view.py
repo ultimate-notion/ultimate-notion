@@ -76,6 +76,13 @@ def test_to_pandas(task_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
+def test_to_polars(task_db: uno.Database) -> None:
+    view = task_db.get_all_pages()
+    df = view.to_polars()
+    assert len(view) == len(df)
+
+
+@pytest.mark.vcr()
 def test_to_pydantic(task_db: uno.Database) -> None:
     view = task_db.get_all_pages()
     tasks = view.to_pydantic()

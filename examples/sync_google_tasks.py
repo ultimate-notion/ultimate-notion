@@ -110,8 +110,8 @@ with uno.Session() as notion, GTasksClient(read_only=False) as gtasks:
         notion_db=task_db,
         tasklist=tasklist,
         completed_col=status_col,
-        completed_val=status_col.type.options['Done'],
-        not_completed_val=status_col.type.options['Backlog'],
+        completed_val='Done',
+        not_completed_val='Backlog',
         due_col=due_date_col,
     )
     sync_task.run_every(seconds=1).in_total(times=2).schedule()
