@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.8
+
+- New: Added support for creating inline databases by Tzumx
+
 ## Version 0.7.1, 2025-01-05
 
 - Fix: Added missing tomli dependency, issue #62.
