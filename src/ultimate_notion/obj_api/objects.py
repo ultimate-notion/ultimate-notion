@@ -39,7 +39,7 @@ class SelectOption(GenericObject):
 
     name: str
     id: str = None  # type: ignore  # According to docs: "These are sometimes, but not always, UUIDs."
-    color: Color = Color.DEFAULT
+    color: Color = None  # type: ignore  # Leave this empty when overwriting an option
     description: list[RichTextBaseObject] | None = None  # ToDo: Undocumented in the Notion API
 
     @classmethod

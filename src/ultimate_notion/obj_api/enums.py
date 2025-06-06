@@ -29,7 +29,10 @@ class VState(str, Enum):
 
 
 class Color(str, Enum):
-    """Basic colors"""
+    """Basic colors
+
+    DEFAULT is a light gray, which is the default color in the Notion App.
+    """
 
     DEFAULT = 'default'
     GRAY = 'gray'
