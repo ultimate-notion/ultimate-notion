@@ -11,7 +11,7 @@ from ultimate_notion.rich_text import Text
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     """Option for select & multi-select property."""
 
-    def __init__(self, name: str, *, color: Color | str = Color.DEFAULT):
+    def __init__(self, name: str, *, color: Color | str | None = None):
         if isinstance(color, str):
             color = Color(color)
         super().__init__(name, color=color)
@@ -26,6 +26,18 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         """Name of the option."""
         return self.obj_ref.name
 
+    @property
+    def color(self) -> Color:
+        """Color of the option."""
+        if color := self.obj_ref.color:
+            return color
+        else:
+            # we don't return None for convienience, but raise an error
+            # as this is quite unexpected for options and general usage
+            msg = f'Option {self.name} has no color set yet.'
+            raise RuntimeError(msg)
+
+    @property
     def description(self) -> str:
         """Description of the option."""
         if desc := self.obj_ref.description:
