@@ -135,7 +135,31 @@ class GenericObject(BaseModel):
         return cls(*args, **kwargs)
 
 
-class NotionObject(GenericObject):
+class UniqueObject(GenericObject):
+    """A Notion object that has a unique ID.
+
+    This is the base class for all Notion objects that have a unique identifier, i.e. `id`.
+    """
+
+    id: UUID | str = Field(union_mode='left_to_right', default=None)  # type: ignore
+    """`id` is an `UUID` if possible or a string (possibly not unique) depending on the object"""
+
+    def __hash__(self) -> int:
+        """Return a hash of the object based on its ID."""
+        return hash(self.id)
+
+    def __eq__(self, value: Any) -> bool:
+        """Check if the given value is equal to this object."""
+        match value:
+            case UniqueObject():
+                return self.id == value.id
+            case BaseModel():
+                return super().__eq__(value)
+            case _:
+                return False
+
+
+class NotionObject(UniqueObject):
     """A top-level Notion API resource.
 
     Many objects in the Notion API follow a standard pattern with a `object` property, which
@@ -144,8 +168,7 @@ class NotionObject(GenericObject):
 
     object: str = Field(default=None)  # type: ignore # avoids mypy plugin errors as this is set in __init_subclass__
     """`object` is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ..."""
-    id: UUID | str = Field(union_mode='left_to_right', default=None)  # type: ignore
-    """`id` is an `UUID` if possible or a string (possibly not unique) depending on the object"""
+
     request_id: UUID | None = None
     """`request_id` is a UUID that is used to track requests in the Notion API"""
 
@@ -189,7 +212,7 @@ class NotionEntity(NotionObject):
     last_edited_time: datetime = None  # type: ignore
 
 
-class TypedObject(GenericObject):
+class TypedObject(UniqueObject):
     """A type-referenced object.
 
     Many objects in the Notion API follow a standard pattern with a `type` property
