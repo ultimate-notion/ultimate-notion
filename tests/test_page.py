@@ -322,3 +322,45 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
 def test_unfurl_blocks(notion: uno.Session, unfurl_page: uno.Page) -> None:
     pass
     # ToDo: Implement test
+
+
+@pytest.mark.vcr()
+def test_option_page_props(notion: uno.Session, root_page: uno.Page) -> None:
+    select_options = [
+        uno.Option(name='Open', color=uno.Color.GRAY),
+        uno.Option(name='In Progress', color=uno.Color.BLUE),
+        uno.Option(name='Blocked', color=uno.Color.RED),
+        uno.Option(name='Closed', color=uno.Color.GREEN),
+    ]
+    multi_select_options = [
+        uno.Option(name='Option 1', color=uno.Color.DEFAULT),
+        uno.Option(name='Option 2', color=uno.Color.PINK),
+    ]
+
+    class Schema(uno.Schema, db_title='Option Page Props Test'):
+        """Schema for testing option page props"""
+
+        title = uno.Property('Title', uno.PropType.Title())
+        status = uno.Property('Status', uno.PropType.Select(options=select_options))
+        multi_status = uno.Property('Multi Status', uno.PropType.MultiSelect(options=multi_select_options))
+
+    notion.create_db(parent=root_page, schema=Schema)
+    page1 = Schema.create(title='Page 1', status='Open', multi_status=['Option 1'])
+    page2 = Schema.create(title='Page 2', status='In Progress', multi_status=['Option 1', 'Option 2'])
+
+    s_options = {opt.name: opt for opt in select_options}
+    ms_options = {opt.name: opt for opt in multi_select_options}
+
+    assert page1.props.status == s_options['Open']  # type: ignore[attr-defined]
+    page1.props.status = s_options['Blocked']  # type: ignore[attr-defined]
+    assert page1.props.status.name == 'Blocked'  # type: ignore[attr-defined]
+    page1.props.status = 'Closed'  # type: ignore[attr-defined]
+    assert page1.props.status.name == 'Closed'  # type: ignore[attr-defined]
+
+    assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]  # type: ignore[attr-defined]
+    page2.props.multi_status = [ms_options['Option 1']]  # type: ignore[attr-defined]
+    assert page2.props.multi_status == [ms_options['Option 1']]  # type: ignore[attr-defined]
+    page2.props.multi_status = 'Option 2'  # type: ignore[attr-defined]
+    assert page2.props.multi_status == [ms_options['Option 2']]  # type: ignore[attr-defined]
+    page2.props.multi_status = ['Option 1', 'Option 2']  # type: ignore[attr-defined]
+    assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]  # type: ignore[attr-defined]
