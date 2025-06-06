@@ -178,7 +178,7 @@ class SchemaType(ABCMeta):
 
 
 class SchemaModel(BaseModel):
-    """Base Pydantic model for custom schemas."""
+    """Base Pydantic model for schemas to validate pages within a database."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra='forbid')
     _db_title: str | None = PrivateAttr(default=None)
@@ -187,8 +187,10 @@ class SchemaModel(BaseModel):
         """Convert the Pydantic model to a dictionary."""
         result = {}
         for name, field in self.model_fields.items():
-            alias = field.alias or name
-            result[alias] = field.obj_ref if isinstance(field, PropertyType) else field.default
+            value = getattr(self, name)
+            name = field.alias or name
+            if isinstance(value, PropertyValue):
+                result[name] = value.obj_ref
         return result
 
     def __repr__(self):
