@@ -154,10 +154,8 @@ class View(Sequence[Page]):
 
     def _probe_col_type(self, col: str) -> PropertyValue | None:
         """Probe the type of a column by checking the values in the column."""
-        for page in self.to_pages():
-            prop_value = page.props._get_property(col)
-            if prop_value.value is not None:
-                return prop_value
+        if len(self) != 0:
+            return self.get_page(0).props._get_property(col)
 
     def _to_polars_schema(self) -> dict[str, pl.DataType]:
         """Create a Polars schema for the view."""
