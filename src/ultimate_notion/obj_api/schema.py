@@ -14,7 +14,7 @@ from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 class PropertyType(TypedObject, polymorphic_base=True):
     """Base class for Notion property objects."""
 
-    id: str | None = None
+    id: str = None  # type: ignore
     name: str | None = None
 
 
