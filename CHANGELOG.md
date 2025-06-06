@@ -7,6 +7,7 @@
 - New: The schema of a database provides a `to_pydantic_model` class for evaluating input.
 - New: More schema validations like checking for a title property and distinct property names.
 - Fix: Fix error when setting a (multi-)select option with no color specified.
+- New: Added a button property value.
 
 ## Version 0.7.1, 2025-01-05
 
