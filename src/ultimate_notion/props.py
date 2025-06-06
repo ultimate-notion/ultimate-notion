@@ -389,3 +389,22 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
             return None
         else:
             return pnd.instance(self.obj_ref.verification.date)
+
+
+class Button(PropertyValue[obj_props.Button], wraps=obj_props.Button):
+    """Button property value.
+
+    This is a read-only property that represents a button in a database.
+    """
+
+    readonly = True
+
+    @property
+    def value(self) -> None:
+        return None
+
+    def __str__(self) -> str:
+        return f'Button(id={self.id})'
+
+    def __repr__(self) -> str:
+        return get_repr(self, desc=self.id)
