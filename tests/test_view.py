@@ -69,15 +69,23 @@ def test_reverse(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_to_pandas(task_db: uno.Database) -> None:
+def test_to_pandas(task_db: uno.Database, all_props_db: uno.Database) -> None:
     view = task_db.get_all_pages()
+    df = view.to_pandas()
+    assert len(view) == len(df)
+
+    view = all_props_db.get_all_pages()
     df = view.to_pandas()
     assert len(view) == len(df)
 
 
 @pytest.mark.vcr()
-def test_to_polars(task_db: uno.Database) -> None:
+def test_to_polars(task_db: uno.Database, all_props_db: uno.Database) -> None:
     view = task_db.get_all_pages()
+    df = view.to_polars()
+    assert len(view) == len(df)
+
+    view = all_props_db.get_all_pages()
     df = view.to_polars()
     assert len(view) == len(df)
 

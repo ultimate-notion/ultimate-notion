@@ -95,7 +95,5 @@ an `id`-property on most of its objects for that. Notion also provides a shorten
 
     https://notion.so/{UUID}
 
-
-
 [My integrations]: https://www.notion.so/my-integrations
 [logo]: ../assets/images/logo_integration.png

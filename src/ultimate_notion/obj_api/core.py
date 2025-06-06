@@ -212,7 +212,7 @@ class NotionEntity(NotionObject):
     last_edited_time: datetime = None  # type: ignore
 
 
-class TypedObject(UniqueObject):
+class TypedObject(GenericObject):
     """A type-referenced object.
 
     Many objects in the Notion API follow a standard pattern with a `type` property

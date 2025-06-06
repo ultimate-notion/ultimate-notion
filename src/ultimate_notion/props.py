@@ -177,7 +177,7 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
     """Multi-select property value."""
 
     def __init__(self, options: str | Option | Sequence[str | Option]):
-        if (not isinstance(options, Sequence) and not isinstance(options, str)) or isinstance(options, str):
+        if not isinstance(options, Sequence | str) or isinstance(options, str):
             options = [options]
         options = [Option(option) if isinstance(option, str) else option for option in options]
         super().__init__(options)

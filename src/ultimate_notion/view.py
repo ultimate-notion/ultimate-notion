@@ -11,20 +11,15 @@ from pydantic import BaseModel
 from tabulate import tabulate
 
 from ultimate_notion import props, schema
-from ultimate_notion.core import get_repr
+from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.enums import FormulaType, RollupType
 from ultimate_notion.page import Page
 from ultimate_notion.props import Option
 from ultimate_notion.rich_text import html_img
 from ultimate_notion.schema import PropertyType
-from ultimate_notion.utils import (
-    SList,
-    deepcopy_with_sharing,
-    find_index,
-    find_indices,
-    is_notebook,
-)
+from ultimate_notion.user import User
+from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook, rec_apply
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -140,22 +135,26 @@ class View(Sequence[Page]):
 
         return models
 
-    def _get_row_values(self) -> list[list[Any]]:
-        return [[elem.name if isinstance(elem, Option) else elem for elem in row] for row in self.to_rows()]
-
     def to_pandas(self) -> pd.DataFrame:
         """Convert the view to a Pandas dataframe."""
         import pandas as pd  # noqa: PLC0415
 
         # remove index as pandas uses its own
         view = self.without_index() if self.has_index else self
-        data = self._get_row_values()
+        data = rec_apply(cmplx_to_str, self.to_rows())
+
         return pd.DataFrame(data, columns=view.columns)
 
     def _probe_col_type(self, col: str) -> PropertyValue | None:
         """Probe the type of a column by checking the values in the column."""
-        if len(self) != 0:
-            return self.get_page(0).props._get_property(col)
+        for page in self.to_pages():
+            match prop := page.props._get_property(col):
+                case props.Relations():
+                    # we can only determine the type of a relation if it has at least one value
+                    if prop.value:
+                        return prop
+                case _:
+                    return prop
 
     def _to_polars_schema(self) -> dict[str, pl.DataType]:
         """Create a Polars schema for the view."""
@@ -184,7 +183,7 @@ class View(Sequence[Page]):
         """Convert the view to a Polars dataframe."""
         import polars as pl  # noqa: PLC0415
 
-        data = self._get_row_values()
+        data = rec_apply(cmplx_to_str, self.to_rows())
         schema = self._to_polars_schema()
         return pl.DataFrame(data=data, schema=schema, orient='row')
 
@@ -407,6 +406,19 @@ class View(Sequence[Page]):
         return view
 
 
+def cmplx_to_str(obj: Wrapper) -> Wrapper | str:
+    """Convert complex objects to a string representation."""
+    match obj:
+        case FileInfo():
+            return obj.url
+        case Option():
+            return obj.name
+        case User():
+            return obj.name
+        case _:
+            return obj
+
+
 def prop_type_to_polars(prop_valtype: PropertyType | PropertyValue) -> pl.DataType:
     """Convert a Notion property type to a Polars data type."""
     import polars as pl  # noqa: PLC0415
@@ -417,6 +429,8 @@ def prop_type_to_polars(prop_valtype: PropertyType | PropertyValue) -> pl.DataTy
         case schema.ID() | props.ID():
             return pl.String()
         case schema.Verification() | props.Verification():
+            return pl.Object()
+        case schema.Button() | props.Button():
             return pl.Object()
         case schema.Number() | props.Number():
             return pl.Float64()
@@ -433,7 +447,8 @@ def prop_type_to_polars(prop_valtype: PropertyType | PropertyValue) -> pl.DataTy
         case schema.Date() | props.Date():
             return pl.Datetime(time_unit='ms')
         case schema.Files() | schema.Person() | props.Files() | props.Person():
-            return pl.List(pl.Object())
+            # Fix 2025-06-06: `not yet implemented: Nested object types` pl.List(pl.Object()) not working
+            return pl.List(pl.String())
         case schema.CreatedTime() | schema.LastEditedTime() | props.CreatedTime() | props.LastEditedTime():
             return pl.Datetime(time_unit='ms')
         case schema.CreatedBy() | schema.LastEditedBy() | props.CreatedBy() | props.LastEditedBy():
@@ -464,7 +479,8 @@ def prop_type_to_polars(prop_valtype: PropertyType | PropertyValue) -> pl.DataTy
                 case RollupType.DATE:
                     return pl.Datetime(time_unit='ms')
                 case RollupType.ARRAY:
-                    return pl.List(pl.Object())
+                    # Fix 2025-06-06: `not yet implemented: Nested object types` pl.List(pl.Object()) not working
+                    return pl.List(pl.String())
                 case _:
                     msg = f'Unsupported rollup type: {prop.value_type}'
                     raise ValueError(msg)
