@@ -8,6 +8,7 @@
 - New: More schema validations like checking for a title property and distinct property names.
 - Fix: Fix error when setting a (multi-)select option with no color specified.
 - New: Added a button property value.
+- New: Added `to_polars` method to views of databases.
 
 ## Version 0.7.1, 2025-01-05
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 import textwrap
-from collections.abc import Generator, Mapping, Sequence
+from collections.abc import Callable, Generator, Mapping, Sequence
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
@@ -422,3 +422,22 @@ def temp_attr(obj: object, **kwargs: Any) -> Generator[None, None, None]:
     finally:
         for attr, original_value in orig_values.items():
             setattr(obj, attr, original_value)
+
+
+def rec_apply(func: Callable[[Any], Any], obj: Any) -> Any:
+    """
+    Recursively applies a function `func` to all elements in a nested structure.
+
+    - Applies `func` to every non-container element.
+    - Recurses into lists and tuples.
+    - Strings are treated as atomic elements and are **not** considered containers.
+
+    Example:
+        rows = [[1, 2], [3, [4, 5]]]
+        result = recursive_apply(rows, lambda x: x * 2)
+        print(result)  # [[2, 4], [6, [8, 10]]]
+    """
+    if isinstance(obj, list | tuple):
+        return type(obj)(rec_apply(func, item) for item in obj)
+    else:
+        return func(obj)
