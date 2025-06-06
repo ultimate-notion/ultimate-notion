@@ -97,7 +97,7 @@ This often provides additional considerations and avoids unnecessary work.
 
 1. Create a branch to hold your changes:
    ```console
-   git checkout -b my-feature
+   git switch -c my-feature
    ```
    and start making changes. Never work on the main branch!
 
@@ -139,7 +139,7 @@ This often provides additional considerations and avoids unnecessary work.
       git push -u origin my-feature
       ```
 
-2. Go to the web page of your fork and click "Create pull request"
+2. Go to the GitHub page of your fork and click "Create pull request"
    to send your changes for review.
 
    Find more detailed information in [creating a PR]. You might also want to open
