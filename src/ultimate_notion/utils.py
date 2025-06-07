@@ -391,14 +391,14 @@ def del_nested_attr(
         for lvl, attr in enumerate(attrs[:-1]):
             curr_obj = getattr(curr_obj, attr, None)
             if curr_obj is None and not missing_ok:
-                msg = f"{attr} does not exist in {'.'.join(attrs[:lvl - 1]) if lvl > 1 else 'the object'}."
+                msg = f'{attr} does not exist in {".".join(attrs[: lvl - 1]) if lvl > 1 else "the object"}.'
                 raise AttributeError(msg)
 
         last_attr = attrs[-1]
         if hasattr(curr_obj, last_attr):
             delattr(curr_obj, last_attr)
         elif not missing_ok:
-            msg = f"{last_attr} does not exist in {'.'.join(attrs[:-2]) if len(attrs) > 1 else 'the object'}."
+            msg = f'{last_attr} does not exist in {".".join(attrs[:-2]) if len(attrs) > 1 else "the object"}.'
             raise AttributeError(msg)
 
     return obj

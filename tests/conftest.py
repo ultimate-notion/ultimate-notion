@@ -589,7 +589,7 @@ def delete_all_taskslists() -> None:
         msg = (
             "We tampered with the token's expiry date to allow for VCR testing but you seem to try to "
             'connect to the Google API now.\n'
-            f"Delete `{TEST_CFG_FILE.parent / 'token.json'}` and run:\n"
+            f'Delete `{TEST_CFG_FILE.parent / "token.json"}` and run:\n'
             'hatch run vcr-rewrite -k ...\n'
             'to perform the authentication flow before rewriting the VCR cassettes.'
         )

@@ -367,7 +367,7 @@ class View(Sequence[Page]):
         """Select columns for the view"""
         curr_cols = self._columns  # we only consider non-meta columns, e.g. no index, etc.
         if not_included := set(cols) - set(curr_cols):
-            msg = f"Some columns, i.e. {', '.join(not_included)}, are not in view"
+            msg = f'Some columns, i.e. {", ".join(not_included)}, are not in view'
             raise RuntimeError(msg)
 
         view = self.clone()

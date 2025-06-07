@@ -195,10 +195,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         attr_to_name = {prop.attr_name: prop.name for prop in self.schema.get_props()}
         if not set(kwargs).issubset(set(attr_to_name)):
             add_kwargs = set(kwargs) - set(attr_to_name)
-            msg = f"kwargs {', '.join(add_kwargs)} not defined in schema"
+            msg = f'kwargs {", ".join(add_kwargs)} not defined in schema'
             raise SchemaError(msg)
         if ro_props := set(kwargs) & {prop.attr_name for prop in self.schema.get_ro_props()}:
-            msg = f"Read-only properties {', '.join(ro_props)} cannot be set"
+            msg = f'Read-only properties {", ".join(ro_props)} cannot be set'
             raise ReadOnlyPropertyError(msg)
 
         schema_kwargs = {attr_to_name[attr]: value for attr, value in kwargs.items()}

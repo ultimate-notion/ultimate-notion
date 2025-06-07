@@ -1,14 +1,15 @@
 """Provides an object-based Notion API with all endpoints.
 
-This pydantic based API is often referred to as just `api` while the low-level
+This pydantic based API is often referred to as `api` while the low-level
 API of the [Notion Client SDK library](https://github.com/ramnes/notion-sdk-py)
-is just referred to as `raw_api`.
+is referred to as `raw_api`.
 """
 
 from __future__ import annotations
 
 import logging
 from collections.abc import Iterator, Mapping
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias, cast
 from uuid import UUID
 
@@ -61,11 +62,11 @@ class NotionAPI:
         self.comments = CommentsEndpoint(self)
 
 
+@dataclass
 class Endpoint:
     """Baseclass of the Notion API endpoints."""
 
-    def __init__(self, api: NotionAPI):
-        self.api = api
+    api: NotionAPI
 
 
 class BlocksEndpoint(Endpoint):

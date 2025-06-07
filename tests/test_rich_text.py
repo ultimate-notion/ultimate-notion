@@ -74,8 +74,7 @@ def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Sess
     text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com/')
     text += uno.mention(person)
     exp_text = (
-        'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) '
-        '[@Florian Wilhelm]()'
+        'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) [@Florian Wilhelm]()'
     )
     assert text.to_markdown() == exp_text
 
