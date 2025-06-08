@@ -11,7 +11,7 @@ from typing_extensions import Self
 from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject
 from ultimate_notion.comment import Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_repr
-from ultimate_notion.file import Emoji, FileInfo, wrap_icon
+from ultimate_notion.file import CustomEmoji, Emoji, FileInfo, wrap_icon
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
@@ -203,7 +203,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         session.api.pages.update(self.obj_ref, **{title_prop_name: title.obj_ref})
 
     @property
-    def icon(self) -> FileInfo | Emoji | None:
+    def icon(self) -> FileInfo | Emoji | CustomEmoji | None:
         """Icon of the page, i.e. emojis, Notion's icons, or custom images."""
         if (icon := self.obj_ref.icon) is None:
             return None

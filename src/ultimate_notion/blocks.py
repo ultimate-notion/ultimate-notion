@@ -14,7 +14,7 @@ from typing_extensions import Self
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url
 from ultimate_notion.errors import InvalidAPIUsageError
-from ultimate_notion.file import Emoji, FileInfo, wrap_icon
+from ultimate_notion.file import CustomEmoji, Emoji, FileInfo, wrap_icon
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -482,7 +482,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blo
         return Emoji('💡')
 
     @property
-    def icon(self) -> FileInfo | Emoji:
+    def icon(self) -> FileInfo | Emoji | CustomEmoji:
         if (icon := self.obj_ref.value.icon) is None:
             return self.get_default_icon()
         else:
