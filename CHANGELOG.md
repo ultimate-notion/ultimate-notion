@@ -9,6 +9,7 @@
 - Fix: Fix error when setting a (multi-)select option with no color specified.
 - New: Added a button property value.
 - New: Added `to_polars` method to views of databases.
+- New: Add support for custom emoji icons
 
 ## Version 0.7.1, 2025-01-05
 

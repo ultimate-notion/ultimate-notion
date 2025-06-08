@@ -100,7 +100,7 @@ class UnsupportedBlock(Block, type='unsupported'):
 
     class TypeData(GenericObject): ...
 
-    unsupported: TypeData | None = None
+    unsupported: TypeData = TypeData()
 
 
 class TextBlock(Block, ABC):

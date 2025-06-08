@@ -308,6 +308,17 @@ class EmojiObject(TypedObject, type='emoji'):
         return EmojiObject.model_construct(emoji=emoji)
 
 
+class CustomEmojiObject(TypedObject, type='custom_emoji'):
+    """A Notion custom emoji object."""
+
+    class TypeData(GenericObject):
+        id: UUID
+        name: str
+        url: str
+
+    custom_emoji: TypeData
+
+
 class Annotations(GenericObject):
     """Style information for RichTextObject's."""
 
