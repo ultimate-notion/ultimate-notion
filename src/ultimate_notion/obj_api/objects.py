@@ -297,28 +297,6 @@ class UnknownUser(User, type='unknown'):
     unknown: TypeData = TypeData()
 
 
-class EmojiObject(TypedObject, type='emoji'):
-    """A Notion emoji object."""
-
-    emoji: str
-
-    @classmethod
-    def build(cls, emoji: str) -> EmojiObject:
-        """Compose an EmojiObject from the given emoji string."""
-        return EmojiObject.model_construct(emoji=emoji)
-
-
-class CustomEmojiObject(TypedObject, type='custom_emoji'):
-    """A Notion custom emoji object."""
-
-    class TypeData(GenericObject):
-        id: UUID
-        name: str
-        url: str
-
-    custom_emoji: TypeData
-
-
 class Annotations(GenericObject):
     """Style information for RichTextObject's."""
 
@@ -498,6 +476,41 @@ class MentionTemplateUser(MentionTemplateData, type='template_mention_user'):
     """Nested user template data for `Mention` properties."""
 
     template_mention_user: str
+
+
+class EmojiObject(TypedObject, type='emoji'):
+    """A Notion emoji object.
+
+    Within text an emoji is represented as unicode string.
+    """
+
+    emoji: str
+
+    @classmethod
+    def build(cls, emoji: str) -> EmojiObject:
+        """Compose an EmojiObject from the given emoji string."""
+        return EmojiObject.model_construct(emoji=emoji)
+
+
+class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
+    """A Notion custom emoji object.
+
+    Within text a custom emoji is represented as a mention.
+    """
+
+    class TypeData(GenericObject):
+        id: UUID
+        name: str
+        url: str
+
+    custom_emoji: TypeData
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        style = deepcopy(style)
+        # note that `href` is always `None` for custom emoji mentions
+        return MentionObject.model_construct(
+            plain_text=f':{self.custom_emoji.name}:', href=None, annotations=style, mention=self
+        )
 
 
 class FileObject(TypedObject, polymorphic_base=True):

@@ -8,10 +8,11 @@ from typing import TYPE_CHECKING, Any, TypeGuard
 from emoji import is_emoji
 from typing_extensions import Self
 
-from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject
+from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject, wrap_icon
 from ultimate_notion.comment import Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_repr
-from ultimate_notion.file import CustomEmoji, Emoji, FileInfo, wrap_icon
+from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
@@ -211,9 +212,9 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: FileInfo | Emoji | str | None):
+    def icon(self, icon: FileInfo | Emoji | CustomEmoji | str | None):
         """Set the icon of this page."""
-        if isinstance(icon, str) and not isinstance(icon, Emoji):
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
             icon = Emoji(icon) if is_emoji(icon) else FileInfo(url=icon, name=None)
         icon_obj = None if icon is None else icon.obj_ref
         session = get_active_session()

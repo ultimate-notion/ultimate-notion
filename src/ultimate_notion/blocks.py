@@ -13,8 +13,9 @@ from typing_extensions import Self
 
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url
+from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import InvalidAPIUsageError
-from ultimate_notion.file import CustomEmoji, Emoji, FileInfo, wrap_icon
+from ultimate_notion.file import FileInfo
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -28,6 +29,20 @@ if TYPE_CHECKING:
 
 
 DO = TypeVar('DO', bound=obj_blocks.DataObject)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject) -> FileInfo | CustomEmoji | Emoji:
+    """Wrap the icon object into the corresponding class."""
+    match icon_obj:
+        case objs.ExternalFile():
+            return FileInfo.wrap_obj_ref(icon_obj)
+        case objs.EmojiObject():
+            return Emoji.wrap_obj_ref(icon_obj)
+        case objs.CustomEmojiObject():
+            return CustomEmoji.wrap_obj_ref(icon_obj)
+        case _:
+            msg = f'unknown icon object of {type(icon_obj)}'
+            raise RuntimeError(msg)
 
 
 class DataObject(NotionEntity[DO], wraps=obj_blocks.DataObject):
@@ -470,7 +485,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blo
         text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
-        icon: FileInfo | Emoji | None = None,
+        icon: FileInfo | Emoji | CustomEmoji | None = None,
     ) -> None:
         super().__init__(text, color=color)
         if icon is not None:
@@ -489,7 +504,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blo
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: FileInfo | Emoji | None) -> None:
+    def icon(self, icon: FileInfo | Emoji | CustomEmoji | None) -> None:
         if icon is None:
             icon = self.get_default_icon()
         self.obj_ref.value.icon = icon.obj_ref
@@ -499,6 +514,8 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blo
         match self.icon:
             case Emoji():
                 return f'{self.icon} {self.rich_text.to_markdown()}\n'
+            case CustomEmoji():
+                return f':{self.icon.name}: {self.rich_text.to_markdown()}\n'
             case FileInfo():
                 return f'![icon]({self.icon.url}) {self.rich_text.to_markdown()}\n'
             case _:

@@ -62,6 +62,7 @@ TASK_DB = 'Task DB'
 UNFURL_TEST_PAGE = 'Embed/Inline & Unfurl'
 COMMENT_PAGE = 'Comments'
 ALL_BLOCKS_PAGE = 'All Blocks Page Test'
+CUSTOM_EMOJI_PAGE = 'Custom Emoji Page'
 
 # Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
 TEST_CFG_FILE = get_cfg_file()
@@ -399,6 +400,12 @@ def all_blocks_page(notion_cached: Session) -> Page:
     return notion_cached.search_page(ALL_BLOCKS_PAGE).item()
 
 
+@vcr_fixture(scope='module')
+def custom_emoji_page(notion_cached: Session) -> Page:
+    """Return a page with a custom emoji."""
+    return notion_cached.search_page(CUSTOM_EMOJI_PAGE).item()
+
+
 @pytest.fixture(scope='module')
 def static_pages(  # noqa: PLR0917
     root_page: Page,
@@ -409,9 +416,20 @@ def static_pages(  # noqa: PLR0917
     unfurl_page: Page,
     comment_page: Page,
     all_blocks_page: Page,
+    custom_emoji_page: Page,
 ) -> set[Page]:
     """Return all static pages for the unit tests."""
-    return {intro_page, root_page, md_text_page, md_page, md_subpage, unfurl_page, comment_page, all_blocks_page}
+    return {
+        intro_page,
+        root_page,
+        md_text_page,
+        md_page,
+        md_subpage,
+        unfurl_page,
+        comment_page,
+        all_blocks_page,
+        custom_emoji_page,
+    }
 
 
 @vcr_fixture(scope='module')

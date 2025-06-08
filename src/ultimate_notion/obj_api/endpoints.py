@@ -19,6 +19,7 @@ from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
     Comment,
+    CustomEmojiObject,
     DatabaseRef,
     EmojiObject,
     FileObject,
@@ -401,7 +402,7 @@ class PagesEndpoint(Endpoint):
         page: Page,
         *,
         cover: FileObject | T_UNSET | None = UNSET,
-        icon: FileObject | EmojiObject | T_UNSET | None = UNSET,
+        icon: FileObject | EmojiObject | CustomEmojiObject | T_UNSET | None = UNSET,
         in_trash: bool | T_UNSET = UNSET,
     ) -> Page:
         """Set specific page attributes (such as cover, icon, etc.) on the server.
