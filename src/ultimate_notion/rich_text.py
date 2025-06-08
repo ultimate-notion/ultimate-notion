@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 import pendulum as pnd
 
 from ultimate_notion.core import Wrapper
+from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.markdown import render_md, rich_texts_to_markdown
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
@@ -98,7 +99,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
     def __init__(
         self,
-        target: User | Page | Database | dt.datetime | dt.date | pnd.Interval,
+        target: User | Page | Database | CustomEmoji | dt.datetime | dt.date | pnd.Interval,
         *,
         bold: bool = False,
         italic: bool = False,
@@ -122,7 +123,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
 
 def mention(
-    target: User | Page | Database | dt.datetime | dt.date | pnd.Interval,
+    target: User | Page | Database | CustomEmoji | dt.datetime | dt.date | pnd.Interval,
     *,
     bold: bool = False,
     italic: bool = False,
@@ -258,11 +259,14 @@ class Text(str):
         return hash(str(self))
 
     def __add__(self, other: str) -> Text:
-        if isinstance(other, str):
-            return Text.wrap_obj_ref([*self.obj_ref, *Text(other).obj_ref])
-        else:
-            msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
-            raise RuntimeError(msg)
+        match other:
+            case CustomEmoji():  # got to wrap CusomEmoji in a Mention
+                return Text.wrap_obj_ref([*self.obj_ref, *mention(other).obj_ref])
+            case str():
+                return Text.wrap_obj_ref([*self.obj_ref, *Text(other).obj_ref])
+            case _:
+                msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
+                raise RuntimeError(msg)
 
 
 def text(

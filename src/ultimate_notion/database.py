@@ -7,12 +7,12 @@ from typing import cast
 from pydantic import ValidationError
 from typing_extensions import Self
 
-from ultimate_notion.blocks import ChildrenMixin, DataObject
+from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import get_active_session, get_repr
+from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
-from ultimate_notion.file import Emoji, FileInfo
+from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
-from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case, snake_case
@@ -78,18 +78,12 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session.api.databases.update(self.obj_ref, description=text.obj_ref)
 
     @property
-    def icon(self) -> FileInfo | Emoji | None:
+    def icon(self) -> FileInfo | Emoji | CustomEmoji | None:
         """Return the icon of this database as file or emoji."""
-        match self.obj_ref.icon:
-            case objs.FileObject() as icon:
-                return FileInfo.wrap_obj_ref(icon)
-            case objs.EmojiObject() as icon:
-                return Emoji.wrap_obj_ref(icon)
-            case None:
-                return None
-            case _:
-                msg = f'Unknown icon object of {type(self.obj_ref.icon)}'
-                raise RuntimeError(msg)
+        if (icon := self.obj_ref.icon) is None:
+            return None
+        else:
+            return wrap_icon(icon)
 
     @property
     def cover(self) -> FileInfo | None:

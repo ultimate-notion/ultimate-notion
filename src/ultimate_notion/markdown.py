@@ -138,6 +138,8 @@ def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
                 match text.type:
                     case 'user' | 'date':
                         md_rich_texts[idx] = f'[{obj_ref.plain_text}]()'  # @ is already included
+                    case 'custom_emoji':
+                        md_rich_texts[idx] = f'{obj_ref.plain_text}'  # parentheses are already included
                     case _:
                         md_rich_texts[idx] = f'↗[{obj_ref.plain_text}]({obj_ref.href})'
 

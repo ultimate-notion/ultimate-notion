@@ -9,6 +9,7 @@ import pytest
 import ultimate_notion as uno
 from tests.conftest import assert_eventually
 from ultimate_notion.blocks import Block
+from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 
 
@@ -364,3 +365,32 @@ def test_option_page_props(notion: uno.Session, root_page: uno.Page) -> None:
     assert page2.props.multi_status == [ms_options['Option 2']]  # type: ignore[attr-defined]
     page2.props.multi_status = ['Option 1', 'Option 2']  # type: ignore[attr-defined]
     assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]  # type: ignore[attr-defined]
+
+
+@pytest.mark.vcr()
+def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoji_page: uno.Page) -> None:
+    """Test custom emoji on a page."""
+    assert isinstance(custom_emoji_page.icon, CustomEmoji)
+    assert custom_emoji_page.icon.name == 'ultimate-notion'
+    assert str(custom_emoji_page.icon) == ':ultimate-notion:'
+
+    exp_md = dedent(
+        """
+        # Custom Emoji Page
+
+        This page has a custom emoji :ultimate-notion: compared to 🚀.
+        """
+    ).strip()
+
+    assert custom_emoji_page.to_markdown() == exp_md
+
+    page = notion.create_page(
+        parent=root_page,
+        title='Page with Custom Emoji Icon',
+    )
+    page.icon = custom_emoji_page.icon
+    assert isinstance(page.icon, CustomEmoji)
+
+    text = 'This page has a user-added custom emoji icon '
+    page.append(uno.Paragraph(uno.text(text) + custom_emoji_page.icon))
+    assert page.children[0].to_markdown() == text + f'{custom_emoji_page.icon}'

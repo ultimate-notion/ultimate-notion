@@ -16,6 +16,7 @@ from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     Annotations,
     BlockRef,
+    CustomEmojiObject,
     EmojiObject,
     FileObject,
     MentionDatabase,
@@ -47,7 +48,7 @@ class Database(DataObject, MentionMixin, object='database'):
     title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     url: str = None  # type: ignore
     public_url: str | None = None
-    icon: SerializeAsAny[FileObject] | EmojiObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyType] = None  # type: ignore
     description: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
@@ -62,7 +63,7 @@ class Page(DataObject, MentionMixin, object='page'):
 
     url: str = None  # type: ignore
     public_url: str | None = None
-    icon: SerializeAsAny[FileObject] | EmojiObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyValue] = None  # type: ignore
 
@@ -173,7 +174,7 @@ class Callout(TextBlock, type='callout'):
     class TypeData(GenericObject):
         rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
         children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        icon: SerializeAsAny[FileObject] | EmojiObject = None  # type: ignore
+        icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject = None  # type: ignore
         color: Color | BGColor = BGColor.GRAY
 
     callout: TypeData = TypeData()

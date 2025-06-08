@@ -10,7 +10,6 @@ from emoji import demojize, emojize, is_emoji
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.errors import InvalidAPIUsageError
-from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import objects as objs
 
 TO = TypeVar('TO', bound=objs.TypedObject)
@@ -95,17 +94,3 @@ class CustomEmoji(EmojiBase[objs.CustomEmojiObject], wraps=objs.CustomEmojiObjec
 
     def __str__(self) -> str:
         return f':{self.name}:'
-
-
-def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject) -> FileInfo | CustomEmoji | Emoji:
-    """Wrap the icon object into the corresponding class."""
-    match icon_obj:
-        case objs.ExternalFile():
-            return FileInfo.wrap_obj_ref(icon_obj)
-        case objs.EmojiObject():
-            return Emoji.wrap_obj_ref(icon_obj)
-        case objs.CustomEmojiObject():
-            return CustomEmoji.wrap_obj_ref(icon_obj)
-        case _:
-            msg = f'unknown icon object of {type(icon_obj)}'
-            raise RuntimeError(msg)

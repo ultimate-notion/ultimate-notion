@@ -50,7 +50,8 @@ from ultimate_notion.blocks import (
 )
 from ultimate_notion.core import get_active_session
 from ultimate_notion.database import Database
-from ultimate_notion.file import Emoji, FileInfo
+from ultimate_notion.emoji import Emoji
+from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, VState
 from ultimate_notion.option import Option, OptionNS
 from ultimate_notion.page import Page
