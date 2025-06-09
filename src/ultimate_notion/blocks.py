@@ -912,9 +912,13 @@ class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
             mds.append(block.to_markdown())
         return '\n'.join(mds)
 
+    def width_ratio(self) -> float | None:
+        """Return the width ratio of this column."""
+        return self.obj_ref.column.width_ratio
+
 
 class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.ColumnList):
-    """Columns block."""
+    """Columns block holding multiple `Column` blocks."""
 
     def __init__(self, n_columns: int):
         """Create a new `Columns` block with the given number of columns."""
