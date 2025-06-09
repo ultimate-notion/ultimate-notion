@@ -289,7 +289,7 @@ dependencies = [
     "mktestdocs>=0.2.3",
     "packaging",
     "matplotlib",
-    "vcrpy~=5.1", # < 6.0.0 to avoid breaking changes with RuntimeError: asyncio.run() cannot be called from a running event loop
+    "vcrpy~=7.0",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
@@ -389,7 +389,7 @@ dependencies = [
     "pytest-dotenv",
     "pytest-sugar",
     "pytest-recording>=0.13.1",
-    "vcrpy~=5.1", # < 6.0.0 to avoid breaking changes with RuntimeError: asyncio.run() cannot be called from a running event loop
+    "vcrpy~=7.0",
     ]
 [tool.hatch.envs.prod.scripts]
 test = "pytest tests/test_latest_release.py --disable-recording --check-latest-release {args}"
