@@ -341,6 +341,7 @@ class Column(Block, type='column'):
         # note that children will not be populated when getting this block
         # https://developers.notion.com/changelog/column-list-and-column-support
         children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+        width_ratio: float | None = None
 
     column: TypeData = TypeData()
 
