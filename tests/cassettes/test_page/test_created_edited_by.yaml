@@ -21,14 +21,19 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/users/me
   response:
-    content: '{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
-      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true},"workspace_name":"GitHub
-      Unittests"},"request_id":"658258f0-dbbf-47cd-b6ae-6df2e328720d"}'
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA1yQzW6DQAyEX6XyGZOwPyHwAsmlx57R7mKabYClrLf5E+9eJaqUqBfrk2dkeeYG
+        wX6RY6ghRZohA99CDRulqazaFiUpiWrdElatLlBWUpeucEqUHWQwmoGghp3nQ7JvH6NnpsgRMjA/
+        hs3cpLmHGg7MU6xXqygxRTxRZBS5Gcw1jOYUcxeG1ZRs710+BvZhxMiGvXsIVamlLo3DspQWlXMW
+        K91pJGmE2TjqNkW32nneJ4vvZj5iIdbTGac+xXwaPyEDvkz3J21gyB6zvkE4jTTf4U88hfkYJ+MI
+        sheueU60vGyaZ+D9v8BPT+8Hz/F+fDDnpvM9NWnqg2mb6K/U+LGxF6YItRZKbLfrZclgpu9EkZtH
+        +VpWYis2EoW2DlUhLVplLa5bVei2FFtZdbD8AgAA//8DAJZowVy6AQAA
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 8fd41e944cee35f4-FRA
+      - 94d30b028ac2e7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -58,13 +63,14 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 658258f0-dbbf-47cd-b6ae-6df2e328720d
+      - 53928263-25bc-413b-b4bb-0d415d72839f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 - request:
     body: ''
     headers:
@@ -87,15 +93,23 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/users?page_size=100
   response:
-    content: '{"object":"list","results":[{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322","name":"Florian
-      Wilhelm","avatar_url":"https://lh3.googleusercontent.com/a-/AAuE7mBBGq22qnRbLoOSo5zScC4miXci-xi4vELc30G9Aw=s100","type":"person","person":{"email":"florian.wilhelm@gmail.com"}},{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
-      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true},"workspace_name":"GitHub
-      Unittests"}}],"next_cursor":null,"has_more":false,"type":"user","user":{},"request_id":"e8e8846b-5cc6-4205-a68b-6bec99a1e24c"}'
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwAAAP//dJJRa9swFIX/SrnPVmJLsh0LBktHlz50DFbKBmMYWb5OtMqSa0lN2uD/
+        Ppx2Sxn0RbrcKzjn07lHcM1vVAEEGO0DJDCijyZ4ED+P51n0OEICugUBTZaqpmg7klHsCOctI6uV
+        bAnN06xYdUXBKIUErOwRBHw2btTSXnzXZoemhwTkowxyrONoQMAuhMGL5dLs2GLr3NbgLKWcDWjD
+        Qrl+KclyvY5XZX95uXmg9MF+a27c11uXP9+qT7zXP5QmB80fr24USzfVev/BZ2kKCYSnYTYw4Oid
+        heRvIY6AvdSzePfibbF/8fZxO/dnUZim5B36gudYVm1LGHJGeNoiqdo8I6xieakyxWnZnek3Ouxi
+        c3FndQjog38P3zMSPdmjD4QuZC+fnZV7f+IfYmO0WlgXtLPEBxm0Og2qMmd5KRUpS9YQrlRDqrzL
+        CTJJZaGwK7JuudHhOjbkixzvSUbT4UAGE/1isNvzDzVuzn0+xRHc3uI4F6/DvRvv/SAVQvKmFmGM
+        OL3p1Gfg6/+Az2+M7vW8WUfo5aHutME6DsbJtvb6GWtt6+YpoAeRU05Xq3Sapl8JWDyEWsXRuxGE
+        jcYksJO+7t2IIDppPP4jeQ3qdInjNC/zQ0Qf6lN0leIpk11HJEVFeFdkROaKEsqpRNVyltICpj8A
+        AAD//wMAGEvWXRIDAAA=
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 8fd41e9908e935f4-FRA
+      - 94d30b041e20e7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -125,11 +139,12 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e8e8846b-5cc6-4205-a68b-6bec99a1e24c
+      - 9c403aff-a2ec-4f61-a5c2-242aecd43026
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 version: 1

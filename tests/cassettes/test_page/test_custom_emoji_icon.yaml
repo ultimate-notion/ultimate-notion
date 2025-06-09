@@ -21,16 +21,25 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/blocks/20c974f3-b388-808b-99a9-cfd22f106a8e/children?page_size=100
   response:
-    content: "{\"object\":\"list\",\"results\":[{\"object\":\"block\",\"id\":\"20c974f3-b388-8041-97e4-e839a68aad8f\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"20c974f3-b388-808b-99a9-cfd22f106a8e\"},\"created_time\":\"2025-06-08T16:02:00.000Z\",\"last_edited_time\":\"2025-06-08T19:16:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"b10cb6df-12ef-44d3-88ad-250168f66322\"},\"has_children\":false,\"archived\":false,\"in_trash\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
-      page has a custom emoji \",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      page has a custom emoji \",\"href\":null},{\"type\":\"mention\",\"mention\":{\"type\":\"custom_emoji\",\"custom_emoji\":{\"id\":\"20c974f3-b388-8063-b812-007aeaf0578a\",\"name\":\"ultimate-notion\",\"url\":\"https://s3-us-west-2.amazonaws.com/public.notion-static.com/021a290b-d194-4457-ab01-01f9b2bf803f/favicon.svg\"}},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\":ultimate-notion:\",\"href\":null},{\"type\":\"text\",\"text\":{\"content\":\"
-      compared to \U0001F680.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"
-      compared to \U0001F680.\",\"href\":null}],\"color\":\"default\"}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"block\",\"block\":{},\"request_id\":\"3b94fe80-f0ae-4665-9024-4a3a7da45cb5\"}"
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA81US27bMBC9ijBr0aZoWZZ4jqxaFMbwZzGhSJekkrSGgZ6jm16xRygkJ4qRJuim
+        i6w4Pz6++XBOEMStlhk4OJsylBB1Gl1OwD+fXnzCBXkHJVgFHBiV3a42GyI2bUtaWlek2+ma6HbT
+        YdMiqtZACUeM2mfgJ8jfjho4HPGg91bNrov0N1YrSNdhR6RRjJmKNthqOJcgo8as1T7bQc/X2JbQ
+        htD2pmo4ZZzSFaX0E5TgMOW9Vvad6I5PF5boZ1zxbSK65DsmHZ/TFRWVolGGVEwbUtdqQ9oWFWFb
+        WjWtaZoNYxPF64f/A1yPaS9761TUHrhBl3QJGGVv77VaDNbvc8TUL4al1hEPEY/9pRFPMj9BtLLf
+        Z/2Y5wY/Rc96eTn4CWTweW4d3PQ2FVO3ih5TgYUcUw5DoYdwa4up2NbfAfejc+cS0PuQMdvg04Qi
+        grvimdFZuagpR3uncx/DeHjhPnqlo7NeLxYZ1LXiQgQOShscXZ6KdHQ4VWDm/U+yfdTmmeyS+qD9
+        xBjKRXoZ2AvAfgaYZuVa5ae3P0OzIaKtGKF0hxoN3e5ahBI8zpM4umwHzJr48PTqGB1w6HM+Jr5e
+        pw0ZE3nQKRO2wgG/B48PaSXDsD6Owlm5ulwkaSq0nB2UVcg6KoiquprU9XZHUNCK0Mp0ggnT0o1Z
+        G7y3MvhVuj/A+QP0ir+qBH+vP++OZiHDMK0YVeRQ/P7188fqo83jmwyvkvzyBsRk9Pox7+UY0+Sa
+        Ii/LYAhRv/7mz3v5cvLTedrfX0ed8mW9mm3FWEV3pGupIHUnGoKm3hFV71gjqBQKDZz/ALJOxd0F
+        BgAA
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94cb6c32cf1a65d0-FRA
+      - 94d30c9acfa1e7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -60,13 +69,14 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 3b94fe80-f0ae-4665-9024-4a3a7da45cb5
+      - f5122107-980b-49b6-af47-d4726b0cbdaf
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 - request:
     body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
       "properties": {"title": {"type": "title", "title": [{"type": "text", "plain_text":
@@ -97,14 +107,22 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"20c974f3-b388-81d0-b2fd-fb8148530643","created_time":"2025-06-08T21:18:00.000Z","last_edited_time":"2025-06-08T21:18:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
-      with Custom Emoji Icon","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
-      with Custom Emoji Icon","href":null}]}},"url":"https://www.notion.so/Page-with-Custom-Emoji-Icon-20c974f3b38881d0b2fdfb8148530643","public_url":null,"request_id":"052acf2e-c406-4642-8ff5-f5004512d730"}'
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6yTsZLbIBCGX8WztfCBkCxBm0mRLkWqZDIeBCuLOwwKQufcePzuGaSz7pImKVJp
+        dwf9/7cLe4XQPaJOIGFUJ4QCrAEJJTWiqXpOOt62pGWqI23bMIKV1uZQt43RJRSgI6qE5pjsGZe/
+        yprQA6HiCxOSM0npnlL6FQpwakpHNPbfTt91uxeQ1zfCecJ4JzxUNTbCGMKx4qSiBokwNSNc8LrR
+        TFdl08Ptd+P/IKfDM0aQfnauAKuDv8ejiuhT1k8vI76O82gNFFskoe5rWjMhSFeKklQN40SUtCMH
+        ZlrGu74pFc8uKurBPqMB2Ss3YQHWH1NU07AVxhhGjMnitFja5DAHi8uaFXeQLV0PfdsIE/5MuZ4/
+        8go6+LS0AJ/VCXcXm4bdh3lK4bz7eA6Pdvcpt1uAs/5p7TqTeh+SSjb4BaQL7h10Us7qLZ1StE+Y
+        hhjm01sjszcYnfW4VXQw7xMXIkgw2KvZpTyc0ak8joX6L6hDxP4V9fvtVsAcHUgYUhon+fBwuVz2
+        PmT2/RQeshLJSmRVIosSyUrkvg55G/Iy5F34YxXGuXNWHxeH9UVE/DHjlNabp8Zw7NuGsLLsSdUJ
+        Trpe9IQzFIprXvFDC7dfAAAA//8DAFoR2ZmOAwAA
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94cb6c378c4f65d0-FRA
+      - 94d30c9ffb5be7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -134,13 +152,14 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 052acf2e-c406-4642-8ff5-f5004512d730
+      - 0dd3ef87-122f-4b93-bf9f-31e9a3c34368
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 - request:
     body: ''
     headers:
@@ -163,12 +182,22 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/pages/5f505199-b292-4713-920b-61d813bf72a3
   response:
-    content: '{"object":"page","id":"5f505199-b292-4713-920b-61d813bf72a3","created_time":"2022-08-22T15:47:00.000Z","last_edited_time":"2025-06-08T21:18:00.000Z","created_by":{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-5f505199b2924713920b61d813bf72a3","public_url":null,"request_id":"b4582046-2a5c-4722-a3f0-8f7abfe8eda4"}'
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3yS3ZLbIAyF30XXJgFs7MBz5KqdTgaDvKFhwQW86U4m797BaX62F72ypJGPPolz
+        gTj+RFNAwazfEBpwFhSISVDBpCQjl5x0A2uJ5HQkPbM71o7TwHULDZiEuqA9FPeOoIBTzgndEc73
+        TKhuUJRuKKXfoAGvczmgdV+7BaE9oXLPpGrZS/ddd/wEdXkSLhnTnXBk1Iy9nQjjOJGusy3Z7bQl
+        XFDW76a+bzmH69fB/5HrO4GDtJa02LWkoxaJtIKRVrZiMMx0fJiqnIkfmECFxfsGnInhHs86YShV
+        v3zOdb1zTKc8a1Nv+oxVSQteG9DJHN0HWlCT9hkbcOFQks7HR2FOccZUHOZV1BWPNVhpb1lzH/VI
+        b03fHwwFf5darx91ARNDWSFhj7nk+iwunG4bVKYQYtHFxbCOHKN/wSvaO/NIc0nuhOWY4vL2RF6C
+        xeRdwEfFRPua+JhAgcVJL77Uc85e18VXvgfUMeH0F+rH9drAkjwoOJYyZ7Xdns/nTYiVcpPjdv2H
+        3O1a3VrNWr36j1XnZfTOHFat24sl/LVgLof1opPtpBiYIBKZJt2oJZFsbImkhjM5iB67Ea5/AAAA
+        //8DAJKaiwMuAwAA
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94cb6c3a6e6f65d0-FRA
+      - 94d30cb17a15e7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -198,13 +227,14 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b4582046-2a5c-4722-a3f0-8f7abfe8eda4
+      - fd495715-9e1a-4ba9-91b3-90c219756e4b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 - request:
     body: '{"icon": {"type": "custom_emoji", "custom_emoji": {"id": "20c974f3-b388-8063-b812-007aeaf0578a",
       "name": "ultimate-notion", "url": "https://s3-us-west-2.amazonaws.com/public.notion-static.com/021a290b-d194-4457-ab01-01f9b2bf803f/favicon.svg"}}}'
@@ -230,16 +260,26 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/pages/20c974f3b38881d0b2fdfb8148530643
+    uri: https://api.notion.com/v1/pages/20d974f3b38881ab8871e4ccd6587dc2
   response:
-    content: '{"object":"page","id":"20c974f3-b388-81d0-b2fd-fb8148530643","created_time":"2025-06-08T21:18:00.000Z","last_edited_time":"2025-06-08T21:18:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"cover":null,"icon":{"type":"custom_emoji","custom_emoji":{"id":"20c974f3-b388-8063-b812-007aeaf0578a","name":"ultimate-notion","url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/021a290b-d194-4457-ab01-01f9b2bf803f/favicon.svg"}},"parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"archived":false,"in_trash":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
-      with Custom Emoji Icon","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
-      with Custom Emoji Icon","href":null}]}},"url":"https://www.notion.so/Page-with-Custom-Emoji-Icon-20c974f3b38881d0b2fdfb8148530643","public_url":null,"request_id":"05c47e7e-3fc6-476d-a9c0-bf86680d1758"}'
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA61Tu5LbMAz8FQ9qwSZFyXq0mRTpUqRKJuPhA7J5R4uKSNm5ePzvGUpnny9NUqSS
+        AJKLxS5wAa+eSEdoYZB7ggysgRZyZpqq6AQqUddYc6mwriuOVGhttmVdGZ1DBnokGcnsoj3S/Cov
+        kW2RNV940wreMrZmjH2FDJwMcUfG/tvtG656gfbyxnAKNN4YbouSqsYYFFQILJghbEzJUTSirDTX
+        RV51cH1f+D/AaX+iEdp+ci4Dq32fEOPLkBrSU4j+uKOjf7KpicewvdyE1Y/Csq1AVfMcGaskyY6V
+        VS0hg17OEk0u2qOMhL2P1veQwTQ6aOEQ4xDazSYInAKeKUTM1/Iof/lensNa++NmmJSzer08xBBl
+        tHo+YDmXecMUGt4UWBRlhVIxjox3jcpVVzPRbTp5Ss2tw2kP12sGgxypjw+9pmHZWQPZ/a+FsitZ
+        yZsGVd7kWFRcYJMzhVtuai5UV+VSJA3lqA/2RAbaTrpAGdh+F0cZDvfEMPqBxmgpzCVtdHRXcImy
+        G5F7uFz6dmcY6WdM+fRpL6B9H+cW4LPc0+ps42H1YXZo9TE5tPqkZ4Gd7Z8XfxPTvvdJOd/PRJR3
+        D6SjdFbfwxBH+0zxMPpp/9bI1Bsane3pntHePAbOj9CCoU5OLiZxBieTHDPrv1A9jNS9Uv2eTHo/
+        G+fz+dX9dfCbhIQJCRcknJEwIeFt2dNIplVPm/7Hoi/TtJsrLLM/0o+JQlycrysq66JT2JSswkJs
+        BTZFUSJXwjBGUtak4fobroka72wEAAA=
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94cb6c3dc8ab65d0-FRA
+      - 94d30cb63cace7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -269,13 +309,14 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 05c47e7e-3fc6-476d-a9c0-bf86680d1758
+      - 87e584fb-9507-4363-9445-1b3d00eaa8ec
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 - request:
     body: ''
     headers:
@@ -296,14 +337,18 @@ interactions:
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/blocks/20c974f3-b388-81d0-b2fd-fb8148530643/children?page_size=100
+    uri: https://api.notion.com/v1/blocks/20d974f3-b388-81ab-8871-e4ccd6587dc2/children?page_size=100
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"91c46838-db06-4c9b-befc-00a184bcdcec"}'
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwAAAP//LMxNCsIwEAbQu3zrBNT+JJ2riJQ0mWI1NppJQCm9uwiu3u5tSNONfQEh
+        LlKgkFlqLAI6XxRWfpfR1ywpg9Yao8LVyfhImUGzi8IK5fNkEKaY/B3qL237r3pVljIuAYTehsaF
+        xmkTmqNuu37QQ+tO+uCM7Y2dJ9922L8AAAD//wMACfBbm5AAAAA=
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94cb6c48f86565d0-FRA
+      - 94d30cd36ec3e7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -333,13 +378,14 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 91c46838-db06-4c9b-befc-00a184bcdcec
+      - 68d3ad3a-7d31-4569-94a2-0a78678fbc45
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 - request:
     body: '{"children": [{"type": "paragraph", "object": "block", "has_children":
       false, "in_trash": false, "archived": false, "paragraph": {"rich_text": [{"type":
@@ -374,16 +420,26 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/blocks/20c974f3-b388-81d0-b2fd-fb8148530643/children
+    uri: https://api.notion.com/v1/blocks/20d974f3-b388-81ab-8871-e4ccd6587dc2/children
   response:
-    content: '{"object":"list","results":[{"object":"block","id":"20c974f3-b388-81a0-9ae3-dc5230e6d6c0","parent":{"type":"page_id","page_id":"20c974f3-b388-81d0-b2fd-fb8148530643"},"created_time":"2025-06-08T21:18:00.000Z","last_edited_time":"2025-06-08T21:18:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
-      page has a user-added custom emoji icon ","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"This
-      page has a user-added custom emoji icon ","href":null},{"type":"mention","mention":{"type":"custom_emoji","custom_emoji":{"id":"20c974f3-b388-8063-b812-007aeaf0578a","name":"ultimate-notion","url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/021a290b-d194-4457-ab01-01f9b2bf803f/favicon.svg"}},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":":ultimate-notion:","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"30f868bd-39a1-4f27-836a-e9367999019f"}'
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA81UyY7bMAz9FYNnK5G32NZ3zKlFYdASHWtGllJJnqVB/r2wM/Gky6EFeuhJ3PRE
+        PlI8g+sfSUYQYHSIkIKnMJsYQHw+f/h64+QTpKAVCMi5autyKFhfNA1rMnlg/aFtmcRMZdUh75uy
+        gRRO6MlGEGeIbycCASc8UqfV6rpKv2Jhz5qmzhiVUqpD1dRK5nBJQXrCSKqLeqL1Wl4xfmC8fcha
+        UWSC8x3n/BOkYDDEjpT+s+gbbv+2JLrVOwfyt3IPZUV1qxQrqCxYyRWxVlUZK9qiqmUmy7welhTv
+        H/4HcCOGTo7aKE8WxIAmUAro5aifSW0GbbvoMYybYePa49Hjabw24l0WZ/Bajl2k17g2+D161dPr
+        Ic4gnY1r6+Bh1CFZupWMGBJMlkIYKkUqkXOIbkpoco860dLZZCFf2ycQdjbmkgJa6yJG7WxYUHtn
+        7vKOaLTc1BC9fqI4ejcfP2qZrSJvtKXNIp26V4zzIEDRgLOJC2kngwsjax1/nfzoabglv1EzkV0q
+        gHSTPgb6itKtKMss3avifPss8n7A+aFgfZPljPMaCQde1Q1CChbXSZ1N1BNGYta9vzp7AwLGGE9B
+        7PehYHNgLxQiy3c44Tdn8SXspJv2p7k3Wu6uF1lYiJerg+cZ5i3vmcrakpVlVTPsecZ4NrR93g8N
+        L4b9gM8LDbvwfITLf9A78RMT4sf+fPkNwmK09Bo7OfuwuJbI6z+anKeff8htpV1Pcb4sq+/rTCHe
+        NlPdFLmqmOqxYmUtM9YoqllZUp/JrEHMG7h8B8uu7UxABQAA
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94cb6c4d2b6965d0-FRA
+      - 94d30cd55b7ee7b6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -413,11 +469,12 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 30f868bd-39a1-4f27-836a-e9367999019f
+      - 207832d5-dba5-47c1-8de7-44eb1c18aa28
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    http_version: HTTP/1.1
-    status_code: 200
+    status:
+      code: 200
+      message: OK
 version: 1
