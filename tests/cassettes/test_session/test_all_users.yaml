@@ -21,23 +21,15 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/users?page_size=100
   response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAAwAAAP//dJJfa9swFMW/SrnPVmJbsh0LBktHlz50DFbKBmMYWb5OtMqSqz9N2uDv
-        Ppx2Sxn0RbrcKzjnp3OPYNvfKANw0MoHSMChjzp44D+P51n06CAB1QGHNktlW3Y9yXLsCWMdJauV
-        6EhepFm56suS5jkkYMSAwOGztk4Jc/Fd6R3qARIQjyII10SngcMuhNHz5VLv6GJr7VbjLCWtCWjC
-        QtphKchyvY5X1XB5uXnI8wfzrb2xX29t8XwrP7FB/ZCKHBR7vLqRNN3U6/0Hn6UpJBCextnAiM5b
-        A8nfgh8BB6Fm8f7F22L/4u3jdu7PojBNyTv0JSuwqruOUGSUsLRDUndFRmhNi0pmkuVVf6bfqLCL
-        7cWdUSGgD/49fE9J9GSPPpB8IQbxbI3Y+xP/GFut5MLYoKwhPoig5GlQVwUtKiFJVdGWMClbUhd9
-        QZCKXJQS+zLrlxsVrmNLvgh3T7I8HQ9k1NEvRrM9/1Br59znkx/B7g26uXgd7q2796OQCMmbmgcX
-        cXrTac7A1/8Bn99oNah5s44wiEPTK41NHLUVXePVMzbKNO1TQA+8yFm+WqXTNP1KwOAhNDI6bx1w
-        E7VOYCd8M1iHwHuhPf4jeQ3qdPHjNC/zQ0QfmlN0VCLWtEPCyrQgjPUZqUW/Ii3L6j6rijSrEaY/
-        AAAA//8DAJY6ywESAwAA
+    content: '{"object":"list","results":[{"object":"user","id":"b10cb6df-12ef-44d3-88ad-250168f66322","name":"Florian
+      Wilhelm","avatar_url":"https://lh3.googleusercontent.com/a-/AAuE7mBBGq22qnRbLoOSo5zScC4miXci-xi4vELc30G9Aw=s100","type":"person","person":{"email":"florian.wilhelm@gmail.com"}},{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
+      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true},"workspace_name":"GitHub
+      Unittests","workspace_limits":{"max_file_upload_size_in_bytes":5242880}}}],"next_cursor":null,"has_more":false,"type":"user","user":{},"request_id":"09b22b36-4a95-40d8-a810-e1f46b833d7b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94d313e02d03190f-FRA
+      - 94dabee9e9956961-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -67,14 +59,13 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 3cee93de-4605-44f1-9af8-b419f175019e
+      - 09b22b36-4a95-40d8-a810-e1f46b833d7b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    status:
-      code: 200
-      message: OK
+    http_version: HTTP/1.1
+    status_code: 200
 - request:
     body: ''
     headers:
@@ -97,19 +88,14 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/users/me
   response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAAwAAAP//XJDNboNADIRfpfIZJ/wtsLxAeumxZ+RdTLMNsJT1lrZR3r1KVClRL9Yn
-        z8jyzBm8eWcr0EIMvEICrocWqlJxrfseCy4LLNOeUfcqw0IXqraZLfN6gARmmhhaODg5RvP0OjsR
-        DhIgAfokobWL6wgtHEWW0O73ocAYcOMgmO9ooh8/0xZ21k/7JZrR2d3sxfkZg5A4exN0rQpVk8W6
-        LgyW1hrUalDIBeVUWR6qbNgfnDxHgy+0njDL0+ULlzGG3TK/QQLyvVyfNF4guc32DH6beb3Cn7j5
-        9RQWsgzJA7eyRr48bLp74Od/ge+e0U1OwvX4RF/d4Ebu4jJ66rvgfrhzc2e+hQO0Ki/zpkkvlwRW
-        /ogcpLuVnxLp1DYNZhUPWCqdohkajabJal1Za5TK4fILAAD//wMA9iP4troBAAA=
+    content: '{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f","name":"Github
+      Unittests","avatar_url":"https://s3-us-west-2.amazonaws.com/public.notion-static.com/975357ac-773b-4ccb-95f5-e3a2a6cef61f/GitHub-Mark-120px-plus.png","type":"bot","bot":{"owner":{"type":"workspace","workspace":true},"workspace_name":"GitHub
+      Unittests","workspace_limits":{"max_file_upload_size_in_bytes":5242880}},"request_id":"5bf2a421-9ad5-4955-a623-3846064052cd"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 94d313e1fec7190f-FRA
+      - 94dabeebaa866961-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -139,12 +125,11 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 0aa90c88-16ef-4590-bf89-b81796ccb552
+      - 5bf2a421-9ad5-4955-a623-3846064052cd
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
       - '0'
-    status:
-      code: 200
-      message: OK
+    http_version: HTTP/1.1
+    status_code: 200
 version: 1
