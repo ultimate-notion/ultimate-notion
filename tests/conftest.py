@@ -63,6 +63,7 @@ UNFURL_TEST_PAGE = 'Embed/Inline & Unfurl'
 COMMENT_PAGE = 'Comments'
 ALL_BLOCKS_PAGE = 'All Blocks Page Test'
 CUSTOM_EMOJI_PAGE = 'Custom Emoji Page'
+FORMULA_DB = 'Formula DB'
 
 # Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
 TEST_CFG_FILE = get_cfg_file()
@@ -361,7 +362,7 @@ def wiki_db(notion_cached: Session) -> Database:
 @vcr_fixture(scope='module')
 def formula_db(notion_cached: Session) -> Database:
     """Return manually created formula db."""
-    return notion_cached.search_db('Formula DB').item()
+    return notion_cached.search_db(FORMULA_DB).item()
 
 
 @vcr_fixture(scope='module')
