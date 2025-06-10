@@ -14,7 +14,18 @@ Notion databases and pages in the most convenient and pythonic way.
 | Package | [![PyPI - Version][PyPI_ver-image]][PyPI_ver-link] [![PyPI - Downloads][PyPI_down-image]][PyPI_down-link] [![PyPI - Python Version][PyPI_py-image]][PyPI_py-link] [![GitHub Sponsors][sponsor-image]][sponsor-link] |
 | Details | [![Hatch project][hatch-image]][hatch-link] [![Linting - Ruff][ruff-image]][ruff-link] [![Pre-Commit][precommit-image]][precommit-link] [![test - pytest][pytest-image]][pytest-link] [![Types - Mypy][mypy-image]][mypy-link] [![License - MIT][MIT-image]][MIT-link] [![Docs - mkdocs][mkdocs-image]][mkdocs-link] |
 
-## Installation
+## ✨ Features
+
+- 📝 **CRUD operations** — Create, read, update, and delete Notion pages and databases.
+- 🐍 **Pythonic API** — Clean, intuitive interfaces that feel natural in Python.
+- 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
+- 🔎 **Rich querying capabilities** — Support for filters, sorting, pagination, and searching.
+- 🧩 **Integration with notion-sdk-py** — Built atop the official client, enhancing functionality.
+- 🚀 **One-step setup** — Getting up to speed with a [simple setup guide].
+
+👉 Want to learn more? Check out the full feature breakdown [here](https://ultimate-notion.com/latest/features/).
+
+## 📦 Installation
 
 Install the most recent release using [PyPI] with:
 
@@ -28,7 +39,21 @@ or to install all additional dependencies, use:
 pip install 'ultimate-notion[all]'
 ```
 
-## Usage
+### 🛠️ Installing the Development Version
+
+To install the latest (potentially unstable) version directly from the main branch on GitHub:
+
+```console
+pip install git+https://github.com/ultimate-notion/ultimate-notion.git@main
+```
+
+or with all optional dependencies:
+
+```console
+pip install 'ultimate-notion[all] @ git+https://github.com/ultimate-notion/ultimate-notion.git@main'
+```
+
+## 🚀 Usage
 
 Make sure you have set the environment variable `NOTION_TOKEN` to your Notion
 integration token. Then it's as simple as:
@@ -53,13 +78,13 @@ Check out the official [Ultimate Notion documentation] for more details.
 Especially the page about [creating a Notion integration] to get the token.
 The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pages].
 
-## Getting help
+## 🆘 Getting help
 
 If you are stuck with a problem and need help or just want to brag about what you did,
 the [Discussion] area is the right place for you. Here, you can ask questions, provide
 suggesions and discuss with other users.
 
-## Contributing
+## 🤝 Contributing
 
 After having cloned this repository:
 
@@ -79,7 +104,7 @@ ULTIMATE_NOTION_CONFIG=/path/to/repo/.ultimate-notion/config.toml
 
 Check out this [page about contributing] for more details.
 
-## License & Credits
+## 📄 License & Credits
 
 Ultimate Notion is distributed under the terms of the [MIT license](LICENSE.txt).
 To start this project off a lot of inspiration and code was taken from [hatch] and [notional].
@@ -130,3 +155,4 @@ Ultimate Notion highly depends on [notion-sdk-py].
 [precommit-link]: https://pre-commit.com/
 [pytest-image]: https://img.shields.io/static/v1?label=‎&message=Pytest&logo=Pytest&color=0A9EDC&logoColor=white
 [pytest-link]:  https://docs.pytest.org/
+[simple setup guide]: https://ultimate-notion.com/latest/usage/getting_started/
