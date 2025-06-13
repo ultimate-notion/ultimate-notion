@@ -61,8 +61,11 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref.name = name
 
     @property
-    def caption(self) -> Text:
-        return Text.wrap_obj_ref(self.obj_ref.caption)
+    def caption(self) -> Text | None:
+        """Return the caption of the file."""
+        if (caption := self.obj_ref.caption) is None:
+            return None
+        return Text.wrap_obj_ref(caption)
 
     @caption.setter
     def caption(self, caption: str | None) -> None:

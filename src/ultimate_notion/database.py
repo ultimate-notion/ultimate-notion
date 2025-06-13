@@ -64,9 +64,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session.api.databases.update(self.obj_ref, title=text.obj_ref)
 
     @property
-    def description(self) -> Text:
+    def description(self) -> Text | None:
         """Return the description of this database as rich text."""
-        desc = self.obj_ref.description
+        if (desc := self.obj_ref.description) is None:
+            return None
         return Text.wrap_obj_ref(desc)
 
     @description.setter
