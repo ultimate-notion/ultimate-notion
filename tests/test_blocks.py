@@ -148,11 +148,11 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
         [https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
-        [https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+        [Rick Roll](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
         Bookmark: [https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
-        Bookmark: [https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+        Bookmark: [Rick Roll](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
         $$
         -1 = \\exp(i \\pi)
@@ -393,9 +393,9 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     child_code = cast(uno.Code, page.children[1])
     assert child_code.language == uno.CodeLang.JAVASCRIPT
     assert child_code.caption == uno.text('JavaScript Code')
-    child_code.caption = None  # type: ignore[assignment]
+    child_code.caption = None
     child_code.reload()
-    assert child_code.caption == ''
+    assert child_code.caption is None
 
     child_heading = cast(uno.Heading1, page.children[2])
     assert child_heading.toggleable is False
@@ -430,7 +430,7 @@ def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page.append(children)
 
     file.name = 'my_robot'
-    assert file.caption == ''
+    assert file.caption is None
     new_caption_text = 'My Robot.txt of Google'
     file.caption = new_caption_text  # type: ignore[assignment]
 
@@ -444,7 +444,7 @@ def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     image.reload()
     assert image.caption == new_caption_text
 
-    assert video.caption == ''
+    assert video.caption is None
     new_caption_text = 'Rick Roll but not really'
     video.caption = new_caption_text  # type: ignore[assignment]
     video.reload()

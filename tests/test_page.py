@@ -142,7 +142,7 @@ def test_title_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page.reload()
     assert new_page.title == uno.text(title)
 
-    new_page.title = None  # type: ignore[assignment]
+    new_page.title = None
     new_page.reload()
     assert new_page.title == ''
 
@@ -219,7 +219,7 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
         # Python Code
         import ultimate_notion
         ```
-        [https://picsum.photos/300/300](https://picsum.photos/300/300)
+        [Caption](https://picsum.photos/300/300)
 
         ![1004-300x300.jpg](https://)
 

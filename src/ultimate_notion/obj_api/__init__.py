@@ -69,3 +69,4 @@ __all__ = ['NotionAPI', 'create_notion_client']
 #       to differentiate between a model for sending and receiving data.
 #       Idea: Use a sentinel value, e.g. API_RESPONSE = object() as default value for fields that are only given
 #       by the API and not sent to the API. This way we can differentiate between the two cases.
+#       Maybe use T_UNSET und UNSET

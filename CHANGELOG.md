@@ -8,7 +8,7 @@
 - New: More schema validations like checking for a title property and distinct property names.
 - Fix: Fix error when setting a (multi-)select option with no color specified.
 - New: Added a button property value.
-- New: Added `to_polars` method to views of databases.
+- New: Added support for [Polars], i.e. `to_polars` method of database views.
 - New: Add support for custom emoji icons
 
 ## Version 0.7.1, 2025-01-05
@@ -63,6 +63,7 @@
 - Chg: Make use of [pendulum](https://pendulum.eustace.io/) to represent `DateRange` values.
 - Chg: Renamed `page.database` to `page.parent_db` and `page.in_db` added as methods.
 - Chg: Large restructering of the code base.
+- Chg: Return `None` for various string attributes/properties if no string is set for consistency.
 
 ## Version 0.4, 2024-02-14
 
@@ -97,3 +98,5 @@
 ## Version 0.1, 2023-12-16
 
 - First official alpha release.
+
+[Polars]: https://pola.rs/
