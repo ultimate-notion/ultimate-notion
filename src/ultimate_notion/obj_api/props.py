@@ -70,7 +70,6 @@ class PropertyValue(TypedObject, polymorphic_base=True):
 class Title(PropertyValue, type='title'):
     """Notion title type."""
 
-    # ToDo: Check again if we cannot have here an empty list or no default value.
     title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
 
 
@@ -331,12 +330,16 @@ class PropertyItem(NotionObject, TypedObject, polymorphic_base=True, object='pro
 class TitlePropertyItem(PropertyItem, type='title'):
     """A `PropertyItem` returned by the Notion API containing the `Title` property."""
 
+    # According to the Notion API docs, this should be a list of rich text objects.
+    # Nevertheless, the Notion API returns a single rich text object
     title: SerializeAsAny[RichTextBaseObject]
 
 
 class RichTextPropertyItem(PropertyItem, type='rich_text'):
     """A `PropertyItem` returned by the Notion API containing the `RichText` property."""
 
+    # According to the Notion API docs, this should be a list of rich text objects.
+    # Nevertheless, the Notion API returns a single rich text object
     rich_text: SerializeAsAny[RichTextBaseObject]
 
 
@@ -367,6 +370,8 @@ class MultiSelectPropertyItem(PropertyItem, MultiSelect, type='multi_select'):
 class PeoplePropertyItem(PropertyItem, type='people'):
     """A `PropertyItem` returned by the Notion API containing the `People` property."""
 
+    # According to the Notion API docs, this should be a list of people objects.
+    # Nevertheless, the Notion API returns a single people object
     people: User
 
 
