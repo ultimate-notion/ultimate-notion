@@ -26,6 +26,7 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> FileInfo:
+        """Wrap an existing low-level FileObject into a FileInfo."""
         self = cast(FileInfo, cls.__new__(cls))
         self.obj_ref = obj_ref
         return self
@@ -54,6 +55,7 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
 
     @property
     def name(self) -> str | None:
+        """Return the name of the file."""
         return self.obj_ref.name
 
     @name.setter
@@ -72,12 +74,25 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref.caption = Text(caption).obj_ref if caption is not None else []
 
     @property
+    def _type_obj(self) -> objs.HostedFile.TypeData | objs.ExternalFile.TypeData:
+        """Get the low-level type data object reference."""
+        match self.obj_ref:
+            case objs.HostedFile():
+                return self.obj_ref.file
+            case objs.ExternalFile():
+                return self.obj_ref.external
+            case _:
+                msg = f'Unknown file type: {type(self.obj_ref)}'
+                raise TypeError(msg)
+
+    @property
     def url(self) -> str:
-        return self.obj_ref.value.url
+        """Return the URL of this file."""
+        return self._type_obj.url
 
     @url.setter
     def url(self, url: str) -> None:
-        self.obj_ref.value.url = url
+        self._type_obj.url = url
 
 
 def is_notion_hosted(url: str) -> bool:

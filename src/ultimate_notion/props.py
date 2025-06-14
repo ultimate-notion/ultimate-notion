@@ -18,6 +18,7 @@ from ultimate_notion import rich_text as rt
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
+from ultimate_notion.obj_api.objects import DateRange
 from ultimate_notion.option import Option
 from ultimate_notion.user import User
 
@@ -268,11 +269,19 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 
     @property
     def value(self) -> str | float | int | pnd.DateTime | pnd.Date | pnd.Interval | None:
+        """Return the result value of the formula."""
         # returns all values of subclasses of `FormulaResult`
-        return self.obj_ref.formula.value if self.obj_ref.formula else None
+        if self.obj_ref.formula is None:
+            return None
+        match value := self.obj_ref.formula.value:
+            case DateRange():
+                return value.to_pendulum() if value else None
+            case _:
+                return value
 
     @property
     def value_type(self) -> FormulaType | None:
+        """Return the type of the formula result."""
         return FormulaType(self.obj_ref.formula.type) if self.obj_ref.formula else None
 
 
@@ -283,6 +292,7 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 
     @property
     def value(self) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None:
+        """Return the result value of the rollup."""
         match rollup_type := self.obj_ref.rollup:
             case None:
                 return None
@@ -298,6 +308,7 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 
     @property
     def value_type(self) -> RollupType | None:
+        """Return the type of the rollup result."""
         return RollupType(self.obj_ref.rollup.type) if self.obj_ref.rollup else None
 
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import re
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 from uuid import UUID
 
 from pydantic import (
@@ -212,7 +212,10 @@ class NotionEntity(NotionObject):
     last_edited_time: datetime = None  # type: ignore
 
 
-class TypedObject(GenericObject):
+T = TypeVar('T')  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
+
+
+class TypedObject(GenericObject, Generic[T]):
     """A type-referenced object.
 
     Many objects in the Notion API follow a standard pattern with a `type` property
@@ -313,11 +316,11 @@ class TypedObject(GenericObject):
         return sub_cls(**value)
 
     @property
-    def value(self) -> Any:  # TODO: Check if this can be GenericObject[Any] or similar
+    def value(self) -> T:
         """Return the nested object."""
         return getattr(self, self.type)
 
     @value.setter
-    def value(self, val: Any) -> None:
+    def value(self, val: T) -> None:
         """Set the nested object."""
         setattr(self, self.type, val)
