@@ -31,5 +31,5 @@ def test_rich_text_md(md_text_page: uno.Page) -> None:
     ]
     for idx, block in enumerate(md_text_page.children):
         assert isinstance(block, TextBlock)
-        our_md = block.rich_text.to_markdown()
+        our_md = block.to_markdown()
         assert our_md == correct_mds[idx]

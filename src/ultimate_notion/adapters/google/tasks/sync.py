@@ -81,11 +81,11 @@ class SyncGTasks(SyncTask):
 
     def notion_hash(self, obj: Page) -> str:
         """Get the hash of the Notion page for object mapping/linking."""
-        return str_hash(obj.title)
+        return str_hash(obj.title or '')
 
     def other_hash(self, obj: GTask) -> str:
         """Get the hash of the other object for object mapping/linking."""
-        return str_hash(obj.title)
+        return str_hash(obj.title or '')
 
     def notion_to_dict(self, obj: Page) -> dict[str, Any]:
         """Convert a Notion object to a dictionary."""

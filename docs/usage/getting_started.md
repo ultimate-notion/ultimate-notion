@@ -69,7 +69,7 @@ via the API, thus you must always work with the source database. A special type 
 *wiki database* that comes with a pre-defined schema, i.e., title, last-edited-time, owner, tags, verification.
 
 Besides the properties of pages contained in a database, every page has *attributes* such as a title, cover, icon, or
-whether it is archived or not. The *title* attribute of a page is special and will always be included as a property
+whether it is in the trash or not. The *title* attribute of a page is special and will always be included as a property
 in the schema if the page is contained in a database. The property name of the title attribute can be customized.
 Think of the title property as a human-readable identifier, which does not have to be unique! This concept is important
 when *relation* properties are used between different databases as the title property of a linked page will show up in
@@ -94,6 +94,11 @@ UUIDs of other entities like blocks, properties, users etc. can only be retrieve
 an `id`-property on most of its objects for that. Notion also provides a shortened URL compared to the one above:
 
     https://notion.so/{UUID}
+
+For the Notion API, strings like captions and text contents are always present — even if empty — so there's no real distinction
+between `""` and unset. Ultimate Notion aligns with this by treating both as equivalent internally but returning `None` for
+empty strings to be consistent with other data types like numbers. When converting a container type, like a block,
+to strings (e.g., `str(block)`), `None` will be displayed as `""`, preserving clean, intuitive output.
 
 [My integrations]: https://www.notion.so/my-integrations
 [logo]: ../assets/images/logo_integration.png

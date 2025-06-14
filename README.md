@@ -16,7 +16,7 @@ Notion databases and pages in the most convenient and pythonic way.
 
 ## ✨ Features
 
-- 📝 **CRUD operations** — Create, read, update, and delete Notion pages and databases.
+- 🗂️ **CRUD operations** — Create, read, update, and delete Notion pages and databases.
 - 🐍 **Pythonic API** — Clean, intuitive interfaces that feel natural in Python.
 - 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
 - 🔎 **Rich querying capabilities** — Support for filters, sorting, pagination, and searching.
@@ -39,7 +39,7 @@ or to install all additional dependencies, use:
 pip install 'ultimate-notion[all]'
 ```
 
-### 🛠️ Installing the Development Version
+### 🧪 Installing the Development Version
 
 To install the latest (potentially unstable) version directly from the main branch on GitHub:
 
@@ -78,7 +78,7 @@ Check out the official [Ultimate Notion documentation] for more details.
 Especially the page about [creating a Notion integration] to get the token.
 The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pages].
 
-## 🆘 Getting help
+## 💬 Getting help
 
 If you are stuck with a problem and need help or just want to brag about what you did,
 the [Discussion] area is the right place for you. Here, you can ask questions, provide

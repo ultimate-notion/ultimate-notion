@@ -226,7 +226,7 @@ class Text(str):
         return cls(text)
 
     def to_plain_text(self) -> str:
-        """Return rich text as plaintext
+        """Return rich text as plain text
 
         This method is a more explicit variant then just using the object.
         """

@@ -189,9 +189,11 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         return self.parent_db is not None
 
     @property
-    def title(self) -> Text:
+    def title(self) -> Text | None:
         """Title of the page."""
-        return Text.wrap_obj_ref(self.obj_ref.title)
+        if (title := self.obj_ref.title) is None:
+            return None
+        return Text.wrap_obj_ref(title)
 
     @title.setter
     def title(self, text: str | None):
@@ -297,7 +299,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         """Return the content of the page as HTML."""
         html = render_md(self.to_markdown())
         if not raw:
-            html = page_html(html, title=self.title)
+            html = page_html(html, title=self.title or 'Untitled Page')
         return html
 
     def show(self, *, simple: bool | None = None):

@@ -22,9 +22,11 @@ class Comment(NotionEntity[objs.Comment], wraps=objs.Comment):
     """A comment on a page, block, or database behaving like a normal string."""
 
     @property
-    def text(self) -> Text:
+    def text(self) -> Text | None:
         """The text of the comment."""
-        return Text.wrap_obj_ref(self.obj_ref.rich_text)
+        if (rt := self.obj_ref.rich_text) is None:
+            return None
+        return Text.wrap_obj_ref(rt)
 
     @property
     def user(self) -> User:
@@ -37,10 +39,12 @@ class Comment(NotionEntity[objs.Comment], wraps=objs.Comment):
         return self.obj_ref.discussion_id
 
     def __str__(self) -> str:
+        if self.text is None:
+            return ''
         return str(self.text)
 
     def __repr__(self) -> str:
-        return f'Comment("{self.user}", "{self.text}")'
+        return f'Comment("{self.user}", "{self!s}")'
 
 
 class Discussion(Sequence[Comment]):

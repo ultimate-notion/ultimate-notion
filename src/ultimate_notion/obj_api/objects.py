@@ -150,7 +150,7 @@ class ObjectRef(GenericObject):
         match ref:
             case ObjectRef():
                 return ref.model_copy(deep=True)
-            case ParentRef():
+            case ParentRef() if isinstance(ref.value, UUID):
                 # ParentRefs are typed objects with a nested UUID
                 return cls.model_construct(id=ref.value)
             case GenericObject() if hasattr(ref, 'id'):
@@ -308,7 +308,7 @@ class Annotations(GenericObject):
     color: Color | BGColor = Color.DEFAULT
 
 
-class RichTextBaseObject(TypedObject, polymorphic_base=True):
+class RichTextBaseObject(TypedObject[GenericObject], polymorphic_base=True):
     """Base class for Notion rich text elements."""
 
     plain_text: str
@@ -374,7 +374,7 @@ class EquationObject(RichTextBaseObject, type='equation'):
         )
 
 
-class MentionBase(TypedObject, polymorphic_base=True):
+class MentionBase(TypedObject[GenericObject], polymorphic_base=True):
     """Base class for typed `Mention` objects."""
 
 
@@ -456,7 +456,7 @@ class MentionLinkPreview(MentionBase, type='link_preview'):
     link_preview: TypeData
 
 
-class MentionTemplateData(TypedObject):
+class MentionTemplateData(TypedObject[GenericObject]):
     """Nested template data for `Mention` properties."""
 
 
@@ -478,7 +478,7 @@ class MentionTemplateUser(MentionTemplateData, type='template_mention_user'):
     template_mention_user: str
 
 
-class EmojiObject(TypedObject, type='emoji'):
+class EmojiObject(TypedObject[GenericObject], type='emoji'):
     """A Notion emoji object.
 
     Within text an emoji is represented as unicode string.
@@ -513,7 +513,7 @@ class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
         )
 
 
-class FileObject(TypedObject, polymorphic_base=True):
+class FileObject(TypedObject[GenericObject], polymorphic_base=True):
     """A Notion file object.
 
     Depending on the context, a FileObject may require a name (such as in the `Files`
