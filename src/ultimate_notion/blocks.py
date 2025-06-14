@@ -311,7 +311,20 @@ AnyBlock: TypeAlias = Block[Any]
 """For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock], in user code."""
 
 
-# ToDo: Consider having an abstract Caption Block here.
+class CaptionMixin(Block, wraps=obj_blocks.Block):
+    """Mixin for objects that can have captions."""
+
+    @property
+    def caption(self) -> Text | None:
+        """Return the caption of the code block."""
+        if not (caption := self.obj_ref.value.caption):
+            return None
+        return Text.wrap_obj_ref(caption)
+
+    @caption.setter
+    def caption(self, caption: str | None) -> None:
+        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
+        self._update_in_notion()
 
 
 class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
@@ -352,7 +365,7 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
         return self.rich_text.to_markdown()
 
 
-class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
+class Code(TextBlock[obj_blocks.Code], CaptionMixin, wraps=obj_blocks.Code):
     """Code block."""
 
     def __init__(
@@ -374,18 +387,6 @@ class Code(TextBlock[obj_blocks.Code], wraps=obj_blocks.Code):
     @language.setter
     def language(self, language: CodeLang) -> None:
         self.obj_ref.value.language = language
-        self._update_in_notion()
-
-    @property
-    def caption(self) -> Text | None:
-        """Return the caption of the code block."""
-        if not (caption := self.obj_ref.value.caption):
-            return None
-        return Text.wrap_obj_ref(caption)
-
-    @caption.setter
-    def caption(self, caption: str | None) -> None:
-        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
         self._update_in_notion()
 
     def to_markdown(self) -> str:
@@ -618,7 +619,7 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
         return ' / '.join(ancestor.title or 'Untitled Page' for ancestor in self.ancestors if is_page(ancestor)) + '\n'
 
 
-class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
+class Embed(CaptionMixin, Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
     """Embed block."""
 
     def __init__(self, url: str, *, caption: str | None = None):
@@ -636,18 +637,6 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
         self.obj_ref.value.url = url
         self._update_in_notion()
 
-    @property
-    def caption(self) -> Text | None:
-        """Return the caption of the embedded item."""
-        if not (caption := self.obj_ref.value.caption):
-            return None
-        return Text.wrap_obj_ref(caption)
-
-    @caption.setter
-    def caption(self, caption: str | None) -> None:
-        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
-        self._update_in_notion()
-
     def to_markdown(self) -> str:
         title = self.caption.to_plain_text() if self.caption is not None else self.url
         if self.url is not None:
@@ -656,7 +645,7 @@ class Embed(Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
             return ''
 
 
-class Bookmark(Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
+class Bookmark(CaptionMixin, Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
 
     def __init__(self, url: str, *, caption: str | None = None):
@@ -672,18 +661,6 @@ class Bookmark(Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     @url.setter
     def url(self, url: str) -> None:
         self.obj_ref.value.url = url
-        self._update_in_notion()
-
-    @property
-    def caption(self) -> Text | None:
-        """Return the caption of the bookmark."""
-        if not (caption := self.obj_ref.value.caption):
-            return None
-        return Text.wrap_obj_ref(caption)
-
-    @caption.setter
-    def caption(self, caption: str | None) -> None:
-        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
         self._update_in_notion()
 
     def to_markdown(self) -> str:
@@ -751,7 +728,7 @@ class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
 FT = TypeVar('FT', bound=obj_blocks.FileBase)
 
 
-class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
+class FileBaseBlock(CaptionMixin, Block[FT], ABC, wraps=obj_blocks.FileBase):
     """Abstract Block for file-based blocks.
 
     Parent class of all file-based block types.
@@ -781,18 +758,6 @@ class FileBaseBlock(Block[FT], ABC, wraps=obj_blocks.FileBase):
     def url(self) -> str:
         """Return the URL of the file."""
         return self.file_info.url
-
-    @property
-    def caption(self) -> Text | None:
-        """Return the caption of the file block."""
-        if not (caption := self.obj_ref.value.caption):
-            return None
-        return Text.wrap_obj_ref(caption)
-
-    @caption.setter
-    def caption(self, caption: str | None) -> None:
-        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
-        self._update_in_notion()
 
 
 class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
