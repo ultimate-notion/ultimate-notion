@@ -155,4 +155,4 @@ class EndpointIterator(Generic[T]):
                 yield cast(T, obj_or_list)
                 self.has_more = False
 
-            _logger.debug(f'Fetched `{self.total_items}` items in total over `{self.page_num}` pages.')
+            _logger.debug(f'Fetched {self.total_items} item(s) in total over {self.page_num} page(s).')

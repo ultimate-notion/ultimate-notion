@@ -461,6 +461,9 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying column blocks')
     cols = uno.Columns(2)
     page.append(cols)
+    assert cols[0].width_ratio is None
+    assert cols[1].width_ratio is None
+
     cols[0].append(left := uno.Paragraph('Column 1'))
     cols[1].append(right := uno.Paragraph('Column 2'))
     cols[0].delete()
@@ -473,7 +476,7 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     assert left.reload().is_deleted
 
     with pytest.raises(IndexError):
-        cols.add_column(index=0)
+        cols.add_column(index=-1)
     with pytest.raises(IndexError):
         cols.add_column(index=len(cols.children) + 1)
 
@@ -488,6 +491,24 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
     with pytest.raises(InvalidAPIUsageError):
         cols.append(uno.Paragraph('This is a paragraph'))
+
+
+@pytest.mark.vcr()
+def test_modify_column_blocks_width_ratios(root_page: uno.Page, notion: uno.Session) -> None:
+    page = notion.create_page(parent=root_page, title='Page for modifying column blocks with width ratios')
+    cols = uno.Columns((1, 3))
+    page.append(cols)
+    assert cols[0].width_ratio == 0.25
+    assert cols[1].width_ratio == 0.75
+    cols[0].append(uno.Paragraph('Column 1'))
+    cols[1].append(uno.Paragraph('Column 2'))
+
+    cols.add_column(index=1)
+    cols[1].append(uno.Paragraph('Column 1.5'))
+    assert cols[1].width_ratio is None
+
+    cols.width_ratios = (1, 6, 1)
+    assert cols.width_ratios == (0.125, 0.75, 0.125)
 
 
 @pytest.mark.vcr()

@@ -346,8 +346,8 @@ class Column(Block, type='column'):
     column: TypeData = TypeData()
 
     @classmethod
-    def build(cls) -> Column:
-        return Column.model_construct(column=cls.TypeData.model_construct(children=[]))
+    def build(cls, width_ratio: float | None = None) -> Column:
+        return Column.model_construct(column=cls.TypeData.model_construct(children=[], width_ratio=width_ratio))
 
 
 class ColumnList(Block, type='column_list'):
