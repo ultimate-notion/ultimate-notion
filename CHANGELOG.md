@@ -10,6 +10,7 @@
 - New: Added a button property value.
 - New: Added support for [Polars], i.e. `to_polars` method of database views.
 - New: Add support for custom emoji icons
+- Chg: Return `None` instead of an empty string `""` when a text property or block is unset.
 
 ## Version 0.7.1, 2025-01-05
 
