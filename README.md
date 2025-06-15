@@ -23,7 +23,7 @@ Notion databases and pages in the most convenient and pythonic way.
 - 🧩 **Integration with notion-sdk-py** — Built atop the official client, enhancing functionality.
 - 🚀 **One-step setup** — Getting up to speed with a [simple setup guide].
 
-👉 Want to learn more? Check out the full feature breakdown [here](https://ultimate-notion.com/latest/features/).
+👉 Want to learn more? Check out the full [feature breakdown].
 
 ## 📦 Installation
 
@@ -156,3 +156,4 @@ Ultimate Notion highly depends on [notion-sdk-py].
 [pytest-image]: https://img.shields.io/static/v1?label=‎&message=Pytest&logo=Pytest&color=0A9EDC&logoColor=white
 [pytest-link]:  https://docs.pytest.org/
 [simple setup guide]: https://ultimate-notion.com/latest/usage/getting_started/
+[feature breakdown]: https://ultimate-notion.com/latest/features/

@@ -61,7 +61,6 @@ MD_SUBPAGE_TEST_PAGE = 'Markdown SubPage Test'
 TASK_DB = 'Task DB'
 UNFURL_TEST_PAGE = 'Embed/Inline & Unfurl'
 COMMENT_PAGE = 'Comments'
-ALL_BLOCKS_PAGE = 'All Blocks Page Test'
 CUSTOM_EMOJI_PAGE = 'Custom Emoji Page'
 FORMULA_DB = 'Formula DB'
 
@@ -396,12 +395,6 @@ def comment_page(notion_cached: Session) -> Page:
 
 
 @vcr_fixture(scope='module')
-def all_blocks_page(notion_cached: Session) -> Page:
-    """Return a page with all possible blocks."""
-    return notion_cached.search_page(ALL_BLOCKS_PAGE).item()
-
-
-@vcr_fixture(scope='module')
 def custom_emoji_page(notion_cached: Session) -> Page:
     """Return a page with a custom emoji."""
     return notion_cached.search_page(CUSTOM_EMOJI_PAGE).item()
@@ -416,7 +409,6 @@ def static_pages(  # noqa: PLR0917
     md_subpage: Page,
     unfurl_page: Page,
     comment_page: Page,
-    all_blocks_page: Page,
     custom_emoji_page: Page,
 ) -> set[Page]:
     """Return all static pages for the unit tests."""
@@ -428,7 +420,6 @@ def static_pages(  # noqa: PLR0917
         md_subpage,
         unfurl_page,
         comment_page,
-        all_blocks_page,
         custom_emoji_page,
     }
 
