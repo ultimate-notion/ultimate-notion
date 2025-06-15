@@ -11,6 +11,8 @@
 - New: Added support for [Polars], i.e. `to_polars` method of database views.
 - New: Add support for custom emoji icons
 - Chg: Return `None` instead of an empty string `""` when a text property or block is unset.
+- New: Setting the width ratios of page columns is supported.
+- Fix: Adding a column with `add_column(index)` at a given index is no longer off by 1.
 
 ## Version 0.7.1, 2025-01-05
 

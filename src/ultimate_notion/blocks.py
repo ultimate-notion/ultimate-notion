@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, overload
 
+import numpy as np
 from tabulate import tabulate
 from typing_extensions import Self
 
@@ -925,30 +926,59 @@ class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
             mds.append(block.to_markdown())
         return '\n'.join(mds)
 
+    @property
     def width_ratio(self) -> float | None:
         """Return the width ratio of this column."""
         return self.obj_ref.column.width_ratio
 
 
 class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.ColumnList):
-    """Columns block holding multiple `Column` blocks."""
+    """Columns block holding multiple `Column` blocks.
 
-    def __init__(self, n_columns: int):
+    This block is used to create a layout with multiple columns in a single page.
+    Either specify the number of columns as an integer or provide a sequence of width ratios,
+    which can be positive integers or floats.
+    """
+
+    def __init__(self, columns: int | Sequence[float | int]):
         """Create a new `Columns` block with the given number of columns."""
         super().__init__()
-        self.obj_ref.column_list.children = [obj_blocks.Column.build() for _ in range(n_columns)]
+        match columns:
+            case int() as n_columns:
+                if n_columns < 1:
+                    msg = 'Number of columns must be at least 1.'
+                    raise ValueError(msg)
+                self.obj_ref.column_list.children = [obj_blocks.Column.build() for _ in range(n_columns)]
+            case ratios if isinstance(ratios, Sequence) and all(isinstance(x, float | int) for x in ratios):
+                if not ratios or any(r <= 0 for r in ratios):
+                    msg = 'Ratios must be a non-empty sequence of positive numbers.'
+                    raise ValueError(msg)
+                ratios_arr = np.array(ratios, dtype=float)
+                ratios_arr /= ratios_arr.sum()  # normalize ratios to sum to 1 as asked by the Notion API
+                self.obj_ref.column_list.children = [obj_blocks.Column.build(width_ratio=ratio) for ratio in ratios_arr]
+            case _:
+                msg = 'Columns must be initialized with an integer or a sequence of floats/integers.'
+                raise TypeError(msg)
 
     def __getitem__(self, index: int) -> Column:
         return cast(Column, self.children[index])
 
-    def add_column(self, index: int = -1) -> Self:
-        """Add a new column to this block of columns."""
-        if 1 <= index <= len(self.children):
+    def add_column(self, index: int | None = None) -> Self:
+        """Add a new column to this block of columns at the given index.
+
+        The index must be between 0 and the number of columns (inclusive).
+        If no index is given, the new column is added at the end.
+
+        To specify the width ratio of the new column, use the `width_ratios` property.
+        """
+        if index is None:
+            index = len(self.children)
+        if 0 <= index <= len(self.children):
             new_col = Column.wrap_obj_ref(obj_blocks.Column.build())
-            super().append(new_col, after=self.children[index - 1])
+            super().append(new_col, after=self.children[index - 1] if index > 0 else None)
             return self
         else:
-            msg = f'Columns can only be inserted from index 1 to {len(self.children)}.'
+            msg = f'Column index must be between 0 and {len(self.children)} (inclusive).'
             raise IndexError(msg)
 
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None) -> Self:  # noqa: PLR6301
@@ -963,6 +993,34 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
             md = md_comment(f'column {i + 1}')
             cols.append(md + block.to_markdown())
         return '\n'.join(cols)
+
+    @property
+    def width_ratios(self) -> tuple[float | None, ...]:
+        """Return the width ratios of the columns."""
+        return tuple(cast(Column, col).width_ratio for col in self.children)
+
+    @width_ratios.setter
+    def width_ratios(self, ratios: Sequence[float | int]) -> None:
+        """Set the width ratios of the columns."""
+        if len(ratios) != len(self.children):
+            msg = f'Ratios must have the same length as the number of columns ({len(self.children)}).'
+            raise ValueError(msg)
+
+        if not isinstance(ratios, Sequence) or not all(isinstance(x, float | int) for x in ratios):
+            msg = 'Ratios must be a sequence of floats or integers.'
+            raise TypeError(msg)
+        if not ratios or any(r <= 0 for r in ratios):
+            msg = 'Ratios must be a non-empty sequence of positive numbers.'
+            raise ValueError(msg)
+
+        ratios_arr = np.array(ratios, dtype=float)
+        ratios_arr /= ratios_arr.sum()  # normalize ratios to sum to 1 as asked by the Notion API
+        for col, ratio in zip(self.children, ratios_arr, strict=False):
+            if not isinstance(col, Column):
+                msg = 'All children of a Columns block must be Column blocks.'
+                raise TypeError(msg)
+            col.obj_ref.column.width_ratio = ratio
+            col._update_in_notion(exclude_attrs=['column.children'])
 
 
 class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
