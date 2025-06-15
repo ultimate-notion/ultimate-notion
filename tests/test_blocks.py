@@ -459,6 +459,9 @@ def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying column blocks')
+    with pytest.raises(ValueError):
+        uno.Columns(1)
+
     cols = uno.Columns(2)
     page.append(cols)
     assert cols[0].width_ratio is None
@@ -496,6 +499,12 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_modify_column_blocks_width_ratios(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying column blocks with width ratios')
+    with pytest.raises(TypeError):
+        uno.Columns((0.5, 'a', 0.5))  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError):
+        uno.Columns((1, -2, 3))
+
     cols = uno.Columns((1, 3))
     page.append(cols)
     assert cols[0].width_ratio == 0.25
@@ -509,6 +518,15 @@ def test_modify_column_blocks_width_ratios(root_page: uno.Page, notion: uno.Sess
 
     cols.width_ratios = (1, 6, 1)
     assert cols.width_ratios == (0.125, 0.75, 0.125)
+
+    with pytest.raises(ValueError):
+        cols.width_ratios = (1, 2, 3, 4)
+
+    with pytest.raises(TypeError):
+        cols.width_ratios = (1, 'a', 3)
+
+    with pytest.raises(ValueError):
+        cols.width_ratios = (-1, 2, 3)
 
 
 @pytest.mark.vcr()

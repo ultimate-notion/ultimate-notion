@@ -29,6 +29,9 @@ if TYPE_CHECKING:
     from ultimate_notion.page import Page
 
 
+MIN_COLS = 2
+"""Minimum number of columns when creating a column block to structure a page."""
+
 DO = TypeVar('DO', bound=obj_blocks.DataObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
@@ -945,8 +948,8 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
         super().__init__()
         match columns:
             case int() as n_columns:
-                if n_columns < 1:
-                    msg = 'Number of columns must be at least 1.'
+                if n_columns < MIN_COLS:
+                    msg = 'Number of columns must be at least 2.'
                     raise ValueError(msg)
                 self.obj_ref.column_list.children = [obj_blocks.Column.build() for _ in range(n_columns)]
             case ratios if isinstance(ratios, Sequence) and all(isinstance(x, float | int) for x in ratios):
@@ -1016,9 +1019,6 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
         ratios_arr = np.array(ratios, dtype=float)
         ratios_arr /= ratios_arr.sum()  # normalize ratios to sum to 1 as asked by the Notion API
         for col, ratio in zip(self.children, ratios_arr, strict=False):
-            if not isinstance(col, Column):
-                msg = 'All children of a Columns block must be Column blocks.'
-                raise TypeError(msg)
             col.obj_ref.column.width_ratio = ratio
             col._update_in_notion(exclude_attrs=['column.children'])
 
