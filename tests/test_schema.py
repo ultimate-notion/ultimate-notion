@@ -278,8 +278,17 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
         cat = uno.Property('Category', uno.PropType.Select(options))
         tags = uno.Property('Tags', uno.PropType.MultiSelect(options))
         formula = uno.Property('Formula', uno.PropType.Formula('prop("Name")'))
+        number = uno.Property('Number', uno.PropType.Number(uno.NumberFormat.DOLLAR))
 
     db = notion.create_db(parent=root_page, schema=Schema)
+
+    assert db.schema['Number'].format == uno.NumberFormat.DOLLAR  # type: ignore[attr-defined]
+    db.schema['Number'].format = uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    db.reload()
+    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    db.schema['Number'].format = uno.NumberFormat.EURO.value  # type: ignore[attr-defined]
+    assert db.schema['Number'].format == uno.NumberFormat.EURO  # type: ignore[attr-defined]
 
     assert db.schema['Formula'].expression.startswith(block_ref(db.schema['Name']))  # type: ignore[attr-defined]
     db.schema['Formula'].expression = 'prop("Category")'  # type: ignore[attr-defined]

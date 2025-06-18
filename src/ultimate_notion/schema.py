@@ -550,6 +550,15 @@ class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
         """Return the number format of this number property."""
         return self.obj_ref.number.format
 
+    @format.setter
+    def format(self, new_format: NumberFormat | str) -> None:
+        """Set the number format of this number property."""
+        if isinstance(new_format, str):
+            new_format = NumberFormat(new_format)
+        self.obj_ref.number.format = new_format
+        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
+        self._update_attr(schema)
+
 
 class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
     """Defines a select property in a database."""
