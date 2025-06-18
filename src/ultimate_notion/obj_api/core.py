@@ -111,7 +111,7 @@ class GenericObject(BaseModel):
 
     # https://github.com/pydantic/pydantic/discussions/3139
     def update(self, **data: Any) -> Self:
-        """Update the internal attributes with new data."""
+        """Update the internal attributes with new data in place."""
 
         new_obj_dct = self.model_dump()
         new_obj_dct.update(data)
