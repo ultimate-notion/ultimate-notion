@@ -266,12 +266,26 @@ def test_to_pydantic_model() -> None:
 def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> None:
     options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
 
+    def block_ref(prop: PropertyType) -> str:
+        """Helper function to create a block reference for the formula.
+
+        Note that Notion converts 'prop("Name")' to Jinja2-like expressions
+        """
+        return f'{{{{notion:block_property:{prop.id}:'
+
     class Schema(uno.Schema, db_title='Select Options Update Test'):
         name = uno.Property('Name', uno.PropType.Title())
         cat = uno.Property('Category', uno.PropType.Select(options))
         tags = uno.Property('Tags', uno.PropType.MultiSelect(options))
+        formula = uno.Property('Formula', uno.PropType.Formula('prop("Name")'))
 
     db = notion.create_db(parent=root_page, schema=Schema)
+
+    assert db.schema['Formula'].expression.startswith(block_ref(db.schema['Name']))  # type: ignore[attr-defined]
+    db.schema['Formula'].expression = 'prop("Category")'  # type: ignore[attr-defined]
+    assert db.schema['Formula'].expression == 'prop("Category")'  # type: ignore[attr-defined]
+    db.reload()
+    assert db.schema['Formula'].expression.startswith(block_ref(db.schema['Category']))  # type: ignore[attr-defined]
 
     for prop in ('Category', 'Tags'):
         curr_cats = db.schema[prop].options  # type: ignore[attr-defined]
