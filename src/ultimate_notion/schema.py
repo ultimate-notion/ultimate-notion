@@ -693,6 +693,13 @@ class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
         """Return the expression of this formula property."""
         return self.obj_ref.formula.expression
 
+    @expression.setter
+    def expression(self, expression: str) -> None:
+        """Set the expression of this formula property."""
+        self.obj_ref.formula.expression = expression
+        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
+        self._update_attr(schema)
+
 
 class RelationError(SchemaError):
     """Error if a Relation cannot be initialised."""
