@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from abc import ABCMeta
 from collections import Counter
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from functools import partial
 from textwrap import dedent
 from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast
@@ -33,8 +33,15 @@ from tabulate import tabulate
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion import rich_text
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
-from ultimate_notion.errors import EmptyListError, MultipleItemsError, SchemaError, SchemaNotBoundError
+from ultimate_notion.errors import (
+    EmptyListError,
+    InvalidAPIUsageError,
+    MultipleItemsError,
+    SchemaError,
+    SchemaNotBoundError,
+)
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
+from ultimate_notion.obj_api.schema import PropertyType as obj_PropertyType
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, dict_diff_str, is_notebook
@@ -42,7 +49,7 @@ from ultimate_notion.utils import SList, dict_diff_str, is_notebook
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
-
+from ultimate_notion.option import compare_options
 
 T = TypeVar('T', bound=obj_schema.PropertyType)
 
@@ -66,7 +73,7 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
         return self.obj_ref.id
 
     @property
-    def name(self) -> str | None:
+    def name(self) -> str:
         """Return name of this property type."""
         return self.obj_ref.name
 
@@ -84,6 +91,17 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     def _is_init(self) -> bool:
         """Determines if the property type is already initialized"""
         return hasattr(self, 'obj_ref')
+
+    def _update_attr(self, schema: Mapping[str, obj_PropertyType]) -> None:
+        """Update the attributes of this property type from a schema."""
+        if self.prop_ref is None:
+            msg = 'PropertyType must be bound to a Property before updating attributes.'
+            raise SchemaError(msg)
+        if not self._is_init:
+            raise SchemaNotBoundError(self.prop_ref._schema)
+        db = self.prop_ref._schema.get_db()
+        session = get_active_session()
+        session.api.databases.update(db=db.obj_ref, schema=schema)
 
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
@@ -105,9 +123,10 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
 
 
 class Property:
-    """Database property/column with a name and a certain property type for defining a Notion database schema.
+    """Database property/column with a name and a Notion property type.
 
-    This is implemented as a descriptor.
+    A schema is a collection of properties that define the structure of a database.
+    This is implemented as a descriptor in Python.
     """
 
     _name: str
@@ -158,7 +177,7 @@ class SchemaType(ABCMeta):
     """Metaclass for the schema of a database.
 
     This makes the schema class itself more user-friendly by providing a custom `__repr__` method
-    and letting it behave like a dictionary for the properties athough it is a class, not an instance.
+    and letting it behave like a dictionary for the properties although it is a class, not an instance.
     """
 
     # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
@@ -287,7 +306,7 @@ class Schema(metaclass=SchemaType):
         before it is passed to Ultimate Notion. The actual values are converted to `PropertyValue`
         and thus `value` needs to be called to retrieve the actual Python type.
 
-        If `with_ro_props` is set to `True`, read-only properties are included in the model
+        If `with_ro_props` is set to `True`, read-only properties are included in the model.
         """
 
         # ToDo: Validate the categories in Select and MultiSelect using pydantic!
@@ -421,7 +440,7 @@ class Schema(metaclass=SchemaType):
 
     @classmethod
     def bind_db(cls, db: Database):
-        """Bind the PageSchema to the corresponding database for back-reference."""
+        """Bind this schema to the corresponding database for back-reference."""
         cls._database = db
         cls._set_obj_refs()
 
@@ -521,8 +540,13 @@ class Text(PropertyType[obj_schema.RichText], wraps=obj_schema.RichText):
 class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
     """Defines a number property in a database."""
 
-    def __init__(self, number_format: NumberFormat | str = NumberFormat.NUMBER):
-        super().__init__(NumberFormat(number_format))
+    def __init__(self, format: NumberFormat | str = NumberFormat.NUMBER):  # noqa: A002
+        super().__init__(NumberFormat(format))
+
+    @property
+    def format(self) -> NumberFormat:
+        """Return the number format of this number property."""
+        return self.obj_ref.number.format
 
 
 class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
@@ -540,6 +564,28 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
         """Return the options of this select property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.select.options]
 
+    @options.setter
+    def options(self, new_options: list[Option] | type[OptionNS]) -> None:
+        """Set the options of this select property.
+
+        !!! note
+            Omitted options are removed from the property and new options
+            will be added. Updating the `name` and `color` of an existing option
+            is not supported via the API.
+        """
+        if isinstance(new_options, type) and issubclass(new_options, OptionNS):
+            new_options = new_options.to_list()
+
+        # Compare current and new options, handle changed attributes if needed
+        diffs = compare_options(self.options, new_options)
+        if diffs:
+            msg = f'Cannot update options of {self.name} property: {diffs}'
+            raise InvalidAPIUsageError(msg)
+
+        self.obj_ref.select.options = [option.obj_ref for option in new_options]
+        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
+        self._update_attr(schema)
+
 
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
     """Defines a multi-select property in a database."""
@@ -555,6 +601,28 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
     def options(self) -> list[Option]:
         """Return the options of this multi-select property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options]
+
+    @options.setter
+    def options(self, new_options: list[Option] | type[OptionNS]) -> None:
+        """Set the options of this multi-select property.
+
+        !!! note
+            Omitted options are removed from the property and new options
+            will be added. Updating the `name` and `color` of an existing option
+            is not supported via the API.
+        """
+        if isinstance(new_options, type) and issubclass(new_options, OptionNS):
+            new_options = new_options.to_list()
+
+        # Compare current and new options, handle changed attributes if needed
+        diffs = compare_options(self.options, new_options)
+        if diffs:
+            msg = f'Cannot update options of {self.name} property: {diffs}'
+            raise InvalidAPIUsageError(msg)
+
+        self.obj_ref.multi_select.options = [option.obj_ref for option in new_options]
+        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
+        self._update_attr(schema)
 
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):

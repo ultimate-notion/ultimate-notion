@@ -15,7 +15,7 @@ class PropertyType(TypedObject, polymorphic_base=True):
     """Base class for Notion property objects."""
 
     id: str = None  # type: ignore
-    name: str | None = None
+    name: str = None  # type: ignore
 
 
 class Title(PropertyType, type='title'):
