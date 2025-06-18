@@ -37,6 +37,8 @@ from ultimate_notion.errors import (
     EmptyListError,
     InvalidAPIUsageError,
     MultipleItemsError,
+    RelationError,
+    RollupError,
     SchemaError,
     SchemaNotBoundError,
 )
@@ -701,10 +703,6 @@ class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
         self._update_attr(schema)
 
 
-class RelationError(SchemaError):
-    """Error if a Relation cannot be initialised."""
-
-
 class SelfRef(Schema, db_title=None):
     """Target schema for self-referencing database relations."""
 
@@ -836,10 +834,6 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             our_db = self.prop_ref._schema.get_db()
             session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
             our_db.schema._set_obj_refs()
-
-
-class RollupError(SchemaError):
-    """Error if definition of rollup is wrong."""
 
 
 class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
