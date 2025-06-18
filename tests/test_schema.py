@@ -264,36 +264,35 @@ def test_to_pydantic_model() -> None:
 
 @pytest.mark.vcr()
 def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> None:
-    s_options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
-
-    ms_options = [uno.Option(name='Tag1', color=uno.Color.DEFAULT), uno.Option(name='Tag2', color=uno.Color.GREEN)]
+    options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
 
     class Schema(uno.Schema, db_title='Select Options Update Test'):
         name = uno.Property('Name', uno.PropType.Title())
-        cat = uno.Property('Category', uno.PropType.Select(s_options))
-        tags = uno.Property('Tags', uno.PropType.MultiSelect(ms_options))
+        cat = uno.Property('Category', uno.PropType.Select(options))
+        tags = uno.Property('Tags', uno.PropType.MultiSelect(options))
 
     db = notion.create_db(parent=root_page, schema=Schema)
 
-    curr_cats = db.schema.cat.type.options  # type: ignore[attr-defined]
-    assert [cat.name for cat in curr_cats] == ['Cat1', 'Cat2']
+    for prop in ('Category', 'Tags'):
+        curr_cats = db.schema[prop].options  # type: ignore[attr-defined]
+        assert [cat.name for cat in curr_cats] == ['Cat1', 'Cat2']
 
-    new_cat = uno.Option(name='Cat3', color=uno.Color.RED)
-    # Adding a new category to the select options
-    db.schema.cat.type.options = [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        new_cat = uno.Option(name='Cat3', color=uno.Color.RED)
+        # Adding a new category to the select options
+        db.schema[prop].options = [*curr_cats, new_cat]  # type: ignore[attr-defined]
 
-    assert db.schema.cat.type.options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
-    db.reload()
-    assert db.schema.cat.type.options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        db.reload()
+        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
 
-    # Removing a category from the select options
-    db.schema.cat.type.options = [new_cat]  # type: ignore[attr-defined]
-    assert db.schema.cat.type.options == [new_cat]  # type: ignore[attr-defined]
-    db.reload()
-    assert db.schema.cat.type.options == [new_cat]  # type: ignore[attr-defined]
+        # Removing a category from the select options
+        db.schema[prop].options = [new_cat]  # type: ignore[attr-defined]
+        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
+        db.reload()
+        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
 
-    # Updating a category in the select options
-    with pytest.raises(InvalidAPIUsageError):
-        exist_option = uno.Option(name='Cat3', color=uno.Color.GREEN)
-        # trying to update the color of an existing option
-        db.schema.cat.type.options = [exist_option]  # type: ignore[attr-defined]
+        # Updating a category in the select options
+        with pytest.raises(InvalidAPIUsageError):
+            exist_option = uno.Option(name='Cat3', color=uno.Color.GREEN)
+            # trying to update the color of an existing option
+            db.schema[prop].options = [exist_option]  # type: ignore[attr-defined]
