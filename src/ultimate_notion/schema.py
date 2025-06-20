@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from abc import ABCMeta
 from collections import Counter
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator
 from functools import partial
 from textwrap import dedent
 from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast
@@ -44,6 +44,7 @@ from ultimate_notion.errors import (
 )
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.obj_api.schema import PropertyType as obj_PropertyType
+from ultimate_notion.obj_api.schema import Relation as obj_Relation
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, dict_diff_str, is_notebook
@@ -94,16 +95,15 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
         """Determines if the property type is already initialized"""
         return hasattr(self, 'obj_ref')
 
-    def _update_attr(self, schema: Mapping[str, obj_PropertyType]) -> None:
+    def _update_prop(self, name: str, prop_type: obj_PropertyType) -> obj_PropertyType:
         """Update the attributes of this property type from a schema."""
         if self.prop_ref is None:
             msg = 'PropertyType must be bound to a Property before updating attributes.'
             raise SchemaError(msg)
-        if not self._is_init:
-            raise SchemaNotBoundError(self.prop_ref._schema)
         db = self.prop_ref._schema.get_db()
         session = get_active_session()
-        session.api.databases.update(db=db.obj_ref, schema=schema)
+        db_obj = session.api.databases.update(db=db.obj_ref, schema={name: prop_type})
+        return db_obj.properties[name]
 
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
@@ -149,6 +149,25 @@ class Property:
     def __repr__(self) -> str:
         return get_repr(self, name='Property', desc=self.type)
 
+    def _update_prop(self, new_name: str | None) -> None:
+        """Update the name of this property in the schema or delete it."""
+        if self._schema is None:
+            msg = 'Property must be bound to a Schema.'
+            raise SchemaError(msg)
+        db = self._schema.get_db()
+        session = get_active_session()
+        schema: dict[str, obj_schema.RenameProp | None] = (
+            {self._name: None} if new_name is None else {self._name: obj_schema.RenameProp(name=new_name)}
+        )
+        session.api.databases.update(db=db.obj_ref, schema=schema)
+        if new_name is not None:
+            self._name = new_name
+        db.reload()
+
+    def delete(self) -> None:
+        """Delete this property from the schema."""
+        self._update_prop(None)
+
     @property
     def name(self) -> str:
         """Return the name of this property."""
@@ -157,7 +176,7 @@ class Property:
     @name.setter
     def name(self, new_name: str):
         """Set the name of this property."""
-        raise NotImplementedError
+        self._update_prop(new_name)
 
     @property
     def type(self) -> PropertyType:
@@ -190,6 +209,9 @@ class SchemaType(ABCMeta):
 
     def __getitem__(cls: type[Schema], prop_name: str) -> PropertyType:  # type: ignore[misc]
         return cls.get_prop(prop_name).type
+
+    def __delitem__(cls: type[Schema], prop_name: str) -> None:  # type: ignore[misc]
+        cls.get_prop(prop_name).delete()
 
     def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
         return len(cls.get_props())
@@ -556,8 +578,7 @@ class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
         if isinstance(new_format, str):
             new_format = NumberFormat(new_format)
         self.obj_ref.number.format = new_format
-        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
-        self._update_attr(schema)
+        self._update_prop(self.name, self.obj_ref)
 
 
 class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
@@ -594,8 +615,7 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
             raise InvalidAPIUsageError(msg)
 
         self.obj_ref.select.options = [option.obj_ref for option in new_options]
-        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
-        self._update_attr(schema)
+        self._update_prop(self.name, self.obj_ref)
 
 
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
@@ -632,8 +652,7 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
             raise InvalidAPIUsageError(msg)
 
         self.obj_ref.multi_select.options = [option.obj_ref for option in new_options]
-        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
-        self._update_attr(schema)
+        self._update_prop(self.name, self.obj_ref)
 
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
@@ -708,8 +727,7 @@ class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
     def expression(self, expression: str) -> None:
         """Set the expression of this formula property."""
         self.obj_ref.formula.expression = expression
-        schema: dict[str, obj_PropertyType] = {self.name: self.obj_ref}
-        self._update_attr(schema)
+        self._update_prop(self.name, self.obj_ref)
 
 
 class SelfRef(Schema, db_title=None):
@@ -752,12 +770,22 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         """Schema of the relation database."""
         if self._schema:
             return self._schema if self._schema is not SelfRef else None
-        elif self.prop_ref is not None and self.prop_ref._schema.is_bound():
-            db = self.prop_ref._schema._database
+        if self.prop_ref is not None and self.prop_ref._schema.is_bound():
             session = get_active_session()
-            return session.get_db(self.obj_ref.relation.database_id).schema if db is not None else None
+            return session.get_db(self.obj_ref.relation.database_id).schema
         else:
             return None
+
+    @schema.setter
+    def schema(self, new_schema: type[Schema]):
+        """Set the schema of the relation database."""
+        if self.is_two_way:
+            new_rel = obj_schema.DualPropertyRelation.build(new_schema.get_db().id)
+        else:
+            new_rel = obj_schema.SinglePropertyRelation.build(new_schema.get_db().id)
+        self.obj_ref.relation = new_rel.relation
+        self._update_prop(self.name, self.obj_ref)
+        self._schema = new_schema
 
     @property
     def _is_two_way_target(self) -> bool:
@@ -778,6 +806,39 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             return self.schema.get_prop(prop_name) if prop_name else None
         else:
             return None
+
+    @two_way_prop.setter
+    def two_way_prop(self, new_prop_name: str | None):
+        """Set the target property object of a two-way relation."""
+        if self.schema is None or (db := self.schema.get_db()) is None:
+            msg = 'The target schema of the relation is not bound to a database'
+            raise RelationError(msg)
+
+        if new_prop_name is None:
+            new_rel = obj_schema.SinglePropertyRelation.build(db.id)
+            self.obj_ref.relation = new_rel.relation
+            self.obj_ref = cast(obj_Relation, self._update_prop(self.name, self.obj_ref))
+        else:
+            new_rel = obj_schema.DualPropertyRelation.build(db.id)
+
+            if not isinstance(new_rel.relation, obj_schema.DualPropertyRelation):
+                msg = 'Cannot set two-way property on a one-way relation'
+                raise SchemaError(msg)
+
+            self.obj_ref.relation = new_rel.relation
+            self.obj_ref = cast(obj_Relation, self._update_prop(self.name, self.obj_ref))
+
+            if not isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
+                msg = 'Cannot set two-way property on a one-way relation'
+                raise SchemaError(msg)
+
+            tmp_new_prop_name = self.obj_ref.relation.dual_property.synced_property_name
+            db = self.schema.get_db()
+            db.reload()
+            if (back_ref_prop := db.schema[tmp_new_prop_name].prop_ref) is not None:
+                back_ref_prop.name = new_prop_name
+
+        self._schema = None  # Don't rely on the initialization of the schema
 
     @property
     def is_two_way(self) -> bool:
