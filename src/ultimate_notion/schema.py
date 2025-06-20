@@ -33,8 +33,18 @@ from tabulate import tabulate
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion import rich_text
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
-from ultimate_notion.errors import EmptyListError, MultipleItemsError, SchemaError, SchemaNotBoundError
+from ultimate_notion.errors import (
+    EmptyListError,
+    InvalidAPIUsageError,
+    MultipleItemsError,
+    RelationError,
+    RollupError,
+    SchemaError,
+    SchemaNotBoundError,
+)
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
+from ultimate_notion.obj_api.schema import PropertyType as obj_PropertyType
+from ultimate_notion.obj_api.schema import Relation as obj_Relation
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, dict_diff_str, is_notebook
@@ -42,7 +52,7 @@ from ultimate_notion.utils import SList, dict_diff_str, is_notebook
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
-
+from ultimate_notion.option import compare_options
 
 T = TypeVar('T', bound=obj_schema.PropertyType)
 
@@ -66,7 +76,7 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
         return self.obj_ref.id
 
     @property
-    def name(self) -> str | None:
+    def name(self) -> str:
         """Return name of this property type."""
         return self.obj_ref.name
 
@@ -84,6 +94,16 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
     def _is_init(self) -> bool:
         """Determines if the property type is already initialized"""
         return hasattr(self, 'obj_ref')
+
+    def _update_prop(self, name: str, prop_type: obj_PropertyType) -> obj_PropertyType:
+        """Update the attributes of this property type from a schema."""
+        if self.prop_ref is None:
+            msg = 'PropertyType must be bound to a Property before updating attributes.'
+            raise SchemaError(msg)
+        db = self.prop_ref._schema.get_db()
+        session = get_active_session()
+        db_obj = session.api.databases.update(db=db.obj_ref, schema={name: prop_type})
+        return db_obj.properties[name]
 
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
@@ -105,9 +125,10 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
 
 
 class Property:
-    """Database property/column with a name and a certain property type for defining a Notion database schema.
+    """Database property/column with a name and a Notion property type.
 
-    This is implemented as a descriptor.
+    A schema is a collection of properties that define the structure of a database.
+    This is implemented as a descriptor in Python.
     """
 
     _name: str
@@ -128,6 +149,25 @@ class Property:
     def __repr__(self) -> str:
         return get_repr(self, name='Property', desc=self.type)
 
+    def _update_prop(self, new_name: str | None) -> None:
+        """Update the name of this property in the schema or delete it."""
+        if self._schema is None:
+            msg = 'Property must be bound to a Schema.'
+            raise SchemaError(msg)
+        db = self._schema.get_db()
+        session = get_active_session()
+        schema: dict[str, obj_schema.RenameProp | None] = (
+            {self._name: None} if new_name is None else {self._name: obj_schema.RenameProp(name=new_name)}
+        )
+        session.api.databases.update(db=db.obj_ref, schema=schema)
+        if new_name is not None:
+            self._name = new_name
+        db.reload()
+
+    def delete(self) -> None:
+        """Delete this property from the schema."""
+        self._update_prop(None)
+
     @property
     def name(self) -> str:
         """Return the name of this property."""
@@ -136,7 +176,7 @@ class Property:
     @name.setter
     def name(self, new_name: str):
         """Set the name of this property."""
-        raise NotImplementedError
+        self._update_prop(new_name)
 
     @property
     def type(self) -> PropertyType:
@@ -158,7 +198,7 @@ class SchemaType(ABCMeta):
     """Metaclass for the schema of a database.
 
     This makes the schema class itself more user-friendly by providing a custom `__repr__` method
-    and letting it behave like a dictionary for the properties athough it is a class, not an instance.
+    and letting it behave like a dictionary for the properties although it is a class, not an instance.
     """
 
     # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
@@ -169,6 +209,9 @@ class SchemaType(ABCMeta):
 
     def __getitem__(cls: type[Schema], prop_name: str) -> PropertyType:  # type: ignore[misc]
         return cls.get_prop(prop_name).type
+
+    def __delitem__(cls: type[Schema], prop_name: str) -> None:  # type: ignore[misc]
+        cls.get_prop(prop_name).delete()
 
     def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
         return len(cls.get_props())
@@ -287,7 +330,7 @@ class Schema(metaclass=SchemaType):
         before it is passed to Ultimate Notion. The actual values are converted to `PropertyValue`
         and thus `value` needs to be called to retrieve the actual Python type.
 
-        If `with_ro_props` is set to `True`, read-only properties are included in the model
+        If `with_ro_props` is set to `True`, read-only properties are included in the model.
         """
 
         # ToDo: Validate the categories in Select and MultiSelect using pydantic!
@@ -421,7 +464,7 @@ class Schema(metaclass=SchemaType):
 
     @classmethod
     def bind_db(cls, db: Database):
-        """Bind the PageSchema to the corresponding database for back-reference."""
+        """Bind this schema to the corresponding database for back-reference."""
         cls._database = db
         cls._set_obj_refs()
 
@@ -521,8 +564,21 @@ class Text(PropertyType[obj_schema.RichText], wraps=obj_schema.RichText):
 class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
     """Defines a number property in a database."""
 
-    def __init__(self, number_format: NumberFormat | str = NumberFormat.NUMBER):
-        super().__init__(NumberFormat(number_format))
+    def __init__(self, format: NumberFormat | str = NumberFormat.NUMBER):  # noqa: A002
+        super().__init__(NumberFormat(format))
+
+    @property
+    def format(self) -> NumberFormat:
+        """Return the number format of this number property."""
+        return self.obj_ref.number.format
+
+    @format.setter
+    def format(self, new_format: NumberFormat | str) -> None:
+        """Set the number format of this number property."""
+        if isinstance(new_format, str):
+            new_format = NumberFormat(new_format)
+        self.obj_ref.number.format = new_format
+        self._update_prop(self.name, self.obj_ref)
 
 
 class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
@@ -540,6 +596,27 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
         """Return the options of this select property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.select.options]
 
+    @options.setter
+    def options(self, new_options: list[Option] | type[OptionNS]) -> None:
+        """Set the options of this select property.
+
+        !!! note
+            Omitted options are removed from the property and new options
+            will be added. Updating the `name` and `color` of an existing option
+            is not supported via the API.
+        """
+        if isinstance(new_options, type) and issubclass(new_options, OptionNS):
+            new_options = new_options.to_list()
+
+        # Compare current and new options, handle changed attributes if needed
+        diffs = compare_options(self.options, new_options)
+        if diffs:
+            msg = f'Cannot update options of {self.name} property: {diffs}'
+            raise InvalidAPIUsageError(msg)
+
+        self.obj_ref.select.options = [option.obj_ref for option in new_options]
+        self._update_prop(self.name, self.obj_ref)
+
 
 class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
     """Defines a multi-select property in a database."""
@@ -555,6 +632,27 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
     def options(self) -> list[Option]:
         """Return the options of this multi-select property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.multi_select.options]
+
+    @options.setter
+    def options(self, new_options: list[Option] | type[OptionNS]) -> None:
+        """Set the options of this multi-select property.
+
+        !!! note
+            Omitted options are removed from the property and new options
+            will be added. Updating the `name` and `color` of an existing option
+            is not supported via the API.
+        """
+        if isinstance(new_options, type) and issubclass(new_options, OptionNS):
+            new_options = new_options.to_list()
+
+        # Compare current and new options, handle changed attributes if needed
+        diffs = compare_options(self.options, new_options)
+        if diffs:
+            msg = f'Cannot update options of {self.name} property: {diffs}'
+            raise InvalidAPIUsageError(msg)
+
+        self.obj_ref.multi_select.options = [option.obj_ref for option in new_options]
+        self._update_prop(self.name, self.obj_ref)
 
 
 class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
@@ -625,9 +723,11 @@ class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
         """Return the expression of this formula property."""
         return self.obj_ref.formula.expression
 
-
-class RelationError(SchemaError):
-    """Error if a Relation cannot be initialised."""
+    @expression.setter
+    def expression(self, expression: str) -> None:
+        """Set the expression of this formula property."""
+        self.obj_ref.formula.expression = expression
+        self._update_prop(self.name, self.obj_ref)
 
 
 class SelfRef(Schema, db_title=None):
@@ -670,12 +770,22 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         """Schema of the relation database."""
         if self._schema:
             return self._schema if self._schema is not SelfRef else None
-        elif self.prop_ref is not None and self.prop_ref._schema.is_bound():
-            db = self.prop_ref._schema._database
+        if self.prop_ref is not None and self.prop_ref._schema.is_bound():
             session = get_active_session()
-            return session.get_db(self.obj_ref.relation.database_id).schema if db is not None else None
+            return session.get_db(self.obj_ref.relation.database_id).schema
         else:
             return None
+
+    @schema.setter
+    def schema(self, new_schema: type[Schema]):
+        """Set the schema of the relation database."""
+        if self.is_two_way:
+            new_rel = obj_schema.DualPropertyRelation.build(new_schema.get_db().id)
+        else:
+            new_rel = obj_schema.SinglePropertyRelation.build(new_schema.get_db().id)
+        self.obj_ref.relation = new_rel.relation
+        self._update_prop(self.name, self.obj_ref)
+        self._schema = new_schema
 
     @property
     def _is_two_way_target(self) -> bool:
@@ -696,6 +806,39 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             return self.schema.get_prop(prop_name) if prop_name else None
         else:
             return None
+
+    @two_way_prop.setter
+    def two_way_prop(self, new_prop_name: str | None):
+        """Set the target property object of a two-way relation."""
+        if self.schema is None or (db := self.schema.get_db()) is None:
+            msg = 'The target schema of the relation is not bound to a database'
+            raise RelationError(msg)
+
+        if new_prop_name is None:
+            new_rel = obj_schema.SinglePropertyRelation.build(db.id)
+            self.obj_ref.relation = new_rel.relation
+            self.obj_ref = cast(obj_Relation, self._update_prop(self.name, self.obj_ref))
+        else:
+            new_rel = obj_schema.DualPropertyRelation.build(db.id)
+
+            if not isinstance(new_rel.relation, obj_schema.DualPropertyRelation):
+                msg = 'Cannot set two-way property on a one-way relation'
+                raise SchemaError(msg)
+
+            self.obj_ref.relation = new_rel.relation
+            self.obj_ref = cast(obj_Relation, self._update_prop(self.name, self.obj_ref))
+
+            if not isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
+                msg = 'Cannot set two-way property on a one-way relation'
+                raise SchemaError(msg)
+
+            tmp_new_prop_name = self.obj_ref.relation.dual_property.synced_property_name
+            db = self.schema.get_db()
+            db.reload()
+            if (back_ref_prop := db.schema[tmp_new_prop_name].prop_ref) is not None:
+                back_ref_prop.name = new_prop_name
+
+        self._schema = None  # Don't rely on the initialization of the schema
 
     @property
     def is_two_way(self) -> bool:
@@ -761,10 +904,6 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             our_db = self.prop_ref._schema.get_db()
             session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
             our_db.schema._set_obj_refs()
-
-
-class RollupError(SchemaError):
-    """Error if definition of rollup is wrong."""
 
 
 class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):

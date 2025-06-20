@@ -1279,7 +1279,11 @@ class Template(TextBlock[obj_blocks.Template], ChildrenMixin, wraps=obj_blocks.T
 
 
 class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.UnsupportedBlock):
-    """Unsupported block in the API."""
+    """Unsupported block in the API.
+
+    Some blocks like buttons, AI blocks, or templates are not supported by the Notion API.
+    They will be returned as `Unsupported` blocks when fetched, but cannot be created or modified.
+    """
 
     def __init__(self):
         msg = 'An unsupported block cannot be created by a user.'

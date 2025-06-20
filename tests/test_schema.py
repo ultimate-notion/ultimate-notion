@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import props
-from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
+from ultimate_notion.errors import InvalidAPIUsageError, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.schema import PropertyType
 
@@ -23,7 +23,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -
     options = [uno.Option(name='Option1'), uno.Option(name='Option2', color=uno.Color.RED)]
 
     class SchemaB(uno.Schema, db_title='Schema B'):
-        """Acutal interesting schema/db"""
+        """Actual interesting schema/db"""
 
         checkbox = uno.Property('Checkbox', uno.PropType.Checkbox())
         created_by = uno.Property('Created by', uno.PropType.CreatedBy())
@@ -260,3 +260,116 @@ def test_to_pydantic_model() -> None:
     created_on = props.CreatedTime(pnd.parse('2021-01-01T12:00:00Z'))
     all_props_item = all_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2'], 'Created on': created_on})
     assert len(all_props_item.model_fields) == 3
+
+
+@pytest.mark.vcr()
+def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> None:
+    class SchemaA(uno.Schema, db_title='Update Prop-Test: Schema A'):
+        """Only used to create relations in Schema C"""
+
+        name = uno.Property('Name', uno.PropType.Title())
+        relation = uno.Property('Relation', uno.PropType.Relation())
+
+    class SchemaB(uno.Schema, db_title='Update Prop-Test: Schema B'):
+        """Only used to create relations in Schema C"""
+
+        name = uno.Property('Name', uno.PropType.Title())
+        relation = uno.Property('Relation', uno.PropType.Relation())
+
+    class SchemaC(uno.Schema, db_title='Update Prop-Test: Schema C'):
+        """Actual interesting schema/db"""
+
+        name = uno.Property('Name', uno.PropType.Title())
+        relation = uno.Property('Relation', uno.PropType.Relation(SchemaA))
+        relation_twoway = uno.Property(
+            'Relation two-way', uno.PropType.Relation(SchemaA, two_way_prop=SchemaA.relation)
+        )
+        rollup = uno.Property(
+            'Rollup',
+            uno.PropType.Rollup(relation_prop=relation, rollup_prop=SchemaA.name, calculate=uno.AggFunc.COUNT_ALL),
+        )
+
+    db_a = notion.create_db(parent=root_page, schema=SchemaA)
+    db_b = notion.create_db(parent=root_page, schema=SchemaB)
+    db_c = notion.create_db(parent=root_page, schema=SchemaC)
+
+    # Change the two-way relation property
+    assert db_c.schema['Relation'].two_way_prop is None  # type: ignore[attr-defined]
+    two_way_prop = 'Back Relation'
+    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    db_c.reload()
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    db_c.schema['Relation'].two_way_prop = None  # type: ignore[attr-defined]
+    # ToDo: Fix this!!!
+    # assert two_way_prop not in [prop.name for prop in db_a.schema]
+    # db_a.reload()
+    # assert two_way_prop not in [prop.name for prop in db_a.schema]
+
+    # Change target from SchemaA to SchemaB for one-way and two-way relations
+    for rel in ('Relation', 'Relation two-way'):
+        assert db_c.schema[rel].schema == db_a.schema  # type: ignore[attr-defined]
+        db_c.schema[rel].schema = db_b.schema  # type: ignore[attr-defined]
+        assert db_c.schema[rel].schema == db_b.schema  # type: ignore[attr-defined]
+        db_c.reload()
+        assert db_c.schema[rel].schema == db_b.schema  # type: ignore[attr-defined]
+
+    # change the options of the (multi-)select property
+    options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
+
+    def block_ref(prop: PropertyType) -> str:
+        """Helper function to create a block reference for the formula.
+
+        Note that Notion converts 'prop("Name")' to Jinja2-like expressions
+        """
+        return f'{{{{notion:block_property:{prop.id}:'
+
+    class Schema(uno.Schema, db_title='Select Options Update Test'):
+        name = uno.Property('Name', uno.PropType.Title())
+        cat = uno.Property('Category', uno.PropType.Select(options))
+        tags = uno.Property('Tags', uno.PropType.MultiSelect(options))
+        formula = uno.Property('Formula', uno.PropType.Formula('prop("Name")'))
+        number = uno.Property('Number', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+
+    db = notion.create_db(parent=root_page, schema=Schema)
+
+    # Change the number format of the number property
+    assert db.schema['Number'].format == uno.NumberFormat.DOLLAR  # type: ignore[attr-defined]
+    db.schema['Number'].format = uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    db.reload()
+    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    db.schema['Number'].format = uno.NumberFormat.EURO.value  # type: ignore[attr-defined]
+    assert db.schema['Number'].format == uno.NumberFormat.EURO  # type: ignore[attr-defined]
+
+    # Change the formula property
+    assert db.schema['Formula'].expression.startswith(block_ref(db.schema['Name']))  # type: ignore[attr-defined]
+    db.schema['Formula'].expression = 'prop("Category")'  # type: ignore[attr-defined]
+    assert db.schema['Formula'].expression == 'prop("Category")'  # type: ignore[attr-defined]
+    db.reload()
+    assert db.schema['Formula'].expression.startswith(block_ref(db.schema['Category']))  # type: ignore[attr-defined]
+
+    # Change the select options of the select and multi-select properties
+    for prop in ('Category', 'Tags'):
+        curr_cats = db.schema[prop].options  # type: ignore[attr-defined]
+        assert [cat.name for cat in curr_cats] == ['Cat1', 'Cat2']
+
+        new_cat = uno.Option(name='Cat3', color=uno.Color.RED)
+        # Adding a new category to the select options
+        db.schema[prop].options = [*curr_cats, new_cat]  # type: ignore[attr-defined]
+
+        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        db.reload()
+        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+
+        # Removing a category from the select options
+        db.schema[prop].options = [new_cat]  # type: ignore[attr-defined]
+        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
+        db.reload()
+        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
+
+        # Updating a category in the select options
+        with pytest.raises(InvalidAPIUsageError):
+            exist_option = uno.Option(name='Cat3', color=uno.Color.GREEN)
+            # trying to update the color of an existing option
+            db.schema[prop].options = [exist_option]  # type: ignore[attr-defined]

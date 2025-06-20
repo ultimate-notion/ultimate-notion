@@ -57,5 +57,13 @@ class SchemaNotBoundError(SchemaError):
         super().__init__(msg)
 
 
+class RollupError(SchemaError):
+    """Error if definition of rollup is wrong."""
+
+
+class RelationError(SchemaError):
+    """Error if a Relation cannot be initialised."""
+
+
 class ReadOnlyPropertyError(SchemaError):
     """Raised when an attempt is made to write to a write-protected property."""

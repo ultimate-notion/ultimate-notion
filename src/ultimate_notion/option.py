@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import inspect
+
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
@@ -114,3 +116,28 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
 
     def __str__(self) -> str:
         return self.name
+
+
+def compare_options(old: list[Option], new: list[Option]) -> dict[str, list[str]]:
+    """Compare two lists of options by their name, ignoring the id.
+
+    Returns which attributes have changed for each option.
+    This is mainly used to check if options have changed
+    when updating a select or multi-select property.
+    """
+    old_by_name = {opt.name: opt for opt in old}
+    new_by_name = {opt.name: opt for opt in new}
+    common_names = set(old_by_name) & set(new_by_name)
+
+    updates: dict[str, list[str]] = {}
+    for name in common_names:
+        old_opt = old_by_name[name]
+        new_opt = new_by_name[name]
+
+        # we
+        attrs_to_check = {name for name, value in inspect.getmembers(Option) if isinstance(value, property)}
+        attrs_to_check -= {'name', 'id'}
+        for attr in attrs_to_check:
+            if getattr(old_opt, attr, None) != getattr(new_opt, attr, None):
+                updates.setdefault(name, []).append(attr)
+    return updates

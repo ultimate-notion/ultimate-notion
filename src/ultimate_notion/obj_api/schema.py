@@ -15,7 +15,7 @@ class PropertyType(TypedObject, polymorphic_base=True):
     """Base class for Notion property objects."""
 
     id: str = None  # type: ignore
-    name: str | None = None
+    name: str = None  # type: ignore
 
 
 class Title(PropertyType, type='title'):
@@ -176,7 +176,7 @@ class SinglePropertyRelation(PropertyRelation, type='single_property'):
     single_property: TypeData = TypeData()
 
     @classmethod
-    def build(cls, dbref):
+    def build(cls, dbref: UUID) -> Relation:
         """Create a `single_property` relation using the target database reference.
 
         `dbref` must be either a string or UUID.
@@ -198,7 +198,7 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
     dual_property: TypeData = TypeData()
 
     @classmethod
-    def build(cls, dbref):
+    def build(cls, dbref: UUID) -> Relation:
         """Create a `dual_property` relation using the target database reference.
 
         `dbref` must be either a string or UUID.

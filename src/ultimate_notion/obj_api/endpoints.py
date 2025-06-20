@@ -183,7 +183,7 @@ class DatabasesEndpoint(Endpoint):
     @staticmethod
     def _build_request(
         parent: SerializeAsAny[ParentRef] | None = None,
-        schema: Mapping[str, PropertyType | RenameProp] | None = None,
+        schema: Mapping[str, PropertyType | RenameProp | None] | None = None,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         *,
@@ -244,7 +244,7 @@ class DatabasesEndpoint(Endpoint):
         db: Database,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
-        schema: Mapping[str, PropertyType | RenameProp] | None = None,
+        schema: Mapping[str, PropertyType | RenameProp | None] | None = None,
     ) -> Database:
         """Update the Database object on the server.
 
