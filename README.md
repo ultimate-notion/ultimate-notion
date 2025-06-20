@@ -76,7 +76,6 @@ notion.close()
 
 Check out the official [Ultimate Notion documentation] for more details.
 Especially the page about [creating a Notion integration] to get the token.
-The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pages].
 
 ## 💬 Getting help
 
@@ -107,8 +106,9 @@ Check out this [page about contributing] for more details.
 ## 📄 License & Credits
 
 Ultimate Notion is distributed under the terms of the [MIT license](LICENSE.txt).
-To start this project off a lot of inspiration and code was taken from [hatch] and [notional].
-Ultimate Notion highly depends on [notion-sdk-py].
+Ultimate Notion is built on top of [notion-sdk-py].
+To start this project off a lot of inspiration and code was taken from [notional] and the overall project setup from [hatch].
+The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pages].
 
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/
