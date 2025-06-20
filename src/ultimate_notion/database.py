@@ -159,6 +159,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Reload this database."""
         session = get_active_session()
         self.obj_ref = session.api.databases.retrieve(self.obj_ref.id)
+        self._schema = None  # reset schema to reflect the current database
         self.schema._set_obj_refs()
         return self
 
