@@ -20,7 +20,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] search for a database by its title
 - [x] create a new database with a given schema, i.e. properties and their types
 - [x] delete and restore a database
-- [ ] update a database schema, i.e. adding/removing properties or changing their types
+- [x] update a database schema, i.e. adding/removing properties or changing their types
 - [ ] change database properties, e.g. name, formula of formula property, options, etc.
 - [x] read the database attributes like title, description, cover, icon, etc.
 - [x] change database attributes like title, description, etc.

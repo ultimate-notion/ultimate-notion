@@ -263,6 +263,62 @@ def test_to_pydantic_model() -> None:
 
 
 @pytest.mark.vcr()
+def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
+    options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
+
+    class Schema(uno.Schema, db_title='Add/Del/Update Prop-Test'):
+        """Schema for testing adding, deleting and updating properties"""
+
+        name = uno.Property('Name', uno.PropType.Title())
+        cat = uno.Property('Category', uno.PropType.Select(options))
+        tags = uno.Property('Tags', uno.PropType.MultiSelect(options))
+        formula = uno.Property('Formula', uno.PropType.Formula('prop("Name")'))
+
+    db = notion.create_db(parent=root_page, schema=Schema)
+
+    # Delete properties from the schema
+    assert hasattr(db.schema, 'formula')
+    del db.schema['Formula']
+    assert 'Formula' not in [prop.name for prop in db.schema]
+    assert not hasattr(db.schema, 'formula')
+    db.reload()
+    assert 'Formula' not in [prop.name for prop in db.schema]
+    assert not hasattr(db.schema, 'formula')
+
+    db.schema.tags.delete()  # type: ignore[attr-defined]
+    assert 'Tags' not in [prop.name for prop in db.schema]
+    assert not hasattr(db.schema, 'tags')
+    db.reload()
+    assert 'Tags' not in [prop.name for prop in db.schema]
+    assert not hasattr(db.schema, 'tags')
+
+    # Add properties to the schema
+    db.schema['Number'] = uno.PropType.Number(uno.NumberFormat.DOLLAR)
+    assert 'Number' in [prop.name for prop in db.schema]
+    assert hasattr(db.schema, 'number')
+    db.reload()
+    assert 'Number' in [prop.name for prop in db.schema]
+    assert hasattr(db.schema, 'number')
+
+    db.schema.date = uno.Property('Date', uno.PropType.Date())
+    assert 'Date' in [prop.name for prop in db.schema]
+    assert hasattr(db.schema, 'date')
+    db.reload()
+    assert 'Date' in [prop.name for prop in db.schema]
+    assert hasattr(db.schema, 'date')
+
+    # Update properties in the schema
+    db.schema['Number'] = uno.PropType.Formula('prop("Name") + "!"')
+    assert db.schema['Number'].expression.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+    db.reload()
+    assert db.schema['Number'].expression.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+
+    db.schema.number = uno.Property('NewNumber', uno.PropType.Number(uno.NumberFormat.PERCENT))
+    assert 'NewNumber' in [prop.name for prop in db.schema]
+    db.reload()
+    assert 'NewNumber' in [prop.name for prop in db.schema]
+
+
 def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Update Prop-Test: Schema A'):
         """Only used to create relations in Schema C"""
