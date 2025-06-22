@@ -160,9 +160,11 @@ class Property:
             {self._name: None} if new_name is None else {self._name: obj_schema.RenameProp(name=new_name)}
         )
         session.api.databases.update(db=db.obj_ref, schema=schema)
-        if new_name is not None:
+        if new_name is None:
+            delattr(self._schema, self._attr_name)
+        else:
             self._name = new_name
-        db.reload()
+        self._schema._set_obj_refs()
 
     def delete(self) -> None:
         """Delete this property from the schema."""
@@ -212,6 +214,21 @@ class SchemaType(ABCMeta):
 
     def __delitem__(cls: type[Schema], prop_name: str) -> None:  # type: ignore[misc]
         cls.get_prop(prop_name).delete()
+
+    def __setitem__(cls: type[Schema], prop_name: str, prop_type: PropertyType) -> None:  # type: ignore[misc]
+        session = get_active_session()
+        session.api.databases.update(db=cls.get_db().obj_ref, schema={prop_name: prop_type.obj_ref})
+        prop = Property(prop_name, prop_type)
+        super().__setattr__(rich_text.snake_case(prop_name), prop)  # type: ignore[misc]
+        prop.__set_name__(cls, rich_text.snake_case(prop_name))
+        cls._set_obj_refs()
+
+    def __setattr__(cls: type[Schema], name: str, value: Any) -> None:  # type: ignore[misc]
+        if isinstance(value, Property):
+            cls[value.name] = value.type
+            super().__setattr__(name, cls.get_prop(value.name))  # type: ignore[misc]
+        else:
+            super().__setattr__(name, value)  # type: ignore[misc]
 
     def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
         return len(cls.get_props())

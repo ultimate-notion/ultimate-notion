@@ -138,6 +138,8 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Return whether the database is inline."""
         return self.obj_ref.is_inline
 
+    # TODO: Implement setting is_inline
+
     def delete(self) -> Self:
         """Delete this database."""
         if not self.is_deleted:

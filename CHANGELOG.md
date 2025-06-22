@@ -13,6 +13,7 @@
 - Chg: Return `None` instead of an empty string `""` when a text property or block is unset.
 - New: Setting the width ratios of page columns is supported.
 - Fix: Adding a column with `add_column(index)` at a given index is no longer off by 1.
+- Add: Updating a database schema, i.e. adding/removing properties or changing their types
 
 ## Version 0.7.1, 2025-01-05
 
