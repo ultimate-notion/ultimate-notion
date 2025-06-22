@@ -357,10 +357,9 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     db_c.reload()
     assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
     db_c.schema['Relation'].two_way_prop = None  # type: ignore[attr-defined]
-    # ToDo: Fix this!!!
-    # assert two_way_prop not in [prop.name for prop in db_a.schema]
-    # db_a.reload()
-    # assert two_way_prop not in [prop.name for prop in db_a.schema]
+    assert two_way_prop not in [prop.name for prop in db_a.schema]
+    db_a.reload()
+    assert two_way_prop not in [prop.name for prop in db_a.schema]
 
     # Change target from SchemaA to SchemaB for one-way and two-way relations
     for rel in ('Relation', 'Relation two-way'):

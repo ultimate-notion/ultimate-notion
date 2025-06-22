@@ -131,6 +131,8 @@ class Property:
     This is implemented as a descriptor in Python.
     """
 
+    # TODO: Do we really need this class? It is only used to set the name and type of a property!
+
     _name: str
     _type: PropertyType
     # properties below are set by __set_name__
@@ -827,14 +829,22 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
     @two_way_prop.setter
     def two_way_prop(self, new_prop_name: str | None):
         """Set the target property object of a two-way relation."""
+
         if self.schema is None or (db := self.schema.get_db()) is None:
             msg = 'The target schema of the relation is not bound to a database'
             raise RelationError(msg)
 
         if new_prop_name is None:
+            if self.two_way_prop is None:
+                return
+            target_schema = self.schema
+            target_two_way_prop = self.two_way_prop.name
             new_rel = obj_schema.SinglePropertyRelation.build(db.id)
             self.obj_ref.relation = new_rel.relation
             self.obj_ref = cast(obj_Relation, self._update_prop(self.name, self.obj_ref))
+            # Strangely enough, the two-way property is not removed from the target schema
+            # also it is no longer a two-way relation.
+            del target_schema[target_two_way_prop]
         else:
             new_rel = obj_schema.DualPropertyRelation.build(db.id)
 
