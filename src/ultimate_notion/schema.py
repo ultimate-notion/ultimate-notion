@@ -248,7 +248,7 @@ class SchemaModel(BaseModel):
     def to_dict(self) -> dict[str, Any]:
         """Convert the Pydantic model to a dictionary."""
         result = {}
-        for name, field in self.model_fields.items():
+        for name, field in self.__class__.model_fields.items():
             value = getattr(self, name)
             name = field.alias or name
             if isinstance(value, PropertyValue):
