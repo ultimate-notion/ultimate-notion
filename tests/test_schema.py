@@ -349,13 +349,22 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
     db_c = notion.create_db(parent=root_page, schema=SchemaC)
 
-    # Change the two-way relation property
+    # Set a two-way relation property
     assert db_c.schema['Relation'].two_way_prop is None  # type: ignore[attr-defined]
     two_way_prop = 'Back Relation'
     db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
     assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
     db_c.reload()
     assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+
+    # Try renaming the two-way relation property
+    two_way_prop = 'Other Back Relation'
+    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    db_c.reload()
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+
+    # Delete the two-way relation property
     db_c.schema['Relation'].two_way_prop = None  # type: ignore[attr-defined]
     assert two_way_prop not in [prop.name for prop in db_a.schema]
     db_a.reload()
