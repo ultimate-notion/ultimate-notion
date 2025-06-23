@@ -165,8 +165,17 @@ def vcr_config() -> dict[str, Any]:
 
 @pytest.fixture(scope='session')
 def custom_config(request: SubRequest) -> Iterator[Path]:
-    """Return a custom configuration file for the tests."""
-    if request.config.getoption('--record-mode') == 'none':  # corresponds to `vcr-only`
+    """Return a custom configuration file for the tests.
+
+    !!! note
+        pytest-dotenv will use `../.vscode/.env` by default and load the local
+        ultimate-notion configuration file defined in `.env`.
+    """
+    # compare with hatch scripts in `pyproject.toml`
+    vcr_only = request.config.getoption('--record-mode') == 'none'
+    test = request.config.getoption('--record-mode') == 'once' and not request.config.getoption('--disable-recording')
+
+    if vcr_only:
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             cfg_path = tmp_dir_path / Path('config.toml')
             with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
@@ -189,7 +198,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
                 )
                 yield cfg_path
 
-    elif request.config.getoption('--record-mode') == 'once':  # corresponds to `test`
+    elif test:
         cfg_path = get_cfg_file()
         # make sure that the token is valid forever to avoid problems with the Google API
         with tempfile.TemporaryDirectory() as tmp_dir_path:
@@ -204,9 +213,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
                 yield cfg_path
 
-    else:
-        # Note: pytest-dotenv will use ../.vscode/.env as default and load the local
-        # ultimate-notion configuration file for development here.
+    else:  # vcr-off and vcr-rewrite
         cfg_path = get_cfg_file()
         with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
             yield cfg_path
@@ -240,7 +247,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
                 mode = request.config.getoption('--record-mode')
                 if mode == 'rewrite':
                     # This avoids rewriting the fixture cassettes every time we rewrite for a new test!
-                    mode = 'once'
+                    mode = 'new_episodes'
                 elif mode is None:
                     mode = 'none'
                 vcr = VCR(record_mode=vcr_mode(mode), **vcr_config)
@@ -600,7 +607,7 @@ def delete_all_taskslists() -> None:
             "We tampered with the token's expiry date to allow for VCR testing but you seem to try to "
             'connect to the Google API now.\n'
             f'Delete `{TEST_CFG_FILE.parent / "token.json"}` and run:\n'
-            'hatch run vcr-rewrite -k ...\n'
+            'hatch run vcr-off -k ...\n'
             'to perform the authentication flow before rewriting the VCR cassettes.'
         )
         raise RuntimeError(msg) from e
