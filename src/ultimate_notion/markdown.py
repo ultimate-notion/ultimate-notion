@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, TypeGuard
 
 import mistune
 import numpy as np
-from mistune import Markdown
 from mistune.directives import FencedDirective, TableOfContents
 
 from ultimate_notion.utils import rank
@@ -175,9 +174,10 @@ def md_comment(text: str) -> str:
     return f'<!--- {text} -->\n'
 
 
-def get_md_renderer() -> Markdown:
+def get_md_renderer() -> Callable[[str], str]:
     """Create a markdown renderer."""
-    return mistune.create_markdown(
+
+    vanilla_renderer = mistune.create_markdown(
         plugins=[
             'strikethrough',
             'url',
@@ -192,6 +192,20 @@ def get_md_renderer() -> Markdown:
         ],
         escape=False,
     )
+
+    def md_renderer(md_str: str) -> str:
+        match html := vanilla_renderer(md_str):
+            case str():
+                return html
+            case list():
+                msg = 'Cannot convert rich text to HTML, because the renderer returned a list:\n'
+                msg += '\n'.join(str(elem) for elem in html)
+                raise ValueError(msg)
+            case _:
+                msg = f'Cannot convert rich text to HTML, because the renderer returned {type(html)}'
+                raise ValueError(msg)
+
+    return md_renderer
 
 
 render_md = get_md_renderer()
