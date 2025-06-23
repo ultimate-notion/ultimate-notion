@@ -12,7 +12,7 @@ import ultimate_notion as uno
 notion = uno.Session.get_or_create()
 ```
 
-## Declarative schemas & relations
+## Declarative way of defining a schema
 
 We start by defining the schema for our items in a really pythonic way.
 The schema should have three properties, the title property `Name` for the name of an item, e.g. "Jeans",
@@ -65,6 +65,52 @@ for the various property types defined in [schema]. Property types with the clas
 variable `allowed_at_creation` set to `False` are currently not supported by the Notion API.
 when creating a new database.
 
+## Programmatic way of defining a schema
+
+Besides the recommended *declarative* approach to define a schema, you can also choose a
+more classical *programmatic* approach. The main difference is that we first create the
+a database with a default schema and then start adding new properties, i.e. columns to it.
+
+```python
+employee_db = notion.create_db(parent=root_page)
+employee_db.title = 'Employee DB'
+employee_db.description = 'Database holding all our employees'
+
+employee_db.schema['Salary'] = uno.PropType.Number()
+employee_db.schema.hiring_date = uno.Property('Hiring Date', uno.PropType.Date())
+
+options = [uno.Option(name='Junior', color=uno.Color.GREEN),
+           uno.Option(name='Advanced', color=uno.Color.YELLOW),
+           uno.Option(name='Senior', color=uno.Color.RED)]
+
+employee_db.schema['Level'] = uno.PropType.Select(options)
+```
+
+As shown above, there are two ways to add new properties by:
+
+1. a dictionary item assignment of a [PropType] to the schema,
+2. a property assignment of a [Property] to the schema.
+
+In the first case, a corresponding property `salary` of the schema will be created automatically.
+
+This also allows us to do schema evolution by changing and updating columns, e.g.:
+
+```python
+employee_db.schema['Salary'] = uno.PropType.Formula('50000 + dateBetween(prop("Hiring Date"), now(), "years")*1000')
+employee_db.schema['Level'].options = [*options, uno.Option(name='Partner', color=uno.Color.PINK)]
+employee_db.schema.hiring_date = uno.Property('Hiring Date as String', uno.PropType.Text())
+employee_db.schema.hiring_date.name = 'Hiring Date'
+```
+
+Of course, we can also delete properties:
+
+```python
+del employee_db.schema['Salary']
+employee_db.schema.hiring_date.delete()
+```
+
+Again using the dictionary and the property approach.
+
 ## New database entries
 
 Now that we have created those two databases, we can start filling them with a few entries
@@ -76,8 +122,8 @@ khaki_pants = item_db.create_page(name='Khaki pants', size=Size.M, price=25)
 tank_top = item_db.create_page(name='Tank top', size=Size.S, price=15)
 ```
 
-or we can also directly use the [create] method of the schema if the schema is already bound
-to a database:
+or we can also directly use the [create] method of the schema if the schema is already bound,
+e.g. by using [bind_db], to a database:
 
 ```python
 lovelace = Customer.create(name='Ada Lovelace', purchases=[tank_top])
@@ -200,5 +246,7 @@ tidyup_kitchen = Task.create(
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
 [create]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema.create
 [Relation]:  ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Relation
+[Property]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Property
 [PropType]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.PropType
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema
+[bind_db]: ../../reference/ultimate_notion/#ultimate_notion.Schema.bind_db
