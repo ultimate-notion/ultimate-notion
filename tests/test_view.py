@@ -97,7 +97,7 @@ def test_to_pydantic(task_db: uno.Database) -> None:
     assert len(view) == len(tasks)
 
     task = tasks[0]
-    for field_attr in task.model_fields:
+    for field_attr in task.__class__.model_fields:
         field = getattr(task, field_attr)
         assert isinstance(field, PropertyValue)
         _ = field.value
