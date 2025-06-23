@@ -567,5 +567,10 @@ class ExternalFile(FileObject, type='external'):
 class Comment(NotionEntity, object='comment'):
     """A Notion comment object."""
 
+    class TypeData(GenericObject):
+        type: str  # This is strangely always `integration`, even if set by a user
+        resolved_name: str  # This always the workspace name
+
     discussion_id: UUID
     rich_text: list[RichTextBaseObject]
+    display_name: TypeData
