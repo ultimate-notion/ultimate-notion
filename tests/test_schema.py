@@ -319,6 +319,7 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert 'NewNumber' in [prop.name for prop in db.schema]
 
 
+@pytest.mark.vcr()
 def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Update Prop-Test: Schema A'):
         """Only used to create relations in Schema C"""
