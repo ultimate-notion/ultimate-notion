@@ -47,7 +47,6 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-# ToDo: Also add polars and pandas (remove it from direct dependencies)
 google = [
    "google-api-python-client",
    "google-auth-httplib2",
@@ -276,6 +275,7 @@ pip-compile-resolver = "pip-compile" # or "uv"
 pip-compile-hashes = false  # no hashes in lock files
 lock-filename = "locks/{env_name}.lock"
 dependencies = [
+    "urllib3==2.2.3",  # Issue: https://github.com/kevin1024/vcrpy/issues/888
     "coverage[toml]>=6.2",
     "pytest",
     "pytest-cov",
@@ -296,7 +296,7 @@ dependencies = [
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
 debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
 vcr-off = "test --disable-recording {args}"
-vcr-only = "test --record-mode none --block-network {args}"
+vcr-only = "test --record-mode=none --block-network {args}"
 vcr-rewrite = "test --record-mode=rewrite {args}"
 vcr-drop-cassettes = "find ./tests -type d -name 'cassettes' -exec rm -rf {{}} +"
 test-release = "vcr-off --check-latest-release {args}"
