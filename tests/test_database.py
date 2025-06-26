@@ -56,6 +56,10 @@ def test_db_inline(notion: uno.Session, root_page: uno.Page):
 
     db = notion.create_db(parent=root_page, schema=Article, inline=True)
     assert db.is_inline
+    db.is_inline = False
+    assert not db.is_inline
+    db.reload()  # reload to get the updated value
+    assert not db.is_inline
     db.delete()
 
 

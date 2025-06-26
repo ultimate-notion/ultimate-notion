@@ -182,12 +182,12 @@ class DatabasesEndpoint(Endpoint):
 
     @staticmethod
     def _build_request(
+        *,
         parent: SerializeAsAny[ParentRef] | None = None,
         schema: Mapping[str, PropertyType | RenameProp | None] | None = None,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
-        *,
-        inline: bool = False,
+        inline: bool | None = None,
     ) -> dict[str, Any]:
         """Build a request payload from the given items.
 
@@ -210,8 +210,8 @@ class DatabasesEndpoint(Endpoint):
                 name: value.serialize_for_api() if value is not None else None for name, value in schema.items()
             }
 
-        if inline:
-            request['is_inline'] = True
+        if inline is not None:
+            request['is_inline'] = inline
 
         return request
 
@@ -220,14 +220,14 @@ class DatabasesEndpoint(Endpoint):
         self,
         parent: Page,
         schema: Mapping[str, PropertyType],
-        title: list[RichTextBaseObject] | None = None,
         *,
+        title: list[RichTextBaseObject] | None = None,
         inline: bool = False,
     ) -> Database:
         """Add a database to the given Page parent."""
         parent_ref = PageRef.build(parent)
         _logger.debug(f'Creating new database below page with id `{parent_ref.page_id}`.')
-        request = self._build_request(parent_ref, schema, title, inline=inline)
+        request = self._build_request(parent=parent_ref, schema=schema, title=title, inline=inline)
         data = self.raw_api.create(**request)
         return Database.model_validate(data)
 
@@ -242,8 +242,10 @@ class DatabasesEndpoint(Endpoint):
     def update(
         self,
         db: Database,
+        *,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
+        inline: bool | None = None,
         schema: Mapping[str, PropertyType | RenameProp | None] | None = None,
     ) -> Database:
         """Update the Database object on the server.
@@ -254,7 +256,7 @@ class DatabasesEndpoint(Endpoint):
         """
         _logger.debug(f'Updating info of database with id `{db.id}`.')
 
-        if request := self._build_request(schema=schema, title=title, description=description):
+        if request := self._build_request(schema=schema, title=title, description=description, inline=inline):
             # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
             # Typing in notion_client sucks, thus we cast
             data = cast(dict[str, Any], self.raw_api.update(str(db.id), **request))

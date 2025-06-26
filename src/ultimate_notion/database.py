@@ -138,7 +138,13 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Return whether the database is inline."""
         return self.obj_ref.is_inline
 
-    # TODO: Implement setting is_inline
+    @is_inline.setter
+    def is_inline(self, inline: bool):
+        """Set whether the database is inline."""
+        if self.is_inline != inline:
+            session = get_active_session()
+            session.api.databases.update(self.obj_ref, inline=inline)
+            self.obj_ref.is_inline = inline
 
     def delete(self) -> Self:
         """Delete this database."""
