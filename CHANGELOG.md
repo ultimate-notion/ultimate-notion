@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.9
+
+- New: Allow updating if a database is inline or not
+
 ## Version 0.8, 2025-06-23
 
 - New: Added support for creating inline databases by Tzumx
