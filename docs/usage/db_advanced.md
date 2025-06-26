@@ -96,11 +96,23 @@ In the first case, a corresponding property `salary` of the schema will be creat
 This also allows us to do schema evolution by changing and updating columns, e.g.:
 
 ```python
-employee_db.schema['Salary'] = uno.PropType.Formula('50000 + dateBetween(prop("Hiring Date"), now(), "years")*1000')
-employee_db.schema['Level'].options = [*options, uno.Option(name='Partner', color=uno.Color.PINK)]
-employee_db.schema.hiring_date = uno.Property('Hiring Date as String', uno.PropType.Text())
+employee_db.schema['Salary'] = uno.PropType.Formula(
+    '50000 + dateBetween(prop("Hiring Date"), now(), "years")*1000'
+)
+employee_db.schema['Level'].options = [
+    *options,
+    uno.Option(name='Partner', color=uno.Color.PINK)
+]
+employee_db.schema.hiring_date = uno.Property(
+    'Hiring Date as String',
+    uno.PropType.Text()
+)
 employee_db.schema.hiring_date.name = 'Hiring Date'
 ```
+
+This changes the salary property to a formula type, adds a partner level to the level property, changes
+the hiring date first to a text type and the name of it, which is then followed by setting the name back
+using property access.
 
 Of course, we can also delete properties:
 
