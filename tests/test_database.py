@@ -79,6 +79,26 @@ def test_db_without_title(notion: uno.Session, root_page: uno.Page) -> None:
 
 
 @pytest.mark.vcr()
+def test_db_with_title(notion: uno.Session, root_page: uno.Page) -> None:
+    """Simple database of articles"""
+
+    class Article(uno.Schema, db_title='My Articles'):
+        name = uno.Property('Name', uno.PropType.Title())
+        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+        desc = uno.Property('Description', uno.PropType.Text())
+
+    db = notion.create_db(parent=root_page, schema=Article, title='Overwritten Title')
+    assert db.title == 'Overwritten Title'
+    assert db.description == ''
+    db.delete()
+
+    db = notion.create_db(parent=root_page, title='No Schema Used')
+    assert db.title == 'No Schema Used'
+    assert db.description == ''
+    db.delete()
+
+
+@pytest.mark.vcr()
 def test_db_with_docstring(notion: uno.Session, root_page: uno.Page) -> None:
     """Simple database of articles"""
 

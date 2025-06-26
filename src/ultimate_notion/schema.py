@@ -1029,13 +1029,12 @@ class Button(PropertyType[obj_schema.Button], wraps=obj_schema.Button):
 
 
 class DefaultSchema(Schema, db_title=None):
-    """Default database schema of Notion.
-
-    As inferred by just creating an empty database in the Notion UI.
-    """
+    # Default database schema of Notion.
+    #
+    # As inferred by just creating an empty database in the Notion UI.
+    # NOTE: Use no docstring here, otherwise it will be used as the database description.
 
     name = Property('Name', Title())
-    tags = Property('Tags', MultiSelect([]))
 
 
 class PropType:

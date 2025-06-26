@@ -151,31 +151,39 @@ class Session:
         _logger.info(f'Retrieved `{type(block)}` block.')
         return block
 
-    # ToDo: Provide a title and description for the database that overwrites the values from the schema
-    def create_db(self, parent: Page, schema: type[Schema] | None = None, *, inline: bool = False) -> Database:
-        """Create a new database within a page."""
+    def create_db(
+        self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
+    ) -> Database:
+        """Create a new database within a page.
+
+        In case a title and a schema ware provided, title overrides the schema's `db_title` attribute.
+        """
         # Implementation:
         # 1. initialize external forward relations, i.e. relations pointing to other databases
         # 2. create the database using a Notion API call and potential external forward relations
         # 3. initialize self-referencing forward relations
         # 4. create properties with self-referencing forward relations using an update call
         # 5. update the backward references, i.e. two-way relations, using an update call
+        if title is not None:
+            title = Text(title)
+        elif title is None and schema is not None:
+            title = schema.db_title
+
+        db_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
+
+        _logger.info(f'Creating database `{title or "<NoTitle>"}` in page `{parent.title}` with schema:\n{db_schema}')
         if schema:
-            _logger.info(f'Creating database `{schema.db_title}` in page `{parent.title}` with schema:\n{schema}')
             schema._init_fwd_rels()
-            schema_dct = {prop.name: prop.type.obj_ref for prop in schema._get_init_props()}
-            title = schema.db_title.obj_ref if schema.db_title is not None else None
-            db_obj = self.api.databases.create(parent=parent.obj_ref, title=title, schema=schema_dct, inline=inline)
-            if schema.db_desc:
-                db_obj = self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
-        else:
-            _logger.info(f'Creating database in page `{parent.title}` with default schema.')
-            schema_dct = {prop.name: prop.type.obj_ref for prop in DefaultSchema._get_init_props()}
-            db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct)
+
+        title_obj = title.obj_ref if title is not None else None
+        schema_dct = {prop.name: prop.type.obj_ref for prop in db_schema._get_init_props()}
+        db_obj = self.api.databases.create(parent=parent.obj_ref, title=title_obj, schema=schema_dct, inline=inline)
 
         db: Database = Database.wrap_obj_ref(db_obj)
 
         if schema:
+            if schema.db_desc:
+                self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
             db._set_schema(schema, during_init=True)  # schema is thus bound to the database
             schema._init_self_refs()
             schema._init_self_ref_rollups()
@@ -228,7 +236,7 @@ class Session:
         """Get or create the database."""
         dbs = SList(db for db in self.search_db(schema.db_title) if db.parent == parent)
         if len(dbs) == 0:
-            db = self.create_db(parent, schema)
+            db = self.create_db(parent, schema=schema)
             while not [db for db in self.search_db(schema.db_title) if db.parent == parent]:
                 _logger.info(f'Waiting for database `{db.title}` to be fully created.')
                 time.sleep(1)
