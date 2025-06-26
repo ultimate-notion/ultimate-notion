@@ -3,6 +3,7 @@
 ## Version 0.9
 
 - New: Allow updating if a database is inline or not
+- Chg: `create_db` has a `title` parameter to set a title if no schema is used or needs to be overwritten.
 
 ## Version 0.8, 2025-06-23
 
