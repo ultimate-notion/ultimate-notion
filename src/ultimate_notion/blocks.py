@@ -263,8 +263,8 @@ class Block(CommentMixin, DataObject[BT], ABC, wraps=obj_blocks.Block):
         if self.in_notion:
             session = get_active_session()
             # missing_ok=True below to cover `Heading` which behave like `TextBlock` but have no `children` attribute
-            obj_ref = del_nested_attr(self.obj_ref, exclude_attrs, inplace=False, missing_ok=True)
-            self.obj_ref = cast(BT, session.api.blocks.update(obj_ref))
+            del_nested_attr(self.obj_ref, exclude_attrs, inplace=True, missing_ok=True)
+            session.api.blocks.update(self.obj_ref)
 
     def replace(self, blocks: Block | Sequence[Block]) -> None:
         """Replace this block with another block or blocks."""

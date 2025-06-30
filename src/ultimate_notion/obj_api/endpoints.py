@@ -153,8 +153,8 @@ class BlocksEndpoint(Endpoint):
         return Block.model_validate(data)
 
     # https://developers.notion.com/reference/update-a-block
-    def update(self, block: Block) -> Block:
-        """Update the block content on the server.
+    def update(self, block: Block) -> None:
+        """Update the block object on the server.
 
         The block info will be updated to the latest version from the server.
         """
@@ -169,7 +169,7 @@ class BlocksEndpoint(Endpoint):
 
         # Typing in notion_client sucks, so we cast
         data = cast(dict[str, Any], self.raw_api.update(block.id.hex, **params))
-        return block.update(**data)
+        block.update(**data)
 
 
 class DatabasesEndpoint(Endpoint):
@@ -247,7 +247,7 @@ class DatabasesEndpoint(Endpoint):
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
         schema: Mapping[str, PropertyType | RenameProp | None] | None = None,
-    ) -> Database:
+    ) -> None:
         """Update the Database object on the server.
 
         The database info will be updated to the latest version from the server.
@@ -261,8 +261,6 @@ class DatabasesEndpoint(Endpoint):
             # Typing in notion_client sucks, thus we cast
             data = cast(dict[str, Any], self.raw_api.update(str(db.id), **request))
             db = db.update(**data)
-
-        return db
 
     def delete(self, db: Database) -> Database:
         """Delete (archive) the specified Database."""
@@ -392,12 +390,12 @@ class PagesEndpoint(Endpoint):
         return Page.model_validate(data)
 
     # https://developers.notion.com/reference/patch-page
-    def update(self, page: Page, **properties: PropertyValue) -> Page:
+    def update(self, page: Page, **properties: PropertyValue) -> None:
         """Update the Page object properties on the server."""
         _logger.debug(f'Updating info on page with id `{page.id}`.')
         props = {name: value.serialize_for_api() if value is not None else None for name, value in properties.items()}
         data = cast(dict[str, Any], self.raw_api.update(page.id.hex, properties=props))
-        return page.update(**data)
+        page.update(**data)
 
     def set_attr(
         self,

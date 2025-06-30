@@ -102,8 +102,8 @@ class PropertyType(Wrapper[T], wraps=obj_schema.PropertyType):
             raise SchemaError(msg)
         db = self.prop_ref._schema.get_db()
         session = get_active_session()
-        db_obj = session.api.databases.update(db=db.obj_ref, schema={name: prop_type})
-        return db_obj.properties[name]
+        session.api.databases.update(db=db.obj_ref, schema={name: prop_type})
+        return db.obj_ref.properties[name]
 
     def __init__(self, *args, **kwargs):
         obj_api_type = self._obj_api_map_inv[self.__class__]
@@ -530,7 +530,7 @@ class Schema(metaclass=SchemaType):
 
         new_props_schema = {prop.name: prop.type.obj_ref for prop in cls._get_self_refs()} or None
         session = get_active_session()
-        db.obj_ref = session.api.databases.update(db.obj_ref, schema=new_props_schema)
+        session.api.databases.update(db.obj_ref, schema=new_props_schema)
         cls._set_obj_refs()
 
     @classmethod
@@ -543,7 +543,7 @@ class Schema(metaclass=SchemaType):
         self_ref_rollups = [prop for prop in cls.get_props() if isinstance(prop.type, Rollup) and prop.type.is_self_ref]
         new_props_schema = {prop.name: prop.type.obj_ref for prop in self_ref_rollups} or None
         session = get_active_session()
-        db.obj_ref = session.api.databases.update(db.obj_ref, schema=new_props_schema)
+        session.api.databases.update(db.obj_ref, schema=new_props_schema)
         cls._set_obj_refs()
 
     @classmethod
