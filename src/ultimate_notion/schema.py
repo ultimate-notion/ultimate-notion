@@ -292,25 +292,7 @@ class Schema(metaclass=SchemaType):
         if duplicates := [prop for prop, count in counter.items() if count > 1]:
             msg = f'Properties {", ".join(duplicates)} are defined more than once'
             raise SchemaError(msg)
-
-    @classmethod
-    def from_dict(
-        cls, schema_dct: dict[str, PropertyType], db_title: str | None = None, db_desc: str | None = None
-    ) -> type[Schema]:
-        """Creation of a schema from a dictionary for easy support of dynamically created schemas."""
-        title_props = [k for k, v in schema_dct.items() if isinstance(v, Title)]
-        if not title_props:
-            msg = 'Missing an item with property type `Title` as value'
-            raise SchemaError(msg)
-        elif len(title_props) > 1:
-            msg = f'More than one item with property type `Title` as value found: {", ".join(title_props)}'
-            raise SchemaError(msg)
-
-        cls_name = f'{cls.__name__}FromDct'
-        attrs: dict[str, Any] = {'db_desc': db_desc}
-        for prop_name, prop_type in schema_dct.items():
-            attrs[rich_text.snake_case(prop_name)] = Property(prop_name, prop_type)
-        return type(cls_name, (Schema,), attrs, db_title=db_title)
+        #ToDo: Check here that all property types have a name set.
 
     @classmethod
     def create(cls, **kwargs) -> Page:
@@ -731,21 +713,21 @@ class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
     """Defines a formula property in a database.
 
     Currently the formula expression cannot reference other formula properties, e.g. `prop("other formula")`
-    This is a limitation of the API.
+    This is a limitation of the Notion API.
     """
 
-    def __init__(self, expression: str):
-        super().__init__(expression)
+    def __init__(self, formula: str):
+        super().__init__(formula)
 
     @property
-    def expression(self) -> str:
-        """Return the expression of this formula property."""
+    def formula(self) -> str:
+        """Return the formula of this property."""
         return self.obj_ref.formula.expression
 
-    @expression.setter
-    def expression(self, expression: str) -> None:
-        """Set the expression of this formula property."""
-        self.obj_ref.formula.expression = expression
+    @formula.setter
+    def formula(self, formula: str) -> None:
+        """Set the formula of this property."""
+        self.obj_ref.formula.expression = formula
         self._update_prop(self.name, self.obj_ref)
 
 
