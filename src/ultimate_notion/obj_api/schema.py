@@ -11,14 +11,14 @@ from ultimate_notion.obj_api.enums import AggFunc, NumberFormat
 from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 
 
-class PropertyType(TypedObject, polymorphic_base=True):
+class Property(TypedObject, polymorphic_base=True):
     """Base class for Notion property objects."""
 
     id: str = None  # type: ignore
     name: str = None  # type: ignore
 
 
-class Title(PropertyType, type='title'):
+class Title(Property, type='title'):
     """Defines the title configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -26,7 +26,7 @@ class Title(PropertyType, type='title'):
     title: TypeData = TypeData()
 
 
-class RichText(PropertyType, type='rich_text'):
+class RichText(Property, type='rich_text'):
     """Defines the rich text configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -34,7 +34,7 @@ class RichText(PropertyType, type='rich_text'):
     rich_text: TypeData = TypeData()
 
 
-class Number(PropertyType, type='number'):
+class Number(Property, type='number'):
     """Defines the number configuration for a database property."""
 
     class TypeData(GenericObject):
@@ -55,7 +55,7 @@ class Number(PropertyType, type='number'):
         return cls.model_construct(number=cls.TypeData(format=format))
 
 
-class Select(PropertyType, type='select'):
+class Select(Property, type='select'):
     """Defines the select configuration for a database property."""
 
     class TypeData(GenericObject):
@@ -69,7 +69,7 @@ class Select(PropertyType, type='select'):
         return cls.model_construct(select=cls.TypeData(options=options))
 
 
-class MultiSelect(PropertyType, type='multi_select'):
+class MultiSelect(Property, type='multi_select'):
     """Defines the multi-select configuration for a database property."""
 
     class TypeData(GenericObject):
@@ -83,7 +83,7 @@ class MultiSelect(PropertyType, type='multi_select'):
         return cls.model_construct(multi_select=cls.TypeData(options=options))
 
 
-class Status(PropertyType, type='status'):
+class Status(Property, type='status'):
     """Defines the status configuration for a database property."""
 
     class TypeData(GenericObject):
@@ -93,7 +93,7 @@ class Status(PropertyType, type='status'):
     status: TypeData = TypeData()
 
 
-class Date(PropertyType, type='date'):
+class Date(Property, type='date'):
     """Defines the date configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -101,7 +101,7 @@ class Date(PropertyType, type='date'):
     date: TypeData = TypeData()
 
 
-class People(PropertyType, type='people'):
+class People(Property, type='people'):
     """Defines the people configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -109,7 +109,7 @@ class People(PropertyType, type='people'):
     people: TypeData = TypeData()
 
 
-class Files(PropertyType, type='files'):
+class Files(Property, type='files'):
     """Defines the files configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -117,7 +117,7 @@ class Files(PropertyType, type='files'):
     files: TypeData = TypeData()
 
 
-class Checkbox(PropertyType, type='checkbox'):
+class Checkbox(Property, type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -125,7 +125,7 @@ class Checkbox(PropertyType, type='checkbox'):
     checkbox: TypeData = TypeData()
 
 
-class Email(PropertyType, type='email'):
+class Email(Property, type='email'):
     """Defines the email configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -133,7 +133,7 @@ class Email(PropertyType, type='email'):
     email: TypeData = TypeData()
 
 
-class URL(PropertyType, type='url'):
+class URL(Property, type='url'):
     """Defines the URL configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -141,7 +141,7 @@ class URL(PropertyType, type='url'):
     url: TypeData = TypeData()
 
 
-class PhoneNumber(PropertyType, type='phone_number'):
+class PhoneNumber(Property, type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -149,7 +149,7 @@ class PhoneNumber(PropertyType, type='phone_number'):
     phone_number: TypeData = TypeData()
 
 
-class Formula(PropertyType, type='formula'):
+class Formula(Property, type='formula'):
     """Defines the formula configuration for a database property."""
 
     class TypeData(GenericObject):
@@ -158,8 +158,8 @@ class Formula(PropertyType, type='formula'):
     formula: TypeData = TypeData()
 
     @classmethod
-    def build(cls, expression):
-        return cls.model_construct(formula=cls.TypeData(expression=expression))
+    def build(cls, formula):
+        return cls.model_construct(formula=cls.TypeData(expression=formula))
 
 
 class PropertyRelation(TypedObject, polymorphic_base=True):
@@ -207,13 +207,13 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
         return Relation.model_construct(relation=rel)
 
 
-class Relation(PropertyType, type='relation'):
+class Relation(Property, type='relation'):
     """Defines the relation configuration for a database property."""
 
     relation: SerializeAsAny[PropertyRelation]
 
 
-class Rollup(PropertyType, type='rollup'):
+class Rollup(Property, type='rollup'):
     """Defines the rollup configuration for a database property."""
 
     class TypeData(GenericObject):
@@ -241,7 +241,7 @@ class Rollup(PropertyType, type='rollup'):
         )
 
 
-class CreatedTime(PropertyType, type='created_time'):
+class CreatedTime(Property, type='created_time'):
     """Defines the created-time configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -249,7 +249,7 @@ class CreatedTime(PropertyType, type='created_time'):
     created_time: TypeData = TypeData()
 
 
-class CreatedBy(PropertyType, type='created_by'):
+class CreatedBy(Property, type='created_by'):
     """Defines the created-by configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -257,7 +257,7 @@ class CreatedBy(PropertyType, type='created_by'):
     created_by: TypeData = TypeData()
 
 
-class LastEditedBy(PropertyType, type='last_edited_by'):
+class LastEditedBy(Property, type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -265,7 +265,7 @@ class LastEditedBy(PropertyType, type='last_edited_by'):
     last_edited_by: TypeData = TypeData()
 
 
-class LastEditedTime(PropertyType, type='last_edited_time'):
+class LastEditedTime(Property, type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
     class TypeData(GenericObject): ...
@@ -273,7 +273,7 @@ class LastEditedTime(PropertyType, type='last_edited_time'):
     last_edited_time: TypeData = TypeData()
 
 
-class UniqueID(PropertyType, type='unique_id'):
+class UniqueID(Property, type='unique_id'):
     """Unique ID database property."""
 
     class TypeData(GenericObject):
@@ -282,7 +282,7 @@ class UniqueID(PropertyType, type='unique_id'):
     unique_id: TypeData = TypeData()
 
 
-class Verification(PropertyType, type='verification'):
+class Verification(Property, type='verification'):
     """Verfication database property of Wiki databases."""
 
     class TypeData(GenericObject): ...
@@ -290,7 +290,7 @@ class Verification(PropertyType, type='verification'):
     verification: TypeData = TypeData()
 
 
-class Button(PropertyType, type='button'):
+class Button(Property, type='button'):
     """Button database property."""
 
     class TypeData(GenericObject): ...

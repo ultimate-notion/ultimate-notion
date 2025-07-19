@@ -28,7 +28,7 @@ from ultimate_notion.obj_api.objects import (
     UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
-from ultimate_notion.obj_api.schema import PropertyType
+from ultimate_notion.obj_api.schema import Property
 
 
 class DataObject(NotionEntity, ABC):
@@ -50,7 +50,7 @@ class Database(DataObject, MentionMixin, object='database'):
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, PropertyType] = None  # type: ignore
+    properties: dict[str, Property] = None  # type: ignore
     description: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     is_inline: bool = False
 

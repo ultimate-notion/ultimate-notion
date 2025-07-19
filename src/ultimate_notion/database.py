@@ -16,7 +16,7 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case, snake_case
-from ultimate_notion.schema import Property, PropertyType, Schema
+from ultimate_notion.schema import PropertyType, Schema
 from ultimate_notion.view import View
 
 
@@ -107,10 +107,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Reflection about the database schema."""
         title = str(self)
         cls_name = f'{camel_case(title)}Schema'
-        attrs = {
-            snake_case(k): Property(k, cast(PropertyType, PropertyType.wrap_obj_ref(v)))
-            for k, v in obj_ref.properties.items()
-        }
+        attrs = {snake_case(k): cast(PropertyType, PropertyType.wrap_obj_ref(v)) for k, v in obj_ref.properties.items()}
         schema: type[Schema] = type(cls_name, (Schema,), attrs, db_title=title)
         schema.bind_db(self)
         return schema

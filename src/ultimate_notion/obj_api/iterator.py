@@ -136,9 +136,9 @@ class EndpointIterator(Generic[T]):
             self.page_num += 1
 
             if self.next_cursor is None:
-                msg = f'Fetching page `{self.page_num}` of endpoint.'
+                msg = f'Fetching last page {self.page_num} of endpoint.'
             else:
-                msg = f'Fetching page `{self.page_num}` of endpoint with cursor `{self.next_cursor}`.'
+                msg = f'Fetching page {self.page_num} of endpoint with next cursor {self.next_cursor}.'
             _logger.debug(msg)
 
             result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)

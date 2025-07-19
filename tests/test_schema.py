@@ -17,41 +17,41 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        relation = uno.Property('Relation', uno.PropType.Relation())
+        name = uno.PropType.Title('Name')
+        relation = uno.PropType.Relation('Relation')
 
     options = [uno.Option(name='Option1'), uno.Option(name='Option2', color=uno.Color.RED)]
 
     class SchemaB(uno.Schema, db_title='Schema B'):
         """Actual interesting schema/db"""
 
-        checkbox = uno.Property('Checkbox', uno.PropType.Checkbox())
-        created_by = uno.Property('Created by', uno.PropType.CreatedBy())
-        created_time = uno.Property('Created time', uno.PropType.CreatedTime())
-        date = uno.Property('Date', uno.PropType.Date())
-        email = uno.Property('Email', uno.PropType.Email())
-        files = uno.Property('Files', uno.PropType.Files())
-        formula = uno.Property('Formula', uno.PropType.Formula('prop("Number") * 2'))
-        last_edited_by = uno.Property('Last edited by', uno.PropType.LastEditedBy())
-        last_edited_time = uno.Property('Last edited time', uno.PropType.LastEditedTime())
-        multi_select = uno.Property('Multi-select', uno.PropType.MultiSelect(options))
-        number = uno.Property('Number', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        people = uno.Property('People', uno.PropType.Person())
-        phone_number = uno.Property('Phone number', uno.PropType.Phone())
-        relation = uno.Property('Relation', uno.PropType.Relation(SchemaA))
-        relation_twoway = uno.Property(
-            'Relation two-way', uno.PropType.Relation(SchemaA, two_way_prop=SchemaA.relation)
-        )
-        rollup = uno.Property(
+        checkbox = uno.PropType.Checkbox('Checkbox')
+        created_by = uno.PropType.CreatedBy('Created by')
+        created_time = uno.PropType.CreatedTime('Created time')
+        date = uno.PropType.Date('Date')
+        email = uno.PropType.Email('Email')
+        files = uno.PropType.Files('Files')
+        formula = uno.PropType.Formula('Formula', formula='prop("Number") * 2')
+        last_edited_by = uno.PropType.LastEditedBy('Last edited by')
+        last_edited_time = uno.PropType.LastEditedTime('Last edited time')
+        multi_select = uno.PropType.MultiSelect('Multi-select', options=options)
+        number = uno.PropType.Number('Number', format=uno.NumberFormat.DOLLAR)
+        people = uno.PropType.Person('People')
+        phone_number = uno.PropType.Phone('Phone number')
+        relation = uno.PropType.Relation('Relation', schema=SchemaA)
+        relation_twoway = uno.PropType.Relation('Relation two-way', schema=SchemaA, two_way_prop=SchemaA.relation)
+        rollup = uno.PropType.Rollup(
             'Rollup',
-            uno.PropType.Rollup(relation_prop=relation, rollup_prop=SchemaA.name, calculate=uno.AggFunc.COUNT_ALL),
+            relation=relation,
+            rollup=SchemaA.name,
+            calculate=uno.AggFunc.COUNT_ALL,
         )
-        select = uno.Property('Select', uno.PropType.Select(options))
-        # status = uno.Property('Status', schema.Status()) # 2023-08-11: is not yet supported by Notion API
-        text = uno.Property('Text', uno.PropType.Text())
-        title = uno.Property('Title', uno.PropType.Title())
-        url = uno.Property('URL', uno.PropType.URL())
-        # unique_id = Property('Unique ID', schema.ID()) # 2023-08-11: is not yet supported by Notion API
+        select = uno.PropType.Select('Select', options=options)
+        # status = uno.PropType.Status('Status')  # 2025-06-30: is not yet supported by Notion API
+        text = uno.PropType.Text('Text')
+        title = uno.PropType.Title('Title')
+        url = uno.PropType.URL('URL')
+        # unique_id = uno.PropType.ID('Unique ID')  # 2025-06-30: is not yet supported by Notion API
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
@@ -193,37 +193,6 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
 #     assert db_a.schema.bwd_rel.type.two_way_prop is SchemaA.fwd_rel  # type: ignore
 
 
-@pytest.mark.vcr()
-def test_schema_from_dict() -> None:
-    class ClassStyleSchema(uno.Schema, db_title='Class Style'):
-        name = uno.Property('Name', uno.PropType.Title())
-        tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
-
-    dict_style_schema: dict[str, PropertyType] = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.MultiSelect([])}
-    DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-    DictStyleSchema.assert_consistency_with(ClassStyleSchema)
-
-    dict_style_schema = {'Name': uno.PropType.Title(), 'Tags': uno.PropType.Select([])}  # Wrong PropertyType!
-    DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-
-    with pytest.raises(SchemaError):
-        DictStyleSchema.assert_consistency_with(ClassStyleSchema)
-
-    dict_style_schema = {'Name': uno.PropType.Title(), 'My Tags': uno.PropType.MultiSelect([])}  # Wrong property!
-    DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-
-    with pytest.raises(SchemaError):
-        DictStyleSchema.assert_consistency_with(ClassStyleSchema)
-
-    with pytest.raises(SchemaError):
-        dict_style_schema = {'Tags': uno.PropType.MultiSelect([])}
-        DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-
-    with pytest.raises(SchemaError):
-        dict_style_schema = {'Name1': uno.PropType.Title(), 'Name2': uno.PropType.Title()}
-        DictStyleSchema = uno.Schema.from_dict(dict_style_schema, db_title='Dict Style')  # noqa: N806
-
-
 def test_title_missing_or_too_many() -> None:
     with pytest.raises(SchemaError):
 
@@ -309,9 +278,9 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
 
     # Update properties in the schema
     db.schema['Number'] = uno.PropType.Formula('prop("Name") + "!"')
-    assert db.schema['Number'].expression.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+    assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
     db.reload()
-    assert db.schema['Number'].expression.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+    assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
 
     db.schema.number = uno.Property('NewNumber', uno.PropType.Number(uno.NumberFormat.PERCENT))
     assert 'NewNumber' in [prop.name for prop in db.schema]
@@ -343,7 +312,7 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
         )
         rollup = uno.Property(
             'Rollup',
-            uno.PropType.Rollup(relation_prop=relation, rollup_prop=SchemaA.name, calculate=uno.AggFunc.COUNT_ALL),
+            uno.PropType.Rollup(relation=relation, rollup=SchemaA.name, calculate=uno.AggFunc.COUNT_ALL),
         )
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
@@ -408,11 +377,11 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     assert db.schema['Number'].format == uno.NumberFormat.EURO  # type: ignore[attr-defined]
 
     # Change the formula property
-    assert db.schema['Formula'].expression.startswith(block_ref(db.schema['Name']))  # type: ignore[attr-defined]
-    db.schema['Formula'].expression = 'prop("Category")'  # type: ignore[attr-defined]
-    assert db.schema['Formula'].expression == 'prop("Category")'  # type: ignore[attr-defined]
+    assert db.schema['Formula'].formula.startswith(block_ref(db.schema['Name']))  # type: ignore[attr-defined]
+    db.schema['Formula'].formula = 'prop("Category")'  # type: ignore[attr-defined]
+    assert db.schema['Formula'].formula == 'prop("Category")'  # type: ignore[attr-defined]
     db.reload()
-    assert db.schema['Formula'].expression.startswith(block_ref(db.schema['Category']))  # type: ignore[attr-defined]
+    assert db.schema['Formula'].formula.startswith(block_ref(db.schema['Category']))  # type: ignore[attr-defined]
 
     # Change the select options of the select and multi-select properties
     for prop in ('Category', 'Tags'):
