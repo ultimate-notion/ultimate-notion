@@ -176,7 +176,7 @@ class Session:
             schema._init_fwd_rels()
 
         title_obj = title.obj_ref if title is not None else None
-        schema_dct = {prop.name: prop.type.obj_ref for prop in db_schema._get_init_props()}
+        schema_dct = {prop.name: prop.obj_ref for prop in db_schema._get_init_props()}
         db_obj = self.api.databases.create(parent=parent.obj_ref, title=title_obj, schema=schema_dct, inline=inline)
 
         db: Database = Database.wrap_obj_ref(db_obj)

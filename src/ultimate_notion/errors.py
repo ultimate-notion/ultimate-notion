@@ -67,3 +67,7 @@ class RelationError(SchemaError):
 
 class ReadOnlyPropertyError(SchemaError):
     """Raised when an attempt is made to write to a write-protected property."""
+
+
+class PropertyError(SchemaError):
+    """Raised when there is an issue with a property in the schema."""

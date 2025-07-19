@@ -329,9 +329,9 @@ def article_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
     """Simple database of articles."""
 
     class Article(schema.Schema, db_title='Articles'):
-        name = schema.Property('Name', schema.Title())
-        cost = schema.Property('Cost', schema.Number(schema.NumberFormat.DOLLAR))
-        desc = schema.Property('Description', schema.Text())
+        name = schema.Title('Name')
+        cost = schema.Number('Cost', format=schema.NumberFormat.DOLLAR)
+        desc = schema.Text('Description')
 
     db = notion_cached.create_db(parent=root_page, schema=Article)
     yield db
@@ -545,19 +545,19 @@ def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
     class Tasklist(schema.Schema, db_title='My Tasks'):
         """My personal task list"""
 
-        task = schema.Property('Task', schema.Title())
-        status = schema.Property('Status', schema.Select(status_options))
-        priority = schema.Property('Priority', schema.Select(priority_options))
-        urgency = schema.Property('Urgency', schema.Formula(urgency_formula))
-        started = schema.Property('Started', schema.Date())
-        due_date = schema.Property('Due Date', schema.Date())
-        due_by = schema.Property('Due by', schema.Formula(due_formula))
-        done = schema.Property('Done', schema.Formula(done_formula))
-        repeats = schema.Property('Repeats', schema.Select(repeats_options))
-        url = schema.Property('URL', schema.URL())
+        task = schema.Title('Task')
+        status = schema.Select('Status', options=status_options)
+        priority = schema.Select('Priority', options=priority_options)
+        urgency = schema.Formula('Urgency', formula=urgency_formula)
+        started = schema.Date('Started')
+        due_date = schema.Date('Due Date')
+        due_by = schema.Formula('Due by', formula=due_formula)
+        done = schema.Formula('Done', formula=done_formula)
+        repeats = schema.Select('Repeats', options=repeats_options)
+        url = schema.URL('URL')
         # ToDo: Reintroduce after the problem with adding a two-way relation property is fixed in the Notion API
-        # parent = schema.Property('Parent Task', schema.Relation(schema.SelfRef))
-        # subs = schema.Property('Sub-Tasks', schema.Relation(schema.SelfRef, two_way_prop=parent))
+        # parent = schema.Relation('Parent Task', schema.SelfRef)
+        # subs = schema.Relation('Sub-Tasks', schema.SelfRef, two_way_prop=parent)
 
     db = notion_cached.create_db(parent=root_page, schema=Tasklist)
     yield db

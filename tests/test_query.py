@@ -544,23 +544,23 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session) -> None:
         number = uno.Property('Number', uno.PropType.Number())
         rollup_title = uno.Property(
             rollup_title_prop,
-            uno.PropType.Rollup(relation_prop=relation, rollup_prop=title, calculate=uno.AggFunc.SHOW_ORIGINAL),
+            uno.PropType.Rollup(relation=relation, rollup=title, calculate=uno.AggFunc.SHOW_ORIGINAL),
         )
         rollup_date = uno.Property(
             rollup_date_prop,
-            uno.PropType.Rollup(relation_prop=relation, rollup_prop=date, calculate=uno.AggFunc.EARLIEST_DATE),
+            uno.PropType.Rollup(relation=relation, rollup=date, calculate=uno.AggFunc.EARLIEST_DATE),
         )
         rollup_date_arr = uno.Property(
             rollup_date_arr_prop,
-            uno.PropType.Rollup(relation_prop=relation, rollup_prop=date, calculate=uno.AggFunc.SHOW_ORIGINAL),
+            uno.PropType.Rollup(relation=relation, rollup=date, calculate=uno.AggFunc.SHOW_ORIGINAL),
         )
         rollup_number = uno.Property(
             rollup_number_prop,
-            uno.PropType.Rollup(relation_prop=relation, rollup_prop=number, calculate=uno.AggFunc.MAX),
+            uno.PropType.Rollup(relation=relation, rollup=number, calculate=uno.AggFunc.MAX),
         )
         rollup_number_arr = uno.Property(
             rollup_number_prop_arr,
-            uno.PropType.Rollup(relation_prop=relation, rollup_prop=number, calculate=uno.AggFunc.SHOW_ORIGINAL),
+            uno.PropType.Rollup(relation=relation, rollup=number, calculate=uno.AggFunc.SHOW_ORIGINAL),
         )
 
     db = notion.create_db(parent=root_page, schema=DB)

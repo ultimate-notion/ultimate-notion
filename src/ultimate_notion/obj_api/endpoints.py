@@ -33,7 +33,7 @@ from ultimate_notion.obj_api.objects import (
 )
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DBQueryBuilder, SearchQueryBuilder
-from ultimate_notion.obj_api.schema import PropertyType, RenameProp
+from ultimate_notion.obj_api.schema import Property, RenameProp
 
 if TYPE_CHECKING:
     from notion_client import Client as NCClient
@@ -184,7 +184,7 @@ class DatabasesEndpoint(Endpoint):
     def _build_request(
         *,
         parent: SerializeAsAny[ParentRef] | None = None,
-        schema: Mapping[str, PropertyType | RenameProp | None] | None = None,
+        schema: Mapping[str, Property | RenameProp | None] | None = None,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
@@ -219,7 +219,7 @@ class DatabasesEndpoint(Endpoint):
     def create(
         self,
         parent: Page,
-        schema: Mapping[str, PropertyType],
+        schema: Mapping[str, Property],
         *,
         title: list[RichTextBaseObject] | None = None,
         inline: bool = False,
@@ -246,7 +246,7 @@ class DatabasesEndpoint(Endpoint):
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
-        schema: Mapping[str, PropertyType | RenameProp | None] | None = None,
+        schema: Mapping[str, Property | RenameProp | None] | None = None,
     ) -> None:
         """Update the Database object on the server.
 
