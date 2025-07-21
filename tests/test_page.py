@@ -273,15 +273,15 @@ def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page
     class Item(uno.Schema, db_title='Item DB for max relation items'):
         """Database of all items"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        bought_by = uno.Property('Bought by', uno.PropType.Relation())
+        name = uno.PropType.Title('Name')
+        price = uno.PropType.Number('Price', format=uno.NumberFormat.DOLLAR)
+        bought_by = uno.PropType.Relation('Bought by')
 
     class Customer(uno.Schema, db_title='Customer DB for max relation items'):
         """Database for customers"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        purchases = uno.Property('Items Purchased', uno.PropType.Relation(Item, two_way_prop=Item.bought_by))
+        name = uno.PropType.Title('Name')
+        purchases = uno.PropType.Relation('Items Purchased', schema=Item, two_way_prop=Item.bought_by)
 
     item_db = notion.create_db(parent=root_page, schema=Item)
     customer_db = notion.create_db(parent=root_page, schema=Customer)
@@ -304,8 +304,8 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
     class Item(uno.Schema, db_title='Item DB for max text items'):
         """Database of all items"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.PropType.Title('Name')
+        desc = uno.PropType.Text('Description')
 
     notion.create_db(parent=root_page, schema=Item)
 
@@ -343,9 +343,9 @@ def test_option_page_props(notion: uno.Session, root_page: uno.Page) -> None:
     class Schema(uno.Schema, db_title='Option Page Props Test'):
         """Schema for testing option page props"""
 
-        title = uno.Property('Title', uno.PropType.Title())
-        status = uno.Property('Status', uno.PropType.Select(options=select_options))
-        multi_status = uno.Property('Multi Status', uno.PropType.MultiSelect(options=multi_select_options))
+        title = uno.PropType.Title('Title')
+        status = uno.PropType.Select('Status', options=select_options)
+        multi_status = uno.PropType.MultiSelect('Multi Status', options=multi_select_options)
 
     notion.create_db(parent=root_page, schema=Schema)
     page1 = Schema.create(title='Page 1', status='Open', multi_status=['Option 1'])

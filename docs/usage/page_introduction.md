@@ -116,11 +116,11 @@ assert task.props.due_date == old_due_date
 Those change will also be automatically reflected on the Notion server. So each assignment
 triggers an update web request.
 
-Here is an example on how to change the task status, which is a select property. First we
-get the list of all options by accessing the the corresponding column type of the property with:
+Here is an example on how to change the task status, which is a select property. First, we
+get the list of all options by accessing the the corresponding property types with:
 
 ```python
-options = {opt.name: opt for opt in task.parent_db.schema.status.type.options}
+options = {opt.name: opt for opt in task.parent_db.schema.status.options}
 ```
 
 This generates a dictionary of [Option] objects:
