@@ -56,10 +56,7 @@ from ultimate_notion.option import compare_options
 T = TypeVar('T', bound=obj_schema.Property)
 
 
-# ToDo: Rename this in the end to Property!
-
-
-class PropertyType(Wrapper[T], ABC, wraps=obj_schema.Property):
+class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     """Base class for Notion property objects.
 
     A property defines the name and type of a property in a database, e.g. number, date, text, etc.
@@ -74,7 +71,7 @@ class PropertyType(Wrapper[T], ABC, wraps=obj_schema.Property):
     _attr_name: str | None = None  # Python attribute name of the property in the schema
 
     def __new__(cls, *args, **kwargs) -> T:
-        if cls is PropertyType:
+        if cls is Property:
             msg = f'{cls.__name__} is abstract and cannot be instantiated directly'
             raise TypeError(msg)
         return super().__new__(cls)
@@ -92,7 +89,7 @@ class PropertyType(Wrapper[T], ABC, wraps=obj_schema.Property):
         self._attr_name = name
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, PropertyType):
+        if not isinstance(other, Property):
             return NotImplemented
         return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
 
@@ -212,13 +209,13 @@ class SchemaType(ABCMeta):
         # We can only overwrite __repr__ for a class in a metaclass
         return cls.as_table(tablefmt='simple')
 
-    def __getitem__(cls: type[Schema], prop_name: str) -> PropertyType:  # type: ignore[misc]
+    def __getitem__(cls: type[Schema], prop_name: str) -> Property:  # type: ignore[misc]
         return cls.get_prop(prop_name)
 
     def __delitem__(cls: type[Schema], prop_name: str) -> None:  # type: ignore[misc]
         cls.get_prop(prop_name).delete()
 
-    def __setitem__(cls: type[Schema], prop_name: str, prop_type: PropertyType) -> None:  # type: ignore[misc]
+    def __setitem__(cls: type[Schema], prop_name: str, prop_type: Property) -> None:  # type: ignore[misc]
         if prop_type._name is not None:
             msg = (
                 f'Property `{prop_name}` already has a name and thus the `name` parameter of `{prop_type}` must '
@@ -235,11 +232,11 @@ class SchemaType(ABCMeta):
         cls._set_obj_refs()
 
     def __setattr__(cls: type[Schema], name: str, value: Any) -> None:  # type: ignore[misc]
-        if isinstance(value, PropertyType):
+        if isinstance(value, Property):
             curr_attr = getattr(cls, name, None)
             if curr_attr is None:  # adding a new property
                 cls[value._set_name(None)] = value
-            elif isinstance(curr_attr, PropertyType):  # updating an existing property
+            elif isinstance(curr_attr, Property):  # updating an existing property
                 cls[curr_attr.name] = value
             else:
                 msg = f'Cannot override non-property `{name}` of type `{type(curr_attr)}`.'
@@ -250,7 +247,7 @@ class SchemaType(ABCMeta):
     def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
         return len(cls.get_props())
 
-    def __iter__(cls: type[Schema]) -> Iterator[PropertyType]:  # type: ignore[misc]
+    def __iter__(cls: type[Schema]) -> Iterator[Property]:  # type: ignore[misc]
         return (prop for prop in cls.get_props())
 
 
@@ -314,12 +311,12 @@ class Schema(metaclass=SchemaType):
         return cls.get_db().create_page(**kwargs)
 
     @classmethod
-    def get_props(cls) -> list[PropertyType]:
+    def get_props(cls) -> list[Property]:
         """Get all properties of this schema."""
-        return [prop for prop in cls.__dict__.values() if isinstance(prop, PropertyType)]
+        return [prop for prop in cls.__dict__.values() if isinstance(prop, Property)]
 
     @classmethod
-    def get_prop(cls, prop_name: str) -> PropertyType:
+    def get_prop(cls, prop_name: str) -> Property:
         """Get a specific property from this schema assuming that property names are unique."""
         try:
             return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
@@ -328,12 +325,12 @@ class Schema(metaclass=SchemaType):
             raise SchemaError(msg) from e
 
     @classmethod
-    def get_ro_props(cls) -> list[PropertyType]:
+    def get_ro_props(cls) -> list[Property]:
         """Get all read-only properties of this schema."""
         return [prop for prop in cls.get_props() if prop.readonly]
 
     @classmethod
-    def get_rw_props(cls) -> list[PropertyType]:
+    def get_rw_props(cls) -> list[Property]:
         """Get all writeable properties of this schema."""
         return [prop for prop in cls.get_props() if not prop.readonly]
 
@@ -385,7 +382,7 @@ class Schema(metaclass=SchemaType):
         return model
 
     @classmethod
-    def to_dict(cls) -> dict[str, PropertyType]:
+    def to_dict(cls) -> dict[str, Property]:
         """Convert this schema to a dictionary of property names and corresponding types."""
         return {prop.name: prop for prop in cls.get_props()}
 
@@ -438,7 +435,7 @@ class Schema(metaclass=SchemaType):
         return cls.as_table(tablefmt='html')
 
     @classmethod
-    def get_title_prop(cls) -> PropertyType:
+    def get_title_prop(cls) -> Property:
         """Returns the property holding the title of the pages."""
         return SList(prop for prop in cls.get_props() if isinstance(prop, Title)).item()
 
@@ -542,7 +539,7 @@ class Schema(metaclass=SchemaType):
         cls._set_obj_refs()
 
     @classmethod
-    def _get_init_props(cls) -> list[PropertyType]:
+    def _get_init_props(cls) -> list[Property]:
         """Get all properties that are initialized by now."""
         return [prop for prop in cls.get_props() if prop._is_init]
 
@@ -567,15 +564,15 @@ class Schema(metaclass=SchemaType):
                 prop_type.obj_ref = obj_ref
 
 
-class Title(PropertyType[obj_schema.Title], wraps=obj_schema.Title):
+class Title(Property[obj_schema.Title], wraps=obj_schema.Title):
     """Defines the mandatory title property in a database."""
 
 
-class Text(PropertyType[obj_schema.RichText], wraps=obj_schema.RichText):
+class Text(Property[obj_schema.RichText], wraps=obj_schema.RichText):
     """Defines a text property in a database."""
 
 
-class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
+class Number(Property[obj_schema.Number], wraps=obj_schema.Number):
     """Defines a number property in a database."""
 
     def __init__(self, name: str | None = None, *, format: NumberFormat | str = NumberFormat.NUMBER):  # noqa: A002
@@ -595,7 +592,7 @@ class Number(PropertyType[obj_schema.Number], wraps=obj_schema.Number):
         self._update_prop(self.obj_ref)
 
 
-class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
+class Select(Property[obj_schema.Select], wraps=obj_schema.Select):
     """Defines a select property in a database."""
 
     def __init__(self, name: str | None = None, *, options: list[Option] | type[OptionNS]):
@@ -632,7 +629,7 @@ class Select(PropertyType[obj_schema.Select], wraps=obj_schema.Select):
         self._update_prop(self.obj_ref)
 
 
-class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
+class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
     """Defines a multi-select property in a database."""
 
     def __init__(self, name: str | None = None, *, options: list[Option] | type[OptionNS]):
@@ -669,7 +666,7 @@ class MultiSelect(PropertyType[obj_schema.MultiSelect], wraps=obj_schema.MultiSe
         self._update_prop(self.obj_ref)
 
 
-class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
+class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
     """Defines a status property in a database.
 
     The Notion API doesn't allow to create a property of this type.
@@ -694,35 +691,35 @@ class Status(PropertyType[obj_schema.Status], wraps=obj_schema.Status):
         return [OptionGroup.wrap_obj_ref(group, options=self.options) for group in self.obj_ref.status.groups]
 
 
-class Date(PropertyType[obj_schema.Date], wraps=obj_schema.Date):
+class Date(Property[obj_schema.Date], wraps=obj_schema.Date):
     """Defines a date property in a database."""
 
 
-class Person(PropertyType[obj_schema.People], wraps=obj_schema.People):
+class Person(Property[obj_schema.People], wraps=obj_schema.People):
     """Defines a person/people property in a database."""
 
 
-class Files(PropertyType[obj_schema.Files], wraps=obj_schema.Files):
+class Files(Property[obj_schema.Files], wraps=obj_schema.Files):
     """Defines a files property in a database."""
 
 
-class Checkbox(PropertyType[obj_schema.Checkbox], wraps=obj_schema.Checkbox):
+class Checkbox(Property[obj_schema.Checkbox], wraps=obj_schema.Checkbox):
     """Defines a checkbox property in database."""
 
 
-class Email(PropertyType[obj_schema.Email], wraps=obj_schema.Email):
+class Email(Property[obj_schema.Email], wraps=obj_schema.Email):
     """Defines an e-mail property in a database."""
 
 
-class URL(PropertyType[obj_schema.URL], wraps=obj_schema.URL):
+class URL(Property[obj_schema.URL], wraps=obj_schema.URL):
     """Defines a URL property in a database."""
 
 
-class Phone(PropertyType[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNumber):
+class Phone(Property[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNumber):
     """Defines a phone number property in a database."""
 
 
-class Formula(PropertyType[obj_schema.Formula], wraps=obj_schema.Formula):
+class Formula(Property[obj_schema.Formula], wraps=obj_schema.Formula):
     """Defines a formula property in a database.
 
     Currently the formula expression cannot reference other formula properties, e.g. `prop("other formula")`
@@ -747,15 +744,15 @@ class SelfRef(Schema, db_title=None):
     _ = Title('title')  # mandatory title property, used for nothing.
 
 
-class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
+class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     """Relation to another database."""
 
     _rel_schema: type[Schema] | None = None  # other schema, i.e. of the target database
-    _two_way_prop: PropertyType | None = None  # other property, i.e. of the target database
+    _two_way_prop: Property | None = None  # other property, i.e. of the target database
 
     # ToDo: Fix this. two_way_prop should not be a PropertyType, but a Relation or a string even.
     def __init__(
-        self, name: str | None = None, *, schema: type[Schema] | None = None, two_way_prop: PropertyType | None = None
+        self, name: str | None = None, *, schema: type[Schema] | None = None, two_way_prop: Property | None = None
     ):
         self._name = name
         self._schema = None
@@ -764,7 +761,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             msg = '`schema` needs to be provided if `two_way_prop` is set'
             raise RuntimeError(msg)
 
-        if isinstance(schema, PropertyType):
+        if isinstance(schema, Property):
             msg = 'Please provide a schema, not a property! Use `two_way_prop` to specify a property.'
             raise ValueError(msg)
 
@@ -809,7 +806,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
         return self._rel_schema is None
 
     @property
-    def two_way_prop(self) -> PropertyType | None:
+    def two_way_prop(self) -> Property | None:
         """Return the target property object of a two-way relation."""
         if self._two_way_prop:
             return self._two_way_prop
@@ -930,7 +927,7 @@ class Relation(PropertyType[obj_schema.Relation], wraps=obj_schema.Relation):
             our_db.schema._set_obj_refs()
 
 
-class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
+class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
     """Defines the rollup property in a database.
 
     If the relation propery is a self-referencing relation, i.e. `uno.PropType.Relation(uno.SelfRef)` in the schema,
@@ -941,8 +938,8 @@ class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
         self,
         name: str | None = None,
         *,
-        relation: PropertyType,
-        rollup: PropertyType,
+        relation: Property,
+        rollup: Property,
         calculate: AggFunc | str = AggFunc.SHOW_ORIGINAL,
     ):
         if not isinstance(relation, Relation):
@@ -982,7 +979,7 @@ class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
             raise RollupError(msg)
 
     @property
-    def rollup_prop(self) -> PropertyType:
+    def rollup_prop(self) -> Property:
         """Return the rollup property object of the rollup."""
         if self.is_bound():
             return self._schema.get_prop(self.obj_ref.rollup.rollup_property_name)
@@ -996,23 +993,23 @@ class Rollup(PropertyType[obj_schema.Rollup], wraps=obj_schema.Rollup):
         return self.obj_ref.rollup.function
 
 
-class CreatedTime(PropertyType[obj_schema.CreatedTime], wraps=obj_schema.CreatedTime):
+class CreatedTime(Property[obj_schema.CreatedTime], wraps=obj_schema.CreatedTime):
     """Defines the created-time property in a database."""
 
 
-class CreatedBy(PropertyType[obj_schema.CreatedBy], wraps=obj_schema.CreatedBy):
+class CreatedBy(Property[obj_schema.CreatedBy], wraps=obj_schema.CreatedBy):
     """Defines the created-by property in a database."""
 
 
-class LastEditedBy(PropertyType[obj_schema.LastEditedBy], wraps=obj_schema.LastEditedBy):
+class LastEditedBy(Property[obj_schema.LastEditedBy], wraps=obj_schema.LastEditedBy):
     """Defines the last-edited-by property in a database."""
 
 
-class LastEditedTime(PropertyType[obj_schema.LastEditedTime], wraps=obj_schema.LastEditedTime):
+class LastEditedTime(Property[obj_schema.LastEditedTime], wraps=obj_schema.LastEditedTime):
     """Defines the last-edited-time property in a database."""
 
 
-class ID(PropertyType[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
+class ID(Property[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
     """Defines a unique ID property in a database."""
 
     allowed_at_creation = False
@@ -1023,13 +1020,13 @@ class ID(PropertyType[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
         return '' if opt_prefix is None else opt_prefix
 
 
-class Verification(PropertyType[obj_schema.Verification], wraps=obj_schema.Verification):
+class Verification(Property[obj_schema.Verification], wraps=obj_schema.Verification):
     """Defines a unique ID property in a database."""
 
     allowed_at_creation = False
 
 
-class Button(PropertyType[obj_schema.Button], wraps=obj_schema.Button):
+class Button(Property[obj_schema.Button], wraps=obj_schema.Button):
     """Defines a button property in a database."""
 
     allowed_at_creation = False

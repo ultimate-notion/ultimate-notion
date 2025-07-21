@@ -22,7 +22,7 @@ from ultimate_notion.view import View
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-    from ultimate_notion.schema import PropertyType
+    from ultimate_notion.schema import Property
 
 
 _logger = logging.getLogger(__name__)
@@ -193,14 +193,14 @@ class PropertyCondition(Condition, ABC):
     _probe_page: Page | None = None
 
     @abstractmethod
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         """Create the keyword arguments for the obj_query.PropertyFilter constructor.
 
         We need this as a rollup array condition works on top of a property condition.
         Thus we handle here everything except of the rollup array condition.
         """
 
-    def _get_prop_type(self, db: Database) -> schema.PropertyType:
+    def _get_prop_type(self, db: Database) -> schema.Property:
         return db.schema[self.prop.name]
 
     def _get_probe_page(self, db: Database) -> Page:
@@ -255,7 +255,7 @@ class IsEmpty(PropertyCondition):
     _condition_kw = 'is_empty'
     is_method: bool = True
 
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
 
         match prop_type:
@@ -349,7 +349,7 @@ class IsNotEmpty(IsEmpty):
 class Equals(PropertyCondition):
     _condition_kw = 'equals'
 
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
 
         match prop_type:
@@ -442,7 +442,7 @@ class InEquality(PropertyCondition, ABC):
     _num_condition_kw: str
     _date_condition_kw: str
 
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
 
         match prop_type:
@@ -552,7 +552,7 @@ class Contains(PropertyCondition):
     _condition_kw = 'contains'
     is_method: bool = True
 
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
 
         match prop_type:
@@ -620,7 +620,7 @@ class StartsWith(PropertyCondition):
     _condition_kw = 'starts_with'
     is_method: bool = True
 
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
 
         match prop_type:
@@ -680,7 +680,7 @@ class DateCondition(PropertyCondition, ABC):
     _condition_kw: str
     is_method: bool = True
 
-    def _create_obj_ref_kwargs(self, db: Database, prop_type: PropertyType) -> dict[str, obj_query.Condition]:
+    def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
 
         match prop_type:

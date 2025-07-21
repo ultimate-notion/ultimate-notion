@@ -9,7 +9,7 @@ import ultimate_notion as uno
 from ultimate_notion import props
 from ultimate_notion.errors import InvalidAPIUsageError, PropertyError, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.schema import PropertyType
+from ultimate_notion.schema import Property
 
 
 @pytest.mark.vcr()
@@ -114,7 +114,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -
     for item in (b_item1, b_item2):
         for kwarg, prop_val in kwargs.items():
             assert getattr(item.props, kwarg) == prop_val.value
-            prop: uno.PropertyType = getattr(SchemaB, kwarg)
+            prop: uno.Property = getattr(SchemaB, kwarg)
             assert item.props[prop.name] == prop_val.value
 
     db_a.delete()
@@ -361,7 +361,7 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     # change the options of the (multi-)select property
     options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
 
-    def block_ref(prop: PropertyType) -> str:
+    def block_ref(prop: Property) -> str:
         """Helper function to create a block reference for the formula.
 
         Note that Notion converts 'prop("Name")' to Jinja2-like expressions
