@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion import props
-from ultimate_notion.errors import InvalidAPIUsageError, ReadOnlyPropertyError, SchemaError
+from ultimate_notion.errors import InvalidAPIUsageError, PropertyError, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.schema import PropertyType
 
@@ -114,7 +114,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -
     for item in (b_item1, b_item2):
         for kwarg, prop_val in kwargs.items():
             assert getattr(item.props, kwarg) == prop_val.value
-            prop: uno.Property = getattr(SchemaB, kwarg)
+            prop: uno.PropertyType = getattr(SchemaB, kwarg)
             assert item.props[prop.name] == prop_val.value
 
     db_a.delete()
@@ -139,22 +139,20 @@ def test_two_way_prop(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        relation = uno.Property('Relation', uno.PropType.Relation())
+        name = uno.PropType.Title('Name')
+        relation = uno.PropType.Relation('Relation')
 
     class SchemaB(uno.Schema, db_title='Schema B'):
         """Only used to create relations in Schema B"""
 
-        relation_twoway = uno.Property(
-            'Relation two-way', uno.PropType.Relation(SchemaA, two_way_prop=SchemaA.relation)
-        )
-        title = uno.Property('Title', uno.PropType.Title())
+        relation_twoway = uno.PropType.Relation('Relation two-way', schema=SchemaA, two_way_prop=SchemaA.relation)
+        title = uno.PropType.Title('Title')
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
 
-    assert db_b.schema.relation_twoway.type.two_way_prop is SchemaA.relation  # type: ignore
-    assert db_a.schema.relation.type.two_way_prop is SchemaB.relation_twoway  # type: ignore
+    assert db_b.schema.relation_twoway.two_way_prop is SchemaA.relation  # type: ignore
+    assert db_a.schema.relation.two_way_prop is SchemaB.relation_twoway  # type: ignore
 
 
 @pytest.mark.vcr()
@@ -162,8 +160,8 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Schema A description"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
+        name = uno.PropType.Title('Name')
+        relation = uno.PropType.Relation('Relation', schema=uno.SelfRef)
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
 
@@ -173,52 +171,61 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
 # ToDo: Reactivate after the bug on the Notion API side is fixed that adding a two-way relation property with update
 #       actually generates a one-way relation property.
 # @pytest.mark.vcr()
-# def test_self_ref_two_way_prop(notion: Session, root_page: Page):
-#     class SchemaA(Schema, db_title='Schema A'):
+# def test_self_ref_two_way_prop(notion: uno.Session, root_page: uno.Page):
+#     class SchemaA(uno.Schema, db_title='Schema A'):
 #         """Schema A description"""
 
-#         name = Property('Name', schema.Title())
-#         fwd_rel = Property('Forward Relation', schema.Relation())
-#         bwd_rel = Property('Backward Relation', schema.Relation(schema.SelfRef, two_way_prop=fwd_rel))
+#         name = uno.PropType.Title('Name')
+#         fwd_rel = uno.PropType.Relation('Forward Relation')
+#         bwd_rel = uno.PropType.Relation('Backward Relation', schema=uno.SelfRef, two_way_prop=fwd_rel)
 
 #     db_a = notion.create_db(parent=root_page, schema=SchemaA)
 
 #     assert db_a.schema.fwd_rel._schema is db_a._schema  # type: ignore
 #     assert db_a.schema.bwd_rel._schema is db_a._schema  # type: ignore
 
-#     assert db_a.schema.fwd_rel.type.name == 'Forward Relation'  # type: ignore
-#     assert db_a.schema.bwd_rel.type.name == 'Backward Relation'  # type: ignore
+#     assert db_a.schema.fwd_rel.name == 'Forward Relation'  # type: ignore
+#     assert db_a.schema.bwd_rel.name == 'Backward Relation'  # type: ignore
 
-#     assert db_a.schema.fwd_rel.type.two_way_prop is SchemaA.bwd_rel  # type: ignore
-#     assert db_a.schema.bwd_rel.type.two_way_prop is SchemaA.fwd_rel  # type: ignore
+#     assert db_a.schema.fwd_rel.two_way_prop is SchemaA.bwd_rel  # type: ignore
+#     assert db_a.schema.bwd_rel.two_way_prop is SchemaA.fwd_rel  # type: ignore
 
 
 def test_title_missing_or_too_many() -> None:
     with pytest.raises(SchemaError):
 
         class MissingTitleSchema(uno.Schema, db_title='Missing Title'):
-            tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
+            tags = uno.PropType.MultiSelect('Tags', options=[])
 
     with pytest.raises(SchemaError):
 
         class TwoTitleSchema(uno.Schema, db_title='Two Titles'):
-            title = uno.Property('Title', uno.PropType.Title())
-            name = uno.Property('Name', uno.PropType.Title())
+            title = uno.PropType.Title('Title')
+            name = uno.PropType.Title('Name')
 
 
 def test_unique_property_names() -> None:
     with pytest.raises(SchemaError):
 
         class AmbiguousPropSchema(uno.Schema, db_title='Ambiguous Properties'):
-            tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
-            select = uno.Property('Tags', uno.PropType.Select([]))
+            title = uno.PropType.Title('Title')
+            tags = uno.PropType.MultiSelect('Tags', options=[])
+            select = uno.PropType.Select('Tags', options=[])
+
+
+def test_property_name_is_set() -> None:
+    with pytest.raises(PropertyError):
+
+        class NoNameSchema(uno.Schema, db_title='No Name Set'):
+            title = uno.PropType.Title('Title')
+            tags = uno.PropType.Number()
 
 
 def test_to_pydantic_model() -> None:
     class Schema(uno.Schema, db_title='Schema'):
-        name = uno.Property('Name', uno.PropType.Title())
-        tags = uno.Property('Tags', uno.PropType.MultiSelect([]))
-        created_on = uno.Property('Created on', uno.PropType.CreatedTime())
+        name = uno.PropType.Title('Name')
+        tags = uno.PropType.MultiSelect('Tags', options=[])
+        created_on = uno.PropType.CreatedTime('Created on')
 
     rw_props_model = Schema.to_pydantic_model(with_ro_props=False)
     rw_props_item = rw_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2']})
@@ -238,10 +245,10 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     class Schema(uno.Schema, db_title='Add/Del/Update Prop-Test'):
         """Schema for testing adding, deleting and updating properties"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        cat = uno.Property('Category', uno.PropType.Select(options))
-        tags = uno.Property('Tags', uno.PropType.MultiSelect(options))
-        formula = uno.Property('Formula', uno.PropType.Formula('prop("Name")'))
+        name = uno.PropType.Title('Name')
+        cat = uno.PropType.Select('Category', options=options)
+        tags = uno.PropType.MultiSelect('Tags', options=options)
+        formula = uno.PropType.Formula('Formula', formula='prop("Name")')
 
     db = notion.create_db(parent=root_page, schema=Schema)
 
@@ -262,14 +269,14 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert not hasattr(db.schema, 'tags')
 
     # Add properties to the schema
-    db.schema['Number'] = uno.PropType.Number(uno.NumberFormat.DOLLAR)
+    db.schema['Number'] = uno.PropType.Number(format=uno.NumberFormat.DOLLAR)
     assert 'Number' in [prop.name for prop in db.schema]
     assert hasattr(db.schema, 'number')
     db.reload()
     assert 'Number' in [prop.name for prop in db.schema]
     assert hasattr(db.schema, 'number')
 
-    db.schema.date = uno.Property('Date', uno.PropType.Date())
+    db.schema.date = uno.PropType.Date('Date')
     assert 'Date' in [prop.name for prop in db.schema]
     assert hasattr(db.schema, 'date')
     db.reload()
@@ -277,15 +284,18 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert hasattr(db.schema, 'date')
 
     # Update properties in the schema
-    db.schema['Number'] = uno.PropType.Formula('prop("Name") + "!"')
+    with pytest.raises(PropertyError):
+        db.schema['Number'] = uno.PropType.Formula('New Name', formula='prop("Name") + "!"')
+
+    db.schema['Number'] = uno.PropType.Formula(formula='prop("Name") + "!"')
     assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
     db.reload()
     assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
 
-    db.schema.number = uno.Property('NewNumber', uno.PropType.Number(uno.NumberFormat.PERCENT))
-    assert 'NewNumber' in [prop.name for prop in db.schema]
+    db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)
+    assert db.schema.number.format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
     db.reload()
-    assert 'NewNumber' in [prop.name for prop in db.schema]
+    assert db.schema.number.format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
 
 
 @pytest.mark.vcr()
@@ -293,26 +303,26 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     class SchemaA(uno.Schema, db_title='Update Prop-Test: Schema A'):
         """Only used to create relations in Schema C"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        relation = uno.Property('Relation', uno.PropType.Relation())
+        name = uno.PropType.Title('Name')
+        relation = uno.PropType.Relation('Relation')
 
     class SchemaB(uno.Schema, db_title='Update Prop-Test: Schema B'):
         """Only used to create relations in Schema C"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        relation = uno.Property('Relation', uno.PropType.Relation())
+        name = uno.PropType.Title('Name')
+        relation = uno.PropType.Relation('Relation')
 
     class SchemaC(uno.Schema, db_title='Update Prop-Test: Schema C'):
         """Actual interesting schema/db"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        relation = uno.Property('Relation', uno.PropType.Relation(SchemaA))
-        relation_twoway = uno.Property(
-            'Relation two-way', uno.PropType.Relation(SchemaA, two_way_prop=SchemaA.relation)
-        )
-        rollup = uno.Property(
+        name = uno.PropType.Title('Name')
+        relation = uno.PropType.Relation('Relation', schema=SchemaA)
+        relation_twoway = uno.PropType.Relation('Relation two-way', schema=SchemaA, two_way_prop=SchemaA.relation)
+        rollup = uno.PropType.Rollup(
             'Rollup',
-            uno.PropType.Rollup(relation=relation, rollup=SchemaA.name, calculate=uno.AggFunc.COUNT_ALL),
+            relation=relation,
+            rollup=SchemaA.name,
+            calculate=uno.AggFunc.COUNT_ALL,
         )
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
@@ -359,11 +369,11 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
         return f'{{{{notion:block_property:{prop.id}:'
 
     class Schema(uno.Schema, db_title='Select Options Update Test'):
-        name = uno.Property('Name', uno.PropType.Title())
-        cat = uno.Property('Category', uno.PropType.Select(options))
-        tags = uno.Property('Tags', uno.PropType.MultiSelect(options))
-        formula = uno.Property('Formula', uno.PropType.Formula('prop("Name")'))
-        number = uno.Property('Number', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+        name = uno.PropType.Title('Name')
+        cat = uno.PropType.Select('Category', options=options)
+        tags = uno.PropType.MultiSelect('Tags', options=options)
+        formula = uno.PropType.Formula('Formula', formula='prop("Name")')
+        number = uno.PropType.Number('Number', format=uno.NumberFormat.DOLLAR)
 
     db = notion.create_db(parent=root_page, schema=Schema)
 
