@@ -17,7 +17,7 @@ from ultimate_notion.obj_api.enums import FormulaType, RollupType
 from ultimate_notion.page import Page
 from ultimate_notion.props import Option
 from ultimate_notion.rich_text import html_img
-from ultimate_notion.schema import PropertyType
+from ultimate_notion.schema import Property
 from ultimate_notion.user import User
 from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook, rec_apply
 
@@ -164,7 +164,7 @@ class View(Sequence[Page]):
         pl_schema: dict[str, pl.DataType] = {}
         for col in self.columns:
             if col in db_schema:
-                prop_type: PropertyType | PropertyValue = db_schema[col]
+                prop_type: Property | PropertyValue = db_schema[col]
                 if isinstance(prop_type, schema.Rollup | schema.Relation | schema.Formula):
                     prop_type = probed_type if (probed_type := self._probe_col_type(col)) is not None else prop_type
                 pl_schema[col] = prop_type_to_polars(prop_type)
@@ -419,7 +419,7 @@ def cmplx_to_str(obj: Wrapper) -> Wrapper | str:
             return obj
 
 
-def prop_type_to_polars(prop_valtype: PropertyType | PropertyValue) -> pl.DataType:
+def prop_type_to_polars(prop_valtype: Property | PropertyValue) -> pl.DataType:
     """Convert a Notion property type to a Polars data type."""
     import polars as pl  # noqa: PLC0415
 
