@@ -33,9 +33,9 @@ class Status(uno.OptionNS):
 class Task(uno.Schema, db_title='My synced task db'):
     """My personal task list of all the important stuff I have to do"""
 
-    task = uno.Property('Task', uno.PropType.Title())
-    status = uno.Property('Status', uno.PropType.Select(Status))
-    due_date = uno.Property('Due Date', uno.PropType.Date())
+    task = uno.PropType.Title('Task')
+    status = uno.PropType.Select('Status', options=Status)
+    due_date = uno.PropType.Date('Due Date')
 
 
 with uno.Session() as notion:

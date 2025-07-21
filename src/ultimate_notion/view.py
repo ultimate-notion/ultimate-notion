@@ -123,7 +123,7 @@ class View(Sequence[Page]):
     def to_pydantic(self) -> list[BaseModel]:
         """Convert the view to a list of Pydantic models."""
         model = self.database.schema.to_pydantic_model(with_ro_props=True)
-        is_prop_ro = {prop.name: prop.type.readonly for prop in self.database.schema.get_props()}
+        is_prop_ro = {prop.name: prop.readonly for prop in self.database.schema.get_props()}
 
         def get_prop(page: Page, prop: str) -> PropertyValue | Any:
             prop_value = page.props._get_property(prop)

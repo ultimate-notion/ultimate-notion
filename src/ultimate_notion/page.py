@@ -90,7 +90,7 @@ class PagePropertiesNS(Mapping[str, Any]):
 
         if not isinstance(value, PropertyValue):
             # construct concrete PropertyValue using the schema
-            value = db.schema.get_prop(prop_name).type.prop_value(value)
+            value = db.schema.get_prop(prop_name).prop_value(value)
 
         session = get_active_session()
         # update the property on the server (which will update the local data)

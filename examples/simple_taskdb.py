@@ -44,11 +44,11 @@ urgency = (
 class Task(uno.Schema, db_title='My task list'):
     """My personal task list of all the important stuff I have to do"""
 
-    task = uno.Property('Task', uno.PropType.Title())
-    status = uno.Property('Status', uno.PropType.Select(Status))
-    priority = uno.Property('Priority', uno.PropType.Select(Priority))
-    urgency = uno.Property('Urgency', uno.PropType.Formula(urgency))
-    due_date = uno.Property('Due Date', uno.PropType.Date())
+    task = uno.PropType.Title('Task')
+    status = uno.PropType.Select('Status', options=Status)
+    priority = uno.PropType.Select('Priority', options=Priority)
+    urgency = uno.PropType.Formula('Urgency', formula=urgency)
+    due_date = uno.PropType.Date('Due Date')
 
 
 with uno.Session() as notion:

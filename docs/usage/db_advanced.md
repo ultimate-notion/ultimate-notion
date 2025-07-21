@@ -30,9 +30,9 @@ class Size(uno.OptionNS):
 
 class Item(uno.Schema, db_title='Item DB'):
     """Database of all the items we sell"""
-    name = uno.Property('Name', uno.PropType.Title())
-    size = uno.Property('Size', uno.PropType.Select(Size))
-    price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
+    name = uno.PropType.Title('Name')
+    size = uno.PropType.Select('Size', options=Size)
+    price = uno.PropType.Number('Price', format=uno.NumberFormat.DOLLAR)
 ```
 
 Since a database needs to be a block wighin a page, we assume there is a page called
@@ -49,8 +49,8 @@ Now we create a database for our customers and define a one-way [Relation] to th
 ```python
 class Customer(uno.Schema, db_title='Customer DB'):
     """Database of all our beloved customers"""
-    name = uno.Property('Name', uno.PropType.Title())
-    purchases = uno.Property('Items Purchased', uno.PropType.Relation(Item))
+    name = uno.PropType.Title('Name')
+    purchases = uno.PropType.Relation('Items Purchased', schema=Item)
 
 customer_db = notion.create_db(parent=root_page, schema=Customer)
 ```
@@ -77,19 +77,19 @@ employee_db.title = 'Employee DB'
 employee_db.description = 'Database holding all our employees'
 
 employee_db.schema['Salary'] = uno.PropType.Number()
-employee_db.schema.hiring_date = uno.Property('Hiring Date', uno.PropType.Date())
+employee_db.schema.hiring_date = uno.PropType.Date('Hiring Date')
 
 options = [uno.Option(name='Junior', color=uno.Color.GREEN),
            uno.Option(name='Advanced', color=uno.Color.YELLOW),
            uno.Option(name='Senior', color=uno.Color.RED)]
 
-employee_db.schema['Level'] = uno.PropType.Select(options)
+employee_db.schema['Level'] = uno.PropType.Select(options=options)
 ```
 
 As shown above, there are two ways to add new properties by:
 
 1. a dictionary item assignment of a [PropType] to the schema,
-2. a property assignment of a [Property] to the schema.
+2. a property assignment of a [PropType] to the schema.
 
 In the first case, a corresponding property `salary` of the schema will be created automatically.
 
@@ -97,17 +97,14 @@ This also allows us to do schema evolution by changing and updating columns, e.g
 
 ```python
 employee_db.schema['Salary'] = uno.PropType.Formula(
-    '50000 + dateBetween(prop("Hiring Date"), now(), "years")*1000'
+    formula='50000 + dateBetween(prop("Hiring Date"), now(), "years")*1000'
 )
 employee_db.schema['Level'].options = [
     *options,
     uno.Option(name='Partner', color=uno.Color.PINK)
 ]
-employee_db.schema.hiring_date = uno.Property(
-    'Hiring Date as String',
-    uno.PropType.Text()
-)
-employee_db.schema.hiring_date.name = 'Hiring Date'
+employee_db.schema.hiring_date = uno.PropType.Text()
+employee_db.schema.hiring_date.name = 'Hiring Date as String'
 ```
 
 This changes the salary property to a formula type, adds a partner level to the level property, changes
@@ -183,18 +180,15 @@ from `Customer` needs to become a two-way relation. We can achieve this, with a 
 ```python
 class Item(uno.Schema, db_title='Item DB'):
     """Database of all the items we sell"""
-    name = uno.Property('Name', uno.PropType.Title())
-    size = uno.Property('Size', uno.PropType.Select(Size))
-    price = uno.Property('Price', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-    bought_by = uno.Property('Bought by', uno.PropType.Relation())
+    name = uno.PropType.Title('Name')
+    size = uno.PropType.Select('Size', options=Size)
+    price = uno.PropType.Number('Price', format=uno.NumberFormat.DOLLAR)
+    bought_by = uno.PropType.Relation('Bought by')
 
 class Customer(uno.Schema, db_title='Customer DB'):
     """Database of all our beloved customers"""
-    name = uno.Property('Name', uno.PropType.Title())
-    purchases = uno.Property(
-        'Items Purchased',
-        uno.PropType.Relation(Item, two_way_prop=Item.bought_by)
-    )
+    name = uno.PropType.Title('Name')
+    purchases = uno.PropType.Relation('Items Purchased', schema=Item, two_way_prop=Item.bought_by)
 ```
 
 So what happens here is that we first create a *target* relation property `bought_by` in `Item` by not
@@ -224,9 +218,9 @@ certain tasks can be subtasks of others:
 ```python
 class Task(uno.Schema, db_title='Task List'):
     """A really simple task lists with subtasks"""
-    task = uno.Property('Task', uno.PropType.Title())
-    due_by = uno.Property('Due by', uno.PropType.Date())
-    parent = uno.Property('Parent Task', uno.PropType.Relation(uno.SelfRef))
+    task = uno.PropType.Title('Task')
+    due_by = uno.PropType.Date('Due by')
+    parent = uno.PropType.Relation('Parent Task', schema=uno.SelfRef)
 
 task_db = notion.create_db(parent=root_page, schema=Task)
 
@@ -258,7 +252,6 @@ tidyup_kitchen = Task.create(
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
 [create]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema.create
 [Relation]:  ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Relation
-[Property]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Property
 [PropType]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.PropType
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema
 [bind_db]: ../../reference/ultimate_notion/#ultimate_notion.Schema.bind_db

@@ -318,7 +318,7 @@ class IsEmpty(PropertyCondition):
                             )
                             raise FilterQueryError(msg)
 
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
@@ -408,7 +408,7 @@ class Equals(PropertyCondition):
                             )
                             raise FilterQueryError(msg)
 
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
@@ -493,7 +493,7 @@ class InEquality(PropertyCondition, ABC):
                             )
                             raise FilterQueryError(msg)
 
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
@@ -595,7 +595,7 @@ class Contains(PropertyCondition):
                             )
                             raise FilterQueryError(msg)
 
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
@@ -655,7 +655,7 @@ class StartsWith(PropertyCondition):
                             )
                             raise FilterQueryError(msg)
 
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
@@ -723,7 +723,7 @@ class DateCondition(PropertyCondition, ABC):
                             )
                             raise FilterQueryError(msg)
 
-                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop.type)
+                        kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
                         condition = obj_query.RollupArrayCondition(**kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.DATE:

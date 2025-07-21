@@ -34,9 +34,9 @@ class Topic(uno.OptionNS):
 
 class Article(uno.Schema, db_title='Article DB'):
     """Database of various articles"""
-    name = uno.Property('Name', uno.PropType.Title())
-    topic = uno.Property('Topic', uno.PropType.Select(Topic))
-    released = uno.Property('Released', uno.PropType.Date())
+    name = uno.PropType.Title('Name')
+    topic = uno.PropType.Select('Topic', options=Topic)
+    released = uno.PropType.Date('Released')
 
 article_db = notion.create_db(parent=root_page, schema=Article)
 

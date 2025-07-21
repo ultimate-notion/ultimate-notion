@@ -109,10 +109,10 @@ def test_property() -> None:
 @pytest.mark.vcr()
 def test_date_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Date Query DB Test'):
-        name = uno.Property('Name', uno.PropType.Title())
-        date = uno.Property('Date', uno.PropType.Date())
-        created = uno.Property('Created', uno.PropType.CreatedTime())
-        last_edited = uno.Property('Last Edited', uno.PropType.LastEditedTime())
+        name = uno.PropType.Title('Name')
+        date = uno.PropType.Date('Date')
+        created = uno.PropType.CreatedTime('Created')
+        last_edited = uno.PropType.LastEditedTime('Last Edited')
 
     db = notion.create_db(parent=root_page, schema=DB)
     now = pnd.now()
@@ -196,11 +196,11 @@ def test_date_query(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_text_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Text Query DB Test'):
-        title = uno.Property('Title', uno.PropType.Title())
-        name = uno.Property('Name', uno.PropType.Text())
-        phone = uno.Property('Phone', uno.PropType.Phone())
-        email = uno.Property('Email', uno.PropType.Email())
-        url = uno.Property('URL', uno.PropType.URL())
+        title = uno.PropType.Title('Title')
+        name = uno.PropType.Text('Name')
+        phone = uno.PropType.Phone('Phone')
+        email = uno.PropType.Email('Email')
+        url = uno.PropType.URL('URL')
 
     db = notion.create_db(parent=root_page, schema=DB)
     page_empty = db.create_page()
@@ -258,8 +258,8 @@ def test_text_query(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_number_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Number Query DB Test'):
-        title = uno.Property('Title', uno.PropType.Title())
-        number = uno.Property('Number', uno.PropType.Number())
+        title = uno.PropType.Title('Title')
+        number = uno.PropType.Number('Number')
 
     db = notion.create_db(parent=root_page, schema=DB)
     page_empty = db.create_page()
@@ -302,9 +302,9 @@ def test_select_query(root_page: uno.Page, notion: uno.Session) -> None:
     ]
 
     class DB(uno.Schema, db_title='(Multi)-Select Query DB Test'):
-        title = uno.Property('Title', uno.PropType.Title())
-        select = uno.Property('Select', uno.PropType.Select(status_options))
-        multi_select = uno.Property('Multi-Select', uno.PropType.MultiSelect(status_options))
+        title = uno.PropType.Title('Title')
+        select = uno.PropType.Select('Select', options=status_options)
+        multi_select = uno.PropType.MultiSelect('Multi-Select', options=status_options)
 
     db = notion.create_db(parent=root_page, schema=DB)
     page_empty = db.create_page()
@@ -356,9 +356,9 @@ def test_select_query(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Files & Checkbox Query DB Test'):
-        title = uno.Property('Title', uno.PropType.Title())
-        files = uno.Property('Files', uno.PropType.Files())
-        check = uno.Property('Checkbox', uno.PropType.Checkbox())
+        title = uno.PropType.Title('Title')
+        files = uno.PropType.Files('Files')
+        check = uno.PropType.Checkbox('Checkbox')
 
     db = notion.create_db(parent=root_page, schema=DB)
 
@@ -395,9 +395,9 @@ def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person: uno.User) -> None:
     class DB(uno.Schema, db_title='People & Relation Query DB Test'):
-        title = uno.Property('Title', uno.PropType.Title())
-        people = uno.Property('People', uno.PropType.Person())
-        relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
+        title = uno.PropType.Title('Title')
+        people = uno.PropType.Person('People')
+        relation = uno.PropType.Relation('Relation', schema=uno.SelfRef)
 
     db = notion.create_db(parent=root_page, schema=DB)
 
@@ -520,8 +520,8 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
     assert set(query.execute()) == set()
 
     class DB(uno.Schema, db_title='Empty Formula DB Test'):
-        title = uno.Property('Title', uno.PropType.Title())
-        formula = uno.Property('Formula', uno.PropType.Formula('prop("Title")'))
+        title = uno.PropType.Title('Title')
+        formula = uno.PropType.Formula('Formula', formula='prop("Title")')
 
     db = notion.create_db(parent=root_page, schema=DB)
 
@@ -538,29 +538,24 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session) -> None:
     rollup_date_arr_prop = 'Rollup Date Array'
 
     class DB(uno.Schema, db_title='Rollup Query DB Test'):
-        title = uno.Property('Title', uno.PropType.Title())
-        relation = uno.Property('Relation', uno.PropType.Relation(uno.SelfRef))
-        date = uno.Property('Date', uno.PropType.Date())
-        number = uno.Property('Number', uno.PropType.Number())
-        rollup_title = uno.Property(
-            rollup_title_prop,
-            uno.PropType.Rollup(relation=relation, rollup=title, calculate=uno.AggFunc.SHOW_ORIGINAL),
+        title = uno.PropType.Title('Title')
+        relation = uno.PropType.Relation('Relation', schema=uno.SelfRef)
+        date = uno.PropType.Date('Date')
+        number = uno.PropType.Number('Number')
+        rollup_title = uno.PropType.Rollup(
+            rollup_title_prop, relation=relation, rollup=title, calculate=uno.AggFunc.SHOW_ORIGINAL
         )
-        rollup_date = uno.Property(
-            rollup_date_prop,
-            uno.PropType.Rollup(relation=relation, rollup=date, calculate=uno.AggFunc.EARLIEST_DATE),
+        rollup_date = uno.PropType.Rollup(
+            rollup_date_prop, relation=relation, rollup=date, calculate=uno.AggFunc.EARLIEST_DATE
         )
-        rollup_date_arr = uno.Property(
-            rollup_date_arr_prop,
-            uno.PropType.Rollup(relation=relation, rollup=date, calculate=uno.AggFunc.SHOW_ORIGINAL),
+        rollup_date_arr = uno.PropType.Rollup(
+            rollup_date_arr_prop, relation=relation, rollup=date, calculate=uno.AggFunc.SHOW_ORIGINAL
         )
-        rollup_number = uno.Property(
-            rollup_number_prop,
-            uno.PropType.Rollup(relation=relation, rollup=number, calculate=uno.AggFunc.MAX),
+        rollup_number = uno.PropType.Rollup(
+            rollup_number_prop, relation=relation, rollup=number, calculate=uno.AggFunc.MAX
         )
-        rollup_number_arr = uno.Property(
-            rollup_number_prop_arr,
-            uno.PropType.Rollup(relation=relation, rollup=number, calculate=uno.AggFunc.SHOW_ORIGINAL),
+        rollup_number_arr = uno.PropType.Rollup(
+            rollup_number_prop_arr, relation=relation, rollup=number, calculate=uno.AggFunc.SHOW_ORIGINAL
         )
 
     db = notion.create_db(parent=root_page, schema=DB)

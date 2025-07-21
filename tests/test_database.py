@@ -30,16 +30,16 @@ def test_schema(article_db: uno.Database) -> None:
     assert ref_schema.to_dict() == db_schema
 
     class MySchema(uno.Schema, db_title='My Schema'):
-        name = uno.Property('Name', uno.PropType.Title())
-        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
+        desc = uno.PropType.Text('Description')
 
     article_db.schema = MySchema
 
     class WrongSchema(uno.Schema, db_title='My Wrong Schema'):
-        name = uno.Property('Name', uno.PropType.Title())
-        cost = uno.Property('Cost', uno.PropType.Text())
-        desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Text('Cost')
+        desc = uno.PropType.Text('Description')
 
     with pytest.raises(SchemaError):
         article_db.schema = WrongSchema
@@ -50,9 +50,9 @@ def test_db_inline(notion: uno.Session, root_page: uno.Page):
     """Simple inline database of articles"""
 
     class Article(uno.Schema, db_title=None):
-        name = uno.Property('Name', uno.PropType.Title())
-        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
+        desc = uno.PropType.Text('Description')
 
     db = notion.create_db(parent=root_page, schema=Article, inline=True)
     assert db.is_inline
@@ -68,9 +68,9 @@ def test_db_without_title(notion: uno.Session, root_page: uno.Page) -> None:
     """Simple database of articles"""
 
     class Article(uno.Schema, db_title=None):
-        name = uno.Property('Name', uno.PropType.Title())
-        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
+        desc = uno.PropType.Text('Description')
 
     db = notion.create_db(parent=root_page, schema=Article)
     assert db.title == ''
@@ -83,9 +83,9 @@ def test_db_with_title(notion: uno.Session, root_page: uno.Page) -> None:
     """Simple database of articles"""
 
     class Article(uno.Schema, db_title='My Articles'):
-        name = uno.Property('Name', uno.PropType.Title())
-        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
+        desc = uno.PropType.Text('Description')
 
     db = notion.create_db(parent=root_page, schema=Article, title='Overwritten Title')
     assert db.title == 'Overwritten Title'
@@ -105,9 +105,9 @@ def test_db_with_docstring(notion: uno.Session, root_page: uno.Page) -> None:
     class Article(uno.Schema, db_title=None):
         """My articles"""
 
-        name = uno.Property('Name', uno.PropType.Title())
-        cost = uno.Property('Cost', uno.PropType.Number(uno.NumberFormat.DOLLAR))
-        desc = uno.Property('Description', uno.PropType.Text())
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
+        desc = uno.PropType.Text('Description')
 
     db = notion.create_db(parent=root_page, schema=Article)
     assert db.title == ''
