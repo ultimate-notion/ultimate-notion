@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-class Property(BaseModel):
+class PageProperty(BaseModel):
     """Represents a property of a page.
 
     !!! note
@@ -128,7 +128,7 @@ class Property(BaseModel):
         return RollupArrayProperty(name=self.name, sort=self.sort, quantifier=ArrayQuantifier.EVERY)
 
 
-class RollupArrayProperty(Property):
+class RollupArrayProperty(PageProperty):
     """Represents a rollup array property of a page."""
 
     quantifier: ArrayQuantifier
@@ -137,9 +137,9 @@ class RollupArrayProperty(Property):
         return f"prop('{self.name}').{self.quantifier.value}"
 
 
-def prop(prop_name: str, /) -> Property:
+def prop(prop_name: str, /) -> PageProperty:
     """Create a property object."""
-    return Property(name=prop_name)
+    return PageProperty(name=prop_name)
 
 
 class Condition(BaseModel, ABC):
@@ -188,7 +188,7 @@ class Condition(BaseModel, ABC):
 
 
 class PropertyCondition(Condition, ABC):
-    prop: Property
+    prop: PageProperty
     value: Any
     _probe_page: Page | None = None
 
@@ -200,7 +200,7 @@ class PropertyCondition(Condition, ABC):
         Thus we handle here everything except of the rollup array condition.
         """
 
-    def _get_prop_type(self, db: Database) -> schema.Property:
+    def _get_prop_type(self, db: Database) -> Property:
         return db.schema[self.prop.name]
 
     def _get_probe_page(self, db: Database) -> Page:
@@ -798,7 +798,7 @@ class Query:
 
     database: Database
     _filter: Condition | None = None
-    _sorts: list[Property]
+    _sorts: list[PageProperty]
 
     def __init__(self, database: Database):
         self.database = database
@@ -845,7 +845,7 @@ class Query:
 
         return self
 
-    def sort(self, *props: Property | str) -> Query:
+    def sort(self, *props: PageProperty | str) -> Query:
         """Sort the query by the given properties and directions.
 
         !!! note
@@ -853,7 +853,7 @@ class Query:
             the second is the secondary sort, and so on. Calling this method multiple times
             will overwrite the previous sorts.
         """
-        self._sorts = [prop if isinstance(prop, Property) else Property(name=prop) for prop in props]
+        self._sorts = [prop if isinstance(prop, PageProperty) else PageProperty(name=prop) for prop in props]
         return self
 
     def __repr__(self) -> str:
