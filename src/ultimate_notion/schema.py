@@ -25,7 +25,7 @@ from collections import Counter
 from collections.abc import Iterator
 from functools import partial
 from textwrap import dedent
-from typing import TYPE_CHECKING, Annotated, Any, TypeVar
+from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
@@ -70,7 +70,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     _schema: type[Schema] | None = None  # back reference to the schema
     _attr_name: str | None = None  # Python attribute name of the property in the schema
 
-    def __new__(cls, *args, **kwargs) -> T:
+    def __new__(cls, *args, **kwargs) -> Property:
         if cls is Property:
             msg = f'{cls.__name__} is abstract and cannot be instantiated directly'
             raise TypeError(msg)
@@ -86,6 +86,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
 
     def __set_name__(self, owner: type[Schema], name: str):
         self._schema = owner
+        # ToDo: Remove the attr_name and determine this on the fly from the schema
         self._attr_name = name
 
     def __eq__(self, other: object) -> bool:
@@ -115,12 +116,13 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         db = self._schema.get_db()
         session = get_active_session()
         session.api.databases.update(db=db.obj_ref, schema={self.name: prop_obj})
-        return db.obj_ref.properties[self.name]
+        return cast(T, db.obj_ref.properties[self.name])
 
     def _rename_prop(self, new_name: str | None) -> None:
         """Update the name of this property in the schema or delete it.
 
         !!! warning
+
             The name of the Python attribute, i.e. `attr_name` in the schema is not changed.
         """
         if not self.is_bound():
@@ -752,7 +754,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
 
     # ToDo: Fix this. two_way_prop should not be a PropertyType, but a Relation or a string even.
     def __init__(
-        self, name: str | None = None, *, schema: type[Schema] | None = None, two_way_prop: Property | None = None
+        self, name: str | None = None, *, schema: type[Schema] | None = None, two_way_prop: Relation | None = None
     ):
         self._name = name
         self._schema = None

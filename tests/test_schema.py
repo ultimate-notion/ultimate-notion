@@ -293,9 +293,9 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
 
     db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)
-    assert db.schema.number.format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    assert db.schema.number.format == uno.NumberFormat.PERCENT
     db.reload()
-    assert db.schema.number.format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    assert db.schema.number.format == uno.NumberFormat.PERCENT
 
 
 @pytest.mark.vcr()
