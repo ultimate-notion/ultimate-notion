@@ -44,14 +44,13 @@ from ultimate_notion.errors import (
     SchemaNotBoundError,
 )
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
-from ultimate_notion.option import Option, OptionGroup, OptionNS
+from ultimate_notion.option import Option, OptionGroup, OptionNS, compare_options
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, dict_diff_str, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
-from ultimate_notion.option import compare_options
 
 T = TypeVar('T', bound=obj_schema.Property)
 

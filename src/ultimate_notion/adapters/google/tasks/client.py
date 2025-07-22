@@ -17,7 +17,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from datetime import date, datetime, time, timezone
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
@@ -78,7 +78,7 @@ class GObject(BaseModel):
     self_link: HttpUrl = Field(..., alias='selfLink')
     _resource: Resource
 
-    def __init__(self, resource: Resource, **data: str):
+    def __init__(self, resource: Resource, **data: Any):
         super().__init__(**data)
         self._resource = resource
 
