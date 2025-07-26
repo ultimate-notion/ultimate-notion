@@ -67,7 +67,6 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     """If the Notion API allows to create a new database with a property of this type"""
     _name: str | None = None  # name given by the user, not the Notion API, will match when set
     _schema: type[Schema] | None = None  # back reference to the schema
-    _attr_name: str | None = None  # Python attribute name of the property in the schema
 
     def __new__(cls, *args, **kwargs) -> Property:
         if cls is Property:
@@ -83,10 +82,10 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         obj_api_type = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(**kwargs)
 
-    def __set_name__(self, owner: type[Schema], name: str):
+    def __set_name__(self, owner: type[Schema], name: str) -> None:
         self._schema = owner
-        # ToDo: Remove the attr_name and determine this on the fly from the schema
-        self._attr_name = name
+        # We do not set attr_name here to avoid a state that needs to be managed.
+        # self._attr_name = name
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
@@ -124,7 +123,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
 
             The name of the Python attribute, i.e. `attr_name` in the schema is not changed.
         """
-        if not self.is_bound():
+        if self._schema is None:
             msg = 'Property must be bound to a Schema.'
             raise PropertyError(msg)
 
@@ -136,15 +135,11 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         session.api.databases.update(db=db.obj_ref, schema=schema)
 
         if new_name is None:
-            delattr(self._schema, self._attr_name)
+            delattr(self._schema, self.attr_name)
         else:
             self._set_name(new_name)
 
         self._schema._set_obj_refs()
-
-    def is_bound(self) -> bool:
-        """Return if this property is bound to a schema."""
-        return self._schema is not None
 
     def delete(self) -> None:
         """Delete this property from the schema."""
@@ -181,10 +176,12 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     @property
     def attr_name(self) -> str:
         """Return the Python attribute name of the property in the schema."""
-        if not self.is_bound():
+        if self._schema is None:
             msg = 'Property must be bound to a Schema.'
             raise PropertyError(msg)
-        return self._attr_name
+        for attr_name, prop in self._schema.__dict__.items():
+            if prop is self:
+                return attr_name
 
     @property
     def prop_value(self) -> type[PropertyValue]:
@@ -968,7 +965,7 @@ class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
     @property
     def relation_prop(self) -> Relation:
         """Return the relation property object of the rollup."""
-        if self.is_bound():
+        if self._schema is not None:
             rel_prop = self._schema.get_prop(self.obj_ref.rollup.relation_property_name)
             if isinstance(rel_prop, Relation):
                 return rel_prop
@@ -982,7 +979,7 @@ class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
     @property
     def rollup_prop(self) -> Property:
         """Return the rollup property object of the rollup."""
-        if self.is_bound():
+        if self._schema is not None:
             return self._schema.get_prop(self.obj_ref.rollup.rollup_property_name)
         else:
             msg = 'Rollup property not bound to a `Property` object'
