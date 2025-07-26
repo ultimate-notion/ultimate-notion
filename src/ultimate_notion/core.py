@@ -31,7 +31,7 @@ class ObjRefWrapper(Protocol[GT]):
 class Wrapper(ObjRefWrapper[GT], ABC):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
-    obj_ref: GT
+    _obj_ref: GT
 
     _obj_api_map: ClassVar[dict[type[GT], type[Wrapper]]] = {}  # type: ignore[misc]
 
@@ -46,12 +46,25 @@ class Wrapper(ObjRefWrapper[GT], ABC):
     def __init__(self, *args: Any, **kwargs: Any):
         """Default constructor that also builds `obj_ref`."""
         obj_api_type: type[obj_core.GenericObject] = self._obj_api_map_inv[self.__class__]
-        self.obj_ref = obj_api_type.build(*args, **kwargs)
+        self._obj_ref = obj_api_type.build(*args, **kwargs)
 
     def __pydantic_serializer__(self):  # noqa: PLW3201
         """Return the Pydantic serializers for this object."""
         # This is used only when creating a pydantic model from a schema.
-        return self.obj_ref.__pydantic_serializer__
+        return self._obj_ref.__pydantic_serializer__
+
+    @property
+    def obj_ref(self) -> GT:
+        """Return the low-level Notion-API object reference.
+
+        This is just the answer of the Notion API as a Pydantic model.
+        """
+        return self._obj_ref
+
+    @obj_ref.setter
+    def obj_ref(self, value: GT) -> None:
+        """Set the low-level Notion-API object reference."""
+        self._obj_ref = value
 
     @classmethod
     def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
@@ -63,7 +76,7 @@ class Wrapper(ObjRefWrapper[GT], ABC):
             # ToDo: remove type ignore when https://github.com/python/mypy/issues/14123 is fixed
             # break recursion
             hl_obj = hl_cls.__new__(hl_cls)
-            hl_obj.obj_ref = obj_ref
+            hl_obj._obj_ref = obj_ref
             return cast(Self, hl_obj)
         else:
             return cast(Self, hl_cls.wrap_obj_ref(obj_ref))
