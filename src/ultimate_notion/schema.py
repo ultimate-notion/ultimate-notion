@@ -137,7 +137,8 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         if new_name is None:
             delattr(self._schema, self.attr_name)
         else:
-            self._set_name(new_name)
+            self.obj_ref.name = new_name
+            self._name = new_name
 
         self._schema._set_obj_refs()
 
@@ -166,13 +167,6 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         """Set the name of this property."""
         self._rename_prop(new_name)
 
-    def _set_name(self, name: str | None) -> str | None:
-        """(Un-)set the name of this property and return the current one."""
-        curr_name = self.name
-        self.obj_ref.name = name
-        self._name = name
-        return curr_name
-
     @property
     def attr_name(self) -> str:
         """Return the Python attribute name of the property in the schema."""
@@ -182,6 +176,8 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         for attr_name, prop in self._schema.__dict__.items():
             if prop is self:
                 return attr_name
+        msg = f'Property `{self.name}` not found in schema `{self._schema.__name__}`.'
+        raise PropertyError(msg)
 
     @property
     def prop_value(self) -> type[PropertyValue]:
@@ -233,7 +229,13 @@ class SchemaType(ABCMeta):
         if isinstance(value, Property):
             curr_attr = getattr(cls, name, None)
             if curr_attr is None:  # adding a new property
-                cls[value._set_name(None)] = value
+                prop_name = value.name
+                if prop_name is None:
+                    msg = f'Property `{name}` must have a name.'
+                    raise PropertyError(msg)
+                else:
+                    value._name = None  # __setitem__ needs _name to be unset
+                    cls[prop_name] = value
             elif isinstance(curr_attr, Property):  # updating an existing property
                 cls[curr_attr.name] = value
             else:
@@ -781,7 +783,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         """Schema of the relation database."""
         if self._rel_schema:
             return self._rel_schema if self._rel_schema is not SelfRef else None
-        if self._schema.is_bound():
+        if self._schema is not None and self._schema.is_bound():
             session = get_active_session()
             return session.get_db(self.obj_ref.relation.database_id).schema
         else:
@@ -920,9 +922,13 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
-            our_db = self._schema.get_db()
-            session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
-            our_db.schema._set_obj_refs()
+            if self._schema is not None:
+                our_db = self._schema.get_db()
+                session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
+                our_db.schema._set_obj_refs()
+            else:
+                msg = 'This relation is not bound to a schema'
+                raise RelationError(msg)
 
 
 class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
