@@ -66,7 +66,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     allowed_at_creation = True
     """If the Notion API allows to create a new database with a property of this type"""
     _name: str | None = None  # name given by the user, not the Notion API, will match when set
-    _schema: type[Schema] | None = None  # back reference to the schema
+    _owner: type[Schema] | None = None  # back reference to the schema
 
     def __new__(cls, *args, **kwargs) -> Property:
         if cls is Property:
@@ -83,7 +83,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         self.obj_ref = obj_api_type.build(**kwargs)
 
     def __set_name__(self, owner: type[Schema], name: str) -> None:
-        self._schema = owner
+        self._owner = owner
         # We do not set attr_name here to avoid a state that needs to be managed.
         # self._attr_name = name
 
@@ -106,12 +106,16 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         """Determines if the property is already initialized"""
         return hasattr(self, 'obj_ref')
 
+    def _get_owner(self) -> type[Schema]:
+        """Get the owner schema of this property."""
+        if self._owner is None:
+            msg = f'The property {self.name} is not bound to a Schema!'
+            raise PropertyError(msg)
+        return self._owner
+
     def _update_prop(self, prop_obj: T) -> T:
         """Update the attributes of this property from a schema."""
-        if self._schema is None:
-            msg = 'Property must be bound to a Schema.'
-            raise SchemaError(msg)
-        db = self._schema.get_db()
+        db = self._get_owner().get_db()
         session = get_active_session()
         session.api.databases.update(db=db.obj_ref, schema={self.name: prop_obj})
         return cast(T, db.obj_ref.properties[self.name])
@@ -123,24 +127,21 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
 
             The name of the Python attribute, i.e. `attr_name` in the schema is not changed.
         """
-        if self._schema is None:
-            msg = 'Property must be bound to a Schema.'
-            raise PropertyError(msg)
-
-        db = self._schema.get_db()
+        schema = self._get_owner()
+        db = schema.get_db()
         session = get_active_session()
-        schema: dict[str, obj_schema.RenameProp | None] = (
+        schema_obj: dict[str, obj_schema.RenameProp | None] = (
             {self.name: None} if new_name is None else {self.name: obj_schema.RenameProp(name=new_name)}
         )
-        session.api.databases.update(db=db.obj_ref, schema=schema)
+        session.api.databases.update(db=db.obj_ref, schema=schema_obj)
 
         if new_name is None:
-            delattr(self._schema, self.attr_name)
+            delattr(schema, self.attr_name)
         else:
             self.obj_ref.name = new_name
             self._name = new_name
 
-        self._schema._set_obj_refs()
+        schema._set_obj_refs()
 
     def delete(self) -> None:
         """Delete this property from the schema."""
@@ -170,13 +171,11 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     @property
     def attr_name(self) -> str:
         """Return the Python attribute name of the property in the schema."""
-        if self._schema is None:
-            msg = 'Property must be bound to a Schema.'
-            raise PropertyError(msg)
-        for attr_name, prop in self._schema.__dict__.items():
+        schema = self._get_owner()
+        for attr_name, prop in schema.__dict__.items():
             if prop is self:
                 return attr_name
-        msg = f'Property `{self.name}` not found in schema `{self._schema.__name__}`.'
+        msg = f'Property `{self.name}` not found in schema `{schema.__name__}`.'
         raise PropertyError(msg)
 
     @property
@@ -748,17 +747,16 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     """Relation to another database."""
 
     _rel_schema: type[Schema] | None = None  # other schema, i.e. of the target database
-    _two_way_prop: Property | None = None  # other property, i.e. of the target database
+    _two_way_prop: Property | str | None = None  # other property, i.e. of the target database
 
-    # ToDo: Fix this. two_way_prop should not be a PropertyType, but a Relation or a string even.
     def __init__(
-        self, name: str | None = None, *, schema: type[Schema] | None = None, two_way_prop: Relation | None = None
+        self, name: str | None = None, *, schema: type[Schema] | None = None, two_way_prop: Relation | str | None = None
     ):
         self._name = name
-        self._schema = None
+        self._owner = None
         # Note that we don't call super().__init__ here since we only know how to build the obj_ref later.
         if two_way_prop and not schema:
-            msg = '`schema` needs to be provided if `two_way_prop` is set'
+            msg = '`schema` needs to be provided if `two_way_prop` is set!'
             raise RuntimeError(msg)
 
         if isinstance(schema, Property):
@@ -768,12 +766,12 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         self._rel_schema = schema
 
         if two_way_prop is not None:
-            if not isinstance(two_way_prop, Relation):
-                msg = f'The two-way property {two_way_prop.name} needs to be of type Relation!'
+            if not isinstance(two_way_prop, Relation | str):
+                msg = 'The two-way property parameter needs to be of type Relation or str!'
                 raise ValueError(msg)
 
-            if two_way_prop.schema is not None:
-                msg = f'The two-way property {two_way_prop.name} must not reference a schema itself'
+            if isinstance(two_way_prop, Relation) and two_way_prop.schema is not None:
+                msg = f'The two-way property {two_way_prop.name} must not reference a schema itself!'
                 raise ValueError(msg)
 
             self._two_way_prop = two_way_prop
@@ -783,7 +781,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         """Schema of the relation database."""
         if self._rel_schema:
             return self._rel_schema if self._rel_schema is not SelfRef else None
-        if self._schema is not None and self._schema.is_bound():
+        if self._get_owner().is_bound():
             session = get_active_session()
             return session.get_db(self.obj_ref.relation.database_id).schema
         else:
@@ -809,6 +807,8 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     def two_way_prop(self) -> Property | None:
         """Return the target property object of a two-way relation."""
         if self._two_way_prop:
+            if isinstance(self._two_way_prop, str):
+                self._two_way_prop = self._get_owner().get_prop(self._two_way_prop)
             return self._two_way_prop
         elif (
             hasattr(self, 'obj_ref')
@@ -873,7 +873,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     @property
     def is_self_ref(self) -> bool:
         """Determines if this relation is self referencing the same schema."""
-        return (self._rel_schema is SelfRef) or (self._rel_schema is self._schema)
+        return (self._rel_schema is SelfRef) or (self._rel_schema is self._get_owner())
 
     def _make_obj_ref(self) -> None:
         """Initialize the low-level object references for this relation.
@@ -902,7 +902,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             raise SchemaError(msg)
 
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
-        two_way_prop_name = self._two_way_prop.name if self._two_way_prop else None
+        two_way_prop_name = self.two_way_prop.name if self.two_way_prop else None
 
         if obj_synced_property_name != two_way_prop_name:
             session = get_active_session()
@@ -922,13 +922,9 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
-            if self._schema is not None:
-                our_db = self._schema.get_db()
-                session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
-                our_db.schema._set_obj_refs()
-            else:
-                msg = 'This relation is not bound to a schema'
-                raise RelationError(msg)
+            our_db = self._get_owner().get_db()
+            session.api.databases.update(db=our_db.obj_ref, schema={})  # sync obj_ref
+            our_db.schema._set_obj_refs()
 
 
 class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
@@ -971,25 +967,17 @@ class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
     @property
     def relation_prop(self) -> Relation:
         """Return the relation property object of the rollup."""
-        if self._schema is not None:
-            rel_prop = self._schema.get_prop(self.obj_ref.rollup.relation_property_name)
-            if isinstance(rel_prop, Relation):
-                return rel_prop
-            else:
-                msg = f'Rollup property {self.name} is not bound to a Relation property'
-                raise RollupError(msg)
+        rel_prop = self._get_owner().get_prop(self.obj_ref.rollup.relation_property_name)
+        if isinstance(rel_prop, Relation):
+            return rel_prop
         else:
-            msg = 'Rollup property not bound to a `Property` object'
+            msg = f'Rollup property {self.name} is not bound to a Relation property'
             raise RollupError(msg)
 
     @property
     def rollup_prop(self) -> Property:
         """Return the rollup property object of the rollup."""
-        if self._schema is not None:
-            return self._schema.get_prop(self.obj_ref.rollup.rollup_property_name)
-        else:
-            msg = 'Rollup property not bound to a `Property` object'
-            raise RollupError(msg)
+        return self._get_owner().get_prop(self.obj_ref.rollup.rollup_property_name)
 
     @property
     def calculate(self) -> AggFunc:

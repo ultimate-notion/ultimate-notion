@@ -165,7 +165,7 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
 
-    assert db_a.schema.relation._schema is db_a._schema  # type: ignore
+    assert db_a.schema.relation.schema is db_a.schema  # type: ignore
 
 
 # ToDo: Reactivate after the bug on the Notion API side is fixed that adding a two-way relation property with update
@@ -282,6 +282,17 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     db.reload()
     assert 'Date' in [prop.name for prop in db.schema]
     assert hasattr(db.schema, 'date')
+
+    # db.schema['Relation'] = uno.PropType.Relation(schema=Schema, two_way_prop='Back Relation')
+    # assert 'Relation' in [prop.name for prop in db.schema]
+    # assert 'Back Relation' in [prop.name for prop in db.schema]
+    # assert hasattr(db.schema, 'relation')
+    # assert hasattr(db.schema, 'back_relation')
+    # db.reload()
+    # assert 'Relation' in [prop.name for prop in db.schema]
+    # assert 'Back Relation' in [prop.name for prop in db.schema]
+    # assert hasattr(db.schema, 'relation')
+    # assert hasattr(db.schema, 'back_relation')
 
     # Update properties in the schema
     with pytest.raises(PropertyError):
