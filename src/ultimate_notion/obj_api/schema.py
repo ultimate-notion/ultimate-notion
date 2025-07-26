@@ -50,7 +50,7 @@ class Number(Property, type='number'):
     number: TypeData = TypeData()
 
     @classmethod
-    def build(cls, format):  # noqa: A002
+    def build(cls, format) -> Number:  # noqa: A002
         """Create a `Number` object with the expected format."""
         return cls.model_construct(number=cls.TypeData(format=format))
 
@@ -64,7 +64,7 @@ class Select(Property, type='select'):
     select: TypeData = TypeData()
 
     @classmethod
-    def build(cls, options):
+    def build(cls, options) -> Select:
         """Create a `Select` object from the list of `SelectOption`'s."""
         return cls.model_construct(select=cls.TypeData(options=options))
 
@@ -78,7 +78,7 @@ class MultiSelect(Property, type='multi_select'):
     multi_select: TypeData = TypeData()
 
     @classmethod
-    def build(cls, options):
+    def build(cls, options) -> MultiSelect:
         """Create a `Select` object from the list of `SelectOption`'s."""
         return cls.model_construct(multi_select=cls.TypeData(options=options))
 
@@ -158,7 +158,7 @@ class Formula(Property, type='formula'):
     formula: TypeData = TypeData()
 
     @classmethod
-    def build(cls, formula):
+    def build(cls, formula) -> Formula:
         return cls.model_construct(formula=cls.TypeData(expression=formula))
 
 
@@ -235,7 +235,7 @@ class Rollup(Property, type='rollup'):
     rollup: TypeData = TypeData()
 
     @classmethod
-    def build(cls, relation, property, function):  # noqa: A002
+    def build(cls, relation, property, function) -> Rollup:  # noqa: A002
         return Rollup.model_construct(
             rollup=cls.TypeData(function=function, relation_property_name=relation, rollup_property_name=property)
         )
