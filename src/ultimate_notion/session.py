@@ -159,21 +159,17 @@ class Session:
         In case a title and a schema ware provided, title overrides the schema's `db_title` attribute.
         """
         # Implementation:
-        # 1. initialize external forward relations, i.e. relations pointing to other databases
-        # 2. create the database using a Notion API call and potential external forward relations
-        # 3. initialize self-referencing forward relations
-        # 4. create properties with self-referencing forward relations using an update call
-        # 5. update the backward references, i.e. two-way relations, using an update call
+        # 1. create the database using a Notion API call and potential external forward relations
+        # 2. initialize self-referencing forward relations
+        # 3. create properties with self-referencing forward relations using an update call
+        # 4. update the backward references, i.e. two-way relations, using an update call
         if title is not None:
             title = Text(title)
         elif title is None and schema is not None:
             title = schema.db_title
 
         db_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
-
         _logger.info(f'Creating database `{title or "<NoTitle>"}` in page `{parent.title}` with schema:\n{db_schema}')
-        if schema:
-            schema._init_fwd_rels()
 
         title_obj = title.obj_ref if title is not None else None
         schema_dct = {prop.name: prop.obj_ref for prop in db_schema._get_init_props()}

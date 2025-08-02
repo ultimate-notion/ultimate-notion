@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import inspect
-
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.enums import Color
@@ -17,6 +15,28 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         if isinstance(color, str):
             color = Color(color)
         super().__init__(name, color=color)
+
+    def __repr__(self) -> str:
+        return get_repr(self)
+
+    def __str__(self) -> str:
+        return self.name
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Option):
+            # We do not compare the id, as it is not always set
+            res = (self.name == other.name) & (self.color == other.color) & (self.description == other.description)
+        elif isinstance(other, str):
+            res = self.name == other
+        elif other is None:
+            res = False
+        else:
+            msg = f'Cannot compare Option with types {type(other)}'
+            raise RuntimeError(msg)
+        return res
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
     @property
     def id(self) -> str:
@@ -34,10 +54,8 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         if color := self.obj_ref.color:
             return color
         else:
-            # we don't return None for convienience, but raise an error
-            # as this is quite unexpected for options and general usage
-            msg = f'Option {self.name} has no color set yet.'
-            raise RuntimeError(msg)
+            # for uninitialized options, return default color
+            return Color.DEFAULT
 
     @property
     def description(self) -> str:
@@ -46,28 +64,6 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
             return Text.wrap_obj_ref(desc)
         else:
             return ''
-
-    def __repr__(self) -> str:
-        return get_repr(self)
-
-    def __str__(self) -> str:
-        return self.name
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, Option):
-            # We compare only the name as the id is not set for new options
-            res = self.name == other.name
-        elif isinstance(other, str):
-            res = self.name == other
-        elif other is None:
-            res = False
-        else:
-            msg = f'Cannot compare Option with types {type(other)}'
-            raise RuntimeError(msg)
-        return res
-
-    def __hash__(self) -> int:
-        return super().__hash__()
 
 
 class OptionNSType(type):
@@ -118,12 +114,11 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
         return self.name
 
 
-def compare_options(old: list[Option], new: list[Option]) -> dict[str, list[str]]:
-    """Compare two lists of options by their name, ignoring the id.
+def check_for_updates(old: list[Option], new: list[Option]) -> dict[str, list[str]]:
+    """Check if two lists of options contain updates.
 
-    Returns which attributes have changed for each option.
-    This is mainly used to check if options have changed
-    when updating a select or multi-select property.
+    Returns which attributes have changed for each option. This is mainly used to check if options have changed
+    when updating a select or multi-select property as this is not supported by the Notion API.
     """
     old_by_name = {opt.name: opt for opt in old}
     new_by_name = {opt.name: opt for opt in new}
@@ -134,10 +129,7 @@ def compare_options(old: list[Option], new: list[Option]) -> dict[str, list[str]
         old_opt = old_by_name[name]
         new_opt = new_by_name[name]
 
-        # we
-        attrs_to_check = {name for name, value in inspect.getmembers(Option) if isinstance(value, property)}
-        attrs_to_check -= {'name', 'id'}
-        for attr in attrs_to_check:
-            if getattr(old_opt, attr, None) != getattr(new_opt, attr, None):
+        for attr in ('name', 'color', 'description'):
+            if getattr(old_opt, attr) != getattr(new_opt, attr):
                 updates.setdefault(name, []).append(attr)
     return updates
