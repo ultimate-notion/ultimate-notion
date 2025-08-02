@@ -60,7 +60,6 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     A property defines the name and type of a property in a database, e.g. number, date, text, etc.
     """
 
-    obj_ref: T
     """Reference to the low-level object representation of this property"""
     allowed_at_creation = True
     """If the Notion API allows to create a new database with a property of this type"""
@@ -225,7 +224,7 @@ class SchemaType(ABCMeta):
         cls._set_obj_refs()
 
         if isinstance(prop_type, Relation) and (prop_type._two_way_prop is not None):
-            prop_type._rename_two_way_prop(prop_type._two_way_prop)
+            prop_type._rename_two_way_prop(prop if isinstance(prop := prop_type._two_way_prop, str) else prop.name)
 
     def __setattr__(cls: type[Schema], name: str, value: Any) -> None:  # type: ignore[misc]
         if isinstance(value, Property):
@@ -500,9 +499,7 @@ class Schema(metaclass=SchemaType):
     @classmethod
     def _get_fwd_rels(cls) -> list[Relation]:
         return [
-            prop
-            for prop in cls.get_props()
-            if isinstance(prop, Relation) and not (prop._is_two_way_target or prop.is_self_ref)
+            prop for prop in cls.get_props() if isinstance(prop, Relation) and not (prop.is_target or prop.is_self_ref)
         ]
 
     @classmethod
@@ -778,7 +775,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
                 msg = 'The two-way property parameter needs to be of type Relation or str!'
                 raise ValueError(msg)
 
-            if isinstance(two_way_prop, Relation) and two_way_prop.schema is not None:
+            if isinstance(two_way_prop, Relation) and two_way_prop._rel_schema is not None:
                 msg = f'The two-way property {two_way_prop.name} must not reference a schema itself!'
                 raise ValueError(msg)
 
@@ -786,10 +783,6 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
 
     def _make_obj_ref(self) -> obj_schema.Relation:
         """Create the low-level object reference for this relation."""
-        if self.schema is None:
-            msg = 'The target schema of the relation is not bound to a database'
-            raise RelationError(msg)
-
         try:
             db = self.schema.get_db()
         except SchemaNotBoundError as e:
@@ -814,15 +807,17 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         self._obj_ref = new_obj_ref
 
     @property
-    def schema(self) -> type[Schema] | None:
+    def schema(self) -> type[Schema]:
         """Schema of the relation database."""
-        if self._rel_schema:
-            return self._rel_schema if self._rel_schema is not SelfRef else None
-        if self._get_owner().is_bound():
+        if self._rel_schema is None and self._get_owner().is_bound():
             session = get_active_session()
-            return session.get_db(self.obj_ref.relation.database_id).schema
+            self._rel_schema = session.get_db(self.obj_ref.relation.database_id).schema
+        elif self._rel_schema is not None:
+            return self._rel_schema if self._rel_schema is not SelfRef else self.schema
         else:
-            return None
+            msg = 'The relation is not yet related to another schema!'
+            raise RelationError(msg)
+        return self._rel_schema
 
     @schema.setter
     def schema(self, new_schema: type[Schema]) -> None:
@@ -834,24 +829,6 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         self.obj_ref.relation = new_rel.relation
         self._update_prop(self.obj_ref)
         self._rel_schema = new_schema
-
-    @property
-    def _is_two_way_target(self) -> bool:
-        """Determines if relation is meant as target for a two-way relation."""
-        return self._rel_schema is None
-
-    @property
-    def two_way_prop(self) -> Property | None:
-        """Return the target property object of a two-way relation."""
-        if self._two_way_prop:
-            if isinstance(self._two_way_prop, str):
-                self._two_way_prop = self._get_owner().get_prop(self._two_way_prop)
-            return self._two_way_prop
-        elif self._is_init and self.schema and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
-            prop_name = self.obj_ref.relation.dual_property.synced_property_name
-            return self.schema.get_prop(prop_name) if prop_name else None
-        else:
-            return None
 
     def _rename_two_way_prop(self, new_prop_name: str) -> None:
         """Rename the two-way property in the target schema.
@@ -866,6 +843,19 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
             back_ref_prop_type.name = new_prop_name
 
+    @property
+    def two_way_prop(self) -> Property | None:
+        """Return the target property object of a two-way relation."""
+        if self._two_way_prop:
+            if isinstance(self._two_way_prop, str):
+                self._two_way_prop = self._get_owner().get_prop(self._two_way_prop)
+            return self._two_way_prop
+        elif self._is_init and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
+            prop_name = self.obj_ref.relation.dual_property.synced_property_name
+            return self.schema.get_prop(prop_name) if prop_name else None
+        else:
+            return None
+
     @two_way_prop.setter
     def two_way_prop(self, prop_name: str | None) -> None:
         """Set the target property as string of a two-way relation.
@@ -873,7 +863,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         The `new_prop_name` is the name of the property in the target schema.
         """
 
-        if self.schema is None or (db := self.schema.get_db()) is None:
+        if (db := self.schema.get_db()) is None:
             msg = 'The target schema of the relation is not bound to a database'
             raise RelationError(msg)
 
@@ -922,10 +912,6 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
 
         if obj_synced_property_name != two_way_prop_name:
             session = get_active_session()
-
-            if self.schema is None:
-                msg = 'The target schema of the relation is not bound to a database'
-                raise RelationError(msg)
 
             # change the old default name in the target schema to what was passed during initialization
             other_db = self.schema.get_db()
