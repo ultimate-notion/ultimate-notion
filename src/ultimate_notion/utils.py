@@ -197,12 +197,12 @@ def dict_diff(dct1: Mapping[KT, VT], dct2: Mapping[KT, VT]) -> tuple[list[KT], l
     return keys_added, keys_removed, values_changed
 
 
-def dict_diff_str(dct1: Mapping[KT, VT], dct2: Mapping[KT, VT]) -> tuple[str, str, str]:
-    """Returns the added keys, removed keys and keys of changed values of both dictionaries as strings for printing."""
+def dict_diff_str(dct1: Mapping[KT, VT], dct2: Mapping[KT, VT]) -> tuple[list[str], list[str], list[str]]:
+    """Returns the added keys, removed keys and keys of changed values of both dictionaries."""
     keys_added, keys_removed, values_changed = dict_diff(dct1, dct2)
-    keys_added_str = ', '.join([str(k) for k in keys_added]) or 'None'
-    keys_removed_str = ', '.join([str(k) for k in keys_removed]) or 'None'
-    keys_changed_str = ', '.join(f'{k}: {v[0]} -> {v[1]}' for k, v in values_changed.items()) or 'None'
+    keys_added_str = [str(k) for k in keys_added]
+    keys_removed_str = [str(k) for k in keys_removed]
+    keys_changed_str = [f'{k}: {v[0]} -> {v[1]}' for k, v in values_changed.items()]
     return keys_added_str, keys_removed_str, keys_changed_str
 
 

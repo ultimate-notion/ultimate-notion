@@ -168,8 +168,8 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
     assert db_a.schema.relation.schema is db_a.schema  # type: ignore
 
 
-# ToDo: Reactivate after the bug on the Notion API side is fixed that adding a two-way relation property with update
-#       actually generates a one-way relation property.
+# ToDo: Reactivate after the bug on the Notion API side is fixed that adding a two-way relation property
+#       on a self-reference schema leads to a Notion Internal Server Error 500.
 # @pytest.mark.vcr()
 # def test_self_ref_two_way_prop(notion: uno.Session, root_page: uno.Page):
 #     class SchemaA(uno.Schema, db_title='Schema A'):
@@ -283,16 +283,23 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert 'Date' in [prop.name for prop in db.schema]
     assert hasattr(db.schema, 'date')
 
-    # db.schema['Relation'] = uno.PropType.Relation(schema=Schema, two_way_prop='Back Relation')
-    # assert 'Relation' in [prop.name for prop in db.schema]
-    # assert 'Back Relation' in [prop.name for prop in db.schema]
-    # assert hasattr(db.schema, 'relation')
-    # assert hasattr(db.schema, 'back_relation')
-    # db.reload()
-    # assert 'Relation' in [prop.name for prop in db.schema]
-    # assert 'Back Relation' in [prop.name for prop in db.schema]
-    # assert hasattr(db.schema, 'relation')
-    # assert hasattr(db.schema, 'back_relation')
+    class TargetSchema(uno.Schema, db_title='Add/Del/Update Prop-Test'):
+        """Target schema as self-reference relations lead to a Notion Internal Server Error 500"""
+
+        name = uno.PropType.Title('Name')
+
+    target_db = notion.create_db(parent=root_page, schema=TargetSchema)
+
+    db.schema['Relation'] = uno.PropType.Relation(schema=TargetSchema, two_way_prop='Back Relation')
+    assert 'Relation' in [prop.name for prop in db.schema]
+    assert 'Back Relation' in [prop.name for prop in target_db.schema]
+    assert hasattr(db.schema, 'relation')
+    assert hasattr(target_db.schema, 'back_relation')
+    db.reload()
+    assert 'Relation' in [prop.name for prop in db.schema]
+    assert 'Back Relation' in [prop.name for prop in target_db.schema]
+    assert hasattr(db.schema, 'relation')
+    assert hasattr(target_db.schema, 'back_relation')
 
     # Update properties in the schema
     with pytest.raises(PropertyError):

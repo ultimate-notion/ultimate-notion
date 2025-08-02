@@ -30,7 +30,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     _schema: type[Schema] | None = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.title:
             return str(self.title)
         else:
@@ -112,7 +112,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         schema.bind_db(self)
         return schema
 
-    def _set_schema(self, schema: type[Schema], *, during_init: bool):
+    def _set_schema(self, schema: type[Schema], *, during_init: bool) -> None:
         """Set a custom schema in order to change the Python variables names."""
         self.schema.assert_consistency_with(schema, during_init=during_init)
         schema.bind_db(self)
@@ -136,7 +136,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return self.obj_ref.is_inline
 
     @is_inline.setter
-    def is_inline(self, inline: bool):
+    def is_inline(self, inline: bool) -> None:
         """Set whether the database is inline."""
         if self.is_inline != inline:
             session = get_active_session()

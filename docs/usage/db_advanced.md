@@ -105,10 +105,11 @@ employee_db.schema['Level'].options = [
 ]
 employee_db.schema.hiring_date = uno.PropType.Text()
 employee_db.schema.hiring_date.name = 'Hiring Date as String'
+employee_db.schema['Hiring Date as String'].name = 'Hiring Date'
 ```
 
 This changes the salary property to a formula type, adds a partner level to the level property, changes
-the hiring date first to a text type and the name of it, which is then followed by setting the name back
+the hiring date first to a text type and the name of it. This is then then followed by setting the name back
 using property access.
 
 Of course, we can also delete properties:
