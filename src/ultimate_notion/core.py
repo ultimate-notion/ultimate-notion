@@ -25,7 +25,13 @@ class ObjRefWrapper(Protocol[GT]):
     Note: This allows us to define Mixin classes that require the obj_ref attribute.
     """
 
-    obj_ref: GT
+    _obj_ref: GT
+
+    @property
+    def obj_ref(self) -> GT: ...
+
+    @obj_ref.setter
+    def obj_ref(self, value: GT) -> None: ...
 
 
 class Wrapper(ObjRefWrapper[GT], ABC):
