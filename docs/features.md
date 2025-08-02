@@ -109,5 +109,5 @@ If you think those limitations should be fixed, [let the developers of Notion kn
 [Google Tasks API]: https://developers.google.com/tasks/overview
 [Google Sheets API]: https://developers.google.com/sheets
 [page’s parent cannot be changed]: https://developers.notion.com/reference/patch-page
-[reminder]: https://www.notion.so/help/comments-mentions-and-reminders#reminders
+[reminder]: https://www.notion.com/help/reminders
 [official Notion API]: https://developers.notion.com/reference/
