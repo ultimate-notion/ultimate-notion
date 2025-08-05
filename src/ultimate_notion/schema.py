@@ -315,7 +315,7 @@ class Schema(metaclass=SchemaType):
     @classmethod
     def create(cls, **kwargs) -> Page:
         """Create a page using this schema with a bound database."""
-        return cls.get_db().create_page(**kwargs)
+        return cls.get_db().create_page(_schema=cls, **kwargs)
 
     @classmethod
     def get_props(cls) -> list[Property]:

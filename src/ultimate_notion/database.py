@@ -194,19 +194,20 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         msg = 'Use .is_empty instead of bool(db) to check if a database is empty.'
         raise RuntimeError(msg)
 
-    def create_page(self, **kwargs) -> Page:
+    def create_page(self, _schema=None, **kwargs) -> Page:
         """Create a page with properties according to the schema within the corresponding database."""
-        attr_to_name = {prop.attr_name: prop.name for prop in self.schema.get_props()}
+        _schema = _schema or self.schema
+        attr_to_name = {prop.attr_name: prop.name for prop in _schema.get_props()}
         if not set(kwargs).issubset(set(attr_to_name)):
             add_kwargs = set(kwargs) - set(attr_to_name)
             msg = f'kwargs {", ".join(add_kwargs)} not defined in schema'
             raise SchemaError(msg)
-        if ro_props := set(kwargs) & {prop.attr_name for prop in self.schema.get_ro_props()}:
+        if ro_props := set(kwargs) & {prop.attr_name for prop in _schema.get_ro_props()}:
             msg = f'Read-only properties {", ".join(ro_props)} cannot be set'
             raise ReadOnlyPropertyError(msg)
 
         schema_kwargs = {attr_to_name[attr]: value for attr, value in kwargs.items()}
-        validator = self.schema.to_pydantic_model(with_ro_props=False)
+        validator = _schema.to_pydantic_model(with_ro_props=False)
         try:
             schema = validator(**schema_kwargs)
         except ValidationError as e:
