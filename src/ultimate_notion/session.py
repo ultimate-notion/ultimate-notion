@@ -65,7 +65,7 @@ class Session:
         self.api = NotionAPI(self.client)
 
     @classmethod
-    def _initialize_once(cls, instance: Session):
+    def _initialize_once(cls, instance: Session) -> None:
         _logger.info('Initializing Notion session.')
         with Session._lock:
             if Session._active_session and Session._active_session is not instance:
@@ -172,7 +172,7 @@ class Session:
         _logger.info(f'Creating database `{title or "<NoTitle>"}` in page `{parent.title}` with schema:\n{db_schema}')
 
         title_obj = title.obj_ref if title is not None else None
-        schema_dct = {prop.name: prop.obj_ref for prop in db_schema._get_init_props()}
+        schema_dct = {prop.name: prop.obj_ref for prop in db_schema.get_props() if prop._is_init_ready}
         db_obj = self.api.databases.create(parent=parent.obj_ref, title=title_obj, schema=schema_dct, inline=inline)
 
         db: Database = Database.wrap_obj_ref(db_obj)
