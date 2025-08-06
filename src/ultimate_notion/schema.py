@@ -104,6 +104,11 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         """Determines if the property is already initialized"""
         return hasattr(self, '_obj_ref')
 
+    @property
+    def _is_init_ready(self) -> bool:
+        """Determines if the property is ready to be initialized"""
+        return True
+
     def _get_owner(self) -> type[Schema]:
         """Get the owner schema of this property."""
         if self._owner is None:
@@ -542,15 +547,6 @@ class Schema(metaclass=SchemaType):
         cls._set_obj_refs()
 
     @classmethod
-    def _get_init_props(cls) -> list[Property]:
-        """Get all properties that can be initalized."""
-        return [
-            prop
-            for prop in cls.get_props()
-            if not (isinstance(prop, Relation) and (prop._is_two_way_target or prop.is_self_ref))
-        ]
-
-    @classmethod
     def _update_bwd_rels(cls) -> None:
         """Update the default property name in case of a two-way relation in the external target schema.
 
@@ -783,6 +779,11 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
 
             self._two_way_prop = two_way_prop
 
+    @property
+    def _is_init_ready(self) -> bool:
+        """Determines if the Relation can be initialized"""
+        return not (self._rel_schema is SelfRef or self._is_two_way_target)
+
     def _make_obj_ref(self) -> obj_schema.Relation:
         """Create the low-level object reference for this relation."""
         try:
@@ -815,8 +816,8 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         if self._rel_schema is None and self._get_owner().is_bound():
             session = get_active_session()
             self._rel_schema = session.get_db(self.obj_ref.relation.database_id).schema
-        elif self._rel_schema is not None:
-            return self._rel_schema if self._rel_schema is not SelfRef else self.schema
+        elif self._rel_schema is not None and self._rel_schema is not SelfRef:
+            return self._rel_schema
         else:
             msg = 'The relation is not yet related to another schema!'
             raise RelationError(msg)
@@ -943,18 +944,22 @@ class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
         self,
         name: str | None = None,
         *,
-        relation: Property,
+        relation: Relation,
         rollup: Property,
         calculate: AggFunc | str = AggFunc.SHOW_ORIGINAL,
     ):
-        if not isinstance(relation, Relation):
-            msg = f'Property `{relation.name}` must be of type Relation'
-            raise RollupError(msg)
-
         calculate = AggFunc.from_alias(calculate) if not isinstance(calculate, AggFunc) else calculate
 
         # ToDo: One could check here if property really is a property in the database where relation points to
         super().__init__(name, relation=relation.name, property=rollup.name, function=calculate)
+
+    @property
+    def _is_init_ready(self) -> bool:
+        """Determines if the relation of the rollup is ready to be initialized."""
+        try:
+            return self.relation_prop._is_init_ready
+        except SchemaError:  # DB is not bound yet
+            return False
 
     @property
     def is_self_ref(self) -> bool:
