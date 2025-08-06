@@ -14,11 +14,13 @@ Due to the Pydantic v2 migration and several other design changes, it was heavil
 from __future__ import annotations
 
 import logging
+import platform
 from typing import TYPE_CHECKING, Any
 
 import httpx
 import notion_client
 
+from ultimate_notion import __version__
 from ultimate_notion.config import get_cfg_file
 from ultimate_notion.obj_api.endpoints import NotionAPI
 
@@ -29,30 +31,23 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
+def _get_default_user_agent() -> str:
+    """Return the default user agent string for the Notion client."""
+    python_version = platform.python_version()
+    os_name = platform.system()
+    architecture = platform.machine()
+    httpx_version = httpx.__version__
+
+    return (
+        f'ultimate-notion/{__version__} '
+        f'(https://ultimate-notion.com/) '
+        f'python/{python_version} {os_name}/{architecture} '
+        f'httpx/{httpx_version}'
+    )
+
+
 def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
     """Create a Notion client with the given authentication token."""
-
-    class LoggingClient(httpx.Client):
-        """A client that logs the request and response."""
-
-        def send(self, request: httpx.Request, **kwargs: Any) -> httpx.Response:
-            msg = f'Request: {request.method} {request.url}'
-            if request.content:
-                msg += f'\n{request.content.decode("utf-8") if isinstance(request.content, bytes) else request.content}'
-            _logger.debug(msg)
-
-            response = super().send(request, **kwargs)
-
-            msg = f'Response: {response.status_code} {request.url}'
-            response.read()  # Ensure that the response content is fully loaded. Memory schouldn't be an issue here.
-            if response.content:
-                msg += (
-                    f'\n{response.content.decode("utf-8") if isinstance(response.content, bytes) else response.content}'
-                )
-            _logger.debug(msg)
-
-            return response
-
     if (auth := cfg.ultimate_notion.token) is None:
         msg = f'No Notion token found! Check {get_cfg_file()}.'
         raise RuntimeError(msg)
@@ -60,7 +55,26 @@ def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
     # Same sane default as notion_client defines its own logger
     kwargs.setdefault('logger', logging.getLogger('notion_client'))
     kwargs.setdefault('log_level', logging.NOTSET)
-    return notion_client.Client(auth=auth, client=LoggingClient(), **kwargs)
+
+    def log_request(request: httpx.Request) -> None:
+        msg = f'Request: {request.method} {request.url}'
+        if request.content:
+            msg += f'\n{request.content.decode("utf-8") if isinstance(request.content, bytes) else request.content}'
+        _logger.debug(msg)
+
+    def log_response(response: httpx.Response) -> None:
+        msg = f'Response: {response.status_code} {response.url}'
+        response.read()  # Ensure that the response content is fully loaded. Memory schouldn't be an issue here.
+        if response.content:
+            msg += f'\n{response.content.decode("utf-8") if isinstance(response.content, bytes) else response.content}'
+        _logger.debug(msg)
+
+    user_agent = kwargs.pop('user_agent', _get_default_user_agent())
+    httpx_client = httpx.Client(event_hooks={'request': [log_request], 'response': [log_response]})
+    client = notion_client.Client(auth=auth, client=httpx_client, **kwargs)
+    # we need to set the user agent manually, because notion_client ovewrites it during initialization
+    httpx_client.headers['User-Agent'] = user_agent
+    return client
 
 
 __all__ = ['NotionAPI', 'create_notion_client']
