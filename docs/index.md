@@ -8,9 +8,19 @@ title_bar: Ultimate Notion
 
 <br>
 
-Ultimate Notion is the ultimate Python client for [Notion]! It allows you to access, create and change your
-Notion databases and pages in the most convenient and pythonic way. Under [Features](features.md) you will find
-the current status of the implemented functionality. Ultimate Notion is distributed under the terms of the [MIT] license.
+Ultimate Notion is the ultimate Python client for [Notion] with a rich set of features:
+
+- 🐍 **Pythonic API** — Clean, intuitive Python interfaces with robust type annotations.
+- 🗂️ **CRUD operations** — Create, read, update, and delete Notion pages, databases, and blocks.
+- 🔎 **Rich querying capabilities** — Support for filters, sorting, pagination, and searching.
+- 🪄 **Flexible export options** — Convert Notion content to Markdown, HTML, pandas, or Polars data frames.
+- 🧩 **Built atop notion-sdk-py** — Enhancing the functionality of the popular low-level client.
+- 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
+- 🚀 **One-step setup** — Getting up to speed with a [simple setup guide].
+
+👉 Want to learn more? Explore the full [feature breakdown](features.md).
+
+Ultimate Notion is distributed under the terms of the [MIT] license.
 
 ## Navigation
 

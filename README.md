@@ -16,14 +16,15 @@ Notion databases and pages in the most convenient and pythonic way.
 
 ## ✨ Features
 
-- 🗂️ **CRUD operations** — Create, read, update, and delete Notion pages and databases.
-- 🐍 **Pythonic API** — Clean, intuitive interfaces that feel natural in Python.
-- 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
+- 🐍 **Pythonic API** — Clean, intuitive Python interfaces with robust type annotations.
+- 🗂️ **CRUD operations** — Create, read, update, and delete Notion pages, databases, and blocks.
 - 🔎 **Rich querying capabilities** — Support for filters, sorting, pagination, and searching.
-- 🧩 **Integration with notion-sdk-py** — Built atop the official client, enhancing functionality.
+- 🪄 **Flexible export options** — Convert Notion content to Markdown, HTML, pandas, or Polars data frames.
+- 🧩 **Built atop notion-sdk-py** — Enhancing the functionality of the popular low-level client.
+- 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
 - 🚀 **One-step setup** — Getting up to speed with a [simple setup guide].
 
-👉 Want to learn more? Check out the full [feature breakdown].
+👉 Want to learn more? Explore the full [feature breakdown].
 
 ## 📦 Installation
 
