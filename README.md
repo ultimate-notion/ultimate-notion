@@ -19,7 +19,7 @@ Notion databases and pages in the most convenient and pythonic way.
 - 🐍 **Pythonic API** — Clean, intuitive Python interfaces with robust type annotations.
 - 🗂️ **CRUD operations** — Create, read, update, and delete Notion pages, databases, and blocks.
 - 🔎 **Rich querying capabilities** — Support for filters, sorting, pagination, and searching.
-- 🪄 **Flexible export options** — Convert Notion content to Markdown, HTML, pandas, or Polars data frames.
+- 🪄 **Flexible export options** — Convert pages to Markdown, HTML, pandas/Polars data frames, etc.
 - 🧩 **Built atop notion-sdk-py** — Enhancing the functionality of the popular low-level client.
 - 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
 - 🚀 **One-step setup** — Getting up to speed with a [simple setup guide].

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import logging
 import platform
+from importlib.metadata import version
 from typing import TYPE_CHECKING, Any
 
 import httpx
@@ -37,11 +38,13 @@ def _get_default_user_agent() -> str:
     os_name = platform.system()
     architecture = platform.machine()
     httpx_version = httpx.__version__
+    notion_sdk_version = version('notion-client')
 
     return (
         f'ultimate-notion/{__version__} '
         f'(https://ultimate-notion.com/) '
         f'python/{python_version} {os_name}/{architecture} '
+        f'notion-sdk-py/{notion_sdk_version} '
         f'httpx/{httpx_version}'
     )
 
