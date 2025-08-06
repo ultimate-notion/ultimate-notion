@@ -52,7 +52,7 @@ def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
         msg = f'No Notion token found! Check {get_cfg_file()}.'
         raise RuntimeError(msg)
 
-    # Same sane default as notion_client defines its own logger
+    # Set same sane defaults as notion_client defines its own logger
     kwargs.setdefault('logger', logging.getLogger('notion_client'))
     kwargs.setdefault('log_level', logging.NOTSET)
 
