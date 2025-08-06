@@ -453,7 +453,7 @@ class Schema(metaclass=SchemaType):
                 name: prop_type
                 for name, prop_type in other_schema_dct.items()
                 if not (
-                    (isinstance(prop_type, Relation) and (prop_type.is_target or prop_type.is_self_ref))
+                    (isinstance(prop_type, Relation) and (prop_type._is_two_way_target or prop_type.is_self_ref))
                     or (isinstance(prop_type, Rollup) and prop_type.is_self_ref)
                 )
             }
@@ -499,7 +499,9 @@ class Schema(metaclass=SchemaType):
     @classmethod
     def _get_fwd_rels(cls) -> list[Relation]:
         return [
-            prop for prop in cls.get_props() if isinstance(prop, Relation) and not (prop.is_target or prop.is_self_ref)
+            prop
+            for prop in cls.get_props()
+            if isinstance(prop, Relation) and not (prop._is_two_way_target or prop.is_self_ref)
         ]
 
     @classmethod
@@ -527,7 +529,7 @@ class Schema(metaclass=SchemaType):
         cls._set_obj_refs()
 
     @classmethod
-    def _init_self_ref_rollups(cls):
+    def _init_self_ref_rollups(cls) -> None:
         """Initialise all rollup properties that reference the same schema."""
         if not cls._has_self_refs():
             return
@@ -545,11 +547,11 @@ class Schema(metaclass=SchemaType):
         return [
             prop
             for prop in cls.get_props()
-            if not (isinstance(prop, Relation) and (prop.is_target or prop.is_self_ref))
+            if not (isinstance(prop, Relation) and (prop._is_two_way_target or prop.is_self_ref))
         ]
 
     @classmethod
-    def _update_bwd_rels(cls):
+    def _update_bwd_rels(cls) -> None:
         """Update the default property name in case of a two-way relation in the external target schema.
 
         By default the property in the target schema is named "Related to <this_database> (<this_field>)"
@@ -560,7 +562,7 @@ class Schema(metaclass=SchemaType):
                 prop_type._update_bwd_rel()
 
     @classmethod
-    def _set_obj_refs(cls):
+    def _set_obj_refs(cls) -> None:
         """Map obj_refs from the properties of the schema to obj_ref.properties of the bound database."""
         db_props_dct = cls.get_db().obj_ref.properties
         for prop_name, prop_type in cls.to_dict().items():
@@ -799,6 +801,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     def obj_ref(self) -> obj_schema.Relation:
         """Initialize the low-level object references for this relation."""
         if not self._is_init:
+            # Delayed construction of obj_ref to assure that a self-reference is resolved.
             self._obj_ref = self._make_obj_ref()
         return self._obj_ref
 
@@ -897,7 +900,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         return (self._rel_schema is SelfRef) or (self._rel_schema is self._get_owner())
 
     @property
-    def is_target(self) -> bool:
+    def _is_two_way_target(self) -> bool:
         """Determines if this relation is a target of a two-way relation."""
         return self._rel_schema is None
 
