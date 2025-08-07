@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import cast
-
 from pydantic import ValidationError
 from typing_extensions import Self
 
@@ -56,7 +54,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return Text.wrap_obj_ref(title)
 
     @title.setter
-    def title(self, text: str | Text):
+    def title(self, text: str | Text) -> None:
         """Set the title of this database"""
         if not isinstance(text, Text):
             text = Text.from_plain_text(text)
@@ -71,7 +69,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return Text.wrap_obj_ref(desc)
 
     @description.setter
-    def description(self, text: str | Text):
+    def description(self, text: str | Text) -> None:
         """Set the description of this database."""
         if not isinstance(text, Text):
             text = Text.from_plain_text(text)
@@ -107,7 +105,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Reflection about the database schema."""
         title = str(self)
         cls_name = f'{camel_case(title)}Schema'
-        attrs = {snake_case(k): cast(Property, Property.wrap_obj_ref(v)) for k, v in obj_ref.properties.items()}
+        attrs = {snake_case(k): Property.wrap_obj_ref(v) for k, v in obj_ref.properties.items()}
         schema: type[Schema] = type(cls_name, (Schema,), attrs, db_title=title)
         schema.bind_db(self)
         return schema
