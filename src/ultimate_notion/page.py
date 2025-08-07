@@ -29,13 +29,13 @@ if TYPE_CHECKING:
 class PageProperty:
     """Property of a page implementing the descriptor protocol."""
 
-    def __init__(self, prop_name: str):
+    def __init__(self, prop_name: str) -> None:
         self._prop_name = prop_name
 
     def __get__(self, obj: PagePropertiesNS, type=None) -> Any:  # noqa: A002
         return obj[self._prop_name]
 
-    def __set__(self, obj: PagePropertiesNS, value: Any):
+    def __set__(self, obj: PagePropertiesNS, value: Any) -> None:
         obj[self._prop_name] = value
 
 
@@ -48,7 +48,7 @@ class PagePropertiesNS(Mapping[str, Any]):
     You can also convert it to a dictionary with `dict(page.props)`.
     """
 
-    def __init__(self, page: Page):
+    def __init__(self, page: Page) -> None:
         self._page = page
 
     @property
@@ -80,7 +80,7 @@ class PagePropertiesNS(Mapping[str, Any]):
     def __getitem__(self, prop_name: str) -> Any:
         return self._get_property(prop_name).value
 
-    def __setitem__(self, prop_name: str, value: Any):
+    def __setitem__(self, prop_name: str, value: Any) -> None:
         # Todo: use the schema of the database to see which properties are writeable at all.
         db = self._page.parent_db
 
@@ -111,7 +111,9 @@ class PagePropertiesNS(Mapping[str, Any]):
         return str(dict(self))
 
 
-class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_blocks.Page):
+class Page(
+    ChildrenMixin[obj_blocks.Page], CommentMixin[obj_blocks.Page], DataObject[obj_blocks.Page], wraps=obj_blocks.Page
+):
     """A Notion page.
 
     Attributes:
@@ -196,7 +198,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
         return Text.wrap_obj_ref(title)
 
     @title.setter
-    def title(self, text: str | None):
+    def title(self, text: str | None) -> None:
         """Set the title of the page."""
         if text is None:
             text = ''
@@ -214,7 +216,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: FileInfo | Emoji | CustomEmoji | str | None):
+    def icon(self, icon: FileInfo | Emoji | CustomEmoji | str | None) -> None:
         """Set the icon of this page."""
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
             icon = Emoji(icon) if is_emoji(icon) else FileInfo(url=icon, name=None)
@@ -235,7 +237,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             raise RuntimeError(msg)
 
     @cover.setter
-    def cover(self, cover: FileInfo | str | None):
+    def cover(self, cover: FileInfo | str | None) -> None:
         """Set the cover fo this page."""
         if isinstance(cover, str):
             cover = FileInfo(url=str(cover), name=None)
@@ -302,7 +304,7 @@ class Page(ChildrenMixin, CommentMixin, DataObject[obj_blocks.Page], wraps=obj_b
             html = page_html(html, title=self.title or 'Untitled Page')
         return html
 
-    def show(self, *, simple: bool | None = None):
+    def show(self, *, simple: bool | None = None) -> None:
         """Show the content of the page, rendered in JupyterLab"""
         simple = simple if simple is not None else not is_notebook()
         md = self.to_markdown()

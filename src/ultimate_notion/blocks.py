@@ -241,7 +241,7 @@ class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
 BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Block(CommentMixin, DataObject[BT], ABC, wraps=obj_blocks.Block):
+class Block(CommentMixin[BT], DataObject[BT], ABC, wraps=obj_blocks.Block):
     """Abstract Notion block.
 
     Parent class of all block types.
@@ -426,11 +426,13 @@ class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
         self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
-class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin, wraps=obj_blocks.Paragraph):
+class Paragraph(
+    ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph
+):
     """Paragraph block."""
 
 
-class Heading(ColoredTextBlock[BT], ChildrenMixin, ABC, wraps=obj_blocks.Heading):
+class Heading(ColoredTextBlock[BT], ChildrenMixin[obj_blocks.Heading], ABC, wraps=obj_blocks.Heading):
     """Abstract Heading block.
 
     Parent class of all heading block types.
@@ -488,14 +490,14 @@ class Heading3(Heading[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
         return f'#### {super().to_markdown()}'
 
 
-class Quote(ColoredTextBlock[obj_blocks.Quote], ChildrenMixin, wraps=obj_blocks.Quote):
+class Quote(ColoredTextBlock[obj_blocks.Quote], ChildrenMixin[obj_blocks.Quote], wraps=obj_blocks.Quote):
     """Quote block."""
 
     def to_markdown(self) -> str:
         return f'> {super().to_markdown()}\n'
 
 
-class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blocks.Callout):
+class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Callout], wraps=obj_blocks.Callout):
     """Callout block.
 
     !!! note
@@ -547,21 +549,29 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin, wraps=obj_blo
                 raise ValueError(msg)
 
 
-class BulletedItem(ColoredTextBlock[obj_blocks.BulletedListItem], ChildrenMixin, wraps=obj_blocks.BulletedListItem):
+class BulletedItem(
+    ColoredTextBlock[obj_blocks.BulletedListItem],
+    ChildrenMixin[obj_blocks.BulletedListItem],
+    wraps=obj_blocks.BulletedListItem,
+):
     """Bulleted list item."""
 
     def to_markdown(self) -> str:
         return f'- {super().to_markdown()}\n'
 
 
-class NumberedItem(ColoredTextBlock[obj_blocks.NumberedListItem], ChildrenMixin, wraps=obj_blocks.NumberedListItem):
+class NumberedItem(
+    ColoredTextBlock[obj_blocks.NumberedListItem],
+    ChildrenMixin[obj_blocks.NumberedListItem],
+    wraps=obj_blocks.NumberedListItem,
+):
     """Numbered list item."""
 
     def to_markdown(self) -> str:
         return f'1. {super().to_markdown()}\n'
 
 
-class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin, wraps=obj_blocks.ToDo):
+class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin[obj_blocks.ToDo], wraps=obj_blocks.ToDo):
     """ToDo list item."""
 
     def __init__(
@@ -588,7 +598,7 @@ class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin, wraps=obj_block
         return f'- [{mark}] {super().to_markdown()}\n'
 
 
-class ToggleItem(ColoredTextBlock[obj_blocks.Toggle], ChildrenMixin, wraps=obj_blocks.Toggle):
+class ToggleItem(ColoredTextBlock[obj_blocks.Toggle], ChildrenMixin[obj_blocks.Toggle], wraps=obj_blocks.Toggle):
     """Toggle list item."""
 
     def to_markdown(self) -> str:
@@ -915,7 +925,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         raise InvalidAPIUsageError(msg)
 
 
-class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
+class Column(Block[obj_blocks.Column], ChildrenMixin[obj_blocks.Column], wraps=obj_blocks.Column):
     """Column block."""
 
     def __init__(self) -> None:
@@ -935,7 +945,7 @@ class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
         return self.obj_ref.column.width_ratio
 
 
-class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.ColumnList):
+class Columns(Block[obj_blocks.ColumnList], ChildrenMixin[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
     """Columns block holding multiple `Column` blocks.
 
     This block is used to create a layout with multiple columns in a single page.
@@ -1047,7 +1057,7 @@ class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_bl
         return ' | '.join(s or '' for s in self)  # convert None to ''
 
 
-class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
+class Table(Block[obj_blocks.Table], ChildrenMixin[obj_blocks.Table], wraps=obj_blocks.Table):
     """Table block."""
 
     def __init__(self, n_rows: int, n_cols: int, *, header_col: bool = False, header_row: bool = False) -> None:
@@ -1206,7 +1216,7 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
         return f'[**↗️ <u>{self.page.title}</u>**]({self.page.url})\n'
 
 
-class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks.SyncedBlock):
+class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBlock):
     """Synced block - either original or synced."""
 
     def __init__(self, blocks: Block | Sequence[Block]) -> None:
@@ -1261,7 +1271,7 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks
         return md
 
 
-class Template(TextBlock[obj_blocks.Template], ChildrenMixin, wraps=obj_blocks.Template):
+class Template(TextBlock[obj_blocks.Template], ChildrenMixin[obj_blocks.Template], wraps=obj_blocks.Template):
     """Template block.
 
     !!! warning "Deprecated"

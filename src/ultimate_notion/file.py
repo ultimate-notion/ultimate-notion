@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from typing import cast
 from urllib.parse import urlparse
+
+from typing_extensions import Self
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
@@ -25,9 +26,9 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
             self.obj_ref = objs.ExternalFile.build(url=url, name=name, caption=caption_obj)
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> FileInfo:
+    def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> Self:
         """Wrap an existing low-level FileObject into a FileInfo."""
-        self = cast(FileInfo, cls.__new__(cls))
+        self = cls.__new__(cls)
         self.obj_ref = obj_ref
         return self
 
@@ -40,7 +41,7 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
             case _:
                 return NotImplemented
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(str(self))
 
     def __repr__(self) -> str:

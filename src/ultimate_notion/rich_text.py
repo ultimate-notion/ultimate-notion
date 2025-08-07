@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, TypeGuard, TypeVar, cast
 from urllib.parse import urlparse
 
 import pendulum as pnd
+from typing_extensions import Self
 
 from ultimate_notion.core import Wrapper
 from ultimate_notion.emoji import CustomEmoji
@@ -65,7 +66,7 @@ class Math(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
         underline: bool = False,
         color: Color = Color.DEFAULT,
         href: str | None = None,
-    ):
+    ) -> None:
         annotations = objs.Annotations(
             bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
         )
@@ -107,7 +108,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
         code: bool = False,
         underline: bool = False,
         color: Color = Color.DEFAULT,
-    ):
+    ) -> None:
         annotations = objs.Annotations(
             bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
         )
@@ -158,7 +159,7 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
         underline: bool = False,
         color: Color = Color.DEFAULT,
         href: str | None = None,
-    ):
+    ) -> None:
         if len(text) > MAX_TEXT_OBJECT_SIZE:
             msg = f'Text object exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `RichText` instead!'
             raise ValueError(msg)
@@ -177,7 +178,7 @@ class Text(str):
 
     _rich_texts: list[RichTextBase]
 
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         # note that super().__new__ (which is inherited) stores the plain text in the object for `str(self)`
         super().__init__()
 
@@ -194,7 +195,7 @@ class Text(str):
         return tuple(self._rich_texts)
 
     @classmethod
-    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> Text:
+    def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> Self:
         obj_refs = [] if obj_refs is None else obj_refs
         rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
         plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
@@ -255,7 +256,7 @@ class Text(str):
         else:
             return NotImplemented
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(str(self))
 
     def __add__(self, other: str) -> Text:
