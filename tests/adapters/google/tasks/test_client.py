@@ -16,13 +16,13 @@ def gtasks(custom_config: Path) -> GTasksClient:
 
 
 @vcr_fixture(scope='module', autouse=True)
-def gtasks_cleanups(custom_config: Path):
+def gtasks_cleanups(custom_config: Path) -> None:
     """Clean all Tasklists except of the default one before the tests."""
     delete_all_taskslists()
 
 
 @pytest.mark.vcr()
-def test_gtask_client(gtasks: GTasksClient):
+def test_gtask_client(gtasks: GTasksClient) -> None:
     new_list = gtasks.create_tasklist('My new tasklist')
     assert new_list.title == 'My new tasklist'
 
@@ -36,7 +36,7 @@ def test_gtask_client(gtasks: GTasksClient):
 
 
 @pytest.mark.vcr()
-def test_gtask_tasklist(gtasks: GTasksClient):
+def test_gtask_tasklist(gtasks: GTasksClient) -> None:
     new_list = gtasks.create_tasklist('My new tasklist')
     assert not new_list.is_default
     new_task = new_list.create_task('My new task')
@@ -64,7 +64,7 @@ def test_gtask_tasklist(gtasks: GTasksClient):
 
 
 @pytest.mark.vcr()
-def test_gtask_task(gtasks: GTasksClient):
+def test_gtask_task(gtasks: GTasksClient) -> None:
     new_list = gtasks.create_tasklist('My new tasklist')
     today = datetime(2024, 1, 1, tzinfo=timezone.utc)
     tomorrow = today + timedelta(days=1)

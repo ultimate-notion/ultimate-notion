@@ -446,7 +446,7 @@ class SearchEndpoint(Endpoint):
     """Interface to the API 'search' endpoint."""
 
     # https://developers.notion.com/reference/post-search
-    def __call__(self, text=None) -> SearchQueryBuilder:
+    def __call__(self, text: str | None = None) -> SearchQueryBuilder:
         """Perform a search with the optional text"""
         return SearchQueryBuilder(endpoint=self.api.client.search, text=text)
 

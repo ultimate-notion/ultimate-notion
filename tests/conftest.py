@@ -140,7 +140,7 @@ def vcr_config() -> dict[str, Any]:
         'user-agent',
     ]
 
-    def remove_secrets(response: dict[str, dict[str, str]]):
+    def remove_secrets(response: dict[str, dict[str, str]]) -> dict[str, dict[str, str]]:
         for secret in secret_params:
             response['headers'].pop(secret, None)
         if 'body' in response and 'string' in response['body']:
@@ -225,11 +225,11 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
         msg = f'Use this only for module or session scope, not {scope}!'
         raise ValueError(msg)
 
-    def decorator(func):
+    def decorator(func: Callable) -> Callable:
         args = inspect.signature(func).parameters  # to inject the fixtures into the wrapper
         is_generator = inspect.isgeneratorfunction(func)
 
-        def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR, str]:
+        def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR | MagicMock, str]:
             if scope == 'module':
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
                 cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
@@ -241,7 +241,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
             vcr_config |= {'cassette_library_dir': cassette_dir}
             disable_recording = request.config.getoption('--disable-recording')
             if disable_recording:
-                vcr = MagicMock()
+                vcr: MagicMock = MagicMock()
                 vcr.use_cassette.return_value.__enter__.return_value = None
             else:
                 mode = request.config.getoption('--record-mode')
@@ -259,7 +259,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
 
         @wraps(func)
         @pytest.fixture(scope=scope, autouse=autouse)
-        def generator_wrapper(request: SubRequest, vcr_config: dict[str, str], notion_cached: Session):
+        def generator_wrapper(request: SubRequest, vcr_config: dict[str, str], notion_cached: Session) -> Iterator[Any]:
             vcr, cassette_name = setup_vcr(request, vcr_config)
             fixture_args = [request.getfixturevalue(arg) for arg in args]
             # This opens and closes the cassette for each iteration of the generator
@@ -277,7 +277,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
 
         @wraps(func)
         @pytest.fixture(scope=scope, autouse=autouse)
-        def function_wrapper(request: SubRequest, vcr_config: dict[str, str], notion_cached: Session):
+        def function_wrapper(request: SubRequest, vcr_config: dict[str, str], notion_cached: Session) -> Any:
             vcr, cassette_name = setup_vcr(request, vcr_config)
             fixture_args = [request.getfixturevalue(arg) for arg in args]
 
@@ -300,7 +300,7 @@ def notion_cached() -> Iterator[Session]:
 
 
 @pytest.fixture(scope='function')
-def notion(notion_cached) -> Iterator[Session]:
+def notion(notion_cached: Session) -> Iterator[Session]:
     """Return a fresh notion session without state for testing."""
     with temp_attr(notion_cached, cache={}, _own_bot_id=None):
         yield notion_cached
@@ -574,7 +574,7 @@ def notion_cleanups(
     Overwrite it in a a test module to avoid this behavior.
     """
 
-    def clean():
+    def clean() -> None:
         for db in notion_cached.search_db():
             if db.ancestors[0] == root_page and db not in static_dbs:
                 db.delete()
@@ -586,7 +586,8 @@ def notion_cleanups(
                 ancestors
                 and ancestors[0] == root_page
                 and page.parent_db not in static_dbs
-                and not any(p.is_deleted for p in ancestors)  # skip if any ancestor was already deleted
+                # skip if any ancestor page or database was already deleted
+                and not any(isinstance(p, Page | Database) and p.is_deleted for p in ancestors)
             ):
                 page.delete()
 

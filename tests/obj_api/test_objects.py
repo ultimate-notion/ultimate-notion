@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import datetime as dt
+from typing import cast
 
 import pendulum as pnd
 
 from ultimate_notion.obj_api import objects as objs
 
 
-def test_date_range(tz_berlin):
+def test_date_range(tz_berlin: str) -> None:
     date = pnd.date(2024, 1, 1)
     obj = objs.DateRange.build(date)
     assert isinstance(obj.start, dt.date)
@@ -24,7 +25,9 @@ def test_date_range(tz_berlin):
     assert obj.time_zone == tz_berlin
     assert obj.to_pendulum() == datetime
 
-    date_interval = pnd.interval(start=pnd.parse('2024-01-01', exact=True), end=pnd.parse('2024-01-03', exact=True))
+    start = cast(pnd.DateTime, pnd.parse('2024-01-01', exact=True))
+    end = cast(pnd.DateTime, pnd.parse('2024-01-03', exact=True))
+    date_interval = pnd.interval(start=start, end=end)
     obj = objs.DateRange.build(date_interval)
     assert isinstance(obj.start, dt.date)
     assert obj.start == date_interval.start
@@ -33,7 +36,9 @@ def test_date_range(tz_berlin):
     assert obj.time_zone is None
     assert obj.to_pendulum() == date_interval
 
-    datetime_interval = pnd.interval(start=pnd.parse('2024-01-01 10:00'), end=pnd.parse('2024-01-03 12:00'))
+    start = cast(pnd.DateTime, pnd.parse('2024-01-01 10:00', exact=True))
+    end = cast(pnd.DateTime, pnd.parse('2024-01-03 12:00', exact=True))
+    datetime_interval = pnd.interval(start=start, end=end)
     obj = objs.DateRange.build(datetime_interval)
     assert isinstance(obj.start, dt.datetime)
     assert obj.start == datetime_interval.start

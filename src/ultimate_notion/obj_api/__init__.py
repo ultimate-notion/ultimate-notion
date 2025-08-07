@@ -39,12 +39,11 @@ def _get_default_user_agent() -> str:
     architecture = platform.machine()
     httpx_version = httpx.__version__
     notion_sdk_version = version('notion-client')
-
-    return (
-        f'ultimate-notion/{__version__} '
-        f'(https://ultimate-notion.com/) '
-        f'python/{python_version} {os_name}/{architecture} '
-        f'notion-sdk-py/{notion_sdk_version} '
+    return ' '.join(
+        f'ultimate-notion/{__version__} (https://ultimate-notion.com/)'
+        f'python/{python_version}'
+        f'{os_name}/{architecture}'
+        f'notion-sdk-py/{notion_sdk_version}'
         f'httpx/{httpx_version}'
     )
 
@@ -86,4 +85,4 @@ __all__ = ['NotionAPI', 'create_notion_client']
 #       to differentiate between a model for sending and receiving data.
 #       Idea: Use a sentinel value, e.g. API_RESPONSE = object() as default value for fields that are only given
 #       by the API and not sent to the API. This way we can differentiate between the two cases.
-#       Maybe use T_UNSET und UNSET
+#       Maybe use T_UNSET und UNSET like in endpoints already used.

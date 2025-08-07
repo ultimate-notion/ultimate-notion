@@ -6,7 +6,7 @@ import ultimate_notion as uno
 
 
 @pytest.mark.vcr()
-def test_retrieve_property(all_props_db: uno.Database):
+def test_retrieve_property(all_props_db: uno.Database) -> None:
     page = all_props_db.get_all_pages().to_pages()[0]
     page_obj = page.obj_ref
     page_props = page.props._obj_prop_vals

@@ -14,10 +14,11 @@ from __future__ import annotations
 
 import datetime as dt
 from abc import ABC
-from typing import Any
+from typing import Any, cast
 
 import pendulum as pnd
 from pydantic import SerializeAsAny, field_validator, model_serializer
+from typing_extensions import Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
@@ -52,12 +53,12 @@ class PropertyValue(TypedObject, polymorphic_base=True):
     _is_retrieved: bool = False  # fetched separately as property item from the server
 
     @classmethod
-    def build(cls, value):
+    def build(cls, value) -> Self:
         """Build the property value from given value, e.g. native Python or nested type.
 
         In practice, this is like calling __init__ with the corresponding keyword.
         """
-        return cls.model_construct(**{cls.model_fields['type'].get_default(): value})
+        return cast(Self, cls.model_construct(**{cls.model_fields['type'].get_default(): value}))
 
     def serialize_for_api(self):
         """Serialize the object for sending it to the Notion API."""
@@ -97,9 +98,9 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, dt_spec: str | dt.datetime | dt.date | pnd.Interval):
+    def build(cls, dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> Self:
         """Create a new Date from the native values."""
-        return cls.model_construct(date=DateRange.build(dt_spec))
+        return cast(Self, cls.model_construct(date=DateRange.build(dt_spec)))
 
 
 class Status(PropertyValue, type='status'):
@@ -200,9 +201,9 @@ class Relation(PropertyValue, type='relation'):
     has_more: bool = False
 
     @classmethod
-    def build(cls, pages):
+    def build(cls, pages) -> Self:
         """Return a `Relation` property with the specified pages."""
-        return cls.model_construct(relation=[ObjectRef.build(page) for page in pages])
+        return cast(Self, cls.model_construct(relation=[ObjectRef.build(page) for page in pages]))
 
 
 class RollupObject(TypedObject, ABC, polymorphic_base=True):
@@ -297,7 +298,7 @@ class Verification(PropertyValue, type='verification'):
         # https://github.com/pydantic/pydantic/issues/355
         @field_validator('state')
         @classmethod
-        def validate_enum_field(cls, field: str):
+        def validate_enum_field(cls, field: str) -> VState:
             return VState(field)
 
     verification: TypeData = TypeData()

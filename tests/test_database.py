@@ -46,7 +46,7 @@ def test_schema(article_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_db_inline(notion: uno.Session, root_page: uno.Page):
+def test_db_inline(notion: uno.Session, root_page: uno.Page) -> None:
     """Simple inline database of articles"""
 
     class Article(uno.Schema, db_title=None):

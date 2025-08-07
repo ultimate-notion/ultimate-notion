@@ -605,7 +605,7 @@ class Divider(Block[obj_blocks.Divider], wraps=obj_blocks.Divider):
 class TableOfContents(Block[obj_blocks.TableOfContents], wraps=obj_blocks.TableOfContents):
     """Table of Contents block."""
 
-    def __init__(self, *, color: Color | BGColor = Color.DEFAULT):
+    def __init__(self, *, color: Color | BGColor = Color.DEFAULT) -> None:
         super().__init__()
         self.obj_ref.value.color = color
 
@@ -626,7 +626,7 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
 class Embed(CaptionMixin, Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
     """Embed block."""
 
-    def __init__(self, url: str, *, caption: str | None = None):
+    def __init__(self, url: str, *, caption: str | None = None) -> None:
         super().__init__()
         self.obj_ref.value.url = url
         self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else None
@@ -652,7 +652,7 @@ class Embed(CaptionMixin, Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
 class Bookmark(CaptionMixin, Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
 
-    def __init__(self, url: str, *, caption: str | None = None):
+    def __init__(self, url: str, *, caption: str | None = None) -> None:
         super().__init__()
         self.obj_ref.value.url = url
         self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else None
@@ -684,7 +684,7 @@ class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
         The Notion API does not support creating or appending `link_preview` blocks.
     """
 
-    def __init__(self, url: str):
+    def __init__(self, url: str) -> None:
         msg = 'The Notion API does not support creating or appending `link_preview` blocks.'
         raise NotImplementedError(msg)
         # ToDo: Implement this when the API supports it
@@ -707,7 +707,7 @@ class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
     LaTeX equation in display mode, e.g. `$$ \\mathrm{E=mc^2} $$`, but without the `$$` signs.
     """
 
-    def __init__(self, latex: str):
+    def __init__(self, latex: str) -> None:
         super().__init__()
         self.obj_ref.value.expression = latex
 
@@ -744,7 +744,7 @@ class FileBaseBlock(CaptionMixin, Block[FT], ABC, wraps=obj_blocks.FileBase):
         *,
         caption: str | None = None,
         name: str | None = None,
-    ):
+    ) -> None:
         super().__init__()
         file_info = FileInfo(url=url, name=name, caption=caption)
         self.obj_ref.value = file_info.obj_ref
@@ -780,7 +780,7 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
         url: str,
         *,
         caption: str | None = None,
-    ):
+    ) -> None:
         super().__init__(url, caption=caption, name=name)
 
     @property
@@ -810,7 +810,7 @@ class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
         Only the caption can be modified, the URL is read-only.
     """
 
-    def __init__(self, url: str, *, caption: str | None = None):
+    def __init__(self, url: str, *, caption: str | None = None) -> None:
         super().__init__(url, caption=caption)
 
     def to_markdown(self) -> str:
@@ -865,7 +865,7 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
         This block is used only internally.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         msg = 'To create a child page block, create a new page with the corresponding parent.'
         raise InvalidAPIUsageError(msg)
 
@@ -894,7 +894,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         This block is used only internally.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         msg = 'To create a child database block, create a new database with the corresponding parent.'
         raise InvalidAPIUsageError(msg)
 
@@ -918,7 +918,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
 class Column(Block[obj_blocks.Column], ChildrenMixin, wraps=obj_blocks.Column):
     """Column block."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         msg = 'Column blocks cannot be created directly. Use `Columns` instead.'
         raise InvalidAPIUsageError(msg)
 
@@ -943,7 +943,7 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin, wraps=obj_blocks.Colu
     which can be positive integers or floats.
     """
 
-    def __init__(self, columns: int | Sequence[float | int]):
+    def __init__(self, columns: int | Sequence[float | int]) -> None:
         """Create a new `Columns` block with the given number of columns."""
         super().__init__()
         match columns:
@@ -1029,7 +1029,7 @@ class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_bl
     def __new__(cls, *cells: str | None) -> TableRow:
         return tuple.__new__(cls, cells)
 
-    def __init__(self, *cells: str | None):
+    def __init__(self, *cells: str | None) -> None:
         super().__init__(n_cells=len(cells))
         for idx, cell in enumerate(cells):
             if cell is None:
@@ -1050,7 +1050,7 @@ class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_bl
 class Table(Block[obj_blocks.Table], ChildrenMixin, wraps=obj_blocks.Table):
     """Table block."""
 
-    def __init__(self, n_rows: int, n_cols: int, *, header_col: bool = False, header_row: bool = False):
+    def __init__(self, n_rows: int, n_cols: int, *, header_col: bool = False, header_row: bool = False) -> None:
         super().__init__()
         self.obj_ref.table.table_width = n_cols
         self.obj_ref.table.has_column_header = header_row
@@ -1183,7 +1183,7 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
         Use `.replace(new_block)` instead.
     """
 
-    def __init__(self, page: Page):
+    def __init__(self, page: Page) -> None:
         super().__init__()
         self.obj_ref.link_to_page = objs.PageRef.build(page.obj_ref)
 
@@ -1209,7 +1209,7 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
 class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin, wraps=obj_blocks.SyncedBlock):
     """Synced block - either original or synced."""
 
-    def __init__(self, blocks: Block | Sequence[Block]):
+    def __init__(self, blocks: Block | Sequence[Block]) -> None:
         """Create the original synced block."""
         super().__init__()
         blocks = [blocks] if isinstance(blocks, Block) else blocks
@@ -1269,7 +1269,7 @@ class Template(TextBlock[obj_blocks.Template], ChildrenMixin, wraps=obj_blocks.T
         As of March 27, 2023 creation of template blocks will no longer be supported.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         msg = 'A template block cannot be created by a user.'
         raise InvalidAPIUsageError(msg)
 
@@ -1285,7 +1285,7 @@ class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.Unsupport
     They will be returned as `Unsupported` blocks when fetched, but cannot be created or modified.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         msg = 'An unsupported block cannot be created by a user.'
         raise InvalidAPIUsageError(msg)
 

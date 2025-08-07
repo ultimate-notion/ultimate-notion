@@ -38,7 +38,7 @@ def test_slist() -> None:
 
 def test_deepcopy_with_sharing() -> None:
     class Class:
-        def __init__(self):
+        def __init__(self) -> None:
             self.shared = {'a': 1}
             self.copied = {'a': 2}
 
@@ -75,7 +75,7 @@ def test_is_stable_version() -> None:
     assert utils.is_stable_version('1.2.3.post1.dev') is False
 
 
-def test_parse_dt_str(tz_berlin) -> None:
+def test_parse_dt_str(tz_berlin: str) -> None:
     assert utils.parse_dt_str('2021-01-01') == pnd.date(2021, 1, 1)
     assert utils.parse_dt_str('2021-01-01 12:00:00') == pnd.datetime(2021, 1, 1, 12, 0, 0, tz=tz_berlin)
     assert utils.parse_dt_str('2021-01-01 12:00:00+02:00') == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
@@ -98,7 +98,7 @@ def test_parse_dt_str(tz_berlin) -> None:
     assert date_interval == pnd.interval(start=exp_start, end=exp_end)
 
 
-def test_to_pendulum(tz_berlin) -> None:
+def test_to_pendulum(tz_berlin: str) -> None:
     date_and_time = utils.to_pendulum('2021-01-01 12:00:00')
     assert isinstance(date_and_time, pnd.DateTime)
     assert isinstance(date_and_time, dt.datetime)
