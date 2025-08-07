@@ -3,7 +3,7 @@ from __future__ import annotations
 from ultimate_notion.obj_api import props as obj_props
 
 
-def test_number():
+def test_number() -> None:
     obj = obj_props.Number.build(42)
     assert obj.number == 42
     assert isinstance(obj.number, int)

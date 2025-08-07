@@ -6,6 +6,7 @@ import asyncio
 import logging
 import pickle  # noqa: S403
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, TypeAlias
@@ -327,11 +328,11 @@ class SyncTask(ABC):
 
         return state
 
-    def __await__(self):
+    def __await__(self) -> Generator[Any, None, None]:
         """Delegate the await to the __call__ method"""
         return self().__await__()
 
-    async def __call__(self):
+    async def __call__(self) -> None:
         """Run the task as scheduled."""
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
         state = pickle.loads(self.state_path.read_bytes()) if self.state_path.exists() else None  # noqa: S301
@@ -356,10 +357,10 @@ all_tasks: set[SyncTask] = set()
 """All tasks that have been created so far."""
 
 
-def run_all_tasks(*, debug: bool | None = None):
+def run_all_tasks(*, debug: bool | None = None) -> None:
     """Run all scheduled tasks."""
 
-    async def gather_all_tasks():
+    async def gather_all_tasks() -> list[Any]:
         return await asyncio.gather(*all_tasks)
 
     _logger.info('Running all scheduled tasks...')

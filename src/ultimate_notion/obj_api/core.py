@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import re
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar, cast
 from uuid import UUID
 
 from pydantic import (
@@ -318,7 +318,7 @@ class TypedObject(GenericObject, Generic[T]):
     @property
     def value(self) -> T:
         """Return the nested object."""
-        return getattr(self, self.type)
+        return cast(T, getattr(self, self.type))
 
     @value.setter
     def value(self, val: T) -> None:

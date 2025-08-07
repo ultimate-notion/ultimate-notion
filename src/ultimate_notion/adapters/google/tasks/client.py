@@ -17,6 +17,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from datetime import date, datetime, time, timezone
 from enum import Enum
+from types import TracebackType
 from typing import Any, Literal
 
 from google.auth.exceptions import RefreshError
@@ -78,7 +79,7 @@ class GObject(BaseModel):
     self_link: HttpUrl = Field(..., alias='selfLink')
     _resource: Resource
 
-    def __init__(self, resource: Resource, **data: Any):
+    def __init__(self, resource: Resource, **data: Any) -> None:
         super().__init__(**data)
         self._resource = resource
 
@@ -91,7 +92,7 @@ class GObject(BaseModel):
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def _update(self, resp: dict[str, str]):
+    def _update(self, resp: dict[str, str]) -> None:
         """Updates this object with the given response from the API."""
         new_obj_dct = dict(resp, resource=self._resource)
         new_obj = self.model_validate(new_obj_dct)
@@ -148,7 +149,7 @@ class GTask(GObject):
         return self.due_
 
     @due.setter
-    def due(self, due_date: datetime | date | None):
+    def due(self, due_date: datetime | date | None) -> None:
         """Sets the due date of this task."""
         due_date = assert_datetime(due_date)
         due_date_str = due_date if due_date is None else due_date.isoformat()
@@ -162,7 +163,7 @@ class GTask(GObject):
         return self.notes_
 
     @notes.setter
-    def notes(self, new_notes: str | None):
+    def notes(self, new_notes: str | None) -> None:
         """Sets the notes of this task."""
         resource = self._resource.tasks()
         resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'notes': new_notes}).execute()
@@ -174,7 +175,7 @@ class GTask(GObject):
         return self.title_
 
     @title.setter
-    def title(self, new_title: str):
+    def title(self, new_title: str) -> None:
         """Sets the title of this task."""
         resource = self._resource.tasks()
         resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'title': new_title}).execute()
@@ -186,7 +187,7 @@ class GTask(GObject):
         return self.status == Status.COMPLETED
 
     @is_completed.setter
-    def is_completed(self, completed: bool):
+    def is_completed(self, completed: bool) -> None:
         """Sets the completed status of this task."""
         resource = self._resource.tasks()
         resp = resource.patch(
@@ -195,7 +196,6 @@ class GTask(GObject):
             body={'status': Status.COMPLETED if completed else Status.NEEDS_ACTION},
         ).execute()
         self._update(resp)
-        return self
 
     @property
     def position(self) -> int:
@@ -220,7 +220,7 @@ class GTask(GObject):
         return GTask(resource=self._resource, **resp)
 
     @parent.setter
-    def parent(self, parent: GTask | None):
+    def parent(self, parent: GTask | None) -> None:
         """Sets the parent of this task."""
         parent_id = None if parent is None else parent.id
 
@@ -246,7 +246,7 @@ class GTaskList(GObject):
 
     kind: Literal[Kind.TASK_LIST]
 
-    def all_tasks(self, *, show_deleted=False) -> list[GTask]:
+    def all_tasks(self, *, show_deleted: bool = False) -> list[GTask]:
         """Returns a list of all tasks, completed or not, in this task list."""
         resource = self._resource.tasks()
         page_token = None
@@ -324,7 +324,7 @@ class GTaskList(GObject):
         return self.title_
 
     @title.setter
-    def title(self, new_title: str):
+    def title(self, new_title: str) -> None:
         """Sets the title of this task list."""
         resource = self._resource.tasklists()
         resp = resource.patch(tasklist=self.id, body={'title': new_title}).execute()
@@ -346,7 +346,7 @@ class GTasksClient:
     _config: Config
     resource: Resource
 
-    def __init__(self, config: Config | None = None, *, read_only: bool = False):
+    def __init__(self, config: Config | None = None, *, read_only: bool = False) -> None:
         self.read_only = read_only
         self._scopes = [Scope.TASKS_RO.value] if read_only else [Scope.TASKS_RW.value]
         if config is None:
@@ -385,9 +385,10 @@ class GTasksClient:
 
         return build('tasks', 'v1', credentials=creds)
 
-    def recreate_token(self):
+    def recreate_token(self) -> None:
         """Recreate the current token using the scopes given at initialization."""
-        self._config.google.token_json.unlink(missing_ok=True)
+        if (gconfig := self._config.google) and (token_json := gconfig.token_json):
+            token_json.unlink(missing_ok=True)
         self.resource = self._build_resource()
 
     def all_tasklists(self, max_results: int | None = None) -> list[GTaskList]:
@@ -432,14 +433,16 @@ class GTasksClient:
         else:
             return tasklists.item()
 
-    def close(self):
+    def close(self) -> None:
         """Closes the client."""
         self.resource.close()
 
     def __enter__(self) -> GTasksClient:
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(
+        self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
+    ) -> None:
         self.close()
 
 

@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from ultimate_notion.obj_api.core import extract_id
 
 
-def test_extract_id():
+def test_extract_id() -> None:
     """Make sure we can parse UUID's with and without dashes."""
 
     page_id = uuid4()

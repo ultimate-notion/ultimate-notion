@@ -43,7 +43,7 @@ class SelectOption(GenericObject):
     description: list[RichTextBaseObject] | None = None  # ToDo: Undocumented in the Notion API
 
     @classmethod
-    def build(cls, name, color=Color.DEFAULT) -> SelectOption:
+    def build(cls, name: str, color=Color.DEFAULT) -> SelectOption:
         """Create a `SelectOption` object from the given name and color."""
         return cls.model_construct(name=name, color=color)
 

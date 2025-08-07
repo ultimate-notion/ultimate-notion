@@ -11,10 +11,11 @@ from tests.conftest import assert_eventually
 from ultimate_notion.blocks import Block
 from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
+from ultimate_notion.page import Page
 
 
 @pytest.mark.vcr()
-def test_parent(page_hierarchy) -> None:
+def test_parent(page_hierarchy: tuple[Page, Page, Page]) -> None:
     root_page, l1_page, l2_page = page_hierarchy
     assert isinstance(root_page, uno.Page)
     assert isinstance(l1_page, uno.Page)
