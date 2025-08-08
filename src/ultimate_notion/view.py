@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 
 import numpy as np
 from pydantic import BaseModel
@@ -24,6 +24,7 @@ from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find
 if TYPE_CHECKING:
     import pandas as pd
     import polars as pl
+    from numpy.typing import NDArray
 
     from ultimate_notion.database import Database
     from ultimate_notion.props import PropertyValue
@@ -38,7 +39,7 @@ class View(Sequence[Page]):
         self._query = query
         self._title_col = database.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
-        self._pages: np.ndarray = np.array(pages)
+        self._pages: NDArray[Any] = np.array(pages)
         self.default_limit = 10
 
         self.reset()
@@ -85,11 +86,11 @@ class View(Sequence[Page]):
         if isinstance(idx, slice):
             return tuple(pages)
         else:
-            return pages
+            return cast(Page, pages)
 
     def get_page(self, idx: int, /) -> Page:
         """Retrieve a page by index of the view."""
-        return self._pages[self._row_indices[idx]]
+        return cast(Page, self._pages[self._row_indices[idx]])
 
     def search_page(self, name: str) -> SList[Page]:
         """Retrieve a page from this view by name"""
@@ -155,6 +156,7 @@ class View(Sequence[Page]):
                         return prop
                 case _:
                     return prop
+        return None
 
     def _to_polars_schema(self) -> dict[str, pl.DataType]:
         """Create a Polars schema for the view."""
@@ -227,7 +229,7 @@ class View(Sequence[Page]):
         else:
             return tabulate(rows, headers=cols, tablefmt=tablefmt)
 
-    def show(self, *, simple: bool | None = None):
+    def show(self, *, simple: bool | None = None) -> None:
         """Show the database as human-readable table."""
         if simple:
             tablefmt = 'simple'
@@ -264,7 +266,7 @@ class View(Sequence[Page]):
     def __str__(self) -> str:
         return self.as_table()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._row_indices)
 
     @property
@@ -281,7 +283,7 @@ class View(Sequence[Page]):
     def has_index(self) -> bool:
         return self._index_name is not None
 
-    def with_index(self, name='index') -> View:
+    def with_index(self, name: str = 'index') -> View:
         """Add an index column to the view."""
         if self.has_index and name == self._index_name:
             return self
@@ -307,7 +309,7 @@ class View(Sequence[Page]):
     def has_icon(self) -> bool:
         return self._icon_name is not None
 
-    def with_icon(self, name='icon') -> View:
+    def with_icon(self, name: str = 'icon') -> View:
         """Show icons in HTML output."""
         if self.has_icon and name == self._icon_name:
             return self
@@ -389,12 +391,12 @@ class View(Sequence[Page]):
         view._row_indices = view._row_indices[::-1]
         return view
 
-    def sort(self):
+    def sort(self) -> View:
         """Sort the view with respect to some columns."""
         # ToDo: Implement me
         raise NotImplementedError
 
-    def filter(self):
+    def filter(self) -> View:
         """Filter the view."""
         # ToDo: Implement me
         raise NotImplementedError
@@ -414,7 +416,7 @@ def cmplx_to_str(obj: Wrapper) -> Wrapper | str:
         case Option():
             return obj.name
         case User():
-            return obj.name
+            return str(obj)
         case _:
             return obj
 

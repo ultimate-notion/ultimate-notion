@@ -5,24 +5,27 @@ from __future__ import annotations
 import datetime as dt
 import re
 import textwrap
-from collections.abc import Callable, Generator, Mapping, Sequence
+import types
+from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from copy import deepcopy
-from functools import wraps
+from functools import update_wrapper
 from hashlib import sha256
 from itertools import chain
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, Generic, ParamSpec, TypeVar
 
 import numpy as np
 import pendulum as pnd
 from packaging.version import Version
 from pydantic import BaseModel
+from typing_extensions import Self
 
 from ultimate_notion import __version__
 from ultimate_notion.errors import EmptyListError, MultipleItemsError
 
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
+P = ParamSpec('P')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
 class SList(list[T]):
@@ -68,7 +71,28 @@ def is_notebook() -> bool:
             return False  # Other type (?)
 
 
-def store_retvals(func):
+class StoredRetvalsFunctor(Generic[P, T]):
+    """A decorator that stores the return values of a function for later use."""
+
+    def __init__(self, func: Callable[P, T]) -> None:
+        # Kopiert __name__, __doc__, __module__, __annotations__, __wrapped__
+        update_wrapper(self, func)
+        self._func = func
+        self.retvals: list[T] = []
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> T:
+        rv = self._func(*args, **kwargs)
+        self.retvals.append(rv)
+        return rv
+
+    # Ensures that the decorator also binds correctly to methods (self/cls)
+    def __get__(self, obj: Any, objtype: type | None = None) -> Self | types.MethodType:
+        if obj is None:
+            return self
+        return types.MethodType(self, obj)  # bind 'obj' as first argument
+
+
+def store_retvals(func: Callable[P, T]) -> StoredRetvalsFunctor[P, T]:
     """Decorator storing the return values as function attribute for later cleanups.
 
     This can be used for instance in a generator like this:
@@ -93,15 +117,7 @@ def store_retvals(func):
             notion.databases.delete(db)
     ```
     """
-
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        retval = func(*args, **kwargs)
-        wrapped.retvals.append(retval)
-        return retval
-
-    wrapped.retvals = []
-    return wrapped
+    return StoredRetvalsFunctor(func)
 
 
 def find_indices(elements: np.ndarray | Sequence[Any], total_set: np.ndarray | Sequence[Any]) -> np.ndarray:
@@ -123,7 +139,7 @@ def find_index(elem: Any, lst: list[Any]) -> int | None:
         return None
 
 
-def deepcopy_with_sharing(obj: Any, shared_attributes: Sequence[str], memo: dict[int, Any] | None = None):
+def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[int, Any] | None = None) -> T:
     """Like `deepcopy` but specified attributes are shared.
 
     Deepcopy an object, except for a given list of attributes, which should
@@ -132,7 +148,7 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: Sequence[str], memo: dict
     Args:
         obj: some object to copy
         shared_attributes: A list of strings identifying the attributes that should be shared instead of copied.
-        memo: dictionary passed into __deepcopy__.  Ignore this argument if not calling from within __deepcopy__.
+        memo: dictionary passed into __deepcopy__. Ignore this argument if not calling from within __deepcopy__.
 
     Example:
         ```python
@@ -161,8 +177,7 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: Sequence[str], memo: dict
     """
     shared_attrs = {k: getattr(obj, k) for k in shared_attributes}
 
-    deepcopy_defined = hasattr(obj, '__deepcopy__')
-    if deepcopy_defined:
+    if hasattr(obj, '__deepcopy__'):
         # Do hack to prevent infinite recursion in call to deepcopy
         deepcopy_method = obj.__deepcopy__
         obj.__deepcopy__ = None
@@ -176,10 +191,10 @@ def deepcopy_with_sharing(obj: Any, shared_attributes: Sequence[str], memo: dict
         setattr(obj, attr, val)
         setattr(clone, attr, val)
 
-    if deepcopy_defined:
+    if hasattr(obj, '__deepcopy__'):
         # Undo hack
         obj.__deepcopy__ = deepcopy_method
-        del clone.__deepcopy__
+        del clone.__deepcopy__  # type: ignore[attr-defined]
 
     return clone
 
@@ -230,8 +245,8 @@ def convert_md_to_py(path: Path | str, *, target_path: Path | str | None = None)
 
     md_str = path.read_text()
 
-    def check_codeblock(block):
-        first_line = block.split('\n')[0]
+    def check_codeblock(block: str) -> str:
+        first_line = block.split('\n', maxsplit=1)[0]
         if first_line[3:] != 'python':
             return ''
         return '\n'.join(block.split('\n')[1:])
@@ -354,7 +369,7 @@ def to_pendulum(dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> pnd.Date
 
 
 @contextmanager
-def temp_timezone(tz: str | pnd.Timezone):
+def temp_timezone(tz: str | pnd.Timezone) -> Iterator[None]:
     """Temporarily set the local timezone to the given timezone. Mostly used by unit tests."""
     if not isinstance(tz, pnd.Timezone):
         tz = pnd.timezone(tz)

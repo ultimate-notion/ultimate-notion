@@ -29,7 +29,7 @@ class EmojiBase(Wrapper[TO], str, ABC, wraps=objs.TypedObject):
         """Represent the emoji as :shortcode:, e.g. :smile:"""
         return f':{self.name}:'
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(str(self))
 
     def __eq__(self, other: Any) -> bool:

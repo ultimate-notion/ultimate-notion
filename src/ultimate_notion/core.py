@@ -15,6 +15,8 @@ from ultimate_notion.obj_api import objects as objs
 GT = TypeVar('GT', bound=obj_core.GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 if TYPE_CHECKING:
+    from pydantic_core import SchemaSerializer
+
     from ultimate_notion.session import Session
     from ultimate_notion.user import User
 
@@ -45,7 +47,7 @@ class Wrapper(ObjRefWrapper[GT], ABC):
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[wraps] = cls
 
-    def __new__(cls, *args, **kwargs) -> Self:
+    def __new__(cls, *args: Any, **kwargs: Any) -> Self:
         # Needed for wrap_obj_ref and its call to __new__ to work!
         return super().__new__(cls)
 
@@ -54,7 +56,7 @@ class Wrapper(ObjRefWrapper[GT], ABC):
         obj_api_type: type[obj_core.GenericObject] = self._obj_api_map_inv[self.__class__]
         self._obj_ref = obj_api_type.build(*args, **kwargs)
 
-    def __pydantic_serializer__(self):  # noqa: PLW3201
+    def __pydantic_serializer__(self) -> SchemaSerializer:  # noqa: PLW3201
         """Return the Pydantic serializers for this object."""
         # This is used only when creating a pydantic model from a schema.
         return self._obj_ref.__pydantic_serializer__
