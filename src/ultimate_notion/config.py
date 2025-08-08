@@ -5,6 +5,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 import tomli
 from pydantic import BaseModel, FilePath, field_validator
@@ -71,7 +72,7 @@ class Config(BaseModel):
     @field_validator('google')
     @classmethod
     def google_convert_path(cls, value: GoogleCfg | None, info: ValidationInfo) -> GoogleCfg | None:
-        def make_rel_path_abs(entry: FilePath | None):
+        def make_rel_path_abs(entry: FilePath | None) -> FilePath | None:
             if entry is not None and not entry.is_absolute():
                 cfg_path: Path = info.data['ultimate_notion'].cfg_path
                 entry = cfg_path.parent / entry
@@ -106,10 +107,11 @@ def get_cfg() -> Config:
     cfg_path = get_cfg_file()
     _logger.info(f'Loading configuration from path `{cfg_path}`.')
     with open(cfg_path, 'rb') as fh:
+        # ToDo: Use `tomllib` when Python 3.11 is the minimum version
         cfg_dict = tomli.load(fh)
 
     # Resolve environment variable values in the configuration
-    def resolve_values(data):
+    def resolve_values(data: Any) -> None:
         if isinstance(data, dict):
             for key, value in data.items():
                 if isinstance(value, dict):

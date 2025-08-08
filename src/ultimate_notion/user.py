@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
+
+if TYPE_CHECKING:
+    from uuid import UUID
 
 
 class User(Wrapper[objs.User], wraps=objs.User):
@@ -18,12 +21,12 @@ class User(Wrapper[objs.User], wraps=objs.User):
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: objs.User) -> User:
-        self = cast(User, cls.__new__(cls))
+        self = cls.__new__(cls)
         self.obj_ref = obj_ref
         return self
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return self.name or f'Unnamed user {self.id}>'
 
     def __repr__(self) -> str:
         return get_repr(self)
@@ -37,12 +40,12 @@ class User(Wrapper[objs.User], wraps=objs.User):
         return hash(self.id)
 
     @property
-    def id(self):
+    def id(self) -> UUID:
         """Return the ID of this user."""
         return self.obj_ref.id
 
     @property
-    def name(self):
+    def name(self) -> str | None:
         """Return the name of this user."""
         return self.obj_ref.name
 
@@ -62,7 +65,7 @@ class User(Wrapper[objs.User], wraps=objs.User):
         return isinstance(self.obj_ref, objs.UnknownUser)
 
     @property
-    def avatar_url(self):
+    def avatar_url(self) -> str | None:
         """Return the avatar URL of this user."""
         return self.obj_ref.avatar_url
 
