@@ -91,7 +91,9 @@ def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
     def last_non_ws_char(text: str) -> re.Match[str] | None:
         return re.search(r'\S(?=\s*$)', text)
 
-    def add_md_style(md_rich_texts: list[str], rich_texts: list[RichTextBase], start: int, end: int, md_style: str):
+    def add_md_style(
+        md_rich_texts: list[str], rich_texts: list[RichTextBase], start: int, end: int, md_style: str
+    ) -> None:
         # we skip text blocks with only whitespace characters
         if has_only_ws_chars(md_rich_texts[start]) and start != end:
             return add_md_style(md_rich_texts, rich_texts, start + 1, end, md_style)
@@ -118,11 +120,11 @@ def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
             msg = f'Error when inserting markdown styles into:\n{rt_objs}'
             raise ValueError(msg)
 
-    def add_all_md_styles(md_rich_texts: list[str], rich_texts: list[RichTextBase]):
+    def add_all_md_styles(md_rich_texts: list[str], rich_texts: list[RichTextBase]) -> None:
         for start, end, md_style in sorted_md_spans(md_spans(rich_texts)):
             add_md_style(md_rich_texts, rich_texts, start, end, md_style)
 
-    def add_mentions(md_rich_texts: list[str], rich_texts: list[RichTextBase]):
+    def add_mentions(md_rich_texts: list[str], rich_texts: list[RichTextBase]) -> None:
         def is_mention(rt: RichTextBase) -> TypeGuard[Mention]:
             return rt.is_mention
 
@@ -155,7 +157,7 @@ def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
         if left is not None:
             yield left, len(rich_texts) - 1
 
-    def add_underlines(md_rich_texts: list[str], rich_texts: list[RichTextBase]):
+    def add_underlines(md_rich_texts: list[str], rich_texts: list[RichTextBase]) -> None:
         for left, right in find_span(rich_texts, lambda rt: rt.obj_ref.annotations.underline):
             md_rich_texts[left] = '<u>' + md_rich_texts[left]
             md_rich_texts[right] += '</u>'

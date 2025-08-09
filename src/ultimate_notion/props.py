@@ -8,7 +8,7 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
 
 import pendulum as pnd
 from typing_extensions import Self
@@ -58,7 +58,10 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PropertyValue):
             return NotImplemented
-        return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
+        other_obj_ref = cast(T, other.obj_ref)
+        # ToDo: FIXME, this is a serious bug! The next line is correct
+        # return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
+        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == self.obj_ref.value)
 
     @property
     @abstractmethod

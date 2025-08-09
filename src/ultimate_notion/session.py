@@ -85,7 +85,7 @@ class Session:
                 raise ValueError(msg)
 
     @classmethod
-    def get_or_create(cls, *args, **kwargs) -> Session:
+    def get_or_create(cls, *args: Any, **kwargs: Any) -> Session:
         """Return the current active session or create a new session."""
         with Session._lock:
             if Session._active_session:

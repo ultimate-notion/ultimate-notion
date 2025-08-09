@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import ValidationError
 from typing_extensions import Self
 
@@ -124,7 +126,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         return self._schema
 
     @schema.setter
-    def schema(self, schema: type[Schema]):
+    def schema(self, schema: type[Schema]) -> None:
         """Set a custom schema in order to change the Python variables names."""
         self._set_schema(schema, during_init=False)
 
@@ -189,7 +191,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         msg = 'Use .is_empty instead of bool(db) to check if a database is empty.'
         raise RuntimeError(msg)
 
-    def create_page(self, **kwargs) -> Page:
+    def create_page(self, **kwargs: Any) -> Page:
         """Create a page with properties according to the schema within the corresponding database."""
         attr_to_name = {prop.attr_name: prop.name for prop in self.schema.get_props()}
         if not set(kwargs).issubset(set(attr_to_name)):

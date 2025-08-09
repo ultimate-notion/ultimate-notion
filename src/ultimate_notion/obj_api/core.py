@@ -130,7 +130,7 @@ class GenericObject(BaseModel):
         return self.model_dump(mode='json', exclude_none=True, by_alias=True)
 
     @classmethod
-    def build(cls, *args, **kwargs):
+    def build(cls, *args: Any, **kwargs: Any):
         """Use the standard constructur to build the instance. Will be overwritten for more complex types."""
         return cls(*args, **kwargs)
 
@@ -189,10 +189,14 @@ class NotionObject(UniqueObject):
 
     @field_validator('object', mode='after')
     @classmethod
-    def _verify_object_matches_expected(cls, val):
+    def _verify_object_matches_expected(cls, val: str) -> str:
         """Make sure that the deserialized object matches the name in this class."""
+        if (obj_field := cls.model_fields.get('object')) is not None:
+            obj_attr = obj_field.default
+        else:
+            msg = 'Field `object` of Notion object is missing'
+            raise ValueError(msg)
 
-        obj_attr = cls.model_fields.get('object').default
         if val != obj_attr:
             msg = f'Invalid object for {obj_attr} - {val}'
             raise ValueError(msg)
@@ -237,12 +241,12 @@ class TypedObject(GenericObject, Generic[T]):
     """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
 
-    def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs):  # noqa: A002
+    def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs: Any) -> None:  # noqa: A002
         super().__init_subclass__(**kwargs)
         cls._polymorphic_base = polymorphic_base
 
     @classmethod
-    def __pydantic_init_subclass__(cls, *, type: str | None = None, **kwargs):  # noqa: A002, PLW3201
+    def __pydantic_init_subclass__(cls, *, type: str | None = None, **kwargs: Any) -> None:  # noqa: A002, PLW3201
         """Register the subtypes of the TypedObject subclass.
 
         This is needed since `model_fields` is not available during __init_subclass__.
@@ -253,7 +257,7 @@ class TypedObject(GenericObject, Generic[T]):
         cls._register_type(type_name)
 
     @classmethod
-    def _register_type(cls, name):
+    def _register_type(cls, name: str) -> None:
         """Register a specific class for the given 'type' name."""
 
         cls._set_field_default('type', default=name)

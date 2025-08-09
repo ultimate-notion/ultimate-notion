@@ -69,7 +69,9 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
 class OptionNSType(type):
     """Metaclass to implement `len` for type `OptionNS` itself, not an instance of it."""
 
-    def __len__(cls):
+    # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
+
+    def __len__(cls: type[OptionNS]) -> int:  # type: ignore[misc]
         return len(cls.to_list())
 
 
@@ -90,7 +92,7 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
     _options: dict[str, Option]  # holds all possible options
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref, /, *, options: list[Option] | None = None) -> OptionGroup:
+    def wrap_obj_ref(cls, obj_ref: objs.SelectGroup, /, *, options: list[Option] | None = None) -> OptionGroup:
         """Convienence constructor for the group of options."""
         obj = super().wrap_obj_ref(obj_ref)
         options = [] if options is None else options
