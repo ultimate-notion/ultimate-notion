@@ -66,7 +66,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     _name: str | None = None  # name given by the user, not the Notion API, will match when set
     _owner: type[Schema] | None = None  # back reference to the schema
 
-    def __new__(cls, *args, **kwargs) -> Property:
+    def __new__(cls, *args: Any, **kwargs: Any) -> Property:
         if cls is Property:
             msg = f'{cls.__name__} is abstract and cannot be instantiated directly'
             raise TypeError(msg)
@@ -88,7 +88,10 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
             return NotImplemented
-        return self.obj_ref.type == other.obj_ref.type and self.obj_ref.value == self.obj_ref.value
+        other_obj_ref = cast(T, other.obj_ref)
+        # ToDo: FIXME, this is a serious bug! The next line is correct
+        # return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
+        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == self.obj_ref.value)
 
     def __hash__(self) -> int:
         return hash(self.obj_ref.type) + hash(self.obj_ref.value)
@@ -167,7 +170,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
             raise PropertyError(msg)
 
     @name.setter
-    def name(self, new_name: str):
+    def name(self, new_name: str) -> None:
         """Set the name of this property."""
         self._rename_prop(new_name)
 
@@ -273,7 +276,7 @@ class SchemaModel(BaseModel):
                 result[name] = value.obj_ref
         return result
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         base = super().__repr__()
         attrs = base[len(self.__class__.__name__) :]
         return f'{self.__class__.__name__}[{self._db_title}]{attrs}'
@@ -312,7 +315,7 @@ class Schema(metaclass=SchemaType):
             raise SchemaError(msg)
 
     @classmethod
-    def create(cls, **kwargs) -> Page:
+    def create(cls, **kwargs: Any) -> Page:
         """Create a page using this schema with a bound database."""
         return cls.get_db().create_page(**kwargs)
 
@@ -417,7 +420,7 @@ class Schema(metaclass=SchemaType):
         return tabulate(rows, headers=headers, tablefmt=tablefmt)
 
     @classmethod
-    def show(cls, *, simple: bool | None = None):
+    def show(cls, *, simple: bool | None = None) -> None:
         """Show the schema as html or as simple table."""
         if simple:
             tablefmt = 'simple'
@@ -475,13 +478,6 @@ class Schema(metaclass=SchemaType):
             raise SchemaError(msg)
 
     @classmethod
-    def connect_db(cls) -> Database | None:
-        """Search for the database `db_title` and bind it to this schema."""
-        # ToDo: We could allow in the future a `db_id` too?
-        msg = 'Database connection logic not implemented.'
-        raise NotImplementedError(msg)
-
-    @classmethod
     def get_db(cls) -> Database:
         """Get the database that is bound to this schema."""
         if cls._database is not None:  # is_bound() cannot be used here due to type checker
@@ -490,9 +486,10 @@ class Schema(metaclass=SchemaType):
             raise SchemaNotBoundError(cls)
 
     @classmethod
-    def bind_db(cls, db: Database):
+    def bind_db(cls, db: Database) -> None:
         """Bind this schema to the corresponding database for back-reference."""
-        # So if None is passed, the schema is unbound.
+        # ToDo: If `None` (default) is passed, search for the database `db_title`
+        # and bind it to this schema.
         cls._database = db
         cls._set_obj_refs()
 

@@ -14,7 +14,8 @@ from __future__ import annotations
 
 import datetime as dt
 from abc import ABC
-from typing import Any, cast
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import pendulum as pnd
 from pydantic import SerializeAsAny, field_validator, model_serializer
@@ -32,6 +33,9 @@ from ultimate_notion.obj_api.objects import (
 )
 from ultimate_notion.obj_api.schema import AggFunc, SelectOption
 
+if TYPE_CHECKING:
+    from ultimate_notion.obj_api.blocks import Page
+
 MAX_ITEMS_PER_PROPERTY = 25
 """Maximum number of items rertrieved per property.
 
@@ -45,22 +49,24 @@ Source: https://developers.notion.com/reference/retrieve-a-page
 # Property Values #
 ###################
 
+T = TypeVar('T')
 
-class PropertyValue(TypedObject, polymorphic_base=True):
+
+class PropertyValue(TypedObject[T], polymorphic_base=True):
     """Base class for Notion property values."""
 
     id: str = None  # type: ignore
     _is_retrieved: bool = False  # fetched separately as property item from the server
 
     @classmethod
-    def build(cls, value) -> Self:
+    def build(cls, value: Any) -> Self:
         """Build the property value from given value, e.g. native Python or nested type.
 
         In practice, this is like calling __init__ with the corresponding keyword.
         """
         return cast(Self, cls.model_construct(**{cls.model_fields['type'].get_default(): value}))
 
-    def serialize_for_api(self):
+    def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
         # We include "null" values as those are used to delete properties
         dump_dct = self.model_dump(mode='json', exclude_none=True, by_alias=True)
@@ -201,7 +207,7 @@ class Relation(PropertyValue, type='relation'):
     has_more: bool = False
 
     @classmethod
-    def build(cls, pages) -> Self:
+    def build(cls, pages: Sequence[Page]) -> Self:
         """Return a `Relation` property with the specified pages."""
         return cast(Self, cls.model_construct(relation=[ObjectRef.build(page) for page in pages]))
 

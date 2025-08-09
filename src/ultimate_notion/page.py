@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any, TypeGuard
+from typing import TYPE_CHECKING, Any, TypeGuard, cast
 
 from emoji import is_emoji
 from typing_extensions import Self
@@ -136,7 +136,7 @@ class Page(
         if self.parent_db is not None:
             for prop in self.parent_db.schema.get_props():
                 setattr(page_props_ns_cls, prop.attr_name, PageProperty(prop_name=prop.name))
-        return page_props_ns_cls(page=self)
+        return cast(PagePropertiesNS, page_props_ns_cls(page=self))
 
     def __str__(self) -> str:
         return str(self.title)

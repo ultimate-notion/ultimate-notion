@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, TypeGuard, TypeVar, cast
+from typing import TYPE_CHECKING, TypeGuard, TypeVar
 from urllib.parse import urlparse
 
 import pendulum as pnd
@@ -197,7 +197,7 @@ class Text(str):
     @classmethod
     def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> Self:
         obj_refs = [] if obj_refs is None else obj_refs
-        rich_texts = [cast(RichTextBase, RichTextBase.wrap_obj_ref(obj_ref)) for obj_ref in obj_refs]
+        rich_texts = [RichTextBase.wrap_obj_ref(obj_ref) for obj_ref in obj_refs]
         plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
         obj = cls(plain_text)
         obj._rich_texts = rich_texts

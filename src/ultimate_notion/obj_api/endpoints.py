@@ -119,7 +119,7 @@ class BlocksEndpoint(Endpoint):
             block_iter = EndpointIterator[Block](endpoint=self.raw_api.list)
             return block_iter(block_id=parent_id)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the `blocks` endpoint for the Notion API."""
         super().__init__(*args, **kwargs)
         self.children = BlocksEndpoint.ChildrenEndpoint(*args, **kwargs)
@@ -313,7 +313,7 @@ class PagesEndpoint(Endpoint):
             )
             return prop_iter(page_id=page_id, property_id=property_id)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the `pages` endpoint for the Notion API"""
         super().__init__(*args, **kwargs)
         self.properties = PagesEndpoint.PropertiesEndpoint(*args, **kwargs)
