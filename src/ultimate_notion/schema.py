@@ -790,9 +790,9 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             raise RelationError(msg) from e
 
         if self._two_way_prop:
-            obj_ref = obj_schema.DualPropertyRelation.build(db.id)
+            obj_ref = obj_schema.DualPropertyRelation.build_relation(db.id)
         else:
-            obj_ref = obj_schema.SinglePropertyRelation.build(db.id)
+            obj_ref = obj_schema.SinglePropertyRelation.build_relation(db.id)
         return obj_ref
 
     @property
@@ -824,9 +824,9 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     def schema(self, new_schema: type[Schema]) -> None:
         """Set the schema of the relation database."""
         if self.is_two_way:
-            new_rel = obj_schema.DualPropertyRelation.build(new_schema.get_db().id)
+            new_rel = obj_schema.DualPropertyRelation.build_relation(new_schema.get_db().id)
         else:
-            new_rel = obj_schema.SinglePropertyRelation.build(new_schema.get_db().id)
+            new_rel = obj_schema.SinglePropertyRelation.build_relation(new_schema.get_db().id)
         self.obj_ref.relation = new_rel.relation
         self._update_prop(self.obj_ref)
         self._rel_schema = new_schema
@@ -873,14 +873,14 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
                 return
             target_schema = self.schema
             target_two_way_prop = self.two_way_prop.name
-            new_rel = obj_schema.SinglePropertyRelation.build(db.id)
+            new_rel = obj_schema.SinglePropertyRelation.build_relation(db.id)
             self.obj_ref.relation = new_rel.relation
             self.obj_ref = self._update_prop(self.obj_ref)
             # Strangely enough, the two-way property is not removed from the target schema
             # also it is no longer a two-way relation.
             del target_schema[target_two_way_prop]
         else:
-            new_rel = obj_schema.DualPropertyRelation.build(db.id)
+            new_rel = obj_schema.DualPropertyRelation.build_relation(db.id)
             self.obj_ref.relation = cast(obj_schema.DualPropertyRelation, new_rel.relation)
             self.obj_ref = self._update_prop(self.obj_ref)
             self._rename_two_way_prop(prop_name)

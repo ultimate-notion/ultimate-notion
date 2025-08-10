@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import builtins
 import logging
 import re
 from datetime import datetime
@@ -130,7 +131,7 @@ class GenericObject(BaseModel):
         return self.model_dump(mode='json', exclude_none=True, by_alias=True)
 
     @classmethod
-    def build(cls, *args: Any, **kwargs: Any):
+    def build(cls, *args: Any, **kwargs: Any) -> Self:
         """Use the standard constructur to build the instance. Will be overwritten for more complex types."""
         return cls(*args, **kwargs)
 
@@ -172,11 +173,11 @@ class NotionObject(UniqueObject):
     request_id: UUID | None = None
     """`request_id` is a UUID that is used to track requests in the Notion API"""
 
-    def __init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002
+    def __init_subclass__(cls, *, object: str | None = None, **kwargs: Any) -> None:  # noqa: A002
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def __pydantic_init_subclass__(cls, *, object=None, **kwargs):  # noqa: A002, PLW3201
+    def __pydantic_init_subclass__(cls, *, object: str | None = None, **kwargs: Any) -> None:  # noqa: A002, PLW3201
         """Update `GenericObject` defaults for the named object.
 
         Needed since `model_fields` are not available during __init_subclass__
@@ -237,9 +238,10 @@ class TypedObject(GenericObject, Generic[T]):
         }
     """
 
-    type: str = Field(default=None)  # type: ignore  # avoids mypy plugin errors as this is set in __init_subclass__
+    type: str = Field(default=None)  # type: ignore  # avoids mypy errors as this is set in __pydantic_init_subclass__
     """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
+    _typemap: ClassVar[dict[str, builtins.type[TypedObject]]]
 
     def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs: Any) -> None:  # noqa: A002
         super().__init_subclass__(**kwargs)
@@ -280,7 +282,7 @@ class TypedObject(GenericObject, Generic[T]):
 
     @model_validator(mode='wrap')
     @classmethod
-    def _resolve_type(cls, value: Any, handler: ValidatorFunctionWrapHandler):
+    def _resolve_type(cls, value: Any, handler: ValidatorFunctionWrapHandler) -> Any:
         """Instantiate the correct object based on the `type` field.
 
         Following this approach: https://github.com/pydantic/pydantic/discussions/7008
