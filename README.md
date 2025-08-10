@@ -5,8 +5,7 @@ alt="Ultimate-Notion logo" width="500" role="img">
 </div>
 <br/>
 
-Ultimate Notion is the ultimate Python client for [Notion]! It allows you to access, create and change your
-Notion databases and pages in the most convenient and pythonic way.
+Ultimate Notion is the ultimate Python client for [Notion]!
 
 |         |                                    |
 |---------|------------------------------------|

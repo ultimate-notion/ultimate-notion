@@ -55,7 +55,7 @@ class Database(DataObject, MentionMixin, object='database'):
     is_inline: bool = False
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
-        return MentionDatabase.build(self, style=style)
+        return MentionDatabase.build_mention(self, style=style)
 
 
 class Page(DataObject, MentionMixin, object='page'):
@@ -84,7 +84,7 @@ class Page(DataObject, MentionMixin, object='page'):
         return title_prop.title
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
-        return MentionPage.build(self, style=style)
+        return MentionPage.build_mention(self, style=style)
 
 
 class Block(DataObject, TypedObject, object='block', polymorphic_base=True):

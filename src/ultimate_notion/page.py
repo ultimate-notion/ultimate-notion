@@ -32,7 +32,7 @@ class PageProperty:
     def __init__(self, prop_name: str) -> None:
         self._prop_name = prop_name
 
-    def __get__(self, obj: PagePropertiesNS, type=None) -> Any:  # noqa: A002
+    def __get__(self, obj: PagePropertiesNS, type: type[PagePropertiesNS] | None = None) -> Any:  # noqa: A002
         return obj[self._prop_name]
 
     def __set__(self, obj: PagePropertiesNS, value: Any) -> None:

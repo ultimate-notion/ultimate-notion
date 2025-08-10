@@ -106,7 +106,7 @@ class DateRange(GenericObject, MentionMixin):
                 raise TypeError(msg)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
-        return MentionDate.build(self, style=style)
+        return MentionDate.build_mention(self, style=style)
 
     def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
         """Convert the DateRange to a pendulum object."""
@@ -255,7 +255,7 @@ class User(UserRef, TypedObject, MentionMixin, polymorphic_base=True):
     avatar_url: str | None = None
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
-        return MentionUser.build(self, style=style)
+        return MentionUser.build_mention(self, style=style)
 
 
 class Person(User, type='person'):
@@ -374,7 +374,7 @@ class EquationObject(RichTextBaseObject, type='equation'):
         )
 
 
-class MentionBase(TypedObject[GenericObject], polymorphic_base=True):
+class MentionBase(TypedObject[GenericObject], ABC, polymorphic_base=True):
     """Base class for typed `Mention` objects."""
 
 
@@ -390,7 +390,7 @@ class MentionUser(MentionBase, type='user'):
     user: SerializeAsAny[User]
 
     @classmethod
-    def build(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         mention = cls.model_construct(user=user)
         # note that `href` is always `None` for user mentions, also we prepend the '@' to mimic server side
@@ -403,7 +403,7 @@ class MentionPage(MentionBase, type='page'):
     page: SerializeAsAny[ObjectRef]
 
     @classmethod
-    def build(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         page_ref = ObjectRef.build(page)
         mention = cls.model_construct(page=page_ref)
@@ -419,7 +419,7 @@ class MentionDatabase(MentionBase, type='database'):
     database: SerializeAsAny[ObjectRef]
 
     @classmethod
-    def build(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         db_ref = ObjectRef.build(db)
         mention = cls.model_construct(database=db_ref)
@@ -435,7 +435,7 @@ class MentionDate(MentionBase, type='date'):
     date: DateRange
 
     @classmethod
-    def build(cls, date_range: DateRange, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention(cls, date_range: DateRange, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         mention = cls.model_construct(date=date_range)
         # note that `href` is always `None` for date mentions
