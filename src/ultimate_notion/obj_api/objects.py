@@ -1,7 +1,7 @@
 """Wrapper for various Notion API objects like parents, mentions, emojis & users.
 
 Similar to other records, these object provide access to the primitive data structure
-used in the Notion API as well as higher-level methods.
+used in the Notion API.
 
 For validation the Pydantic model fields specify if a field is optional or not.
 Some fields are always set, e.g. `id`, when retrieving an object but must not be set
@@ -11,8 +11,8 @@ To model this behavior, the default value `None` is used for those objects, e.g.
 class SelectOption(GenericObject)
     id: str = None  # type: ignore  # to make sure mypy doesn't complain
 ```
-Also be aware that this is import when updating to differentiate actual set values
-from default/unset values.
+Be aware that this is important when updating to differentiate between the actual set
+values from default/unset values.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
 import pendulum as pnd
@@ -60,7 +60,7 @@ class SelectGroup(GenericObject):
 class MentionMixin(ABC):
     """Mixin for objects that can be mentioned in Notion.
 
-    This mixin adds a `mention` property to the object, which can be used to
+    This mixin adds a `build_mention` property to the object, which can be used to
     reference the object in a mention.
     """
 
@@ -106,7 +106,7 @@ class DateRange(GenericObject, MentionMixin):
                 raise TypeError(msg)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
-        return MentionDate.build_mention(self, style=style)
+        return MentionDate.build_mention_from(self, style=style)
 
     def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
         """Convert the DateRange to a pendulum object."""
@@ -255,7 +255,7 @@ class User(UserRef, TypedObject, MentionMixin, polymorphic_base=True):
     avatar_url: str | None = None
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
-        return MentionUser.build_mention(self, style=style)
+        return MentionUser.build_mention_from(self, style=style)
 
 
 class Person(User, type='person'):
@@ -375,7 +375,17 @@ class EquationObject(RichTextBaseObject, type='equation'):
 
 
 class MentionBase(TypedObject[GenericObject], ABC, polymorphic_base=True):
-    """Base class for typed `Mention` objects."""
+    """Base class for typed `Mention` objects.
+
+    Note that this class is different to `MentionMixin`, which is used to
+    provide a `build_mention` method for objects that can be mentioned in Notion.
+    Here, we have a *class method* to build a mention object *from* the target object.
+    """
+
+    @classmethod
+    @abstractmethod
+    def build_mention_from(cls, *args: Any, **kwargs: Any) -> MentionObject:
+        """Build a mention object for this type of mention from the actual target object."""
 
 
 class MentionObject(RichTextBaseObject, type='mention'):
@@ -390,7 +400,7 @@ class MentionUser(MentionBase, type='user'):
     user: SerializeAsAny[User]
 
     @classmethod
-    def build_mention(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention_from(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         mention = cls.model_construct(user=user)
         # note that `href` is always `None` for user mentions, also we prepend the '@' to mimic server side
@@ -403,7 +413,7 @@ class MentionPage(MentionBase, type='page'):
     page: SerializeAsAny[ObjectRef]
 
     @classmethod
-    def build_mention(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention_from(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         page_ref = ObjectRef.build(page)
         mention = cls.model_construct(page=page_ref)
@@ -419,7 +429,7 @@ class MentionDatabase(MentionBase, type='database'):
     database: SerializeAsAny[ObjectRef]
 
     @classmethod
-    def build_mention(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention_from(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         db_ref = ObjectRef.build(db)
         mention = cls.model_construct(database=db_ref)
@@ -435,7 +445,7 @@ class MentionDate(MentionBase, type='date'):
     date: DateRange
 
     @classmethod
-    def build_mention(cls, date_range: DateRange, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention_from(cls, date_range: DateRange, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
         mention = cls.model_construct(date=date_range)
         # note that `href` is always `None` for date mentions
@@ -495,7 +505,9 @@ class EmojiObject(TypedObject[GenericObject], type='emoji'):
 class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
     """A Notion custom emoji object.
 
-    Within text a custom emoji is represented as a mention.
+    Within text a custom emoji is represented as a mention. For this
+    reason there is no `MentionCustomEmoji` class, but the `CustomEmojiObject`
+    itself can be used to build a mention object.
     """
 
     class TypeData(GenericObject):
@@ -505,12 +517,18 @@ class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
 
     custom_emoji: TypeData
 
-    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+    @classmethod
+    def build_mention_from(cls, custom_emoji: CustomEmojiObject, *, style: Annotations | None = None) -> MentionObject:
         style = deepcopy(style)
+        mention = cls.model_construct(custom_emoji=custom_emoji.custom_emoji)
         # note that `href` is always `None` for custom emoji mentions
         return MentionObject.model_construct(
-            plain_text=f':{self.custom_emoji.name}:', href=None, annotations=style, mention=self
+            plain_text=f':{custom_emoji.custom_emoji.name}:', href=None, annotations=style, mention=mention
         )
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        """Build a mention object for this custom emoji."""
+        return self.__class__.build_mention_from(self, style=style)
 
 
 class FileObject(TypedObject[GenericObject], polymorphic_base=True):
