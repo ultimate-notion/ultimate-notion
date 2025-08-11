@@ -6,7 +6,7 @@ Blocks are the base for all Notion content.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any, cast
+from typing import Any, TypeVar, cast
 from uuid import UUID
 
 from pydantic import Field, SerializeAsAny
@@ -87,7 +87,10 @@ class Page(DataObject, MentionMixin, object='page'):
         return MentionPage.build_mention_from(self, style=style)
 
 
-class Block(DataObject, TypedObject, object='block', polymorphic_base=True):
+T = TypeVar('T', bound=GenericObject)
+
+
+class Block(DataObject, TypedObject[T], object='block', polymorphic_base=True):
     """A standard block object in Notion.
 
     Calling the block will expose the nested data in the object.

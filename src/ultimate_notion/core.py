@@ -53,7 +53,7 @@ class Wrapper(ObjRefWrapper[GT], ABC):
 
     def __init__(self, *args: Any, **kwargs: Any):
         """Default constructor that also builds `obj_ref`."""
-        obj_api_type: type[obj_core.GenericObject] = self._obj_api_map_inv[self.__class__]
+        obj_api_type: type[GT] = self._obj_api_map_inv[self.__class__]
         self._obj_ref = obj_api_type.build(*args, **kwargs)
 
     def __pydantic_serializer__(self) -> SchemaSerializer:  # noqa: PLW3201

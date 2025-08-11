@@ -197,7 +197,7 @@ class BooleanFormula(FormulaResult, type=FormulaType.BOOLEAN.value):
 class Formula(PropertyValue, type='formula'):
     """A Notion formula property value."""
 
-    formula: FormulaResult | None = None
+    formula: SerializeAsAny[FormulaResult] | None = None
 
 
 class Relation(PropertyValue, type='relation'):
