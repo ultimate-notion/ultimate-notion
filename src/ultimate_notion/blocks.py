@@ -241,7 +241,7 @@ class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
 BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Block(CommentMixin[BT], DataObject[BT], ABC, wraps=obj_blocks.Block):
+class Block(CommentMixin[BT], ABC, wraps=obj_blocks.Block):
     """Abstract Notion block.
 
     Parent class of all block types.
@@ -315,7 +315,7 @@ AnyBlock: TypeAlias = Block[Any]
 """For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock], in user code."""
 
 
-class CaptionMixin(Block, wraps=obj_blocks.Block):
+class CaptionMixin(Block[BT], wraps=obj_blocks.Block):
     """Mixin for objects that can have captions."""
 
     @property
@@ -369,7 +369,7 @@ class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
         return self.rich_text.to_markdown()
 
 
-class Code(TextBlock[obj_blocks.Code], CaptionMixin, wraps=obj_blocks.Code):
+class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_blocks.Code):
     """Code block."""
 
     def __init__(
@@ -633,7 +633,7 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
         return ' / '.join(ancestor.title or 'Untitled Page' for ancestor in self.ancestors if is_page(ancestor)) + '\n'
 
 
-class Embed(CaptionMixin, Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
+class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
     """Embed block."""
 
     def __init__(self, url: str, *, caption: str | None = None) -> None:
@@ -659,7 +659,7 @@ class Embed(CaptionMixin, Block[obj_blocks.Embed], wraps=obj_blocks.Embed):
             return ''
 
 
-class Bookmark(CaptionMixin, Block[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
+class Bookmark(CaptionMixin[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
 
     def __init__(self, url: str, *, caption: str | None = None) -> None:
@@ -742,7 +742,7 @@ class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
 FT = TypeVar('FT', bound=obj_blocks.FileBase)
 
 
-class FileBaseBlock(CaptionMixin, Block[FT], ABC, wraps=obj_blocks.FileBase):
+class FileBaseBlock(CaptionMixin[FT], ABC, wraps=obj_blocks.FileBase):
     """Abstract Block for file-based blocks.
 
     Parent class of all file-based block types.
