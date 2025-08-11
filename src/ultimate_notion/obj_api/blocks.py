@@ -6,7 +6,7 @@ Blocks are the base for all Notion content.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any, TypeVar, cast
+from typing import Any, Generic, TypeVar, cast
 from uuid import UUID
 
 from pydantic import Field, SerializeAsAny
@@ -90,7 +90,7 @@ class Page(DataObject, MentionMixin, object='page'):
 T = TypeVar('T', bound=GenericObject)
 
 
-class Block(DataObject, TypedObject[T], object='block', polymorphic_base=True):
+class Block(DataObject, TypedObject[T], Generic[T], object='block', polymorphic_base=True):
     """A standard block object in Notion.
 
     Calling the block will expose the nested data in the object.
@@ -99,199 +99,247 @@ class Block(DataObject, TypedObject[T], object='block', polymorphic_base=True):
     id: UUID = None  # type: ignore
 
 
-class UnsupportedBlock(Block, type='unsupported'):
+class UnsupportedBlockTypeData(GenericObject):
+    """Type data for `UnsupportedBlock`."""
+
+
+class UnsupportedBlock(Block[UnsupportedBlockTypeData], type='unsupported'):
     """A placeholder for unsupported blocks in the API."""
 
-    class TypeData(GenericObject): ...
-
-    unsupported: TypeData = TypeData()
+    unsupported: UnsupportedBlockTypeData = UnsupportedBlockTypeData()
 
 
-class TextBlock(Block, ABC):
+class TextBlock(Block[T], Generic[T]):
     """A standard abstract text block object in Notion."""
 
 
-class Paragraph(TextBlock, type='paragraph'):
+class ParagraphTypeData(GenericObject):
+    """Type data for `Paragraph` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    color: Color | BGColor = Color.DEFAULT
+
+
+class Paragraph(TextBlock[ParagraphTypeData], type='paragraph'):
     """A paragraph block in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        color: Color | BGColor = Color.DEFAULT
-
-    paragraph: TypeData = TypeData()
+    paragraph: ParagraphTypeData = ParagraphTypeData()
 
 
-class Heading(TextBlock, ABC):
+class HeadingTypeData(GenericObject):
+    """Type data for `Heading` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    color: Color | BGColor = Color.DEFAULT
+    is_toggleable: bool = False
+
+
+class Heading(TextBlock[HeadingTypeData]):
     """Abstract Heading block."""
-
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        color: Color | BGColor = Color.DEFAULT
-        is_toggleable: bool = False
 
 
 class Heading1(Heading, type='heading_1'):
     """A heading_1 block in Notion."""
 
-    heading_1: Heading.TypeData = Heading.TypeData()
+    heading_1: HeadingTypeData = HeadingTypeData()
 
 
 class Heading2(Heading, type='heading_2'):
     """A heading_2 block in Notion."""
 
-    heading_2: Heading.TypeData = Heading.TypeData()
+    heading_2: HeadingTypeData = HeadingTypeData()
 
 
 class Heading3(Heading, type='heading_3'):
     """A heading_3 block in Notion."""
 
-    heading_3: Heading.TypeData = Heading.TypeData()
+    heading_3: HeadingTypeData = HeadingTypeData()
 
 
-class Quote(TextBlock, type='quote'):
+class QuoteTypeData(GenericObject):
+    """Type data for `Quote` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    color: Color | Color = Color.DEFAULT
+
+
+class Quote(TextBlock[QuoteTypeData], type='quote'):
     """A quote block in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        color: Color | Color = Color.DEFAULT
-
-    quote: TypeData = TypeData()
+    quote: QuoteTypeData = QuoteTypeData()
 
 
-class Code(TextBlock, type='code'):
+class CodeTypeData(GenericObject):
+    """Type data for `Code` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    caption: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    language: CodeLang = CodeLang.PLAIN_TEXT
+
+
+class Code(TextBlock[CodeTypeData], type='code'):
     """A code block in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        caption: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        language: CodeLang = CodeLang.PLAIN_TEXT
-
-    code: TypeData = TypeData()
+    code: CodeTypeData = CodeTypeData()
 
 
-class Callout(TextBlock, type='callout'):
+class CalloutTypeData(GenericObject):
+    """Type data for `Callout` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject = None  # type: ignore
+    color: Color | BGColor = BGColor.GRAY
+
+
+class Callout(TextBlock[CalloutTypeData], type='callout'):
     """A callout block in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject = None  # type: ignore
-        color: Color | BGColor = BGColor.GRAY
-
-    callout: TypeData = TypeData()
+    callout: CalloutTypeData = CalloutTypeData()
 
 
-class BulletedListItem(TextBlock, type='bulleted_list_item'):
+class BulletedListItemTypeData(GenericObject):
+    """Type data for `BulletedListItem` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    color: Color | BGColor = Color.DEFAULT
+
+
+class BulletedListItem(TextBlock[BulletedListItemTypeData], type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        color: Color | BGColor = Color.DEFAULT
-
-    bulleted_list_item: TypeData = TypeData()
+    bulleted_list_item: BulletedListItemTypeData = BulletedListItemTypeData()
 
 
-class NumberedListItem(TextBlock, type='numbered_list_item'):
+class NumberedListItemTypeData(GenericObject):
+    """Type data for `NumberedListItem` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    color: Color | BGColor = Color.DEFAULT
+
+
+class NumberedListItem(TextBlock[NumberedListItemTypeData], type='numbered_list_item'):
     """A numbered list item in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        color: Color | BGColor = Color.DEFAULT
-
-    numbered_list_item: TypeData = TypeData()
+    numbered_list_item: NumberedListItemTypeData = NumberedListItemTypeData()
 
 
-class ToDo(TextBlock, type='to_do'):
+class ToDoTypeData(GenericObject):
+    """Type data for `ToDo` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    checked: bool = False
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    color: Color | BGColor = Color.DEFAULT
+
+
+class ToDo(TextBlock[ToDoTypeData], type='to_do'):
     """A todo list item in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        checked: bool = False
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        color: Color | BGColor = Color.DEFAULT
-
-    to_do: TypeData = TypeData()
+    to_do: ToDoTypeData = ToDoTypeData()
 
 
-class Toggle(TextBlock, type='toggle'):
+class ToggleTypeData(GenericObject):
+    """Type data for `Toggle` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    color: Color | BGColor = Color.DEFAULT
+
+
+class Toggle(TextBlock[ToggleTypeData], type='toggle'):
     """A toggle list item in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        color: Color | BGColor = Color.DEFAULT
-
-    toggle: TypeData = TypeData()
+    toggle: ToggleTypeData = ToggleTypeData()
 
 
-class Divider(Block, type='divider'):
+class DividerTypeData(GenericObject):
+    """Type data for `Divider` block."""
+
+
+class Divider(Block[DividerTypeData], type='divider'):
     """A divider block in Notion."""
 
-    class TypeData(GenericObject): ...
-
-    divider: TypeData = TypeData()
+    divider: DividerTypeData = DividerTypeData()
 
 
-class TableOfContents(Block, type='table_of_contents'):
+class TableOfContentsTypeData(GenericObject):
+    """Type data for `TableOfContents` block."""
+
+    color: Color | BGColor = Color.DEFAULT
+
+
+class TableOfContents(Block[TableOfContentsTypeData], type='table_of_contents'):
     """A table_of_contents block in Notion."""
 
-    class TypeData(GenericObject):
-        color: Color | BGColor = Color.DEFAULT
-
-    table_of_contents: TypeData = TypeData()
+    table_of_contents: TableOfContentsTypeData = TableOfContentsTypeData()
 
 
-class Breadcrumb(Block, type='breadcrumb'):
+class BreadcrumbTypeData(GenericObject):
+    """Type data for `Breadcrumb` block."""
+
+
+class Breadcrumb(Block[BreadcrumbTypeData], type='breadcrumb'):
     """A breadcrumb block in Notion."""
 
-    class TypeData(GenericObject): ...
-
-    breadcrumb: TypeData = TypeData()
+    breadcrumb: BreadcrumbTypeData = BreadcrumbTypeData()
 
 
-class Embed(Block, type='embed'):
+class EmbedTypeData(GenericObject):
+    """Type data for `Embed` block."""
+
+    url: str = None  # type: ignore
+    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
+
+
+class Embed(Block[EmbedTypeData], type='embed'):
     """An embed block in Notion."""
 
-    class TypeData(GenericObject):
-        url: str = None  # type: ignore
-        caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
-
-    embed: TypeData = TypeData()
+    embed: EmbedTypeData = EmbedTypeData()
 
 
-class Bookmark(Block, type='bookmark'):
+class BookmarkTypeData(GenericObject):
+    """Type data for `Bookmark` block."""
+
+    url: str = None  # type: ignore
+    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
+
+
+class Bookmark(Block[BookmarkTypeData], type='bookmark'):
     """A bookmark block in Notion."""
 
-    class TypeData(GenericObject):
-        url: str = None  # type: ignore
-        caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
-
-    bookmark: TypeData = TypeData()
+    bookmark: BookmarkTypeData = BookmarkTypeData()
 
 
-class LinkPreview(Block, type='link_preview'):
+class LinkPreviewTypeData(GenericObject):
+    """Type data for `LinkPreview` block."""
+
+    url: str = None  # type: ignore
+
+
+class LinkPreview(Block[LinkPreviewTypeData], type='link_preview'):
     """A link_preview block in Notion."""
 
-    class TypeData(GenericObject):
-        url: str = None  # type: ignore
-
-    link_preview: TypeData = TypeData()
+    link_preview: LinkPreviewTypeData = LinkPreviewTypeData()
 
 
-class Equation(Block, type='equation'):
+class EquationTypeData(GenericObject):
+    """Type data for `Equation` block."""
+
+    expression: str | None = None
+
+
+class Equation(Block[EquationTypeData], type='equation'):
     """An equation block in Notion."""
 
-    class TypeData(GenericObject):
-        expression: str | None = None
-
-    equation: TypeData = TypeData()
+    equation: EquationTypeData = EquationTypeData()
 
 
-class FileBase(Block, ABC):
+class FileBase(Block[FileObject], ABC):
     """A abstract block referencing a FileObject."""
 
 
@@ -319,93 +367,113 @@ class PDF(FileBase, type='pdf'):
     pdf: SerializeAsAny[FileObject] = None  # type: ignore
 
 
-class ChildPage(Block, type='child_page'):
+class ChildPageTypeData(GenericObject):
+    """Type data for `ChildPage` block."""
+
+    title: str = None  # type: ignore
+
+
+class ChildPage(Block[ChildPageTypeData], type='child_page'):
     """A child page block in Notion."""
 
-    class TypeData(GenericObject):
-        title: str = None  # type: ignore
-
-    child_page: TypeData = TypeData()
+    child_page: ChildPageTypeData = ChildPageTypeData()
 
 
-class ChildDatabase(Block, type='child_database'):
+class ChildDatabaseTypeData(GenericObject):
+    """Type data for `ChildDatabase` block."""
+
+    title: str = None  # type: ignore
+
+
+class ChildDatabase(Block[ChildDatabaseTypeData], type='child_database'):
     """A child database block in Notion."""
 
-    class TypeData(GenericObject):
-        title: str = None  # type: ignore
-
-    child_database: TypeData = TypeData()
+    child_database: ChildDatabaseTypeData = ChildDatabaseTypeData()
 
 
-class Column(Block, type='column'):
+class ColumnTypeData(GenericObject):
+    """Type data for `Column` block."""
+
+    # note that children will not be populated when getting this block
+    # https://developers.notion.com/changelog/column-list-and-column-support
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    width_ratio: float | None = None
+
+
+class Column(Block[ColumnTypeData], type='column'):
     """A column block in Notion."""
 
-    class TypeData(GenericObject):
-        # note that children will not be populated when getting this block
-        # https://developers.notion.com/changelog/column-list-and-column-support
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-        width_ratio: float | None = None
-
-    column: TypeData = TypeData()
+    column: ColumnTypeData = ColumnTypeData()
 
     @classmethod
     def build(cls, width_ratio: float | None = None) -> Column:
-        return Column.model_construct(column=cls.TypeData.model_construct(children=[], width_ratio=width_ratio))
+        return Column.model_construct(column=ColumnTypeData.model_construct(children=[], width_ratio=width_ratio))
 
 
-class ColumnList(Block, type='column_list'):
+class ColumnListTypeData(GenericObject):
+    """Type data for `ColumnList` block."""
+
+    # note that children will not be populated when getting this block
+    # https://developers.notion.com/changelog/column-list-and-column-support
+    children: list[Column] = Field(default_factory=list)
+
+
+class ColumnList(Block[ColumnListTypeData], type='column_list'):
     """A column list block in Notion."""
 
-    class TypeData(GenericObject):
-        # note that children will not be populated when getting this block
-        # https://developers.notion.com/changelog/column-list-and-column-support
-        children: list[Column] = Field(default_factory=list)
-
-    column_list: TypeData = TypeData()
+    column_list: ColumnListTypeData = ColumnListTypeData()
 
 
-class TableRow(Block, type='table_row'):
+class TableRowTypeData(GenericObject):
+    """Type data for `TableRow` block."""
+
+    cells: list[list[SerializeAsAny[RichTextBaseObject]]] = Field(default_factory=list)
+
+
+class TableRow(Block[TableRowTypeData], type='table_row'):
     """A table_row block in Notion."""
 
-    class TypeData(GenericObject):
-        cells: list[list[SerializeAsAny[RichTextBaseObject]]] = Field(default_factory=list)
-
-    table_row: TypeData = TypeData()
+    table_row: TableRowTypeData = TableRowTypeData()
 
     @classmethod
     def build(cls, n_cells: int) -> TableRow:
-        return TableRow.model_construct(table_row=cls.TypeData.model_construct(cells=[[] for _ in range(n_cells)]))
+        return TableRow.model_construct(table_row=TableRowTypeData.model_construct(cells=[[] for _ in range(n_cells)]))
 
 
-class Table(Block, type='table'):
+class TableTypeData(GenericObject):
+    """Type data for `Table` block."""
+
+    table_width: int = 0
+    has_column_header: bool = False
+    has_row_header: bool = False
+    # note that children will not be populated when getting this block
+    # https://developers.notion.com/reference/block#table-blocks
+    children: list[TableRow] = Field(default_factory=list)
+
+
+class Table(Block[TableTypeData], type='table'):
     """A table block in Notion."""
 
-    class TypeData(GenericObject):
-        table_width: int = 0
-        has_column_header: bool = False
-        has_row_header: bool = False
-
-        # note that children will not be populated when getting this block
-        # https://developers.notion.com/reference/block#table-blocks
-        children: list[TableRow] = Field(default_factory=list)
-
-    table: TypeData = TypeData()
+    table: TableTypeData = TableTypeData()
 
 
-class LinkToPage(Block, type='link_to_page'):
+class LinkToPage(Block[ParentRef], type='link_to_page'):
     """A link_to_page block in Notion."""
 
     link_to_page: SerializeAsAny[ParentRef] = None  # type: ignore
 
 
-class SyncedBlock(Block, type='synced_block'):
+class SyncedBlockTypeData(GenericObject):
+    """Type data for `SyncedBlock` block."""
+
+    synced_from: BlockRef | None = None
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+
+
+class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
     """A synced_block block in Notion - either original or synced."""
 
-    class TypeData(GenericObject):
-        synced_from: BlockRef | None = None
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-
-    synced_block: TypeData = TypeData()
+    synced_block: SyncedBlockTypeData = SyncedBlockTypeData()
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
@@ -416,11 +484,14 @@ class SyncedBlock(Block, type='synced_block'):
         return model_data
 
 
-class Template(Block, type='template'):
+class TemplateTypeData(GenericObject):
+    """Type data for `Template` block."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] | None = None
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+
+
+class Template(Block[TemplateTypeData], type='template'):
     """A template block in Notion."""
 
-    class TypeData(GenericObject):
-        rich_text: list[SerializeAsAny[RichTextBaseObject]] | None = None
-        children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-
-    template: TypeData = TypeData()
+    template: TemplateTypeData = TemplateTypeData()
