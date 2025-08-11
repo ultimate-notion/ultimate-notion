@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from abc import ABC
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, Protocol, TypeVar, cast
 from uuid import UUID
 
 from typing_extensions import Self
@@ -36,7 +36,7 @@ class ObjRefWrapper(Protocol[GT]):
     def obj_ref(self, value: GT) -> None: ...
 
 
-class Wrapper(ObjRefWrapper[GT], ABC):
+class Wrapper(ObjRefWrapper[GT], Generic[GT], ABC):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
     _obj_ref: GT
@@ -97,7 +97,7 @@ class Wrapper(ObjRefWrapper[GT], ABC):
 NO = TypeVar('NO', bound=obj_core.NotionObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class NotionObject(Wrapper[NO], ABC, wraps=obj_core.NotionObject):
+class NotionObject(Wrapper[NO], Generic[NO], ABC, wraps=obj_core.NotionObject):
     """A top-level Notion API resource."""
 
     @property
@@ -114,7 +114,7 @@ class NotionObject(Wrapper[NO], ABC, wraps=obj_core.NotionObject):
 NE = TypeVar('NE', bound=obj_core.NotionEntity)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
+class NotionEntity(NotionObject[NE], Generic[NE], ABC, wraps=obj_core.NotionEntity):
     def __eq__(self, other: object) -> bool:
         if other is None:
             return False

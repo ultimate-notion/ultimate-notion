@@ -6,7 +6,7 @@ import itertools
 import mimetypes
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, Generic, TypeAlias, TypeGuard, TypeVar, cast, overload
 
 import numpy as np
 from tabulate import tabulate
@@ -399,7 +399,10 @@ class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_
         return f'```{lang}\n{super().to_markdown()}\n```'
 
 
-class ColoredTextBlock(TextBlock[BT], ABC, wraps=obj_blocks.TextBlock):
+CCT = TypeVar('CCT', bound=obj_blocks.TextBlock)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+class ColoredTextBlock(TextBlock[CCT], Generic[CCT], wraps=obj_blocks.TextBlock):
     """Abstract Text block with color.
 
     Parent class of all text block types with color.
@@ -432,7 +435,10 @@ class Paragraph(
     """Paragraph block."""
 
 
-class Heading(ColoredTextBlock[BT], ChildrenMixin[obj_blocks.Heading], ABC, wraps=obj_blocks.Heading):
+HT = TypeVar('HT', bound=obj_blocks.Heading)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+class Heading(ColoredTextBlock[HT], ChildrenMixin[obj_blocks.Heading], Generic[HT], wraps=obj_blocks.Heading):
     """Abstract Heading block.
 
     Parent class of all heading block types.
@@ -642,12 +648,12 @@ class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
         self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else None
 
     @property
-    def url(self) -> str | None:
+    def url(self) -> str:
         """Return the URL of the embedded item."""
         return self.obj_ref.value.url
 
     @url.setter
-    def url(self, url: str | None) -> None:
+    def url(self, url: str) -> None:
         self.obj_ref.value.url = url
         self._update_in_notion()
 
