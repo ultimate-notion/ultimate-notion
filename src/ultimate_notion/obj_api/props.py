@@ -15,7 +15,7 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pendulum as pnd
 from pydantic import SerializeAsAny, field_validator, model_serializer
@@ -49,10 +49,8 @@ Source: https://developers.notion.com/reference/retrieve-a-page
 # Property Values #
 ###################
 
-T = TypeVar('T')
 
-
-class PropertyValue(TypedObject[T], polymorphic_base=True):
+class PropertyValue(TypedObject[Any], polymorphic_base=True):
     """Base class for Notion property values."""
 
     id: str = None  # type: ignore
