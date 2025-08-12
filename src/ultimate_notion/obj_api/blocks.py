@@ -6,7 +6,7 @@ Blocks are the base for all Notion content.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, TypeVar, cast
 from uuid import UUID
 
 from pydantic import Field, SerializeAsAny
@@ -87,10 +87,10 @@ class Page(DataObject, MentionMixin, object='page'):
         return MentionPage.build_mention_from(self, style=style)
 
 
-T = TypeVar('T', bound=GenericObject)
+GO = TypeVar('GO', bound=GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Block(DataObject, TypedObject[T], Generic[T], object='block', polymorphic_base=True):
+class Block(TypedObject[GO], DataObject, object='block', polymorphic_base=True):
     """A standard block object in Notion.
 
     Calling the block will expose the nested data in the object.
@@ -109,33 +109,52 @@ class UnsupportedBlock(Block[UnsupportedBlockTypeData], type='unsupported'):
     unsupported: UnsupportedBlockTypeData = UnsupportedBlockTypeData()
 
 
-class TextBlock(Block[T], Generic[T]):
+class TextBlockTypeData(GenericObject):
+    """Type data for `TextBlock`."""
+
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+
+
+TB = TypeVar('TB', bound=TextBlockTypeData)  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+class TextBlock(Block[TB]):
     """A standard abstract text block object in Notion."""
 
 
-class ParagraphTypeData(GenericObject):
-    """Type data for `Paragraph` block."""
+class ColoredTextBlockTypeData(TextBlockTypeData):
+    """Type data for `TextBlock` with color."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
     color: Color | BGColor = Color.DEFAULT
 
 
-class Paragraph(TextBlock[ParagraphTypeData], type='paragraph'):
+# ToDo: Use new syntax when requires-python >= 3.12
+CTB = TypeVar('CTB', bound=ColoredTextBlockTypeData)
+
+
+class ColoredTextBlock(TextBlock[CTB]):
+    """A standard abstract text block object in Notion with color."""
+
+
+class ParagraphTypeData(ColoredTextBlockTypeData):
+    """Type data for `Paragraph` block."""
+
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+
+
+class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):
     """A paragraph block in Notion."""
 
     paragraph: ParagraphTypeData = ParagraphTypeData()
 
 
-class HeadingTypeData(GenericObject):
+class HeadingTypeData(ColoredTextBlockTypeData):
     """Type data for `Heading` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-    color: Color | BGColor = Color.DEFAULT
     is_toggleable: bool = False
 
 
-class Heading(TextBlock[HeadingTypeData]):
+class Heading(ColoredTextBlock[HeadingTypeData]):
     """Abstract Heading block."""
 
 
@@ -157,24 +176,21 @@ class Heading3(Heading, type='heading_3'):
     heading_3: HeadingTypeData = HeadingTypeData()
 
 
-class QuoteTypeData(GenericObject):
+class QuoteTypeData(ColoredTextBlockTypeData):
     """Type data for `Quote` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-    color: Color | Color = Color.DEFAULT
 
 
-class Quote(TextBlock[QuoteTypeData], type='quote'):
+class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
     """A quote block in Notion."""
 
     quote: QuoteTypeData = QuoteTypeData()
 
 
-class CodeTypeData(GenericObject):
+class CodeTypeData(TextBlockTypeData):
     """Type data for `Code` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     caption: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     language: CodeLang = CodeLang.PLAIN_TEXT
 
@@ -185,73 +201,63 @@ class Code(TextBlock[CodeTypeData], type='code'):
     code: CodeTypeData = CodeTypeData()
 
 
-class CalloutTypeData(GenericObject):
+class CalloutTypeData(ColoredTextBlockTypeData):
     """Type data for `Callout` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject = None  # type: ignore
-    color: Color | BGColor = BGColor.GRAY
 
 
-class Callout(TextBlock[CalloutTypeData], type='callout'):
+class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
     """A callout block in Notion."""
 
     callout: CalloutTypeData = CalloutTypeData()
 
 
-class BulletedListItemTypeData(GenericObject):
+class BulletedListItemTypeData(ColoredTextBlockTypeData):
     """Type data for `BulletedListItem` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-    color: Color | BGColor = Color.DEFAULT
 
 
-class BulletedListItem(TextBlock[BulletedListItemTypeData], type='bulleted_list_item'):
+class BulletedListItem(ColoredTextBlock[BulletedListItemTypeData], type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
     bulleted_list_item: BulletedListItemTypeData = BulletedListItemTypeData()
 
 
-class NumberedListItemTypeData(GenericObject):
+class NumberedListItemTypeData(ColoredTextBlockTypeData):
     """Type data for `NumberedListItem` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-    color: Color | BGColor = Color.DEFAULT
 
 
-class NumberedListItem(TextBlock[NumberedListItemTypeData], type='numbered_list_item'):
+class NumberedListItem(ColoredTextBlock[NumberedListItemTypeData], type='numbered_list_item'):
     """A numbered list item in Notion."""
 
     numbered_list_item: NumberedListItemTypeData = NumberedListItemTypeData()
 
 
-class ToDoTypeData(GenericObject):
+class ToDoTypeData(ColoredTextBlockTypeData):
     """Type data for `ToDo` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     checked: bool = False
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-    color: Color | BGColor = Color.DEFAULT
 
 
-class ToDo(TextBlock[ToDoTypeData], type='to_do'):
+class ToDo(ColoredTextBlock[ToDoTypeData], type='to_do'):
     """A todo list item in Notion."""
 
     to_do: ToDoTypeData = ToDoTypeData()
 
 
-class ToggleTypeData(GenericObject):
+class ToggleTypeData(ColoredTextBlockTypeData):
     """Type data for `Toggle` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-    color: Color | BGColor = Color.DEFAULT
 
 
-class Toggle(TextBlock[ToggleTypeData], type='toggle'):
+class Toggle(ColoredTextBlock[ToggleTypeData], type='toggle'):
     """A toggle list item in Notion."""
 
     toggle: ToggleTypeData = ToggleTypeData()
