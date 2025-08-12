@@ -6,7 +6,7 @@ import itertools
 import mimetypes
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Generic, TypeAlias, TypeGuard, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, overload
 
 import numpy as np
 from tabulate import tabulate
@@ -238,10 +238,10 @@ class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
         return comments
 
 
-BT = TypeVar('BT', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
+B = TypeVar('B', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Block(CommentMixin[BT], ABC, wraps=obj_blocks.Block):
+class Block(CommentMixin[B], ABC, wraps=obj_blocks.Block):
     """Abstract Notion block.
 
     Parent class of all block types.
@@ -255,7 +255,7 @@ class Block(CommentMixin[BT], ABC, wraps=obj_blocks.Block):
     def reload(self) -> Self:
         """Reload the block from the API."""
         session = get_active_session()
-        self.obj_ref = cast(BT, session.api.blocks.retrieve(self.id))
+        self.obj_ref = cast(B, session.api.blocks.retrieve(self.id))
         return self
 
     def _update_in_notion(self, *, exclude_attrs: Sequence[str] | None = None) -> None:
@@ -315,7 +315,7 @@ AnyBlock: TypeAlias = Block[Any]
 """For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock], in user code."""
 
 
-class CaptionMixin(Block[BT], wraps=obj_blocks.Block):
+class CaptionMixin(Block[B], wraps=obj_blocks.Block):
     """Mixin for objects that can have captions."""
 
     @property
@@ -331,7 +331,7 @@ class CaptionMixin(Block[BT], wraps=obj_blocks.Block):
         self._update_in_notion()
 
 
-class TextBlock(Block[BT], ABC, wraps=obj_blocks.TextBlock):
+class TextBlock(Block[B], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Text block.
 
     Parent class of all text block types.
@@ -399,10 +399,12 @@ class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_
         return f'```{lang}\n{super().to_markdown()}\n```'
 
 
-CCT = TypeVar('CCT', bound=obj_blocks.TextBlock)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+
+TB = TypeVar('TB', bound=obj_blocks.ColoredTextBlock)
 
 
-class ColoredTextBlock(TextBlock[CCT], Generic[CCT], wraps=obj_blocks.TextBlock):
+class ColoredTextBlock(TextBlock[TB], wraps=obj_blocks.ColoredTextBlock):
     """Abstract Text block with color.
 
     Parent class of all text block types with color.
@@ -415,17 +417,21 @@ class ColoredTextBlock(TextBlock[CCT], Generic[CCT], wraps=obj_blocks.TextBlock)
         color: Color | BGColor = Color.DEFAULT,
     ) -> None:
         super().__init__(text)
-        self.obj_ref.value.rich_text = Text(text).obj_ref
-        self.obj_ref.value.color = color
+        value = self._get_value()
+        value.rich_text = Text(text).obj_ref
+        value.color = color
+
+    def _get_value(self) -> obj_blocks.ColoredTextBlockTypeData:
+        return cast(obj_blocks.ColoredTextBlockTypeData, self.obj_ref.value)
 
     @property
     def color(self) -> Color | BGColor:
         """Return the color of the text block."""
-        return self.obj_ref.value.color
+        return self._get_value().color
 
     @color.setter
     def color(self, color: Color | BGColor) -> None:
-        self.obj_ref.value.color = color
+        self._get_value().color = color
         self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
@@ -435,10 +441,11 @@ class Paragraph(
     """Paragraph block."""
 
 
-HT = TypeVar('HT', bound=obj_blocks.Heading)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+HT = TypeVar('HT', bound=obj_blocks.Heading)
 
 
-class Heading(ColoredTextBlock[HT], ChildrenMixin[obj_blocks.Heading], Generic[HT], wraps=obj_blocks.Heading):
+class Heading(ColoredTextBlock[HT], ChildrenMixin[obj_blocks.Heading], wraps=obj_blocks.Heading):
     """Abstract Heading block.
 
     Parent class of all heading block types.
