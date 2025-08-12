@@ -279,8 +279,10 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
         match value := self.obj_ref.formula.value:
             case DateRange():
                 return value.to_pendulum() if value else None
-            case _:
+            case str() | int() | float():
                 return value
+            case _:
+                return None
 
     @property
     def value_type(self) -> FormulaType | None:
