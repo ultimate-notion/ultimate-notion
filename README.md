@@ -135,9 +135,9 @@ Documentation is created using [Material for MkDocs] and hosted on [GitHub Pages
 [Docs-link]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/build-dev-docs.yml
 [PyPI_ver-image]: https://img.shields.io/pypi/v/ultimate-notion.svg?logo=pypi&label=PyPI&logoColor=gold
 [PyPI_ver-link]: https://pypi.org/project/ultimate-notion/
-[PyPI_down-image]: https://img.shields.io/pypi/dm/ultimate-notion.svg?color=blue&label=Downloads&logo=pypi&logoColor=gold
+[PyPI_down-image]: https://img.shields.io/pepy/dt/ultimate-notion?style=flat&logo=python&logoColor=gold&label=Downloads
 [PyPI_down-link]: https://clickpy.clickhouse.com/dashboard/ultimate-notion
-[PyPI_py-image]:https://img.shields.io/pepy/dt/ultimate-notion?style=flat&logo=python&logoColor=gold&label=Downloads
+[PyPI_py-image]: https://img.shields.io/pypi/pyversions/ultimate-notion.svg?logo=python&label=Python&logoColor=gold
 [PyPI_py-link]: https://pypi.org/project/ultimate-notion/
 [hatch-image]: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
 [hatch-link]: https://github.com/pypa/hatch
