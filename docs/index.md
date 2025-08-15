@@ -20,7 +20,7 @@ Ultimate Notion is the ultimate Python client for [Notion] with a rich set of fe
 
 👉 Want to learn more? Explore the full [feature breakdown](features.md).
 
-Ultimate Notion is distributed under the terms of the [MIT] license.
+Ultimate Notion is released under the terms of the [MIT] license.
 
 ## Navigation
 

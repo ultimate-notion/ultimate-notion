@@ -105,10 +105,10 @@ Check out this [page about contributing] for more details.
 
 ## 📄 License & Credits
 
-Ultimate Notion is distributed under the terms of the [MIT license](LICENSE.txt).
-Ultimate Notion is built on top of [notion-sdk-py].
-To start this project off a lot of inspiration and code was taken from [notional] and the overall project setup from [hatch].
-The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pages].
+Ultimate Notion is released under the terms of the [MIT license](LICENSE.txt).
+It is built on top of [notion-sdk-py] and was initially inspired by [notional],
+with the overall project structure adapted from [hatch].
+Documentation is created using [Material for MkDocs] and hosted on [GitHub Pages].
 
 [Notion]: https://www.notion.so/
 [hatch]: https://hatch.pypa.io/
@@ -136,8 +136,8 @@ The documentation is made with [Material for MkDocs] and is hosted on [GitHub Pa
 [PyPI_ver-image]: https://img.shields.io/pypi/v/ultimate-notion.svg?logo=pypi&label=PyPI&logoColor=gold
 [PyPI_ver-link]: https://pypi.org/project/ultimate-notion/
 [PyPI_down-image]: https://img.shields.io/pypi/dm/ultimate-notion.svg?color=blue&label=Downloads&logo=pypi&logoColor=gold
-[PyPI_down-link]: https://pypistats.org/packages/ultimate-notion
-[PyPI_py-image]: https://img.shields.io/pypi/pyversions/ultimate-notion.svg?logo=python&label=Python&logoColor=gold
+[PyPI_down-link]: https://clickpy.clickhouse.com/dashboard/ultimate-notion
+[PyPI_py-image]:https://img.shields.io/pepy/dt/ultimate-notion?style=flat&logo=python&logoColor=gold&label=Downloads
 [PyPI_py-link]: https://pypi.org/project/ultimate-notion/
 [hatch-image]: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
 [hatch-link]: https://github.com/pypa/hatch
