@@ -435,3 +435,35 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
             exist_option = uno.Option(name='Cat3', color=uno.Color.GREEN)
             # trying to update the color of an existing option
             db.schema[prop].options = [exist_option]  # type: ignore[attr-defined]
+
+
+@pytest.mark.vcr()
+def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
+    options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
+
+    class OrigSchema(uno.Schema, db_title='Bind DB Test'):
+        name = uno.PropType.Title('Name')
+        cat = uno.PropType.Select('Category', options=options)
+        tags = uno.PropType.MultiSelect('Tags', options=options)
+
+    db = notion.create_db(parent=root_page, schema=OrigSchema)
+
+    # Check the schema properties
+    assert isinstance(db.schema.name, uno.PropType.Title)
+    assert db.schema.cat.options == options  # type: ignore[attr-defined]
+    assert db.schema.tags.options == options  # type: ignore[attr-defined]
+
+    class ConsistentSchema(uno.Schema):
+        my_name = uno.PropType.Title('Name')
+        my_cat = uno.PropType.Select('Category', options=options)
+        my_tags = uno.PropType.MultiSelect('Tags', options=options)
+
+    ConsistentSchema.bind_db(db)
+
+    # Check the schema attribute names
+    assert isinstance(db.schema.my_name, uno.PropType.Title)
+    assert db.schema.my_cat.options == options  # type: ignore[attr-defined]
+    assert db.schema.my_tags.options == options  # type: ignore[attr-defined]
+    assert not hasattr(db.schema, 'name')
+    assert not hasattr(db.schema, 'cat')
+    assert not hasattr(db.schema, 'tags')

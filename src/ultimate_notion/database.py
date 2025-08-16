@@ -109,13 +109,13 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         cls_name = f'{camel_case(title)}Schema'
         attrs = {'_props': [Property.wrap_obj_ref(v) for v in obj_ref.properties.values()]}
         schema: type[Schema] = type(cls_name, (Schema,), attrs, db_title=title)
-        schema.bind_db(self)
+        schema._bind_db(self)
         return schema
 
     def _set_schema(self, schema: type[Schema], *, during_init: bool) -> None:
         """Set a custom schema in order to change the Python variables names."""
         self.schema.assert_consistency_with(schema, during_init=during_init)
-        schema.bind_db(self)
+        schema._bind_db(self)
         self._schema = schema
 
     @property
