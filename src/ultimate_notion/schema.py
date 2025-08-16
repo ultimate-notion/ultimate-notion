@@ -348,7 +348,7 @@ class Schema(metaclass=SchemaType):
     _database: Database | None = None
     _props: list[Property]
 
-    def __init_subclass__(cls, db_title: str | None, **kwargs: Any):
+    def __init_subclass__(cls, db_title: str | None = None, **kwargs: Any):
         if db_title is not None:
             db_title = rich_text.Text(db_title)
         cls._db_title = db_title
@@ -562,12 +562,19 @@ class Schema(metaclass=SchemaType):
             raise SchemaNotBoundError(cls)
 
     @classmethod
-    def bind_db(cls, db: Database) -> None:
-        """Bind this schema to the corresponding database for back-reference."""
-        # ToDo: If `None` (default) is passed, search for the database `db_title`
-        # and bind it to this schema.
+    def _bind_db(cls, db: Database) -> None:
+        """Bind this schema to the corresponding database for back-reference without setting it in `db`."""
+        # Needed to break the recursion when setting a schema in Database
         cls._database = db
         cls._set_obj_refs()
+
+    @classmethod
+    def bind_db(cls, db: Database) -> None:
+        """Bind this schema to the corresponding database for back-reference and vice versa."""
+        # ToDo: If `None` (default) is passed, search for the database `db_title`
+        # and bind it to this schema.
+        db.schema = cls
+        cls._bind_db(db)
 
     @classmethod
     def is_bound(cls) -> bool:
@@ -813,7 +820,7 @@ class Formula(Property[obj_schema.Formula], wraps=obj_schema.Formula):
         self._update_prop(self.obj_ref)
 
 
-class SelfRef(Schema, db_title=None):
+class SelfRef(Schema):
     """Target schema for self-referencing database relations."""
 
     _ = Title('title')  # mandatory title property, used for nothing.
@@ -1100,7 +1107,7 @@ class Button(Property[obj_schema.Button], wraps=obj_schema.Button):
     allowed_at_creation = False
 
 
-class DefaultSchema(Schema, db_title=None):
+class DefaultSchema(Schema):
     # Default database schema of Notion.
     #
     # As inferred by just creating an empty database in the Notion UI.
