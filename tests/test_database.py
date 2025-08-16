@@ -24,7 +24,7 @@ def test_schema(article_db: uno.Database) -> None:
     assert issubclass(ref_schema, uno.Schema)
     db_schema = {
         'Name': uno.PropType.Title(),
-        'Cost': uno.PropType.Number(uno.NumberFormat.DOLLAR),
+        'Cost': uno.PropType.Number(format=uno.NumberFormat.DOLLAR),
         'Description': uno.PropType.Text(),
     }
     assert ref_schema.to_dict() == db_schema

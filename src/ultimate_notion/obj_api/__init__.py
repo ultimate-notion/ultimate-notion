@@ -86,3 +86,5 @@ __all__ = ['NotionAPI', 'create_notion_client']
 #       Idea: Use a sentinel value, e.g. API_RESPONSE = object() as default value for fields that are only given
 #       by the API and not sent to the API. This way we can differentiate between the two cases.
 #       Maybe use T_UNSET und UNSET like in endpoints already used.
+# ToDo: This would also allow to have a in GenericObject an __eq__ that ignores unset fields by the Notion API.
+# .      recuding code in SelectOption, Relation and Rollup.

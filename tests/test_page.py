@@ -295,7 +295,7 @@ def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page
     customer.reload()  # reload to get the updated relation
     time.sleep(3)  # wait for the changes to be applied on the server side
 
-    assert_eventually(lambda: len(customer.props.purchases) == n_prop_items)  # type: ignore[attr-defined]
+    assert_eventually(lambda: len(customer.props.purchases) == n_prop_items)
 
 
 @pytest.mark.vcr()
@@ -318,8 +318,8 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
     item = Item.create(name=text, desc=text)
     item.reload()  # reload to clear cache and retrieve the page again
 
-    assert len(item.props.name.mentions) == n_mentions  # type: ignore[attr-defined]
-    assert len(item.props.desc.mentions) == n_mentions  # type: ignore[attr-defined]
+    assert len(item.props.name.mentions) == n_mentions
+    assert len(item.props.desc.mentions) == n_mentions
 
 
 @pytest.mark.vcr()
@@ -355,19 +355,19 @@ def test_option_page_props(notion: uno.Session, root_page: uno.Page) -> None:
     s_options = {opt.name: opt for opt in select_options}
     ms_options = {opt.name: opt for opt in multi_select_options}
 
-    assert page1.props.status == s_options['Open']  # type: ignore[attr-defined]
-    page1.props.status = s_options['Blocked']  # type: ignore[attr-defined]
-    assert page1.props.status.name == 'Blocked'  # type: ignore[attr-defined]
-    page1.props.status = 'Closed'  # type: ignore[attr-defined]
+    assert page1.props.status == s_options['Open']
+    page1.props.status = s_options['Blocked']
+    assert page1.props.status.name == 'Blocked'
+    page1.props.status = 'Closed'
     assert page1.props.status.name == 'Closed'  # type: ignore[attr-defined]
 
-    assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]  # type: ignore[attr-defined]
-    page2.props.multi_status = [ms_options['Option 1']]  # type: ignore[attr-defined]
-    assert page2.props.multi_status == [ms_options['Option 1']]  # type: ignore[attr-defined]
-    page2.props.multi_status = 'Option 2'  # type: ignore[attr-defined]
-    assert page2.props.multi_status == [ms_options['Option 2']]  # type: ignore[attr-defined]
-    page2.props.multi_status = ['Option 1', 'Option 2']  # type: ignore[attr-defined]
-    assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]  # type: ignore[attr-defined]
+    assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]
+    page2.props.multi_status = [ms_options['Option 1']]
+    assert page2.props.multi_status == [ms_options['Option 1']]
+    page2.props.multi_status = 'Option 2'
+    assert page2.props.multi_status == [ms_options['Option 2']]
+    page2.props.multi_status = ['Option 1', 'Option 2']
+    assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]
 
 
 @pytest.mark.vcr()
