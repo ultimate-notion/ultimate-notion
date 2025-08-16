@@ -47,6 +47,18 @@ class SelectOption(GenericObject):
         """Create a `SelectOption` object from the given name and color."""
         return cls.model_construct(name=name, color=color)
 
+    def __eq__(self, other: object) -> bool:
+        """Compare SelectOption objects by all attributes except id."""
+        if not isinstance(other, SelectOption):
+            return False
+        return self.name == other.name and self.color == other.color and self.description == other.description
+
+    def __hash__(self) -> int:
+        """Return a hash of the SelectOption based on name, color, and description."""
+        # Convert description list to tuple for hashing if it exists
+        desc_tuple = tuple(self.description) if self.description else None
+        return hash((self.name, self.color, desc_tuple))
+
 
 class SelectGroup(GenericObject):
     """Group of options for status objects."""

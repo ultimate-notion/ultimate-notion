@@ -11,7 +11,7 @@ from ultimate_notion.rich_text import Text
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     """Option for select & multi-select property."""
 
-    def __init__(self, name: str, *, color: Color | str | None = None) -> None:
+    def __init__(self, name: str, *, color: Color | str = Color.DEFAULT) -> None:
         if isinstance(color, str):
             color = Color(color)
         super().__init__(name, color=color)
