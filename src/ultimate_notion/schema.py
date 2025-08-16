@@ -9,12 +9,12 @@ in a custom Schema when creating the database.
 
 ### Design Principles
 
-A schema is a subclass of `Schema` that holds `Property` objects with a name and an
-actual `PropertyType`, e.g. `Text`, `Number`.
+A schema is a subclass of `Schema` that holds `Property` objects, which define the name and the type of the
+property, e.g. `Text`, `Number`.
 
-The source of truth is always the `obj_ref` and a `PropertyType` holds only auxilliary
+The source of truth is always the `obj_ref` and a `Property` holds only auxilliary
 information if actually needed. Since the object references `obj_ref` must always point
-to the actual `obj_api.blocks.Database.properties` value if the schema is bound to an database,
+to the actual `obj_api.blocks.Database.properties` value if the schema is bound to a database,
 the method `_set_obj_refs` rewires this when a schema is used to create a database.
 """
 
@@ -24,14 +24,15 @@ from abc import ABC, ABCMeta
 from collections import Counter
 from collections.abc import Iterator
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast, overload
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
+from typing_extensions import Self
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion import rich_text
-from ultimate_notion.core import Wrapper, get_active_session, get_repr
+from ultimate_notion.core import NoDefault, Wrapper, get_active_session, get_repr
 from ultimate_notion.errors import (
     EmptyListError,
     InvalidAPIUsageError,
@@ -48,13 +49,15 @@ from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, dict_diff_str, is_notebook
 
 if TYPE_CHECKING:
+    from ultimate_notion.core import NoDefaultType
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
 
-T = TypeVar('T', bound=obj_schema.Property)
+T = TypeVar('T')
+PT = TypeVar('PT', bound=obj_schema.Property)
 
 
-class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
+class Property(Wrapper[PT], ABC, wraps=obj_schema.Property):
     """Base class for Notion property objects.
 
     A property defines the name and type of a property in a database, e.g. number, date, text, etc.
@@ -65,6 +68,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     """If the Notion API allows to create a new database with a property of this type"""
     _name: str | None = None  # name given by the user, not the Notion API, will match when set
     _owner: type[Schema] | None = None  # back reference to the schema
+    _attr_name: str | None = None  # name of the attribute within the schema holding the Property
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Property:
         if cls is Property:
@@ -80,15 +84,10 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         obj_api_type = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(**kwargs)
 
-    def __set_name__(self, owner: type[Schema], name: str) -> None:
-        self._owner = owner
-        # We do not set attr_name here to avoid a state that needs to be managed.
-        # self._attr_name = name
-
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
             return NotImplemented
-        other_obj_ref = cast(T, other.obj_ref)
+        other_obj_ref = cast(PT, other.obj_ref)
         # ToDo: FIXME, this is a serious bug! The next line is correct
         # return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
         return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == self.obj_ref.value)
@@ -97,7 +96,7 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         return hash(self.obj_ref.type) + hash(self.obj_ref.value)
 
     def __repr__(self) -> str:
-        return get_repr(self, name='Property', desc=self.__class__.__name__)
+        return get_repr(self, name=f'{self.__class__.__name__} Property', desc=self.name)
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -119,19 +118,20 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
             raise PropertyError(msg)
         return self._owner
 
-    def _update_prop(self, prop_obj: T) -> T:
+    def _update_prop(self, prop_obj: PT) -> PT:
         """Update the attributes of this property from a schema."""
         db = self._get_owner().get_db()
         session = get_active_session()
         session.api.databases.update(db=db.obj_ref, schema={self.name: prop_obj})
-        return cast(T, db.obj_ref.properties[self.name])
+        return cast(PT, db.obj_ref.properties[self.name])
 
     def _rename_prop(self, new_name: str | None) -> None:
         """Update the name of this property in the schema or delete it.
 
         !!! warning
 
-            The name of the Python attribute, i.e. `attr_name`, in the schema is also changed!
+            The name of the Python attribute, i.e. `attr_name`, in the schema is not the changed!
+            Use `prop.attr_name = "..."` to change the attribute name of a property `prop` within a schema.
         """
         schema = self._get_owner()
         db = schema.get_db()
@@ -141,13 +141,20 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
         )
         session.api.databases.update(db=db.obj_ref, schema=schema_obj)
 
-        delattr(schema, self.attr_name)
-        if new_name is not None:
+        if new_name is None:
+            schema._props = [prop for prop in schema.get_props() if prop.name != self.name]
+        else:
             self.obj_ref.name = new_name
             self._name = new_name
-            setattr(schema, rich_text.snake_case(new_name), self)
 
         schema._set_obj_refs()
+
+    @classmethod
+    def wrap_obj_ref(cls, obj_ref: PT) -> Self:
+        """Wrap the object reference for this property."""
+        obj = super().wrap_obj_ref(obj_ref)
+        obj._attr_name = rich_text.snake_case(obj.name)
+        return obj
 
     def delete(self) -> None:
         """Delete this property from the schema."""
@@ -177,12 +184,15 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
     @property
     def attr_name(self) -> str:
         """Return the Python attribute name of the property in the schema."""
-        schema = self._get_owner()
-        for attr_name, prop in schema.__dict__.items():
-            if prop is self:
-                return attr_name
-        msg = f'Property `{self.name}` not found in schema `{schema.__name__}`.'
-        raise PropertyError(msg)
+        if self._attr_name is None:
+            msg = f'Property `{self.name}` has no assigned attribute name yet.'
+            raise PropertyError(msg)
+        return self._attr_name
+
+    @attr_name.setter
+    def attr_name(self, name: str) -> None:
+        """Define the attribute name of the property within the schema."""
+        self._attr_name = name
 
     @property
     def prop_value(self) -> type[PropertyValue]:
@@ -198,12 +208,20 @@ class Property(Wrapper[T], ABC, wraps=obj_schema.Property):
 class SchemaType(ABCMeta):
     """Metaclass for the schema of a database.
 
-    This makes the schema class itself more user-friendly by providing a custom `__repr__` method
-    and letting it behave like a dictionary for the properties although it is a class, not an instance.
+    This makes the schema class itself more user-friendly by providing a `__magic__` methods, e.g.
+    letting it behave like a dictionary for the properties although it is a class, not an instance.
     """
 
     # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
-
+    def __new__(metacls, name: str, bases: tuple[type, ...], namespace: dict[str, object], **kwargs: Any) -> type[Schema]:
+        cls = super().__new__(metacls, name, bases, namespace, **kwargs)
+        # Consume data collected during __prepare__ to set the owner
+        props = namespace.get('_props', [])
+        for prop in props:
+            if isinstance(prop, Property):
+                prop._owner = cls
+        return cls
+    
     def __str__(cls: type[Schema]) -> str:  # type: ignore[misc]
         # We can only overwrite __str__ for a class in a metaclass
         return cls.as_table(tablefmt='simple')
@@ -222,19 +240,42 @@ class SchemaType(ABCMeta):
             )
             raise PropertyError(msg)
 
+        # handle updating existing properties
+        if (curr_prop := cls.get_prop(prop_name, default=None)) is not None:
+            if prop_type._attr_name is None:
+                prop_type._attr_name = curr_prop._attr_name
+            curr_prop.delete()
+
         prop_type._name = prop_name
-        prop_type.__set_name__(cls, rich_text.snake_case(prop_name))
+        prop_type._owner = cls
+        if prop_type._attr_name is None:
+            prop_type._attr_name = rich_text.snake_case(prop_name)
 
         session = get_active_session()
         session.api.databases.update(db=cls.get_db().obj_ref, schema={prop_name: prop_type.obj_ref})
-        super().__setattr__(rich_text.snake_case(prop_name), prop_type)  # type: ignore[misc]
-        prop_type.__set_name__(cls, rich_text.snake_case(prop_name))
+        cls._props.append(prop_type)
         cls._set_obj_refs()
 
         if isinstance(prop_type, Relation) and (prop_type._two_way_prop is not None):
             prop_type._rename_two_way_prop(prop if isinstance(prop := prop_type._two_way_prop, str) else prop.name)
 
+    def __getattr__(cls: type[Schema], name: str) -> Property:  # type: ignore
+        attr_name_props = SList([prop for prop in cls.get_props() if prop._attr_name == name])
+        try:
+            return attr_name_props.item()
+        except MultipleItemsError as e:
+            non_unique_attrs = ', '.join(str(attr) for attr in attr_name_props)
+            msg = (
+                f'Attribute {name} is not unique for properties {non_unique_attrs}! '
+                'Use indexing, i.e. [...], to access the property.'
+            )
+            raise AttributeError(msg) from e
+        except EmptyListError as e:
+            msg = f'Schema has no property with attribute name {name}.'
+            raise AttributeError(msg) from e
+
     def __setattr__(cls: type[Schema], name: str, value: Any) -> None:  # type: ignore[misc]
+        # Overwrite runtime setting of class attributes
         if isinstance(value, Property):
             curr_attr = getattr(cls, name, None)
             if curr_attr is None:  # adding a new property
@@ -244,14 +285,33 @@ class SchemaType(ABCMeta):
                     raise PropertyError(msg)
                 else:
                     value._name = None  # __setitem__ needs _name to be unset
+                    value._attr_name = name
                     cls[prop_name] = value
             elif isinstance(curr_attr, Property):  # updating an existing property
                 cls[curr_attr.name] = value
             else:
                 msg = f'Cannot override non-property `{name}` of type `{type(curr_attr)}`.'
                 raise PropertyError(msg)
-            value = cls.get_prop(value.name)
-        super().__setattr__(name, value)  # type: ignore[misc]
+        else:
+            super().__setattr__(name, value)  # type: ignore[misc]  # no clue why this results in a type problem
+
+    @classmethod
+    def __prepare__(cls: type[Schema], name: str, bases: tuple[type, ...], /, **kwargs: Any) -> dict[str, object]:  # type: ignore[misc]
+        # Overwrite compile-time setting of class attributes
+        class SaveAttrsInPropsListDict(dict[str, Any]):
+            """Safe the Property attributes at compile-time in `._props`."""
+
+            def __setitem__(self, key: str, value: str) -> None:
+                if isinstance(value, Property):
+                    value._attr_name = key
+                    self['_props'].append(value)
+                else:
+                    super().__setitem__(key, value)
+
+        attr_dict: dict[str, Any] = SaveAttrsInPropsListDict()
+        # since __prepare__ is called even before __new__, we have to set the attribute `_props` here
+        attr_dict['_props'] = []
+        return attr_dict
 
     def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
         return len(cls.get_props())
@@ -285,15 +345,16 @@ class SchemaModel(BaseModel):
 class Schema(metaclass=SchemaType):
     """Base class for the schema of a database."""
 
-    db_title: rich_text.Text | None
-    db_desc: rich_text.Text | None
+    _db_title: rich_text.Text | None
+    _db_desc: rich_text.Text | None
     _database: Database | None = None
+    _props: list[Property]
 
     def __init_subclass__(cls, db_title: str | None, **kwargs: Any):
         if db_title is not None:
             db_title = rich_text.Text(db_title)
-        cls.db_title = db_title
-        cls.db_desc = rich_text.Text(cls.__doc__) if cls.__doc__ is not None else None
+        cls._db_title = db_title
+        cls._db_desc = rich_text.Text(cls.__doc__) if cls.__doc__ is not None else None
         cls._validate()
         super().__init_subclass__(**kwargs)
 
@@ -322,16 +383,33 @@ class Schema(metaclass=SchemaType):
     @classmethod
     def get_props(cls) -> list[Property]:
         """Get all properties of this schema."""
-        return [prop for prop in cls.__dict__.values() if isinstance(prop, Property)]
+        return cls._props
+
+    @overload
+    @classmethod
+    def get_prop(cls, prop_name: str, *, default: NoDefaultType = ...) -> Property: ...
+    @overload
+    @classmethod
+    def get_prop(cls, prop_name: str, *, default: T) -> Property | T: ...
 
     @classmethod
-    def get_prop(cls, prop_name: str) -> Property:
+    def get_prop(cls, prop_name: str, *, default: object = NoDefault) -> Property | T:
         """Get a specific property from this schema assuming that property names are unique."""
         try:
             return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
         except EmptyListError as e:
-            msg = f'Property `{prop_name}` not found in database `{cls._database}`.'
-            raise SchemaError(msg) from e
+            if default is NoDefault:
+                if cls.is_bound():
+                    msg = f'Property `{prop_name}` not found in schema of `{cls._database}`.'
+                else:
+                    msg = f'Property `{prop_name}` not found in unbound schema.'
+                raise SchemaError(msg) from e
+            return cast(T, default)
+
+    @classmethod
+    def has_prop(cls, prop_name: str) -> bool:
+        """Check if a property exists in this schema."""
+        return cls.get_prop(prop_name, default=None) is not None
 
     @classmethod
     def get_ro_props(cls) -> list[Property]:
@@ -387,7 +465,7 @@ class Schema(metaclass=SchemaType):
             __base__=SchemaModel,
             **kwargs,
         )
-        model._db_title = cls.db_title
+        model._db_title = cls._db_title
         return model
 
     @classmethod

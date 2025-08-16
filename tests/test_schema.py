@@ -261,7 +261,7 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert 'Formula' not in [prop.name for prop in db.schema]
     assert not hasattr(db.schema, 'formula')
 
-    db.schema.tags.delete()  # type: ignore[attr-defined]
+    db.schema.tags.delete()
     assert 'Tags' not in [prop.name for prop in db.schema]
     assert not hasattr(db.schema, 'tags')
     db.reload()

@@ -106,17 +106,20 @@ employee_db.schema['Level'].options = [
 employee_db.schema.hiring_date = uno.PropType.Text()
 employee_db.schema.hiring_date.name = 'Hiring Date as String'
 employee_db.schema['Hiring Date as String'].name = 'Hiring Date'
+employee_db.schema.hiring_date.attr_name = 'hiring_date_as_str'
+assert employee_db.schema.hiring_date_as_str == uno.PropType.Text()
 ```
 
 This changes the salary property to a formula type, adds a partner level to the level property, changes
 the hiring date first to a text type and the name of it. This is then then followed by setting the name back
-using property access.
+using property access. It also shows how `attr_name` can be used to set the actual attribute name of the schema
+object to `hiring_date_as_str`.
 
 Of course, we can also delete properties:
 
 ```python
 del employee_db.schema['Salary']
-employee_db.schema.hiring_date.delete()
+employee_db.schema.hiring_date_as_str.delete()
 ```
 
 Again using the dictionary and the property approach.
