@@ -275,7 +275,7 @@ class SchemaType(ABCMeta):
         if isinstance(prop_type, Relation) and (prop_type._two_way_prop is not None):
             prop_type._rename_two_way_prop(prop if isinstance(prop := prop_type._two_way_prop, str) else prop.name)
 
-    def __getattr__(cls: type[Schema], name: str) -> Property:  # type: ignore
+    def __getattr__(cls: type[Schema], name: str) -> Property:  # type: ignore[misc]
         attr_name_props = SList([prop for prop in cls.get_props() if prop._attr_name == name])
         try:
             return attr_name_props.item()
