@@ -28,6 +28,19 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+
+class UnsetType:
+    """Sentinel type for missing default values."""
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return '<Unset>'
+
+
+Unset: UnsetType = UnsetType()
+
+
 BASE_URL_PATTERN = r'https://(www.)?notion.so/'
 UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
 

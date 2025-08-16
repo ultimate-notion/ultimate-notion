@@ -21,18 +21,6 @@ if TYPE_CHECKING:
     from ultimate_notion.user import User
 
 
-class NoDefaultType:
-    """Sentinel type for missing default values."""
-
-    __slots__ = ()
-
-    def __repr__(self) -> str:
-        return '<NoDefault>'
-
-
-NoDefault = NoDefaultType()
-
-
 class ObjRefWrapper(Protocol[GT]):
     """Wrapper for objects that have an obj_ref attribute.
 
