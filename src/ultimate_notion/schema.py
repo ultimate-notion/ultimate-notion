@@ -33,7 +33,7 @@ from typing_extensions import Self
 
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion import rich_text
-from ultimate_notion.core import NoDefault, Wrapper, get_active_session, get_repr
+from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.errors import (
     EmptyListError,
     InvalidAPIUsageError,
@@ -44,14 +44,15 @@ from ultimate_notion.errors import (
     SchemaError,
     SchemaNotBoundError,
 )
+from ultimate_notion.obj_api.core import Unset
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, dict_diff_str, is_notebook
 
 if TYPE_CHECKING:
-    from ultimate_notion.core import NoDefaultType
     from ultimate_notion.database import Database
+    from ultimate_notion.obj_api.core import UnsetType
     from ultimate_notion.page import Page
 
 T = TypeVar('T')
@@ -383,18 +384,18 @@ class Schema(metaclass=SchemaType):
 
     @overload
     @classmethod
-    def get_prop(cls, prop_name: str, *, default: NoDefaultType = ...) -> Property: ...
+    def get_prop(cls, prop_name: str, *, default: UnsetType = ...) -> Property: ...
     @overload
     @classmethod
     def get_prop(cls, prop_name: str, *, default: T) -> Property | T: ...
 
     @classmethod
-    def get_prop(cls, prop_name: str, *, default: object = NoDefault) -> Property | T:
+    def get_prop(cls, prop_name: str, *, default: object = Unset) -> Property | T:
         """Get a specific property from this schema assuming that property names are unique."""
         try:
             return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
         except EmptyListError as e:
-            if default is NoDefault:
+            if default is Unset:
                 if cls.is_bound():
                     msg = f'Property `{prop_name}` not found in schema of `{cls._database}`.'
                 else:
