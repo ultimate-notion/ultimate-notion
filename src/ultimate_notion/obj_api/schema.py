@@ -155,6 +155,21 @@ class Formula(Property, type='formula'):
     class TypeData(GenericObject):
         expression: str = None  # type: ignore
 
+        def __eq__(self, other: object) -> bool:
+            """Compare Formula objects by all attributes except id."""
+            # Sadly expressions are changed by the Notion API, e.g. 'prop("Name")' in our request becomes
+            # {{notion:block_property:title:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+            # ToDo: Implement a way to compare these expressions, which is possible in principle.
+            return isinstance(other, Formula.TypeData)
+
+        def __hash__(self) -> int:
+            """Return a hash of the Formula TypeData.
+
+            Since __eq__ always returns True due to API expression transformation,
+            we use a constant hash to maintain consistency with equality.
+            """
+            return hash(self.__class__)
+
     formula: TypeData = TypeData()
 
     @classmethod
@@ -195,6 +210,17 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
         synced_property_name: str = None  # type: ignore
         synced_property_id: str | None = None
 
+        def __eq__(self, other: object) -> bool:
+            """Compare DualPropertyRelation objects by all attributes except id."""
+            if not isinstance(other, DualPropertyRelation.TypeData):
+                return False
+            # we skip the id as this is set by the Notion API.
+            return self.synced_property_name == other.synced_property_name
+
+        def __hash__(self) -> int:
+            """Return a hash of the DualPropertyRelation TypeData based on synced_property_name."""
+            return hash(self.synced_property_name)
+
     dual_property: TypeData = TypeData()
 
     @classmethod
@@ -203,6 +229,9 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
 
         `dbref` must be either a string or UUID.
         """
+        # No `synced_property_name` is set since it will be ignored by the Notion API.
+        # Thus we first get the default two-way relation name, which we gonna change later.
+        # See: https://developers.notion.com/reference/property-schema-object#dual-property-relation-configuration
         rel = DualPropertyRelation.model_construct(database_id=dbref)
         return Relation.model_construct(relation=rel)
 
@@ -231,6 +260,20 @@ class Rollup(Property, type='rollup'):
         @classmethod
         def validate_enum_field(cls, field: str) -> AggFunc:
             return AggFunc(field)
+
+        def __eq__(self, value: object) -> bool:
+            """Compare Rollup objects by all attributes except id."""
+            if not isinstance(value, Rollup.TypeData):
+                return False
+            return (
+                self.function == value.function
+                and self.relation_property_name == value.relation_property_name
+                and self.rollup_property_name == value.rollup_property_name
+            )
+
+        def __hash__(self) -> int:
+            """Return a hash of the Rollup TypeData based on function and property names."""
+            return hash((self.function, self.relation_property_name, self.rollup_property_name))
 
     rollup: TypeData = TypeData()
 

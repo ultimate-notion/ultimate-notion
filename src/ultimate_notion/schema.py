@@ -89,9 +89,7 @@ class Property(Wrapper[PT], ABC, wraps=obj_schema.Property):
         if not isinstance(other, Property):
             return NotImplemented
         other_obj_ref = cast(PT, other.obj_ref)
-        # ToDo: FIXME, this is a serious bug! The next line is correct
-        # return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
-        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == self.obj_ref.value)
+        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
 
     def __hash__(self) -> int:
         return hash(self.obj_ref.type) + hash(self.obj_ref.value)
@@ -533,11 +531,20 @@ class Schema(metaclass=SchemaType):
         if during_init:
             # backward relation was not yet initialised in the other schema (during the creation of the data model)
             # or self-referencing relation was not yet initialised
+            own_schema_dct = {
+                name: prop_type
+                for name, prop_type in own_schema_dct.items()
+                if not (
+                    isinstance(prop_type, Relation) and (prop_type.is_two_way)  # synced_prop_name default name
+                )
+            }
+
             other_schema_dct = {
                 name: prop_type
                 for name, prop_type in other_schema_dct.items()
                 if not (
-                    (isinstance(prop_type, Relation) and (prop_type._is_two_way_target or prop_type.is_self_ref))
+                    (isinstance(prop_type, Relation) and (prop_type.is_two_way))
+                    or (isinstance(prop_type, Relation) and (prop_type._is_two_way_target or prop_type.is_self_ref))
                     or (isinstance(prop_type, Rollup) and prop_type.is_self_ref)
                 )
             }
@@ -974,7 +981,9 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     @property
     def is_two_way(self) -> bool:
         """Determine if this relation is a two-way relation."""
-        return self._two_way_prop is not None
+        return self._two_way_prop is not None or (
+            self._is_init and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation)
+        )
 
     @property
     def is_self_ref(self) -> bool:
