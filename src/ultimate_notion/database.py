@@ -15,7 +15,7 @@ from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
-from ultimate_notion.rich_text import Text, camel_case, snake_case
+from ultimate_notion.rich_text import Text, camel_case
 from ultimate_notion.schema import Property, Schema
 from ultimate_notion.view import View
 
@@ -107,7 +107,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Reflection about the database schema."""
         title = str(self)
         cls_name = f'{camel_case(title)}Schema'
-        attrs = {snake_case(k): Property.wrap_obj_ref(v) for k, v in obj_ref.properties.items()}
+        attrs = {'_props': [Property.wrap_obj_ref(v) for v in obj_ref.properties.values()]}
         schema: type[Schema] = type(cls_name, (Schema,), attrs, db_title=title)
         schema.bind_db(self)
         return schema
@@ -196,7 +196,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         attr_to_name = {prop.attr_name: prop.name for prop in self.schema.get_props()}
         if not set(kwargs).issubset(set(attr_to_name)):
             add_kwargs = set(kwargs) - set(attr_to_name)
-            msg = f'kwargs {", ".join(add_kwargs)} not defined in schema'
+            msg = f'Attributes {", ".join(add_kwargs)} not defined for properties in schema {self.__class__.__name__}'
             raise SchemaError(msg)
         if ro_props := set(kwargs) & {prop.attr_name for prop in self.schema.get_ro_props()}:
             msg = f'Read-only properties {", ".join(ro_props)} cannot be set'

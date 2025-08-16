@@ -166,7 +166,7 @@ class Session:
         if title is not None:
             title = Text(title)
         elif title is None and schema is not None:
-            title = schema.db_title
+            title = schema._db_title
 
         db_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
         _logger.info(f'Creating database `{title or "<NoTitle>"}` in page `{parent.title}` with schema:\n{db_schema}')
@@ -178,8 +178,8 @@ class Session:
         db: Database = Database.wrap_obj_ref(db_obj)
 
         if schema:
-            if schema.db_desc:
-                self.api.databases.update(db_obj, description=schema.db_desc.obj_ref)
+            if schema._db_desc:
+                self.api.databases.update(db_obj, description=schema._db_desc.obj_ref)
             db._set_schema(schema, during_init=True)  # schema is thus bound to the database
             schema._init_self_refs()
             schema._init_self_ref_rollups()
@@ -230,10 +230,10 @@ class Session:
 
     def get_or_create_db(self, parent: Page, schema: type[Schema]) -> Database:
         """Get or create the database."""
-        dbs = SList(db for db in self.search_db(schema.db_title) if db.parent == parent)
+        dbs = SList(db for db in self.search_db(schema._db_title) if db.parent == parent)
         if len(dbs) == 0:
             db = self.create_db(parent, schema=schema)
-            while not [db for db in self.search_db(schema.db_title) if db.parent == parent]:
+            while not [db for db in self.search_db(schema._db_title) if db.parent == parent]:
                 _logger.info(f'Waiting for database `{db.title}` to be fully created.')
                 time.sleep(1)
             return db
