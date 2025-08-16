@@ -23,6 +23,7 @@ from __future__ import annotations
 from abc import ABC, ABCMeta
 from collections import Counter
 from collections.abc import Iterator
+from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast, overload
 
@@ -212,16 +213,30 @@ class SchemaType(ABCMeta):
     letting it behave like a dictionary for the properties although it is a class, not an instance.
     """
 
-    # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
-    def __new__(metacls, name: str, bases: tuple[type, ...], namespace: dict[str, object], **kwargs: Any) -> type[Schema]:
-        cls = super().__new__(metacls, name, bases, namespace, **kwargs)
-        # Consume data collected during __prepare__ to set the owner
-        props = namespace.get('_props', [])
+    # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments
+    def __new__(metacls, name: str, bases: tuple[type, ...], namespace: dict[str, object], **kwargs: Any) -> SchemaType:
+        # This collects all schema properties under `_props`. Using __prepare__ doesn't work as referencing
+        # the class itself would not be possible at that stage any more as __getattr__ is not used at that point.
+        # Thus, we create the class normally and change it only afterwards when __prepare__ is already done.
+        props = cast(list[Property], namespace.setdefault('_props', []))
+
+        for b in bases:
+            for prop in getattr(b, '_props', []):
+                prop = cast(Property, deepcopy(prop))
+                props.append(prop)
+
+        for attr, val in list(namespace.items()):
+            if isinstance(val, Property):
+                del namespace[attr]
+                val._attr_name = attr
+                props.append(val)
+
+        cls = super().__new__(metacls, name, bases, dict(namespace), **kwargs)
         for prop in props:
-            if isinstance(prop, Property):
-                prop._owner = cls
+            prop._owner = cls
+
         return cls
-    
+
     def __str__(cls: type[Schema]) -> str:  # type: ignore[misc]
         # We can only overwrite __str__ for a class in a metaclass
         return cls.as_table(tablefmt='simple')
@@ -253,6 +268,7 @@ class SchemaType(ABCMeta):
 
         session = get_active_session()
         session.api.databases.update(db=cls.get_db().obj_ref, schema={prop_name: prop_type.obj_ref})
+
         cls._props.append(prop_type)
         cls._set_obj_refs()
 
@@ -294,24 +310,6 @@ class SchemaType(ABCMeta):
                 raise PropertyError(msg)
         else:
             super().__setattr__(name, value)  # type: ignore[misc]  # no clue why this results in a type problem
-
-    @classmethod
-    def __prepare__(cls: type[Schema], name: str, bases: tuple[type, ...], /, **kwargs: Any) -> dict[str, object]:  # type: ignore[misc]
-        # Overwrite compile-time setting of class attributes
-        class SaveAttrsInPropsListDict(dict[str, Any]):
-            """Safe the Property attributes at compile-time in `._props`."""
-
-            def __setitem__(self, key: str, value: str) -> None:
-                if isinstance(value, Property):
-                    value._attr_name = key
-                    self['_props'].append(value)
-                else:
-                    super().__setitem__(key, value)
-
-        attr_dict: dict[str, Any] = SaveAttrsInPropsListDict()
-        # since __prepare__ is called even before __new__, we have to set the attribute `_props` here
-        attr_dict['_props'] = []
-        return attr_dict
 
     def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
         return len(cls.get_props())
@@ -921,6 +919,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         db.reload()
         if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
             back_ref_prop_type.name = new_prop_name
+            back_ref_prop_type._attr_name = rich_text.snake_case(new_prop_name)
 
     @property
     def two_way_prop(self) -> Property | None:
