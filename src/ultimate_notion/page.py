@@ -19,24 +19,13 @@ from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text, render_md
+from ultimate_notion.schema import Property
 from ultimate_notion.templates import page_html
 from ultimate_notion.utils import SList, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-
-
-class PageProperty:
-    """Property of a page implementing the descriptor protocol."""
-
-    def __init__(self, prop_name: str) -> None:
-        self._prop_name = prop_name
-
-    def __get__(self, obj: PagePropertiesNS, type: type[PagePropertiesNS] | None = None) -> Any:  # noqa: A002
-        return obj[self._prop_name]
-
-    def __set__(self, obj: PagePropertiesNS, value: Any) -> None:
-        obj[self._prop_name] = value
+    from ultimate_notion.schema import Schema
 
 
 class PagePropertiesNS(Mapping[str, Any]):
@@ -48,8 +37,9 @@ class PagePropertiesNS(Mapping[str, Any]):
     You can also convert it to a dictionary with `dict(page.props)`.
     """
 
-    def __init__(self, page: Page) -> None:
+    def __init__(self, page: Page, schema: type[Schema] | None) -> None:
         self._page = page
+        self._schema = schema
 
     @property
     def _obj_prop_vals(self) -> dict[str, obj_props.PropertyValue]:
@@ -96,6 +86,24 @@ class PagePropertiesNS(Mapping[str, Any]):
         # update the property on the server (which will update the local data)
         session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
 
+    def _check_schema(self) -> None:
+        if self._schema is None:
+            msg = f'{self.__class__.__name__} object is not bound to any schema'
+            raise RuntimeError(msg)
+
+    def __getattr__(self, attr_name: str) -> Any:
+        self._check_schema()
+        prop = cast(Property, getattr(self._schema, attr_name))
+        return self[prop.name]
+
+    def __setattr__(self, attr_name: str, value: Any) -> None:
+        if attr_name.startswith('_'):
+            return super().__setattr__(attr_name, value)
+
+        self._check_schema()
+        prop = cast(Property, getattr(self._schema, attr_name))
+        self[prop.name] = value
+
     def __iter__(self) -> Iterator[str]:
         """Iterator of property names."""
         yield from self._obj_prop_vals.keys()
@@ -130,13 +138,8 @@ class Page(
 
     def _create_page_props_ns(self) -> PagePropertiesNS:
         """Create a namespace for the properties of this page defind by the database."""
-        # We have to subclass in order to populate it with the descriptor `PageProperty`
-        # as this only works on the class level and we want a unique class for each page.
-        page_props_ns_cls = type('_PagePropertiesNS', (PagePropertiesNS,), {})
-        if self.parent_db is not None:
-            for prop in self.parent_db.schema.get_props():
-                setattr(page_props_ns_cls, prop.attr_name, PageProperty(prop_name=prop.name))
-        return cast(PagePropertiesNS, page_props_ns_cls(page=self))
+        schema = None if self.parent_db is None else self.parent_db.schema
+        return PagePropertiesNS(page=self, schema=schema)
 
     def __str__(self) -> str:
         return str(self.title)
