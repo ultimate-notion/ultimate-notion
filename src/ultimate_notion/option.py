@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.rich_text import Text
 
@@ -11,7 +12,7 @@ from ultimate_notion.rich_text import Text
 class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     """Option for select & multi-select property."""
 
-    def __init__(self, name: str, *, color: Color | str = Color.DEFAULT) -> None:
+    def __init__(self, name: str, *, color: Color | str | UnsetType = Unset) -> None:
         if isinstance(color, str):
             color = Color(color)
         super().__init__(name, color=color)
@@ -24,8 +25,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Option):
-            # We do not compare the id, as it is not always set
-            res = (self.name == other.name) & (self.color == other.color) & (self.description == other.description)
+            res = self.obj_ref == other.obj_ref
         elif isinstance(other, str):
             res = self.name == other
         elif other is None:
@@ -41,7 +41,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     @property
     def id(self) -> str:
         """ID of the option."""
-        return self.obj_ref.id
+        return raise_unset(self.obj_ref.id)
 
     @property
     def name(self) -> str:
@@ -51,10 +51,9 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     @property
     def color(self) -> Color:
         """Color of the option."""
-        if color := self.obj_ref.color:
-            return color
-        else:
-            # for uninitialized options, return default color
+        try:
+            return raise_unset(self.obj_ref.color)
+        except ValueError:  # i.e. unset value
             return Color.DEFAULT
 
     @property

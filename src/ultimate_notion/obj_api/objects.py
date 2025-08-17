@@ -6,10 +6,10 @@ used in the Notion API.
 For validation the Pydantic model fields specify if a field is optional or not.
 Some fields are always set, e.g. `id`, when retrieving an object but must not be set
 when sending the object to the Notion API in order to create the object.
-To model this behavior, the default value `None` is used for those objects, e.g.
+To model this behavior, the default sentinel value `Unset` is used for those objects, e.g.
 ```
 class SelectOption(GenericObject)
-    id: str = None  # type: ignore  # to make sure mypy doesn't complain
+    id: str | UnsetType = Unset
 ```
 Be aware that this is important when updating to differentiate between the actual set
 values from default/unset values.
@@ -26,7 +26,15 @@ from uuid import UUID
 import pendulum as pnd
 from pydantic import Field, SerializeAsAny
 
-from ultimate_notion.obj_api.core import GenericObject, NotionEntity, NotionObject, TypedObject, extract_id
+from ultimate_notion.obj_api.core import (
+    GenericObject,
+    NotionEntity,
+    NotionObject,
+    TypedObject,
+    Unset,
+    UnsetType,
+    extract_id,
+)
 from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.utils import parse_dt_str
 
@@ -35,11 +43,15 @@ if TYPE_CHECKING:
 
 
 class SelectOption(GenericObject):
-    """Options for select & multi-select objects."""
+    """Options for select & multi-select objects.
+
+    Specifying no color will result in the default color being used, i.e. `Color.DEFAULT`, which is a light grey.
+    Note that colors can't be changed after they are set.
+    """
 
     name: str
-    id: str = None  # type: ignore  # According to docs: "These are sometimes, but not always, UUIDs."
-    color: Color = None  # type: ignore  # Leave this empty when overwriting an option
+    id: str | UnsetType = Unset  # According to docs: "These are sometimes, but not always, UUIDs."
+    color: Color | UnsetType = Unset  # Leave this as Unset when overwriting an option as colors can't be changed
     description: list[RichTextBaseObject] | None = None  # ToDo: Undocumented in the Notion API
 
     @classmethod
@@ -51,7 +63,10 @@ class SelectOption(GenericObject):
         """Compare SelectOption objects by all attributes except id."""
         if not isinstance(other, SelectOption):
             return False
-        return self.name == other.name and self.color == other.color and self.description == other.description
+
+        my_color = Color.DEFAULT if self.color is Unset else self.color
+        other_color = Color.DEFAULT if other.color is Unset else other.color
+        return self.name == other.name and my_color == other_color and self.description == other.description
 
     def __hash__(self) -> int:
         """Return a hash of the SelectOption based on name, color, and description."""

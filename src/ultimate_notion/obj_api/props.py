@@ -66,8 +66,7 @@ class PropertyValue(TypedObject[Any], polymorphic_base=True):
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
-        # We include "null" values as those are used to delete properties
-        dump_dct = self.model_dump(mode='json', exclude_none=True, by_alias=True)
+        dump_dct = super().serialize_for_api()
         dump_dct.setdefault(dump_dct['type'], None)
         return dump_dct
 
