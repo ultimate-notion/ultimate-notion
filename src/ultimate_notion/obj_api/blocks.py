@@ -1,6 +1,17 @@
 """Wrapper for Notion API blocks.
 
 Blocks are the base for all Notion content.
+
+For validation the Pydantic model fields specify if a field is optional or not.
+Some fields are always set, e.g. `id`, when retrieving an object but must not be set
+when sending the object to the Notion API in order to create the object.
+To model this behavior, the default sentinel value `Unset` is used for those objects, e.g.
+```
+class SelectOption(GenericObject)
+    id: str | UnsetType = Unset
+```
+Be aware that this is important when updating to differentiate between the actual set
+values from default/unset values.
 """
 
 from __future__ import annotations

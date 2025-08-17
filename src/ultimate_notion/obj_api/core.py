@@ -29,18 +29,6 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-class UnsetType:
-    """Sentinel type for missing default values."""
-
-    __slots__ = ()
-
-    def __repr__(self) -> str:
-        return '<Unset>'
-
-
-Unset: UnsetType = UnsetType()
-
-
 BASE_URL_PATTERN = r'https://(www.)?notion.so/'
 UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
 
@@ -73,6 +61,36 @@ BLOCK_URL_LONG_RE = re.compile(
     $""",
     flags=re.IGNORECASE | re.VERBOSE,
 )
+
+
+T = TypeVar('T')  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
+
+
+class UnsetType(BaseModel):
+    """Sentinel type for missing default values.
+
+    A sentinel type for indicating that a value is unset or missing for cases when `None` has another meaning.
+    In the Notion API, `None` is also used to delete properties, so a way to represent "no value" explicitly is needed.
+    """
+
+    __slots__ = ()
+
+    # Marker field that survives serialization to identify unset values
+    unset_marker: bool = Field(default=True, exclude=False)
+
+    def __repr__(self) -> str:
+        return 'Unset'
+
+
+Unset: UnsetType = UnsetType()
+
+
+def raise_unset(obj: T | UnsetType) -> T:
+    """Raise an error if the object is unset."""
+    if isinstance(obj, UnsetType):
+        msg = f'Object of type {type(obj).__name__} is unset.'
+        raise ValueError(msg)
+    return obj
 
 
 def extract_id(text: str) -> str | None:
@@ -141,7 +159,25 @@ class GenericObject(BaseModel):
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
         # Notion API doesn't like "null" values
-        return self.model_dump(mode='json', exclude_none=True, by_alias=True)
+        data = self.model_dump(mode='json', exclude_none=True, by_alias=True)
+
+        def remove_unset(obj: dict[str, Any]) -> dict[str, Any]:
+            if isinstance(obj, dict):
+                return {
+                    key: remove_unset(value)
+                    for key, value in obj.items()
+                    if not (isinstance(value, dict) and value.get('unset_marker') is True)
+                }
+            elif isinstance(obj, list):
+                return [
+                    remove_unset(item)
+                    for item in obj
+                    if not (isinstance(item, dict) and item.get('unset_marker') is True)
+                ]
+            else:
+                return obj
+
+        return remove_unset(data)
 
     @classmethod
     def build(cls, *args: Any, **kwargs: Any) -> Self:
@@ -228,9 +264,6 @@ class NotionEntity(NotionObject):
     created_by: UserRef = None  # type: ignore
 
     last_edited_time: datetime = None  # type: ignore
-
-
-T = TypeVar('T')  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
 
 
 class TypedObject(GenericObject, Generic[T]):
