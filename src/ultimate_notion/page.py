@@ -16,6 +16,7 @@ from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
+from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text, render_md
@@ -159,7 +160,7 @@ class Page(
     @property
     def url(self) -> str:
         """Return the URL of this page."""
-        return self.obj_ref.url
+        return raise_unset(self.obj_ref.url)
 
     @property
     def public_url(self) -> str | None:
@@ -346,7 +347,7 @@ class Page(
     def reload(self) -> Self:
         """Reload this page."""
         session = get_active_session()
-        self.obj_ref = session.api.pages.retrieve(self.obj_ref.id)
+        self.obj_ref = session.api.pages.retrieve(self.id)
         self._children = None  # forces a new retrieval of children next time
         self._comments = None  # forces a new retrieval of comments next time
         return self

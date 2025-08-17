@@ -20,6 +20,7 @@ from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserEr
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
+from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.obj_api.objects import get_uuid
@@ -208,7 +209,10 @@ class Session:
         query: obj_query.SearchQueryBuilder[obj_blocks.Database] = self.api.search(db_name).filter(db_only=True)
         if reverse:
             query.sort(ascending=True)
-        dbs = [cast(Database, self.cache.setdefault(db.id, Database.wrap_obj_ref(db))) for db in query.execute()]
+        dbs = [
+            cast(Database, self.cache.setdefault(raise_unset(db.id), Database.wrap_obj_ref(db)))
+            for db in query.execute()
+        ]
         if exact and db_name is not None:
             dbs = [db for db in dbs if db.title == db_name]
         if not deleted:
@@ -255,7 +259,8 @@ class Session:
         if reverse:
             query.sort(ascending=True)
         pages = [
-            cast(Page, self.cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj))) for page_obj in query.execute()
+            cast(Page, self.cache.setdefault(raise_unset(page_obj.id), Page.wrap_obj_ref(page_obj)))
+            for page_obj in query.execute()
         ]
         if exact and title is not None:
             pages = [page for page in pages if page.title == title]

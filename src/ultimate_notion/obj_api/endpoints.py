@@ -16,7 +16,7 @@ from uuid import UUID
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
-from ultimate_notion.obj_api.core import Unset, UnsetType
+from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
     Comment,
@@ -157,7 +157,8 @@ class BlocksEndpoint(Endpoint):
 
         The block info will be updated to the latest version from the server.
         """
-        _logger.debug(f'Updating block with id `{block.id}`.')
+        block_id = cast(UUID, raise_unset(block.id))  # don't get why mypy needs this cast
+        _logger.debug(f'Updating block with id `{block_id}`.')
         params = block.serialize_for_api()
 
         if isinstance(block, FileBase):
@@ -167,7 +168,7 @@ class BlocksEndpoint(Endpoint):
             del params[block.type][dtype]
 
         # Typing in notion_client sucks, so we cast
-        data = cast(dict[str, Any], self.raw_api.update(block.id.hex, **params))
+        data = cast(dict[str, Any], self.raw_api.update(block_id.hex, **params))
         block.update(**data)
 
 
@@ -391,9 +392,10 @@ class PagesEndpoint(Endpoint):
     # https://developers.notion.com/reference/patch-page
     def update(self, page: Page, **properties: PropertyValue) -> None:
         """Update the Page object properties on the server."""
-        _logger.debug(f'Updating info on page with id `{page.id}`.')
+        page_id = raise_unset(page.id)
+        _logger.debug(f'Updating info on page with id `{page_id}`.')
         props = {name: value.serialize_for_api() if value is not None else None for name, value in properties.items()}
-        data = cast(dict[str, Any], self.raw_api.update(page.id.hex, properties=props))
+        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, properties=props))
         page.update(**data)
 
     def set_attr(
