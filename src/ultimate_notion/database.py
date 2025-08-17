@@ -13,6 +13,7 @@ from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case
@@ -46,18 +47,21 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def url(self) -> str:
         """Return the URL of this database."""
-        return self.obj_ref.url
+        return raise_unset(self.obj_ref.url)
 
     @property
-    def title(self) -> str | Text:
+    def title(self) -> str | Text | None:
         """Return the title of this database as rich text."""
-        title = self.obj_ref.title
         # `str` added as return value but always RichText returned, which inherits from str.
-        return Text.wrap_obj_ref(title)
+        if title := raise_unset(self.obj_ref.title):
+            return Text.wrap_obj_ref(title)
+        return None
 
     @title.setter
-    def title(self, text: str | Text) -> None:
+    def title(self, text: str | Text | None) -> None:
         """Set the title of this database"""
+        if text is None:
+            text = ''
         if not isinstance(text, Text):
             text = Text.from_plain_text(text)
         session = get_active_session()
@@ -66,13 +70,15 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def description(self) -> Text | None:
         """Return the description of this database as rich text."""
-        if (desc := self.obj_ref.description) is None:
-            return None
-        return Text.wrap_obj_ref(desc)
+        if desc := raise_unset(self.obj_ref.description):
+            return Text.wrap_obj_ref(desc)
+        return None
 
     @description.setter
-    def description(self, text: str | Text) -> None:
+    def description(self, text: str | Text | None) -> None:
         """Set the description of this database."""
+        if text is None:
+            text = ''
         if not isinstance(text, Text):
             text = Text.from_plain_text(text)
         session = get_active_session()
@@ -163,7 +169,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def reload(self) -> Self:
         """Reload this database."""
         session = get_active_session()
-        self.obj_ref = session.api.databases.retrieve(self.obj_ref.id)
+        self.obj_ref = session.api.databases.retrieve(self.id)
         self._schema = None  # reset schema to reflect the current database
         self.schema._set_obj_refs()
         return self

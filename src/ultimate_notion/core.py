@@ -11,6 +11,7 @@ from typing_extensions import Self
 
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import raise_unset
 
 GT = TypeVar('GT', bound=obj_core.GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
 
@@ -103,12 +104,12 @@ class NotionObject(Wrapper[NO], ABC, wraps=obj_core.NotionObject):
     @property
     def id(self) -> UUID | str:
         """Return the ID of the block."""
-        return self.obj_ref.id
+        return raise_unset(self.obj_ref.id)
 
     @property
     def in_notion(self) -> bool:
         """Return whether the block was created in Notion."""
-        return self.obj_ref.id is not None
+        return self.obj_ref.id != obj_core.Unset
 
 
 NE = TypeVar('NE', bound=obj_core.NotionEntity)  # ToDo: Use new syntax when requires-python >= 3.12
@@ -130,23 +131,24 @@ class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
     @property
     def id(self) -> UUID:
         """Return the ID of the entity."""
-        return self.obj_ref.id
+        return raise_unset(self.obj_ref.id)
 
     @property
     def created_time(self) -> dt.datetime:
         """Return the time when the block was created."""
-        return self.obj_ref.created_time
+        return raise_unset(self.obj_ref.created_time)
 
     @property
     def created_by(self) -> User:
         """Return the user who created the block."""
         session = get_active_session()
-        return session.get_user(self.obj_ref.created_by.id, raise_on_unknown=False)
+        created_by = raise_unset(self.obj_ref.created_by)
+        return session.get_user(raise_unset(created_by.id), raise_on_unknown=False)
 
     @property
     def last_edited_time(self) -> dt.datetime:
         """Return the time when the block was last edited."""
-        return self.obj_ref.last_edited_time
+        return raise_unset(self.obj_ref.last_edited_time)
 
     @property
     def parent(self) -> NotionEntity | None:

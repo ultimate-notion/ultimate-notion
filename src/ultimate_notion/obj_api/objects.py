@@ -34,6 +34,7 @@ from ultimate_notion.obj_api.core import (
     Unset,
     UnsetType,
     extract_id,
+    raise_unset,
 )
 from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.utils import parse_dt_str
@@ -79,7 +80,7 @@ class SelectGroup(GenericObject):
     """Group of options for status objects."""
 
     name: str
-    id: str = None  # type: ignore  # According to docs: "These are sometimes, but not always, UUIDs."
+    id: str  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color = Color.DEFAULT
     option_ids: list[str] = Field(default_factory=list)
 
@@ -159,7 +160,7 @@ class LinkObject(GenericObject):
     """Reference a URL."""
 
     type: str = 'url'
-    url: str = None  # type: ignore
+    url: str
 
 
 class ObjectRef(GenericObject):
@@ -267,6 +268,8 @@ class CommentRef(ParentRef, type='comment_id'):
 class UserRef(NotionObject, object='user'):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
 
+    id: UUID
+
     @classmethod
     def build(cls, user_ref: User | str | UUID) -> UserRef:
         """Compose a PageRef from the given reference object."""
@@ -277,7 +280,6 @@ class UserRef(NotionObject, object='user'):
 class User(UserRef, TypedObject, MentionMixin, polymorphic_base=True):
     """Represents a User in Notion."""
 
-    id: UUID = None  # type: ignore
     name: str | None = None
     avatar_url: str | None = None
 
@@ -289,7 +291,8 @@ class Person(User, type='person'):
     """Represents a Person in Notion."""
 
     class TypeData(GenericObject):
-        email: str = None  # type: ignore
+        # only present if an integration has user capabilities that allow access to email addresses.
+        email: str | None = None
 
     person: TypeData = TypeData()
 
@@ -297,17 +300,19 @@ class Person(User, type='person'):
 class WorkSpaceLimits(GenericObject):
     """Limits for a Notion workspace."""
 
-    max_file_upload_size_in_bytes: int = None  # type: ignore
+    max_file_upload_size_in_bytes: int | None = None
 
 
 class Bot(User, type='bot'):
     """Represents a Bot in Notion."""
 
     class TypeData(GenericObject):
-        owner: WorkspaceRef = None  # type: ignore
-        workspace_name: str = None  # type: ignore
+        owner: WorkspaceRef | None = None
+        workspace_name: str | None = None
         workspace_limits: WorkSpaceLimits = WorkSpaceLimits()
 
+    # Even if stated otherwise in the docs, `bot` type data is optional and for instance
+    # not present when a new page is created by a bot within a database with a `CreatedBy` Property.
     bot: TypeData = TypeData()
 
 
@@ -352,10 +357,10 @@ class TextObject(RichTextBaseObject, type='text'):
     """Notion text element."""
 
     class TypeData(GenericObject):
-        content: str = None  # type: ignore
+        content: str
         link: LinkObject | None = None
 
-    text: TypeData = TypeData()
+    text: TypeData
 
     @classmethod
     def build(cls, text: str, *, href: str | None = None, style: Annotations | None = None) -> TextObject:
@@ -461,8 +466,9 @@ class MentionDatabase(MentionBase, type='database'):
         db_ref = ObjectRef.build(db)
         mention = cls.model_construct(database=db_ref)
         # note that `href` is always `None` for database mentions
+        db_title = raise_unset(db.title)
         return MentionObject.model_construct(
-            plain_text=rich_text_to_str(db.title), ref=None, annotations=style, mention=mention
+            plain_text=rich_text_to_str(db_title), ref=None, annotations=style, mention=mention
         )
 
 

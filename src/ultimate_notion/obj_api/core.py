@@ -6,7 +6,7 @@ import builtins
 import logging
 import re
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, TypeVar, cast, overload
 from uuid import UUID
 
 from pydantic import (
@@ -85,6 +85,10 @@ class UnsetType(BaseModel):
 Unset: UnsetType = UnsetType()
 
 
+@overload
+def raise_unset(obj: UnsetType) -> NoReturn: ...
+@overload
+def raise_unset(obj: T) -> T: ...
 def raise_unset(obj: T | UnsetType) -> T:
     """Raise an error if the object is unset."""
     if isinstance(obj, UnsetType):
@@ -191,7 +195,7 @@ class UniqueObject(GenericObject):
     This is the base class for all Notion objects that have a unique identifier, i.e. `id`.
     """
 
-    id: UUID | str = Field(union_mode='left_to_right', default=None)  # type: ignore
+    id: UUID | str | UnsetType = Field(union_mode='left_to_right', default=Unset)
     """`id` is an `UUID` if possible or a string (possibly not unique) depending on the object"""
 
     def __hash__(self) -> int:
@@ -257,13 +261,13 @@ class NotionObject(UniqueObject):
 class NotionEntity(NotionObject):
     """A materialized entity, which was created by a user."""
 
-    id: UUID = None  # type: ignore
-    parent: SerializeAsAny[ParentRef] = None  # type: ignore
+    id: UUID | UnsetType = Unset
+    parent: SerializeAsAny[ParentRef] | UnsetType = Unset
 
-    created_time: datetime = None  # type: ignore
-    created_by: UserRef = None  # type: ignore
+    created_time: datetime | UnsetType = Unset
+    created_by: UserRef | UnsetType = Unset
 
-    last_edited_time: datetime = None  # type: ignore
+    last_edited_time: datetime | UnsetType = Unset
 
 
 class TypedObject(GenericObject, Generic[T]):

@@ -73,8 +73,8 @@ def test_db_without_title(notion: uno.Session, root_page: uno.Page) -> None:
         desc = uno.PropType.Text('Description')
 
     db = notion.create_db(parent=root_page, schema=Article)
-    assert db.title == ''
-    assert db.description == ''
+    assert db.title is None
+    assert db.description is None
     db.delete()
 
 
@@ -89,12 +89,12 @@ def test_db_with_title(notion: uno.Session, root_page: uno.Page) -> None:
 
     db = notion.create_db(parent=root_page, schema=Article, title='Overwritten Title')
     assert db.title == 'Overwritten Title'
-    assert db.description == ''
+    assert db.description is None
     db.delete()
 
     db = notion.create_db(parent=root_page, title='No Schema Used')
     assert db.title == 'No Schema Used'
-    assert db.description == ''
+    assert db.description is None
     db.delete()
 
 
@@ -110,7 +110,7 @@ def test_db_with_docstring(notion: uno.Session, root_page: uno.Page) -> None:
         desc = uno.PropType.Text('Description')
 
     db = notion.create_db(parent=root_page, schema=Article)
-    assert db.title == ''
+    assert db.title is None
     assert db.description == 'My articles'
     db.delete()
 
@@ -140,13 +140,13 @@ def test_title_setter(notion: uno.Session, article_db: uno.Database) -> None:
     assert article_db.title == new_title
     article_db.title = uno.text(old_title)
     assert article_db.title == old_title
-    article_db.title = ''
-    assert article_db.title == ''
+    article_db.title = None
+    assert article_db.title is None
 
 
 @pytest.mark.vcr()
 def test_description_setter(notion: uno.Session, article_db: uno.Database) -> None:
-    assert article_db.description == ''
+    assert article_db.description is None
 
     new_description = 'My most favorite articles'
     article_db.description = new_description  # type: ignore
@@ -156,8 +156,8 @@ def test_description_setter(notion: uno.Session, article_db: uno.Database) -> No
     del notion.cache[article_db.id]
     article_db = notion.get_db(article_db.id)
     assert article_db.description == new_description
-    article_db.description = ''  # type: ignore
-    assert article_db.description == ''
+    article_db.description = None
+    assert article_db.description is None
 
 
 @pytest.mark.vcr()

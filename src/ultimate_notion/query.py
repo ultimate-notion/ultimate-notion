@@ -14,6 +14,7 @@ from ultimate_notion import props, schema
 from ultimate_notion.core import get_active_session
 from ultimate_notion.errors import EmptyDBError, FilterQueryError
 from ultimate_notion.obj_api import query as obj_query
+from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import ArrayQuantifier, FormulaType, RollupType, SortDirection
 from ultimate_notion.option import Option
 from ultimate_notion.page import Page
@@ -212,7 +213,8 @@ class PropertyCondition(Condition, ABC):
             except StopIteration as e:
                 msg = f'The database {db} is empty.'
                 raise EmptyDBError(msg) from e
-            self._probe_page = cast(Page, session.cache.setdefault(page_obj.id, Page.wrap_obj_ref(page_obj)))
+            page_obj_id = raise_unset(page_obj.id)
+            self._probe_page = cast(Page, session.cache.setdefault(page_obj_id, Page.wrap_obj_ref(page_obj)))
 
         return self._probe_page
 
@@ -829,7 +831,10 @@ class Query:
         if sort_objs := self._sorts_obj_ref():
             query_obj = query_obj.sort(sort_objs)
 
-        pages = [cast(Page, session.cache.setdefault(page.id, Page.wrap_obj_ref(page))) for page in query_obj.execute()]
+        pages = [
+            cast(Page, session.cache.setdefault(raise_unset(page.id), Page.wrap_obj_ref(page)))
+            for page in query_obj.execute()
+        ]
         return View(database=self.database, pages=pages, query=self)
 
     def filter(self, expr: Condition) -> Query:

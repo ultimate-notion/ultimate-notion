@@ -20,6 +20,7 @@ from ultimate_notion.file import FileInfo
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.rich_text import Text, User
 from ultimate_notion.utils import del_nested_attr
@@ -67,7 +68,8 @@ class DataObject(NotionEntity[DO], wraps=obj_blocks.DataObject):
     def last_edited_by(self) -> User:
         """Return the user who last edited the block."""
         session = get_active_session()
-        return session.get_user(self.obj_ref.last_edited_by.id)
+        last_edit_user_ref = raise_unset(self.obj_ref.last_edited_by)
+        return session.get_user(raise_unset(last_edit_user_ref.id))
 
     @property
     def has_children(self) -> bool:
@@ -222,7 +224,7 @@ class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
             raise RuntimeError(msg)
 
         session = get_active_session()
-        comment_objs = session.api.comments.list(self.obj_ref.id)
+        comment_objs = session.api.comments.list(self.id)
         comments = [Comment.wrap_obj_ref(comment_obj) for comment_obj in comment_objs]
         return [Discussion(comment_thread, parent=self) for comment_thread in self._group_by_discussions(comments)]
 
@@ -537,7 +539,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Cal
 
     @property
     def icon(self) -> FileInfo | Emoji | CustomEmoji:
-        if (icon := self.obj_ref.value.icon) is None:
+        if isinstance(icon := self.obj_ref.value.icon, UnsetType):
             return self.get_default_icon()
         else:
             return wrap_icon(icon)
@@ -650,9 +652,8 @@ class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
     """Embed block."""
 
     def __init__(self, url: str, *, caption: str | None = None) -> None:
-        super().__init__()
-        self.obj_ref.value.url = url
-        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else None
+        caption_obj = Text(caption).obj_ref if caption is not None else None
+        super().__init__(url=url, caption=caption_obj)
 
     @property
     def url(self) -> str:
@@ -676,17 +677,20 @@ class Bookmark(CaptionMixin[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
 
     def __init__(self, url: str, *, caption: str | None = None) -> None:
-        super().__init__()
-        self.obj_ref.value.url = url
-        self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else None
+        caption_obj = Text(caption).obj_ref if caption is not None else None
+        super().__init__(url=url, caption=caption_obj)
 
     @property
     def url(self) -> str | None:
         """Return the URL of the bookmark."""
-        return self.obj_ref.value.url
+        if url := self.obj_ref.value.url:
+            return url
+        return None
 
     @url.setter
-    def url(self, url: str) -> None:
+    def url(self, url: str | None) -> None:
+        if url is None:
+            url = ''
         self.obj_ref.value.url = url
         self._update_in_notion()
 
@@ -893,15 +897,17 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
         raise InvalidAPIUsageError(msg)
 
     @property
-    def title(self) -> str:
+    def title(self) -> str | None:
         """Return the title of the child page."""
-        return self.obj_ref.child_page.title
+        if title := raise_unset(self.obj_ref.child_page.title):
+            return title
+        return None
 
     @property
     def page(self) -> Page:
         """Return the actual Page object."""
         sess = get_active_session()
-        return sess.get_page(self.obj_ref.id)
+        return sess.get_page(self.id)
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         msg = '`ChildPage` is only used internally, work with a proper `Page` instead.'
@@ -922,15 +928,17 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         raise InvalidAPIUsageError(msg)
 
     @property
-    def title(self) -> str:
+    def title(self) -> str | None:
         """Return the title of the child database"""
-        return self.obj_ref.child_database.title
+        if title := raise_unset(self.obj_ref.child_database.title):
+            return title
+        return None
 
     @property
     def db(self) -> Database:
         """Return the actual Database object."""
         sess = get_active_session()
-        return sess.get_db(self.obj_ref.id)
+        return sess.get_db(self.id)
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return the child database as Markdown."""
@@ -1207,8 +1215,8 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
     """
 
     def __init__(self, page: Page) -> None:
-        super().__init__()
-        self.obj_ref.link_to_page = objs.PageRef.build(page.obj_ref)
+        page_ref = objs.PageRef.build(page.obj_ref)
+        super().__init__(link_to_page=page_ref)
 
     @property
     def page(self) -> Page:

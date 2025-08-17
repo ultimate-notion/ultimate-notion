@@ -18,11 +18,10 @@ from __future__ import annotations
 
 from abc import ABC
 from typing import Any, TypeVar, cast
-from uuid import UUID
 
 from pydantic import Field, SerializeAsAny
 
-from ultimate_notion.obj_api.core import GenericObject, NotionEntity, TypedObject
+from ultimate_notion.obj_api.core import GenericObject, NotionEntity, TypedObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     Annotations,
@@ -50,19 +49,19 @@ class DataObject(NotionEntity, ABC):
     in_trash: bool = False  # used to be `archived`
     archived: bool = False  # ToDo: Deprecated but still partially used in Notion. Check to remove in v1.0!
 
-    last_edited_by: UserRef = None  # type: ignore
+    last_edited_by: UserRef | UnsetType = Unset
 
 
 class Database(DataObject, MentionMixin, object='database'):
     """A database record type."""
 
-    title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
-    url: str = None  # type: ignore
+    title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    url: str | UnsetType = Unset
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, Property] = None  # type: ignore
-    description: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    properties: dict[str, Property]
+    description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
@@ -72,11 +71,11 @@ class Database(DataObject, MentionMixin, object='database'):
 class Page(DataObject, MentionMixin, object='page'):
     """A standard Notion page object."""
 
-    url: str = None  # type: ignore
+    url: str | UnsetType = Unset
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, PropertyValue] = None  # type: ignore
+    properties: dict[str, PropertyValue]
 
     def _get_title_prop_name(self) -> str:
         """Get the name of the title property."""
@@ -107,8 +106,6 @@ class Block(TypedObject[GO], DataObject, object='block', polymorphic_base=True):
     Calling the block will expose the nested data in the object.
     """
 
-    id: UUID = None  # type: ignore
-
 
 class UnsupportedBlockTypeData(GenericObject):
     """Type data for `UnsupportedBlock`."""
@@ -123,7 +120,7 @@ class UnsupportedBlock(Block[UnsupportedBlockTypeData], type='unsupported'):
 class TextBlockTypeData(GenericObject):
     """Type data for `TextBlock`."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 TB = TypeVar('TB', bound=TextBlockTypeData)  # ToDo: Use new syntax when requires-python >= 3.12
@@ -202,7 +199,7 @@ class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
 class CodeTypeData(TextBlockTypeData):
     """Type data for `Code` block."""
 
-    caption: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
     language: CodeLang = CodeLang.PLAIN_TEXT
 
 
@@ -216,7 +213,7 @@ class CalloutTypeData(ColoredTextBlockTypeData):
     """Type data for `Callout` block."""
 
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject = None  # type: ignore
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType = Unset
 
 
 class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
@@ -309,39 +306,47 @@ class Breadcrumb(Block[BreadcrumbTypeData], type='breadcrumb'):
 class EmbedTypeData(GenericObject):
     """Type data for `Embed` block."""
 
-    url: str = None  # type: ignore
-    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
+    url: str
+    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class Embed(Block[EmbedTypeData], type='embed'):
     """An embed block in Notion."""
 
-    embed: EmbedTypeData = EmbedTypeData()
+    embed: EmbedTypeData
+
+    @classmethod
+    def build(cls, url: str, caption: list[RichTextBaseObject]) -> Embed:
+        return Embed.model_construct(embed=EmbedTypeData.model_construct(url=url, caption=caption))
 
 
 class BookmarkTypeData(GenericObject):
     """Type data for `Bookmark` block."""
 
-    url: str = None  # type: ignore
-    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
+    url: str
+    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class Bookmark(Block[BookmarkTypeData], type='bookmark'):
     """A bookmark block in Notion."""
 
-    bookmark: BookmarkTypeData = BookmarkTypeData()
+    bookmark: BookmarkTypeData
+
+    @classmethod
+    def build(cls, url: str, caption: list[RichTextBaseObject]) -> Bookmark:
+        return Bookmark.model_construct(bookmark=BookmarkTypeData.model_construct(url=url, caption=caption))
 
 
 class LinkPreviewTypeData(GenericObject):
     """Type data for `LinkPreview` block."""
 
-    url: str = None  # type: ignore
+    url: str
 
 
 class LinkPreview(Block[LinkPreviewTypeData], type='link_preview'):
     """A link_preview block in Notion."""
 
-    link_preview: LinkPreviewTypeData = LinkPreviewTypeData()
+    link_preview: LinkPreviewTypeData
 
 
 class EquationTypeData(GenericObject):
@@ -363,49 +368,49 @@ class FileBase(Block[FileObject], ABC):
 class File(FileBase, type='file'):
     """A file block in Notion."""
 
-    file: SerializeAsAny[FileObject] = None  # type: ignore
+    file: SerializeAsAny[FileObject] | None = None
 
 
 class Image(FileBase, type='image'):
     """An image block in Notion."""
 
-    image: SerializeAsAny[FileObject] = None  # type: ignore
+    image: SerializeAsAny[FileObject] | None = None
 
 
 class Video(FileBase, type='video'):
     """A video block in Notion."""
 
-    video: SerializeAsAny[FileObject] = None  # type: ignore
+    video: SerializeAsAny[FileObject] | None = None
 
 
 class PDF(FileBase, type='pdf'):
     """A pdf block in Notion."""
 
-    pdf: SerializeAsAny[FileObject] = None  # type: ignore
+    pdf: SerializeAsAny[FileObject] | None = None
 
 
 class ChildPageTypeData(GenericObject):
     """Type data for `ChildPage` block."""
 
-    title: str = None  # type: ignore
+    title: str
 
 
 class ChildPage(Block[ChildPageTypeData], type='child_page'):
     """A child page block in Notion."""
 
-    child_page: ChildPageTypeData = ChildPageTypeData()
+    child_page: ChildPageTypeData
 
 
 class ChildDatabaseTypeData(GenericObject):
     """Type data for `ChildDatabase` block."""
 
-    title: str = None  # type: ignore
+    title: str
 
 
 class ChildDatabase(Block[ChildDatabaseTypeData], type='child_database'):
     """A child database block in Notion."""
 
-    child_database: ChildDatabaseTypeData = ChildDatabaseTypeData()
+    child_database: ChildDatabaseTypeData
 
 
 class ColumnTypeData(GenericObject):
@@ -477,7 +482,7 @@ class Table(Block[TableTypeData], type='table'):
 class LinkToPage(Block[ParentRef], type='link_to_page'):
     """A link_to_page block in Notion."""
 
-    link_to_page: SerializeAsAny[ParentRef] = None  # type: ignore
+    link_to_page: SerializeAsAny[ParentRef]
 
 
 class SyncedBlockTypeData(GenericObject):
