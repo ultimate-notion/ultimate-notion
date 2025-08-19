@@ -168,3 +168,4 @@ This often provides additional considerations and avoids unnecessary work.
 [guide created by FreeCodeCamp]: https://github.com/FreeCodeCamp/how-to-contribute-to-open-source
 [VS Code]: https://code.visualstudio.com/
 [GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files
+[mkdocs]: https://www.mkdocs.org/
