@@ -2,6 +2,8 @@
 
 ## Version 0.9
 
+First Beta release:
+
 - New: Allow updating if a database is inline or not
 - Chg: `create_db` has a `title` parameter to set a title if no schema is used or needs to be overwritten.
 - Chg: Removed `from_dict` class method of `Schema` since this can now be more easily done manually.
