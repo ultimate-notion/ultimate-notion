@@ -469,6 +469,7 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
     assert not hasattr(db.schema, 'tags')
 
 
+@pytest.mark.vcr()
 def test_bind_db_auto(notion: uno.Session) -> None:
     class StatusOption(uno.OptionNS):
         backlog = uno.Option('Backlog', color=uno.Color.GRAY)
