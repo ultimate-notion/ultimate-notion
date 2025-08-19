@@ -157,7 +157,7 @@ class Session:
     ) -> Database:
         """Create a new database within a page.
 
-        In case a title and a schema ware provided, title overrides the schema's `db_title` attribute.
+        In case a title and a schema ware provided, title overrides the schema's `db_title` attribute if it exists.
         """
         # Implementation:
         # 1. create the database using a Notion API call and potential external forward relations
@@ -166,8 +166,10 @@ class Session:
         # 4. update the backward references, i.e. two-way relations, using an update call
         if title is not None:
             title = Text(title)
-        elif title is None and schema is not None:
+        elif schema is not None and schema._db_title is not None:
             title = schema._db_title
+        else:
+            title = None  # Anonymous database without a title.
 
         db_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
         _logger.info(f'Creating database `{title or "<NoTitle>"}` in page `{parent.title}` with schema:\n{db_schema}')

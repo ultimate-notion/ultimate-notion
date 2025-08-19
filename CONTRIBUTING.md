@@ -6,20 +6,20 @@ Welcome to the contributor guide of Ultimate Notion.
 This document focuses on getting any potential contributor familiarized with
 the development processes, but [other kinds of contributions] are also appreciated.
 
-If you are new to using [git] or have never collaborated in a project previously,
+If you are new to using [git] or have never collaborated on a project previously,
 please have a look at [contribution-guide.org]. Other resources are also
 listed in the excellent [guide created by FreeCodeCamp] [^contrib1].
 
-Please notice, all users and contributors are expected to be **open,
+Please notice that all users and contributors are expected to be **open,
 considerate, reasonable, and respectful**. When in doubt,
 [Python Software Foundation's Code of Conduct] is a good reference in terms of
 behavior guidelines.
 
 ## Issue Reports
 
-If you experience bugs or general issues with Ultimate-Notion, please have a look
-on the [issue tracker].
-If you don't see anything useful there, please feel free to fire an issue report.
+If you experience bugs or general issues with Ultimate Notion, please have a look
+at the [issue tracker].
+If you don't see anything useful there, please feel free to file an issue report.
 
 !!! tip
     Please don't forget to include the closed issues in your search.
@@ -28,7 +28,7 @@ If you don't see anything useful there, please feel free to fire an issue report
 
 New issue reports should include information about your programming environment
 (e.g., operating system, Python version) and steps to reproduce the problem.
-Please try also to simplify the reproduction steps to a very minimal example
+Please also try to simplify the reproduction steps to a very minimal example
 that still illustrates the problem you are facing. By removing other factors,
 you help us to identify the root cause of the issue.
 
@@ -39,18 +39,18 @@ and coherent, or by adding missing information and correcting mistakes.
 
 This documentation uses [mkdocs] as its main documentation compiler.
 This means that the docs are kept in the same repository as the project code, and
-that any documentation update is done in the same way was a code contribution.
+that any documentation update is done in the same way as a code contribution.
 
 !!! tip
       Please notice that the [GitHub web interface] provides a quick way for
-      proposing changes. While this mechanism can  be tricky for normal code contributions,
+      proposing changes. While this mechanism can be tricky for normal code contributions,
       it works perfectly fine for contributing to the docs, and can be quite handy.
       If you are interested in trying this method out, please navigate to
       the `docs` folder in the source [repository], find which file you
-      would like to propose changes and click in the little pencil icon at the
+      would like to propose changes to and click on the little pencil icon at the
       top, to open [GitHub's code editor]. Once you finish editing the file,
       please write a message in the form at the bottom of the page describing
-      which changes have you made and what are the motivations behind them and
+      which changes you have made and what the motivations behind them are and
       submit your proposal.
 
 When working on documentation changes in your local machine, you can
@@ -78,7 +78,7 @@ This often provides additional considerations and avoids unnecessary work.
    cd ultimate-notion
    ```
 
-4. Make sure [hatch] and [pre-commit] is installed using [pipx]:
+4. Make sure [hatch] and [pre-commit] are installed using [pipx]:
    ```console
    pipx install hatch
    pipx install pre-commit
@@ -105,7 +105,7 @@ This often provides additional considerations and avoids unnecessary work.
    to new functions, modules and classes, especially if they are part of public APIs.
 
 3. Check that your changes don't break any unit tests with `hatch run vcr-only` for tests
-   that do not generate calls to the Notion API or  `hatch run test` for new tests generating API calls.
+   that do not generate calls to the Notion API or `hatch run test` for new tests generating API calls.
 
 4. Run `hatch run lint:all` and `hatch run lint:fix` to check the code with [ruff] & [mypy]
    and automatically fix [ruff] issues if possible.
@@ -118,13 +118,13 @@ This often provides additional considerations and avoids unnecessary work.
    git commit
    ```
    to record your changes in [git].\
-   Please make sure you see the validation messages from [pre-commit] and fix and remaining issues.
+   Please make sure you see the validation messages from [pre-commit] and fix any remaining issues.
 
 !!! info
       Don't forget to add unit tests and documentation in case your
       contribution adds a feature and is not just a bugfix.
 
-      Moreover, writing an [descriptive commit message] is highly recommended.
+      Moreover, writing a [descriptive commit message] is highly recommended.
       In case of doubt, you can check the commit history with:
       ```
       git log --graph --decorate --pretty=oneline --abbrev-commit --all

@@ -1,19 +1,19 @@
 # Introduction to pages
 
 Pages are one of the most essential building blocks of Notion.
-A page has certain *attributes* such as a title, cover, icon, and wether it is deleted, i.e.
+A page has certain *attributes* such as a title, cover, icon, and whether it is deleted, i.e.,
 in the trash, or not.
-Items within a database, or rows if you will, are just pages and the schema of the database,
+Items within a database, or rows if you will, are just pages, and the schema of the database,
 that is the set of columns and their types, imposes *properties* on each contained page.
 
-Beside attributes and properties, a page also has a *content*, consisting of *blocks* for text
+Besides attributes and properties, a page also has *content*, consisting of *blocks* for text
 and everything you can choose in the Notion UI by hitting <kbd>/</kbd>. As a page can be contained
 in another page, we can have a *parent* and *children* relation between pages.
 Check out the [Page object] to find out more about accessing these functionalities.
 
 ## Searching for a page
 
-To get started, assume we have a page called "Getting Started", which we want to access using Ultimate Notion.
+To get started, assume we have a page called "Getting Started" that we want to access using Ultimate Notion.
 
 ```python
 import ultimate_notion as uno
@@ -23,7 +23,7 @@ notion = uno.Session.get_or_create()  # if NOTION_TOKEN is set in environment
 intro_page = notion.search_page('Getting Started').item()
 ```
 
-We can also display that content of the page within [JupyterLab] or even at the console with
+We can also display the content of the page within [JupyterLab] or even at the console with
 
 ```python
 intro_page.show()
@@ -40,7 +40,7 @@ Assume we have a page acting like a task in a database similar to the [Task List
 
 ![Notion task database](../assets/images/notion-task-db.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-We search for `Task DB`, retrieve all pages in a [View] and select the `Run first Marathon`-page:
+We search for `Task DB`, retrieve all pages in a [View], and select the `Run first Marathon` page:
 
 ```python
 task_view = notion.search_db('Task DB').item().get_all_pages()
@@ -48,9 +48,9 @@ task = task_view.search_page('Run first Marathon').item()
 ```
 
 !!! note
-    As Notion rarely has any uniqueness guarantees, many methods return [SList], i.e. <b>S</b>ingle-item **List**,
+    As Notion rarely has any uniqueness guarantees, many methods return [SList], i.e., <b>S</b>ingle-item **List**,
     a special list type for lists that *typically* hold a single item. An `SList` behaves exactly like
-    a normal Python list except of the fact that it provides an additional [item] method to retrieve the
+    a normal Python list except for the fact that it provides an additional [item] method to retrieve the
     single item or raise an exception otherwise.
 
 To check again for the date of the marathon, and also if we completed this task, we can use `props.col_name`, like
@@ -65,7 +65,7 @@ to get the output:
 Task "Run first Marathon" was Done on 2023-11-24 17:10:00+01:00
 ```
 
-The actual property names like `status` and `due_date` can be easily find out by looking at the schema of the database
+The actual property names like `status` and `due_date` can be easily found out by looking at the schema of the database
 holding our page, with:
 
 ```python
@@ -93,9 +93,9 @@ f'Task "{task.title}" was {task.props["Status"]} on {task.props["Due Date"]}'
 
 ## Working with properties
 
-The properties of a page provide access to the actual low-level Python object like `int`, `float`, `datetime`,
-the `str` subtype [RichText] and so on. There are a few exceptions though, like [Select], [MultiSelect] and [Status],
-where an [Option] object gives you access to its name, color and description.
+The properties of a page provide access to the actual low-level Python objects like `int`, `float`, `datetime`,
+the `str` subtype [RichText], and so on. There are a few exceptions though, like [Select], [MultiSelect], and [Status],
+where an [Option] object gives you access to its name, color, and description.
 
 To change a page property, we can just assign a new value to the corresponding property, e.g.:
 
@@ -113,11 +113,11 @@ task.props.due_date = old_due_date
 assert task.props.due_date == old_due_date
 ```
 
-Those change will also be automatically reflected on the Notion server. So each assignment
+Those changes will also be automatically reflected on the Notion server. So each assignment
 triggers an update web request.
 
-Here is an example on how to change the task status, which is a select property. First, we
-get the list of all options by accessing the the corresponding property types with:
+Here is an example of how to change the task status, which is a select property. First, we
+get the list of all options by accessing the corresponding property types with:
 
 ```python
 options = {opt.name: opt for opt in task.parent_db.schema.status.options}
