@@ -80,9 +80,18 @@ class SelectGroup(GenericObject):
     """Group of options for status objects."""
 
     name: str
-    id: str  # According to docs: "These are sometimes, but not always, UUIDs."
-    color: Color = Color.DEFAULT
+    id: str | UnsetType = Unset  # According to docs: "These are sometimes, but not always, UUIDs."
+    color: Color | UnsetType = Unset
     option_ids: list[str] = Field(default_factory=list)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SelectGroup):
+            return False
+        # we don't compare option_ids since we might not always have them (Status property can't be created)
+        return self.name == other.name and self.color == other.color
+
+    def __hash__(self) -> int:
+        return hash((self.name, self.color))
 
 
 class MentionMixin(ABC):

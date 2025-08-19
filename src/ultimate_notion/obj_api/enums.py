@@ -84,6 +84,14 @@ class ArrayQuantifier(str, Enum):
     NONE = 'none'
 
 
+class OptionGroupType(str, Enum):
+    """Option group type of the Status property."""
+
+    TO_DO = 'to_do'
+    IN_PROGRESS = 'in_progress'
+    COMPLETE = 'complete'
+
+
 class BGColor(str, Enum):
     """Background colors for most textual blocks, e.g. paragraphs, callouts, etc."""
 

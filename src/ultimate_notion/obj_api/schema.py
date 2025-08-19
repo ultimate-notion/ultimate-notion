@@ -92,6 +92,17 @@ class Status(Property, type='status'):
 
     status: TypeData = TypeData()
 
+    @classmethod
+    def build(cls, options: list[SelectOption], groups: list[SelectGroup]) -> Status:
+        """Create a `Status` object from the list of `SelectOption`'s.
+
+        !!! warning
+
+            While a Status property can be built, it can only be used to
+            check a schema, not to create a database having such a property.
+        """
+        return cls.model_construct(status=cls.TypeData(options=options, groups=groups))
+
 
 class Date(Property, type='date'):
     """Defines the date configuration for a database property."""
@@ -157,7 +168,7 @@ class Formula(Property, type='formula'):
 
         def __eq__(self, other: object) -> bool:
             """Compare Formula objects by all attributes except id."""
-            # Sadly expressions are changed by the Notion API, e.g. 'prop("Name")' in our request becomes
+            # Sadly, expressions are changed by the Notion API, e.g. 'prop("Name")' in our request becomes
             # {{notion:block_property:title:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
             # ToDo: Implement a way to compare these expressions, which is possible in principle.
             return isinstance(other, Formula.TypeData)

@@ -467,3 +467,74 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
     assert not hasattr(db.schema, 'name')
     assert not hasattr(db.schema, 'cat')
     assert not hasattr(db.schema, 'tags')
+
+
+def test_bind_db_auto(notion: uno.Session) -> None:
+    class StatusOption(uno.OptionNS):
+        backlog = uno.Option('Backlog', color=uno.Color.GRAY)
+        in_progress = uno.Option('In Progress', color=uno.Color.BLUE)
+        blocked = uno.Option('Blocked', color=uno.Color.RED)
+        done = uno.Option('Done', color=uno.Color.GREEN)
+
+    priority_options = [
+        uno.Option('✹ High', color=uno.Color.RED),
+        uno.Option('✷ Medium', color=uno.Color.YELLOW),
+        uno.Option('✶ Low', color=uno.Color.GRAY),
+    ]
+    formula = (
+        'if(prop("Status") == "Done", "✅", '
+        'if(empty(prop("Due Date")), "", '
+        'if(formatDate(now(), "YWD") == formatDate(prop("Due Date"), "YWD"), "🔹 Today", '
+        'if(now() > prop("Due Date"), '
+        '"🔥 " + compactDays(), '
+        '"🕐 " + compactDays()'
+        '))))'
+    )
+    compact_days_formula = (
+        '('
+        'if(if(empty(prop("Due Date")), toNumber(""), dateBetween(prop("Due Date"), now(), "days")) < 0, "-", "") + '
+        'if((if(if(empty(prop("Due Date")), toNumber(""), '
+        'dateBetween(prop("Due Date"), now(), "days")) < 0, -1, 1) * '
+        'floor(abs(if(empty(prop("Due Date")), toNumber(""), '
+        'dateBetween(prop("Due Date"), now(), "days")) / 7))) == 0, '
+        '"", format(abs(if(if(empty(prop("Due Date")), toNumber(""), '
+        'dateBetween(prop("Due Date"), now(), "days")) < 0, '
+        '-1, 1) * floor(abs(if(empty(prop("Due Date")), toNumber(""), '
+        'dateBetween(prop("Due Date"), now(), "days")) / 7)))) '
+        '+ "w")'
+        ') + '
+        'if((if(empty(prop("Due Date")), toNumber(""), dateBetween(prop("Due Date"), now(), "days")) % 7) == 0, "", '
+        'format(abs(if(empty(prop("Due Date")), toNumber(""), '
+        'dateBetween(prop("Due Date"), now(), "days"))) % 7) + "d"'
+        ')'
+    )
+    formula = formula.replace('compactDays()', compact_days_formula)
+
+    class TaskBase(uno.Schema):
+        task = uno.PropType.Title('Task')
+        due_date = uno.PropType.Date('Due Date')
+        priority = uno.PropType.Select('Priority', options=priority_options)
+        status = uno.PropType.Status(
+            'Status',
+            to_do=[StatusOption.backlog, StatusOption.blocked],
+            in_progress=[StatusOption.in_progress],
+            complete=[StatusOption.done],
+        )
+        urgency = uno.PropType.Formula('Urgency', formula=formula)
+
+    with pytest.raises(InvalidAPIUsageError):
+        TaskBase.bind_db()
+    assert not TaskBase.is_bound()
+
+    class TaskWithDbId(TaskBase, db_id='b0cb6b70e740496d9c818a298fa2d5e1'):
+        """Schema with a reference to a database by ID"""
+
+    TaskWithDbId.bind_db()
+    assert TaskWithDbId.is_bound()
+    assert not TaskBase.is_bound()
+
+    class TaskWithDbTitle(TaskBase, db_title='Task DB'):
+        """Schema with a reference to a database by title"""
+
+    TaskWithDbTitle.bind_db()
+    assert TaskWithDbTitle.is_bound()

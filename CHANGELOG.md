@@ -8,6 +8,9 @@
 - Chg: Unify `Property` and `PropertyType` to simplify declarative approach to schemas.
 - Fix: Possible collision of attribute names in `Page` and `Schema`.
 - Fix: Wrong equality check between properties as well as property values.
+- New: Bind a schema automatically with `bind_schema()` if `db_id` or `db_title` is set in the `Schema`.
+- Chg: Consistently return `None` for title, description, caption if these are not set instead of an empty string.
+- Fix: More strict typing and checks which led to many small bug fixes in edge cases.
 
 ## Version 0.8, 2025-06-23
 

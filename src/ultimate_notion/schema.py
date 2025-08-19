@@ -45,6 +45,7 @@ from ultimate_notion.errors import (
     SchemaNotBoundError,
 )
 from ultimate_notion.obj_api.core import Unset
+from ultimate_notion.obj_api.enums import OptionGroupType
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
 from ultimate_notion.props import PropertyValue
@@ -93,7 +94,7 @@ class Property(Wrapper[PT], ABC, wraps=obj_schema.Property):
         return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
 
     def __hash__(self) -> int:
-        return hash(self.obj_ref.type) + hash(self.obj_ref.value)
+        return hash((self.obj_ref.type, self.obj_ref.value))
 
     def __repr__(self) -> str:
         return get_repr(self, name=f'{self.__class__.__name__} Property', desc=self.name)
@@ -322,6 +323,7 @@ class SchemaModel(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra='forbid')
     _db_title: str | None = PrivateAttr(default=None)
+    _db_id: str | None = PrivateAttr(default=None)
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the Pydantic model to a dictionary."""
@@ -336,21 +338,24 @@ class SchemaModel(BaseModel):
     def __repr__(self) -> str:
         base = super().__repr__()
         attrs = base[len(self.__class__.__name__) :]
-        return f'{self.__class__.__name__}[{self._db_title}]{attrs}'
+        title = 'Untitled' if self._db_title is None else f' ({self._db_title})'
+        return f'{self.__class__.__name__}[{title}]{attrs}'
 
 
 class Schema(metaclass=SchemaType):
     """Base class for the schema of a database."""
 
     _db_title: rich_text.Text | None
+    _db_id: str | None
     _db_desc: rich_text.Text | None
     _database: Database | None = None
     _props: list[Property]
 
-    def __init_subclass__(cls, db_title: str | None = None, **kwargs: Any):
+    def __init_subclass__(cls, db_title: str | None = None, db_id: str | None = None, **kwargs: Any):
         if db_title is not None:
             db_title = rich_text.Text(db_title)
         cls._db_title = db_title
+        cls._db_id = db_id
         cls._db_desc = rich_text.Text(cls.__doc__) if cls.__doc__ is not None else None
         cls._validate()
         super().__init_subclass__(**kwargs)
@@ -463,6 +468,7 @@ class Schema(metaclass=SchemaType):
             **kwargs,
         )
         model._db_title = cls._db_title
+        model._db_id = cls._db_id
         return model
 
     @classmethod
@@ -577,10 +583,22 @@ class Schema(metaclass=SchemaType):
         cls._set_obj_refs()
 
     @classmethod
-    def bind_db(cls, db: Database) -> None:
-        """Bind this schema to the corresponding database for back-reference and vice versa."""
-        # ToDo: If `None` (default) is passed, search for the database `db_title`
-        # and bind it to this schema.
+    def bind_db(cls, db: Database | None = None) -> None:
+        """Bind this schema to the corresponding database for back-reference and vice versa.
+
+        If `None` (default) is passed, search for the database using `db_id` or `db_title`
+        and bind it to this schema.
+        """
+        if db is None:
+            sess = get_active_session()
+            if cls._db_id is not None:
+                db = sess.get_db(cls._db_id)
+            elif cls._db_title is not None:
+                db = sess.search_db(cls._db_title).item()
+            else:
+                msg = 'Neither a database ID nor a title is set to bind the schema automatically.'
+                raise InvalidAPIUsageError(msg)
+
         db.schema = cls
         cls._bind_db(db)
 
@@ -766,19 +784,68 @@ class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
 
     Also the Status configuration is not mentioned as a
     [Property Schema Object])https://developers.notion.com/reference/property-schema-object).
+
+    It can still be used to check a schema.
     """
 
     allowed_at_creation = False
+
+    def __init__(
+        self,
+        name: str | None = None,
+        *,
+        to_do: list[Option] | type[OptionNS] | None = None,
+        in_progress: list[Option] | type[OptionNS] | None = None,
+        complete: list[Option] | type[OptionNS] | None = None,
+    ) -> None:
+        def _normalize(group: list[Option] | type[OptionNS] | None) -> list[Option]:
+            if group is None:
+                return []
+            elif isinstance(group, type) and issubclass(group, OptionNS):
+                return group.to_list()
+            else:
+                return group
+
+        to_do = _normalize(to_do)
+        in_progress = _normalize(in_progress)
+        complete = _normalize(complete)
+
+        to_do_group = OptionGroup(OptionGroupType.TO_DO, options=to_do)
+        in_progress_group = OptionGroup(OptionGroupType.IN_PROGRESS, options=in_progress)
+        complete_group = OptionGroup(OptionGroupType.COMPLETE, options=complete)
+
+        option_objs = [option.obj_ref for option in (*to_do, *in_progress, *complete)]
+        group_objs = [group.obj_ref for group in (to_do_group, in_progress_group, complete_group)]
+        super().__init__(name, options=option_objs, groups=group_objs)
 
     @property
     def options(self) -> list[Option]:
         """Return the options of this status property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.status.options]
 
+    def _extract_groups(self) -> list[tuple[obj_schema.SelectGroup, list[Option]]]:
+        """Extract options from a group."""
+
+        def get_id(option: Option) -> str:
+            try:
+                return option.id
+            except ValueError:
+                return option.name
+
+        option_ids = {get_id(option): option for option in self.options}
+
+        groups = []
+        for group_obj in self.obj_ref.status.groups:
+            # note that opt_id might be a name here, as explained in `OptionGroup``
+            group_options = [option_ids[opt_id] for opt_id in set(group_obj.option_ids) & set(option_ids.keys())]
+            groups.append((group_obj, group_options))
+
+        return groups
+
     @property
     def groups(self) -> list[OptionGroup]:
         """Return the option groups of this status property."""
-        return [OptionGroup.wrap_obj_ref(group, options=self.options) for group in self.obj_ref.status.groups]
+        return [OptionGroup.wrap_obj_ref(group, options=options) for group, options in self._extract_groups()]
 
 
 class Date(Property[obj_schema.Date], wraps=obj_schema.Date):

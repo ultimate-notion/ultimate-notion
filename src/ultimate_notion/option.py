@@ -5,7 +5,7 @@ from __future__ import annotations
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
-from ultimate_notion.obj_api.enums import Color
+from ultimate_notion.obj_api.enums import Color, OptionGroupType
 from ultimate_notion.rich_text import Text
 
 
@@ -88,14 +88,39 @@ class OptionNS(metaclass=OptionNSType):
 class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
     """Group of options for status property."""
 
-    _options: dict[str, Option]  # holds all possible options
+    _options: list[Option]  # holds all possible options of this group
+
+    def __init__(self, group_type: OptionGroupType | str, options: list[Option]) -> None:
+        group_type = OptionGroupType(group_type)
+        # There are three option groups and the colors and names seem to be fixed. No way to change it in the UX.
+        match group_type:
+            case OptionGroupType.TO_DO:
+                name = 'To-do'
+                color = Color.GRAY
+            case OptionGroupType.IN_PROGRESS:
+                name = 'In progress'
+                color = Color.BLUE
+            case OptionGroupType.COMPLETE:
+                name = 'Complete'
+                color = Color.GREEN
+
+        self._options = options
+        # Note that we use option names (not IDs, which may not be present) to identify options in the group.
+        # OptionGroups cannot be created with the Notion API and thus we only use it for convenience
+        # during local development and testing and when checking schemas it will be ignored.
+        option_ids = []
+        for option in options:
+            try:
+                option_ids.append(option.id)
+            except ValueError:
+                option_ids.append(option.name)
+        super().__init__(name=name, color=color, option_ids=option_ids)
 
     @classmethod
     def wrap_obj_ref(cls, obj_ref: objs.SelectGroup, /, *, options: list[Option] | None = None) -> OptionGroup:
         """Convienence constructor for the group of options."""
         obj = super().wrap_obj_ref(obj_ref)
-        options = [] if options is None else options
-        obj._options = {option.id: option for option in options}
+        obj._options = [] if options is None else options
         return obj
 
     @property
@@ -106,13 +131,21 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
     @property
     def options(self) -> list[Option]:
         """Options within this option group."""
-        return [self._options[opt_id] for opt_id in self.obj_ref.option_ids]
+        return self._options
 
     def __repr__(self) -> str:
         return get_repr(self)
 
     def __str__(self) -> str:
         return self.name
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, OptionGroup):
+            return self.obj_ref == other.obj_ref
+        return False
+
+    def __hash__(self) -> int:
+        return hash(self.obj_ref)
 
 
 def check_for_updates(old: list[Option], new: list[Option]) -> dict[str, list[str]]:
