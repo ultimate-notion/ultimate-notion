@@ -40,6 +40,8 @@ class View(Sequence[Page]):
         self._title_col = database.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
         self._pages: NDArray[Any] = np.array(pages)
+        self._row_indices: NDArray[Any]
+        self._col_indices: NDArray[Any]
         self.default_limit = 10
 
         self.reset()
