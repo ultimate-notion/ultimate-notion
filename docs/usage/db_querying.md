@@ -91,7 +91,7 @@ assert len(pages) == num_of_articles / len(Topic)
 
 Using the Notion UI to get the same result, we would define an *Advanced filter* on a view like this:
 
-![View filter](../assets/images/notion-view-filter.png){: style="height:300px; display:block; margin-left:auto; margin-right:auto;"}
+![View filter](../assets/images/notion-view-filter.png){:style="height:300px; display:block; margin-left:auto; margin-right:auto;"}
 
 It should also be noted that the methods `filter` and `sort` of [Query][query object] return a
 new [Query][query object] object to make method chaining possible. This potentially allows

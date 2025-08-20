@@ -70,7 +70,7 @@ new_page.cover = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
 
 This is how *My DB* looks right now.
 
-![Notion My DB](../assets/images/notion-my-db.png){: style="width:500px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion My DB](../assets/images/notion-my-db.png){:style="width:500px; display:block; margin-left:auto; margin-right:auto;"}
 
 But how can I figure out which keyword arguments to pass to [create_page]? For this, we can take a look at the [schema]
 of the database, which also allows us to create new pages in a neat way. As our database holds *tools*, we can express
@@ -102,7 +102,7 @@ This is basically just an alias for [create_page] but can make your code much mo
 
 Assume we have a simple database listing tasks like this:
 
-![Notion task database](../assets/images/notion-task-db.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion task database](../assets/images/notion-task-db.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 To access the tasks, i.e., the pages within this database, we can use the [get_all_pages] method to
 generate a [View]. It's as simple as:
@@ -130,7 +130,7 @@ Plan vacation                     Backlog      ✹ High      🕐 18w     2025-1
 
 or in [JupyterLab] this will be shown as:
 
-![Notion task view](../assets/images/notion-task-view.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion task view](../assets/images/notion-task-view.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 Special columns for the index, the page's ID, and its icon can be activated using
 [with_index], [with_id], and [with_icon], respectively:
@@ -139,7 +139,7 @@ Special columns for the index, the page's ID, and its icon can be activated usin
 task_view.with_index().with_id().with_icon()
 ```
 
-![Notion task view extended](../assets/images/notion-task-view-ext.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion task view extended](../assets/images/notion-task-view-ext.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 The index can now be used to retrieve a specific page with [get_page], or we could just
 convert the whole view to a [Pandas] dataframe with [to_pandas].

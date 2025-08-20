@@ -156,7 +156,7 @@ also be updated via the [update-a-block endpoint] of the official Notion API.
 
 Our page now looks like this so far:
 
-![Block page](../assets/images/notion-block-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Block page](../assets/images/notion-block-page.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 !!! bug
 
@@ -361,7 +361,7 @@ page.append(uno.Paragraph(rt))
 
 Let's take a look at how our fancy text page looks in the end.
 
-![Fancy text page](../assets/images/notion-fancy-text-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Fancy text page](../assets/images/notion-fancy-text-page.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 ## Working with comments
 

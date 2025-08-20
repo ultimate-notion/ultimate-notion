@@ -24,7 +24,7 @@ window, click <kbd>Connections</kbd> and choose <kbd>Develop or manage integrati
 the [My integrations] site. Now select <kbd>+ Create new integration</kbd>, provide a name, a [logo], and select the
 Notion workspace the integration should be associated with. After that, click the <kbd>Submit</kbd> button.
 
-![Notion integration](../assets/images/notion-integration-create.png){: style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion integration](../assets/images/notion-integration-create.png){:style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 This brings you to the Secrets site where you need to copy and save the *Internal Integration Token*, which always starts
 with `ntn_` or `secret_` when created before September 25, 2024. This token will be used by Ultimate Notion for
@@ -38,7 +38,7 @@ select the <kbd>···</kbd> on the upper right. In the drop-down menu, scroll d
 search and select your created integration. A pop-up that you need to confirm will inform you that your integration
 will have access to the selected page as well as all its children.
 
-![Notion integration](../assets/images/notion-integration-add.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion integration](../assets/images/notion-integration-add.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 ## Loading a Notion page
 
@@ -53,7 +53,7 @@ token is set correctly as an environment variable or in your configuration file.
 Run the code and you should see the following rendered Markdown code in JupyterLab or just the plain output if you run the
 code in a terminal.
 
-![Getting started page](../assets/images/notion-getting-started-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+![Getting started page](../assets/images/notion-getting-started-page.png){style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
 ## Notion concepts in a nutshell
 

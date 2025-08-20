@@ -153,7 +153,6 @@ task.props.status = 'Blocked'
 [View]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View
 [SList]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList
 [item]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList.item
-[PropertyValue]: ../../reference/ultimate_notion/props/#ultimate_notion.props.PropertyValue
 [RichText]: ../../reference/ultimate_notion/objects/#ultimate_notion.objects.RichText
 [Option]: ../../reference/ultimate_notion/objects/#ultimate_notion.objects.Option
 [Select]: ../../reference/ultimate_notion/props/#ultimate_notion.props.Select

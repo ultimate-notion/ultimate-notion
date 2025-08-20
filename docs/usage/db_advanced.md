@@ -167,11 +167,9 @@ engelbart = Customer.create(name='Doug Engelbart', purchases=[khaki_pants, t_shi
 
 This is how our two databases `item_db` and `customer_db` look in the Notion UI right now:
 
-![Notion item database](../assets/images/notion-item-db.png){:
-style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion item database](../assets/images/notion-item-db.png){:style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
 
-![Notion customer database](../assets/images/notion-customer-db.png){:
-style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion customer database](../assets/images/notion-customer-db.png){:style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
 
 !!! note
     The description of the databases corresponds to the docstring of the schema classes `Item` and `Customer`.
@@ -234,8 +232,7 @@ hertzfeld = Customer.create(name='Andy Herzfeld', purchases=[t_shirt])
 
 and take a look at the two-way relation within `item_db`:
 
-![Notion customer database with two-way relation](../assets/images/notion-item-db-two-way.png){:
-style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
+![Notion customer database with two-way relation](../assets/images/notion-item-db-two-way.png){:style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
 
 Assume now that we want to have a schema that references itself, for instance a simple task list
 where certain tasks can be subtasks of others:
