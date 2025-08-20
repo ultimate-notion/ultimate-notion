@@ -13,6 +13,7 @@ First Beta release:
 - New: Bind a schema automatically with `bind_schema()` if `db_id` or `db_title` is set in the `Schema`.
 - Chg: Consistently return `None` for title, description, caption if these are not set instead of an empty string.
 - Fix: More strict typing and checks which led to many small bug fixes in edge cases.
+- Fix: Too strict dependencies that too often lead to conflicts with other packages.
 
 ## Version 0.8, 2025-06-23
 
