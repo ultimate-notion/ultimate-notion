@@ -117,15 +117,15 @@ To get a quick overview of our tasks, we can use [show]. On the console, this wi
 ```console
 Task                              Status       Priority    Urgency    Due Date
 --------------------------------  -----------  ----------  ---------  -------------------------
-Clearing out the cellar           In Progress  ✶ Low       🔥 -2w2d   2023-11-16 17:10:00+01:00
-Run first Marathon                Done         ✶ Low       ✅         2023-11-24 17:10:00+01:00
-Pay yearly utility bills          Blocked      ✹ High      🔥 -5d     2023-11-27 17:10:00+01:00
-Call family                       Done         ✶ Low       ✅         2023-12-01 17:10:00+01:00
-Complete project report for work  In Progress  ✷ Medium    🔹 Today   2023-12-02 17:10:00+01:00
-Build tool with Ultimate Notion   In Progress  ✶ Low       🕐 1d      2023-12-03 17:10:00+01:00
-Clean the house                   In Progress  ✶ Low       🕐 5d      2023-12-07 17:10:00+01:00
-Read book about procrastination    Backlog      ✷ Medium    🕐 2w2d    2023-12-18 17:10:00+01:00
-Plan vacation                     Backlog      ✹ High      🕐 3w3d    2023-12-26 17:10:00+01:00
+Clearing out the cellar           In Progress  ✹ High      🔥 -3w6d   2025-07-23 21:10:00+00:00
+Run first Marathon                Done         ✶ Low       ✅         2025-08-05 11:00:00+00:00
+Pay yearly utility bills          Blocked      ✹ High      🔥 -1d     2025-08-18 16:10:00+00:00
+Call family                       Done         ✶ Low       ✅         2025-08-19 16:10:00+00:00
+Complete project report for work  In Progress  ✷ Medium    🕐 3d      2025-08-23 16:10:00+00:00
+Build tool with Ultimate Notion   In Progress  ✶ Low       🕐 2w2d    2025-09-05 16:10:00+00:00
+Clean the house                   In Progress  ✶ Low       🕐 3w5d    2025-09-15 16:10:00+00:00
+Read book about procrastination   Backlog      ✷ Medium    🕐 13w     2025-11-19 16:10:00+00:00
+Plan vacation                     Backlog      ✹ High      🕐 18w     2025-12-24 16:10:00+00:00
 ```
 
 or in [JupyterLab] this will be shown as:
