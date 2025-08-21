@@ -607,3 +607,11 @@ def test_insert_after_replace_block(root_page: uno.Page, notion: uno.Session) ->
 
     with pytest.raises(InvalidAPIUsageError):
         divider.replace(divider)
+
+
+@pytest.mark.vcr()
+def test_nested_bullet_items(root_page: uno.Page, notion: uno.Session) -> None:
+    page = notion.create_page(parent=root_page, title='Page for nested bullet points')
+    page.append(uno.BulletedItem('First bullet'))
+    page.append(second_bullet := uno.BulletedItem('Second bullet'))
+    second_bullet.append(uno.BulletedItem('Nested bullet'))
