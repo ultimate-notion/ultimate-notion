@@ -157,7 +157,7 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
         strikethrough: bool = False,
         code: bool = False,
         underline: bool = False,
-        color: Color = Color.DEFAULT,
+        color: Color | None = None,
         href: str | None = None,
     ) -> None:
         if len(text) > MAX_TEXT_OBJECT_SIZE:

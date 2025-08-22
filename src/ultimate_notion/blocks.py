@@ -378,10 +378,12 @@ class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_
         self,
         text: str,
         *,
-        language: CodeLang = CodeLang.PLAIN_TEXT,
+        language: str | CodeLang = CodeLang.PLAIN_TEXT,
         caption: str | None = None,
     ) -> None:
         super().__init__(text)
+        if not isinstance(language, CodeLang):
+            language = CodeLang(language)
         self.obj_ref.value.language = language
         self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
 
