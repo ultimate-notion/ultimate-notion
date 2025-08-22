@@ -6,6 +6,7 @@ repos:
   - id: check-added-large-files
   - id: check-ast
   - id: check-json
+    exclude: '^\.vscode/'  # VS Code config files use JSONC (JSON with Comments)
   - id: check-merge-conflict
   - id: check-xml
   - id: check-yaml
