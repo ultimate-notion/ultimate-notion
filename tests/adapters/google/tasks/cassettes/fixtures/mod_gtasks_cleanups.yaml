@@ -13,17 +13,18 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
     uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/4WQzU7DMBCE73kKy1xJnBho2pyolFIh6rZI4RAoBys1wc2vWLemqfruxKZSTojL
-        SKtvdmd3Tw5CuJD1FkcIKw4FXBldSFCArw0UiucGbvCDq+vxNJ2n85cN/oVSiQp6+tYXCJ2s/jnQ
-        tlguLWXxLGDdI2W7Wbfsnm9WcfHNkmlfpyMWN3rwDzvQuJqss51+4tllB2tQUpXCzjyixIQOaN9u
-        uRI2kPr01vUDl/pJMIpoGN1NvDAMXwcziPJjIevCuD+VaiEiRGvt5U2Tl4K3ErysqYi9ixwCsgfx
-        BeS+EqQ0HyP/nmSDzr2+O2fnB/WEfPx9AQAA
+        H4sIAAAAAAAC/4WQwU7DMAyG730Kq+etBcRpt2pUYpchQXdCHLLESsPSuCTpYEx9d5K0EhNC2in6
+        7S+WP58zgBytJZuv4BxCiJwEhnR/c7uYCh06x2Ss5c/4MaDz0DIByhyZVgLY4Fs0XnHmFRngFkWM
+        TLsC6q8euUcBT1Wg4A4Y52EaeDqgWYAmqcIPooNCIAsUJlm4MraAF0Rove/dqiwFHlFTj9YVkkhq
+        LDh1pUqsP5VOSbNUpvzEfUQ5GUcal72l97BYkc+K6QQuGL6mDPMt/upvZuX1r+M8IZGCOqZMBKWm
+        PdOXPYvMUepFsTqd/KKtafKMQDwVWfU9Ff6BmlOf1mmRCbT5DIzpfZuNnGd+iEb5blvtmsd622zW
+        VVM/RHzMxuwH1VrBt/sBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -33,10 +34,14 @@ interactions:
       - application/json; charset=UTF-8
       Server:
       - ESF
+      Transfer-Encoding:
+      - chunked
       Vary:
       - Origin
       - X-Origin
       - Referer
+      WWW-Authenticate:
+      - Bearer realm="https://accounts.google.com/", error="invalid_token"
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
@@ -46,20 +51,14 @@ interactions:
       x-l2-request-path:
       - l2-managed-14
     status:
-      code: 200
-      message: OK
+      code: 401
+      message: Unauthorized
 - request:
     body: grant_type=refresh_token&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ftasks
     headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
+      accept-encoding:
       - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '333'
-      Content-Type:
+      content-type:
       - application/x-www-form-urlencoded
       user-agent:
       - secret...
@@ -69,8 +68,14 @@ interactions:
     uri: https://oauth2.googleapis.com/token
   response:
     body:
-      string: '{"access_token": "secret...", "expires_in": 3599, "scope": "https://www.googleapis.com/auth/tasks",
-        "token_type": "Bearer", "refresh_token_expires_in": 601251}'
+      string: !!binary |
+        H4sIAAAAAAAC/1XQy3KCQBAF0L1fYbmOyksG3I34IBBUBDVkQ404MogIToOgqfx7oq6y7Vt9b9X5
+        brXbHRJFFCAs85SeO8N250YkvYcF7MmmOq/z2rF8gqbzLiO33MYTI7tfNpcC66ZZuXu3YfsgMScr
+        +6AY42qbHQ/rpcP80QcgOlKB7ZddbxF5Y3xOrO1KXZ4cFK8zzWzYjq3TY7mUeaSutEq+i0gyUGjv
+        QoLtxU6LFSmysyZ4L7RkdgdOXXQ/b5J5EVuiyqtN3Zy90khBuIG0CDiqfF9T/MmgHuWK8CXwVBXj
+        aA1dYsSBjfeOh1eON3XN2afkJHirBNcpwKERLSurCjDs69EVJAF13h4mtCkSTiFMHiLyQNefV4jy
+        gj6IWFkWMOz367ruxXkenygpEuhFedYnVcn6JYEUXk1P1rC8vR5HlHDKXwmnh78J9oIP/y2KsqQj
+        1Pr5BbclyY6gAQAA
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -98,6 +103,57 @@ interactions:
       - SAMEORIGIN
       X-XSS-Protection:
       - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      content-length:
+      - '0'
+      user-agent:
+      - secret...
+      x-goog-api-client:
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+    method: GET
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/4WQzU7DMBCE73kKy1xJnBho2pyolFIh6rZI4RAoBys1wc2vWLemqfruxKZSTojL
+        SKtvdmd3Tw5CuJD1FkcIKw4FXBldSFCArw0UiucGbvCDq+vxNJ2n85cN/oVSiQp6+tYXCJ2s/jnQ
+        tlguLWXxLGDdI2W7Wbfsnm9WcfHNkmlfpyMWN3rwDzvQuJqss51+4tllB2tQUpXCzjyixIQOaN9u
+        uRI2kPr01vUDl/pJMIpoGN1NvDAMXwcziPJjIevCuD+VaiEiRGvt5U2Tl4K3ErysqYi9ixwCsgfx
+        BeS+EqQ0HyP/nmSDzr2+O2fnB/WEfPx9AQAA
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Server:
+      - ESF
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+      x-l2-request-path:
+      - l2-managed-14
     status:
       code: 200
       message: OK

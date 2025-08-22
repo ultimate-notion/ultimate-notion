@@ -15,16 +15,125 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: POST
     uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPTQuCQBCG7/6KZbumqyuGeIpOESpUEiheFl1t8ZNmbZHov9cqdOswc3ke3nfm
-        ZSCEG9GXOEBYMmhgo3coQOKtZmIhKXVo7F7gO3FhZ+n1WB6K82pwyWrt5DgJ51tTnRREfo5XKIVs
-        uabRjHqukA5vf+HTWDLJlwZqU8+0dyZ1E8cNKA083/JcL1tF4G0Vir7R5l3KEQJClFJWPQx1y9ko
-        wCqGjiwPkKdDJuAPIPuOE10G5M/9xtv4AEeFRpYBAQAA
+        H4sIAAAAAAAC/4WQwU7DMAyG730Kq+etBcRpt2pUYpchQXdCHLLESsPSuCTpYEx9d5K0EhNC2in6
+        7S+WP58zgBytJZuv4BxCiJwEhnR/c7uYCh06x2Ss5c/4MaDz0DIByhyZVgLY4Fs0XnHmFRngFkWM
+        TLsC6q8euUcBT1Wg4A4Y52EaeDqgWYAmqcIPooNCIAsUJlm4MraAF0Rove/dqiwFHlFTj9YVkkhq
+        LDh1pUqsP5VOSbNUpvzEfUQ5GUcal72l97BYkc+K6QQuGL6mDPMt/upvZuX1r+M8IZGCOqZMBKWm
+        PdOXPYvMUepFsTqd/KKtafKMQDwVWfU9Ff6BmlOf1mmRCbT5DIzpfZuNnGd+iEb5blvtmsd622zW
+        VVM/RHzMxuwH1VrBt/sBAAA=
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Server:
+      - ESF
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      WWW-Authenticate:
+      - Bearer realm="https://accounts.google.com/", error="invalid_token"
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+      x-l2-request-path:
+      - l2-managed-14
+    status:
+      code: 401
+      message: Unauthorized
+- request:
+    body: grant_type=refresh_token&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ftasks
+    headers:
+      accept-encoding:
+      - gzip, deflate
+      content-type:
+      - application/x-www-form-urlencoded
+      user-agent:
+      - secret...
+      x-goog-api-client:
+      - gl-python/3.10.9 auth/2.40.3 cred-type/u
+    method: POST
+    uri: https://oauth2.googleapis.com/token
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/1XQS3OCMBQF4H1/heO6VR4+iDtUGiqiRbSAGyZITBgEIgGBdPrfW3XV7T1zz5n5
+        vl96vT46nTDnYVWkOO/Pev0OKWCgS7qrmpNNAyNHXC03WwE18myuW/A80rS1BqM0S28MXsJ0ngVc
+        zUHryUQV8+uCQmJd6mM2jqpGMJnCndjcUk1IRjted1Z2kHwUhaWNz9hP9vKn0S2D1kZ2VXuja7wS
+        xPTzr+AG9WWmxiBmxAoc5nKPHupWsBgbVkdhtM6BdzlPFrkc674+BQaPhLJbxTGut+pbapofRGyc
+        KUULEli6b7j6znbfHRP6ip0olrLS4PVID5OjhJi2322PlEiKNO2/3k1wy5IS8zC5i6hjAB5XfioY
+        vhPRqmJ8Nhw2TTMgRUEuGLGED05FNkR1RYcV4il/Nj1Yw6p7Ps4xKnH5TEp8/pugT/jw36KsKkCe
+        vPz8Atrn2OOgAQAA
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Expires:
+      - Mon, 01 Jan 1990 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - scaffolding on HTTPServer2
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"title": "My new tasklist"}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      content-length:
+      - '28'
+      content-type:
+      - application/json
+      user-agent:
+      - secret...
+      x-goog-api-client:
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+    method: POST
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/3WPywrCMBBF9/2KELfapBGxdKULFcQHgliVbooda+gTZ2pQ8d8lLbhzM5tzuPfO
+        22GMZ7pMeMA4xZhhz96VRuJ9y3RLTuGyOCyWp6O3uR1eyQ5CQ9tpZwDFqXUinm1ni/mouoaNH/EO
+        kqYcLF0/WQmG2fD8F97USUzQNiipRgPpD5Tay3EgvUBJd+iPz52IkF9XusyseSOqMRDCGOOmVZXm
+        ENca3UtViPYB8fBEg3BHMSlA2DIUf/Y7H+cLIYPjxQEBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -67,18 +176,18 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: POST
-    uri: https://tasks.googleapis.com/tasks/v1/lists/Y212N3RsN3RNc0ZYSHdBcQ/tasks?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/lists/YWJmVGJYX1NhVzdQeWwtOA/tasks?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/32PXUvDMBSG7/srSrx1TZp+qAWRCYIXWphu/ZiTkbWxje2aSrLFIf53l7QoiBhI
-        4Jz3OSfv+2HZNmhYV4LIBpKIRpzoF5zqPjPdDPf+Zj49FGmDkqQK0kWyj9VAUEkqzazAOgvrmoUz
-        lVYrMIiSyZZq9f5gd1TZP4t3fUkkNdsxwsEEhRPszV0vwjgKzp3QD5cDKGj7cse6RpO1lL2IIFRK
-        ORXnVUtJz4RT8C00xuHehS0TUsAcuzj2HsTxxgVa5o+35XUxG6n/4vRcMMl4p79Df5zRlCRyJzTT
-        UVqKaWFGjNQevWrl6dmUim4SRtXvBMbImOHbP1y/vm8RfmP+IrvIb/jZlSCXIbA+rS+M3ltppAEA
-        AA==
+        H4sIAAAAAAAC/32PXUvDMBSG7/srSrx1TT/oOgoiRZluuMpktpvOi9hmbWj6ITkzc+J/16RFQcRc
+        HMh5n3PO+74bpokq1uQoNBEQUYkTVdGp6jPdJffxIeZ8Fjt3QC4XXjbNjvGyJyiQQjFbRNbFrNyx
+        aRNVW9SLwIBTpS7ezIZK82fxvssJUL3dtV1/ZE9Grruyg9B2Qte2/Inz0IOC8t0NaypFlgCdCDGW
+        UlpF2xacko4JK2trrI3jVwdzJkDgTTqvk6v5Zu3EZXLMlzSVcBsN1H9xulYwYG2jztl/vMEUENgL
+        xTSU5iLK9IiW+JdXpTw+6a+kzwmj8ncCbWTI8O0fs4uX8eY6WNWlF3Sp558LcjZGxofxCVsuzJSk
+        AQAA
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -119,18 +228,18 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/lists/Y212N3RsN3RNc0ZYSHdBcQ/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
+    uri: https://tasks.googleapis.com/tasks/v1/lists/YWJmVGJYX1NhVzdQeWwtOA/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/4WRa0vDMBiFv/dXhPjVLW16UQsiEwaKOphu7To3RtfGNvaSSrLFMfbfbWPpVAYG
-        8kLynOS8J9lrAMCMljF0ARQhz/iZqvC8AUSESQMW0HwoWXCf+AUbLuA3pIIUvKav9QKAvaonL1Ny
-        xagiM1xZ68lgF/mZ7nmJ7U+97UgeVUfX1cxJU+qMpZ+0rkogqMhJo3jagZJI8NtkU8WhIMoJ69ju
-        6U4PmxPDdDF27cu+Yznzo5iT/O2RllmjToWouIuQlLKfMJbkJKwo70esQCoM2hoop1xwFGADj8xn
-        Xs9RpM+Dl7v4Nhq3qv/iVYxTQVnZWOonxo/mRCg2zRPDkpCYDyJ1rMN53bf6gGW3Jcnao0T+TaQa
-        azN1edDq/bPQ8Qe1prOrYMgubnh47UB11aGuS+2gfQFYXuRzHwIAAA==
+        H4sIAAAAAAAC/4WRXU/CMBSG7/kVTb0Vuo3wkSXGEJWvyAwGGCBc1K1szboP0wMVCP/drZKhhsRe
+        nKR93p73vO2xghCOeOJjG2GgMpI3uuLbAjCgQQFW2NnJZf/wtJ/25Ap/Qw4sljl9yzcIHXW92kzL
+        NeOa0Knz6QgxcMxXoI+jutf1Ds74orq40nkwCDe8m3Sis6sWAAfBCsVojxKm0G+TbeZTYNrJMqxG
+        1WhXLWtitGzDtC2j1miby4tYMrF55klUqEOATNqEKKVqQZoGgtGMy5qXxkSHITuTCC5BkoU7jGe9
+        4WJuOuHs4I+Zq+Clc1b9Fy9LJQeeJoWlcWX9GA4obIsnxgljvux4+lqJRT63/oB1eaTY+4wz9TeR
+        HuycqcxD+MNHc9FvTeKw3srceuNe0rsm1q1OeV1XTpUvAmmx6x8CAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -173,18 +282,18 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: PATCH
-    uri: https://tasks.googleapis.com/tasks/v1/lists/Y212N3RsN3RNc0ZYSHdBcQ/tasks/X2p4bTAycWk0VVg5WUVvNw?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/lists/YWJmVGJYX1NhVzdQeWwtOA/tasks/aUNxNllIN1RtaDM3cFczNQ?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/32PX0vDMBTF3/spSny1S5qu0xZEVEQftKBu3Ton0j+xZs3ajGSLU/zuNmlxIGrg
-        Bu69h3PP78OybVDRugChDWQqKnGgf3Co59RMZ5gPs/HZLp9WKI5LfzqJt5HqFESmpdYswPoiL5fO
-        VZ29owXolpJKRvT2dmfXRNl74w0vUkmMO0bYd9DIwd7Y9UKMQ/94EGA874SCsJcbWlda+SolFyGE
-        SqlB2TQlIymnYpA3K2iCw60LGRVSwAS7OPLuRVtRjubJw3Vxnt/1qv9weCOopE2tz6FfXh9KpnIj
-        tKa9zRnRJGaxb/8CQ0EPxloobfH4ZFpFspgS9RPVJO5hv0Hh8/JthfCaDiezILlsjk5FejIC1qf1
-        BYZAgH7NAQAA
+        H4sIAAAAAAAC/32P3UvDMBTF3/tXlPjqln5say2IiGPasVUms7U6H2Ib29D0Q3JndOL/7tIWB6Lm
+        IXDvOZx7fh+arqOCVSnydAREFOJI/ehY7Vm7JbfBW8C5H5g3QKZLO5klu2DVOSiQTHk2aOq4iR/N
+        gC/8DepEYMCpUpfvekWlfgjeNikB2qZbhjUeGO7AstaG4xmmZxnDE3d03xkF5c8LVhXKmQM0wsNY
+        SjnM6jrjlDRMDJO6xG1x/GpizgQIHEfzMrycx3dmkIe7dEUjCdfnves/nKYWDFhdqXPGL68vBQS2
+        Qnn2txtOFUkrHMa/wEZuD8b3UCri4bEdJX0KGZU/UdvGPew3KGYXL5P4ylmXue00kT0+E+R0grRP
+        7QsbsOcNzQEAAA==
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -225,9 +334,9 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: DELETE
-    uri: https://tasks.googleapis.com/tasks/v1/lists/Y212N3RsN3RNc0ZYSHdBcQ/tasks/X2p4bTAycWk0VVg5WUVvNw
+    uri: https://tasks.googleapis.com/tasks/v1/lists/YWJmVGJYX1NhVzdQeWwtOA/tasks/aUNxNllIN1RtaDM3cFczNQ
   response:
     body:
       string: ''
@@ -269,18 +378,18 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/lists/Y212N3RsN3RNc0ZYSHdBcQ/tasks/X2p4bTAycWk0VVg5WUVvNw?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/lists/YWJmVGJYX1NhVzdQeWwtOA/tasks/aUNxNllIN1RtaDM3cFczNQ?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/32PbUvDMBCAv/dXlPjVNWm6bktBRFHwwyzsrXtxMrI21tiurSZdHOJ/t8mqAxED
-        F7i7h7t7PizbBhkvEhDYQFKRiTP9g3Nd56a6wFV3O706xPMMRVHqz2fRPlRHgkmaamYNCrrtj2+K
-        w2Y4WoNjU3KZM929P9gFU/ZpcF0lVDIzHSPsd1Cvg72p6wUYBz5xkI9WR1Cw/GnIi0yTz1JWIoBQ
-        KeWkZZnmjFZcOHG5g+ZwuHdhzoUUcIldHHpj0UQYo9Vycpdcx6OW+k+nKgWXvCz0OkTMG+Au8Vwf
-        YRcR1B4lqayFZprdVc60iWmc0j/FBg5BpBVL2Dco32pmSnnjqac+PJpUsW3EmfptbyRa/x93uHl5
-        3yH8yruzBVnelv1LQS96wPq0vgCH6cmV4AEAAA==
+        H4sIAAAAAAAC/32PUU/CMBDH3/kUS32Vde2YY0uMMRpBlBkMglN8qFuFStkmPaxi/O7SMiUxxj40
+        uf/9cne/j4bjoLkochQ7CJiaqz3zo32TC5uym+QtkfI8IdfATvt+dpatk8GW4MCmhpmgbhJGzxed
+        DJbpBG2bIEBy0+2/OwXXzm7wqsoZcDudejRoeu0mpUMvjD0SU+JSSu+2oOLy6VIUc0POACoVY6y1
+        dqdlOZWcVUK5WbnA9nD8SrAUChROx73FqNNLb0kyG63zAR9ruDquqf90qlIJEGVh1nmRfW3aapHA
+        j0jkBaQ+ChislGE2uyvJjYlt7Mo/xTw3arVrsZx/g7BccRvJjaeZev9gS80fR4Lr3/ZWovb/ccfi
+        5OUg7YbDxcwPq7EfHCl2eIAan40vD9tvPOABAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -321,9 +430,9 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/lists/Y212N3RsN3RNc0ZYSHdBcQ/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
+    uri: https://tasks.googleapis.com/tasks/v1/lists/YWJmVGJYX1NhVzdQeWwtOA/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
   response:
     body:
       string: !!binary |
@@ -369,16 +478,16 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Y212N3RsN3RNc0ZYSHdBcQ?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/YWJmVGJYX1NhVzdQeWwtOA?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPPQ+CMBCGd35FU1ehpQSiTMZFBzBRdMCwEDix4TNetTHG/66FxM3hbnmevO/d
-        yyKE1rIraUioyrHGmdmRREXnhsmRpMIVO++A39kV/Jwm23Jd7CcDVF4ZJ6MbHQfJqa9BLzI6QSVV
-        A4bGT9KBJia8+YXfhzJXMDYILnybB7bwjq4XChH6S4f7/DyJCM0lkl1tzKtSA4aMaa2dqu+rBvJB
-        olP0LRsfYA+X3RFuyFYtMFOG7M/91tv6AJunR/8BAQAA
+        H4sIAAAAAAAC/3WPSwuCQBSF9/6KYdqWowOiuCpaRNGDILTCjeTNBp90rw0V/fcYhXZt7ub7OOfc
+        t8UYL1Sd8ZBxSrHAkblrhcTHhqmenOJVFS1Wp6O7vUWvbA+xpt1sMIDS3DgJr/zL0su9eRfMEj5A
+        UlSCoZsnq0EzE17+wrs2Swn6BulIb+IEEykPjh86bihdW0p5HkSE8rpWdWHMG1GLoRBaaztvmryE
+        tFVoX5pK9A+Ihys6hDuKaQXClKH4s9/6WF9FyzcEAQEAAA==
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -421,16 +530,16 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: PATCH
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Y212N3RsN3RNc0ZYSHdBcQ?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/YWJmVGJYX1NhVzdQeWwtOA?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPSwuCQBRG9/6KYdqWo2MFuYpoEWFBj03hZtCbDY4PvNckov9eo9Cuxb2bc+Dw
-        vRzGeK7LlIeMk8IcR/ZHGomPLdM9uUhf7oMjfm+feNfLaZOuksNgAKnMOjEvTC7X623bEsZ8gKTJ
-        gKW7J2ugVAWkzAbML9DWqSLoK9KTs4k3n8jg7AehlOFs4U4X3nUQEcwt0mVuzTtRjaEQXde5WVVl
-        BlSt0U2qQvQjxMMXLUKDYlmAsDEUfzY4b+cDXYrZ0QUBAAA=
+        H4sIAAAAAAAC/3WPOwvCMBRG9/6KEFdt0ogPOukk1KoIYq24BHutoU+8V4uK/13SgpvLt5wDh+/t
+        MMYzUybcZ5w0ZtizGxok3rfMtCSOgmK/COKDt77uX8kWooY2884A0ql1TnwoDyYqY03L+Yl3kAzl
+        YOnqyW5Q6gISZgP5L3CvE03QVpRUo4GcDpTayYkvPV957nQ8PnYiQn4JTZlZ80pUoy9E0zRuWlVp
+        Dro26J6rQrQnxMMTd4QbilkBwsZQ/PngfJwvLsFfZAUBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -471,16 +580,16 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Y212N3RsN3RNc0ZYSHdBcQ?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/YWJmVGJYX1NhVzdQeWwtOA?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPSwuCQBRG9/6KYdqWo2MFuYpoEWFBj03hZtCbDY4PvNckov9eo9Cuxb2bc+Dw
-        vRzGeK7LlIeMk8IcR/ZHGomPLdM9uUhf7oMjfm+feNfLaZOuksNgAKnMOjEvTC7X623bEsZ8gKTJ
-        gKW7J2ugVAWkzAbML9DWqSLoK9KTs4k3n8jg7AehlOFs4U4X3nUQEcwt0mVuzTtRjaEQXde5WVVl
-        BlSt0U2qQvQjxMMXLUKDYlmAsDEUfzY4b+cDXYrZ0QUBAAA=
+        H4sIAAAAAAAC/3WPOwvCMBRG9/6KEFdt0ogPOukk1KoIYq24BHutoU+8V4uK/13SgpvLt5wDh+/t
+        MMYzUybcZ5w0ZtizGxok3rfMtCSOgmK/COKDt77uX8kWooY2884A0ql1TnwoDyYqY03L+Yl3kAzl
+        YOnqyW5Q6gISZgP5L3CvE03QVpRUo4GcDpTayYkvPV957nQ8PnYiQn4JTZlZ80pUoy9E0zRuWlVp
+        Dro26J6rQrQnxMMTd4QbilkBwsZQ/PngfJwvLsFfZAUBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -521,9 +630,9 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: DELETE
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Y212N3RsN3RNc0ZYSHdBcQ
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/YWJmVGJYX1NhVzdQeWwtOA
   response:
     body:
       string: ''
@@ -565,7 +674,7 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.173.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
     uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/%40default?alt=json
   response:
