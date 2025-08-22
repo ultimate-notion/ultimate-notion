@@ -141,7 +141,7 @@ def mention(
 
 
 class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
-    """A Text object.
+    """A RichText object defining a formatted text fragment.
 
     !!! note
 
@@ -161,7 +161,7 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
         href: str | None = None,
     ) -> None:
         if len(text) > MAX_TEXT_OBJECT_SIZE:
-            msg = f'Text object exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `RichText` instead!'
+            msg = f'Text exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `Text` object instead!'
             raise ValueError(msg)
 
         annotations = objs.Annotations(

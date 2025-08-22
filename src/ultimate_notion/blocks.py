@@ -117,7 +117,7 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
     """Mixin for data objects that can have children
 
     Note that we don't use the `children` property of some Notion objects, e.g. paragraph, quote, etc.,
-    as not every object has this property, e.g. a page, database or toggable heading.
+    as not every object has this property, e.g. a page or toggleable heading.
     """
 
     # ToDo: This could be reworked to differentiate between blocks that have a children attribute and those that don't,
