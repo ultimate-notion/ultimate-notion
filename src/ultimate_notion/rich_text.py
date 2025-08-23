@@ -15,6 +15,7 @@ from ultimate_notion.core import Wrapper
 from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.markdown import render_md, rich_texts_to_markdown
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import Unset
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.user import User
 
@@ -164,8 +165,9 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
             msg = f'Text exceeds the maximum size of {MAX_TEXT_OBJECT_SIZE} characters. Use `Text` object instead!'
             raise ValueError(msg)
 
+        color_or_unset = Unset if color is None else color
         annotations = objs.Annotations(
-            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
+            bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color_or_unset
         )
         super().__init__(text, href=href, style=annotations)
 

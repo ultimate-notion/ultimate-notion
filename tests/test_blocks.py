@@ -8,6 +8,7 @@ import pytest
 import ultimate_notion as uno
 from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.errors import InvalidAPIUsageError
+from ultimate_notion.obj_api.core import Unset
 
 
 @pytest.mark.vcr()
@@ -621,7 +622,7 @@ def test_nested_bullet_items(root_page: uno.Page, notion: uno.Session) -> None:
 def test_color_code_block(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for color code block')
     code_block = uno.Code('print("Hello, world!")', language='python')
-    assert code_block.obj_ref.code.rich_text[0].annotations.color is None  # type: ignore[union-attr]
+    assert code_block.obj_ref.code.rich_text[0].annotations.color is Unset  # type: ignore[union-attr]
     page.append(code_block)
 
     assert page.children == (code_block,)

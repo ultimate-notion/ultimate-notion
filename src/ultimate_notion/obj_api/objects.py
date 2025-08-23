@@ -346,8 +346,8 @@ class Annotations(GenericObject):
     strikethrough: bool = False
     underline: bool = False
     code: bool = False
-    # None for instance for code blocks to have flexible coloring. Will be replaced by DEFAULT
-    color: Color | BGColor | None = None
+    # `Unset` for instance for code blocks to have flexible coloring. Will be replaced by Color.DEFAULT.
+    color: Color | BGColor | UnsetType = Unset
 
 
 class RichTextBaseObject(TypedObject[GenericObject], polymorphic_base=True):

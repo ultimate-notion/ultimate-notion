@@ -75,6 +75,12 @@ class UnsetType(BaseModel):
 
     __slots__ = ()
 
+    def __new__(cls, *args: Any, **kwargs: Any) -> UnsetType:
+        # Ensure only one instance is created, allowing `is` to work correctly
+        if not hasattr(cls, '_instance'):
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     # Marker field that survives serialization to identify unset values
     unset_marker: bool = Field(default=True, exclude=False)
 
