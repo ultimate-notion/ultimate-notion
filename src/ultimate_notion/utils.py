@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import re
 import textwrap
 import types
@@ -17,6 +18,7 @@ from typing import Any, Generic, ParamSpec, TypeVar
 
 import numpy as np
 import pendulum as pnd
+import tomli_w
 from packaging.version import Version
 from pydantic import BaseModel
 from typing_extensions import Self
@@ -444,7 +446,7 @@ def rec_apply(func: Callable[[Any], Any], obj: Any) -> Any:
     Recursively applies a function `func` to all elements in a nested structure.
 
     - Applies `func` to every non-container element.
-    - Recurses into lists and tuples.
+    - Recurses into lists, tuples and dicts.
     - Strings are treated as atomic elements and are **not** considered containers.
 
     Example:
@@ -452,7 +454,19 @@ def rec_apply(func: Callable[[Any], Any], obj: Any) -> Any:
         result = recursive_apply(rows, lambda x: x * 2)
         print(result)  # [[2, 4], [6, [8, 10]]]
     """
-    if isinstance(obj, list | tuple):
-        return type(obj)(rec_apply(func, item) for item in obj)
+    if isinstance(obj, str):  # str is a sequence!
+        return func(obj)
+    elif isinstance(obj, Sequence):
+        return [rec_apply(func, item) for item in obj]
+    elif isinstance(obj, Mapping):
+        return {k: rec_apply(func, v) for k, v in obj.items()}
     else:
         return func(obj)
+
+
+def pydantic_to_toml(model: BaseModel) -> str:
+    """Convert a Pydantic model to a TOML string."""
+    json_dct = json.loads(model.model_dump_json())
+    # Remove None as TOML doesn't support null/None values.
+    json_dct = rec_apply(lambda x: '' if x is None else x, json_dct)
+    return tomli_w.dumps(json_dct)
