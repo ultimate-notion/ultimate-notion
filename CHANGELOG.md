@@ -85,6 +85,7 @@ First Beta release:
 - Chg: Renamed `page.database` to `page.parent_db` and `page.in_db` added as methods.
 - Chg: Large restructering of the code base.
 - Chg: Return `None` for various string attributes/properties if no string is set for consistency.
+- New: `uno` command line interface to show the current resolved config.
 
 ## Version 0.4, 2024-02-14
 
