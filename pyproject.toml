@@ -43,8 +43,13 @@ dependencies = [
     "packaging",
     "pendulum>=3.0",
     "typing_extensions", # for Python 3.10 compatibility, check if still needed when pumbing `requires-python`
+    "typer>=0.16",
+    "tomli_w>=1.2",
 ]
 dynamic = ["version"]
+
+[project.scripts]
+uno = "ultimate_notion.cli:app"
 
 [project.optional-dependencies]
 google = [
