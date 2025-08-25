@@ -4,17 +4,18 @@
 
 First Beta release:
 
-- New: Allow updating if a database is inline or not
+- New: Allow updating if a database is inline or not, issue #80.
 - Chg: `create_db` has a `title` parameter to set a title if no schema is used or needs to be overwritten.
 - Chg: Removed `from_dict` class method of `Schema` since this can now be more easily done manually.
-- Chg: Unify `Property` and `PropertyType` to simplify declarative approach to schemas.
-- Fix: Possible collision of attribute names in `Page` and `Schema`.
+- Chg: Unify `Property` and `PropertyType` to simplify declarative approach to schemas, issue #81.
+- Fix: Possible collision of attribute names in `Page` and `Schema`, issue #86.
 - Fix: Wrong equality check between properties as well as property values.
 - New: Bind a schema automatically with `bind_schema()` if `db_id` or `db_title` is set in the `Schema`.
 - Chg: Consistently return `None` for title, description, caption if these are not set instead of an empty string.
 - Fix: More strict typing and checks which led to many small bug fixes in edge cases.
-- Fix: Too strict dependencies that too often lead to conflicts with other packages.
+- Fix: Too strict dependencies that too often lead to conflicts with other packages, e.g. issue #90.
 - New: `uno` command line interface to show the current resolved config and integration info.
+- New: Allow offline assembly of blocks to create a page with content in one call, issue #94.
 
 ## Version 0.8, 2025-06-23
 
@@ -24,13 +25,13 @@ First Beta release:
 - New: More schema validations like checking for a title property and distinct property names.
 - Fix: Fix error when setting a (multi-)select option with no color specified.
 - New: Added a button property value.
-- New: Added support for [Polars], i.e. `to_polars` method of database views.
-- New: Add support for custom emoji icons
-- Chg: Return `None` instead of an empty string `""` when a text property or block is unset.
-- New: Setting the width ratios of page columns is supported.
+- New: Added support for [Polars], i.e. `to_polars` method of database views, issue #55.
+- New: Add support for custom emoji icons, issue #70.
+- Chg: Return `None` instead of an empty string `""` when a text property or block is unset, issue #59.
+- New: Setting the width ratios of page columns is supported, issue #74.
 - Fix: Adding a column with `add_column(index)` at a given index is no longer off by 1.
-- Add: Updating a database schema, i.e. adding/removing properties or changing their types
-- Add: Changing database properties, e.g. name, formula of formula property, options, etc.
+- Add: Updating a database schema, i.e. adding/removing properties or changing their types, issue #76.
+- Add: Changing database properties, e.g. name, formula of formula property, options, etc, issue #77.
 - Add: Added the `display_name` field of comments
 
 ## Version 0.7.1, 2025-01-05
