@@ -164,8 +164,8 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
     # test appending to an actual block
     paragraph_with_children = uno.Paragraph('This is a paragraph with children')
-    with pytest.raises(RuntimeError):
-        paragraph_with_children.append(uno.Paragraph('This is a child paragraph'))
+    with pytest.raises(InvalidAPIUsageError):
+        paragraph_with_children.append(uno.Paragraph('This is a child paragraph'), sync=True)
 
     page.append(paragraph_with_children)
     paragraph_with_children.append(uno.Paragraph('This is a child paragraph'))
@@ -630,3 +630,33 @@ def test_color_code_block(root_page: uno.Page, notion: uno.Session) -> None:
     # Note that None was replaced with Color.DEFAULT by the API. Sending it directly
     # would have prevented the python code coloring from being applied in the Notion UI.
     assert code_block.obj_ref.code.rich_text[0].annotations.color is uno.Color.DEFAULT  # type: ignore[union-attr]
+
+
+@pytest.mark.vcr()
+def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> None:
+    blocks = [
+        p := uno.Paragraph('This is the first block.'),
+        q := uno.Quote('This is a quote.'),
+        b := uno.BulletedItem('This is a bullet point.'),
+    ]
+    p.append(cp := uno.Paragraph('This is a child paragraph.'))
+    q.append(cq := uno.Paragraph('This is a child paragraph of the quote.'))
+    b.append(cb := uno.Paragraph('This is a child paragraph of the bullet point.'))
+
+    page = notion.create_page(parent=root_page, title='Page for offline assembly', blocks=blocks)
+
+    assert page.children == (p, q, b)
+    assert p.children == (cp,)
+    assert q.children == (cq,)
+    assert b.children == (cb,)
+
+    page.reload()
+
+    assert page.children == (p, q, b)
+    assert p.children == (cp,)
+    assert q.children == (cq,)
+    assert b.children == (cb,)
+
+    callout = uno.Callout('This is a callout.')
+    with pytest.raises(InvalidAPIUsageError):
+        callout.append(uno.Paragraph('This is a child paragraph.'))

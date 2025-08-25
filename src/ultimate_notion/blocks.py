@@ -1,11 +1,30 @@
-"""Blocks that make up the content of a page."""
+"""Blocks that make up the content of a page.
+
+Following blocks can be nested, i.e. they can contain children:
+
+- Paragraph
+- Headings if toggleable (*)
+- Quote
+- Callout (*)
+- BulletedItem
+- NumberedItem
+- ToDoItem
+- ToggleItem
+- Column within a Columns object (*)
+- Table as list of TableRow objects (*)
+- Synced Block
+- Template (read-only)
+
+Blocks with (*) require an `append` call to an existing block, i.e. created in Notion, to add children.
+Thus they cannot be assembled offline to a complete block structure before being sent to the Notion API.
+"""
 
 from __future__ import annotations
 
 import itertools
 import mimetypes
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, overload
 
 import numpy as np
@@ -163,11 +182,36 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
             children = ()
         return children
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None) -> Self:
-        """Append a block or a sequence of blocks to the content of this block."""
-        if not self.in_notion:
-            msg = 'Cannot append blocks to a block that is not in Notion.'
-            raise RuntimeError(msg)
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
+        """Append a block or a sequence of blocks to the content of this block.
+
+        Args:
+            blocks: A block or a sequence of blocks to append.
+            after: A block to append the new blocks after.
+            sync: Whether to sync the changes with Notion directly or in one batch call later.
+                  If `sync = None` (default), the blocks are appended directly if this block is already in Notion,
+                  otherwise they are prepared to be appended in one batch call, later.
+        """
+        if sync is True and not self.in_notion:
+            msg = 'Cannot append blocks synchronously to a block that is not in Notion.'
+            raise InvalidAPIUsageError(msg)
+        elif sync is False:
+            if self.in_notion:
+                msg = 'Cannot append asynchronously blocks to a block that is already in Notion.'
+                raise InvalidAPIUsageError(msg)
+            elif after is not None:
+                msg = 'Appending asynchronously blocks after a specific block is not supported.'
+                raise InvalidAPIUsageError(msg)
+        elif not self.in_notion:
+            if after is not None:
+                msg = 'Cannot append blocks after a specific block if this block is not in Notion.'
+                raise InvalidAPIUsageError(msg)
+            if isinstance(self, Block) and not hasattr(self.obj_ref.value, 'children'):
+                # This is just no possible as the API object doesn't provide a children attribute.
+                # For those special blocks, only the `Append block children` API can be used.
+                block_name = self.__class__.__name__
+                msg = f'Cannot append blocks to a {block_name} block that is not already in Notion.'
+                raise InvalidAPIUsageError(msg)
 
         blocks = [blocks] if isinstance(blocks, Block) else blocks
         if not blocks:
@@ -181,16 +225,17 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
                 raise InvalidAPIUsageError(msg)
 
         if self._children is None:
-            self._children = self._gen_children_cache()
+            self._children = self._gen_children_cache() if self.in_notion else []
 
-        session = get_active_session()
         block_objs = [block.obj_ref for block in blocks]
         after_obj = None if after is None else after.obj_ref
-        block_objs, after_block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
 
-        for block, obj in zip(blocks, block_objs, strict=True):
-            block.obj_ref = obj
-            session.cache[block.id] = block
+        if self.in_notion:
+            session = get_active_session()
+            block_objs, after_block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
+            for block, obj in zip(blocks, block_objs, strict=True):
+                block.obj_ref = obj
+                session.cache[block.id] = block
 
         if after is None:
             self._children.extend(blocks)
@@ -202,6 +247,10 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
             self._children[insert_idx:insert_idx] = blocks
 
         self.obj_ref.has_children = True
+
+        if isinstance(self, Block) and hasattr(self.obj_ref.value, 'children'):
+            self.obj_ref.value.children = [block.obj_ref for block in self._children]
+
         return self
 
 
@@ -1325,3 +1374,11 @@ class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.Unsupport
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return a placeholder for unsupported blocks."""
         return '<kbd>Unsupported block</kbd>\n'
+
+
+def traverse_blocks(blocks: Sequence[Block]) -> Iterator[Block]:
+    """Recursively traverse blocks and their children in depth-first order."""
+    for block in blocks:
+        yield block
+        if block.has_children and isinstance(block, ChildrenMixin):
+            yield from traverse_blocks(block.children)
