@@ -212,7 +212,6 @@ class Code(TextBlock[CodeTypeData], type='code'):
 class CalloutTypeData(ColoredTextBlockTypeData):
     """Type data for `Callout` block."""
 
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType = Unset
 
 
