@@ -13,7 +13,7 @@ import httpx
 import notion_client
 from notion_client.errors import APIResponseError
 
-from ultimate_notion.blocks import Block, DataObject
+from ultimate_notion.blocks import Block, DataObject, traverse_blocks
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
@@ -286,12 +286,26 @@ class Session:
         _logger.info(f'Retrieved page `{page.title}`.')
         return page
 
-    def create_page(self, parent: Page | Database, title: Text | str | None = None) -> Page:
-        """Create a new page in a parent page or database."""
+    def create_page(
+        self, parent: Page | Database, title: Text | str | None = None, blocks: list[Block] | None = None
+    ) -> Page:
+        """Create a new page in a `parent` page or database with a given `title`.
+
+        The `blocks` are optional and can be used to create a page with content right away.
+        Note that some nested blocks may not be supported by the API and must be created separately, i.e.
+        with an `append` call to a given block.
+        """
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
-        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
+        blocks_objs = [block.obj_ref for block in blocks] if blocks else None
+        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj, children=blocks_objs))
         self.cache[page.id] = page
+
+        if blocks:
+            # update the `obj_ref` objects of the blocks by retrieving the children of the page for consistency.
+            for child_block, block in zip(traverse_blocks(page.children), traverse_blocks(blocks), strict=True):
+                block.obj_ref = child_block.obj_ref
+
         return page
 
     def get_user(self, user_ref: UUID | str, *, use_cache: bool = True, raise_on_unknown: bool = True) -> User:
