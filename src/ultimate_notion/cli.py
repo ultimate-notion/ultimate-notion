@@ -5,7 +5,7 @@ from typing import Annotated
 
 import typer
 
-from ultimate_notion import __version__
+from ultimate_notion import Session, __version__
 from ultimate_notion.config import get_cfg, get_cfg_file
 from ultimate_notion.utils import pydantic_to_toml
 
@@ -50,3 +50,25 @@ def config() -> None:
     typer.echo('-' * 40)
     toml_string = pydantic_to_toml(cfg)
     typer.echo(toml_string)
+
+
+@app.command()
+def info() -> None:
+    """Display information about the Notion integration"""
+    typer.echo(f'Python version: {sys.version}')
+    typer.echo(f'Ultimate Notion version: {__version__}')
+    with Session() as session:
+        this_integration = session.whoami()
+
+    typer.echo('Notion Integration:')
+    typer.echo(f'- name: {this_integration.name}')
+    typer.echo(f'- id: {this_integration.id}')
+
+    typer.echo('Workspace info:')
+    if (workspace_info := this_integration.workspace_info) is None:
+        typer.echo('- No workspace information available')
+        return
+    for key, value in workspace_info.items():
+        if key == 'name':
+            continue
+        typer.echo(f'- {key}: {value}')

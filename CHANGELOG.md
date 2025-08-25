@@ -14,6 +14,7 @@ First Beta release:
 - Chg: Consistently return `None` for title, description, caption if these are not set instead of an empty string.
 - Fix: More strict typing and checks which led to many small bug fixes in edge cases.
 - Fix: Too strict dependencies that too often lead to conflicts with other packages.
+- New: `uno` command line interface to show the current resolved config and integration info.
 
 ## Version 0.8, 2025-06-23
 
@@ -85,7 +86,6 @@ First Beta release:
 - Chg: Renamed `page.database` to `page.parent_db` and `page.in_db` added as methods.
 - Chg: Large restructering of the code base.
 - Chg: Return `None` for various string attributes/properties if no string is set for consistency.
-- New: `uno` command line interface to show the current resolved config.
 
 ## Version 0.4, 2024-02-14
 
