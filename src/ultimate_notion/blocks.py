@@ -528,11 +528,11 @@ class Heading(ColoredTextBlock[HT], ChildrenMixin[obj_blocks.Heading], wraps=obj
         self.obj_ref.value.is_toggleable = toggleable
         self._update_in_notion()
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None) -> Self:
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = True) -> Self:
         if not self.toggleable:
             msg = 'Cannot append blocks to a non-toggleable heading.'
             raise InvalidAPIUsageError(msg)
-        return super().append(blocks, after=after)
+        return super().append(blocks, after=after, sync=sync)
 
 
 class Heading1(Heading[obj_blocks.Heading1], wraps=obj_blocks.Heading1):
@@ -1066,7 +1066,7 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin[obj_blocks.ColumnList]
             msg = f'Column index must be between 0 and {len(self.children)} (inclusive).'
             raise IndexError(msg)
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None) -> Self:  # noqa: PLR6301
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:  # noqa: PLR6301
         """Append a block or a sequence of blocks to the content of this block."""
         msg = 'Use `add_column` to append a new column.'
         raise InvalidAPIUsageError(msg)

@@ -634,7 +634,7 @@ def test_color_code_block(root_page: uno.Page, notion: uno.Session) -> None:
 
 @pytest.mark.vcr()
 def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> None:
-    blocks = [
+    blocks: list[uno.AnyBlock] = [
         p := uno.Paragraph('This is the first block.'),
         q := uno.Quote('This is a quote.'),
         b := uno.BulletedItem('This is a bullet point.'),
