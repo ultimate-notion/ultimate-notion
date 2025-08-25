@@ -65,10 +65,8 @@ def info() -> None:
     typer.echo(f'- id: {this_integration.id}')
 
     typer.echo('Workspace info:')
-    if (workspace_info := this_integration.workspace_info) is None:
-        typer.echo('- No workspace information available')
-        return
-    for key, value in workspace_info.items():
-        if key == 'name':
-            continue
-        typer.echo(f'- {key}: {value}')
+    if workspace_info := this_integration.workspace_info:
+        for key, value in workspace_info.items():
+            if key == 'name':
+                continue
+            typer.echo(f'- {key}: {value}')
