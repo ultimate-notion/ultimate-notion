@@ -66,7 +66,5 @@ def info() -> None:
 
     typer.echo('Workspace info:')
     if workspace_info := this_integration.workspace_info:
-        for key, value in workspace_info.items():
-            if key == 'name':
-                continue
+        for key, value in workspace_info.model_dump().items():
             typer.echo(f'- {key}: {value}')

@@ -11,6 +11,12 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
+class WorkSpaceInfo(objs.WorkSpaceLimits):
+    """Workspace information for a bot user."""
+
+    name: str
+
+
 class User(Wrapper[objs.User], wraps=objs.User):
     """User object for persons, bots and unknown users.
 
@@ -70,12 +76,11 @@ class User(Wrapper[objs.User], wraps=objs.User):
         return self.obj_ref.avatar_url
 
     @property
-    def workspace_info(self) -> dict[str, str | int] | None:
+    def workspace_info(self) -> WorkSpaceInfo | None:
         """Return the workspace info of this bot, if available."""
         if isinstance(self.obj_ref, objs.Bot):
-            info = self.obj_ref.bot.workspace_limits.model_dump()
-            info['name'] = self.obj_ref.bot.workspace_name
-            return info
+            kwargs = self.obj_ref.bot.workspace_limits.model_dump()
+            return WorkSpaceInfo(name=self.obj_ref.bot.workspace_name, **kwargs)
         else:
             return None
 
