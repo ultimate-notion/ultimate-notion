@@ -5,7 +5,7 @@ Following blocks can be nested, i.e. they can contain children:
 - Paragraph
 - Headings if toggleable (*)
 - Quote
-- Callout (*)
+- Callout
 - BulletedItem
 - NumberedItem
 - ToDoItem

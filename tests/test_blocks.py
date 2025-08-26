@@ -638,25 +638,29 @@ def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> Non
         p := uno.Paragraph('This is the first block.'),
         q := uno.Quote('This is a quote.'),
         b := uno.BulletedItem('This is a bullet point.'),
+        c := uno.Callout('This is a callout.'),
     ]
     p.append(cp := uno.Paragraph('This is a child paragraph.'))
     q.append(cq := uno.Paragraph('This is a child paragraph of the quote.'))
     b.append(cb := uno.Paragraph('This is a child paragraph of the bullet point.'))
+    c.append(cc := uno.Paragraph('This is a child paragraph of the callout.'))
 
     page = notion.create_page(parent=root_page, title='Page for offline assembly', blocks=blocks)
 
-    assert page.children == (p, q, b)
+    assert page.children == (p, q, b, c)
     assert p.children == (cp,)
     assert q.children == (cq,)
     assert b.children == (cb,)
+    assert c.children == (cc,)
 
     page.reload()
 
-    assert page.children == (p, q, b)
+    assert page.children == (p, q, b, c)
     assert p.children == (cp,)
     assert q.children == (cq,)
     assert b.children == (cb,)
+    assert c.children == (cc,)
 
-    callout = uno.Callout('This is a callout.')
+    callout = uno.Heading1('This is a Heading.', toggleable=True)
     with pytest.raises(InvalidAPIUsageError):
         callout.append(uno.Paragraph('This is a child paragraph.'))

@@ -212,6 +212,8 @@ class Code(TextBlock[CodeTypeData], type='code'):
 class CalloutTypeData(ColoredTextBlockTypeData):
     """Type data for `Callout` block."""
 
+    # `children` is undocumented and behaves inconsistent. It is used during creation but not filled when retrieved.
+    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType = Unset
 
 
