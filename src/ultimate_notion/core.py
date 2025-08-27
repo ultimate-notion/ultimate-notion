@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from abc import ABC
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, cast
 from uuid import UUID
 
 from typing_extensions import Self, TypeVar
@@ -23,22 +23,7 @@ if TYPE_CHECKING:
     from ultimate_notion.user import User
 
 
-class WrapperProtocol(Protocol[GT_co]):
-    """Wrapper protocol for objects that have an obj_ref attribute.
-
-    Note: This allows us to define Mixin classes that require the obj_ref attribute.
-    """
-
-    _obj_ref: GT_co
-
-    @property
-    def obj_ref(self) -> GT_co: ...
-
-    @obj_ref.setter
-    def obj_ref(self, value: GT_co) -> None: ...
-
-
-class Wrapper(WrapperProtocol[GT_co], ABC):
+class Wrapper(Generic[GT_co], ABC):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
     _obj_ref: GT_co
@@ -72,12 +57,12 @@ class Wrapper(WrapperProtocol[GT_co], ABC):
         return self._obj_ref
 
     @obj_ref.setter
-    def obj_ref(self, value: GT_co) -> None:
+    def obj_ref(self, value: GT_co) -> None:  # type: ignore[misc] # breaking covariance
         """Set the low-level Notion-API object reference."""
         self._obj_ref = value
 
     @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: GT_co, /) -> Self:
+    def wrap_obj_ref(cls: type[Self], obj_ref: GT_co, /) -> Self:  # type: ignore[misc] # breaking covariance
         """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
         hl_cls = cls._obj_api_map[type(obj_ref)]
         # To allow for `Block.wrap_obj_ref` to work call a specific 'wrap_obj_ref' if it exists,
@@ -96,10 +81,11 @@ class Wrapper(WrapperProtocol[GT_co], ABC):
         return {v: k for k, v in self._obj_api_map.items()}
 
 
-NO = TypeVar('NO', bound=obj_core.NotionObject)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+NO_co = TypeVar('NO_co', bound=obj_core.NotionObject, default=obj_core.NotionObject, covariant=True)
 
 
-class NotionObject(Wrapper[NO], ABC, wraps=obj_core.NotionObject):
+class NotionObject(Wrapper[NO_co], ABC, wraps=obj_core.NotionObject):
     """A top-level Notion API resource."""
 
     @property
@@ -113,10 +99,11 @@ class NotionObject(Wrapper[NO], ABC, wraps=obj_core.NotionObject):
         return self.obj_ref.id != obj_core.Unset
 
 
-NE = TypeVar('NE', bound=obj_core.NotionEntity)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+NE_co = TypeVar('NE_co', bound=obj_core.NotionEntity, default=obj_core.NotionEntity, covariant=True)
 
 
-class NotionEntity(NotionObject[NE], ABC, wraps=obj_core.NotionEntity):
+class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     def __eq__(self, other: object) -> bool:
         if other is None:
             return False

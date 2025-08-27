@@ -126,10 +126,11 @@ class TextBlockTypeData(GenericObject):
     rich_text: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
-TB = TypeVar('TB', bound=TextBlockTypeData)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+TB_co = TypeVar('TB_co', bound=TextBlockTypeData, default=TextBlockTypeData, covariant=True)
 
 
-class TextBlock(Block[TB]):
+class TextBlock(Block[TB_co]):
     """A standard abstract text block object in Notion."""
 
 

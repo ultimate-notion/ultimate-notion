@@ -121,7 +121,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
             raise PropertyError(msg)
         return self._owner
 
-    def _update_prop(self, prop_obj: GO_co) -> GO_co:
+    def _update_prop(self, prop_obj: GO_co) -> GO_co:  # type: ignore[misc] # breaking covariance
         """Update the attributes of this property from a schema."""
         db = self._get_owner().get_db()
         session = get_active_session()
@@ -153,7 +153,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
         schema._set_obj_refs()
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: GO_co) -> Self:
+    def wrap_obj_ref(cls, obj_ref: GO_co) -> Self:  # type: ignore[misc] # breaking covariance
         """Wrap the object reference for this property."""
         obj = super().wrap_obj_ref(obj_ref)
         obj._attr_name = rich_text.snake_case(obj.name)

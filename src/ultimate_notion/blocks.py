@@ -52,7 +52,8 @@ if TYPE_CHECKING:
 MIN_COLS = 2
 """Minimum number of columns when creating a column block to structure a page."""
 
-DO = TypeVar('DO', bound=obj_blocks.DataObject)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+DO_co = TypeVar('DO_co', bound=obj_blocks.DataObject, default=obj_blocks.DataObject, covariant=True)
 
 
 def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject) -> FileInfo | CustomEmoji | Emoji:
@@ -69,7 +70,7 @@ def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObj
             raise RuntimeError(msg)
 
 
-class DataObject(NotionEntity[DO], wraps=obj_blocks.DataObject):
+class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
     """The base type for all data-related types, i.e, pages, databases and blocks."""
 
     @property
@@ -110,7 +111,7 @@ class DataObject(NotionEntity[DO], wraps=obj_blocks.DataObject):
         Pages and databases are moved to the trash, blocks are deleted permanently.
         """
         session = get_active_session()
-        self.obj_ref = cast(DO, session.api.blocks.delete(self.id))
+        self.obj_ref = cast(DO_co, session.api.blocks.delete(self.id))
         self._delete_me_from_parent()
         return self
 
@@ -132,7 +133,7 @@ class DataObject(NotionEntity[DO], wraps=obj_blocks.DataObject):
         return self.to_markdown()
 
 
-class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
+class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     """Mixin for data objects that can have children
 
     Note that we don't use the `children` property of some Notion objects, e.g. paragraph, quote, etc.,
@@ -249,7 +250,7 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
         return self
 
 
-class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
+class CommentMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     """Mixin for objects that can have comments and discussions."""
 
     _comments: list[Discussion] | None = None
