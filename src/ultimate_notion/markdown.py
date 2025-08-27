@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, TypeGuard
 import mistune
 import numpy as np
 from mistune.directives import FencedDirective, TableOfContents
+from numpy.typing import NDArray
 
 from ultimate_notion.utils import rank
 
@@ -27,7 +28,7 @@ MD_STYLE_MAP = {
 """Mapping from markdown style to markdown symbol."""
 
 
-def md_spans(rich_texts: Sequence[RichTextBase]) -> np.ndarray:
+def md_spans(rich_texts: Sequence[RichTextBase]) -> NDArray[np.int_]:
     """Convert rich text to markdown spans.
 
     An span is a sequence of rich texts with the same markdown style expressed as a row in the returned array.
@@ -64,7 +65,7 @@ def md_spans(rich_texts: Sequence[RichTextBase]) -> np.ndarray:
     return spans
 
 
-def sorted_md_spans(md_spans: np.ndarray) -> Iterator[tuple[int, int, str]]:
+def sorted_md_spans(md_spans: NDArray[np.int_]) -> Iterator[tuple[int, int, str]]:
     """Sort the spans of the given markdown spans in the right order.
 
     We have to iterate from the smallest spans to the largest spans and from left to right.
