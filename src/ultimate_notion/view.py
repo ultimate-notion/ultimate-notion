@@ -59,7 +59,7 @@ class View(Sequence[Page]):
         """Clone the current view."""
         return deepcopy_with_sharing(self, shared_attributes=['database', '_pages', '_query'])
 
-    def _get_columns(self, title_col: str) -> np.ndarray:
+    def _get_columns(self, title_col: str) -> NDArray[Any]:
         """Make sure title column is the first columns."""
         cols = list(self.database.schema.to_dict().keys())
         cols.insert(0, cols.pop(cols.index(title_col)))
