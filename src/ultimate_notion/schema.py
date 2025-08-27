@@ -25,11 +25,11 @@ from collections import Counter
 from collections.abc import Iterator
 from copy import deepcopy
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Any, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Annotated, Any, TypeAlias, cast, overload
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 import ultimate_notion.obj_api.core as obj_core
 import ultimate_notion.obj_api.schema as obj_schema
@@ -58,10 +58,11 @@ if TYPE_CHECKING:
     from ultimate_notion.page import Page
 
 T = TypeVar('T')
-PT = TypeVar('PT', bound=obj_schema.Property[obj_core.GenericObject])
+PropertyGO: TypeAlias = obj_schema.Property[obj_core.GenericObject]
+GO_co = TypeVar('GO_co', bound=PropertyGO, default=PropertyGO, covariant=True)
 
 
-class Property(Wrapper[PT], ABC, wraps=obj_schema.Property[Any]):
+class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     """Base class for Notion property objects.
 
     A property defines the name and type of a property in a database, e.g. number, date, text, etc.
@@ -91,7 +92,7 @@ class Property(Wrapper[PT], ABC, wraps=obj_schema.Property[Any]):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
             return NotImplemented
-        other_obj_ref = cast(PT, other.obj_ref)
+        other_obj_ref = cast(GO_co, other.obj_ref)
         return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
 
     def __hash__(self) -> int:
@@ -120,12 +121,12 @@ class Property(Wrapper[PT], ABC, wraps=obj_schema.Property[Any]):
             raise PropertyError(msg)
         return self._owner
 
-    def _update_prop(self, prop_obj: PT) -> PT:
+    def _update_prop(self, prop_obj: GO_co) -> GO_co:
         """Update the attributes of this property from a schema."""
         db = self._get_owner().get_db()
         session = get_active_session()
         session.api.databases.update(db=db.obj_ref, schema={self.name: prop_obj})
-        return cast(PT, db.obj_ref.properties[self.name])
+        return cast(GO_co, db.obj_ref.properties[self.name])
 
     def _rename_prop(self, new_name: str | None) -> None:
         """Update the name of this property in the schema or delete it.
@@ -152,7 +153,7 @@ class Property(Wrapper[PT], ABC, wraps=obj_schema.Property[Any]):
         schema._set_obj_refs()
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: PT) -> Self:
+    def wrap_obj_ref(cls, obj_ref: GO_co) -> Self:
         """Wrap the object reference for this property."""
         obj = super().wrap_obj_ref(obj_ref)
         obj._attr_name = rich_text.snake_case(obj.name)

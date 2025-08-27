@@ -16,7 +16,7 @@ finally:
 
 from ultimate_notion.blocks import (
     PDF,
-    AnyBlock,
+    Block,
     Bookmark,
     Breadcrumb,
     BulletedItem,
@@ -62,8 +62,8 @@ from ultimate_notion.utils import SList
 __all__ = [
     'PDF',
     'AggFunc',
-    'AnyBlock',  # for type hinting only
     'BGColor',
+    'Block',  # for type hinting only
     'Bookmark',
     'Breadcrumb',
     'BulletedItem',

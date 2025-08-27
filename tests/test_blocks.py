@@ -63,7 +63,7 @@ def test_delete_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating basic blocks')
-    children: list[uno.AnyBlock] = [
+    children: list[uno.Block] = [
         uno.Heading1('My new page'),
         uno.Heading2('Heading 2', color=uno.Color.BLUE),
         uno.Paragraph('This is a paragraph'),
@@ -176,7 +176,7 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_create_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating file blocks')
-    children: list[uno.AnyBlock] = [
+    children: list[uno.Block] = [
         uno.File('robots.txt', 'https://www.google.de/robots.txt'),
         uno.File('robots.txt', 'https://www.google.de/robots.txt', caption='Google Robots'),
         uno.Image('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'),
@@ -347,7 +347,7 @@ def test_has_children(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying basic blocks')
-    children: list[uno.AnyBlock] = [
+    children: list[uno.Block] = [
         paragraph := uno.Paragraph('Red paragraph', color=uno.Color.RED),
         code := uno.Code('print("Hello World")', language=uno.CodeLang.PYTHON),
         heading := uno.Heading1('My new page', toggleable=True),
@@ -420,7 +420,7 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 @pytest.mark.vcr()
 def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying file blocks')
-    children: list[uno.AnyBlock] = [
+    children: list[uno.Block] = [
         file := uno.File('robots.txt', 'https://www.google.de/robots.txt'),
         image := uno.Image(
             'https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg', caption='Path on meadow'
@@ -634,7 +634,7 @@ def test_color_code_block(root_page: uno.Page, notion: uno.Session) -> None:
 
 @pytest.mark.vcr()
 def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> None:
-    blocks: list[uno.AnyBlock] = [
+    blocks: list[uno.Block] = [
         p := uno.Paragraph('This is the first block.'),
         q := uno.Quote('This is a quote.'),
         b := uno.BulletedItem('This is a bullet point.'),
