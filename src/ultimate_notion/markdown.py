@@ -34,8 +34,8 @@ def md_spans(rich_texts: Sequence[RichTextBase]) -> NDArray[np.int_]:
     An span is a sequence of rich texts with the same markdown style expressed as a row in the returned array.
     The value k of the j-th array column corresponds to the length of the current span richt_texts[j-k:j].
     """
-    spans = np.zeros((len(MD_STYLES), len(rich_texts) + 1), dtype=int)
-    old_ranks = np.zeros(len(MD_STYLES), dtype=int)
+    spans: NDArray[np.int_] = np.zeros((len(MD_STYLES), len(rich_texts) + 1), dtype=int)
+    old_ranks: NDArray[np.int_] = np.zeros(len(MD_STYLES), dtype=int)
     prev_rich_text = None
 
     for j, rich_text in enumerate(rich_texts, start=1):

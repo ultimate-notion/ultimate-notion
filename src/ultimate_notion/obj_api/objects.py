@@ -38,7 +38,7 @@ from ultimate_notion.obj_api.core import (
     raise_unset,
 )
 from ultimate_notion.obj_api.enums import BGColor, Color
-from ultimate_notion.utils import parse_dt_str
+from ultimate_notion.utils import DateTimeOrRange, parse_dt_str
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Block, Database, Page
@@ -115,7 +115,7 @@ class DateRange(GenericObject, MentionMixin):
     time_zone: str | None = None
 
     @classmethod
-    def build(cls, dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> DateRange:
+    def build(cls, dt_spec: str | DateTimeOrRange) -> DateRange:
         """Compose a DateRange object from the given properties."""
 
         if isinstance(dt_spec, str):
@@ -146,7 +146,7 @@ class DateRange(GenericObject, MentionMixin):
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionDate.build_mention_from(self, style=style)
 
-    def to_pendulum(self) -> pnd.DateTime | pnd.Date | pnd.Interval:
+    def to_pendulum(self) -> DateTimeOrRange:
         """Convert the DateRange to a pendulum object."""
         # self.time_zone is None for pure dates.
         start = str(self.start) if self.time_zone is None else f'{self.start} {self.time_zone}'
@@ -155,10 +155,14 @@ class DateRange(GenericObject, MentionMixin):
         else:
             end = str(self.end) if self.time_zone is None else f'{self.end} {self.time_zone}'
             start_dt, end_dt = parse_dt_str(start), parse_dt_str(end)
-            if isinstance(start_dt, pnd.Interval) or isinstance(end_dt, pnd.Interval):
+
+            if isinstance(start_dt, pnd.Date) and isinstance(end_dt, pnd.Date):
+                return pnd.Interval(start=start_dt, end=end_dt)
+            elif isinstance(start_dt, pnd.DateTime) and isinstance(end_dt, pnd.DateTime):
+                return pnd.Interval(start=start_dt, end=end_dt)
+            else:
                 msg = f"Unsupported type for 'start' or 'end': {type(start)}, {type(end)}"
                 raise TypeError(msg)
-            return pnd.Interval(start=start_dt, end=end_dt)
 
     def __str__(self) -> str:
         # ToDo: Implement the possibility to configure date format globally, maybe in the config?

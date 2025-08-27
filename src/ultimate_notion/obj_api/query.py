@@ -6,10 +6,11 @@ import logging
 from abc import ABC
 from collections.abc import Awaitable, Callable, Iterator, Mapping
 from datetime import date, datetime
-from typing import Any, Generic, Literal, TypeAlias, TypeVar
+from typing import Any, Generic, Literal, TypeAlias
 from uuid import UUID
 
 from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
+from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.blocks import Database, Page
 from ultimate_notion.obj_api.core import GenericObject
@@ -266,7 +267,7 @@ class DBQuery(Query):
     sorts: list[DBSort] | None = None
 
 
-T = TypeVar('T', bound=Page | Database)
+T = TypeVar('T', bound=Page | Database, default=Page | Database)
 
 
 class QueryBuilder(Generic[T], ABC):
@@ -311,7 +312,7 @@ class SearchQueryBuilder(QueryBuilder[T]):
                 _logger.debug(f'Searching for pages and databases with title: {self.params["query"]}')
         return super().execute(**nc_params)
 
-    def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder:
+    def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder[T]:
         """Filter for pages or databases only"""
         if not (page_only ^ db_only):
             msg = 'Either `page_only` or `db_only` must be true, not both.'
@@ -325,7 +326,7 @@ class SearchQueryBuilder(QueryBuilder[T]):
         builder.query.filter = SearchFilter(property='object', value=value)
         return builder
 
-    def sort(self, *, ascending: bool) -> SearchQueryBuilder:
+    def sort(self, *, ascending: bool) -> SearchQueryBuilder[T]:
         """Add the given sort elements to the query."""
         direction = SortDirection.ASCENDING if ascending else SortDirection.DESCENDING
 
