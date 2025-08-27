@@ -374,7 +374,7 @@ class RichTextBaseObject(TypedObject[GenericObject], polymorphic_base=True):
 
     plain_text: str
     href: str | None = None
-    annotations: Annotations | None = None
+    annotations: Annotations | UnsetType = Unset
 
 
 def rich_text_to_str(rich_texts: list[RichTextBaseObject]) -> str:
@@ -402,13 +402,12 @@ class TextObject(RichTextBaseObject, type='text'):
         """
         link = LinkObject(url=href) if href else None
         nested = cls.TypeData(content=text, link=link)
-        style = deepcopy(style)
 
         return cls.model_construct(
             plain_text=text,
             text=nested,
             href=href,
-            annotations=style,
+            annotations=Unset if style is None else deepcopy(style),
         )
 
 
@@ -429,9 +428,11 @@ class EquationObject(RichTextBaseObject, type='equation'):
             href: optional link for this object
             style: optional annotations for styling this text
         """
-        style = deepcopy(style)
         return cls.model_construct(
-            plain_text=expression, equation=cls.TypeData(expression=expression), href=href, annotations=style
+            plain_text=expression,
+            equation=cls.TypeData(expression=expression),
+            href=href,
+            annotations=Unset if style is None else deepcopy(style),
         )
 
 
@@ -462,10 +463,14 @@ class MentionUser(MentionBase, type='user'):
 
     @classmethod
     def build_mention_from(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
-        style = deepcopy(style)
         mention = cls.model_construct(user=user)
         # note that `href` is always `None` for user mentions, also we prepend the '@' to mimic server side
-        return MentionObject.model_construct(plain_text=f'@{user.name}', href=None, annotations=style, mention=mention)
+        return MentionObject.model_construct(
+            plain_text=f'@{user.name}',
+            href=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
+        )
 
 
 class MentionPage(MentionBase, type='page'):
@@ -475,12 +480,14 @@ class MentionPage(MentionBase, type='page'):
 
     @classmethod
     def build_mention_from(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
-        style = deepcopy(style)
         page_ref = ObjectRef.build(page)
         mention = cls.model_construct(page=page_ref)
         # note that `href` is always `None` for page mentions
         return MentionObject.model_construct(
-            plain_text=rich_text_to_str(page.title), href=None, annotations=style, mention=mention
+            plain_text=rich_text_to_str(page.title),
+            href=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
         )
 
 
@@ -491,13 +498,15 @@ class MentionDatabase(MentionBase, type='database'):
 
     @classmethod
     def build_mention_from(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
-        style = deepcopy(style)
         db_ref = ObjectRef.build(db)
         mention = cls.model_construct(database=db_ref)
         # note that `href` is always `None` for database mentions
         db_title = raise_unset(db.title)
         return MentionObject.model_construct(
-            plain_text=rich_text_to_str(db_title), ref=None, annotations=style, mention=mention
+            plain_text=rich_text_to_str(db_title),
+            ref=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
         )
 
 
@@ -508,10 +517,14 @@ class MentionDate(MentionBase, type='date'):
 
     @classmethod
     def build_mention_from(cls, date_range: DateRange, *, style: Annotations | None = None) -> MentionObject:
-        style = deepcopy(style)
         mention = cls.model_construct(date=date_range)
         # note that `href` is always `None` for date mentions
-        return MentionObject.model_construct(plain_text=str(date_range), ref=None, annotations=style, mention=mention)
+        return MentionObject.model_construct(
+            plain_text=str(date_range),
+            ref=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
+        )
 
 
 class MentionLinkPreview(MentionBase, type='link_preview'):
@@ -581,11 +594,13 @@ class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
 
     @classmethod
     def build_mention_from(cls, custom_emoji: CustomEmojiObject, *, style: Annotations | None = None) -> MentionObject:
-        style = deepcopy(style)
         mention = cls.model_construct(custom_emoji=custom_emoji.custom_emoji)
         # note that `href` is always `None` for custom emoji mentions
         return MentionObject.model_construct(
-            plain_text=f':{custom_emoji.custom_emoji.name}:', href=None, annotations=style, mention=mention
+            plain_text=f':{custom_emoji.custom_emoji.name}:',
+            href=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
         )
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
