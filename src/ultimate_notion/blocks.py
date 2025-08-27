@@ -139,12 +139,6 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
     as not every object has this property, e.g. a page or toggleable heading.
     """
 
-    # ToDo: This could be reworked to differentiate between blocks that have a children attribute and those that don't,
-    # like headings and pages. In the former case we would not neet to have a _children attribute and could directly
-    # access the children attribute of the object reference. In the latter case we would need to have a _children.
-    # This would save some memory and appending would work for the former case even for blocks that are not
-    # yet in Notion.
-
     _children: list[Block] | None = None
 
     def _gen_children_cache(self) -> list[Block]:
@@ -248,6 +242,7 @@ class ChildrenMixin(DataObject[DO], wraps=obj_blocks.DataObject):
 
         self.obj_ref.has_children = True
 
+        # Populate the `children` attribute for consistency if block has this attribute
         if isinstance(self, Block) and hasattr(self.obj_ref.value, 'children'):
             self.obj_ref.value.children = [block.obj_ref for block in self._children]
 
