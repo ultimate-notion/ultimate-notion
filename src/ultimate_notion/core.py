@@ -22,8 +22,8 @@ if TYPE_CHECKING:
     from ultimate_notion.user import User
 
 
-class ObjRefWrapper(Protocol[GT]):
-    """Wrapper for objects that have an obj_ref attribute.
+class WrapperProtocol(Protocol[GT]):
+    """Wrapper protocol for objects that have an obj_ref attribute.
 
     Note: This allows us to define Mixin classes that require the obj_ref attribute.
     """
@@ -37,7 +37,7 @@ class ObjRefWrapper(Protocol[GT]):
     def obj_ref(self, value: GT) -> None: ...
 
 
-class Wrapper(ObjRefWrapper[GT], ABC):
+class Wrapper(WrapperProtocol[GT], ABC):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
     _obj_ref: GT

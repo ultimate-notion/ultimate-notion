@@ -276,7 +276,10 @@ class NotionEntity(NotionObject):
     last_edited_time: datetime | UnsetType = Unset
 
 
-class TypedObject(GenericObject, Generic[T]):
+TO_co = TypeVar('TO_co', covariant=True)  # ToDo: use new syntax in Python 3.12
+
+
+class TypedObject(GenericObject, Generic[TO_co]):
     """A type-referenced object.
 
     Many objects in the Notion API follow a standard pattern with a `type` property
@@ -378,11 +381,14 @@ class TypedObject(GenericObject, Generic[T]):
         return sub_cls(**value)
 
     @property
-    def value(self) -> T:
+    def value(self) -> TO_co:
         """Return the nested object."""
-        return cast(T, getattr(self, self.type))
+        return cast(TO_co, getattr(self, self.type))
 
     @value.setter
-    def value(self, val: T) -> None:
+    def value(self, val: TO_co) -> None:  # type: ignore[misc]
         """Set the nested object."""
+        # we are breaking covariance here but going down the Protocol way didn't work out
+        # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
+        # This is still the most programmatic way it seems without adding too much complexity.
         setattr(self, self.type, val)

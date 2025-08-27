@@ -31,6 +31,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, fi
 from tabulate import tabulate
 from typing_extensions import Self
 
+import ultimate_notion.obj_api.core as obj_core
 import ultimate_notion.obj_api.schema as obj_schema
 from ultimate_notion import rich_text
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
@@ -57,10 +58,10 @@ if TYPE_CHECKING:
     from ultimate_notion.page import Page
 
 T = TypeVar('T')
-PT = TypeVar('PT', bound=obj_schema.Property)
+PT = TypeVar('PT', bound=obj_schema.Property[obj_core.GenericObject])
 
 
-class Property(Wrapper[PT], ABC, wraps=obj_schema.Property):
+class Property(Wrapper[PT], ABC, wraps=obj_schema.Property[Any]):
     """Base class for Notion property objects.
 
     A property defines the name and type of a property in a database, e.g. number, date, text, etc.
