@@ -284,9 +284,8 @@ class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
         return comments
 
 
-B_co = TypeVar(
-    'B_co', bound=obj_blocks.Block, default=obj_blocks.Block, covariant=True
-)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+B_co = TypeVar('B_co', bound=obj_blocks.Block, default=obj_blocks.Block, covariant=True)
 
 
 class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
@@ -468,7 +467,7 @@ class ColoredTextBlock(TextBlock[TB], wraps=obj_blocks.ColoredTextBlock):
         value.color = color
 
     def _get_value(self) -> obj_blocks.ColoredTextBlockTypeData:
-        return cast(obj_blocks.ColoredTextBlockTypeData, self.obj_ref.value)
+        return self.obj_ref.value
 
     @property
     def color(self) -> Color | BGColor:

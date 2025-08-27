@@ -140,10 +140,10 @@ class ColoredTextBlockTypeData(TextBlockTypeData):
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
-CTB = TypeVar('CTB', bound=ColoredTextBlockTypeData)
+CTB_co = TypeVar('CTB_co', bound=ColoredTextBlockTypeData, default=ColoredTextBlockTypeData, covariant=True)
 
 
-class ColoredTextBlock(TextBlock[CTB]):
+class ColoredTextBlock(TextBlock[CTB_co]):
     """A standard abstract text block object in Notion with color."""
 
 

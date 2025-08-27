@@ -6,7 +6,7 @@ import builtins
 import logging
 import re
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, cast, overload
 from uuid import UUID
 
 from pydantic import (
@@ -18,7 +18,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 from ultimate_notion.utils import is_stable_release
 
@@ -276,7 +276,7 @@ class NotionEntity(NotionObject):
     last_edited_time: datetime | UnsetType = Unset
 
 
-TO_co = TypeVar('TO_co', covariant=True)  # ToDo: use new syntax in Python 3.12
+TO_co = TypeVar('TO_co', covariant=True, default=Any)  # ToDo: use new syntax in Python 3.12
 
 
 class TypedObject(GenericObject, Generic[TO_co]):
