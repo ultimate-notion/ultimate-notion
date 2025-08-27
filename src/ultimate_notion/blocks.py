@@ -365,17 +365,27 @@ class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):
     @property
     def caption(self) -> Text | None:
         """Return the caption of the code block."""
+        if not isinstance(self.obj_ref.value, objs.CaptionMixin):
+            msg = f'Block `{type(self).__name__}` with type data `{type(self.obj_ref.value).__name__}` has no caption.'
+            raise RuntimeError(msg)
         if not (caption := self.obj_ref.value.caption):
             return None
         return Text.wrap_obj_ref(caption)
 
     @caption.setter
     def caption(self, caption: str | None) -> None:
+        if not isinstance(self.obj_ref.value, objs.CaptionMixin):
+            msg = f'Block `{type(self).__name__}` with type data `{type(self.obj_ref.value).__name__}` has no caption.'
+            raise RuntimeError(msg)
         self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
         self._update_in_notion()
 
 
-class TextBlock(Block[B_co], ABC, wraps=obj_blocks.TextBlock):
+# ToDo: Use new syntax when requires-python >= 3.12
+TB_co = TypeVar('TB_co', bound=obj_blocks.TextBlock, default=obj_blocks.TextBlock, covariant=True)
+
+
+class TextBlock(Block[TB_co], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Text block.
 
     Parent class of all text block types.
@@ -1094,7 +1104,8 @@ class Columns(Block[obj_blocks.ColumnList], ChildrenMixin[obj_blocks.ColumnList]
         ratios_arr = np.array(ratios, dtype=float)
         ratios_arr /= ratios_arr.sum()  # normalize ratios to sum to 1 as asked by the Notion API
         for col, ratio in zip(self.children, ratios_arr, strict=False):
-            col.obj_ref.column.width_ratio = ratio
+            obj_ref = cast(obj_blocks.Column, col.obj_ref)
+            obj_ref.column.width_ratio = ratio
             col._update_in_notion(exclude_attrs=['column.children'])
 
 

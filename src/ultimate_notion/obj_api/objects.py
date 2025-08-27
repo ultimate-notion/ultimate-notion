@@ -608,7 +608,13 @@ class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
         return self.__class__.build_mention_from(self, style=style)
 
 
-class FileObject(TypedObject[GenericObject], polymorphic_base=True):
+class CaptionMixin(GenericObject, ABC):
+    """Mixin for blocks having a caption."""
+
+    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
+
+
+class FileObject(TypedObject[GenericObject], CaptionMixin, polymorphic_base=True):
     """A Notion file object.
 
     Depending on the context, a FileObject may require a name (such as in the `Files`
@@ -618,7 +624,6 @@ class FileObject(TypedObject[GenericObject], polymorphic_base=True):
     """
 
     name: str | None = None
-    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
 
 
 class HostedFile(FileObject, type='file'):
@@ -640,6 +645,7 @@ class HostedFile(FileObject, type='file'):
         expiry_time: dt.datetime | None = None,
     ) -> HostedFile:
         """Create a new `HostedFile` from the given URL."""
+        caption = [] if caption is None else caption
         return cls.model_construct(name=name, caption=caption, file=cls.TypeData(url=url, expiry_time=expiry_time))
 
 
@@ -656,6 +662,7 @@ class ExternalFile(FileObject, type='external'):
         cls, url: str, *, name: str | None = None, caption: list[RichTextBaseObject] | None = None
     ) -> ExternalFile:
         """Create a new `ExternalFile` from the given URL."""
+        caption = [] if caption is None else caption
         return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url))
 
 

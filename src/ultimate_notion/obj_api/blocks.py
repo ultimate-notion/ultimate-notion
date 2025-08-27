@@ -27,6 +27,7 @@ from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     Annotations,
     BlockRef,
+    CaptionMixin,
     CustomEmojiObject,
     EmojiObject,
     FileObject,
@@ -200,10 +201,9 @@ class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
     quote: QuoteTypeData = QuoteTypeData()
 
 
-class CodeTypeData(TextBlockTypeData):
+class CodeTypeData(TextBlockTypeData, CaptionMixin):
     """Type data for `Code` block."""
 
-    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
     language: CodeLang = CodeLang.PLAIN_TEXT
 
 
@@ -308,11 +308,10 @@ class Breadcrumb(Block[BreadcrumbTypeData], type='breadcrumb'):
     breadcrumb: BreadcrumbTypeData = BreadcrumbTypeData()
 
 
-class EmbedTypeData(GenericObject):
+class EmbedTypeData(CaptionMixin):
     """Type data for `Embed` block."""
 
     url: str
-    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class Embed(Block[EmbedTypeData], type='embed'):
@@ -325,11 +324,10 @@ class Embed(Block[EmbedTypeData], type='embed'):
         return Embed.model_construct(embed=EmbedTypeData.model_construct(url=url, caption=caption))
 
 
-class BookmarkTypeData(GenericObject):
+class BookmarkTypeData(CaptionMixin):
     """Type data for `Bookmark` block."""
 
     url: str
-    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class Bookmark(Block[BookmarkTypeData], type='bookmark'):
@@ -511,14 +509,13 @@ class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
         return model_data
 
 
-class TemplateTypeData(GenericObject):
+class TemplateTypeData(TextBlockTypeData):
     """Type data for `Template` block."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] | None = None
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
-class Template(Block[TemplateTypeData], type='template'):
+class Template(TextBlock[TemplateTypeData], type='template'):
     """A template block in Notion."""
 
     template: TemplateTypeData = TemplateTypeData()
