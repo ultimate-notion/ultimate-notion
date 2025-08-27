@@ -8,10 +8,10 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import pendulum as pnd
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
@@ -25,10 +25,10 @@ from ultimate_notion.user import User
 if TYPE_CHECKING:
     from ultimate_notion.page import Page
 
-T = TypeVar('T', bound=obj_props.PropertyValue)
+PV_co = TypeVar('PV_co', bound=obj_props.PropertyValue, default=obj_props.PropertyValue, covariant=True)
 
 
-class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PLW1641
+class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):  # noqa: PLW1641
     """Base class for Notion property values.
 
     Used to map high-level objects to low-level Notion-API objects
@@ -37,7 +37,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
     readonly: bool = False  # value of property can not be set by us
     _type_value_map: ClassVar[dict[str, type[PropertyValue]]] = {}
 
-    def __init_subclass__(cls, wraps: type[T], **kwargs: Any):
+    def __init_subclass__(cls, wraps: type[PV_co], **kwargs: Any):
         super().__init_subclass__(wraps=wraps, **kwargs)
         # When this is called, the model is not yet constructed, thus no direct field access with .type.
         type_name = wraps.model_fields['type'].get_default()
@@ -58,7 +58,7 @@ class PropertyValue(Wrapper[T], ABC, wraps=obj_props.PropertyValue):  # noqa: PL
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PropertyValue):
             return NotImplemented
-        other_obj_ref = cast(T, other.obj_ref)
+        other_obj_ref = cast(PV_co, other.obj_ref)
         return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
 
     @property
