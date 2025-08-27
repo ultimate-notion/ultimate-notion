@@ -358,6 +358,14 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
             msg = 'Cannot insert a block that has no parent.'
             raise InvalidAPIUsageError(msg)
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Block):
+            return NotImplemented
+        return bool(self.obj_ref == other.obj_ref)  # for type narrowing
+
+    def __hash__(self) -> int:
+        return hash(self.obj_ref)
+
 
 class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):
     """Mixin for objects that can have captions."""
@@ -474,7 +482,6 @@ class ColoredTextBlock(TextBlock[TB], wraps=obj_blocks.ColoredTextBlock):
     ) -> None:
         super().__init__(text)
         value = self._get_value()
-        value.rich_text = Text(text).obj_ref
         value.color = color
 
     def _get_value(self) -> obj_blocks.ColoredTextBlockTypeData:

@@ -112,7 +112,7 @@ def raise_unset(obj: T) -> T: ...
 def raise_unset(obj: T | UnsetType) -> T:
     """Raise an error if the object is unset."""
     if isinstance(obj, UnsetType):
-        msg = f'Object of type {type(obj).__name__} is unset.'
+        msg = 'Object is unset.'
         raise ValueError(msg)
     return obj
 
@@ -139,10 +139,31 @@ def extract_id(text: str) -> str | None:
     return None
 
 
+def _freeze(obj: Any) -> Any:
+    """Make nested structures hashable & deterministic."""
+    if isinstance(obj, BaseModel):
+        return _freeze(obj.model_dump(mode='python'))
+    if isinstance(obj, dict):
+        return tuple((k, _freeze(v)) for k, v in sorted(obj.items()))
+    if isinstance(obj, (list, tuple)):
+        return tuple(_freeze(x) for x in obj)
+    if isinstance(obj, set):
+        return frozenset(_freeze(x) for x in obj)
+    return obj
+
+
 class GenericObject(BaseModel):
     """The base for all API objects."""
 
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
+
+    def __eq__(self, value: object) -> bool:
+        return super().__eq__(value)
+
+    def __hash__(self) -> int:
+        # Consistent with __eq__: we hash the same values that count for equality
+        frozen = _freeze(self.model_dump(mode='python'))
+        return hash(frozen)
 
     @classmethod
     def _set_field_default(cls, name: str, default: str) -> None:
@@ -213,24 +234,14 @@ class UniqueObject(GenericObject):
     """A Notion object that has a unique ID.
 
     This is the base class for all Notion objects that have a unique identifier, i.e. `id`.
+
+    !!! warning
+
+        The `id` field is only set when the object is sent or retrieved from the API, not when created locally.
     """
 
     id: UUID | str | UnsetType = Field(union_mode='left_to_right', default=Unset)
     """`id` is an `UUID` if possible or a string (possibly not unique) depending on the object"""
-
-    def __hash__(self) -> int:
-        """Return a hash of the object based on its ID."""
-        return hash(self.id)
-
-    def __eq__(self, value: Any) -> bool:
-        """Check if the given value is equal to this object."""
-        match value:
-            case UniqueObject():
-                return self.id == value.id
-            case BaseModel():
-                return super().__eq__(value)
-            case _:
-                return False
 
 
 class NotionObject(UniqueObject):

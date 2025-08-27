@@ -118,7 +118,7 @@ class UnsupportedBlockTypeData(GenericObject):
 class UnsupportedBlock(Block[UnsupportedBlockTypeData], type='unsupported'):
     """A placeholder for unsupported blocks in the API."""
 
-    unsupported: UnsupportedBlockTypeData = UnsupportedBlockTypeData()
+    unsupported: UnsupportedBlockTypeData = Field(default_factory=UnsupportedBlockTypeData)
 
 
 class TextBlockTypeData(GenericObject):
@@ -158,7 +158,7 @@ class ParagraphTypeData(ColoredTextBlockTypeData):
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):
     """A paragraph block in Notion."""
 
-    paragraph: ParagraphTypeData = ParagraphTypeData()
+    paragraph: ParagraphTypeData = Field(default_factory=ParagraphTypeData)
 
 
 class HeadingTypeData(ColoredTextBlockTypeData):
@@ -174,19 +174,19 @@ class Heading(ColoredTextBlock[HeadingTypeData]):
 class Heading1(Heading, type='heading_1'):
     """A heading_1 block in Notion."""
 
-    heading_1: HeadingTypeData = HeadingTypeData()
+    heading_1: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class Heading2(Heading, type='heading_2'):
     """A heading_2 block in Notion."""
 
-    heading_2: HeadingTypeData = HeadingTypeData()
+    heading_2: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class Heading3(Heading, type='heading_3'):
     """A heading_3 block in Notion."""
 
-    heading_3: HeadingTypeData = HeadingTypeData()
+    heading_3: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class QuoteTypeData(ColoredTextBlockTypeData):
@@ -198,7 +198,7 @@ class QuoteTypeData(ColoredTextBlockTypeData):
 class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
     """A quote block in Notion."""
 
-    quote: QuoteTypeData = QuoteTypeData()
+    quote: QuoteTypeData = Field(default_factory=QuoteTypeData)
 
 
 class CodeTypeData(TextBlockTypeData, CaptionMixin):
@@ -210,7 +210,7 @@ class CodeTypeData(TextBlockTypeData, CaptionMixin):
 class Code(TextBlock[CodeTypeData], type='code'):
     """A code block in Notion."""
 
-    code: CodeTypeData = CodeTypeData()
+    code: CodeTypeData = Field(default_factory=CodeTypeData)
 
 
 class CalloutTypeData(ColoredTextBlockTypeData):
@@ -224,7 +224,7 @@ class CalloutTypeData(ColoredTextBlockTypeData):
 class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
     """A callout block in Notion."""
 
-    callout: CalloutTypeData = CalloutTypeData()
+    callout: CalloutTypeData = Field(default_factory=CalloutTypeData)
 
 
 class BulletedListItemTypeData(ColoredTextBlockTypeData):
@@ -236,7 +236,7 @@ class BulletedListItemTypeData(ColoredTextBlockTypeData):
 class BulletedListItem(ColoredTextBlock[BulletedListItemTypeData], type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
-    bulleted_list_item: BulletedListItemTypeData = BulletedListItemTypeData()
+    bulleted_list_item: BulletedListItemTypeData = Field(default_factory=BulletedListItemTypeData)
 
 
 class NumberedListItemTypeData(ColoredTextBlockTypeData):
@@ -248,7 +248,7 @@ class NumberedListItemTypeData(ColoredTextBlockTypeData):
 class NumberedListItem(ColoredTextBlock[NumberedListItemTypeData], type='numbered_list_item'):
     """A numbered list item in Notion."""
 
-    numbered_list_item: NumberedListItemTypeData = NumberedListItemTypeData()
+    numbered_list_item: NumberedListItemTypeData = Field(default_factory=NumberedListItemTypeData)
 
 
 class ToDoTypeData(ColoredTextBlockTypeData):
@@ -261,7 +261,7 @@ class ToDoTypeData(ColoredTextBlockTypeData):
 class ToDo(ColoredTextBlock[ToDoTypeData], type='to_do'):
     """A todo list item in Notion."""
 
-    to_do: ToDoTypeData = ToDoTypeData()
+    to_do: ToDoTypeData = Field(default_factory=ToDoTypeData)
 
 
 class ToggleTypeData(ColoredTextBlockTypeData):
@@ -273,7 +273,7 @@ class ToggleTypeData(ColoredTextBlockTypeData):
 class Toggle(ColoredTextBlock[ToggleTypeData], type='toggle'):
     """A toggle list item in Notion."""
 
-    toggle: ToggleTypeData = ToggleTypeData()
+    toggle: ToggleTypeData = Field(default_factory=ToggleTypeData)
 
 
 class DividerTypeData(GenericObject):
@@ -283,7 +283,7 @@ class DividerTypeData(GenericObject):
 class Divider(Block[DividerTypeData], type='divider'):
     """A divider block in Notion."""
 
-    divider: DividerTypeData = DividerTypeData()
+    divider: DividerTypeData = Field(default_factory=DividerTypeData)
 
 
 class TableOfContentsTypeData(GenericObject):
@@ -295,7 +295,7 @@ class TableOfContentsTypeData(GenericObject):
 class TableOfContents(Block[TableOfContentsTypeData], type='table_of_contents'):
     """A table_of_contents block in Notion."""
 
-    table_of_contents: TableOfContentsTypeData = TableOfContentsTypeData()
+    table_of_contents: TableOfContentsTypeData = Field(default_factory=TableOfContentsTypeData)
 
 
 class BreadcrumbTypeData(GenericObject):
@@ -305,7 +305,7 @@ class BreadcrumbTypeData(GenericObject):
 class Breadcrumb(Block[BreadcrumbTypeData], type='breadcrumb'):
     """A breadcrumb block in Notion."""
 
-    breadcrumb: BreadcrumbTypeData = BreadcrumbTypeData()
+    breadcrumb: BreadcrumbTypeData = Field(default_factory=BreadcrumbTypeData)
 
 
 class EmbedTypeData(CaptionMixin):
@@ -361,7 +361,7 @@ class EquationTypeData(GenericObject):
 class Equation(Block[EquationTypeData], type='equation'):
     """An equation block in Notion."""
 
-    equation: EquationTypeData = EquationTypeData()
+    equation: EquationTypeData = Field(default_factory=EquationTypeData)
 
 
 class FileBase(Block[FileObject], ABC):
@@ -428,7 +428,7 @@ class ColumnTypeData(GenericObject):
 class Column(Block[ColumnTypeData], type='column'):
     """A column block in Notion."""
 
-    column: ColumnTypeData = ColumnTypeData()
+    column: ColumnTypeData = Field(default_factory=ColumnTypeData)
 
     @classmethod
     def build(cls, width_ratio: float | None = None) -> Column:
@@ -446,7 +446,7 @@ class ColumnListTypeData(GenericObject):
 class ColumnList(Block[ColumnListTypeData], type='column_list'):
     """A column list block in Notion."""
 
-    column_list: ColumnListTypeData = ColumnListTypeData()
+    column_list: ColumnListTypeData = Field(default_factory=ColumnListTypeData)
 
 
 class TableRowTypeData(GenericObject):
@@ -458,7 +458,7 @@ class TableRowTypeData(GenericObject):
 class TableRow(Block[TableRowTypeData], type='table_row'):
     """A table_row block in Notion."""
 
-    table_row: TableRowTypeData = TableRowTypeData()
+    table_row: TableRowTypeData = Field(default_factory=TableRowTypeData)
 
     @classmethod
     def build(cls, n_cells: int) -> TableRow:
@@ -479,7 +479,7 @@ class TableTypeData(GenericObject):
 class Table(Block[TableTypeData], type='table'):
     """A table block in Notion."""
 
-    table: TableTypeData = TableTypeData()
+    table: TableTypeData = Field(default_factory=TableTypeData)
 
 
 class LinkToPage(Block[ParentRef], type='link_to_page'):
@@ -498,7 +498,7 @@ class SyncedBlockTypeData(GenericObject):
 class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
     """A synced_block block in Notion - either original or synced."""
 
-    synced_block: SyncedBlockTypeData = SyncedBlockTypeData()
+    synced_block: SyncedBlockTypeData = Field(default_factory=SyncedBlockTypeData)
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
@@ -518,4 +518,4 @@ class TemplateTypeData(TextBlockTypeData):
 class Template(TextBlock[TemplateTypeData], type='template'):
     """A template block in Notion."""
 
-    template: TemplateTypeData = TemplateTypeData()
+    template: TemplateTypeData = Field(default_factory=TemplateTypeData)
