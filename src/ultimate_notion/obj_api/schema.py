@@ -2,95 +2,114 @@
 
 from __future__ import annotations
 
+from typing import TypeVar
 from uuid import UUID
 
-from pydantic import Field, SerializeAsAny, field_validator
+from pydantic import Field, field_validator
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
 from ultimate_notion.obj_api.enums import AggFunc, NumberFormat
 from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 
+GO_co = TypeVar('GO_co', bound=GenericObject, covariant=True)  # ToDo: Use new syntax when requires-python >= 3.12
 
-class Property(TypedObject, polymorphic_base=True):
+
+class Property(TypedObject[GO_co], polymorphic_base=True):
     """Base class for Notion property objects."""
 
     id: str = None  # type: ignore
     name: str = None  # type: ignore
 
 
-class Title(Property, type='title'):
+class TitleTypeData(GenericObject):
+    """Type data for `Title`."""
+
+
+class Title(Property[TitleTypeData], type='title'):
     """Defines the title configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    title: TypeData = TypeData()
+    title: TitleTypeData = TitleTypeData()
 
 
-class RichText(Property, type='rich_text'):
+class RichTextTypeData(GenericObject):
+    """Type data for `RichText`."""
+
+
+class RichText(Property[RichTextTypeData], type='rich_text'):
     """Defines the rich text configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    rich_text: TypeData = TypeData()
+    rich_text: RichTextTypeData = RichTextTypeData()
 
 
-class Number(Property, type='number'):
+class NumberTypeData(GenericObject):
+    """Type data for `Number`."""
+
+    format: NumberFormat = NumberFormat.NUMBER
+
+    # leads to better error messages, see
+    # https://github.com/pydantic/pydantic/issues/355
+    @field_validator('format')
+    @classmethod
+    def validate_enum_field(cls, field: str) -> NumberFormat:
+        return NumberFormat(field)
+
+
+class Number(Property[NumberTypeData], type='number'):
     """Defines the number configuration for a database property."""
 
-    class TypeData(GenericObject):
-        format: NumberFormat = NumberFormat.NUMBER
-
-        # leads to better error messages, see
-        # https://github.com/pydantic/pydantic/issues/355
-        @field_validator('format')
-        @classmethod
-        def validate_enum_field(cls, field: str) -> NumberFormat:
-            return NumberFormat(field)
-
-    number: TypeData = TypeData()
+    number: NumberTypeData = NumberTypeData()
 
     @classmethod
     def build(cls, format: NumberFormat) -> Number:  # noqa: A002
         """Create a `Number` object with the expected format."""
-        return cls.model_construct(number=cls.TypeData(format=format))
+        return cls.model_construct(number=NumberTypeData(format=format))
 
 
-class Select(Property, type='select'):
+class SelectTypeData(GenericObject):
+    """Type data for `Select`."""
+
+    options: list[SelectOption] = Field(default_factory=list)
+
+
+class Select(Property[SelectTypeData], type='select'):
     """Defines the select configuration for a database property."""
 
-    class TypeData(GenericObject):
-        options: list[SelectOption] = Field(default_factory=list)
-
-    select: TypeData = TypeData()
+    select: SelectTypeData = SelectTypeData()
 
     @classmethod
     def build(cls, options: list[SelectOption]) -> Select:
         """Create a `Select` object from the list of `SelectOption`'s."""
-        return cls.model_construct(select=cls.TypeData(options=options))
+        return cls.model_construct(select=SelectTypeData(options=options))
 
 
-class MultiSelect(Property, type='multi_select'):
+class MultiSelectTypeData(GenericObject):
+    """Type data for `MultiSelect`."""
+
+    options: list[SelectOption] = Field(default_factory=list)
+
+
+class MultiSelect(Property[MultiSelectTypeData], type='multi_select'):
     """Defines the multi-select configuration for a database property."""
 
-    class TypeData(GenericObject):
-        options: list[SelectOption] = Field(default_factory=list)
-
-    multi_select: TypeData = TypeData()
+    multi_select: MultiSelectTypeData = MultiSelectTypeData()
 
     @classmethod
     def build(cls, options: list[SelectOption]) -> MultiSelect:
         """Create a `Select` object from the list of `SelectOption`'s."""
-        return cls.model_construct(multi_select=cls.TypeData(options=options))
+        return cls.model_construct(multi_select=MultiSelectTypeData(options=options))
 
 
-class Status(Property, type='status'):
+class StatusTypeData(GenericObject):
+    """Type data for `Status`."""
+
+    options: list[SelectOption] = Field(default_factory=list)
+    groups: list[SelectGroup] = Field(default_factory=list)
+
+
+class Status(Property[StatusTypeData], type='status'):
     """Defines the status configuration for a database property."""
 
-    class TypeData(GenericObject):
-        options: list[SelectOption] = Field(default_factory=list)
-        groups: list[SelectGroup] = Field(default_factory=list)
-
-    status: TypeData = TypeData()
+    status: StatusTypeData = StatusTypeData()
 
     @classmethod
     def build(cls, options: list[SelectOption], groups: list[SelectGroup]) -> Status:
@@ -101,105 +120,124 @@ class Status(Property, type='status'):
             While a Status property can be built, it can only be used to
             check a schema, not to create a database having such a property.
         """
-        return cls.model_construct(status=cls.TypeData(options=options, groups=groups))
+        return cls.model_construct(status=StatusTypeData(options=options, groups=groups))
 
 
-class Date(Property, type='date'):
+class DateTypeData(GenericObject):
+    """Type data for `Date`."""
+
+
+class Date(Property[DateTypeData], type='date'):
     """Defines the date configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    date: TypeData = TypeData()
+    date: DateTypeData = DateTypeData()
 
 
-class People(Property, type='people'):
+class PeopleTypeData(GenericObject):
+    """Type data for `People`."""
+
+
+class People(Property[PeopleTypeData], type='people'):
     """Defines the people configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    people: TypeData = TypeData()
+    people: PeopleTypeData = PeopleTypeData()
 
 
-class Files(Property, type='files'):
+class FilesTypeData(GenericObject):
+    """Type data for `Files`."""
+
+
+class Files(Property[FilesTypeData], type='files'):
     """Defines the files configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    files: TypeData = TypeData()
+    files: FilesTypeData = FilesTypeData()
 
 
-class Checkbox(Property, type='checkbox'):
+class CheckboxTypeData(GenericObject):
+    """Type data for `Checkbox`."""
+
+
+class Checkbox(Property[CheckboxTypeData], type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    checkbox: TypeData = TypeData()
+    checkbox: CheckboxTypeData = CheckboxTypeData()
 
 
-class Email(Property, type='email'):
+class EmailTypeData(GenericObject):
+    """Type data for `Email`."""
+
+
+class Email(Property[EmailTypeData], type='email'):
     """Defines the email configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    email: TypeData = TypeData()
+    email: EmailTypeData = EmailTypeData()
 
 
-class URL(Property, type='url'):
+class URLTypeData(GenericObject):
+    """Type data for `URL`."""
+
+
+class URL(Property[URLTypeData], type='url'):
     """Defines the URL configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    url: TypeData = TypeData()
+    url: URLTypeData = URLTypeData()
 
 
-class PhoneNumber(Property, type='phone_number'):
+class PhoneNumberTypeData(GenericObject):
+    """Type data for `PhoneNumber`."""
+
+
+class PhoneNumber(Property[PhoneNumberTypeData], type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    phone_number: TypeData = TypeData()
+    phone_number: PhoneNumberTypeData = PhoneNumberTypeData()
 
 
-class Formula(Property, type='formula'):
+class FormulaTypeData(GenericObject):
+    """Type data for `Formula`."""
+
+    expression: str = None  # type: ignore
+
+    def __eq__(self, other: object) -> bool:
+        """Compare Formula objects by all attributes except id."""
+        # Sadly, expressions are changed by the Notion API, e.g. 'prop("Name")' in our request becomes
+        # {{notion:block_property:title:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+        # ToDo: Implement a way to compare these expressions, which is possible in principle.
+        return isinstance(other, FormulaTypeData)
+
+    def __hash__(self) -> int:
+        """Return a hash of the Formula TypeData.
+
+        Since __eq__ always returns True due to API expression transformation,
+        we use a constant hash to maintain consistency with equality.
+        """
+        return hash(self.__class__)
+
+
+class Formula(Property[FormulaTypeData], type='formula'):
     """Defines the formula configuration for a database property."""
 
-    class TypeData(GenericObject):
-        expression: str = None  # type: ignore
-
-        def __eq__(self, other: object) -> bool:
-            """Compare Formula objects by all attributes except id."""
-            # Sadly, expressions are changed by the Notion API, e.g. 'prop("Name")' in our request becomes
-            # {{notion:block_property:title:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-            # ToDo: Implement a way to compare these expressions, which is possible in principle.
-            return isinstance(other, Formula.TypeData)
-
-        def __hash__(self) -> int:
-            """Return a hash of the Formula TypeData.
-
-            Since __eq__ always returns True due to API expression transformation,
-            we use a constant hash to maintain consistency with equality.
-            """
-            return hash(self.__class__)
-
-    formula: TypeData = TypeData()
+    formula: FormulaTypeData = FormulaTypeData()
 
     @classmethod
     def build(cls, formula: str) -> Formula:
-        return cls.model_construct(formula=cls.TypeData(expression=formula))
+        return cls.model_construct(formula=FormulaTypeData(expression=formula))
 
 
-class PropertyRelation(TypedObject, polymorphic_base=True):
+class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
     """Defines common configuration for a property relation."""
 
     database_id: UUID = None  # type: ignore
 
 
-class SinglePropertyRelation(PropertyRelation, type='single_property'):
+class SinglePropertyRelationTypeData(GenericObject):
+    """Type data for `SinglePropertyRelation`."""
+
+
+class SinglePropertyRelation(PropertyRelation[SinglePropertyRelationTypeData], type='single_property'):
     """Defines a one-way relation configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    single_property: TypeData = TypeData()
+    single_property: SinglePropertyRelationTypeData = SinglePropertyRelationTypeData()
 
     @classmethod
     def build_relation(cls, dbref: UUID) -> Relation:
@@ -211,28 +249,31 @@ class SinglePropertyRelation(PropertyRelation, type='single_property'):
         return Relation.model_construct(relation=rel)
 
 
-class DualPropertyRelation(PropertyRelation, type='dual_property'):
+class DualPropertyRelationTypeData(GenericObject):
+    """Type data for `DualPropertyRelation`."""
+
+    synced_property_name: str = None  # type: ignore
+    synced_property_id: str | None = None
+
+    def __eq__(self, other: object) -> bool:
+        """Compare DualPropertyRelation objects by all attributes except id."""
+        if not isinstance(other, DualPropertyRelationTypeData):
+            return False
+        # we skip the id as this is set by the Notion API.
+        return self.synced_property_name == other.synced_property_name
+
+    def __hash__(self) -> int:
+        """Return a hash of the DualPropertyRelation TypeData based on synced_property_name."""
+        return hash(self.synced_property_name)
+
+
+class DualPropertyRelation(PropertyRelation[DualPropertyRelationTypeData], type='dual_property'):
     """Defines a two-way relation configuration for a database property.
 
     If a two-way relation property X relates to Y then the two-way relation property Y relates to X.
     """
 
-    class TypeData(GenericObject):
-        synced_property_name: str = None  # type: ignore
-        synced_property_id: str | None = None
-
-        def __eq__(self, other: object) -> bool:
-            """Compare DualPropertyRelation objects by all attributes except id."""
-            if not isinstance(other, DualPropertyRelation.TypeData):
-                return False
-            # we skip the id as this is set by the Notion API.
-            return self.synced_property_name == other.synced_property_name
-
-        def __hash__(self) -> int:
-            """Return a hash of the DualPropertyRelation TypeData based on synced_property_name."""
-            return hash(self.synced_property_name)
-
-    dual_property: TypeData = TypeData()
+    dual_property: DualPropertyRelationTypeData = DualPropertyRelationTypeData()
 
     @classmethod
     def build_relation(cls, dbref: UUID) -> Relation:
@@ -247,109 +288,127 @@ class DualPropertyRelation(PropertyRelation, type='dual_property'):
         return Relation.model_construct(relation=rel)
 
 
-class Relation(Property, type='relation'):
+class Relation(Property[SinglePropertyRelation | DualPropertyRelation], type='relation'):
     """Defines the relation configuration for a database property."""
 
-    relation: SerializeAsAny[PropertyRelation]
+    relation: SinglePropertyRelation | DualPropertyRelation
 
 
-class Rollup(Property, type='rollup'):
+class RollupTypeData(GenericObject):
+    """Type data for `Rollup`."""
+
+    function: AggFunc = AggFunc.COUNT_ALL
+
+    relation_property_name: str = None  # type: ignore
+    relation_property_id: str | None = None
+
+    rollup_property_name: str = None  # type: ignore
+    rollup_property_id: str | None = None
+
+    # leads to better error messages, see
+    # https://github.com/pydantic/pydantic/issues/355
+    @field_validator('function')
+    @classmethod
+    def validate_enum_field(cls, field: str) -> AggFunc:
+        return AggFunc(field)
+
+    def __eq__(self, value: object) -> bool:
+        """Compare Rollup objects by all attributes except id."""
+        if not isinstance(value, RollupTypeData):
+            return False
+        return (
+            self.function == value.function
+            and self.relation_property_name == value.relation_property_name
+            and self.rollup_property_name == value.rollup_property_name
+        )
+
+    def __hash__(self) -> int:
+        """Return a hash of the Rollup TypeData based on function and property names."""
+        return hash((self.function, self.relation_property_name, self.rollup_property_name))
+
+
+class Rollup(Property[RollupTypeData], type='rollup'):
     """Defines the rollup configuration for a database property."""
 
-    class TypeData(GenericObject):
-        function: AggFunc = AggFunc.COUNT_ALL
-
-        relation_property_name: str = None  # type: ignore
-        relation_property_id: str | None = None
-
-        rollup_property_name: str = None  # type: ignore
-        rollup_property_id: str | None = None
-
-        # leads to better error messages, see
-        # https://github.com/pydantic/pydantic/issues/355
-        @field_validator('function')
-        @classmethod
-        def validate_enum_field(cls, field: str) -> AggFunc:
-            return AggFunc(field)
-
-        def __eq__(self, value: object) -> bool:
-            """Compare Rollup objects by all attributes except id."""
-            if not isinstance(value, Rollup.TypeData):
-                return False
-            return (
-                self.function == value.function
-                and self.relation_property_name == value.relation_property_name
-                and self.rollup_property_name == value.rollup_property_name
-            )
-
-        def __hash__(self) -> int:
-            """Return a hash of the Rollup TypeData based on function and property names."""
-            return hash((self.function, self.relation_property_name, self.rollup_property_name))
-
-    rollup: TypeData = TypeData()
+    rollup: RollupTypeData = RollupTypeData()
 
     @classmethod
     def build(cls, relation: str, property: str, function: AggFunc) -> Rollup:  # noqa: A002
         return Rollup.model_construct(
-            rollup=cls.TypeData(function=function, relation_property_name=relation, rollup_property_name=property)
+            rollup=RollupTypeData(function=function, relation_property_name=relation, rollup_property_name=property)
         )
 
 
-class CreatedTime(Property, type='created_time'):
+class CreatedTimeTypeData(GenericObject):
+    """Type data for `CreatedTime`."""
+
+
+class CreatedTime(Property[CreatedTimeTypeData], type='created_time'):
     """Defines the created-time configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    created_time: TypeData = TypeData()
+    created_time: CreatedTimeTypeData = CreatedTimeTypeData()
 
 
-class CreatedBy(Property, type='created_by'):
+class CreatedByTypeData(GenericObject):
+    """Type data for `CreatedBy`."""
+
+
+class CreatedBy(Property[CreatedByTypeData], type='created_by'):
     """Defines the created-by configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    created_by: TypeData = TypeData()
+    created_by: CreatedByTypeData = CreatedByTypeData()
 
 
-class LastEditedBy(Property, type='last_edited_by'):
+class LastEditedByTypeData(GenericObject):
+    """Type data for `LastEditedBy`."""
+
+
+class LastEditedBy(Property[LastEditedByTypeData], type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    last_edited_by: TypeData = TypeData()
+    last_edited_by: LastEditedByTypeData = LastEditedByTypeData()
 
 
-class LastEditedTime(Property, type='last_edited_time'):
+class LastEditedTimeTypeData(GenericObject):
+    """Type data for `LastEditedTime`."""
+
+
+class LastEditedTime(Property[LastEditedTimeTypeData], type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
-    class TypeData(GenericObject): ...
-
-    last_edited_time: TypeData = TypeData()
+    last_edited_time: LastEditedTimeTypeData = LastEditedTimeTypeData()
 
 
-class UniqueID(Property, type='unique_id'):
+class UniqueIDTypeData(GenericObject):
+    """Type data for `UniqueID`."""
+
+    prefix: str | None = None
+
+
+class UniqueID(Property[UniqueIDTypeData], type='unique_id'):
     """Unique ID database property."""
 
-    class TypeData(GenericObject):
-        prefix: str | None = None
-
-    unique_id: TypeData = TypeData()
+    unique_id: UniqueIDTypeData = UniqueIDTypeData()
 
 
-class Verification(Property, type='verification'):
+class VerificationTypeData(GenericObject):
+    """Type data for `Verification`."""
+
+
+class Verification(Property[VerificationTypeData], type='verification'):
     """Verfication database property of Wiki databases."""
 
-    class TypeData(GenericObject): ...
-
-    verification: TypeData = TypeData()
+    verification: VerificationTypeData = VerificationTypeData()
 
 
-class Button(Property, type='button'):
+class ButtonTypeData(GenericObject):
+    """Type data for `Button`."""
+
+
+class Button(Property[ButtonTypeData], type='button'):
     """Button database property."""
 
-    class TypeData(GenericObject): ...
-
-    button: TypeData = TypeData()
+    button: ButtonTypeData = ButtonTypeData()
 
 
 class RenameProp(GenericObject):
