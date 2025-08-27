@@ -131,10 +131,10 @@ Also note that you can even pass a sequence of new blocks to `.insert_after` and
 
 !!! note
 
-    For type hinting, use [AnyBlock] for a general block, e.g.,
+    For type hinting, use just [Block] for a general block, e.g.,
 
     ```python
-    new_blocks: uno.AnyBlock = [uno.Heading1('New section'), uno.Divider(), uno.Paragraph('My paragraph')]
+    new_blocks: uno.Block = [uno.Heading1('New section'), uno.Divider(), uno.Paragraph('My paragraph')]
     ```
 
 ## Modifying blocks
@@ -407,7 +407,7 @@ discussion.append('My first appended inline comment!')
 [Notion blocks]: https://www.notion.so/help/category/write-edit-and-customize
 [blocks module]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks
 [Paragraph block]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Paragraph
-[AnyBlock]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.AnyBlock
+[Block]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Block
 [in_notion]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.DataObject.in_notion
 [Columns]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Columns
 [Text object]: ../../reference/ultimate_notion/rich_text/#ultimate_notion.rich_text.Text

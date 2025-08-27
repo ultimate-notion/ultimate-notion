@@ -25,11 +25,11 @@ import itertools
 import mimetypes
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeGuard, TypeVar, cast, overload
+from typing import TYPE_CHECKING, TypeGuard, cast, overload
 
 import numpy as np
 from tabulate import tabulate
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url
@@ -284,10 +284,12 @@ class CommentMixin(DataObject[DO], wraps=obj_blocks.DataObject):
         return comments
 
 
-B = TypeVar('B', bound=obj_blocks.Block)  # ToDo: Use new syntax when requires-python >= 3.12
+B_co = TypeVar(
+    'B_co', bound=obj_blocks.Block, default=obj_blocks.Block, covariant=True
+)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Block(CommentMixin[B], ABC, wraps=obj_blocks.Block):
+class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
     """Abstract Notion block.
 
     Parent class of all block types.
@@ -301,7 +303,7 @@ class Block(CommentMixin[B], ABC, wraps=obj_blocks.Block):
     def reload(self) -> Self:
         """Reload the block from the API."""
         session = get_active_session()
-        self.obj_ref = cast(B, session.api.blocks.retrieve(self.id))
+        self.obj_ref = cast(B_co, session.api.blocks.retrieve(self.id))
         return self
 
     def _update_in_notion(self, *, exclude_attrs: Sequence[str] | None = None) -> None:
@@ -357,11 +359,7 @@ class Block(CommentMixin[B], ABC, wraps=obj_blocks.Block):
             raise InvalidAPIUsageError(msg)
 
 
-AnyBlock: TypeAlias = Block[Any]
-"""For type hinting purposes, especially for lists of blocks, i.e. list[AnyBlock], in user code."""
-
-
-class CaptionMixin(Block[B], wraps=obj_blocks.Block):
+class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):
     """Mixin for objects that can have captions."""
 
     @property
@@ -377,7 +375,7 @@ class CaptionMixin(Block[B], wraps=obj_blocks.Block):
         self._update_in_notion()
 
 
-class TextBlock(Block[B], ABC, wraps=obj_blocks.TextBlock):
+class TextBlock(Block[B_co], ABC, wraps=obj_blocks.TextBlock):
     """Abstract Text block.
 
     Parent class of all text block types.

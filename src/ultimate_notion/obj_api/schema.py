@@ -2,16 +2,17 @@
 
 from __future__ import annotations
 
-from typing import TypeVar
 from uuid import UUID
 
 from pydantic import Field, field_validator
+from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import GenericObject, TypedObject
 from ultimate_notion.obj_api.enums import AggFunc, NumberFormat
 from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 
-GO_co = TypeVar('GO_co', bound=GenericObject, covariant=True)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+GO_co = TypeVar('GO_co', bound=GenericObject, covariant=True, default=GenericObject)
 
 
 class Property(TypedObject[GO_co], polymorphic_base=True):

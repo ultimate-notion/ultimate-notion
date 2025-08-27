@@ -17,9 +17,10 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
 from pydantic import Field, SerializeAsAny
+from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import GenericObject, NotionEntity, TypedObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
@@ -60,7 +61,7 @@ class Database(DataObject, MentionMixin, object='database'):
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, Property]
+    properties: dict[str, SerializeAsAny[Property]]
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
 
@@ -97,10 +98,12 @@ class Page(DataObject, MentionMixin, object='page'):
         return MentionPage.build_mention_from(self, style=style)
 
 
-GO = TypeVar('GO', bound=GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
+GO_co = TypeVar(
+    'GO_co', bound=GenericObject, default=GenericObject, covariant=True
+)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-class Block(TypedObject[GO], DataObject, object='block', polymorphic_base=True):
+class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=True):
     """A standard block object in Notion.
 
     Calling the block will expose the nested data in the object.
