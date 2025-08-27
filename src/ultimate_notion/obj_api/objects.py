@@ -317,7 +317,7 @@ class PersonTypeData(GenericObject):
 class Person(User[PersonTypeData], type='person'):
     """Represents a Person in Notion."""
 
-    person: PersonTypeData = PersonTypeData()
+    person: PersonTypeData = Field(default_factory=PersonTypeData)
 
 
 class WorkSpaceLimits(GenericObject):
@@ -331,7 +331,7 @@ class BotTypeData(GenericObject):
 
     owner: WorkspaceRef | None = None
     workspace_name: str | None = None
-    workspace_limits: WorkSpaceLimits = WorkSpaceLimits()
+    workspace_limits: WorkSpaceLimits = Field(default_factory=WorkSpaceLimits)
 
 
 class Bot(User[BotTypeData], type='bot'):
@@ -340,7 +340,7 @@ class Bot(User[BotTypeData], type='bot'):
     # Even if stated otherwise in the docs, `bot` type data is optional and for instance
     # not present when a new page is created by a bot within a database with a `CreatedBy` Property.
     # For ease of use, we include a default instance of the bot type data.
-    bot: BotTypeData = BotTypeData()
+    bot: BotTypeData = Field(default_factory=BotTypeData)
 
 
 class UnknownUserTypeData(GenericObject):
@@ -354,7 +354,7 @@ class UnknownUser(User[UnknownUserTypeData], type='unknown'):
     """
 
     name: Literal['Unknown User'] = 'Unknown User'
-    unknown: UnknownUserTypeData = UnknownUserTypeData()
+    unknown: UnknownUserTypeData = Field(default_factory=UnknownUserTypeData)
 
 
 class Annotations(GenericObject):

@@ -17,7 +17,7 @@ from abc import ABC
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
-from pydantic import SerializeAsAny, field_validator, model_serializer
+from pydantic import Field, SerializeAsAny, field_validator, model_serializer
 from typing_extensions import Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, Unset, UnsetType
@@ -74,13 +74,13 @@ class PropertyValue(TypedObject[Any], polymorphic_base=True):
 class Title(PropertyValue, type='title'):
     """Notion title type."""
 
-    title: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    title: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class RichText(PropertyValue, type='rich_text'):
     """Notion rich text type."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = None  # type: ignore
+    rich_text: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class Number(PropertyValue, type='number'):
@@ -286,7 +286,7 @@ class UniqueID(PropertyValue, type='unique_id'):
         number: int = 0
         prefix: str | None = None
 
-    unique_id: TypeData = TypeData()
+    unique_id: TypeData = Field(default_factory=TypeData)
 
 
 class Verification(PropertyValue, type='verification'):
@@ -304,7 +304,7 @@ class Verification(PropertyValue, type='verification'):
         def validate_enum_field(cls, field: str) -> VState:
             return VState(field)
 
-    verification: TypeData = TypeData()
+    verification: TypeData = Field(default_factory=TypeData)
 
 
 class Button(PropertyValue, type='button'):
@@ -312,7 +312,7 @@ class Button(PropertyValue, type='button'):
 
     class TypeData(GenericObject): ...
 
-    button: TypeData = TypeData()
+    button: TypeData = Field(default_factory=TypeData)
 
 
 ##################

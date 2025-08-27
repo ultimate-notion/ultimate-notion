@@ -664,3 +664,29 @@ def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> Non
     callout = uno.Heading1('This is a Heading.', toggleable=True)
     with pytest.raises(InvalidAPIUsageError):
         callout.append(uno.Paragraph('This is a child paragraph.'))
+
+
+@pytest.mark.vcr()
+def test_block_equality_and_hash(root_page: uno.Page, notion: uno.Session) -> None:
+    para1 = uno.Paragraph(text='Some text')
+    para2 = uno.Paragraph(text='Different text')
+    para1a = uno.Paragraph(text='Some text')
+
+    assert para1 != para2
+    assert hash(para1) != hash(para2)
+    assert para1 == para1a
+    assert hash(para1) == hash(para1a)
+
+    with pytest.raises(ValueError):
+        assert para1.id != para2.id
+
+    page = notion.create_page(parent=root_page, title='Page for testing block equality and hash')
+    page.append([para1, para2, para1a])
+
+    assert para1.id != para2.id
+    assert para1.id != para1a.id
+
+    assert para1 != para2
+    assert para1 != para1a  # same content but now different id!
+    assert hash(para1) != hash(para2)
+    assert hash(para1) != hash(para1a)

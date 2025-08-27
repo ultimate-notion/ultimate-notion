@@ -29,7 +29,7 @@ class TitleTypeData(GenericObject):
 class Title(Property[TitleTypeData], type='title'):
     """Defines the title configuration for a database property."""
 
-    title: TitleTypeData = TitleTypeData()
+    title: TitleTypeData = Field(default_factory=TitleTypeData)
 
 
 class RichTextTypeData(GenericObject):
@@ -39,7 +39,7 @@ class RichTextTypeData(GenericObject):
 class RichText(Property[RichTextTypeData], type='rich_text'):
     """Defines the rich text configuration for a database property."""
 
-    rich_text: RichTextTypeData = RichTextTypeData()
+    rich_text: RichTextTypeData = Field(default_factory=RichTextTypeData)
 
 
 class NumberTypeData(GenericObject):
@@ -58,7 +58,7 @@ class NumberTypeData(GenericObject):
 class Number(Property[NumberTypeData], type='number'):
     """Defines the number configuration for a database property."""
 
-    number: NumberTypeData = NumberTypeData()
+    number: NumberTypeData = Field(default_factory=NumberTypeData)
 
     @classmethod
     def build(cls, format: NumberFormat) -> Number:  # noqa: A002
@@ -75,7 +75,7 @@ class SelectTypeData(GenericObject):
 class Select(Property[SelectTypeData], type='select'):
     """Defines the select configuration for a database property."""
 
-    select: SelectTypeData = SelectTypeData()
+    select: SelectTypeData = Field(default_factory=SelectTypeData)
 
     @classmethod
     def build(cls, options: list[SelectOption]) -> Select:
@@ -92,7 +92,7 @@ class MultiSelectTypeData(GenericObject):
 class MultiSelect(Property[MultiSelectTypeData], type='multi_select'):
     """Defines the multi-select configuration for a database property."""
 
-    multi_select: MultiSelectTypeData = MultiSelectTypeData()
+    multi_select: MultiSelectTypeData = Field(default_factory=MultiSelectTypeData)
 
     @classmethod
     def build(cls, options: list[SelectOption]) -> MultiSelect:
@@ -110,7 +110,7 @@ class StatusTypeData(GenericObject):
 class Status(Property[StatusTypeData], type='status'):
     """Defines the status configuration for a database property."""
 
-    status: StatusTypeData = StatusTypeData()
+    status: StatusTypeData = Field(default_factory=StatusTypeData)
 
     @classmethod
     def build(cls, options: list[SelectOption], groups: list[SelectGroup]) -> Status:
@@ -131,7 +131,7 @@ class DateTypeData(GenericObject):
 class Date(Property[DateTypeData], type='date'):
     """Defines the date configuration for a database property."""
 
-    date: DateTypeData = DateTypeData()
+    date: DateTypeData = Field(default_factory=DateTypeData)
 
 
 class PeopleTypeData(GenericObject):
@@ -141,7 +141,7 @@ class PeopleTypeData(GenericObject):
 class People(Property[PeopleTypeData], type='people'):
     """Defines the people configuration for a database property."""
 
-    people: PeopleTypeData = PeopleTypeData()
+    people: PeopleTypeData = Field(default_factory=PeopleTypeData)
 
 
 class FilesTypeData(GenericObject):
@@ -151,7 +151,7 @@ class FilesTypeData(GenericObject):
 class Files(Property[FilesTypeData], type='files'):
     """Defines the files configuration for a database property."""
 
-    files: FilesTypeData = FilesTypeData()
+    files: FilesTypeData = Field(default_factory=FilesTypeData)
 
 
 class CheckboxTypeData(GenericObject):
@@ -161,7 +161,7 @@ class CheckboxTypeData(GenericObject):
 class Checkbox(Property[CheckboxTypeData], type='checkbox'):
     """Defines the checkbox configuration for a database property."""
 
-    checkbox: CheckboxTypeData = CheckboxTypeData()
+    checkbox: CheckboxTypeData = Field(default_factory=CheckboxTypeData)
 
 
 class EmailTypeData(GenericObject):
@@ -171,7 +171,7 @@ class EmailTypeData(GenericObject):
 class Email(Property[EmailTypeData], type='email'):
     """Defines the email configuration for a database property."""
 
-    email: EmailTypeData = EmailTypeData()
+    email: EmailTypeData = Field(default_factory=EmailTypeData)
 
 
 class URLTypeData(GenericObject):
@@ -181,7 +181,7 @@ class URLTypeData(GenericObject):
 class URL(Property[URLTypeData], type='url'):
     """Defines the URL configuration for a database property."""
 
-    url: URLTypeData = URLTypeData()
+    url: URLTypeData = Field(default_factory=URLTypeData)
 
 
 class PhoneNumberTypeData(GenericObject):
@@ -191,7 +191,7 @@ class PhoneNumberTypeData(GenericObject):
 class PhoneNumber(Property[PhoneNumberTypeData], type='phone_number'):
     """Defines the phone number configuration for a database property."""
 
-    phone_number: PhoneNumberTypeData = PhoneNumberTypeData()
+    phone_number: PhoneNumberTypeData = Field(default_factory=PhoneNumberTypeData)
 
 
 class FormulaTypeData(GenericObject):
@@ -218,7 +218,7 @@ class FormulaTypeData(GenericObject):
 class Formula(Property[FormulaTypeData], type='formula'):
     """Defines the formula configuration for a database property."""
 
-    formula: FormulaTypeData = FormulaTypeData()
+    formula: FormulaTypeData = Field(default_factory=FormulaTypeData)
 
     @classmethod
     def build(cls, formula: str) -> Formula:
@@ -238,7 +238,7 @@ class SinglePropertyRelationTypeData(GenericObject):
 class SinglePropertyRelation(PropertyRelation[SinglePropertyRelationTypeData], type='single_property'):
     """Defines a one-way relation configuration for a database property."""
 
-    single_property: SinglePropertyRelationTypeData = SinglePropertyRelationTypeData()
+    single_property: SinglePropertyRelationTypeData = Field(default_factory=SinglePropertyRelationTypeData)
 
     @classmethod
     def build_relation(cls, dbref: UUID) -> Relation:
@@ -274,7 +274,7 @@ class DualPropertyRelation(PropertyRelation[DualPropertyRelationTypeData], type=
     If a two-way relation property X relates to Y then the two-way relation property Y relates to X.
     """
 
-    dual_property: DualPropertyRelationTypeData = DualPropertyRelationTypeData()
+    dual_property: DualPropertyRelationTypeData = Field(default_factory=DualPropertyRelationTypeData)
 
     @classmethod
     def build_relation(cls, dbref: UUID) -> Relation:
@@ -331,7 +331,7 @@ class RollupTypeData(GenericObject):
 class Rollup(Property[RollupTypeData], type='rollup'):
     """Defines the rollup configuration for a database property."""
 
-    rollup: RollupTypeData = RollupTypeData()
+    rollup: RollupTypeData = Field(default_factory=RollupTypeData)
 
     @classmethod
     def build(cls, relation: str, property: str, function: AggFunc) -> Rollup:  # noqa: A002
@@ -347,7 +347,7 @@ class CreatedTimeTypeData(GenericObject):
 class CreatedTime(Property[CreatedTimeTypeData], type='created_time'):
     """Defines the created-time configuration for a database property."""
 
-    created_time: CreatedTimeTypeData = CreatedTimeTypeData()
+    created_time: CreatedTimeTypeData = Field(default_factory=CreatedTimeTypeData)
 
 
 class CreatedByTypeData(GenericObject):
@@ -357,7 +357,7 @@ class CreatedByTypeData(GenericObject):
 class CreatedBy(Property[CreatedByTypeData], type='created_by'):
     """Defines the created-by configuration for a database property."""
 
-    created_by: CreatedByTypeData = CreatedByTypeData()
+    created_by: CreatedByTypeData = Field(default_factory=CreatedByTypeData)
 
 
 class LastEditedByTypeData(GenericObject):
@@ -367,7 +367,7 @@ class LastEditedByTypeData(GenericObject):
 class LastEditedBy(Property[LastEditedByTypeData], type='last_edited_by'):
     """Defines the last-edited-by configuration for a database property."""
 
-    last_edited_by: LastEditedByTypeData = LastEditedByTypeData()
+    last_edited_by: LastEditedByTypeData = Field(default_factory=LastEditedByTypeData)
 
 
 class LastEditedTimeTypeData(GenericObject):
@@ -377,7 +377,7 @@ class LastEditedTimeTypeData(GenericObject):
 class LastEditedTime(Property[LastEditedTimeTypeData], type='last_edited_time'):
     """Defines the last-edited-time configuration for a database property."""
 
-    last_edited_time: LastEditedTimeTypeData = LastEditedTimeTypeData()
+    last_edited_time: LastEditedTimeTypeData = Field(default_factory=LastEditedTimeTypeData)
 
 
 class UniqueIDTypeData(GenericObject):
@@ -389,7 +389,7 @@ class UniqueIDTypeData(GenericObject):
 class UniqueID(Property[UniqueIDTypeData], type='unique_id'):
     """Unique ID database property."""
 
-    unique_id: UniqueIDTypeData = UniqueIDTypeData()
+    unique_id: UniqueIDTypeData = Field(default_factory=UniqueIDTypeData)
 
 
 class VerificationTypeData(GenericObject):
@@ -399,7 +399,7 @@ class VerificationTypeData(GenericObject):
 class Verification(Property[VerificationTypeData], type='verification'):
     """Verfication database property of Wiki databases."""
 
-    verification: VerificationTypeData = VerificationTypeData()
+    verification: VerificationTypeData = Field(default_factory=VerificationTypeData)
 
 
 class ButtonTypeData(GenericObject):
@@ -409,7 +409,7 @@ class ButtonTypeData(GenericObject):
 class Button(Property[ButtonTypeData], type='button'):
     """Button database property."""
 
-    button: ButtonTypeData = ButtonTypeData()
+    button: ButtonTypeData = Field(default_factory=ButtonTypeData)
 
 
 class RenameProp(GenericObject):
