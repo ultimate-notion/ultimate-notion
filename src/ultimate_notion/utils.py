@@ -19,6 +19,7 @@ from typing import Any, Generic, ParamSpec, TypeVar
 import numpy as np
 import pendulum as pnd
 import tomli_w
+from numpy.typing import NDArray
 from packaging.version import Version
 from pydantic import BaseModel
 from typing_extensions import Self
@@ -122,7 +123,9 @@ def store_retvals(func: Callable[P, T]) -> StoredRetvalsFunctor[P, T]:
     return StoredRetvalsFunctor(func)
 
 
-def find_indices(elements: np.ndarray | Sequence[Any], total_set: np.ndarray | Sequence[Any]) -> np.ndarray:
+def find_indices(
+    elements: NDArray[np.int_] | Sequence[Any], total_set: NDArray[np.int_] | Sequence[Any]
+) -> NDArray[np.int_]:
     """Finds the indices of the elements in the total set."""
     if not isinstance(total_set, np.ndarray):
         total_set = np.array(total_set)
@@ -275,7 +278,7 @@ def str_hash(*args: str, n_chars: int = 16) -> str:
     return sha256(''.join(args).encode('utf-8')).hexdigest()[:n_chars]
 
 
-def rank(arr: np.ndarray) -> np.ndarray:
+def rank(arr: NDArray[np.int_]) -> NDArray[np.int_]:
     """Returns the rank of the elements in the array and gives the same rank to equal elements."""
     mask = np.argsort(arr)
     rank = np.zeros_like(arr)

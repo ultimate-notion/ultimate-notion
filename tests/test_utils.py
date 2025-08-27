@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Any
 
 import numpy as np
 import pendulum as pnd
 import pytest
 from numpy.testing import assert_array_equal
+from numpy.typing import NDArray
 
 from ultimate_notion import utils
 
 
 def test_find_indices() -> None:
-    elems: list[int] | np.ndarray[Any, np.dtype[np.integer]] = [7, 2, 4]
+    elems: list[int] | NDArray[np.int_] = [7, 2, 4]
     total_set = np.array([1, 2, 7, 3, 6, 4])
     idx = utils.find_indices(elems, total_set)
     assert_array_equal(idx, np.array([2, 1, 5]))
