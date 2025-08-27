@@ -219,13 +219,13 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
-def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable:
+def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
     """Return a VCR fixture for module/session-level fixtures"""
     if scope not in {'module', 'session'}:
         msg = f'Use this only for module or session scope, not {scope}!'
         raise ValueError(msg)
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         args = inspect.signature(func).parameters  # to inject the fixtures into the wrapper
         is_generator = inspect.isgeneratorfunction(func)
 
@@ -608,13 +608,13 @@ def tz_berlin() -> Iterator[str]:
         yield tz
 
 
-def assert_eventually(assertion_func: Callable[[], Any], retries: int = 5, delay: int = 3) -> None:
+def assert_eventually(assertion_func: Callable[..., Any], retries: int = 5, delay: int = 3) -> None:
     """Retry the provided assertion function for a given number of attempts with a delay.
 
     Args:
-        assertion_func (Callable): The lambda containing the assertion logic without parameters.
-        retries (int): Number of retries before failing.
-        delay (int): Delay in seconds between retries.
+        assertion_func: The lambda containing the assertion logic without parameters.
+        retries: Number of retries before failing.
+        delay: Delay in seconds between retries.
     """
     for attempt in range(retries):
         try:
