@@ -17,7 +17,6 @@ from abc import ABC
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
-import pendulum as pnd
 from pydantic import SerializeAsAny, field_validator, model_serializer
 from typing_extensions import Self
 
@@ -32,6 +31,7 @@ from ultimate_notion.obj_api.objects import (
     User,
 )
 from ultimate_notion.obj_api.schema import AggFunc, SelectOption
+from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Page
@@ -101,7 +101,7 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> Self:
+    def build(cls, dt_spec: str | DateTimeOrRange) -> Self:
         """Create a new Date from the native values."""
         return cast(Self, cls.model_construct(date=DateRange.build(dt_spec)))
 

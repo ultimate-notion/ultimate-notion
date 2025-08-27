@@ -14,7 +14,7 @@ from functools import update_wrapper
 from hashlib import sha256
 from itertools import chain
 from pathlib import Path
-from typing import Any, Generic, ParamSpec, TypeVar
+from typing import Any, Generic, ParamSpec, TypeAlias, TypeVar
 
 import numpy as np
 import pendulum as pnd
@@ -297,7 +297,11 @@ def is_stable_release() -> bool:
     return is_stable_version(__version__)
 
 
-def parse_dt_str(dt_str: str) -> pnd.DateTime | pnd.Date | pnd.Interval:
+DateTimeOrRange: TypeAlias = dt.datetime | dt.date | pnd.Interval[pnd.DateTime] | pnd.Interval[pnd.Date]
+"""A type alias for various date, date time and interval representations."""
+
+
+def parse_dt_str(dt_str: str) -> DateTimeOrRange:
     """Parse typical Notion date/datetime/interval strings to pendulum objects.
 
     If no timezone is provided assume local timezone and convert everything else to UTC for consistency."""
@@ -355,7 +359,7 @@ def is_dt_str(dt_str: str) -> bool:
         return False
 
 
-def to_pendulum(dt_spec: str | dt.datetime | dt.date | pnd.Interval) -> pnd.DateTime | pnd.Date | pnd.Interval:
+def to_pendulum(dt_spec: str | DateTimeOrRange) -> DateTimeOrRange:
     """Convert a datetime or date object to a pendulum object."""
     match dt_spec:
         case pnd.DateTime() | pnd.Date() | pnd.Interval():

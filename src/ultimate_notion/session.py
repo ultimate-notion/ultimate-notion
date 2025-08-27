@@ -208,7 +208,7 @@ class Session:
             deleted: include deleted databases in search
         """
         _logger.info(f'Searching for database with name `{db_name}`.')
-        query: obj_query.SearchQueryBuilder[obj_blocks.Database] = self.api.search(db_name).filter(db_only=True)
+        query = cast(obj_query.SearchQueryBuilder[obj_blocks.Database], self.api.search(db_name).filter(db_only=True))
         if reverse:
             query.sort(ascending=True)
         dbs = [
@@ -257,7 +257,7 @@ class Session:
             reverse: search in the reverse order, i.e. the least recently edited results first
         """
         _logger.info(f'Searching for page with title `{title}`.')
-        query: obj_query.SearchQueryBuilder[obj_blocks.Page] = self.api.search(title).filter(page_only=True)
+        query = cast(obj_query.SearchQueryBuilder[obj_blocks.Page], self.api.search(title).filter(page_only=True))
         if reverse:
             query.sort(ascending=True)
         pages = [

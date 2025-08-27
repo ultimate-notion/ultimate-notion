@@ -5,7 +5,6 @@ The names of the properties reflect the name in the Notion UI.
 
 from __future__ import annotations
 
-import datetime as dt
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, cast
@@ -18,7 +17,7 @@ from ultimate_notion import rich_text as rt
 from ultimate_notion.core import Wrapper, get_active_session, get_repr, raise_unset
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
-from ultimate_notion.obj_api.objects import DateRange
+from ultimate_notion.obj_api.objects import DateRange, DateTimeOrRange
 from ultimate_notion.option import Option
 from ultimate_notion.user import User
 
@@ -129,11 +128,11 @@ class Checkbox(PropertyValue[obj_props.Checkbox], wraps=obj_props.Checkbox):
 class Date(PropertyValue[obj_props.Date], wraps=obj_props.Date):
     """Date(-time) property value."""
 
-    def __init__(self, dt_spec: str | dt.datetime | dt.date | pnd.Interval):
+    def __init__(self, dt_spec: str | DateTimeOrRange):
         self.obj_ref = obj_props.Date.build(dt_spec)
 
     @property
-    def value(self) -> pnd.DateTime | pnd.Date | pnd.Interval | None:
+    def value(self) -> DateTimeOrRange | None:
         date = self.obj_ref.date
         if date is None:
             return None
@@ -269,7 +268,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     readonly = True
 
     @property
-    def value(self) -> str | float | int | pnd.DateTime | pnd.Date | pnd.Interval | None:
+    def value(self) -> str | float | int | DateTimeOrRange | None:
         """Return the result value of the formula."""
         # returns all values of subclasses of `FormulaResult`
         if self.obj_ref.formula is None:
@@ -294,7 +293,7 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     readonly = True
 
     @property
-    def value(self) -> float | int | pnd.Date | pnd.DateTime | pnd.Interval | list[Any] | None:
+    def value(self) -> float | int | DateTimeOrRange | list[Any] | None:
         """Return the result value of the rollup."""
         match rollup_type := self.obj_ref.rollup:
             case None:

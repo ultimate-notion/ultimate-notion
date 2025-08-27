@@ -102,7 +102,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
     def __init__(
         self,
-        target: User | Page | Database | CustomEmoji | dt.datetime | dt.date | pnd.Interval,
+        target: User | Page | Database | CustomEmoji | objs.DateTimeOrRange,
         *,
         bold: bool = False,
         italic: bool = False,
@@ -126,7 +126,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
 
 def mention(
-    target: User | Page | Database | CustomEmoji | dt.datetime | dt.date | pnd.Interval,
+    target: User | Page | Database | CustomEmoji | objs.DateTimeOrRange,
     *,
     bold: bool = False,
     italic: bool = False,

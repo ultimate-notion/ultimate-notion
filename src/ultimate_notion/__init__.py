@@ -57,7 +57,7 @@ from ultimate_notion.rich_text import join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SelfRef
 from ultimate_notion.session import Session
 from ultimate_notion.user import User
-from ultimate_notion.utils import SList
+from ultimate_notion.utils import DateTimeOrRange, SList
 
 __all__ = [
     'PDF',
@@ -75,6 +75,7 @@ __all__ = [
     'Columns',
     'Condition',  # for type hinting only
     'Database',
+    'DateTimeOrRange',  # for type hinting only
     'Divider',
     'Embed',
     'Emoji',
