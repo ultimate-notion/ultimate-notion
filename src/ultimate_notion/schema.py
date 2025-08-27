@@ -45,7 +45,7 @@ from ultimate_notion.errors import (
     SchemaError,
     SchemaNotBoundError,
 )
-from ultimate_notion.obj_api.core import Unset
+from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import OptionGroupType
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
@@ -166,12 +166,12 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def id(self) -> str | None:
         """Return identifier of this property."""
-        return self.obj_ref.id
+        return raise_unset(self.obj_ref.id)
 
     @property
     def name(self) -> str:
         """Return name of this property."""
-        if self._is_init and self.obj_ref.name is not None:
+        if self._is_init and not isinstance(self.obj_ref.name, UnsetType):
             return self.obj_ref.name
         elif self._name is not None:
             return self._name

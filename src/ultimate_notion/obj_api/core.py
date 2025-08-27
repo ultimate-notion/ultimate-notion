@@ -98,6 +98,9 @@ class UnsetType(BaseModel):
     def __repr__(self) -> str:
         return 'Unset'
 
+    def __hash__(self) -> int:
+        return hash(UnsetType)
+
 
 Unset: UnsetType = UnsetType()
 
