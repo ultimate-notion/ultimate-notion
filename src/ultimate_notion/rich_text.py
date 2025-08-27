@@ -5,11 +5,11 @@ from __future__ import annotations
 import datetime as dt
 import re
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, TypeGuard, TypeVar
+from typing import TYPE_CHECKING, TypeGuard
 from urllib.parse import urlparse
 
 import pendulum as pnd
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 from ultimate_notion.core import Wrapper
 from ultimate_notion.emoji import CustomEmoji
@@ -27,10 +27,11 @@ MAX_TEXT_OBJECT_SIZE = 2000
 """The max text size according to the Notion API is 2000 characters."""
 
 
-T = TypeVar('T', bound=objs.RichTextBaseObject)
+# ToDo: Use new syntax when requires-python >= 3.12
+RTBO_co = TypeVar('RTBO_co', bound=objs.RichTextBaseObject, default=objs.RichTextBaseObject, covariant=True)
 
 
-class RichTextBase(Wrapper[T], wraps=objs.RichTextBaseObject):
+class RichTextBase(Wrapper[RTBO_co], wraps=objs.RichTextBaseObject):
     """Super class for text, equation and mentions of various kinds."""
 
     @property

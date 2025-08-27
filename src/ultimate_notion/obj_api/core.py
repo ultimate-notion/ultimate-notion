@@ -1,4 +1,15 @@
-"""Base classes for working with the Notion API."""
+"""Base classes for working with the Notion API.
+
+
+!!! warning
+
+   To have proper type checking and inference, covariant type parameters are sometimes used even though
+   they may violate the LSP (Liskov Substitution Principle) in some cases. This was done to improve the usability
+   and flexibility of the API, allowing for more intuitive code while still maintaining type safety.
+   Especially in this complex class hierarchy, Pydantic, which is heavily used in the API, relies on these
+   covariant type parameters to function correctly. As an alternative approach, Protocol classes were tried,
+   but they introduced their own complexities and limitations.
+"""
 
 from __future__ import annotations
 
@@ -386,7 +397,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
         return cast(TO_co, getattr(self, self.type))
 
     @value.setter
-    def value(self, val: TO_co) -> None:  # type: ignore[misc]
+    def value(self, val: TO_co) -> None:  # type: ignore[misc]  # breaking covariance
         """Set the nested object."""
         # we are breaking covariance here but going down the Protocol way didn't work out
         # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
