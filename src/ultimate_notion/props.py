@@ -15,7 +15,7 @@ from typing_extensions import Self, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
-from ultimate_notion.core import Wrapper, get_active_session, get_repr
+from ultimate_notion.core import Wrapper, get_active_session, get_repr, raise_unset
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
 from ultimate_notion.obj_api.objects import DateRange
@@ -68,7 +68,7 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):  # noqa
 
     @property
     def id(self) -> str:
-        return self.obj_ref.id
+        return raise_unset(self.obj_ref.id)
 
     def __repr__(self) -> str:
         return get_repr(self)

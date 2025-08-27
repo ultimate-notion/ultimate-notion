@@ -21,7 +21,7 @@ import pendulum as pnd
 from pydantic import SerializeAsAny, field_validator, model_serializer
 from typing_extensions import Self
 
-from ultimate_notion.obj_api.core import GenericObject, NotionObject
+from ultimate_notion.obj_api.core import GenericObject, NotionObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
 from ultimate_notion.obj_api.objects import (
     DateRange,
@@ -53,7 +53,7 @@ Source: https://developers.notion.com/reference/retrieve-a-page
 class PropertyValue(TypedObject[Any], polymorphic_base=True):
     """Base class for Notion property values."""
 
-    id: str = None  # type: ignore
+    id: str | UnsetType = Unset
     _is_retrieved: bool = False  # fetched separately as property item from the server
 
     @classmethod
