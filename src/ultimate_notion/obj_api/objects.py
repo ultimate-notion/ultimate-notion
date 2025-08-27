@@ -25,6 +25,7 @@ from uuid import UUID
 
 import pendulum as pnd
 from pydantic import Field, SerializeAsAny
+from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import (
     GenericObject,
@@ -210,7 +211,10 @@ def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
     return ObjectRef.build(obj).id
 
 
-class ParentRef(TypedObject, ABC, polymorphic_base=True):
+T = TypeVar('T', default=Any)
+
+
+class ParentRef(TypedObject[T], ABC, polymorphic_base=True):
     """Reference another block as a parent.
 
     Notion API: [Parent Object](https://developers.notion.com/reference/parent-object)
@@ -220,7 +224,7 @@ class ParentRef(TypedObject, ABC, polymorphic_base=True):
     """
 
 
-class DatabaseRef(ParentRef, type='database_id'):
+class DatabaseRef(ParentRef[UUID], type='database_id'):
     """Reference a database."""
 
     database_id: UUID
@@ -232,7 +236,7 @@ class DatabaseRef(ParentRef, type='database_id'):
         return DatabaseRef.model_construct(database_id=ref.id)
 
 
-class PageRef(ParentRef, type='page_id'):
+class PageRef(ParentRef[UUID], type='page_id'):
     """Reference a page."""
 
     page_id: UUID
@@ -244,7 +248,7 @@ class PageRef(ParentRef, type='page_id'):
         return PageRef.model_construct(page_id=ref.id)
 
 
-class BlockRef(ParentRef, type='block_id'):
+class BlockRef(ParentRef[UUID], type='block_id'):
     """Reference a block."""
 
     block_id: UUID
@@ -256,13 +260,13 @@ class BlockRef(ParentRef, type='block_id'):
         return BlockRef.model_construct(block_id=ref.id)
 
 
-class WorkspaceRef(ParentRef, type='workspace'):
+class WorkspaceRef(ParentRef[bool], type='workspace'):
     """Reference the workspace."""
 
     workspace: bool = True
 
 
-class CommentRef(ParentRef, type='comment_id'):
+class CommentRef(ParentRef[UUID], type='comment_id'):
     """Reference a comment."""
 
     comment_id: UUID
@@ -286,7 +290,11 @@ class UserRef(NotionObject, object='user'):
         return UserRef.model_construct(id=ref.id)
 
 
-class User(UserRef, TypedObject, MentionMixin, polymorphic_base=True):
+# ToDo: Use new syntax when requires-python >= 3.12
+GO_co = TypeVar('GO_co', bound=GenericObject, default=GenericObject, covariant=True)
+
+
+class User(TypedObject[GO_co], UserRef, MentionMixin, polymorphic_base=True):
     """Represents a User in Notion."""
 
     name: str | None = None
@@ -296,14 +304,16 @@ class User(UserRef, TypedObject, MentionMixin, polymorphic_base=True):
         return MentionUser.build_mention_from(self, style=style)
 
 
-class Person(User, type='person'):
+class PersonTypeData(GenericObject):
+    """Type data for a `Person`."""
+
+    email: str | None = None
+
+
+class Person(User[PersonTypeData], type='person'):
     """Represents a Person in Notion."""
 
-    class TypeData(GenericObject):
-        # only present if an integration has user capabilities that allow access to email addresses.
-        email: str | None = None
-
-    person: TypeData = TypeData()
+    person: PersonTypeData = PersonTypeData()
 
 
 class WorkSpaceLimits(GenericObject):
@@ -312,30 +322,35 @@ class WorkSpaceLimits(GenericObject):
     max_file_upload_size_in_bytes: int | None = None
 
 
-class Bot(User, type='bot'):
-    """Represents a Bot in Notion."""
+class BotTypeData(GenericObject):
+    """Type data for a `Bot`."""
 
-    class TypeData(GenericObject):
-        owner: WorkspaceRef | None = None
-        workspace_name: str | None = None
-        workspace_limits: WorkSpaceLimits = WorkSpaceLimits()
+    owner: WorkspaceRef | None = None
+    workspace_name: str | None = None
+    workspace_limits: WorkSpaceLimits = WorkSpaceLimits()
+
+
+class Bot(User[BotTypeData], type='bot'):
+    """Represents a Bot in Notion."""
 
     # Even if stated otherwise in the docs, `bot` type data is optional and for instance
     # not present when a new page is created by a bot within a database with a `CreatedBy` Property.
-    bot: TypeData = TypeData()
+    # For ease of use, we include a default instance of the bot type data.
+    bot: BotTypeData = BotTypeData()
 
 
-class UnknownUser(User, type='unknown'):
+class UnknownUserTypeData(GenericObject):
+    """Type data for an `UnknownUser`."""
+
+
+class UnknownUser(User[UnknownUserTypeData], type='unknown'):
     """Represents an unknown user in Notion.
 
     This is a unofficial placeholder for a user that is not recognized by the API.
     """
 
     name: Literal['Unknown User'] = 'Unknown User'
-
-    class TypeData(GenericObject): ...
-
-    unknown: TypeData = TypeData()
+    unknown: UnknownUserTypeData = UnknownUserTypeData()
 
 
 class Annotations(GenericObject):
