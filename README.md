@@ -20,6 +20,7 @@ Ultimate Notion is the ultimate Python client for [Notion]!
 - 🔎 **Rich querying capabilities** — Support for filters, sorting, pagination, and searching.
 - 🪄 **Flexible export options** — Convert Notion pages to Markdown, HTML, and databases to pandas, Polars.
 - 🧩 **Built atop notion-sdk-py** — Enhancing the functionality of the popular low-level client.
+- 🖥️ **Command line interface** — Convenient CLI for quick operations and automation scripts.
 - 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
 - 🚀 **One-step setup** — Getting up to speed with a [simple setup guide].
 
