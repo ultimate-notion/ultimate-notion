@@ -4,16 +4,17 @@ from __future__ import annotations
 
 import datetime as dt
 from abc import ABC
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, cast
 from uuid import UUID
 
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
 
-GT = TypeVar('GT', bound=obj_core.GenericObject)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+GT_co = TypeVar('GT_co', bound=obj_core.GenericObject, default=obj_core.GenericObject, covariant=True)
 
 if TYPE_CHECKING:
     from pydantic_core import SchemaSerializer
@@ -22,29 +23,29 @@ if TYPE_CHECKING:
     from ultimate_notion.user import User
 
 
-class WrapperProtocol(Protocol[GT]):
+class WrapperProtocol(Protocol[GT_co]):
     """Wrapper protocol for objects that have an obj_ref attribute.
 
     Note: This allows us to define Mixin classes that require the obj_ref attribute.
     """
 
-    _obj_ref: GT
+    _obj_ref: GT_co
 
     @property
-    def obj_ref(self) -> GT: ...
+    def obj_ref(self) -> GT_co: ...
 
     @obj_ref.setter
-    def obj_ref(self, value: GT) -> None: ...
+    def obj_ref(self, value: GT_co) -> None: ...
 
 
-class Wrapper(WrapperProtocol[GT], ABC):
+class Wrapper(WrapperProtocol[GT_co], ABC):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
-    _obj_ref: GT
+    _obj_ref: GT_co
 
-    _obj_api_map: ClassVar[dict[type[GT], type[Wrapper]]] = {}  # type: ignore[misc]
+    _obj_api_map: ClassVar[dict[type[GT_co], type[Wrapper]]] = {}  # type: ignore[misc]
 
-    def __init_subclass__(cls, wraps: type[GT], **kwargs: Any):
+    def __init_subclass__(cls, wraps: type[GT_co], **kwargs: Any):
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[wraps] = cls
 
@@ -54,7 +55,7 @@ class Wrapper(WrapperProtocol[GT], ABC):
 
     def __init__(self, *args: Any, **kwargs: Any):
         """Default constructor that also builds `obj_ref`."""
-        obj_api_type: type[GT] = self._obj_api_map_inv[self.__class__]
+        obj_api_type: type[GT_co] = self._obj_api_map_inv[self.__class__]
         self._obj_ref = obj_api_type.build(*args, **kwargs)
 
     def __pydantic_serializer__(self) -> SchemaSerializer:  # noqa: PLW3201
@@ -63,7 +64,7 @@ class Wrapper(WrapperProtocol[GT], ABC):
         return self._obj_ref.__pydantic_serializer__
 
     @property
-    def obj_ref(self) -> GT:
+    def obj_ref(self) -> GT_co:
         """Return the low-level Notion-API object reference.
 
         This is just the answer of the Notion API as a Pydantic model.
@@ -71,12 +72,12 @@ class Wrapper(WrapperProtocol[GT], ABC):
         return self._obj_ref
 
     @obj_ref.setter
-    def obj_ref(self, value: GT) -> None:
+    def obj_ref(self, value: GT_co) -> None:
         """Set the low-level Notion-API object reference."""
         self._obj_ref = value
 
     @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: GT, /) -> Self:
+    def wrap_obj_ref(cls: type[Self], obj_ref: GT_co, /) -> Self:
         """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
         hl_cls = cls._obj_api_map[type(obj_ref)]
         # To allow for `Block.wrap_obj_ref` to work call a specific 'wrap_obj_ref' if it exists,
@@ -91,7 +92,7 @@ class Wrapper(WrapperProtocol[GT], ABC):
             return cast(Self, hl_cls.wrap_obj_ref(obj_ref))
 
     @property
-    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT]]:
+    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT_co]]:
         return {v: k for k, v in self._obj_api_map.items()}
 
 
