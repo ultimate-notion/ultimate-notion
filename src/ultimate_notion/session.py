@@ -6,7 +6,7 @@ import logging
 import time
 from threading import RLock
 from types import TracebackType
-from typing import Any, ClassVar, cast
+from typing import Any, BinaryIO, ClassVar, cast
 from uuid import UUID
 
 import httpx
@@ -17,11 +17,13 @@ from ultimate_notion.blocks import Block, DataObject, traverse_blocks
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
+from ultimate_notion.file import MAX_FILE_SIZE, FileInfo, get_file_size, get_mime_type
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
+from ultimate_notion.obj_api.enums import FileUploadMode
 from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.obj_api.objects import get_uuid
 from ultimate_notion.page import Page
@@ -361,3 +363,28 @@ class Session:
             return cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user)))
         else:
             return cast(User, self.cache[self._own_bot_id])
+
+    def upload(self, file: BinaryIO, *, name: str | None = None) -> FileInfo:
+        """Upload a file to Notion."""
+        filename = name if name else getattr(file, 'name', 'unknown_file')
+        file_size = get_file_size(file)
+        mime_type = get_mime_type(file)
+        mode = FileUploadMode.SINGLE_PART if file_size <= MAX_FILE_SIZE else FileUploadMode.MULTI_PART
+        _logger.info(
+            f'Uploading file `{filename}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'
+        )
+        n_parts = (file_size // MAX_FILE_SIZE) + 1
+        file_upload = self.api.uploads.create(
+            name=filename, n_parts=None if n_parts == 1 else n_parts, mode=mode, content_type=mime_type
+        )
+
+        if mode == FileUploadMode.SINGLE_PART:
+            self.api.uploads.send(file_upload=file_upload, file=file)
+        else:
+            for part in range(1, n_parts + 1):
+                _logger.info(f'Uploading part {part}/{n_parts} of file `{filename}`.')
+                chunk = file.read(MAX_FILE_SIZE)
+                self.api.uploads.send(file_upload=file_upload, part=part, file=chunk)
+
+        self.api.uploads.complete(file_upload=file_upload)
+        return FileInfo.from_file_upload(file_upload)

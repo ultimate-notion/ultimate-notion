@@ -99,9 +99,8 @@ class Page(DataObject, MentionMixin, object='page'):
         return MentionPage.build_mention_from(self, style=style)
 
 
-GO_co = TypeVar(
-    'GO_co', bound=GenericObject, default=GenericObject, covariant=True
-)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+GO_co = TypeVar('GO_co', bound=GenericObject, default=GenericObject, covariant=True)
 
 
 class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=True):
