@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any, TypeGuard, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from emoji import is_emoji
-from typing_extensions import Self
+from typing_extensions import Self, TypeIs
 
 from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject, wrap_icon
 from ultimate_notion.comment import Discussion
-from ultimate_notion.core import NotionEntity, get_active_session, get_repr
+from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr
 from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.file import FileInfo
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -353,11 +353,11 @@ class Page(
         return self
 
 
-def is_db_guard(obj: NotionEntity | None) -> TypeGuard[Database]:
+def is_db_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[Database]:
     """Return whether the object is a database as type guard."""
-    return obj is not None and obj.is_db
+    return isinstance(obj, NotionEntity) and obj.is_db
 
 
-def is_page_guard(obj: NotionEntity | None) -> TypeGuard[Page]:
+def is_page_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[Page]:
     """Return whether the object is a page as type guard."""
-    return obj is not None and obj.is_page
+    return isinstance(obj, NotionEntity) and obj.is_page

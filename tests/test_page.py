@@ -21,9 +21,10 @@ def test_parent(page_hierarchy: tuple[Page, Page, Page]) -> None:
     assert isinstance(l1_page, uno.Page)
     assert isinstance(l2_page, uno.Page)
 
-    assert root_page.parent is None
+    assert root_page.parent is uno.Workspace
     assert l2_page.parent == l1_page
     assert l1_page.parent == root_page
+    assert isinstance(l2_page.parent, uno.Page)
     assert l2_page.parent.parent == root_page
 
 

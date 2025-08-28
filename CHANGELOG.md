@@ -12,10 +12,12 @@ First Beta release:
 - Fix: Wrong equality check between properties as well as property values.
 - New: Bind a schema automatically with `bind_schema()` if `db_id` or `db_title` is set in the `Schema`.
 - Chg: Consistently return `None` for title, description, caption if these are not set instead of an empty string.
-- Fix: More strict typing and checks which led to many small bug fixes in edge cases.
+- Fix: More strict typing and checks which led to many small bug fixes in edge cases, e.g. issue #96.
 - Fix: Too strict dependencies that too often lead to conflicts with other packages, e.g. issue #90.
 - New: `uno` command line interface to show the current resolved config and integration info.
 - New: Allow offline assembly of blocks to create a page with content in one call, issue #94.
+- Fix: Different blocks now have a different hash, equality works as expected, issue #100.
+- Fix: Retrieve a page object even without access access to the parent database, issue #103.
 
 ## Version 0.8, 2025-06-23
 
