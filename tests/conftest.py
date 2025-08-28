@@ -594,7 +594,7 @@ def delete_all_taskslists() -> None:
             "We tampered with the token's expiry date to allow for VCR testing but you seem to try to "
             'connect to the Google API now.\n'
             f'Delete `{TEST_CFG_FILE.parent / "token.json"}` and run:\n'
-            'hatch run vcr-off -k ...\n'
+            'hatch run vcr-off -k test_gtask_client\n'
             'to perform the authentication flow before rewriting the VCR cassettes.'
         )
         raise RuntimeError(msg) from e

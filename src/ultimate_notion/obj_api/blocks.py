@@ -27,7 +27,6 @@ from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     Annotations,
     BlockRef,
-    CaptionMixin,
     CustomEmojiObject,
     EmojiObject,
     FileObject,
@@ -198,6 +197,12 @@ class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
     """A quote block in Notion."""
 
     quote: QuoteTypeData = Field(default_factory=QuoteTypeData)
+
+
+class CaptionMixin(GenericObject, ABC):
+    """Mixin for blocks having a caption."""
+
+    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class CodeTypeData(TextBlockTypeData, CaptionMixin):
