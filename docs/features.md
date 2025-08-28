@@ -97,6 +97,7 @@ These limitations include:
 - locking or unlocking a page or database.
 - working with database button properties.
 - retrieving a list of all custom emojis defined in the workspace.
+- changing the description of a database property.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 

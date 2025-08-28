@@ -1,4 +1,18 @@
-"""Objects representing a database schema."""
+"""Objects representing a database schema.
+
+Properties are used when
+
+1. a database with a specific schema is [created],
+2. a database with a schema is [retrieved].
+
+Unfortunately, the way a schema is defined in case of 1. and 2. is not consistent.
+In case 1., the property name is only defined as a key while in case 2. it is additionally
+defined as `name` attribute of the property object. We treat these two cases the same way
+when constructing the property objects. For this reason `name` is `Unset` by default.
+
+[created]: https://developers.notion.com/reference/property-schema-object
+[retrieved]: https://developers.notion.com/reference/property-object
+"""
 
 from __future__ import annotations
 
@@ -19,7 +33,8 @@ class Property(TypedObject[GO_co], polymorphic_base=True):
     """Base class for Notion property objects."""
 
     id: str | UnsetType = Unset
-    name: str | UnsetType = Unset
+    name: str | UnsetType = Unset  # Unset when creating a database property schema
+    description: str | None = None
 
 
 class TitleTypeData(GenericObject):
