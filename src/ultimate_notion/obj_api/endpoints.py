@@ -24,6 +24,7 @@ from ultimate_notion.obj_api.objects import (
     DatabaseRef,
     EmojiObject,
     FileObject,
+    FileUpload,
     GenericObject,
     ObjectRef,
     PageRef,
@@ -42,6 +43,7 @@ if TYPE_CHECKING:
     from notion_client.api_endpoints import BlocksEndpoint as NCBlocksEndpoint
     from notion_client.api_endpoints import CommentsEndpoint as NCCommentsEndpoint
     from notion_client.api_endpoints import DatabasesEndpoint as NCDatabasesEndpoint
+    from notion_client.api_endpoints import FileUploadsEndpoint as NCFileUploadsEndpoint
     from notion_client.api_endpoints import PagesEndpoint as NCPagesEndpoint
     from notion_client.api_endpoints import PagesPropertiesEndpoint as NCPagesPropertiesEndpoint
     from notion_client.api_endpoints import UsersEndpoint as NCUsersEndpoint
@@ -60,6 +62,7 @@ class NotionAPI:
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
         self.comments = CommentsEndpoint(self)
+        self.uploads = UploadsEndpoint(self)
 
 
 @dataclass
@@ -515,3 +518,34 @@ class CommentsEndpoint(Endpoint):
         _logger.debug(f'Listing comments on block with id `{block_id}`.')
         comment_iter = EndpointIterator[Comment](endpoint=self.raw_api.list)
         return comment_iter(block_id=block_id)
+
+
+class UploadsEndpoint(Endpoint):
+    """Interface to the API 'file uploads' endpoint."""
+
+    @property
+    def raw_api(self) -> NCFileUploadsEndpoint:
+        """Return the underlying endpoint in the Notion SDK"""
+        return self.api.client.file_uploads
+
+    # https://developers.notion.com/reference/create-a-file-upload
+    def create(self, file: FileUpload) -> FileUpload:
+        """Create a file upload."""
+        ...
+
+    # https://developers.notion.com/reference/send-a-file-upload
+    def send(self, file: FileUpload) -> FileUpload:
+        """Send a file upload."""
+        ...
+
+    # https://developers.notion.com/reference/complete-a-file-upload
+
+    # https://developers.notion.com/reference/retrieve-a-file-upload
+    def retrieve(self, file: FileUpload | UUID | str) -> FileUpload:
+        """Return the FileUpload with the given ID."""
+        ...
+
+    # https://developers.notion.com/reference/list-file-uploads
+    def list(self) -> Iterator[FileUpload]:
+        """Return all file uploads."""
+        ...
