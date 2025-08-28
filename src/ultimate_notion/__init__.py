@@ -45,7 +45,7 @@ from ultimate_notion.blocks import (
     ToggleItem,
     Video,
 )
-from ultimate_notion.core import get_active_session
+from ultimate_notion.core import Workspace, WorkspaceType, get_active_session
 from ultimate_notion.database import Database
 from ultimate_notion.emoji import Emoji
 from ultimate_notion.file import FileInfo
@@ -112,6 +112,8 @@ __all__ = [
     'User',
     'VState',
     'Video',
+    'Workspace',
+    'WorkspaceType',  # for type hinting only
     '__version__',
     'get_active_session',
     'join',

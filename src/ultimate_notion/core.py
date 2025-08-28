@@ -3,15 +3,20 @@
 from __future__ import annotations
 
 import datetime as dt
+import logging
 from abc import ABC
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, cast
+from enum import Enum
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias, cast
 from uuid import UUID
 
+from notion_client.errors import APIResponseError
 from typing_extensions import Self, TypeVar
 
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
+
+_logger = logging.getLogger(__name__)
 
 # ToDo: Use new syntax when requires-python >= 3.12
 GT_co = TypeVar('GT_co', bound=obj_core.GenericObject, default=obj_core.GenericObject, covariant=True)
@@ -99,6 +104,16 @@ class NotionObject(Wrapper[NO_co], ABC, wraps=obj_core.NotionObject):
         return self.obj_ref.id != obj_core.Unset
 
 
+# This acts as a simple but type-safe sentinel value, which allows narrowing by the type checker with 'is' checks.
+class _Workspace(Enum):
+    ROOT = 'workspace_root'
+
+
+Workspace: Final = _Workspace.ROOT
+"""This represents the actual root workspace in Notion."""
+WorkspaceType: TypeAlias = Literal[_Workspace.ROOT]
+"""This represents the type of the root workspace in Notion for type hinting."""
+
 # ToDo: Use new syntax when requires-python >= 3.12
 NE_co = TypeVar('NE_co', bound=obj_core.NotionEntity, default=obj_core.NotionEntity, covariant=True)
 
@@ -139,18 +154,28 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
         return raise_unset(self.obj_ref.last_edited_time)
 
     @property
-    def parent(self) -> NotionEntity | None:
-        """Return the parent Notion entity or None if the workspace is the parent."""
+    def parent(self) -> NotionEntity | WorkspaceType | None:
+        """Return the parent Notion entity, Workspace if the workspace is the parent, or None if not accessible."""
         session = get_active_session()
         parent = self.obj_ref.parent
 
         match parent:
             case objs.WorkspaceRef():
-                return None
+                return Workspace
             case objs.PageRef(page_id=page_id):
-                return session.get_page(page_ref=page_id)
+                try:
+                    return session.get_page(page_ref=page_id)
+                except APIResponseError as e:
+                    msg = f'Error retrieving page with id `{page_id}`: {e}'
+                    _logger.warning(msg)
+                    return None
             case objs.DatabaseRef(database_id=database_id):
-                return session.get_db(db_ref=database_id)
+                try:
+                    return session.get_db(db_ref=database_id)
+                except APIResponseError as e:
+                    msg = f'Error retrieving database with id `{database_id}`: {e}'
+                    _logger.warning(msg)
+                    return None
             case objs.BlockRef(block_id=block_id):
                 return session.get_block(block_ref=block_id)
             case _:
@@ -160,11 +185,10 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def ancestors(self) -> tuple[NotionEntity, ...]:
         """Return all ancestors from the workspace to the actual record (excluding)."""
-        match parent := self.parent:
-            case None:
-                return ()
-            case _:
-                return (*parent.ancestors, parent)
+        if (parent := self.parent) is None or parent is Workspace:
+            return ()
+        else:
+            return (*parent.ancestors, parent)
 
     @property
     def is_page(self) -> bool:
