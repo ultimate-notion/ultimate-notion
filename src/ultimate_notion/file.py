@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import io
+from typing import BinaryIO
 from urllib.parse import urlparse
 
+import filetype
 from typing_extensions import Self
 
 from ultimate_notion.core import Wrapper, get_repr
@@ -11,6 +14,7 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.rich_text import Text, html_img
 
 NOTION_HOSTED_DOMAIN = 'secure.notion-static.com'
+MAX_FILE_SIZE = 20_000_000  # 20MB in bytes
 
 
 class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
@@ -32,11 +36,24 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref = obj_ref
         return self
 
+    @classmethod
+    def from_file_upload(cls, file_upload: objs.FileUpload) -> Self:
+        """Create a FileInfo from a FileUpload object.
+
+        Args:
+            file_upload: The FileUpload object from the upload API
+
+        Returns:
+            A FileInfo instance representing the uploaded file
+        """
+        file_obj = objs.UploadedFile.build(id=file_upload.id)
+        self = cls.__new__(cls)
+        self.obj_ref = file_obj
+        return self
+
     def __eq__(self, other: object) -> bool:
         match other:
-            case str():
-                return str(self) == other
-            case FileInfo():
+            case str() | FileInfo():
                 return str(self) == str(other)
             case _:
                 return NotImplemented
@@ -75,27 +92,58 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
         self.obj_ref.caption = Text(caption).obj_ref if caption is not None else []
 
     @property
-    def _type_obj(self) -> objs.HostedFile.TypeData | objs.ExternalFile.TypeData:
-        """Get the low-level type data object reference."""
+    def url(self) -> str | None:
+        """Return the URL of this file."""
         match self.obj_ref:
             case objs.HostedFile():
-                return self.obj_ref.file
+                return self.obj_ref.file.url
             case objs.ExternalFile():
-                return self.obj_ref.external
+                return self.obj_ref.external.url
             case _:
-                msg = f'Unknown file type: {type(self.obj_ref)}'
-                raise TypeError(msg)
-
-    @property
-    def url(self) -> str:
-        """Return the URL of this file."""
-        return self._type_obj.url
-
-    @url.setter
-    def url(self, url: str) -> None:
-        self._type_obj.url = url
+                return None
 
 
 def is_notion_hosted(url: str) -> bool:
     """Check if the URL is hosted on Notion."""
     return urlparse(url).netloc == NOTION_HOSTED_DOMAIN
+
+
+def get_file_size(file: BinaryIO) -> int:
+    """Get the size of a file in bytes.
+
+    This function preserves the current file position.
+
+    Args:
+        file: The binary file object to measure
+
+    Returns:
+        The size of the file in bytes
+    """
+    current_pos = file.tell()
+    file.seek(0, io.SEEK_END)
+    file_size = file.tell()
+    file.seek(current_pos)  # Reset to original position
+    return file_size
+
+
+def get_mime_type(file: BinaryIO) -> str:
+    """Detect the MIME type of a file.
+
+    This function preserves the current file position.
+
+    Args:
+        file: The binary file object to analyze
+
+    Returns:
+        The detected MIME type, or 'application/octet-stream' if unknown
+    """
+    current_pos = file.tell()
+    content_sample = file.read(1024)
+    file.seek(current_pos)  # Reset position
+
+    kind = filetype.guess(content_sample)
+    if kind is not None:
+        return kind.mime
+    else:
+        # Fallback to application/octet-stream if type cannot be determined
+        return 'application/octet-stream'

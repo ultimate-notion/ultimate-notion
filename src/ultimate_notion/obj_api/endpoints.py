@@ -10,13 +10,14 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, BinaryIO, cast
 from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
 from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
+from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
     Comment,
@@ -370,13 +371,13 @@ class PagesEndpoint(Endpoint):
         data = self.raw_api.create(**request)
         return Page.model_validate(data)
 
-    def delete(self, page: Page) -> Page:
+    def delete(self, page: Page) -> None:
         """Delete (archive) the specified Page."""
-        return self.set_attr(page, in_trash=True)
+        self.set_attr(page, in_trash=True)
 
-    def restore(self, page: Page) -> Page:
+    def restore(self, page: Page) -> None:
         """Restore (unarchive) the specified Page."""
-        return self.set_attr(page, in_trash=False)
+        self.set_attr(page, in_trash=False)
 
     # https://developers.notion.com/reference/retrieve-a-page
     def retrieve(self, page: Page | UUID | str) -> Page:
@@ -408,7 +409,7 @@ class PagesEndpoint(Endpoint):
         cover: FileObject | UnsetType | None = Unset,
         icon: FileObject | EmojiObject | CustomEmojiObject | UnsetType | None = Unset,
         in_trash: bool | UnsetType = Unset,
-    ) -> Page:
+    ) -> None:
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
         `page` may be any suitable `PageRef` type.
@@ -443,7 +444,7 @@ class PagesEndpoint(Endpoint):
                 props['archived'] = False
 
         data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **props))
-        return page.update(**data)
+        page.update(**data)
 
 
 class SearchEndpoint(Endpoint):
@@ -529,23 +530,53 @@ class UploadsEndpoint(Endpoint):
         return self.api.client.file_uploads
 
     # https://developers.notion.com/reference/create-a-file-upload
-    def create(self, file: FileUpload) -> FileUpload:
+    def create(
+        self,
+        name: str | None = None,
+        n_parts: int | None = None,
+        mode: FileUploadMode = FileUploadMode.SINGLE_PART,
+        external_url: str | None = None,
+        content_type: str | None = None,
+    ) -> FileUpload:
         """Create a file upload."""
-        ...
+        _logger.debug(f'Creating a file upload with mode `{mode}`.')
+        kwargs = {
+            'file_name': name,
+            'number_of_parts': n_parts,
+            'mode': mode,
+            'external_url': external_url,
+            'content_type': content_type,
+        }
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # Notion API doesn't like nulls
+        data = self.raw_api.create(**kwargs)
+        return FileUpload.model_validate(data)
 
     # https://developers.notion.com/reference/send-a-file-upload
-    def send(self, file: FileUpload) -> FileUpload:
-        """Send a file upload."""
-        ...
+    def send(self, file_upload: FileUpload, file: BinaryIO, part: int | None = None) -> None:
+        """Send a file upload and update the file_upload object."""
+        _logger.debug(f'Sending file upload with id `{file_upload.id}`.')
+        if part is not None:
+            data = self.raw_api.send(file_upload=file_upload, file=file, part=part)
+        else:
+            data = self.raw_api.send(file_upload=file_upload, file=file)
+        file_upload.update(**data)
 
     # https://developers.notion.com/reference/complete-a-file-upload
+    def complete(self, file_upload: FileUpload) -> None:
+        """Complete the file upload and update the file_upload object."""
+        _logger.debug(f'Completing file upload with id `{file_upload.id}`.')
+        data = self.raw_api.complete(file_upload=file_upload)
+        file_upload.update(**data)
 
     # https://developers.notion.com/reference/retrieve-a-file-upload
-    def retrieve(self, file: FileUpload | UUID | str) -> FileUpload:
+    def retrieve(self, upload_id: UUID | str) -> FileUpload:
         """Return the FileUpload with the given ID."""
-        ...
+        _logger.debug(f'Retrieving file upload with id `{upload_id}`.')
+        data = self.raw_api.retrieve(uuid=str(upload_id))
+        return FileUpload.model_validate(data)
 
     # https://developers.notion.com/reference/list-file-uploads
-    def list(self) -> Iterator[FileUpload]:
+    def list(self, status: FileUploadStatus | None = None, page_size: int = 100) -> Iterator[FileUpload]:
         """Return all file uploads."""
-        ...
+        file_upload_iter = EndpointIterator[FileUpload](endpoint=self.raw_api.list)
+        return file_upload_iter(status=status, page_size=page_size)
