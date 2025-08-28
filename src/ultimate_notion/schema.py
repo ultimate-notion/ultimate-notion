@@ -185,6 +185,11 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
         self._rename_prop(new_name)
 
     @property
+    def description(self) -> str | None:
+        """Return the description of this property."""
+        return self.obj_ref.description
+
+    @property
     def attr_name(self) -> str:
         """Return the Python attribute name of the property in the schema."""
         if self._attr_name is None:

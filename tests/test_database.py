@@ -205,6 +205,11 @@ def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page)
 
 
 @pytest.mark.vcr()
+def test_property_description(contacts_db: uno.Database) -> None:
+    assert contacts_db.schema['Title'].description == 'Title within the company'
+
+
+@pytest.mark.vcr()
 def test_new_task_db(new_task_db: uno.Database) -> None:
     # ToDo: Implement a proper test
     pass
