@@ -37,7 +37,7 @@ from ultimate_notion.obj_api.core import (
     extract_id,
     raise_unset,
 )
-from ultimate_notion.obj_api.enums import BGColor, Color
+from ultimate_notion.obj_api.enums import BGColor, Color, FileUploadStatus
 from ultimate_notion.utils import DateTimeOrRange, parse_dt_str
 
 if TYPE_CHECKING:
@@ -664,6 +664,24 @@ class ExternalFile(FileObject, type='external'):
         """Create a new `ExternalFile` from the given URL."""
         caption = [] if caption is None else caption
         return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url))
+
+
+class FileUpload(NotionObject, object='file_upload'):
+    """A Notion file upload object.
+
+    This object is used to handle the process of uploading a file to Notion.
+    """
+
+    created_time: dt.datetime
+    last_edited_time: dt.datetime
+    expiry_time: dt.datetime | None = None
+    status: FileUploadStatus
+    filename: str | None = None
+    content_type: str | None = None
+    content_length: int | None = None
+    upload_url: str | None = None
+    complete_url: str | None = None
+    file_import_result: str | None = None
 
 
 class Comment(NotionEntity, object='comment'):
