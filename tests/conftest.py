@@ -95,6 +95,7 @@ def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: 
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    """Define test selection based on command line flags."""
     marker_name = 'check_latest_release'
     flag_name = f'--{marker_name.replace("_", "-")}'
     if config.getoption(flag_name):

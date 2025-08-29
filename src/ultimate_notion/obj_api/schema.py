@@ -243,6 +243,7 @@ class Formula(Property[FormulaTypeData], type='formula'):
 class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
     """Defines common configuration for a property relation."""
 
+    # ToDo: Check if we can get rid of this type ignore.
     database_id: UUID = None  # type: ignore
     data_source_id: str | None = None  # 2025-09-03 update: https://developers.notion.com/docs/upgrade-guide-2025-09-03
 
@@ -278,6 +279,7 @@ class SinglePropertyRelation(PropertyRelation[SinglePropertyRelationTypeData], t
 class DualPropertyRelationTypeData(GenericObject):
     """Type data for `DualPropertyRelation`."""
 
+    # ToDo: Check if this should not rather be | UnsetType = Unset
     synced_property_name: str = None  # type: ignore
     synced_property_id: str | None = None
 
