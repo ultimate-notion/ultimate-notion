@@ -37,7 +37,7 @@ from ultimate_notion.obj_api.core import (
     extract_id,
     raise_unset,
 )
-from ultimate_notion.obj_api.enums import BGColor, Color
+from ultimate_notion.obj_api.enums import BGColor, Color, FileUploadStatus
 from ultimate_notion.utils import DateTimeOrRange, parse_dt_str
 
 if TYPE_CHECKING:
@@ -608,32 +608,29 @@ class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
         return self.__class__.build_mention_from(self, style=style)
 
 
-class CaptionMixin(GenericObject, ABC):
-    """Mixin for blocks having a caption."""
-
-    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
-
-
-class FileObject(TypedObject[GenericObject], CaptionMixin, polymorphic_base=True):
+class FileObject(TypedObject[GO_co], polymorphic_base=True):
     """A Notion file object.
 
-    Depending on the context, a FileObject may require a name (such as in the `Files`
-    property). This makes the object hierarchy difficult, so here we simply allow
-    `name` to be optional. It is the responsibility of the caller to set `name` if
-    required by the API.
+    Depending on the context, a FileObject may require a name (such as in the `Files` property) or may have a caption.
+    This makes the object hierarchy difficult, so here we simply allow `name` and `caption` to be optional. It is the
+    responsibility of the caller to set `name` if required by the API.
     """
 
     name: str | None = None
+    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
 
 
-class HostedFile(FileObject, type='file'):
+class HostedTypedata(GenericObject):
+    """Type data for `HostedFile`."""
+
+    url: str
+    expiry_time: dt.datetime | None = None
+
+
+class HostedFile(FileObject[HostedTypedata], type='file'):
     """A Notion file object."""
 
-    class TypeData(GenericObject):
-        url: str
-        expiry_time: dt.datetime | None = None
-
-    file: TypeData
+    file: HostedTypedata
 
     @classmethod
     def build(
@@ -645,25 +642,63 @@ class HostedFile(FileObject, type='file'):
         expiry_time: dt.datetime | None = None,
     ) -> HostedFile:
         """Create a new `HostedFile` from the given URL."""
-        caption = [] if caption is None else caption
-        return cls.model_construct(name=name, caption=caption, file=cls.TypeData(url=url, expiry_time=expiry_time))
+        return cls.model_construct(name=name, caption=caption, file=HostedTypedata(url=url, expiry_time=expiry_time))
 
 
-class ExternalFile(FileObject, type='external'):
+class ExternalFileTypeData(GenericObject):
+    """Type data for `ExternalFile`."""
+
+    url: str
+
+
+class ExternalFile(FileObject[ExternalFileTypeData], type='external'):
     """A Notion external file object."""
 
-    class TypeData(GenericObject):
-        url: str
-
-    external: TypeData
+    external: ExternalFileTypeData
 
     @classmethod
     def build(
         cls, url: str, *, name: str | None = None, caption: list[RichTextBaseObject] | None = None
     ) -> ExternalFile:
         """Create a new `ExternalFile` from the given URL."""
-        caption = [] if caption is None else caption
-        return cls.model_construct(name=name, caption=caption, external=cls.TypeData(url=url))
+        return cls.model_construct(name=name, caption=caption, external=ExternalFileTypeData(url=url))
+
+
+class UploadedFileTypeData(GenericObject):
+    """Type data for `UploadedFile`."""
+
+    id: UUID
+
+
+class UploadedFile(FileObject[UploadedFileTypeData], type='file_upload'):
+    """A Notion uploaded file object. The result of completed FileUpload"""
+
+    file_upload: UploadedFileTypeData
+
+    @classmethod
+    def build(cls, id: UUID) -> UploadedFile:  # noqa: A002
+        """Create a new `UploadedFile` from the given ID."""
+        return cls.model_construct(file_upload=UploadedFileTypeData(id=id))
+
+
+class FileUpload(NotionObject, object='file_upload'):
+    """A Notion file upload object.
+
+    This object is used to handle the process of uploading a file to Notion.
+    """
+
+    created_time: dt.datetime
+    last_edited_time: dt.datetime
+    expiry_time: dt.datetime | None = None
+    status: FileUploadStatus
+    filename: str | None = None
+    content_type: str | None = None
+    content_length: int | None = None
+    upload_url: str | None = None
+    complete_url: str | None = None
+    file_import_result: str | None = None
+    archived: bool  # undocumented but sent by the API
+    created_by: User  # undocumented but sent by the API
 
 
 class Comment(NotionEntity, object='comment'):

@@ -27,7 +27,6 @@ from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     Annotations,
     BlockRef,
-    CaptionMixin,
     CustomEmojiObject,
     EmojiObject,
     FileObject,
@@ -99,9 +98,8 @@ class Page(DataObject, MentionMixin, object='page'):
         return MentionPage.build_mention_from(self, style=style)
 
 
-GO_co = TypeVar(
-    'GO_co', bound=GenericObject, default=GenericObject, covariant=True
-)  # ToDo: Use new syntax when requires-python >= 3.12
+# ToDo: Use new syntax when requires-python >= 3.12
+GO_co = TypeVar('GO_co', bound=GenericObject, default=GenericObject, covariant=True)
 
 
 class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=True):
@@ -199,6 +197,12 @@ class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
     """A quote block in Notion."""
 
     quote: QuoteTypeData = Field(default_factory=QuoteTypeData)
+
+
+class CaptionMixin(GenericObject, ABC):
+    """Mixin for blocks having a caption."""
+
+    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class CodeTypeData(TextBlockTypeData, CaptionMixin):

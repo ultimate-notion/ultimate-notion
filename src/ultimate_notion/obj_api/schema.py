@@ -243,7 +243,18 @@ class Formula(Property[FormulaTypeData], type='formula'):
 class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
     """Defines common configuration for a property relation."""
 
+    # ToDo: Check if we can get rid of this type ignore.
     database_id: UUID = None  # type: ignore
+    data_source_id: str | None = None  # 2025-09-03 update: https://developers.notion.com/docs/upgrade-guide-2025-09-03
+
+    def __eq__(self, other: object) -> bool:
+        # ToDo: Consider data_source_id when Update 2025-09-03 is implemented.
+        if not isinstance(other, PropertyRelation):
+            return NotImplemented
+        return self.database_id == other.database_id
+
+    def __hash__(self) -> int:
+        return hash(self.database_id)
 
 
 class SinglePropertyRelationTypeData(GenericObject):
@@ -268,13 +279,14 @@ class SinglePropertyRelation(PropertyRelation[SinglePropertyRelationTypeData], t
 class DualPropertyRelationTypeData(GenericObject):
     """Type data for `DualPropertyRelation`."""
 
+    # ToDo: Check if this should not rather be | UnsetType = Unset
     synced_property_name: str = None  # type: ignore
     synced_property_id: str | None = None
 
     def __eq__(self, other: object) -> bool:
         """Compare DualPropertyRelation objects by all attributes except id."""
         if not isinstance(other, DualPropertyRelationTypeData):
-            return False
+            return NotImplemented
         # we skip the id as this is set by the Notion API.
         return self.synced_property_name == other.synced_property_name
 
@@ -331,7 +343,7 @@ class RollupTypeData(GenericObject):
     def __eq__(self, value: object) -> bool:
         """Compare Rollup objects by all attributes except id."""
         if not isinstance(value, RollupTypeData):
-            return False
+            return NotImplemented
         return (
             self.function == value.function
             and self.relation_property_name == value.relation_property_name

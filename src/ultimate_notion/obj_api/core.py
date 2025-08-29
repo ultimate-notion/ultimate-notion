@@ -187,7 +187,7 @@ class GenericObject(BaseModel):
         cls.model_rebuild(force=True)
 
     # https://github.com/pydantic/pydantic/discussions/3139
-    def update(self, **data: Any) -> Self:
+    def update(self, **data: Any) -> None:
         """Update the internal attributes with new data in place."""
 
         new_obj_dct = self.model_dump()
@@ -198,8 +198,6 @@ class GenericObject(BaseModel):
             # exclude_unset avoids overwriting for instance known children that need to be retrieved separately
             _logger.debug('updating object data: %s => %s', k, v)
             setattr(self, k, getattr(new_obj, k))
-
-        return self
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""

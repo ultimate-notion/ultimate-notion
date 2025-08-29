@@ -48,13 +48,13 @@ class RichTextBase(Wrapper[RTBO_co], wraps=objs.RichTextBaseObject):
 
 
 class Math(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
-    """A inline equation object.
+    """An inline equation object.
 
     A LaTeX equation in inline mode, e.g. `$ \\mathrm{E=mc^2} $`, but without the `$` signs.
 
     !!! note
 
-        Only used internally, use the `math` function instead, to create proper `Text` object.
+        Only used internally. Use the `math` function instead, to create proper `Text` object.
     """
 
     def __init__(
@@ -97,7 +97,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
     !!! note
 
-        Only used internally, use the `mention` function instead, to create proper `RichText` object.
+        Only used internally. Use the `mention` function instead, to create proper `RichText` object.
     """
 
     def __init__(
@@ -147,7 +147,7 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
 
     !!! note
 
-        Only used internally, use `Text` instead.
+        Only used internally. Use `Text` instead.
     """
 
     def __init__(

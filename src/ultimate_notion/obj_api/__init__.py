@@ -60,8 +60,12 @@ def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
 
     def log_request(request: httpx.Request) -> None:
         msg = f'Request: {request.method} {request.url}'
-        if request.content:
-            msg += f'\n{request.content.decode("utf-8") if isinstance(request.content, bytes) else request.content}'
+        try:
+            if request.content:
+                msg += f'\n{request.content.decode("utf-8") if isinstance(request.content, bytes) else request.content}'
+        except httpx.RequestNotRead:
+            # For streaming requests (like file uploads), we can't access content without reading it first
+            msg += '\n<streaming content>'
         _logger.debug(msg)
 
     def log_response(response: httpx.Response) -> None:

@@ -107,6 +107,23 @@ class BGColor(str, Enum):
     RED = 'red_background'
 
 
+class FileUploadStatus(str, Enum):
+    """Status of a file upload."""
+
+    PENDING = 'pending'
+    UPLOADED = 'uploaded'
+    EXPIRED = 'expired'
+    FAILED = 'failed'
+
+
+class FileUploadMode(str, Enum):
+    """File upload modes."""
+
+    SINGLE_PART = 'single_part'
+    MULTI_PART = 'multi_part'
+    EXTERNAL_URL = 'external_url'
+
+
 class CodeLang(str, Enum):
     """Coding languages for code blocks."""
 
