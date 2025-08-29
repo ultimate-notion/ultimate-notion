@@ -82,6 +82,12 @@ def pytest_addoption(parser: Parser) -> None:
         default=False,
         help='Enable DEBUG logging for Ultimate Notion.',
     )
+    parser.addoption(
+        '--file-upload',
+        action='store_true',
+        default=False,
+        help='Run tests that upload files to Notion.',
+    )
 
 
 def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: pytest.TestReport) -> None:
@@ -96,6 +102,7 @@ def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """Define test selection based on command line flags."""
+    # Handle check_latest_release marker
     marker_name = 'check_latest_release'
     flag_name = f'--{marker_name.replace("_", "-")}'
     if config.getoption(flag_name):
@@ -108,6 +115,15 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         for item in items:
             if marker_name in item.keywords:
                 item.add_marker(skip_release_test)
+
+    # Handle file_upload marker
+    file_upload_marker = 'file_upload'
+    file_upload_flag = f'--{file_upload_marker.replace("_", "-")}'
+    if not config.getoption(file_upload_flag):
+        skip_file_upload = pytest.mark.skip(reason=f'use flag `{file_upload_flag}` to run file upload tests')
+        for item in items:
+            if file_upload_marker in item.keywords:
+                item.add_marker(skip_file_upload)
 
 
 def exec_pyfile(file_path: str) -> None:
