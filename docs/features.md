@@ -12,7 +12,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 - [x] high-level and Pythonic interface for the Notion API
 - [x] caching to avoid unnecessary calls to the Notion API
-- [ ] 100% feature parity with the [official Notion API]
+- [x] 100% feature parity with the [official Notion API]
 
 ## Databases
 
@@ -54,7 +54,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 
 ## Files
 
-- [ ] upload files to Notion
+- [x] upload files to Notion
 
 ## Users
 
