@@ -3,15 +3,15 @@ interactions:
     body: '{"parent": {"type": "page_id", "page_id": "5f505199-b292-4713-920b-61d813bf72a3"},
       "title": [{"type": "text", "plain_text": "My Tasks", "annotations": {"bold":
       false, "italic": false, "strikethrough": false, "underline": false, "code":
-      false, "color": "default"}, "text": {"content": "My Tasks"}}], "properties":
-      {"Task": {"type": "title", "title": {}}, "Status": {"type": "select", "select":
-      {"options": [{"name": "Backlog", "color": "gray"}, {"name": "In Progress", "color":
-      "blue"}, {"name": "Blocked", "color": "red"}, {"name": "Done", "color": "green"},
-      {"name": "Rejected", "color": "brown"}]}}, "Priority": {"type": "select", "select":
-      {"options": [{"name": "\u2739 High", "color": "red"}, {"name": "\u2737 Medium",
-      "color": "yellow"}, {"name": "\u2736 Low", "color": "gray"}]}}, "Urgency": {"type":
-      "formula", "formula": {"expression": "if((prop(\"Status\") == \"Done\"), \"\u2705
-      Done\", if(empty(prop(\"Due Date\")), \"\", if(now() > (if(or(prop(\"Due Date\")>=dateSubtract(dateSubtract(now(),hour(now()),\"hours\"),minute(now()),\"minutes\"),empty(prop(\"Repeats\"))),prop(\"Due
+      false}, "text": {"content": "My Tasks"}}], "properties": {"Task": {"type": "title",
+      "title": {}}, "Status": {"type": "select", "select": {"options": [{"name": "Backlog",
+      "color": "gray"}, {"name": "In Progress", "color": "blue"}, {"name": "Blocked",
+      "color": "red"}, {"name": "Done", "color": "green"}, {"name": "Rejected", "color":
+      "brown"}]}}, "Priority": {"type": "select", "select": {"options": [{"name":
+      "\u2739 High", "color": "red"}, {"name": "\u2737 Medium", "color": "yellow"},
+      {"name": "\u2736 Low", "color": "gray"}]}}, "Urgency": {"type": "formula", "formula":
+      {"expression": "if((prop(\"Status\") == \"Done\"), \"\u2705 Done\", if(empty(prop(\"Due
+      Date\")), \"\", if(now() > (if(or(prop(\"Due Date\")>=dateSubtract(dateSubtract(now(),hour(now()),\"hours\"),minute(now()),\"minutes\"),empty(prop(\"Repeats\"))),prop(\"Due
       Date\"),(if((prop(\"Repeats\")==\"Daily\"),dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract(prop(\"Due
       Date\"),hour(prop(\"Due Date\")),\"hours\"),minute(prop(\"Due Date\")),\"minutes\"),1,\"days\"),dateBetween(now(),dateAdd(dateSubtract(dateSubtract(prop(\"Due
       Date\"),hour(prop(\"Due Date\")),\"hours\"),minute(prop(\"Due Date\")),\"minutes\"),1,\"days\"),\"days\")+1,\"days\"),1,\"days\"),hour(prop(\"Due
@@ -81,7 +81,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '9784'
+      - '9766'
       content-type:
       - application/json
       cookie:
@@ -95,190 +95,190 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: "{\"object\":\"database\",\"id\":\"257974f3-b388-8129-b621-e765eefc51a3\",\"cover\":null,\"icon\":null,\"created_time\":\"2025-08-22T08:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2025-08-22T08:36:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+    content: "{\"object\":\"database\",\"id\":\"25e974f3-b388-815b-b17f-f783b205a26c\",\"cover\":null,\"icon\":null,\"created_time\":\"2025-08-29T13:23:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2025-08-29T13:23:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
       Tasks\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
-      Tasks\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"Priority\":{\"id\":\"%3CZES\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"e24303ff-9539-4bce-903f-b28c172b905d\",\"name\":\"\u2739
-      High\",\"color\":\"red\",\"description\":null},{\"id\":\"e0da0d4c-5e4c-4aa8-a5f6-30bd210866c2\",\"name\":\"\u2737
-      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"a8cc8ecb-d2b2-4e59-a3b7-9403f19e58fc\",\"name\":\"\u2736
-      Low\",\"color\":\"gray\",\"description\":null}]}},\"Repeats\":{\"id\":\"KGRn\",\"name\":\"Repeats\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"db8834f5-973f-41e3-b267-955e81a13449\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"f13af8d8-20b8-4d5a-9989-c6950da1b632\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"119ac99e-dae8-4e48-818d-189fe51b5c4c\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"79c6d149-d391-4651-924f-f6184de8708e\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"08c6b6b5-968a-4cc3-b630-f4a45e8ccadf\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"e70639ef-0778-4a9c-95ea-2ae44b6217e3\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"44106977-f440-470c-993e-030fd5fc7721\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Due
-      by\":{\"id\":\"Khtf\",\"name\":\"Due by\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      Tasks\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"Due
+      by\":{\"id\":\"%40i%40G\",\"name\":\"Due by\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
       >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
-      {{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), empty({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      {{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"months\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Due Date\":{\"id\":\"%5BbIm\",\"name\":\"Due
-      Date\",\"type\":\"date\",\"date\":{}},\"Started\":{\"id\":\"gl%3Aj\",\"name\":\"Started\",\"type\":\"date\",\"date\":{}},\"Urgency\":{\"id\":\"n%3CPO\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:yoYk:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"\\\", if(now() > if(or({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Urgency\":{\"id\":\"Lx%7DY\",\"name\":\"Urgency\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:eS%7Cx:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(now() > if(or({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
       >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
-      {{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), empty({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      {{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"months\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\")))))))))), \\\"\U0001F525
-      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"Done\":{\"id\":\"o%60MJ\",\"name\":\"Done\",\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:yoYk:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Done\\\"\"}},\"Status\":{\"id\":\"yoYk\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"0a952243-5026-4fef-9c51-82f19580e11f\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"aed02cda-c61b-4ba2-90a9-0b14597eef28\",\"name\":\"In
-      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"4172ae52-a7c1-496b-a1e2-5a85b2f4fa0d\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"65c8eeb6-026d-43e1-b4b3-f361da68cff3\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"f535d1dc-0afa-4100-b6f9-bb6efbb9469e\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"URL\":{\"id\":\"zH%3AK\",\"name\":\"URL\",\"type\":\"url\",\"url\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/257974f3b3888129b621e765eefc51a3\",\"public_url\":null,\"archived\":false,\"in_trash\":false,\"request_id\":\"4c62a4c9-d6aa-47ed-9e49-a7e0907f9217\"}"
+      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"URL\":{\"id\":\"MKsT\",\"name\":\"URL\",\"description\":null,\"type\":\"url\",\"url\":{}},\"Started\":{\"id\":\"SrGG\",\"name\":\"Started\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Due
+      Date\":{\"id\":\"%5B%3DTI\",\"name\":\"Due Date\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Status\":{\"id\":\"eS%7Cx\",\"name\":\"Status\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"912d3546-c842-4166-9754-8a4b18a5a84d\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"8b2cea56-ce4a-46d7-846d-191f05894cf6\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"d6cb2623-0827-43b9-ad7c-9db63a7504a5\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"8007b4fd-71a2-44c3-a2f4-21f65fa0be89\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"c1f9c414-2d2a-47ba-afab-ff7126582cd1\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"Repeats\":{\"id\":\"eXYW\",\"name\":\"Repeats\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"d538b89d-5066-4787-964d-86c00eae73c9\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"eaca6375-7efe-426c-b23d-9f5d4b19798e\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"c9d9b04b-cb69-41bc-987e-25b3c0269ba9\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"e526c82f-02a6-4509-89d0-30dd8afda401\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"13d526ba-11cf-4ef6-b3d6-14f26f297fa5\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"cfd1f118-3174-4781-a383-fdd090f24bbb\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"db0875d2-075f-45a6-b3f0-f9d7c9189150\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Done\":{\"id\":\"fpEW\",\"name\":\"Done\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:eS%7Cx:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\"\"}},\"Priority\":{\"id\":\"%7B%60hb\",\"name\":\"Priority\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"f21d843c-1827-483f-8a1e-e9276c727075\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"14485c4f-32fe-4908-8eba-f9ec0cf3d57d\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"873cdf5a-5c75-4006-90fe-e201e8a6f59b\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"description\":null,\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/25e974f3b388815bb17ff783b205a26c\",\"public_url\":null,\"archived\":false,\"in_trash\":false,\"request_id\":\"958bc8c5-8b9b-4516-a76e-0fd0088e0a11\"}"
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 97310ad94c7ffc52-PRG
+      - 976c5c9e3e94dbb3-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -287,10 +287,6 @@ interactions:
       - application/json; charset=utf-8
       Server:
       - cloudflare
-      Set-Cookie:
-      - __cf_bm=LNEr8VS9po9.1BaX0Z_t2cKL6vq99is90ChLyqyaE1c-1755851786-1.0.1.1-uDDCr_Syyk2DCd9hIzzfPYkPd6VVpB7S0NCbdmDCbGXHErLJEnLDdD35kZDDnL9mjPhGqAoJFtCebDpeD7mHpyx.YuEXco1nE8BKlOitLzo;
-        path=/; expires=Fri, 22-Aug-25 09:06:26 GMT; domain=.notion.com; HttpOnly;
-        Secure; SameSite=None
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Transfer-Encoding:
@@ -312,7 +308,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 4c62a4c9-d6aa-47ed-9e49-a7e0907f9217
+      - 958bc8c5-8b9b-4516-a76e-0fd0088e0a11
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -320,7 +316,7 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"description":[{"type":"text","plain_text":"My personal task list","annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"text":{"content":"My
+    body: '{"description":[{"type":"text","plain_text":"My personal task list","annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false},"text":{"content":"My
       personal task list"}}]}'
     headers:
       accept:
@@ -332,7 +328,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '228'
+      - '210'
       content-type:
       - application/json
       cookie:
@@ -344,194 +340,194 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/257974f3-b388-8129-b621-e765eefc51a3
+    uri: https://api.notion.com/v1/databases/25e974f3-b388-815b-b17f-f783b205a26c
   response:
-    content: "{\"object\":\"database\",\"id\":\"257974f3-b388-8129-b621-e765eefc51a3\",\"cover\":null,\"icon\":null,\"created_time\":\"2025-08-22T08:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2025-08-22T08:36:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+    content: "{\"object\":\"database\",\"id\":\"25e974f3-b388-815b-b17f-f783b205a26c\",\"cover\":null,\"icon\":null,\"created_time\":\"2025-08-29T13:23:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"645e79dd-3e43-40de-9d51-39357c1c427f\"},\"last_edited_time\":\"2025-08-29T13:23:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
       Tasks\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
       Tasks\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
       personal task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
-      personal task list\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Priority\":{\"id\":\"%3CZES\",\"name\":\"Priority\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"e24303ff-9539-4bce-903f-b28c172b905d\",\"name\":\"\u2739
-      High\",\"color\":\"red\",\"description\":null},{\"id\":\"e0da0d4c-5e4c-4aa8-a5f6-30bd210866c2\",\"name\":\"\u2737
-      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"a8cc8ecb-d2b2-4e59-a3b7-9403f19e58fc\",\"name\":\"\u2736
-      Low\",\"color\":\"gray\",\"description\":null}]}},\"Repeats\":{\"id\":\"KGRn\",\"name\":\"Repeats\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"db8834f5-973f-41e3-b267-955e81a13449\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"f13af8d8-20b8-4d5a-9989-c6950da1b632\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"119ac99e-dae8-4e48-818d-189fe51b5c4c\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"79c6d149-d391-4651-924f-f6184de8708e\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"08c6b6b5-968a-4cc3-b630-f4a45e8ccadf\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"e70639ef-0778-4a9c-95ea-2ae44b6217e3\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"44106977-f440-470c-993e-030fd5fc7721\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Due
-      by\":{\"id\":\"Khtf\",\"name\":\"Due by\",\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      personal task list\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Due
+      by\":{\"id\":\"%40i%40G\",\"name\":\"Due by\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
       >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
-      {{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), empty({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      {{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"months\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Due Date\":{\"id\":\"%5BbIm\",\"name\":\"Due
-      Date\",\"type\":\"date\",\"date\":{}},\"Started\":{\"id\":\"gl%3Aj\",\"name\":\"Started\",\"type\":\"date\",\"date\":{}},\"Urgency\":{\"id\":\"n%3CPO\",\"name\":\"Urgency\",\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:yoYk:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"\\\", if(now() > if(or({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Urgency\":{\"id\":\"Lx%7DY\",\"name\":\"Urgency\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:eS%7Cx:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"\\\", if(now() > if(or({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
       >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
-      {{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), empty({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}})),
+      {{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"days\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:KGRn:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      1, \\\"months\\\"), hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:eXYW:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}},
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
-      \\\"hours\\\"), minute({{notion:block_property:%5BbIm:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      hour({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
+      \\\"hours\\\"), minute({{notion:block_property:%5B%3DTI:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}),
       \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\")))))))))), \\\"\U0001F525
-      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"Done\":{\"id\":\"o%60MJ\",\"name\":\"Done\",\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:yoYk:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
-      == \\\"Done\\\"\"}},\"Status\":{\"id\":\"yoYk\",\"name\":\"Status\",\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"0a952243-5026-4fef-9c51-82f19580e11f\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"aed02cda-c61b-4ba2-90a9-0b14597eef28\",\"name\":\"In
-      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"4172ae52-a7c1-496b-a1e2-5a85b2f4fa0d\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"65c8eeb6-026d-43e1-b4b3-f361da68cff3\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"f535d1dc-0afa-4100-b6f9-bb6efbb9469e\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"URL\":{\"id\":\"zH%3AK\",\"name\":\"URL\",\"type\":\"url\",\"url\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/257974f3b3888129b621e765eefc51a3\",\"public_url\":null,\"archived\":false,\"in_trash\":false,\"request_id\":\"710efb46-ef7b-4033-bdc3-4648aa9e0d43\"}"
+      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"URL\":{\"id\":\"MKsT\",\"name\":\"URL\",\"description\":null,\"type\":\"url\",\"url\":{}},\"Started\":{\"id\":\"SrGG\",\"name\":\"Started\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Due
+      Date\":{\"id\":\"%5B%3DTI\",\"name\":\"Due Date\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Status\":{\"id\":\"eS%7Cx\",\"name\":\"Status\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"912d3546-c842-4166-9754-8a4b18a5a84d\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"8b2cea56-ce4a-46d7-846d-191f05894cf6\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"d6cb2623-0827-43b9-ad7c-9db63a7504a5\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"8007b4fd-71a2-44c3-a2f4-21f65fa0be89\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"c1f9c414-2d2a-47ba-afab-ff7126582cd1\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"Repeats\":{\"id\":\"eXYW\",\"name\":\"Repeats\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"d538b89d-5066-4787-964d-86c00eae73c9\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"eaca6375-7efe-426c-b23d-9f5d4b19798e\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"c9d9b04b-cb69-41bc-987e-25b3c0269ba9\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"e526c82f-02a6-4509-89d0-30dd8afda401\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"13d526ba-11cf-4ef6-b3d6-14f26f297fa5\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"cfd1f118-3174-4781-a383-fdd090f24bbb\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"db0875d2-075f-45a6-b3f0-f9d7c9189150\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Done\":{\"id\":\"fpEW\",\"name\":\"Done\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:eS%7Cx:00000000-0000-0000-0000-000000000000:5a65efbd-bfb2-4ebe-bb5d-ac95c98fb252}}
+      == \\\"Done\\\"\"}},\"Priority\":{\"id\":\"%7B%60hb\",\"name\":\"Priority\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"f21d843c-1827-483f-8a1e-e9276c727075\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"14485c4f-32fe-4908-8eba-f9ec0cf3d57d\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"873cdf5a-5c75-4006-90fe-e201e8a6f59b\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"description\":null,\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"5f505199-b292-4713-920b-61d813bf72a3\"},\"url\":\"https://www.notion.so/25e974f3b388815bb17ff783b205a26c\",\"public_url\":null,\"archived\":false,\"in_trash\":false,\"request_id\":\"5f1b628f-9171-4ae7-9455-97e099cbb73f\"}"
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 97310ae1c9c9fc52-PRG
+      - 976c5ca8ac11dbb3-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -561,7 +557,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 710efb46-ef7b-4033-bdc3-4648aa9e0d43
+      - 5f1b628f-9171-4ae7-9455-97e099cbb73f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -588,15 +584,15 @@ interactions:
       user-agent:
       - secret...
     method: DELETE
-    uri: https://api.notion.com/v1/blocks/257974f3-b388-8129-b621-e765eefc51a3
+    uri: https://api.notion.com/v1/blocks/25e974f3-b388-815b-b17f-f783b205a26c
   response:
-    content: '{"object":"block","id":"257974f3-b388-8129-b621-e765eefc51a3","parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"created_time":"2025-08-22T08:36:00.000Z","last_edited_time":"2025-08-22T08:36:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"in_trash":true,"type":"child_database","child_database":{"title":"My
-      Tasks"},"request_id":"8134a5d9-03c4-436e-a8d2-64ec8a646937"}'
+    content: '{"object":"block","id":"25e974f3-b388-815b-b17f-f783b205a26c","parent":{"type":"page_id","page_id":"5f505199-b292-4713-920b-61d813bf72a3"},"created_time":"2025-08-29T13:23:00.000Z","last_edited_time":"2025-08-29T13:23:00.000Z","created_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"last_edited_by":{"object":"user","id":"645e79dd-3e43-40de-9d51-39357c1c427f"},"has_children":false,"archived":true,"in_trash":true,"type":"child_database","child_database":{"title":"My
+      Tasks"},"request_id":"3af1f1ba-8fe5-4d9f-8a4a-1485530a0813"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 97310af77b22fc52-PRG
+      - 976c5cac3b78dbb3-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -626,7 +622,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 8134a5d9-03c4-436e-a8d2-64ec8a646937
+      - 3af1f1ba-8fe5-4d9f-8a4a-1485530a0813
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
