@@ -244,6 +244,7 @@ class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
     """Defines common configuration for a property relation."""
 
     database_id: UUID = None  # type: ignore
+    data_source_id: str | None = None  # 2025-09-03 update: https://developers.notion.com/docs/upgrade-guide-2025-09-03
 
 
 class SinglePropertyRelationTypeData(GenericObject):
