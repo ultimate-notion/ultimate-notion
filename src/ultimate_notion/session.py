@@ -364,6 +364,8 @@ class Session:
         else:
             return cast(User, self.cache[self._own_bot_id])
 
+    # ToDo: Rather add here the workspace info as this seems to be available only on the own bot.
+
     def upload(self, file: BinaryIO, *, name: str | None = None) -> FileInfo:
         """Upload a file to Notion."""
         filename = name if name else getattr(file, 'name', 'unknown_file')
@@ -385,6 +387,5 @@ class Session:
                 _logger.info(f'Uploading part {part}/{n_parts} of file `{filename}`.')
                 chunk = file.read(MAX_FILE_SIZE)
                 self.api.uploads.send(file_upload=file_upload, part=part, file=chunk)
-
-        self.api.uploads.complete(file_upload=file_upload)
+            self.api.uploads.complete(file_upload=file_upload)
         return FileInfo.from_file_upload(file_upload)

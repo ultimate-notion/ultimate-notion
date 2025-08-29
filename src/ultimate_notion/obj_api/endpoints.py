@@ -555,17 +555,16 @@ class UploadsEndpoint(Endpoint):
     def send(self, file_upload: FileUpload, file: BinaryIO, part: int | None = None) -> None:
         """Send a file upload and update the file_upload object."""
         _logger.debug(f'Sending file upload with id `{file_upload.id}`.')
-        if part is not None:
-            data = self.raw_api.send(file_upload=file_upload, file=file, part=part)
-        else:
-            data = self.raw_api.send(file_upload=file_upload, file=file)
+        kwargs = {'file_upload_id': file_upload.id, 'file': file, 'part': part}
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # Notion API doesn't like nulls
+        data = self.raw_api.send(**kwargs)
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/complete-a-file-upload
     def complete(self, file_upload: FileUpload) -> None:
         """Complete the file upload and update the file_upload object."""
         _logger.debug(f'Completing file upload with id `{file_upload.id}`.')
-        data = self.raw_api.complete(file_upload=file_upload)
+        data = self.raw_api.complete(file_upload_id=file_upload.id)
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/retrieve-a-file-upload
