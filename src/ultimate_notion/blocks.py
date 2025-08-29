@@ -373,7 +373,7 @@ class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):
     @property
     def caption(self) -> Text | None:
         """Return the caption of the code block."""
-        if not isinstance(self.obj_ref.value, objs.CaptionMixin):
+        if not isinstance(self.obj_ref.value, obj_blocks.CaptionMixin | objs.FileObject):
             msg = f'Block `{type(self).__name__}` with type data `{type(self.obj_ref.value).__name__}` has no caption.'
             raise RuntimeError(msg)
         if not (caption := self.obj_ref.value.caption):
@@ -382,7 +382,7 @@ class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):
 
     @caption.setter
     def caption(self, caption: str | None) -> None:
-        if not isinstance(self.obj_ref.value, objs.CaptionMixin):
+        if not isinstance(self.obj_ref.value, obj_blocks.CaptionMixin | objs.FileObject):
             msg = f'Block `{type(self).__name__}` with type data `{type(self.obj_ref.value).__name__}` has no caption.'
             raise RuntimeError(msg)
         self.obj_ref.value.caption = Text(caption).obj_ref if caption is not None else []
