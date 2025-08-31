@@ -11,7 +11,7 @@ from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import get_active_session, get_repr
 from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
-from ultimate_notion.file import FileInfo
+from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.page import Page
@@ -85,7 +85,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session.api.databases.update(self.obj_ref, description=text.obj_ref)
 
     @property
-    def icon(self) -> FileInfo | Emoji | CustomEmoji | None:
+    def icon(self) -> AnyFile | Emoji | CustomEmoji | None:
         """Return the icon of this database as file or emoji."""
         if (icon := self.obj_ref.icon) is None:
             return None
@@ -93,10 +93,10 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
             return wrap_icon(icon)
 
     @property
-    def cover(self) -> FileInfo | None:
+    def cover(self) -> AnyFile | None:
         """Return the cover of this database as file."""
         cover = self.obj_ref.cover
-        return FileInfo.wrap_obj_ref(cover) if cover is not None else None
+        return AnyFile.wrap_obj_ref(cover) if cover is not None else None
 
     @property
     def is_wiki(self) -> bool:

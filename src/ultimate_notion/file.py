@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import io
+from abc import ABC, abstractmethod
 from typing import BinaryIO
 from urllib.parse import urlparse
 
 import filetype
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
@@ -17,46 +18,17 @@ NOTION_HOSTED_DOMAIN = 'secure.notion-static.com'
 MAX_FILE_SIZE = 20_000_000  # 20MB in bytes
 
 
-class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
+# ToDo: Use new syntax when requires-python >= 3.12
+FO_co = TypeVar('FO_co', bound=objs.FileObject, default=objs.FileObject, covariant=True)
+
+
+class AnyFile(Wrapper[FO_co], ABC, wraps=objs.FileObject):
     """Information about a web resource e.g. for the files property."""
 
-    obj_ref: objs.FileObject
-
-    def __init__(self, *, url: str, name: str | None = None, caption: str | None = None) -> None:
-        caption_obj = Text(caption).obj_ref if caption is not None else None  # [] is not accepted here by the API!
-        if is_notion_hosted(url):
-            self.obj_ref = objs.HostedFile.build(url=url, name=name, caption=caption_obj)
-        else:
-            self.obj_ref = objs.ExternalFile.build(url=url, name=name, caption=caption_obj)
-
-    @classmethod
-    def wrap_obj_ref(cls, obj_ref: objs.FileObject) -> Self:
-        """Wrap an existing low-level FileObject into a FileInfo."""
-        self = cls.__new__(cls)
-        self.obj_ref = obj_ref
-        return self
-
-    @classmethod
-    def from_file_upload(cls, file_upload: objs.FileUpload) -> Self:
-        """Create a FileInfo from a FileUpload object.
-
-        Args:
-            file_upload: The FileUpload object from the upload API
-
-        Returns:
-            A FileInfo instance representing the uploaded file
-        """
-        file_obj = objs.UploadedFile.build(id=file_upload.id)
-        self = cls.__new__(cls)
-        self.obj_ref = file_obj
-        return self
-
     def __eq__(self, other: object) -> bool:
-        match other:
-            case str() | FileInfo():
-                return str(self) == str(other)
-            case _:
-                return NotImplemented
+        if not isinstance(other, str | AnyFile):
+            return NotImplemented
+        return str(self) == str(other)
 
     def __hash__(self) -> int:
         return hash(str(self))
@@ -64,8 +36,8 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
     def __repr__(self) -> str:
         return get_repr(self)
 
-    def __str__(self) -> str:
-        return self.url
+    @abstractmethod
+    def __str__(self) -> str: ...
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by JupyterLab automatically to display this file."""
@@ -101,6 +73,58 @@ class FileInfo(Wrapper[objs.FileObject], wraps=objs.FileObject):
                 return self.obj_ref.external.url
             case _:
                 return None
+
+
+class NotionFile(AnyFile[objs.HostedFile], wraps=objs.HostedFile):
+    """Information about a file that is hosted by Notion."""
+
+    def __init__(self, *, url: str, name: str | None = None, caption: str | None = None) -> None:
+        caption_obj = Text(caption).obj_ref if caption is not None else None  # [] is not accepted here by the API!
+        super().__init__(url=url, name=name, caption=caption_obj)
+
+    def __str__(self) -> str:
+        return f'NotionFile({self.url})'
+
+
+class ExternalFile(AnyFile[objs.ExternalFile], wraps=objs.ExternalFile):
+    """Information about a file that is hosted externally, i.e. not by Notion."""
+
+    def __init__(self, *, url: str, name: str | None = None, caption: str | None = None) -> None:
+        caption_obj = Text(caption).obj_ref if caption is not None else None  # [] is not accepted here by the API!
+        super().__init__(url=url, name=name, caption=caption_obj)
+
+    def __str__(self) -> str:
+        return f'ExternalFile({self.url})'
+
+
+class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
+    """Information about a file that has been uploaded to Notion.
+
+    !!! note
+
+        This class is used to represent files that have been uploaded to Notion.
+        After it has been used, e.g. to change a cover or add a file block,
+        it will be converted to a `NotionFile` (i.e. `objs.HostedFile`), when
+        read again from the API.
+    """
+
+    obj_file_upload: objs.FileUpload
+
+    def __str__(self) -> str:
+        return f'UploadedFile({self.id})'
+
+    def id(self) -> str:
+        """Return the ID of the uploaded file."""
+        return self.obj_file_upload.id
+
+    @classmethod
+    def from_file_upload(cls, file_upload: objs.FileUpload) -> Self:
+        """Create an UploadedFile instance from a FileUpload object."""
+        file_obj = objs.UploadedFile.build(id=file_upload.id)
+        self = cls.__new__(cls)
+        self.obj_ref = file_obj
+        self.obj_file_upload = file_upload
+        return self
 
 
 def is_notion_hosted(url: str) -> bool:
@@ -147,3 +171,14 @@ def get_mime_type(file: BinaryIO) -> str:
     else:
         # Fallback to application/octet-stream if type cannot be determined
         return 'application/octet-stream'
+
+
+def url(url: str, *, name: str | None = None, caption: str | None = None) -> NotionFile | ExternalFile:
+    """Create a NotionFile or ExternalFile based on the URL.
+
+    A name and caption can be provided and will be used as default values, e.g. in a File block.
+    """
+    if is_notion_hosted(url):
+        return NotionFile(url=url, name=name, caption=caption)
+    else:
+        return ExternalFile(url=url, name=name, caption=caption)

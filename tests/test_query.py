@@ -365,7 +365,7 @@ def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session) -> None:
     page_empty = db.create_page()
 
     page_files = db.create_page(
-        title='Files', files=[uno.FileInfo(name='image', url='https://some-site.com/image.png')]
+        title='Files', files=[uno.ExternalFile(name='image', url='https://some-site.com/image.png')]
     )
     page_check = db.create_page(title='Checkbox', check=True)
 

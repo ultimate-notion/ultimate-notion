@@ -12,7 +12,7 @@ from tabulate import tabulate
 
 from ultimate_notion import props, schema
 from ultimate_notion.core import Wrapper, get_repr
-from ultimate_notion.file import FileInfo
+from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api.enums import FormulaType, RollupType
 from ultimate_notion.page import Page
 from ultimate_notion.props import Option
@@ -198,7 +198,7 @@ class View(Sequence[Page]):
             return rows
         for idx, row in enumerate(rows):
             page = self.get_page(idx)
-            icon = html_img(page.icon.url, size=1.2) if isinstance(page.icon, FileInfo) else page.icon
+            icon = html_img(page.icon.url, size=1.2) if isinstance(page.icon, AnyFile) else page.icon
             row[title_idx] = icon
         return rows
 
@@ -413,7 +413,7 @@ class View(Sequence[Page]):
 def cmplx_to_str(obj: Wrapper) -> Wrapper | str:
     """Convert complex objects to a string representation."""
     match obj:
-        case FileInfo():
+        case AnyFile():
             return obj.url
         case Option():
             return obj.name

@@ -65,7 +65,7 @@ We can now simply add a new page to this database and set some attributes:
 new_page = my_db.create_page(name='Ultimate Notion')
 new_page.description = 'Notes about Ultimate Notion'
 new_page.icon = '🚀'
-new_page.cover = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
+new_page.cover = uno.url('https://www.notion.so/images/page-cover/woodcuts_2.jpg')
 ```
 
 This is how *My DB* looks right now.

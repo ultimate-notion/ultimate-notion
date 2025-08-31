@@ -87,7 +87,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -
         'checkbox': props.Checkbox(True),
         'date': props.Date(pnd.date(2021, 1, 1)),
         'email': props.Email('email@provider.com'),
-        'files': props.Files([uno.FileInfo(name='My File', url='https://...')]),
+        'files': props.Files([uno.ExternalFile(name='My File', url='https://...')]),
         'multi_select': props.MultiSelect(options[0]),
         'number': props.Number(42),
         'people': props.Person(florian),

@@ -18,6 +18,7 @@ First Beta release:
 - New: Allow offline assembly of blocks to create a page with content in one call, issue #94.
 - Fix: Different blocks now have a different hash, equality works as expected, issue #100.
 - Fix: Retrieve a page object even without access access to the parent database, issue #103.
+- Chg: Renamed `FileInfo` to `AnyFile` and have several subtypes like `UploadedFile`, etc.
 
 ## Version 0.8, 2025-06-23
 

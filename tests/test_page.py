@@ -89,17 +89,13 @@ def test_icon_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.get_page(new_page.id)
     assert new_page.icon == uno.Emoji(emoji_icon)
 
-    notion_icon = 'https://www.notion.so/icons/snake_purple.svg'
-    new_page.icon = notion_icon  # test automatic conversation
-    assert isinstance(new_page.icon, uno.FileInfo)
-    assert new_page.icon == notion_icon
-
-    new_page.icon = uno.FileInfo(url=notion_icon)
-    assert isinstance(new_page.icon, uno.FileInfo)
-    assert new_page.icon == notion_icon
+    notion_icon_url = 'https://www.notion.so/icons/snake_purple.svg'
+    new_page.icon = uno.url(notion_icon_url)
+    assert isinstance(new_page.icon, uno.AnyFile)
+    assert new_page.icon == uno.ExternalFile(url=notion_icon_url)
 
     new_page.reload()
-    assert new_page.icon == uno.FileInfo(url=notion_icon)
+    assert new_page.icon == uno.ExternalFile(url=notion_icon_url)
 
     new_page.icon = None
     new_page.reload()
@@ -111,17 +107,13 @@ def test_cover_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.create_page(parent=root_page, title='My new page with cover')
 
     assert new_page.cover is None
-    cover_file = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
-    new_page.cover = cover_file  # type: ignore[assignment] # test automatic conversation
-    assert isinstance(new_page.cover, uno.FileInfo)
-    assert new_page.cover == cover_file
-
-    new_page.cover = uno.FileInfo(url=cover_file)
-    assert isinstance(new_page.cover, uno.FileInfo)
+    cover_file = uno.url('https://www.notion.so/images/page-cover/woodcuts_2.jpg')
+    new_page.cover = cover_file
+    assert isinstance(new_page.cover, uno.ExternalFile)
     assert new_page.cover == cover_file
 
     new_page.reload()
-    assert new_page.cover == uno.FileInfo(url=cover_file)
+    assert new_page.cover == cover_file
 
     new_page.cover = None
     new_page.reload()

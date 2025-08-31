@@ -5,14 +5,13 @@ from __future__ import annotations
 from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any, cast
 
-from emoji import is_emoji
 from typing_extensions import Self, TypeIs
 
 from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject, wrap_icon
 from ultimate_notion.comment import Discussion
 from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.file import FileInfo
+from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
@@ -212,7 +211,7 @@ class Page(
         session.api.pages.update(self.obj_ref, **{title_prop_name: title.obj_ref})
 
     @property
-    def icon(self) -> FileInfo | Emoji | CustomEmoji | None:
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | None:
         """Icon of the page, i.e. emojis, Notion's icons, or custom images."""
         if (icon := self.obj_ref.icon) is None:
             return None
@@ -220,31 +219,31 @@ class Page(
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: FileInfo | Emoji | CustomEmoji | str | None) -> None:
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji | str | None) -> None:
         """Set the icon of this page."""
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
-            icon = Emoji(icon) if is_emoji(icon) else FileInfo(url=icon, name=None)
+            icon = Emoji(icon)
         icon_obj = None if icon is None else icon.obj_ref
         session = get_active_session()
         session.api.pages.set_attr(self.obj_ref, icon=icon_obj)
 
     @property
-    def cover(self) -> FileInfo | None:
+    def cover(self) -> ExternalFile | NotionFile | None:
         """Cover of the page."""
-        cover = self.obj_ref.cover
-        if isinstance(cover, objs.ExternalFile):
-            return FileInfo.wrap_obj_ref(cover)
-        elif cover is None:
-            return None
-        else:
-            msg = f'unknown cover object of {type(cover)}'
-            raise RuntimeError(msg)
+        match cover := self.obj_ref.cover:
+            case objs.ExternalFile():
+                return ExternalFile.wrap_obj_ref(cover)
+            case objs.HostedFile():
+                return NotionFile.wrap_obj_ref(cover)
+            case None:
+                return None
+            case _:
+                msg = f'Unknown cover object of type {type(cover)}.'
+                raise RuntimeError(msg)
 
     @cover.setter
-    def cover(self, cover: FileInfo | str | None) -> None:
+    def cover(self, cover: AnyFile | None) -> None:
         """Set the cover fo this page."""
-        if isinstance(cover, str):
-            cover = FileInfo(url=str(cover), name=None)
         cover_obj = None if cover is None else cover.obj_ref
         session = get_active_session()
         session.api.pages.set_attr(self.obj_ref, cover=cover_obj)

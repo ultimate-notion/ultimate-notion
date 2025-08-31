@@ -180,20 +180,20 @@ file_page.append(heading)
 
 heading.append([
     uno.File(
-        'robots.txt',
-        'https://www.google.de/robots.txt',
+        uno.url('https://www.google.de/robots.txt'),
+        name='robots.txt',
         caption='Google Robots'
         ),
     uno.Image(
-        'https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg',
+        uno.url('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'),
         caption='Path on meadow'
         ),
     uno.Video(
-        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        uno.url('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
         caption='Rick Roll'
         ),
     uno.PDF(
-        'https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf',
+        uno.url('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf'),
         caption='Dummy PDF'
         ),
 ])
