@@ -35,7 +35,7 @@ from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url
 from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import InvalidAPIUsageError
-from ultimate_notion.file import FileInfo
+from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
@@ -56,11 +56,15 @@ MIN_COLS = 2
 DO_co = TypeVar('DO_co', bound=obj_blocks.DataObject, default=obj_blocks.DataObject, covariant=True)
 
 
-def wrap_icon(icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject) -> FileInfo | CustomEmoji | Emoji:
+def wrap_icon(
+    icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject,
+) -> NotionFile | ExternalFile | CustomEmoji | Emoji:
     """Wrap the icon object into the corresponding class."""
     match icon_obj:
         case objs.ExternalFile():
-            return FileInfo.wrap_obj_ref(icon_obj)
+            return ExternalFile.wrap_obj_ref(icon_obj)
+        case objs.HostedFile():
+            return NotionFile.wrap_obj_ref(icon_obj)
         case objs.EmojiObject():
             return Emoji.wrap_obj_ref(icon_obj)
         case objs.CustomEmojiObject():
@@ -587,7 +591,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Cal
         text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
-        icon: FileInfo | Emoji | CustomEmoji | None = None,
+        icon: AnyFile | Emoji | CustomEmoji | None = None,
     ) -> None:
         super().__init__(text, color=color)
         if icon is not None:
@@ -599,14 +603,14 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Cal
         return Emoji('💡')
 
     @property
-    def icon(self) -> FileInfo | Emoji | CustomEmoji:
+    def icon(self) -> AnyFile | Emoji | CustomEmoji:
         if isinstance(icon := self.obj_ref.value.icon, UnsetType):
             return self.get_default_icon()
         else:
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: FileInfo | Emoji | CustomEmoji | None) -> None:
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji | None) -> None:
         if icon is None:
             icon = self.get_default_icon()
         self.obj_ref.value.icon = icon.obj_ref
@@ -618,7 +622,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Cal
                 return f'{self.icon} {super().to_markdown()}\n'
             case CustomEmoji():
                 return f':{self.icon.name}: {super().to_markdown()}\n'
-            case FileInfo():
+            case AnyFile():
                 return f'![icon]({self.icon.url}) {super().to_markdown()}\n'
             case _:
                 msg = f'Invalid icon type {type(self.icon)}'
@@ -828,20 +832,21 @@ class FileBaseBlock(CaptionMixin[FT], ABC, wraps=obj_blocks.FileBase):
 
     def __init__(
         self,
-        url: str,
+        file: AnyFile,
         *,
         caption: str | None = None,
         name: str | None = None,
     ) -> None:
         super().__init__()
-        file_info = FileInfo(url=url, name=name, caption=caption)
-        self.obj_ref.value = file_info.obj_ref
+        file.name = name if name is not None else file.name
+        file.caption = caption if caption is not None else file.caption
+        self.obj_ref.value = file.obj_ref
 
     @property
-    def file_info(self) -> FileInfo:
+    def file_info(self) -> AnyFile:
         """Return the file information of this block as a copy."""
         if isinstance(file_obj := self.obj_ref.value, objs.FileObject):
-            return FileInfo.wrap_obj_ref(file_obj.model_copy(deep=True))
+            return AnyFile.wrap_obj_ref(file_obj.model_copy(deep=True))
         else:
             msg = f'Unknown file type {type(file_obj)}'
             raise ValueError(msg)
@@ -857,19 +862,19 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
 
     !!! note
 
-        Only the caption and name can be modified, the URL is read-only.
+        Only the caption and name can be modified, the file object is read-only.
         Note that only the file name not the file suffix can be modified,
         the suffix is determined initially by the url.
     """
 
     def __init__(
         self,
-        name: str,
-        url: str,
+        file: AnyFile,
         *,
+        name: str | None = None,
         caption: str | None = None,
     ) -> None:
-        super().__init__(url, caption=caption, name=name)
+        super().__init__(file, caption=caption, name=name)
 
     @property
     def name(self) -> str:

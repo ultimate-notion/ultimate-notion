@@ -326,23 +326,6 @@ class WorkSpaceLimits(GenericObject):
     max_file_upload_size_in_bytes: int | None = None
 
 
-class BotTypeData(GenericObject):
-    """Type data for a `Bot`."""
-
-    owner: WorkspaceRef | None = None
-    workspace_name: str | None = None
-    workspace_limits: WorkSpaceLimits = Field(default_factory=WorkSpaceLimits)
-
-
-class Bot(User[BotTypeData], type='bot'):
-    """Represents a Bot in Notion."""
-
-    # Even if stated otherwise in the docs, `bot` type data is optional and for instance
-    # not present when a new page is created by a bot within a database with a `CreatedBy` Property.
-    # For ease of use, we include a default instance of the bot type data.
-    bot: BotTypeData = Field(default_factory=BotTypeData)
-
-
 class UnknownUserTypeData(GenericObject):
     """Type data for an `UnknownUser`."""
 
@@ -471,6 +454,23 @@ class MentionUser(MentionBase, type='user'):
             annotations=Unset if style is None else deepcopy(style),
             mention=mention,
         )
+
+
+class BotTypeData(GenericObject):
+    """Type data for a `Bot`."""
+
+    owner: WorkspaceRef | MentionUser | None = None
+    workspace_name: str | None = None
+    workspace_limits: WorkSpaceLimits = Field(default_factory=WorkSpaceLimits)
+
+
+class Bot(User[BotTypeData], type='bot'):
+    """Represents a Bot in Notion."""
+
+    # Even if stated otherwise in the docs, `bot` type data is optional and for instance
+    # not present when a new page is created by a bot within a database with a `CreatedBy` Property.
+    # For ease of use, we include a default instance of the bot type data.
+    bot: BotTypeData = Field(default_factory=BotTypeData)
 
 
 class MentionPage(MentionBase, type='page'):
@@ -611,9 +611,9 @@ class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
 class FileObject(TypedObject[GO_co], polymorphic_base=True):
     """A Notion file object.
 
-    Depending on the context, a FileObject may require a name (such as in the `Files` property) or may have a caption.
-    This makes the object hierarchy difficult, so here we simply allow `name` and `caption` to be optional. It is the
-    responsibility of the caller to set `name` if required by the API.
+    Depending on the context, a FileObject may require a name (such as in the `Files` property) or may have a caption,
+    for instance when used within a File block, which makes the object hierarchy complex. Thus, we simply allow `name`
+    and `caption` to be optional. It is the responsibility of the caller to set `name` if required by the API.
     """
 
     name: str | None = None

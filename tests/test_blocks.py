@@ -177,14 +177,16 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 def test_create_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating file blocks')
     children: list[uno.Block] = [
-        uno.File('robots.txt', 'https://www.google.de/robots.txt'),
-        uno.File('robots.txt', 'https://www.google.de/robots.txt', caption='Google Robots'),
-        uno.Image('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'),
-        uno.Image('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg', caption='Path on meadow'),
-        uno.Video('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
-        uno.Video('https://www.youtube.com/watch?v=dQw4w9WgXcQ', caption='Rick Roll'),
-        uno.PDF('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf'),
-        uno.PDF('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf', caption='Dummy PDF'),
+        uno.File(uno.url('https://www.google.de/robots.txt'), name='robots.txt'),
+        uno.File(uno.url('https://www.google.de/robots.txt', name='robots.txt'), caption='Google Robots'),
+        uno.Image(uno.url('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg')),
+        uno.Image(
+            uno.url('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'), caption='Path on meadow'
+        ),
+        uno.Video(uno.url('https://www.youtube.com/watch?v=dQw4w9WgXcQ')),
+        uno.Video(uno.url('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), caption='Rick Roll'),
+        uno.PDF(uno.url('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf')),
+        uno.PDF(uno.url('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf'), caption='Dummy PDF'),
     ]
     page.append(children)
     output = page.to_markdown()
@@ -421,12 +423,17 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying file blocks')
     children: list[uno.Block] = [
-        file := uno.File('robots.txt', 'https://www.google.de/robots.txt'),
-        image := uno.Image(
-            'https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg', caption='Path on meadow'
+        file := uno.File(
+            uno.url(
+                'https://www.google.de/robots.txt',
+                name='robots.txt',
+            )
         ),
-        video := uno.Video('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
-        pdf := uno.PDF('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf'),
+        image := uno.Image(
+            uno.url('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'), caption='Path on meadow'
+        ),
+        video := uno.Video(uno.url('https://www.youtube.com/watch?v=dQw4w9WgXcQ')),
+        pdf := uno.PDF(uno.url('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf')),
     ]
     page.append(children)
 

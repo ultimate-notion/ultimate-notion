@@ -15,7 +15,7 @@ from typing_extensions import Self, TypeVar
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
 from ultimate_notion.core import Wrapper, get_active_session, get_repr, raise_unset
-from ultimate_notion.file import FileInfo
+from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
 from ultimate_notion.obj_api.objects import DateRange, DateTimeOrRange
 from ultimate_notion.option import Option
@@ -232,15 +232,15 @@ class Phone(PropertyValue[obj_props.PhoneNumber], wraps=obj_props.PhoneNumber):
 class Files(PropertyValue[obj_props.Files], wraps=obj_props.Files):
     """Files property value."""
 
-    def __init__(self, files: FileInfo | Sequence[FileInfo]):
+    def __init__(self, files: AnyFile | Sequence[AnyFile]):
         if not isinstance(files, Sequence):
             files = [files]
 
         super().__init__(files)
 
     @property
-    def value(self) -> list[FileInfo]:
-        return [FileInfo.wrap_obj_ref(file) for file in self.obj_ref.files]
+    def value(self) -> list[AnyFile]:
+        return [AnyFile.wrap_obj_ref(file) for file in self.obj_ref.files]
 
 
 class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):

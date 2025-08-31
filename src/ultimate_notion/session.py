@@ -17,7 +17,7 @@ from ultimate_notion.blocks import Block, DataObject, traverse_blocks
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
-from ultimate_notion.file import MAX_FILE_SIZE, FileInfo, get_file_size, get_mime_type
+from ultimate_notion.file import MAX_FILE_SIZE, UploadedFile, get_file_size, get_mime_type
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
@@ -366,7 +366,7 @@ class Session:
 
     # ToDo: Rather add here the workspace info as this seems to be available only on the own bot.
 
-    def upload(self, file: BinaryIO, *, name: str | None = None) -> FileInfo:
+    def upload(self, file: BinaryIO, *, name: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
         filename = name if name else getattr(file, 'name', 'unknown_file')
         file_size = get_file_size(file)
@@ -375,7 +375,7 @@ class Session:
         _logger.info(
             f'Uploading file `{filename}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'
         )
-        n_parts = (file_size // MAX_FILE_SIZE) + 1
+        n_parts = -(-file_size // MAX_FILE_SIZE)  # ceiling division
         file_upload = self.api.uploads.create(
             name=filename, n_parts=None if n_parts == 1 else n_parts, mode=mode, content_type=mime_type
         )
@@ -388,4 +388,5 @@ class Session:
                 chunk = file.read(MAX_FILE_SIZE)
                 self.api.uploads.send(file_upload=file_upload, part=part, file=chunk)
             self.api.uploads.complete(file_upload=file_upload)
-        return FileInfo.from_file_upload(file_upload)
+
+        return UploadedFile.from_file_upload(file_upload)
