@@ -944,6 +944,10 @@ class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
         Only the caption can be modified, the URL is read-only.
     """
 
+    def __init__(self, file: AnyFile, *, caption: str | None = None) -> None:
+        file.name = None  # PDF files cannot have a name
+        super().__init__(file, caption=caption)
+
     def to_markdown(self) -> str:
         """Return the PDF as Markdown."""
         name = self.url.rsplit('/').pop()
