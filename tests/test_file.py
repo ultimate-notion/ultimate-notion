@@ -45,3 +45,24 @@ def test_import_url(root_page: uno.Page, notion: uno.Session) -> None:
     assert uploaded_file.status == uno.FileUploadStatus.UPLOADED
     assert uploaded_file.content_type == 'application/mp4'
     assert uploaded_file.content_length >= 20_000_000  # type: ignore[operator]
+
+
+@pytest.mark.file_upload
+def test_list_uploads(notion: uno.Session) -> None:
+    before_uploads = notion.list_uploads()
+    assert isinstance(before_uploads, list)
+
+    with open('docs/assets/images/favicon.png', 'rb') as file:
+        notion.upload(file=file)
+
+    after_uploads = notion.list_uploads()
+    assert len(after_uploads) == len(before_uploads) + 1
+
+    url = 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_20MB.mp4'
+    uploaded_file = notion.import_url(url=url, file_name='bunny_movie.mp4', block=False)
+    uploads = notion.list_uploads(filter=uno.FileUploadStatus.PENDING)
+    assert len([upload for upload in uploads if upload == uploaded_file]) == 1
+
+    uploaded_file.wait_until_uploaded()
+    uploads = notion.list_uploads(filter=uno.FileUploadStatus.UPLOADED)
+    assert len([upload for upload in uploads if upload == uploaded_file]) == 1

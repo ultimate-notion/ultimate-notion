@@ -379,26 +379,31 @@ class Session:
             f'Uploading file `{file_name}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'
         )
         n_parts = -(-file_size // MAX_FILE_SIZE)  # ceiling division
-        file_upload = self.api.uploads.create(
+        file_upload_obj = self.api.uploads.create(
             name=file_name, n_parts=None if n_parts == 1 else n_parts, mode=mode, content_type=mime_type
         )
 
         if mode == FileUploadMode.SINGLE_PART:
-            self.api.uploads.send(file_upload=file_upload, file=file)
+            self.api.uploads.send(file_upload=file_upload_obj, file=file)
         else:
             for part in range(1, n_parts + 1):
                 _logger.info(f'Uploading part {part}/{n_parts} of file `{file_name}`.')
                 chunk = file.read(MAX_FILE_SIZE)
-                self.api.uploads.send(file_upload=file_upload, part=part, file=io.BytesIO(chunk))
-            self.api.uploads.complete(file_upload=file_upload)
+                self.api.uploads.send(file_upload=file_upload_obj, part=part, file=io.BytesIO(chunk))
+            self.api.uploads.complete(file_upload=file_upload_obj)
 
-        return UploadedFile.from_file_upload(file_upload)
+        return UploadedFile.from_file_upload(file_upload_obj)
 
-    def import_url(self, url: str, file_name: str, *, block: bool = True, poll_interval: float = 1.0) -> UploadedFile:
+    def import_url(self, url: str, file_name: str, *, block: bool = True) -> UploadedFile:
         """Import a file from a URL."""
         _logger.info(f'Importing file from URL `{url}`.')
-        file_upload = self.api.uploads.create(name=file_name, mode=FileUploadMode.EXTERNAL_URL, external_url=url)
-        while block and file_upload.status != FileUploadStatus.UPLOADED:
-            time.sleep(poll_interval)
-            file_upload = self.api.uploads.retrieve(file_upload.id)
-        return UploadedFile.from_file_upload(file_upload)
+        file_upload_obj = self.api.uploads.create(name=file_name, mode=FileUploadMode.EXTERNAL_URL, external_url=url)
+        file_upload = UploadedFile.from_file_upload(file_upload_obj)
+        if block:
+            file_upload.wait_until_uploaded()
+        return file_upload
+
+    def list_uploads(self, filter: FileUploadStatus | None = None) -> list[UploadedFile]:  # noqa: A002
+        """List all uploaded files and optionally filter by status."""
+        _logger.info('Listing all uploaded files.')
+        return [UploadedFile.from_file_upload(upload) for upload in self.api.uploads.list(status=filter)]

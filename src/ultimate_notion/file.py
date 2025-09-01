@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import time
 from abc import ABC, abstractmethod
 from typing import BinaryIO, cast
 from urllib.parse import urlparse
@@ -12,7 +13,7 @@ import filetype
 import pendulum as pnd
 from typing_extensions import Self, TypeVar
 
-from ultimate_notion.core import Wrapper, get_repr
+from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import FileUploadStatus
@@ -37,9 +38,6 @@ class AnyFile(Wrapper[FO_co], ABC, wraps=objs.FileObject):
 
     def __hash__(self) -> int:
         return hash(str(self))
-
-    def __repr__(self) -> str:
-        return get_repr(self)
 
     @abstractmethod
     def __str__(self) -> str: ...
@@ -75,6 +73,9 @@ class NotionFile(AnyFile[objs.HostedFile], wraps=objs.HostedFile):
     def __str__(self) -> str:
         return f'NotionFile({self.url})'
 
+    def __repr__(self) -> str:
+        return get_repr(self, desc=f'url={self.url}')
+
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by JupyterLab automatically to display this file."""
         return html_img(self.url, size=2)
@@ -93,6 +94,9 @@ class ExternalFile(AnyFile[objs.ExternalFile], wraps=objs.ExternalFile):
 
     def __str__(self) -> str:
         return f'ExternalFile({self.url})'
+
+    def __repr__(self) -> str:
+        return get_repr(self, desc=f'url={self.url}')
 
     def _repr_html_(self) -> str:  # noqa: PLW3201
         """Called by JupyterLab automatically to display this file."""
@@ -114,11 +118,20 @@ class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
         read again from the API.
     """
 
+    poll_interval: float = 1.0
     obj_file_upload: objs.FileUpload
 
     def __str__(self) -> str:
         return f'UploadedFile({self.id})'
 
+    def __repr__(self) -> str:
+        return get_repr(self, desc=f'id={self.id}')
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by JupyterLab automatically to display this file."""
+        return html_img(str(self.id), size=2)
+
+    @property
     def id(self) -> UUID:
         """Return the ID of the uploaded file."""
         return raise_unset(self.obj_file_upload.id)
@@ -165,6 +178,19 @@ class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
         if result := self.obj_file_upload.file_import_result:
             return result
         return None
+
+    def update_status(self) -> Self:
+        """Update the uploaded file information."""
+        session = get_active_session()
+        self.obj_file_upload = session.api.uploads.retrieve(self.id)
+        return self
+
+    def wait_until_uploaded(self) -> Self:
+        """Wait until the uploaded file is fully processed."""
+        while self.status != FileUploadStatus.UPLOADED:
+            time.sleep(self.poll_interval)
+            self.update_status()
+        return self
 
 
 def is_notion_hosted(url: str) -> bool:

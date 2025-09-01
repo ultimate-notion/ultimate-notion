@@ -555,9 +555,8 @@ class UploadsEndpoint(Endpoint):
     def send(self, file_upload: FileUpload, file: BinaryIO, part: int | None = None) -> None:
         """Send a file upload and update the file_upload object."""
         _logger.debug(f'Sending file upload with id `{file_upload.id}`.')
-        kwargs = {
-            k: v for k, v in (('file', file), ('part_number', part)) if v is not None
-        }  # Notion API doesn't like nulls
+        # Notion API doesn't like nulls, so we eliminate them
+        kwargs = {k: v for k, v in (('file', file), ('part_number', part)) if v is not None}
         data = cast(dict[str, Any], self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
         file_upload.update(**data)
 
@@ -579,4 +578,11 @@ class UploadsEndpoint(Endpoint):
     def list(self, status: FileUploadStatus | None = None, page_size: int = 100) -> Iterator[FileUpload]:
         """Return all file uploads."""
         file_upload_iter = EndpointIterator[FileUpload](endpoint=self.raw_api.list)
-        return file_upload_iter(status=status, page_size=page_size)
+        kwargs: dict[str, Any] = {'page_size': page_size}
+        if status is not None:
+            kwargs['status'] = status.value
+            suffix = f' filtering by status {status.value}'
+        else:
+            suffix = '.'
+        _logger.debug(f'Listing all file uploads{suffix}')
+        return file_upload_iter(**kwargs)

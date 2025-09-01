@@ -11,7 +11,7 @@ from pydantic.functional_validators import BeforeValidator
 
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
-from ultimate_notion.obj_api.objects import Comment, User
+from ultimate_notion.obj_api.objects import Comment, FileUpload, User
 from ultimate_notion.obj_api.props import PropertyItem
 
 MAX_PAGE_SIZE = 100
@@ -19,7 +19,9 @@ MAX_PAGE_SIZE = 100
 _logger = logging.getLogger(__name__)
 
 
-def convert_to_notion_obj(data: dict[str, Any]) -> Block | Page | Database | PropertyItem | User | GenericObject:
+def convert_to_notion_obj(
+    data: dict[str, Any],
+) -> Block | Page | Database | PropertyItem | User | GenericObject | FileUpload:
     """Convert a dictionary to the corresponding subtype of Notion Object.
 
     Used in the ObjectList below the convert the results from the Notion API.
@@ -30,7 +32,7 @@ def convert_to_notion_obj(data: dict[str, Any]) -> Block | Page | Database | Pro
         msg = 'Unknown object in results'
         raise ValueError(msg)
 
-    models: tuple[type[NotionObject], ...] = (Block, Page, Database, PropertyItem, User, Comment)
+    models: tuple[type[NotionObject], ...] = (Block, Page, Database, PropertyItem, User, Comment, FileUpload)
     model_mapping = {model.model_fields[obj_field].default: model for model in models}
     model_class = model_mapping.get(data[obj_field], GenericObject)
     return model_class.model_validate(data)
@@ -93,6 +95,14 @@ class PropertyItemList(ObjectList, type='property_item'):
         next_url: str | None  # not clear what this is for
 
     property_item: TypeData
+
+
+class FileUploadList(ObjectList, type='file_upload'):
+    """A list of FileUpload objects returned by the Notion API."""
+
+    class TypeData(GenericObject): ...
+
+    file_upload: TypeData
 
 
 T = TypeVar('T', bound=NotionObject)

@@ -55,6 +55,8 @@ icon, last edited by/time, etc., are called *page attributes*.
 ## Files
 
 - [x] upload files to Notion
+- [x] import external files by URL to Notion
+- [x] list all uploads
 
 ## Users
 
