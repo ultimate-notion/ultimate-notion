@@ -19,6 +19,7 @@ First Beta release:
 - Fix: Different blocks now have a different hash, equality works as expected, issue #100.
 - Fix: Retrieve a page object even without access access to the parent database, issue #103.
 - Chg: Renamed `FileInfo` to `AnyFile` and have several subtypes like `UploadedFile`, etc.
+- New: Added `file_upload`, `import_url` and `list_uploads` to support the file upload endpoints, issue #71.
 
 ## Version 0.8, 2025-06-23
 
