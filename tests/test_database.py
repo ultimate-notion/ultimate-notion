@@ -149,7 +149,7 @@ def test_description_setter(notion: uno.Session, article_db: uno.Database) -> No
     assert article_db.description is None
 
     new_description = 'My most favorite articles'
-    article_db.description = new_description  # type: ignore
+    article_db.description = new_description
     assert article_db.description == new_description
 
     # clear cache and retrieve the database again to be sure it was udpated on the server side

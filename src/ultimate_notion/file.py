@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import io
 from abc import ABC, abstractmethod
-from typing import BinaryIO
+from typing import BinaryIO, cast
 from urllib.parse import urlparse
+from uuid import UUID
 
 import filetype
 from typing_extensions import Self, TypeVar
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.rich_text import Text, html_img
 
 NOTION_HOSTED_DOMAIN = 'secure.notion-static.com'
@@ -39,10 +41,6 @@ class AnyFile(Wrapper[FO_co], ABC, wraps=objs.FileObject):
     @abstractmethod
     def __str__(self) -> str: ...
 
-    def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by JupyterLab automatically to display this file."""
-        return html_img(self.url, size=2)
-
     @property
     def name(self) -> str | None:
         """Return the name of the file."""
@@ -63,17 +61,6 @@ class AnyFile(Wrapper[FO_co], ABC, wraps=objs.FileObject):
     def caption(self, caption: str | None) -> None:
         self.obj_ref.caption = Text(caption).obj_ref if caption is not None else []
 
-    @property
-    def url(self) -> str | None:
-        """Return the URL of this file."""
-        match self.obj_ref:
-            case objs.HostedFile():
-                return self.obj_ref.file.url
-            case objs.ExternalFile():
-                return self.obj_ref.external.url
-            case _:
-                return None
-
 
 class NotionFile(AnyFile[objs.HostedFile], wraps=objs.HostedFile):
     """Information about a file that is hosted by Notion."""
@@ -85,6 +72,14 @@ class NotionFile(AnyFile[objs.HostedFile], wraps=objs.HostedFile):
     def __str__(self) -> str:
         return f'NotionFile({self.url})'
 
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by JupyterLab automatically to display this file."""
+        return html_img(self.url, size=2)
+
+    @property
+    def url(self) -> str:
+        return self.obj_ref.file.url
+
 
 class ExternalFile(AnyFile[objs.ExternalFile], wraps=objs.ExternalFile):
     """Information about a file that is hosted externally, i.e. not by Notion."""
@@ -95,6 +90,14 @@ class ExternalFile(AnyFile[objs.ExternalFile], wraps=objs.ExternalFile):
 
     def __str__(self) -> str:
         return f'ExternalFile({self.url})'
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by JupyterLab automatically to display this file."""
+        return html_img(self.url, size=2)
+
+    @property
+    def url(self) -> str:
+        return self.obj_ref.external.url
 
 
 class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
@@ -113,9 +116,9 @@ class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
     def __str__(self) -> str:
         return f'UploadedFile({self.id})'
 
-    def id(self) -> str:
+    def id(self) -> UUID:
         """Return the ID of the uploaded file."""
-        return self.obj_file_upload.id
+        return raise_unset(self.obj_file_upload.id)
 
     @classmethod
     def from_file_upload(cls, file_upload: objs.FileUpload) -> Self:
@@ -167,7 +170,7 @@ def get_mime_type(file: BinaryIO) -> str:
 
     kind = filetype.guess(content_sample)
     if kind is not None:
-        return kind.mime
+        return cast(str, kind.mime)
     else:
         # Fallback to application/octet-stream if type cannot be determined
         return 'application/octet-stream'

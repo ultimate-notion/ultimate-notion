@@ -440,7 +440,7 @@ def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     file.name = 'my_robot'
     assert file.caption is None
     new_caption_text = 'My Robot.txt of Google'
-    file.caption = new_caption_text  # type: ignore[assignment]
+    file.caption = new_caption_text
 
     file.reload()
     assert file.name == 'my_robot.txt'
@@ -454,7 +454,7 @@ def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
     assert video.caption is None
     new_caption_text = 'Rick Roll but not really'
-    video.caption = new_caption_text  # type: ignore[assignment]
+    video.caption = new_caption_text
     video.reload()
     assert video.caption == uno.text(new_caption_text)
 

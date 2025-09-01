@@ -196,7 +196,7 @@ class Page(
     @property
     def title(self) -> Text | None:
         """Title of the page."""
-        if (title := self.obj_ref.title) is None:
+        if not (title := self.obj_ref.title):
             return None
         return Text.wrap_obj_ref(title)
 
