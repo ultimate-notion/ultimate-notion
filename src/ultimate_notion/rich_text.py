@@ -281,7 +281,7 @@ def text(
     strikethrough: bool = False,
     code: bool = False,
     underline: bool = False,
-    color: Color = Color.DEFAULT,
+    color: Color | None = None,
     href: str | None = None,
 ) -> Text:
     """Create a rich text Text object from a normal string with formatting.

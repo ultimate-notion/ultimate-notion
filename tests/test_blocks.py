@@ -697,3 +697,12 @@ def test_block_equality_and_hash(root_page: uno.Page, notion: uno.Session) -> No
     assert para1 != para1a  # same content but now different id!
     assert hash(para1) != hash(para2)
     assert hash(para1) != hash(para1a)
+
+
+def test_rt_default_color() -> None:
+    para_1 = uno.Paragraph(text='Hello')
+    para_2 = uno.Paragraph(text='')
+    rich_text = uno.text(text='Hello')
+    para_2.rich_text = rich_text
+
+    assert para_1.obj_ref.serialize_for_api() == para_2.obj_ref.serialize_for_api()
