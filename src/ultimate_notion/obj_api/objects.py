@@ -681,6 +681,33 @@ class UploadedFile(FileObject[UploadedFileTypeData], type='file_upload'):
         return cls.model_construct(file_upload=UploadedFileTypeData(id=id))
 
 
+class FileImportTypeData(GenericObject):
+    """Type data for `FileImportSuccess` and `FileImportError`.
+
+    For ease of use, the parameters of success and error are combined into a single class.
+    """
+
+    type: str | None = None
+    code: str | None = None
+    message: str | None = None
+    parameter: str | None = None
+    status_code: int | None = None
+
+
+class FileImportSuccess(TypedObject[GenericObject], type='success'):
+    """Result of a successful file import operation."""
+
+    imported_time: dt.datetime | None = None
+    success: FileImportTypeData
+
+
+class FileImportError(TypedObject[GenericObject], type='error'):
+    """Result of a failed file import operation."""
+
+    imported_time: dt.datetime | None = None
+    error: FileImportTypeData
+
+
 class FileUpload(NotionObject, object='file_upload'):
     """A Notion file upload object.
 
@@ -704,7 +731,7 @@ class FileUpload(NotionObject, object='file_upload'):
     number_of_parts: NumberOfParts | None = None
     upload_url: str | None = None
     complete_url: str | None = None
-    file_import_result: str | None = None
+    file_import_result: FileImportSuccess | FileImportError | None = None
     archived: bool  # undocumented but sent by the API
     created_by: User  # undocumented but sent by the API
 

@@ -49,7 +49,16 @@ from ultimate_notion.core import Workspace, WorkspaceType, get_active_session
 from ultimate_notion.database import Database
 from ultimate_notion.emoji import Emoji
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, url
-from ultimate_notion.obj_api.enums import AggFunc, BGColor, CodeLang, Color, NumberFormat, OptionGroupType, VState
+from ultimate_notion.obj_api.enums import (
+    AggFunc,
+    BGColor,
+    CodeLang,
+    Color,
+    FileUploadStatus,
+    NumberFormat,
+    OptionGroupType,
+    VState,
+)
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.page import Page
 from ultimate_notion.query import Condition, prop
@@ -83,6 +92,7 @@ __all__ = [
     'Equation',
     'ExternalFile',
     'File',
+    'FileUploadStatus',
     'Heading1',
     'Heading2',
     'Heading3',
