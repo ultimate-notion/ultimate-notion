@@ -240,7 +240,7 @@ class SchemaType(ABCMeta):
 
         cls = super().__new__(metacls, name, bases, dict(namespace), **kwargs)
         for prop in props:
-            prop._owner = cls
+            prop._owner = cast(type[Schema], cls)
 
         return cls
 

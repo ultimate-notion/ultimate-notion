@@ -603,7 +603,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Cal
         return Emoji('💡')
 
     @property
-    def icon(self) -> AnyFile | Emoji | CustomEmoji:
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
         if isinstance(icon := self.obj_ref.value.icon, UnsetType):
             return self.get_default_icon()
         else:
@@ -854,7 +854,11 @@ class FileBaseBlock(CaptionMixin[FT], ABC, wraps=obj_blocks.FileBase):
     @property
     def url(self) -> str:
         """Return the URL of the file."""
-        return self.file_info.url
+        if isinstance(file_info := self.file_info, NotionFile | ExternalFile):
+            return file_info.url
+        else:
+            msg = f'File type {type(file_info)} has no URL.'
+            raise ValueError(msg)
 
 
 class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
@@ -903,8 +907,8 @@ class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
         Only the caption can be modified, the URL is read-only.
     """
 
-    def __init__(self, url: str, *, caption: str | None = None) -> None:
-        super().__init__(url, caption=caption)
+    def __init__(self, file: AnyFile, *, caption: str | None = None) -> None:
+        super().__init__(file, caption=caption)
 
     def to_markdown(self) -> str:
         """Return the image as Markdown."""

@@ -687,6 +687,7 @@ class FileUpload(NotionObject, object='file_upload'):
     This object is used to handle the process of uploading a file to Notion.
     """
 
+    id: UUID
     created_time: dt.datetime
     last_edited_time: dt.datetime
     expiry_time: dt.datetime | None = None

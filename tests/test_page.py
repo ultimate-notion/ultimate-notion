@@ -76,7 +76,7 @@ def test_icon_attr(notion: uno.Session, root_page: uno.Page) -> None:
 
     assert new_page.icon is None
     emoji_icon = '🐍'
-    new_page.icon = emoji_icon  # type: ignore[assignment] # test automatic conversation
+    new_page.icon = emoji_icon  # test automatic conversation
     assert isinstance(new_page.icon, uno.Emoji)
     assert new_page.icon == emoji_icon
 
@@ -124,10 +124,10 @@ def test_cover_attr(notion: uno.Session, root_page: uno.Page) -> None:
 def test_title_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.create_page(parent=root_page)
 
-    assert new_page.title == ''
+    assert new_page.title is None
 
     title = 'My new title'
-    new_page.title = title  # type: ignore[assignment] # test automatic conversation
+    new_page.title = title  # test automatic conversation
     assert new_page.title == title
 
     new_page.title = uno.text(title)
@@ -138,11 +138,11 @@ def test_title_attr(notion: uno.Session, root_page: uno.Page) -> None:
 
     new_page.title = None
     new_page.reload()
-    assert new_page.title == ''
+    assert new_page.title is None
 
-    new_page.title = ''  # type: ignore[assignment]
+    new_page.title = ''
     new_page.reload()
-    assert new_page.title == ''
+    assert new_page.title is None
 
 
 @pytest.mark.vcr()
@@ -352,7 +352,7 @@ def test_option_page_props(notion: uno.Session, root_page: uno.Page) -> None:
     page1.props.status = s_options['Blocked']
     assert page1.props.status.name == 'Blocked'
     page1.props.status = 'Closed'
-    assert page1.props.status.name == 'Closed'  # type: ignore[attr-defined]
+    assert page1.props.status.name == 'Closed'
 
     assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]
     page2.props.multi_status = [ms_options['Option 1']]

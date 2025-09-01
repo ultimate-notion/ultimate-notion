@@ -46,7 +46,7 @@ def md_spans(rich_texts: Sequence[RichTextBase]) -> NDArray[np.int_]:
                     continue
                 href = rich_text.obj_ref.href
                 if href is not None:
-                    prev_href = prev_rich_text.obj_ref.href if prev_rich_text is not None else None  # type: ignore
+                    prev_href = prev_rich_text.obj_ref.href if prev_rich_text is not None else None
                     if href == prev_href:  # continue current link span or start new one
                         spans[i, j] = spans[i, j - 1] + 1
                     else:

@@ -264,7 +264,7 @@ class DatabasesEndpoint(Endpoint):
             # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
             # Typing in notion_client sucks, thus we cast
             data = cast(dict[str, Any], self.raw_api.update(str(db.id), **request))
-            db = db.update(**data)
+            db.update(**data)
 
     def delete(self, db: Database) -> Database:
         """Delete (archive) the specified Database."""
@@ -555,23 +555,22 @@ class UploadsEndpoint(Endpoint):
     def send(self, file_upload: FileUpload, file: BinaryIO, part: int | None = None) -> None:
         """Send a file upload and update the file_upload object."""
         _logger.debug(f'Sending file upload with id `{file_upload.id}`.')
-        kwargs = {'file_upload_id': file_upload.id, 'file': file, 'part': part}
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # Notion API doesn't like nulls
-        data = self.raw_api.send(**kwargs)
+        kwargs = {k: v for k, v in (('file', file), ('part', part)) if v is not None}  # Notion API doesn't like nulls
+        data = cast(dict[str, Any], self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/complete-a-file-upload
     def complete(self, file_upload: FileUpload) -> None:
         """Complete the file upload and update the file_upload object."""
         _logger.debug(f'Completing file upload with id `{file_upload.id}`.')
-        data = self.raw_api.complete(file_upload_id=file_upload.id)
+        data = cast(dict[str, Any], self.raw_api.complete(file_upload_id=str(file_upload.id)))
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/retrieve-a-file-upload
     def retrieve(self, upload_id: UUID | str) -> FileUpload:
         """Return the FileUpload with the given ID."""
         _logger.debug(f'Retrieving file upload with id `{upload_id}`.')
-        data = self.raw_api.retrieve(uuid=str(upload_id))
+        data = self.raw_api.retrieve(file_upload_id=str(upload_id))
         return FileUpload.model_validate(data)
 
     # https://developers.notion.com/reference/list-file-uploads
