@@ -541,9 +541,9 @@ class UploadsEndpoint(Endpoint):
         """Create a file upload."""
         _logger.debug(f'Creating a file upload with mode `{mode}`.')
         kwargs = {
-            'file_name': name,
+            'filename': name,
             'number_of_parts': n_parts,
-            'mode': mode,
+            'mode': mode.value,
             'external_url': external_url,
             'content_type': content_type,
         }
@@ -555,7 +555,9 @@ class UploadsEndpoint(Endpoint):
     def send(self, file_upload: FileUpload, file: BinaryIO, part: int | None = None) -> None:
         """Send a file upload and update the file_upload object."""
         _logger.debug(f'Sending file upload with id `{file_upload.id}`.')
-        kwargs = {k: v for k, v in (('file', file), ('part', part)) if v is not None}  # Notion API doesn't like nulls
+        kwargs = {
+            k: v for k, v in (('file', file), ('part_number', part)) if v is not None
+        }  # Notion API doesn't like nulls
         data = cast(dict[str, Any], self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
         file_upload.update(**data)
 

@@ -687,6 +687,12 @@ class FileUpload(NotionObject, object='file_upload'):
     This object is used to handle the process of uploading a file to Notion.
     """
 
+    class NumberOfParts(GenericObject):
+        """Number of parts for the file upload."""
+
+        total: int
+        sent: int
+
     id: UUID
     created_time: dt.datetime
     last_edited_time: dt.datetime
@@ -695,6 +701,7 @@ class FileUpload(NotionObject, object='file_upload'):
     filename: str | None = None
     content_type: str | None = None
     content_length: int | None = None
+    number_of_parts: NumberOfParts | None = None
     upload_url: str | None = None
     complete_url: str | None = None
     file_import_result: str | None = None

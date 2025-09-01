@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import logging
+import os
 import time
 from threading import RLock
 from types import TracebackType
@@ -367,9 +368,12 @@ class Session:
 
     def upload(self, file: BinaryIO, *, name: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
-        filename = name if name else getattr(file, 'name', 'unknown_file')
+        filename = name if name is not None else os.path.basename(getattr(file, 'name', 'unknown_file'))
         file_size = get_file_size(file)
         mime_type = get_mime_type(file)
+        if mime_type == 'application/octet-stream':
+            _logger.warning(f'File `{filename}` has unknown MIME type, falling back to text/plain.')
+            mime_type = 'text/plain'  # Notion does not support application/octet-stream
         mode = FileUploadMode.SINGLE_PART if file_size <= MAX_FILE_SIZE else FileUploadMode.MULTI_PART
         _logger.info(
             f'Uploading file `{filename}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'
