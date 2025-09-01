@@ -17,7 +17,8 @@ from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.rich_text import Text, html_img
 
 NOTION_HOSTED_DOMAIN = 'secure.notion-static.com'
-MAX_FILE_SIZE = 20_000_000  # 20MB in bytes
+MAX_FILE_SIZE = 20_000_000
+"""Maximum file size for single part upload. It's 5MB only for the free plan"""
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -172,7 +173,6 @@ def get_mime_type(file: BinaryIO) -> str:
     if kind is not None:
         return cast(str, kind.mime)
     else:
-        # Fallback to application/octet-stream if type cannot be determined
         return 'application/octet-stream'
 
 

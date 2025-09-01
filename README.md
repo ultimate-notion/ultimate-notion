@@ -9,7 +9,7 @@ Ultimate Notion is the ultimate Python client for [Notion]!
 
 |         |                                    |
 |---------|------------------------------------|
-| CI/CD   | [![Tests][Tests-image]][Tests-link] [![Coverage][Coverage-image]][Coverage-link] [![Publish Package][Publish-image]][Publish-link] [![Build Docs][Docs-image]][Docs-link] |
+| CI/CD   | [![Tests][Tests-image]][Tests-link] [![Coverage][Coverage-image]][Coverage-link] [![Publish Package][Publish-image]][Publish-link] [![Build Docs][Docs-image]][Docs-link] [![EffVer Versioning][EffVer-image]][EffVer-link] |
 | Package | [![PyPI - Version][PyPI_ver-image]][PyPI_ver-link] [![PyPI - Downloads][PyPI_down-image]][PyPI_down-link] [![PyPI - Python Version][PyPI_py-image]][PyPI_py-link] [![GitHub Sponsors][sponsor-image]][sponsor-link] |
 | Details | [![Hatch project][hatch-image]][hatch-link] [![Linting - Ruff][ruff-image]][ruff-link] [![Pre-Commit][precommit-image]][precommit-link] [![test - pytest][pytest-image]][pytest-link] [![Types - Mypy][mypy-image]][mypy-link] [![License - MIT][MIT-image]][MIT-link] [![Docs - mkdocs][mkdocs-image]][mkdocs-link] |
 
@@ -134,6 +134,8 @@ Documentation is created using [Material for MkDocs] and hosted on [GitHub Pages
 [Coverage-link]: https://coveralls.io/r/ultimate-notion/ultimate-notion
 [Publish-image]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/publish-pkg.yml/badge.svg
 [Publish-link]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/publish-pkg.yml
+[EffVer-image]: https://img.shields.io/badge/Versioning-EffVer-0097a7
+[EffVer-link]: https://jacobtomlinson.dev/effver
 [Docs-image]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/build-dev-docs.yml/badge.svg
 [Docs-link]: https://github.com/ultimate-notion/ultimate-notion/actions/workflows/build-dev-docs.yml
 [PyPI_ver-image]: https://img.shields.io/pypi/v/ultimate-notion.svg?logo=pypi&label=PyPI&logoColor=gold
