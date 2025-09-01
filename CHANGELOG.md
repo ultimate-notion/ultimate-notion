@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.9
+## Version 0.9, 2025-09-01
 
 First Beta release:
 
