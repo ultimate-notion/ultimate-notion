@@ -36,3 +36,8 @@ def test_page_introduction() -> None:
 @pytest.mark.skipif(sys.platform == 'win32', reason=WIN_SKIP_REASON)
 def test_page_advanced() -> None:
     check_md_file(fpath='docs/usage/page_advanced.md', memory=True)
+
+
+@pytest.mark.file_upload()
+def test_file_upload() -> None:
+    check_md_file(fpath='docs/usage/file_upload.md', memory=True)
