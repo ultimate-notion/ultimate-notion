@@ -25,7 +25,7 @@ from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
-from ultimate_notion.obj_api.enums import FileUploadMode
+from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.obj_api.objects import get_uuid
 from ultimate_notion.page import Page
@@ -366,30 +366,39 @@ class Session:
         else:
             return cast(User, self.cache[self._own_bot_id])
 
-    def upload(self, file: BinaryIO, *, name: str | None = None) -> UploadedFile:
+    def upload(self, file: BinaryIO, *, file_name: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
-        filename = name if name is not None else os.path.basename(getattr(file, 'name', 'unknown_file'))
+        file_name = file_name if file_name is not None else os.path.basename(getattr(file, 'name', 'unknown_file'))
         file_size = get_file_size(file)
         mime_type = get_mime_type(file)
         if mime_type == 'application/octet-stream':
-            _logger.warning(f'File `{filename}` has unknown MIME type, falling back to text/plain.')
+            _logger.warning(f'File `{file_name}` has unknown MIME type, falling back to text/plain.')
             mime_type = 'text/plain'  # Notion does not support application/octet-stream
         mode = FileUploadMode.SINGLE_PART if file_size <= MAX_FILE_SIZE else FileUploadMode.MULTI_PART
         _logger.info(
-            f'Uploading file `{filename}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'
+            f'Uploading file `{file_name}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'
         )
         n_parts = -(-file_size // MAX_FILE_SIZE)  # ceiling division
         file_upload = self.api.uploads.create(
-            name=filename, n_parts=None if n_parts == 1 else n_parts, mode=mode, content_type=mime_type
+            name=file_name, n_parts=None if n_parts == 1 else n_parts, mode=mode, content_type=mime_type
         )
 
         if mode == FileUploadMode.SINGLE_PART:
             self.api.uploads.send(file_upload=file_upload, file=file)
         else:
             for part in range(1, n_parts + 1):
-                _logger.info(f'Uploading part {part}/{n_parts} of file `{filename}`.')
+                _logger.info(f'Uploading part {part}/{n_parts} of file `{file_name}`.')
                 chunk = file.read(MAX_FILE_SIZE)
                 self.api.uploads.send(file_upload=file_upload, part=part, file=io.BytesIO(chunk))
             self.api.uploads.complete(file_upload=file_upload)
 
+        return UploadedFile.from_file_upload(file_upload)
+
+    def import_url(self, url: str, file_name: str, *, block: bool = True, poll_interval: float = 1.0) -> UploadedFile:
+        """Import a file from a URL."""
+        _logger.info(f'Importing file from URL `{url}`.')
+        file_upload = self.api.uploads.create(name=file_name, mode=FileUploadMode.EXTERNAL_URL, external_url=url)
+        while block and file_upload.status != FileUploadStatus.UPLOADED:
+            time.sleep(poll_interval)
+            file_upload = self.api.uploads.retrieve(file_upload.id)
         return UploadedFile.from_file_upload(file_upload)

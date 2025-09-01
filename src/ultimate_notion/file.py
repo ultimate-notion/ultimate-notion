@@ -9,11 +9,13 @@ from urllib.parse import urlparse
 from uuid import UUID
 
 import filetype
+import pendulum as pnd
 from typing_extensions import Self, TypeVar
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.enums import FileUploadStatus
 from ultimate_notion.rich_text import Text, html_img
 
 NOTION_HOSTED_DOMAIN = 'secure.notion-static.com'
@@ -129,6 +131,40 @@ class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
         self.obj_ref = file_obj
         self.obj_file_upload = file_upload
         return self
+
+    @property
+    def status(self) -> FileUploadStatus:
+        """Return the status of the uploaded file."""
+        return self.obj_file_upload.status
+
+    @property
+    def file_name(self) -> str | None:
+        """Return the file name of the uploaded file."""
+        return self.obj_file_upload.filename
+
+    @property
+    def expiry_time(self) -> pnd.DateTime | None:
+        """Return the expiry time of the uploaded file."""
+        if expire_time := self.obj_file_upload.expiry_time:
+            return pnd.instance(expire_time)
+        return None
+
+    @property
+    def content_type(self) -> str | None:
+        """Return the content type of the uploaded file."""
+        return self.obj_file_upload.content_type
+
+    @property
+    def content_length(self) -> int | None:
+        """Return the content length of the uploaded file."""
+        return self.obj_file_upload.content_length
+
+    @property
+    def file_import_result(self) -> objs.FileImportSuccess | objs.FileImportError | None:
+        """Return the file import result of the uploaded file."""
+        if result := self.obj_file_upload.file_import_result:
+            return result
+        return None
 
 
 def is_notion_hosted(url: str) -> bool:

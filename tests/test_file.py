@@ -12,7 +12,7 @@ def test_file_upload(root_page: uno.Page, notion: uno.Session, tmp_path: Path) -
     with open('docs/assets/images/favicon.png', 'rb') as file:
         file_info = notion.upload(file=file)
 
-    page = notion.create_page(parent=root_page, title='Test Page to check file upload as icon')
+    page = notion.create_page(parent=root_page, title='Test Page to test file uploads')
     page.icon = file_info
 
     # test a large 25mb file
@@ -30,3 +30,18 @@ def test_file_upload(root_page: uno.Page, notion: uno.Session, tmp_path: Path) -
         large_file_info = notion.upload(file=file)
 
     page.append(uno.File(large_file_info, caption='A large 25MB dummy file'))
+
+
+@pytest.mark.file_upload
+def test_import_url(root_page: uno.Page, notion: uno.Session) -> None:
+    url = 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_20MB.mp4'
+    uploaded_file = notion.import_url(url=url, file_name='bunny_movie.mp4')
+    page = notion.create_page(parent=root_page, title='Test Page to import an url as file')
+    page.append(uno.Video(uploaded_file, caption='An imported image from URL'))
+
+    assert uploaded_file.file_name == 'bunny_movie.mp4'
+    assert uploaded_file.file_import_result.type == 'success'  # type: ignore[union-attr]
+    assert uploaded_file.expiry_time is not None
+    assert uploaded_file.status == uno.FileUploadStatus.UPLOADED
+    assert uploaded_file.content_type == 'application/mp4'
+    assert uploaded_file.content_length >= 20_000_000  # type: ignore[operator]
