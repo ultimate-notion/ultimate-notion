@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types:
-      - closed
-    branches:
-      - main
-
   workflow_dispatch:
 
 concurrency:
@@ -22,11 +16,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Only build docs on main branch pushes, PR closures to main, or manual dispatch
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'main') ||
-      github.event_name == 'workflow_dispatch'
 
     steps:
     - uses: actions/checkout@v5
@@ -74,11 +63,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
     - build
-    # Only deploy on main branch pushes or manual workflow dispatch
-    if: |
-      github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      needs.build.result == 'success'
 
     steps:
     - name: Download archive
