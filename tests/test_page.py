@@ -319,6 +319,8 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
 def test_embed_blocks(notion: uno.Session, embed_page: uno.Page) -> None:
     blocks = embed_page.children
     assert len(blocks) >= 4
+    md = embed_page.to_markdown()
+    assert md.strip().split('\n')[-1] == '<kbd>↗️ Linked database (unsupported)</kbd>'
 
 
 @pytest.mark.vcr()
