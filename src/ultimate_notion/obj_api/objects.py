@@ -419,7 +419,7 @@ class EquationObject(RichTextBaseObject, type='equation'):
         )
 
 
-class MentionBase(TypedObject[GenericObject], ABC, polymorphic_base=True):
+class MentionBase(TypedObject[GO_co], ABC, polymorphic_base=True):
     """Base class for typed `Mention` objects.
 
     Note that this class is different to `MentionMixin`, which is used to
@@ -439,7 +439,7 @@ class MentionObject(RichTextBaseObject, type='mention'):
     mention: SerializeAsAny[MentionBase]
 
 
-class MentionUser(MentionBase, type='user'):
+class MentionUser(MentionBase[User], type='user'):
     """Nested user data for `Mention` properties."""
 
     user: SerializeAsAny[User]
@@ -450,6 +450,30 @@ class MentionUser(MentionBase, type='user'):
         # note that `href` is always `None` for user mentions, also we prepend the '@' to mimic server side
         return MentionObject.model_construct(
             plain_text=f'@{user.name}',
+            href=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
+        )
+
+
+class MentionLinkTypeData(GenericObject):
+    """Type data for a `MentionLink`."""
+
+    href: str
+    title: str
+
+
+class MentionLink(MentionBase, type='link_mention'):
+    """Nested url data for `Mention` properties."""
+
+    link_mention: MentionLinkTypeData
+
+    @classmethod
+    def build_mention_from(cls, href: str, title: str, *, style: Annotations | None = None) -> MentionObject:
+        """Build a mention object for this type of mention from the actual target object."""
+        mention = cls.model_construct(link_mention=MentionLinkTypeData(href=href, title=title))
+        return MentionObject.model_construct(
+            plain_text=title,
             href=None,
             annotations=Unset if style is None else deepcopy(style),
             mention=mention,
@@ -473,7 +497,7 @@ class Bot(User[BotTypeData], type='bot'):
     bot: BotTypeData = Field(default_factory=BotTypeData)
 
 
-class MentionPage(MentionBase, type='page'):
+class MentionPage(MentionBase[ObjectRef], type='page'):
     """Nested page data for `Mention` properties."""
 
     page: SerializeAsAny[ObjectRef]
@@ -491,7 +515,7 @@ class MentionPage(MentionBase, type='page'):
         )
 
 
-class MentionDatabase(MentionBase, type='database'):
+class MentionDatabase(MentionBase[ObjectRef], type='database'):
     """Nested database information for `Mention` properties."""
 
     database: SerializeAsAny[ObjectRef]
@@ -510,7 +534,7 @@ class MentionDatabase(MentionBase, type='database'):
         )
 
 
-class MentionDate(MentionBase, type='date'):
+class MentionDate(MentionBase[DateRange], type='date'):
     """Nested date data for `Mention` properties."""
 
     date: DateRange
@@ -527,6 +551,12 @@ class MentionDate(MentionBase, type='date'):
         )
 
 
+class MentionLinkPreviewTypeData(GenericObject):
+    """Type data for a `MentionLinkPreview`."""
+
+    url: str
+
+
 class MentionLinkPreview(MentionBase, type='link_preview'):
     """Nested url data for `Mention` properties.
 
@@ -535,17 +565,25 @@ class MentionLinkPreview(MentionBase, type='link_preview'):
         Link previews cannot be created via the API.
     """
 
-    class TypeData(GenericObject):
-        url: str
+    link_preview: MentionLinkPreviewTypeData
 
-    link_preview: TypeData
+    @classmethod
+    def build_mention_from(cls, url: str, *, style: Annotations | None = None) -> MentionObject:
+        """Build a mention object for this type of mention from the actual target object."""
+        mention = cls.model_construct(link_preview=MentionLinkPreviewTypeData.model_construct(url=url))
+        return MentionObject.model_construct(
+            plain_text=url,
+            href=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
+        )
 
 
 class MentionTemplateData(TypedObject[GenericObject]):
     """Nested template data for `Mention` properties."""
 
 
-class MentionTemplate(MentionBase, type='template_mention'):
+class MentionTemplate(MentionBase[MentionTemplateData], type='template_mention'):
     """Nested template data for `Mention` properties."""
 
     template_mention: SerializeAsAny[MentionTemplateData]
@@ -577,7 +615,15 @@ class EmojiObject(TypedObject[GenericObject], type='emoji'):
         return EmojiObject.model_construct(emoji=emoji)
 
 
-class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
+class CustomEmojiObjectTypeData(GenericObject):
+    """Type data for a `CustomEmojiObject`."""
+
+    id: UUID
+    name: str
+    url: str
+
+
+class CustomEmojiObject(MentionBase[CustomEmojiObjectTypeData], MentionMixin, type='custom_emoji'):
     """A Notion custom emoji object.
 
     Within text a custom emoji is represented as a mention. For this
@@ -585,12 +631,7 @@ class CustomEmojiObject(MentionBase, MentionMixin, type='custom_emoji'):
     itself can be used to build a mention object.
     """
 
-    class TypeData(GenericObject):
-        id: UUID
-        name: str
-        url: str
-
-    custom_emoji: TypeData
+    custom_emoji: CustomEmojiObjectTypeData
 
     @classmethod
     def build_mention_from(cls, custom_emoji: CustomEmojiObject, *, style: Annotations | None = None) -> MentionObject:

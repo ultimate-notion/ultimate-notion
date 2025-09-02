@@ -316,9 +316,9 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
 
 
 @pytest.mark.vcr()
-def test_unfurl_blocks(notion: uno.Session, unfurl_page: uno.Page) -> None:
-    pass
-    # ToDo: Implement test
+def test_embed_blocks(notion: uno.Session, embed_page: uno.Page) -> None:
+    blocks = embed_page.children
+    assert len(blocks) >= 4
 
 
 @pytest.mark.vcr()

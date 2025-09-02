@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.9.1
+
+- Fix: Add missing link mention object, which led to an exception.
+
 ## Version 0.9, 2025-09-01
 
 First Beta release:
