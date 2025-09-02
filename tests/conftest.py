@@ -59,7 +59,7 @@ MD_TEXT_TEST_PAGE = 'Markdown Text Test'
 MD_PAGE_TEST_PAGE = 'Markdown Test'
 MD_SUBPAGE_TEST_PAGE = 'Markdown SubPage Test'
 TASK_DB = 'Task DB'
-UNFURL_TEST_PAGE = 'Embed/Inline & Unfurl'
+EMBED_TEST_PAGE = 'Embed/Inline/Linked & Unfurl'
 COMMENT_PAGE = 'Comments'
 CUSTOM_EMOJI_PAGE = 'Custom Emoji Page'
 FORMULA_DB = 'Formula DB'
@@ -407,9 +407,9 @@ def md_subpage(notion_cached: Session) -> Page:
 
 
 @vcr_fixture(scope='module')
-def unfurl_page(notion_cached: Session) -> Page:
-    """Return a page with embed/inline & unfurl content."""
-    return notion_cached.search_page(UNFURL_TEST_PAGE).item()
+def embed_page(notion_cached: Session) -> Page:
+    """Return a page with embed/inline/linked & unfurl content."""
+    return notion_cached.search_page(EMBED_TEST_PAGE).item()
 
 
 @vcr_fixture(scope='module')
@@ -431,7 +431,7 @@ def static_pages(  # noqa: PLR0917
     md_text_page: Page,
     md_page: Page,
     md_subpage: Page,
-    unfurl_page: Page,
+    embed_page: Page,
     comment_page: Page,
     custom_emoji_page: Page,
 ) -> set[Page]:
@@ -442,7 +442,7 @@ def static_pages(  # noqa: PLR0917
         md_text_page,
         md_page,
         md_subpage,
-        unfurl_page,
+        embed_page,
         comment_page,
         custom_emoji_page,
     }
