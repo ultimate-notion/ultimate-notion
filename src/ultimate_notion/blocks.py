@@ -28,6 +28,7 @@ from collections.abc import Iterator, Sequence
 from typing import TYPE_CHECKING, TypeGuard, cast, overload
 
 import numpy as np
+from notion_client import APIResponseError
 from tabulate import tabulate
 from typing_extensions import Self, TypeVar
 
@@ -164,7 +165,13 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
             if isinstance(child_block, ChildPage):
                 child_blocks[idx] = cast(Block, child_block.page)
             elif isinstance(child_block, ChildDatabase):
-                child_blocks[idx] = cast(Block, child_block.db)
+                try:
+                    ref_block = cast(Block, child_block.db)
+                except APIResponseError:
+                    # linked database that cannot be retrieved via API. Check the docs:
+                    # https://developers.notion.com/reference/retrieve-a-database
+                    ref_block = cast(Block, child_block)
+                child_blocks[idx] = ref_block
 
         return [cast(Block, session.cache.setdefault(block.id, block)) for block in child_blocks]
 
@@ -991,6 +998,11 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
 class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatabase):
     """Child database block.
 
+    This block is used to represent a database if it is a child of e.g. a page.
+    We try to resolve it via the API to get the actual database object. This does not work
+    if it is a `linked database` as mentioned in the Notion API docs:
+    https://developers.notion.com/reference/retrieve-a-database
+
     !!! note
 
         To create a child database block as an end-user, create a new database with the corresponding parent.
@@ -1016,8 +1028,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return the child database as Markdown."""
-        msg = '`ChildDatabase` is only used internally, work with a proper `Database` instead.'
-        raise InvalidAPIUsageError(msg)
+        return '<kbd>↗️ Linked database (unsupported)</kbd>'
 
 
 class Column(Block[obj_blocks.Column], ChildrenMixin[obj_blocks.Column], wraps=obj_blocks.Column):
