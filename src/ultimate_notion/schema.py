@@ -1003,7 +1003,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         which is rather a bug in the Notion API itself.
         """
         two_way_prop_rel = cast(obj_schema.DualPropertyRelation, self.obj_ref.relation)
-        tmp_prop_name = two_way_prop_rel.dual_property.synced_property_name
+        tmp_prop_name = raise_unset(two_way_prop_rel.dual_property.synced_property_name)
         db = self.schema.get_db()
         db.reload()
         if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
@@ -1018,7 +1018,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
                 self._two_way_prop = self._get_owner().get_prop(self._two_way_prop)
             return self._two_way_prop
         elif self._is_init and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
-            prop_name = self.obj_ref.relation.dual_property.synced_property_name
+            prop_name = raise_unset(self.obj_ref.relation.dual_property.synced_property_name)
             return self.schema.get_prop(prop_name) if prop_name else None
         else:
             return None
@@ -1085,7 +1085,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             # change the old default name in the target schema to what was passed during initialization
             other_db = self.schema.get_db()
 
-            if (prop_id := self.obj_ref.relation.dual_property.synced_property_id) is None:
+            if isinstance(prop_id := self.obj_ref.relation.dual_property.synced_property_id, UnsetType):
                 msg = 'No synced property ID found in the relation object'
                 raise SchemaError(msg)
 
