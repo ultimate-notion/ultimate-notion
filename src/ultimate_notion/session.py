@@ -312,6 +312,18 @@ class Session:
 
         return page
 
+    def get_or_create_page(self, parent: Page | Database, title: str | None = None) -> Page:
+        """Get an existing page or create a new one if it doesn't exist."""
+        pages = SList(page for page in self.search_page(title) if page.parent == parent)
+        if len(pages) == 0:
+            page = self.create_page(parent, title=title)
+            while not [page for page in self.search_page(title) if page.parent == parent]:
+                _logger.info(f'Waiting for page `{page.title}` to be fully created.')
+                time.sleep(1)
+            return page
+        else:
+            return pages.item()
+
     def get_user(self, user_ref: UUID | str, *, use_cache: bool = True, raise_on_unknown: bool = True) -> User:
         """Get a user by uuid.
 

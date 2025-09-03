@@ -12,6 +12,7 @@ from ultimate_notion import Session, __version__
 from ultimate_notion.blocks import PDF, File, Image, Video
 from ultimate_notion.config import get_cfg, get_cfg_file
 from ultimate_notion.errors import UnknownPageError
+from ultimate_notion.page import Page
 from ultimate_notion.utils import pydantic_to_toml
 
 _logger = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ def _is_uuid(value: str) -> bool:
         return False
 
 
-def _get_block_class_for_file(file_path: Path):
+def _get_block_class_for_file(file_path: Path) -> type[File | Image | Video | PDF]:
     """Determine the appropriate block class based on file content and extension.
 
     Uses the filetype library to detect file type by examining magic bytes,
@@ -104,7 +105,7 @@ def _get_block_class_for_file(file_path: Path):
     return File
 
 
-def _find_page_by_name(session: Session, page_name: str):
+def _find_page_by_name(session: Session, page_name: str) -> Page:
     """Find a page by name, ensuring it's unique."""
     pages = session.search_page(page_name, exact=True)
 
