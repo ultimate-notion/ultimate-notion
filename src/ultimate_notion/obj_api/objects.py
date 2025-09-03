@@ -439,14 +439,16 @@ class MentionObject(RichTextBaseObject, type='mention'):
     mention: SerializeAsAny[MentionBase]
 
 
-class MentionUser(MentionBase[User], type='user'):
+class MentionUser(MentionBase[User | UserRef], type='user'):
     """Nested user data for `Mention` properties."""
 
-    user: SerializeAsAny[User]
+    user: SerializeAsAny[User | UserRef]
 
     @classmethod
     def build_mention_from(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
-        mention = cls.model_construct(user=user)
+        # When creating a user mention, we need to send only the id, not the full object.
+        user_ref = UserRef.build(user)
+        mention = cls.model_construct(user=user_ref)
         # note that `href` is always `None` for user mentions, also we prepend the '@' to mimic server side
         return MentionObject.model_construct(
             plain_text=f'@{user.name}',
