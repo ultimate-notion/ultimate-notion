@@ -106,7 +106,7 @@ __all__ = [
     'OptionGroup',
     'OptionGroupType',
     'OptionNS',
-    'Page',
+    'Page',  # for type hinting only
     'Paragraph',
     'PropType',
     'Property',  # for type hinting only

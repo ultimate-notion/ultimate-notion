@@ -116,14 +116,15 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
             if marker_name in item.keywords:
                 item.add_marker(skip_release_test)
 
-    # Handle file_upload marker
-    file_upload_marker = 'file_upload'
-    file_upload_flag = f'--{file_upload_marker.replace("_", "-")}'
-    if not config.getoption(file_upload_flag):
-        skip_file_upload = pytest.mark.skip(reason=f'use flag `{file_upload_flag}` to run file upload tests')
-        for item in items:
-            if file_upload_marker in item.keywords:
-                item.add_marker(skip_file_upload)
+    # Handle file_upload marker - only if check_latest_release didn't already filter
+    if not config.getoption('--check-latest-release'):
+        file_upload_marker = 'file_upload'
+        file_upload_flag = f'--{file_upload_marker.replace("_", "-")}'
+        if not config.getoption(file_upload_flag):
+            skip_file_upload = pytest.mark.skip(reason=f'use flag `{file_upload_flag}` to run file upload tests')
+            for item in items:
+                if file_upload_marker in item.keywords:
+                    item.add_marker(skip_file_upload)
 
 
 def exec_pyfile(file_path: str) -> None:
