@@ -121,13 +121,13 @@ class Select(PropertyValue, type='select'):
 class MultiSelect(PropertyValue, type='multi_select'):
     """Notion multi-select type."""
 
-    multi_select: list[SelectOption] = None  # type: ignore
+    multi_select: list[SelectOption] = Field(default_factory=list)
 
 
 class People(PropertyValue, type='people'):
     """Notion people type."""
 
-    people: list[User] = None  # type: ignore
+    people: list[User] = Field(default_factory=list)
 
     # Custom serializer as we receive various UserRef subtypes but need to pass
     # a proper UserRef to the Notion API. Notion API is just so inconsistent!
@@ -157,7 +157,7 @@ class PhoneNumber(PropertyValue, type='phone_number'):
 class Files(PropertyValue, type='files'):
     """Notion files type."""
 
-    files: list[SerializeAsAny[FileObject]] = None  # type: ignore
+    files: list[SerializeAsAny[FileObject]] = Field(default_factory=list)
 
 
 class FormulaResult(TypedObject, ABC, polymorphic_base=True):
@@ -200,7 +200,7 @@ class Formula(PropertyValue, type='formula'):
 class Relation(PropertyValue, type='relation'):
     """A Notion relation property value."""
 
-    relation: list[ObjectRef] = None  # type: ignore
+    relation: list[ObjectRef] = Field(default_factory=list)
     has_more: bool = False
 
     @classmethod

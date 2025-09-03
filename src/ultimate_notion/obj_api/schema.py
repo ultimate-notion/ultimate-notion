@@ -212,7 +212,7 @@ class PhoneNumber(Property[PhoneNumberTypeData], type='phone_number'):
 class FormulaTypeData(GenericObject):
     """Type data for `Formula`."""
 
-    expression: str = None  # type: ignore
+    expression: str
 
     def __eq__(self, other: object) -> bool:
         """Compare Formula objects by all attributes except id."""
@@ -233,7 +233,7 @@ class FormulaTypeData(GenericObject):
 class Formula(Property[FormulaTypeData], type='formula'):
     """Defines the formula configuration for a database property."""
 
-    formula: FormulaTypeData = Field(default_factory=FormulaTypeData)
+    formula: FormulaTypeData
 
     @classmethod
     def build(cls, formula: str) -> Formula:
@@ -243,8 +243,7 @@ class Formula(Property[FormulaTypeData], type='formula'):
 class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
     """Defines common configuration for a property relation."""
 
-    # ToDo: Check if we can get rid of this type ignore.
-    database_id: UUID = None  # type: ignore
+    database_id: UUID
     data_source_id: str | None = None  # 2025-09-03 update: https://developers.notion.com/docs/upgrade-guide-2025-09-03
 
     def __eq__(self, other: object) -> bool:
@@ -279,9 +278,8 @@ class SinglePropertyRelation(PropertyRelation[SinglePropertyRelationTypeData], t
 class DualPropertyRelationTypeData(GenericObject):
     """Type data for `DualPropertyRelation`."""
 
-    # ToDo: Check if this should not rather be | UnsetType = Unset
-    synced_property_name: str = None  # type: ignore
-    synced_property_id: str | None = None
+    synced_property_name: str | UnsetType = Unset
+    synced_property_id: str | UnsetType = Unset
 
     def __eq__(self, other: object) -> bool:
         """Compare DualPropertyRelation objects by all attributes except id."""
@@ -327,11 +325,11 @@ class RollupTypeData(GenericObject):
 
     function: AggFunc = AggFunc.COUNT_ALL
 
-    relation_property_name: str = None  # type: ignore
-    relation_property_id: str | None = None
+    relation_property_name: str
+    relation_property_id: str | UnsetType = Unset
 
-    rollup_property_name: str = None  # type: ignore
-    rollup_property_id: str | None = None
+    rollup_property_name: str
+    rollup_property_id: str | UnsetType = Unset
 
     # leads to better error messages, see
     # https://github.com/pydantic/pydantic/issues/355
@@ -358,7 +356,7 @@ class RollupTypeData(GenericObject):
 class Rollup(Property[RollupTypeData], type='rollup'):
     """Defines the rollup configuration for a database property."""
 
-    rollup: RollupTypeData = Field(default_factory=RollupTypeData)
+    rollup: RollupTypeData
 
     @classmethod
     def build(cls, relation: str, property: str, function: AggFunc) -> Rollup:  # noqa: A002
