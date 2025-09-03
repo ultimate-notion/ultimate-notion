@@ -60,7 +60,7 @@ def info() -> None:
     with Session() as session:
         this_integration = session.whoami()
 
-    typer.echo('Notion Integration:')
+    typer.echo('Notion integration:')
     typer.echo(f'- name: {this_integration.name}')
     typer.echo(f'- id: {this_integration.id}')
 

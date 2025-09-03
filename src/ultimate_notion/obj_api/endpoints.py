@@ -20,6 +20,7 @@ from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
+    Bot,
     Comment,
     CustomEmojiObject,
     DatabaseRef,
@@ -480,11 +481,11 @@ class UsersEndpoint(Endpoint):
         return User.model_validate(data)
 
     # https://developers.notion.com/reference/get-self
-    def me(self) -> User:
+    def me(self) -> Bot:
         """Return the current bot User."""
         _logger.debug('Retrieving current integration bot')
         data = self.raw_api.me()
-        return User.model_validate(data)
+        return Bot.model_validate(data)
 
 
 class CommentsEndpoint(Endpoint):

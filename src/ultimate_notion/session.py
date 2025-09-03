@@ -32,7 +32,7 @@ from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.rich_text import Text
 from ultimate_notion.schema import DefaultSchema, Schema
-from ultimate_notion.user import User
+from ultimate_notion.user import Bot, User
 from ultimate_notion.utils import SList
 
 _logger = logging.getLogger(__name__)
@@ -356,15 +356,15 @@ class Session:
         _logger.info('Retrieving all users.')
         return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
 
-    def whoami(self) -> User:
-        """Return the user object of this bot."""
-        _logger.info('Retrieving user of this integration.')
+    def whoami(self) -> Bot:
+        """Return the integration as bot object."""
+        _logger.info('Retrieving information about this integration bot.')
         if self._own_bot_id is None:
             user = self.api.users.me()
             self._own_bot_id = user.id
-            return cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user)))
+            return cast(Bot, self.cache.setdefault(user.id, Bot.wrap_obj_ref(user)))
         else:
-            return cast(User, self.cache[self._own_bot_id])
+            return cast(Bot, self.cache[self._own_bot_id])
 
     def upload(self, file: BinaryIO, *, file_name: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
