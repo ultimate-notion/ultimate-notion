@@ -204,6 +204,7 @@ def test_upload_directory_instead_of_file(tmp_path: Path) -> None:
     assert f"Error: '{test_dir}' is not a file" in result.stderr
 
 
+@pytest.mark.vcr()
 def test_upload_invalid_page_uuid(notion: Session) -> None:
     """Test uploading to a page with invalid UUID."""
     runner = CliRunner()
