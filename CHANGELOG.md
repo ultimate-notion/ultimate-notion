@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.9.1
+## Version 0.9.1, 2025-09-03
 
 - Fix: Add missing link mention object, which led to an exception.
 - Fix: Linked databases are handled as `ChildDatabase` objects and no longer resolved, issue #110.
