@@ -7,6 +7,7 @@
 - Chg: Have a `User` hierarchy with `Bot`, `Person`, etc. to reflect the actual Notion API.
 - Doc: Completed missing parts in the documentation and example for file uploads.
 - New: Allow uploading and appending a file as block to a page via the CLI.
+- Fix: Fix user mention problem, which was caused by a Notion API change.
 
 ## Version 0.9, 2025-09-01
 
