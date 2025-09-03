@@ -5,6 +5,7 @@
 - Fix: Add missing link mention object, which led to an exception.
 - Fix: Linked databases are handled as `ChildDatabase` objects and no longer resolved, issue #110.
 - Chg: Have a `User` hierarchy with `Bot`, `Person`, etc. to reflect the actual Notion API.
+- Doc: Completed missing parts in the documentation and example for file uploads.
 
 ## Version 0.9, 2025-09-01
 

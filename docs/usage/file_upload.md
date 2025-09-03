@@ -101,10 +101,108 @@ page.append([
     External files are not stored in Notion and remain dependent on the external URL being accessible. Uploaded files
     are stored in Notion's infrastructure and remain available even if the original source is removed.
 
+## File Upload Status and Expiry
+
+### Upload Status Tracking
+
+Uploaded files have a status that can be tracked using the [FileUploadStatus] enum:
+
+- `PENDING` - File upload is in progress
+- `UPLOADED` - File has been successfully uploaded and processed
+- `EXPIRED` - File upload expired before completion
+- `FAILED` - File upload failed
+
+You can check the status of an uploaded file:
+
+```python
+print(f"Upload status: {uploaded_image.status}")
+```
+
+### Expiry Time Warning
+
+!!! warning "File Upload Expiry"
+
+    Uploaded files have an expiry time! Within this expiry period, the uploaded file **must be used**
+    (e.g., added to a page or block), or it will be automatically deleted by Notion. You can check
+    the expiry time using the `expiry_time` attribute:
+
+    ```python
+    print(f"File expires at: {uploaded_image.expiry_time}")
+    ```
+
+## Asynchronous File Import
+
+### Non-blocking Import
+
+The `import_url` method supports asynchronous operation. By default, it blocks until the import is complete,
+but you can make it non-blocking:
+
+```python
+# Non-blocking import - returns immediately
+video_file = notion.import_url(url=url, file_name='video.mp4', block=False)
+print(f"Import started, status: {video_file.status}")  # Will likely be PENDING
+
+# Later, check if the import is complete
+video_file.update_status()
+if video_file.status == uno.FileUploadStatus.UPLOADED:
+    print("Import complete!")
+else:
+    print(f"Still processing... Status: {video_file.status}")
+```
+
+### Waiting for Completion
+
+You can explicitly wait for an upload to complete:
+
+```python
+# Start non-blocking import
+large_video = notion.import_url(url=url, file_name='large_video.mp4', block=False)
+
+# Wait until upload is fully processed
+large_video.wait_until_uploaded()
+print("File is now ready to use!")
+
+# Now you can safely use it in blocks
+page.append(uno.Video(large_video, caption='Imported video'))
+```
+
+## Managing Uploads
+
+### Listing Uploads
+
+You can list all uploads in your workspace and filter by status:
+
+```python
+# List all uploads
+all_uploads = notion.list_uploads()
+
+# Filter by status
+pending_uploads = notion.list_uploads(filter=uno.FileUploadStatus.PENDING)
+completed_uploads = notion.list_uploads(filter=uno.FileUploadStatus.UPLOADED)
+failed_uploads = notion.list_uploads(filter=uno.FileUploadStatus.FAILED)
+```
+
+### File Upload Information
+
+Uploaded files provide detailed information:
+
+```python
+# Access file metadata
+print(f"File name: {uploaded_image.file_name}")
+print(f"Content type: {uploaded_image.content_type}")
+print(f"Content length: {uploaded_image.content_length}")
+print(f"Expiry time: {uploaded_image.expiry_time}")
+print(f"Status: {uploaded_image.status}")
+
+# Check import result for URL imports
+if imported_file.file_import_result:
+    print(f"Import result: {imported_file.file_import_result}")
+```
+
 
 ## Complete Example
 
-Here's a complete example demonstrating various file upload features:
+Here's a complete example demonstrating various file upload features including async operations:
 
 ``` py
 --8<-- "examples/file_upload.py"
@@ -113,9 +211,12 @@ Here's a complete example demonstrating various file upload features:
 This example shows:
 
 1. Creating a demo page
-2. Uploading a local image file
+2. Uploading a local image file and checking its expiry time
 3. Adding the uploaded image to a page with a caption
-4. Importing a video from an external URL
-5. Adding the imported video to the page
+4. Importing a video from an external URL using non-blocking mode
+5. Waiting for the import to complete and checking status
+6. Adding the imported video to the page
+7. Listing and filtering uploads by status
 
 [UploadedFile]: ../../reference/ultimate_notion/file/#ultimate_notion.file.UploadedFile
+[FileUploadStatus]: ../../reference/ultimate_notion/obj_api/enums/#ultimate_notion.obj_api.enums.FileUploadStatus
