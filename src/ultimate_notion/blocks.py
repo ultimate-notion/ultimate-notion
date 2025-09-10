@@ -24,6 +24,7 @@ from __future__ import annotations
 import itertools
 import mimetypes
 from abc import ABC, abstractmethod
+from collections import deque
 from collections.abc import Iterator, Sequence
 from typing import TYPE_CHECKING, TypeGuard, cast, overload
 
@@ -52,6 +53,11 @@ if TYPE_CHECKING:
 
 MIN_COLS = 2
 """Minimum number of columns when creating a column block to structure a page."""
+MAX_ARRAY_LENGTH = 100
+""""The maximum length of arrays in Notion API objects, e.g for children.
+
+Source: https://developers.notion.com/reference/request-limits#limits-for-property-values
+"""
 
 # ToDo: Use new syntax when requires-python >= 3.12
 DO_co = TypeVar('DO_co', bound=obj_blocks.DataObject, default=obj_blocks.DataObject, covariant=True)
@@ -191,6 +197,11 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
         """Append a block or a sequence of blocks to the content of this block.
 
+        If *this* block is already in Notion, the blocks are appended directly to Notion, otherwise
+        they are prepared to be appended in one batch call, later.
+        Note that explicitely defining `sync` will not affect the append behaviour itself but will raise
+        an error if it is not what was expected, e.g. `sync=True` when this block is not yet in Notion.
+
         Args:
             blocks: A block or a sequence of blocks to append.
             after: A block to append the new blocks after.
@@ -198,6 +209,21 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                   If `sync = None` (default), the blocks are appended directly if this block is already in Notion,
                   otherwise they are prepared to be appended in one batch call, later.
         """
+        blocks = [blocks] if isinstance(blocks, Block) else blocks
+
+        for block in blocks:
+            if not isinstance(block, Block):
+                msg = f'Cannot append {type(block)} to a block.'
+                raise ValueError(msg)
+            if block.in_notion:
+                msg = 'Cannot append a block that is already in Notion.'
+                raise InvalidAPIUsageError(msg)
+
+        if self._children is None:
+            self._children = self._gen_children_cache() if self.in_notion else []
+        if not blocks:
+            return self
+
         if sync is True and not self.in_notion:
             msg = 'Cannot append blocks synchronously to a block that is not in Notion.'
             raise InvalidAPIUsageError(msg)
@@ -212,51 +238,17 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
             if after is not None:
                 msg = 'Cannot append blocks after a specific block if this block is not in Notion.'
                 raise InvalidAPIUsageError(msg)
-            if isinstance(self, Block) and not hasattr(self.obj_ref.value, 'children'):
-                # This is just no possible as the API object doesn't provide a children attribute.
+            elif isinstance(self, Block) and not hasattr(self.obj_ref.value, 'children'):
+                # This is just not possible as the API object doesn't provide a children attribute.
                 # For those special blocks, only the `Append block children` API can be used.
                 block_name = self.__class__.__name__
                 msg = f'Cannot append blocks to a {block_name} block that is not already in Notion.'
                 raise InvalidAPIUsageError(msg)
-
-        blocks = [blocks] if isinstance(blocks, Block) else blocks
-        if not blocks:
-            return self
-        for block in blocks:
-            if not isinstance(block, Block):
-                msg = f'Cannot append {type(block)} to a block.'
-                raise ValueError(msg)
-            if block.in_notion:
-                msg = 'Cannot append a block that is already in Notion.'
-                raise InvalidAPIUsageError(msg)
-
-        if self._children is None:
-            self._children = self._gen_children_cache() if self.in_notion else []
-
-        block_objs = [block.obj_ref for block in blocks]
-        after_obj = None if after is None else after.obj_ref
-
-        if self.in_notion:
-            session = get_active_session()
-            block_objs, after_block_objs = session.api.blocks.children.append(self.obj_ref, block_objs, after=after_obj)
-            for block, obj in zip(blocks, block_objs, strict=True):
-                block.obj_ref = obj
-                session.cache[block.id] = block
-
-        if after is None:
-            self._children.extend(blocks)
-        else:
-            insert_idx = next(idx for idx, block in enumerate(self._children) if block.id == after.id) + 1
-            # we update the blocks after the position we want to insert.
-            for block, updated_block_obj in zip(self._children[insert_idx:], after_block_objs, strict=True):
-                block.obj_ref.update(**updated_block_obj.model_dump())
-            self._children[insert_idx:insert_idx] = blocks
-
-        self.obj_ref.has_children = True
-
-        # Populate the `children` attribute for consistency if block has this attribute
-        if isinstance(self, Block) and hasattr(self.obj_ref.value, 'children'):
-            self.obj_ref.value.children = [block.obj_ref for block in self._children]
+            else:
+                self._children.extend(blocks)
+        else:  # self.in_notion and sync is not False
+            blocks_iter = _chunk_blocks_for_api(blocks)
+            _append_block_chunks(blocks_iter, root=cast(Block, self), after=after)
 
         return self
 
@@ -376,6 +368,14 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
 
     def __hash__(self) -> int:
         return hash(self.obj_ref)
+
+
+class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
+    """A block that holds children, only used for type checking.
+
+    If there was no block like that, mypy would narrow a Block | Page object down to a Page object
+    if we check for `isinstance(i, ChildrenMixin)` as Page inherits from ChildrenMixin. This is not what we want.
+    """
 
 
 class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):
@@ -509,9 +509,7 @@ class ColoredTextBlock(TextBlock[TB], wraps=obj_blocks.ColoredTextBlock):
         self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
-class Paragraph(
-    ColoredTextBlock[obj_blocks.Paragraph], ChildrenMixin[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph
-):
+class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph):
     """Paragraph block."""
 
 
@@ -519,7 +517,7 @@ class Paragraph(
 HT = TypeVar('HT', bound=obj_blocks.Heading)
 
 
-class Heading(ColoredTextBlock[HT], ChildrenMixin[obj_blocks.Heading], wraps=obj_blocks.Heading):
+class Heading(ColoredTextBlock[HT], ParentBlock[obj_blocks.Heading], wraps=obj_blocks.Heading):
     """Abstract Heading block.
 
     Parent class of all heading block types.
@@ -577,14 +575,14 @@ class Heading3(Heading[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
         return f'#### {super().to_markdown()}'
 
 
-class Quote(ColoredTextBlock[obj_blocks.Quote], ChildrenMixin[obj_blocks.Quote], wraps=obj_blocks.Quote):
+class Quote(ColoredTextBlock[obj_blocks.Quote], ParentBlock[obj_blocks.Quote], wraps=obj_blocks.Quote):
     """Quote block."""
 
     def to_markdown(self) -> str:
         return f'> {super().to_markdown()}\n'
 
 
-class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Callout], wraps=obj_blocks.Callout):
+class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
     """Callout block.
 
     !!! note
@@ -638,7 +636,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ChildrenMixin[obj_blocks.Cal
 
 class BulletedItem(
     ColoredTextBlock[obj_blocks.BulletedListItem],
-    ChildrenMixin[obj_blocks.BulletedListItem],
+    ParentBlock[obj_blocks.BulletedListItem],
     wraps=obj_blocks.BulletedListItem,
 ):
     """Bulleted list item."""
@@ -649,7 +647,7 @@ class BulletedItem(
 
 class NumberedItem(
     ColoredTextBlock[obj_blocks.NumberedListItem],
-    ChildrenMixin[obj_blocks.NumberedListItem],
+    ParentBlock[obj_blocks.NumberedListItem],
     wraps=obj_blocks.NumberedListItem,
 ):
     """Numbered list item."""
@@ -658,7 +656,7 @@ class NumberedItem(
         return f'1. {super().to_markdown()}\n'
 
 
-class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin[obj_blocks.ToDo], wraps=obj_blocks.ToDo):
+class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ParentBlock[obj_blocks.ToDo], wraps=obj_blocks.ToDo):
     """ToDo list item."""
 
     def __init__(
@@ -685,7 +683,7 @@ class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ChildrenMixin[obj_blocks.ToDo]
         return f'- [{mark}] {super().to_markdown()}\n'
 
 
-class ToggleItem(ColoredTextBlock[obj_blocks.Toggle], ChildrenMixin[obj_blocks.Toggle], wraps=obj_blocks.Toggle):
+class ToggleItem(ColoredTextBlock[obj_blocks.Toggle], ParentBlock[obj_blocks.Toggle], wraps=obj_blocks.Toggle):
     """Toggle list item."""
 
     def to_markdown(self) -> str:
@@ -1031,7 +1029,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         return '<kbd>↗️ Linked database (unsupported)</kbd>'
 
 
-class Column(Block[obj_blocks.Column], ChildrenMixin[obj_blocks.Column], wraps=obj_blocks.Column):
+class Column(ParentBlock[obj_blocks.Column], wraps=obj_blocks.Column):
     """Column block."""
 
     def __init__(self) -> None:
@@ -1051,7 +1049,7 @@ class Column(Block[obj_blocks.Column], ChildrenMixin[obj_blocks.Column], wraps=o
         return self.obj_ref.column.width_ratio
 
 
-class Columns(Block[obj_blocks.ColumnList], ChildrenMixin[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
+class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
     """Columns block holding multiple `Column` blocks.
 
     This block is used to create a layout with multiple columns in a single page.
@@ -1164,7 +1162,7 @@ class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_bl
         return ' | '.join(s or '' for s in self)  # convert None to ''
 
 
-class Table(Block[obj_blocks.Table], ChildrenMixin[obj_blocks.Table], wraps=obj_blocks.Table):
+class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
     """Table block."""
 
     def __init__(self, n_rows: int, n_cols: int, *, header_col: bool = False, header_row: bool = False) -> None:
@@ -1323,7 +1321,7 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
         return f'[**↗️ <u>{self.page.title}</u>**]({self.page.url})\n'
 
 
-class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBlock):
+class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBlock):
     """Synced block - either original or synced."""
 
     def __init__(self, blocks: Block | Sequence[Block]) -> None:
@@ -1378,7 +1376,7 @@ class SyncedBlock(Block[obj_blocks.SyncedBlock], ChildrenMixin[obj_blocks.Synced
         return md
 
 
-class Template(TextBlock[obj_blocks.Template], ChildrenMixin[obj_blocks.Template], wraps=obj_blocks.Template):
+class Template(TextBlock[obj_blocks.Template], ParentBlock[obj_blocks.Template], wraps=obj_blocks.Template):
     """Template block.
 
     !!! warning "Deprecated"
@@ -1417,3 +1415,79 @@ def traverse_blocks(blocks: Sequence[Block]) -> Iterator[Block]:
         yield block
         if block.has_children and isinstance(block, ChildrenMixin):
             yield from traverse_blocks(block.children)
+
+
+def _chunk_blocks_for_api(blocks: Sequence[Block]) -> Iterator[tuple[Block | ParentBlock | None, Sequence[Block]]]:
+    """Yield sequences of blocks with a parent that allow appending MAX_ARRAY_LENGTH blocks and a nesting level of 1.
+
+    The first parent is `None` to indicate that these blocks should be appended to the root.
+
+    Source: https://developers.notion.com/reference/request-limits#limits-for-property-values
+    """
+    queue: deque[tuple[Block | None, Sequence[Block]]] = deque([(None, blocks)])
+    while queue:
+        current_parent, current_blocks = queue.popleft()
+        for block in current_blocks:
+            if isinstance(block, ParentBlock) and block.has_children:
+                # Rule: array block limit at level 1
+                if len(block.children) > MAX_ARRAY_LENGTH:
+                    queue.append((block, block.children[MAX_ARRAY_LENGTH:]))
+                    block._children = list(block.children[:MAX_ARRAY_LENGTH])
+
+                # Rule: nesting level limit of 1
+                for child_block in block.children:
+                    if isinstance(child_block, ParentBlock) and child_block.has_children:
+                        queue.append((child_block, list(child_block.children)))
+                        # Clear children to avoid having 2 levels of nested blocks.
+                        child_block._children = None
+
+        # Rule: array block limit at level 0
+        for i in range(0, len(current_blocks), MAX_ARRAY_LENGTH):
+            yield current_parent, current_blocks[i : i + MAX_ARRAY_LENGTH]
+
+
+def _append_block_chunks(
+    block_chunks: Iterator[tuple[Block | ParentBlock | Page | None, Sequence[Block]]],
+    *,
+    root: Block | Page,
+    after: Block | None = None,
+) -> None:
+    """Append chunks of blocks to a parent block, respecting API limits.
+
+    The  `root` block is used if a chunk has no parent, i.e. `None` is passed as parent.
+    """
+    session = get_active_session()
+
+    for parent, blocks in block_chunks:
+        if parent is None:
+            parent = root
+        else:
+            after = None  # only the root level can have an `after` block
+
+        if not isinstance(parent, ChildrenMixin):
+            msg = f'Cannot append blocks to parent of type {type(parent)}.'
+            raise TypeError(msg)
+        # From here on mypy thinks parent is a Page, no Block, but why?
+
+        if parent._children is None:
+            parent._children = parent._gen_children_cache() if parent.in_notion else []
+
+        block_objs = [block.obj_ref for block in blocks]
+        after_obj = None if after is None else after.obj_ref
+        block_objs, after_block_objs = session.api.blocks.children.append(parent.obj_ref, block_objs, after=after_obj)
+
+        if after is None:
+            parent._children.extend(blocks)
+        else:
+            insert_idx = next(idx for idx, block in enumerate(parent._children) if block.id == after.id) + 1
+            # we update the blocks after the position we want to insert.
+            for block, updated_block_obj in zip(parent._children[insert_idx:], after_block_objs, strict=True):
+                block.obj_ref.update(**updated_block_obj.model_dump())
+            parent._children[insert_idx:insert_idx] = blocks
+            after = blocks[-1]  # update `after` to the last inserted block to continue appending after it
+
+        parent.obj_ref.has_children = True
+
+        # Populate the `children` attribute for consistency if block has this attribute
+        if isinstance(parent, ParentBlock) and hasattr(parent.obj_ref.value, 'children'):
+            parent.obj_ref.value.children = [block.obj_ref for block in parent._children]
