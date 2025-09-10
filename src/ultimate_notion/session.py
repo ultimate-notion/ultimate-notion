@@ -6,6 +6,7 @@ import io
 import logging
 import os
 import time
+from collections.abc import Sequence
 from threading import RLock
 from types import TracebackType
 from typing import Any, BinaryIO, ClassVar, cast
@@ -15,7 +16,7 @@ import httpx
 import notion_client
 from notion_client.errors import APIResponseError
 
-from ultimate_notion.blocks import Block, DataObject, traverse_blocks
+from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api, traverse_blocks
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
@@ -291,7 +292,7 @@ class Session:
         return page
 
     def create_page(
-        self, parent: Page | Database, title: Text | str | None = None, blocks: list[Block] | None = None
+        self, parent: Page | Database, title: Text | str | None = None, blocks: Sequence[Block] | None = None
     ) -> Page:
         """Create a new page in a `parent` page or database with a given `title`.
 
@@ -301,14 +302,22 @@ class Session:
         """
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
+
+        blocks = [] if blocks is None else blocks
+        blocks_iter = _chunk_blocks_for_api(blocks)
+        try:
+            _, blocks = next(blocks_iter)  # parent is None as it is the page itself
+        except StopIteration:
+            blocks = []
         blocks_objs = [block.obj_ref for block in blocks] if blocks else None
+
         page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj, children=blocks_objs))
         self.cache[page.id] = page
 
-        if blocks:
-            # update the `obj_ref` objects of the blocks by retrieving the children of the page for consistency.
-            for child_block, block in zip(traverse_blocks(page.children), traverse_blocks(blocks), strict=True):
-                block.obj_ref = child_block.obj_ref
+        _append_block_chunks(blocks_iter, root=page)
+        # update the `obj_ref` objects of the blocks by retrieving the children of the page for consistency.
+        for child_block, block in zip(traverse_blocks(page.children), traverse_blocks(blocks), strict=True):
+            block.obj_ref = child_block.obj_ref
 
         return page
 
