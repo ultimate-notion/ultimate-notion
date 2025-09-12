@@ -77,6 +77,7 @@ class Page(DataObject, MentionMixin, object='page'):
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyValue]
+    is_locked: bool | UnsetType = Unset
 
     def _get_title_prop_name(self) -> str:
         """Get the name of the title property."""

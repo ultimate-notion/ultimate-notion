@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.9.2
+
+- New: Add new `is_locked` property to show if a page is locked or not.
+
 ## Version 0.9.1, 2025-09-03
 
 - Fix: Add missing link mention object, which led to an exception.

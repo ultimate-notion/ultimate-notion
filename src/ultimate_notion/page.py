@@ -157,6 +157,11 @@ class Page(
         return True
 
     @property
+    def is_locked(self) -> bool:
+        """Return whether the page is locked for editing."""
+        return raise_unset(self.obj_ref.is_locked)
+
+    @property
     def url(self) -> str:
         """Return the URL of this page."""
         return raise_unset(self.obj_ref.url)
