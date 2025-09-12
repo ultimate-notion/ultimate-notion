@@ -124,10 +124,13 @@ class EndpointIterator(Generic[T]):
     def __init__(
         self,
         endpoint: Callable[..., Any | Awaitable[Any]],
+        *,
+        pagination: Callable[..., Any | Awaitable[Any]] | None = None,
         model_validate: Callable[[Any], NotionObject] = ObjectList.model_validate,
     ):
         """Initialize an object list iterator for the specified endpoint."""
         self._endpoint = endpoint
+        self._pagination = pagination
         self._model_validate = model_validate
 
     def __call__(self, **kwargs: Any) -> Iterator[T]:
@@ -161,6 +164,11 @@ class EndpointIterator(Generic[T]):
 
                 self.next_cursor = obj_or_list.next_cursor
                 self.has_more = obj_or_list.has_more and self.next_cursor is not None
+                if self.has_more and self._pagination is not None:
+                    # Some endpoints like `blocks.children.append` use a different endpoint for pagination.
+                    # If not used, the action, e.g. appending blocks, will be repeated.
+                    # You gotta love the Notion API...
+                    self._endpoint = self._pagination
             else:
                 yield cast(T, obj_or_list)
                 self.has_more = False
