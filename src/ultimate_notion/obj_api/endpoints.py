@@ -99,7 +99,7 @@ class BlocksEndpoint(Endpoint):
             children = [block.serialize_for_api() for block in blocks if block is not None]
             _logger.debug(f'Appending {len(children)} blocks to parent with id `{parent_id}`.')
 
-            block_iter = EndpointIterator[Block](endpoint=self.raw_api.append)
+            block_iter = EndpointIterator[Block](endpoint=self.raw_api.append, pagination=self.raw_api.list)
             if after is None:
                 appended_blocks = list(block_iter(block_id=parent_id, children=children))
                 if len(appended_blocks) != len(blocks):

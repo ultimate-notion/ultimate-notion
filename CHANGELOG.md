@@ -3,6 +3,7 @@
 ## Version 0.9.2
 
 - New: Add new `is_locked` property to show if a page is locked or not.
+- Fix: Pagination when appending block children no longer leads to repeated appendings.
 
 ## Version 0.9.1, 2025-09-03
 

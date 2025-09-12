@@ -303,21 +303,21 @@ class Session:
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
 
-        blocks = [] if blocks is None else blocks
-        blocks_iter = _chunk_blocks_for_api(blocks)
-        try:
-            _, blocks = next(blocks_iter)  # parent is None as it is the page itself
-        except StopIteration:
-            blocks = []
-        blocks_objs = [block.obj_ref for block in blocks] if blocks else None
+        if blocks:
+            blocks_iter = _chunk_blocks_for_api(blocks)
+            _, init_blocks = next(blocks_iter)
+            children = [block.obj_ref for block in init_blocks]
+        else:
+            children = None
 
-        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj, children=blocks_objs))
+        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj, children=children))
         self.cache[page.id] = page
 
-        _append_block_chunks(blocks_iter, root=page)
-        # update the `obj_ref` objects of the blocks by retrieving the children of the page for consistency.
-        for child_block, block in zip(traverse_blocks(page.children), traverse_blocks(blocks), strict=True):
-            block.obj_ref = child_block.obj_ref
+        if blocks:
+            _append_block_chunks(blocks_iter, root=page)
+            # update the `obj_ref` objects of the blocks by retrieving the children of the page for consistency.
+            for child_block, block in zip(traverse_blocks(page.children), traverse_blocks(blocks), strict=True):
+                block.obj_ref = child_block.obj_ref
 
         return page
 
