@@ -15,8 +15,10 @@ Following blocks can be nested, i.e. they can contain children:
 - Synced Block
 - Template (read-only)
 
-Blocks with (*) require an `append` call to an existing block, i.e. created in Notion, to add children.
-Thus they cannot be assembled offline to a complete block structure before being sent to the Notion API.
+Blocks with (*) don't have a `children` field in the Notion API call but can still contain children using the
+`append` method. They can also be created offline and populated with children offline before being pushed to Notion.
+Note that the `append` method will always trigger a separate call to the Notion API during the automatic batching
+when appending one of the (*) blocks to Notion. This is a technical detail and should not affect the user experience.
 """
 
 from __future__ import annotations
@@ -163,6 +165,11 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
 
     _children: list[Block] | None = None
 
+    @property
+    def _has_children_field(self) -> bool:
+        """Return whether the object has a `children` field."""
+        return isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children')
+
     def _gen_children_cache(self) -> list[Block]:
         """Generate the children cache."""
         if self.is_deleted:
@@ -172,8 +179,8 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         session = get_active_session()
         child_blocks_objs = list(session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref)))
         self.obj_ref.has_children = bool(child_blocks_objs)  # update the property manually to avoid API call
-        if isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children'):
-            self.obj_ref.value.children = child_blocks_objs  # update the children attribute
+        if self._has_children_field:
+            self.obj_ref.value.children = child_blocks_objs  # type: ignore[attr-defined] # update the children attribute
 
         child_blocks: list[Block] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
 
@@ -197,9 +204,9 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         if self.in_notion:
             if self._children is None:
                 self._children = self._gen_children_cache()
-            children = tuple(self._children)  # we copy implicitly to allow deleting blocks while iterating over it
-        elif isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children'):
-            children = tuple(Block.wrap_obj_ref(block) for block in self.obj_ref.value.children)
+            children = tuple(self._children)  # copy list to allow deleting blocks while iterating over it
+        elif self._children is not None:
+            children = tuple(self._children)
         else:
             children = ()
         return children
@@ -248,14 +255,9 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
             if after is not None:
                 msg = 'Cannot append blocks after a specific block if this block is not in Notion.'
                 raise InvalidAPIUsageError(msg)
-            elif isinstance(self, Block) and not hasattr(self.obj_ref.value, 'children'):
-                # This is just not possible as the API object doesn't provide a children attribute.
-                # For those special blocks, only the `Append block children` API can be used.
-                block_name = self.__class__.__name__
-                msg = f'Cannot append blocks to a {block_name} block that is not already in Notion.'
-                raise InvalidAPIUsageError(msg)
-            else:
-                self._children.extend(blocks)
+            self.obj_ref.has_children = True
+            # note that we don't store it in the potential `children` field of the obj_ref yet.
+            self._children.extend(blocks)
         else:  # self.in_notion and sync is not False
             blocks_iter = _chunk_blocks_for_api(blocks)
             _append_block_chunks(blocks_iter, root=cast(Block, self), after=after)
@@ -383,8 +385,8 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
 class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     """A block that holds children, only used for type checking.
 
-    If there was no block like that, mypy would narrow a Block | Page object down to a Page object
-    if we check for `isinstance(i, ChildrenMixin)` as Page inherits from ChildrenMixin. This is not what we want.
+    If there was no block like that, mypy would narrow a `Block | Page` object down to a Page object if we check
+    for `isinstance(i, ChildrenMixin)` as Page inherits from ChildrenMixin and Block not. This is not what we want.
     """
 
 
@@ -1463,7 +1465,7 @@ def _chunk_blocks_for_api(blocks: Sequence[Block]) -> Iterator[tuple[Block | Par
                 break
 
             if isinstance(block, ParentBlock) and block.has_children:
-                if len(index) == MAX_NESTING_LEVEL + 1:
+                if len(index) - 1 > MAX_NESTING_LEVEL or not block._has_children_field:
                     queue.append((block, block.children))
                     block._children = None
                     continue
@@ -1474,40 +1476,45 @@ def _chunk_blocks_for_api(blocks: Sequence[Block]) -> Iterator[tuple[Block | Par
 
         return is_full, index
 
+    def add_children_field(blocks: Sequence[Block]) -> list[Block]:
+        """Populate the `children` field of `obj_ref` if existent from the `_children` cache."""
+        for block in blocks:
+            if isinstance(block, ParentBlock) and block.has_children and block._has_children_field:
+                block._children = add_children_field(block.children)
+                block.obj_ref.value.children = [child.obj_ref for child in block._children]
+        return list(blocks)
+
     queue: deque[tuple[Block | None, Sequence[Block]]] = deque([(None, blocks)])
     while queue:
-        curr_parent, curr_blocks = queue.popleft()
+        batch_parent, batch_blocks = queue.popleft()
+        batch_needed, lvl_idcs = batch_range(batch_blocks)
 
-        batch_needed, lvl_idcs = batch_range(curr_blocks)
-        if not batch_needed:
-            yield curr_parent, curr_blocks
-            break
+        if batch_needed:
+            curr_parent, curr_blocks = batch_parent, batch_blocks
+            n_levels = len(lvl_idcs)
 
-        n_levels = len(lvl_idcs)
+            for lvl, lvl_idx in enumerate(lvl_idcs):
+                if lvl == 0:
+                    batch_blocks = curr_blocks[:lvl_idx]
+                    curr_batch_parent = curr_blocks[lvl_idx - 1]
+                elif isinstance(curr_batch_parent, ParentBlock):
+                    curr_batch_parent._children = list(curr_blocks[:lvl_idx])
+                    curr_batch_parent = curr_blocks[lvl_idx - 1]
+                else:
+                    msg = 'Impossible error as curr_batch_parent must be a ParentBlock.'
+                    raise RuntimeError(msg)
 
-        for lvl, lvl_idx in enumerate(lvl_idcs):
-            if lvl == 0:
-                patch_parent = curr_parent
-                patch_blocks = curr_blocks[:lvl_idx]
-                curr_batch_parent = curr_blocks[lvl_idx - 1]
-            elif isinstance(curr_batch_parent, ParentBlock):
-                curr_batch_parent._children = list(curr_blocks[:lvl_idx])
-                curr_batch_parent = curr_blocks[lvl_idx - 1]
-            else:
-                msg = 'Impossible error as curr_batch_parent must be a ParentBlock.'
-                raise RuntimeError(msg)
+                queue.append((curr_parent, curr_blocks[lvl_idx:]))
 
-            queue.append((curr_parent, curr_blocks[lvl_idx:]))
+                if lvl < n_levels:  # not the last level yet, so dive into children
+                    curr_parent = curr_blocks[lvl_idx - 1]
+                    curr_blocks = curr_parent._children  # type: ignore[attr-defined]
+                elif isinstance(curr_parent, ParentBlock) and curr_parent.has_children:
+                    # if the last block in the batch has children, we need to pass them along
+                    queue.append((curr_parent, curr_parent.children))
+                    curr_parent._children = None
 
-            if lvl < n_levels - 1:  # not the last level yet, so dive into children
-                curr_parent = curr_blocks[lvl_idx - 1]
-                curr_blocks = curr_parent.children  # type: ignore[attr-defined]
-            elif isinstance(curr_parent, ParentBlock) and curr_parent.has_children:
-                # if the last block in the batch has children, we need to pass them along
-                queue.append((curr_parent, curr_parent.children))
-                curr_parent._children = None
-
-        yield patch_parent, patch_blocks
+        yield batch_parent, add_children_field(batch_blocks)
 
 
 def _append_block_chunks(
