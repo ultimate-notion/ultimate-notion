@@ -31,7 +31,7 @@ from pydantic import (
 )
 from typing_extensions import Self, TypeVar
 
-from ultimate_notion.utils import is_stable_release
+from ultimate_notion.utils import is_stable_release, pydantic_apply
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.objects import ParentRef, UserRef
@@ -201,26 +201,17 @@ class GenericObject(BaseModel):
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
+
+        def remove_unset_and_empty_children(key: str, value: Any) -> Any:
+            if key == 'children' and isinstance(value, list) and len(value) == 0:
+                return None
+            if isinstance(value, UnsetType):
+                return None
+            return value
+
+        filtered_obj = pydantic_apply(self, remove_unset_and_empty_children)
         # Notion API doesn't like "null" values
-        data = self.model_dump(mode='json', exclude_none=True, by_alias=True)
-
-        def remove_unset(obj: dict[str, Any]) -> dict[str, Any]:
-            if isinstance(obj, dict):
-                return {
-                    key: remove_unset(value)
-                    for key, value in obj.items()
-                    if not (isinstance(value, dict) and value.get('unset_marker') is True)
-                }
-            elif isinstance(obj, list):
-                return [
-                    remove_unset(item)
-                    for item in obj
-                    if not (isinstance(item, dict) and item.get('unset_marker') is True)
-                ]
-            else:
-                return obj
-
-        return remove_unset(data)
+        return filtered_obj.model_dump(mode='json', exclude_none=True, by_alias=True)
 
     @classmethod
     def build(cls, *args: Any, **kwargs: Any) -> Self:
