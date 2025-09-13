@@ -477,3 +477,30 @@ def pydantic_to_toml(model: BaseModel) -> str:
     # Remove None as TOML doesn't support null/None values.
     json_dct = rec_apply(lambda x: '' if x is None else x, json_dct)
     return tomli_w.dumps(json_dct)
+
+
+def pydantic_apply(obj: PT, func: Callable[[Any, Any], Any]) -> PT:
+    """Apply a function to all fields, i.e. (name, value), of a Pydantic model recursively.
+
+    The transformed model is returned as a copy, leaving the original model unchanged.
+    """
+    upd_obj = obj.model_copy(deep=True)
+    for name in upd_obj.__class__.model_fields:
+        value = getattr(upd_obj, name)
+        if isinstance(value, BaseModel):  # First dive into nested BaseModels ...
+            setattr(upd_obj, name, value := pydantic_apply(value, func))
+        # ... then work on the key-value pairs directly, where := updates value to remove, e.g. empty lists
+        setattr(upd_obj, name, value := func(name, value))
+
+        if isinstance(value, list):
+            new_list = [
+                pydantic_apply(item, func) if isinstance(item, BaseModel) else func(name, item) for item in value
+            ]
+            setattr(upd_obj, name, new_list)
+        elif isinstance(value, dict):
+            new_dict = {
+                k: pydantic_apply(v, func) if isinstance(v, BaseModel) else func(name, v) for k, v in value.items()
+            }
+            setattr(upd_obj, name, new_dict)
+
+    return upd_obj
