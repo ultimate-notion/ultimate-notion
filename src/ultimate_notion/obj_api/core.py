@@ -31,6 +31,7 @@ from pydantic import (
 )
 from typing_extensions import Self, TypeVar
 
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.utils import is_stable_release, pydantic_apply
 
 if TYPE_CHECKING:
@@ -112,8 +113,8 @@ def raise_unset(obj: T) -> T: ...
 def raise_unset(obj: T | UnsetType) -> T:
     """Raise an error if the object is unset."""
     if isinstance(obj, UnsetType):
-        msg = 'Object is unset.'
-        raise ValueError(msg)
+        msg = 'Parameter is unset and was not yet initialized by the Notion API.'
+        raise UnsetError(msg)
     return obj
 
 

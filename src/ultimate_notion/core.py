@@ -157,7 +157,7 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     def parent(self) -> NotionEntity | WorkspaceType | None:
         """Return the parent Notion entity, Workspace if the workspace is the parent, or None if not accessible."""
         session = get_active_session()
-        parent = self.obj_ref.parent
+        parent = raise_unset(self.obj_ref.parent)
 
         match parent:
             case objs.WorkspaceRef():

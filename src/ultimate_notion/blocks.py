@@ -55,18 +55,8 @@ if TYPE_CHECKING:
 
 MIN_COLS = 2
 """Minimum number of columns when creating a column block to structure a page."""
-MAX_ARRAY_LENGTH = 100
-""""The maximum length of arrays in Notion API objects, e.g for children.
-
-Source: https://developers.notion.com/reference/request-limits#limits-for-property-values
-"""
-MAX_BLOCKS_PER_REQUEST = 1000
-"""The maximum number of blocks that can be created/updated/deleted in one API request.
-
-Source: https://developers.notion.com/reference/request-limits#limits-for-property-values
-"""
-MAX_NESTING_LEVEL = 2
-"""The maximum nesting level of blocks in Notion for one append call.
+MAX_BLOCK_CHILDREN = 100
+""""The maximum number of block children that can be appended in one API call.
 
 Source: https://developers.notion.com/reference/patch-block-children
 """
@@ -160,7 +150,10 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     """Mixin for data objects that can have children
 
     Note that we don't use the `children` property of some Notion objects, e.g. paragraph, quote, etc.,
-    as not every object has this property, e.g. a page or toggleable heading.
+    as not every object has this property, e.g. a page or toggleable heading. The `children` property
+    is mostly used to send a nested batch of blocks with children to Notion in one API call. It cannot
+    be trusted though that the `children` property is always up-to-date, e.g. when blocks are appended
+    as the Notion API often doesn't send the `children` property back in the response.
     """
 
     _children: list[Block] | None = None
@@ -256,11 +249,11 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 msg = 'Cannot append blocks after a specific block if this block is not in Notion.'
                 raise InvalidAPIUsageError(msg)
             self.obj_ref.has_children = True
-            # note that we don't store it in the potential `children` field of the obj_ref yet.
+            # Don't store it in the potential `children` field of the obj_ref and let the Notion API do it.
             self._children.extend(blocks)
         else:  # self.in_notion and sync is not False
-            blocks_iter = _chunk_blocks_for_api(blocks)
-            _append_block_chunks(blocks_iter, root=cast(Block, self), after=after)
+            blocks_iter = _chunk_blocks_for_api(cast(ParentBlock, self), blocks)
+            _append_block_chunks(blocks_iter, after=after)
 
         return self
 
@@ -1429,136 +1422,87 @@ def traverse_blocks(blocks: Sequence[Block]) -> Iterator[Block]:
             yield from traverse_blocks(block.children)
 
 
-def _chunk_blocks_for_api(blocks: Sequence[Block]) -> Iterator[tuple[Block | ParentBlock | None, Sequence[Block]]]:
+def _chunk_blocks_for_api(
+    parent: ParentBlock | Page, blocks: Sequence[Block]
+) -> Iterator[tuple[ParentBlock | Page, Sequence[Block]]]:
     """Yield batches of blocks with a parent so that each batch fulfills the Notion API requirements.
 
     Requirements:
     - Maximum of 1000 blocks per request
-    - Maximum of 100 blocks in an array, i.e. children of a block
+    - Maximum of 100 blocks in an array, also when appending children of a block
     - Maximum nesting level of 2, i.e. great grandchildren are not allowed
 
     We won't adhere to the 500KB limit per request here, as this is hard to check without
     knowing the exact size of the serialized request. If you hit this limit, reduce the number
-    of blocks you append at once.
+    of blocks you append at once. This is quite unlikely to happen in practice as the current implementation
+    appends only single-level blocks at a time adhering to the 100 blocks per array limit.
 
     The parents of the root level is `None` to indicate that these blocks should be appended to the root.
 
     Source: https://developers.notion.com/reference/request-limits#limits-for-property-values
     """
 
-    def batch_range(
-        blocks: Sequence[Block], num: int = 0, index: tuple[int, ...] = (0,)
-    ) -> tuple[bool, tuple[int, ...]]:
-        """Determine the range of blocks that can be sent in one batch.
+    # This is implemented as breadth-first application of each level of the block hierarchy.
+    # The smarter way would be depth-first to level 2, adhering to the 100 blocks per array limit,
+    # but this is more complex to implement and is problematic as it leaves the children blocks
+    # uninitialized as the append-endpoint of the API does not return them, requiring another fetch.
+    # So we stick to breadth-first for now.
 
-        This helper function returns a tuple (is_full, index), where `is_full` indicates
-        whether the batch is full (i.e., reached the API limits), and `index` is a tuple of indices
-        indicating the positions in the block hierarchy where the batch should be split.
-        """
-        is_full = False
-
-        for block in blocks:
-            num += 1
-            index = (*index[:-1], index[-1] + 1)
-            if num >= MAX_BLOCKS_PER_REQUEST or index[-1] >= MAX_ARRAY_LENGTH:
-                is_full = True
-                break
-
-            if isinstance(block, ParentBlock) and block.has_children:
-                if len(index) - 1 > MAX_NESTING_LEVEL or not block._has_children_field:
-                    queue.append((block, block.children))
-                    block._children = None
-                    continue
-
-                is_full, new_index = batch_range(block.children, num, (*index, 0))
-                if is_full:
-                    return is_full, new_index
-
-        return is_full, index
-
-    def add_children_field(blocks: Sequence[Block]) -> list[Block]:
-        """Populate the `children` field of `obj_ref` if existent from the `_children` cache."""
-        for block in blocks:
-            if isinstance(block, ParentBlock) and block.has_children and block._has_children_field:
-                block._children = add_children_field(block.children)
-                block.obj_ref.value.children = [child.obj_ref for child in block._children]
-        return list(blocks)
-
-    queue: deque[tuple[Block | None, Sequence[Block]]] = deque([(None, blocks)])
+    queue = deque([(parent, blocks)])
     while queue:
-        batch_parent, batch_blocks = queue.popleft()
-        batch_needed, lvl_idcs = batch_range(batch_blocks)
-
-        if batch_needed:
-            curr_parent, curr_blocks = batch_parent, batch_blocks
-            n_levels = len(lvl_idcs)
-
-            for lvl, lvl_idx in enumerate(lvl_idcs):
-                if lvl == 0:
-                    batch_blocks = curr_blocks[:lvl_idx]
-                    curr_batch_parent = curr_blocks[lvl_idx - 1]
-                elif isinstance(curr_batch_parent, ParentBlock):
-                    curr_batch_parent._children = list(curr_blocks[:lvl_idx])
-                    curr_batch_parent = curr_blocks[lvl_idx - 1]
-                else:
-                    msg = 'Impossible error as curr_batch_parent must be a ParentBlock.'
-                    raise RuntimeError(msg)
-
-                queue.append((curr_parent, curr_blocks[lvl_idx:]))
-
-                if lvl < n_levels:  # not the last level yet, so dive into children
-                    curr_parent = curr_blocks[lvl_idx - 1]
-                    curr_blocks = curr_parent._children  # type: ignore[attr-defined]
-                elif isinstance(curr_parent, ParentBlock) and curr_parent.has_children:
-                    # if the last block in the batch has children, we need to pass them along
-                    queue.append((curr_parent, curr_parent.children))
-                    curr_parent._children = None
-
-        yield batch_parent, add_children_field(batch_blocks)
+        parent, blocks = queue.popleft()
+        batch, next_batch = blocks[:MAX_BLOCK_CHILDREN], blocks[MAX_BLOCK_CHILDREN:]
+        for block in batch:
+            if block.has_children and isinstance(block, ParentBlock):
+                queue.append((block, block.children))
+                block._children = None  # will be filled again when appending
+        if next_batch:
+            queue.append((parent, next_batch))
+        yield parent, batch
 
 
 def _append_block_chunks(
-    block_chunks: Iterator[tuple[Block | ParentBlock | Page | None, Sequence[Block]]],
+    block_chunks: Iterator[tuple[ParentBlock | Page | None, Sequence[Block]]],
     *,
-    root: Block | Page,
     after: Block | None = None,
 ) -> None:
     """Append chunks of blocks to a parent block, respecting API limits.
 
-    The  `root` block is used if a chunk has no parent, i.e. `None` is passed as parent.
+    The blocks are appended in the order they are provided by the iterator and
+    the first parent is considered the root parent. Only the root level can have an
+    `after` block, all other levels will append at the end of their respective parent.
     """
     session = get_active_session()
 
+    root: ParentBlock | Page | None = None
     for parent, blocks in block_chunks:
-        if parent is None:
-            parent = root
-        else:
-            after = None  # only the root level can have an `after` block
+        root = parent if root is None else root
 
+        if parent is not root:
+            after = None  # only the root level can have an `after` block
         if not isinstance(parent, ChildrenMixin):
             msg = f'Cannot append blocks to parent of type {type(parent)}.'
             raise TypeError(msg)
-
         if parent._children is None:
-            parent._children = parent._gen_children_cache() if parent.in_notion else []
+            parent._children = []
 
         block_objs = [block.obj_ref for block in blocks]
         after_obj = None if after is None else after.obj_ref
         block_objs, after_block_objs = session.api.blocks.children.append(parent.obj_ref, block_objs, after=after_obj)
+
+        # update the appended blocks with the returned objects from the API
+        for block, block_obj in zip(blocks, block_objs, strict=True):
+            block.obj_ref.update(**block_obj.model_dump())
 
         if after is None:
             parent._children.extend(blocks)
         else:
             insert_idx = next(idx for idx, block in enumerate(parent._children) if block.id == after.id) + 1
             append_idx = insert_idx + len(after_block_objs)
-            # we update the blocks after the position we want to insert.
+            # we also update the blocks after the position we inserted.
             for block, updated_block_obj in zip(parent._children[insert_idx:append_idx], after_block_objs, strict=True):
                 block.obj_ref.update(**updated_block_obj.model_dump())
             parent._children[insert_idx:insert_idx] = blocks
             after = blocks[-1]  # update `after` to the last inserted block to continue appending after it
 
         parent.obj_ref.has_children = True
-
-        # Populate the `children` attribute for consistency if block has this attribute
-        if isinstance(parent, ParentBlock) and hasattr(parent.obj_ref.value, 'children'):
-            parent.obj_ref.value.children = [block.obj_ref for block in parent._children]
