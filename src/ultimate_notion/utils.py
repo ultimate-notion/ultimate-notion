@@ -397,10 +397,13 @@ def temp_timezone(tz: str | pnd.Timezone) -> Iterator[None]:
 PT = TypeVar('PT', bound=BaseModel)  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-def del_nested_attr(
+def set_attr_none(
     obj: PT, attr_paths: str | Sequence[str] | None, *, inplace: bool = False, missing_ok: bool = False
 ) -> PT:
-    """Remove nested attributes from an object."""
+    """Set the attributes given by a potentially nested path to None.
+
+    `None` attributes will be removed during serialization by default.
+    """
     if attr_paths is None:
         return obj
     if isinstance(attr_paths, str):
@@ -420,7 +423,7 @@ def del_nested_attr(
 
         last_attr = attrs[-1]
         if hasattr(curr_obj, last_attr):
-            delattr(curr_obj, last_attr)
+            setattr(curr_obj, last_attr, None)
         elif not missing_ok:
             msg = f'{last_attr} does not exist in {".".join(attrs[:-2]) if len(attrs) > 1 else "the object"}.'
             raise AttributeError(msg)

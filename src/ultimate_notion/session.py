@@ -302,9 +302,10 @@ class Session:
         """
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
-        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
         # We don't use the `children` parameter as we would need to call `list` afterwards to get the children,
         # in order to initialize them, which would be another API call. So we append the blocks manually here.
+        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
+        self.cache[page.id] = page
 
         if blocks:
             blocks_iter = _chunk_blocks_for_api(page, blocks)

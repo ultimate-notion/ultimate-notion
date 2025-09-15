@@ -44,6 +44,7 @@ from ultimate_notion.errors import (
     RollupError,
     SchemaError,
     SchemaNotBoundError,
+    UnsetError,
 )
 from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import OptionGroupType
@@ -836,7 +837,7 @@ class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
         def get_id(option: Option) -> str:
             try:
                 return option.id
-            except ValueError:
+            except UnsetError:
                 return option.name
 
         option_ids = {get_id(option): option for option in self.options}

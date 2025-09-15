@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion.blocks import MAX_BLOCK_CHILDREN, ChildrenMixin
-from ultimate_notion.errors import InvalidAPIUsageError
+from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
 from ultimate_notion.obj_api.core import Unset
 
 
@@ -684,7 +684,7 @@ def test_block_equality_and_hash(root_page: uno.Page, notion: uno.Session) -> No
     assert para1 == para1a
     assert hash(para1) == hash(para1a)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(UnsetError):
         assert para1.id != para2.id
 
     page = notion.create_page(parent=root_page, title='Page for testing block equality and hash')

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from ultimate_notion.core import Wrapper, get_repr
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import Color, OptionGroupType
@@ -53,7 +54,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
         """Color of the option."""
         try:
             return raise_unset(self.obj_ref.color)
-        except ValueError:  # i.e. unset value
+        except UnsetError:  # i.e. unset value
             return Color.DEFAULT
 
     @property
@@ -112,7 +113,7 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
         for option in options:
             try:
                 option_ids.append(option.id)
-            except ValueError:
+            except UnsetError:
                 option_ids.append(option.name)
         super().__init__(name=name, color=color, option_ids=option_ids)
 
