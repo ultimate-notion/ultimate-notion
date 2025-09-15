@@ -12,6 +12,10 @@ class UltimateNotionError(Exception):
     """Base class for all exceptions in this package."""
 
 
+class UnsetError(UltimateNotionError):
+    """Raised when an unset value is accessed before being initialized by the Notion API."""
+
+
 class SessionError(UltimateNotionError):
     """Raised when there are issues with the Notion session."""
 

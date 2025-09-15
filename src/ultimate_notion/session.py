@@ -16,7 +16,7 @@ import httpx
 import notion_client
 from notion_client.errors import APIResponseError
 
-from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api, traverse_blocks
+from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
 from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
@@ -302,22 +302,13 @@ class Session:
         """
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
+        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
+        # We don't use the `children` parameter as we would need to call `list` afterwards to get the children,
+        # in order to initialize them, which would be another API call. So we append the blocks manually here.
 
         if blocks:
-            blocks_iter = _chunk_blocks_for_api(blocks)
-            _, init_blocks = next(blocks_iter)
-            children = [block.obj_ref for block in init_blocks]
-        else:
-            children = None
-
-        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj, children=children))
-        self.cache[page.id] = page
-
-        if blocks:
-            _append_block_chunks(blocks_iter, root=page)
-            # update the `obj_ref` objects of the blocks by retrieving the children of the page for consistency.
-            for child_block, block in zip(traverse_blocks(page.children), traverse_blocks(blocks), strict=True):
-                block.obj_ref = child_block.obj_ref
+            blocks_iter = _chunk_blocks_for_api(page, blocks)
+            _append_block_chunks(blocks_iter)
 
         return page
 
