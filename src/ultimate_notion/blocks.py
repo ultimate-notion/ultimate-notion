@@ -46,7 +46,7 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.rich_text import Text, User
-from ultimate_notion.utils import del_nested_attr
+from ultimate_notion.utils import set_attr_none
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -319,7 +319,7 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
         if self.in_notion:
             session = get_active_session()
             # missing_ok=True below to cover `Heading` which behave like `TextBlock` but have no `children` attribute
-            del_nested_attr(self.obj_ref, exclude_attrs, inplace=True, missing_ok=True)
+            set_attr_none(self.obj_ref, exclude_attrs, inplace=True, missing_ok=True)
             session.api.blocks.update(self.obj_ref)
 
     def replace(self, blocks: Block | Sequence[Block]) -> None:
