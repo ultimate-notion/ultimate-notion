@@ -6,7 +6,8 @@ from typing import cast
 import pytest
 
 import ultimate_notion as uno
-from ultimate_notion.blocks import MAX_BLOCK_CHILDREN, ChildrenMixin
+from ultimate_notion import blocks as uno_blocks
+from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
 from ultimate_notion.obj_api.core import Unset
 
@@ -710,21 +711,21 @@ def test_rt_default_color() -> None:
 
 @pytest.mark.vcr()
 def test_max_children_length(root_page: uno.Page, notion: uno.Session) -> None:
-    n_blocks = int(1.2 * MAX_BLOCK_CHILDREN)
+    n_blocks = int(1.2 * uno_blocks.MAX_BLOCK_CHILDREN)
     blocks = [uno.Paragraph(f'Paragraph {i}') for i in range(n_blocks)]
     page = notion.create_page(parent=root_page, title='Page for testing max children length', blocks=blocks)
     assert len(page.children) == len(blocks)
 
     ablocks = [uno.Paragraph(f'Another Paragraph {i}') for i in range(n_blocks)]
-    page.append(ablocks, after=page.children[10])
-    assert page.children[11] == ablocks[0]
+    page.append(ablocks, after=page.children[2])
+    assert page.children[3] == ablocks[0]
     assert len(page.children) == 2 * n_blocks
-    assert page.children[11 + n_blocks] == blocks[11]
+    assert page.children[3 + n_blocks] == blocks[3]
 
 
 @pytest.mark.vcr()
 def test_max_nesting_level(root_page: uno.Page, notion: uno.Session) -> None:
-    n_blocks = int(1.2 * MAX_BLOCK_CHILDREN)
+    n_blocks = int(1.2 * uno_blocks.MAX_BLOCK_CHILDREN)
     blocks = [uno.BulletedItem(f'Point {i}') for i in range(n_blocks)]
     # add a 1st level of nesting
     blocks[0].append([uno.BulletedItem(f'Nested Point {i}') for i in range(n_blocks)])
