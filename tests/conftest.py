@@ -42,6 +42,7 @@ from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
 from ultimate_notion import Database, Option, Page, Session, User, schema
+from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.adapters.google.tasks import GTasksClient
 from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, ENV_ULTIMATE_NOTION_DEBUG, get_cfg_file, get_or_create_cfg
 from ultimate_notion.utils import temp_attr, temp_timezone
@@ -642,3 +643,10 @@ def assert_eventually(assertion_func: Callable[..., Any], retries: int = 5, dela
             if attempt < retries - 1:
                 time.sleep(delay)
     assertion_func()
+
+
+@pytest.fixture(autouse=True)
+def strict_api_limits(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Set very strict API limits to test appending blocks batch-wise."""
+    monkeypatch.setattr(uno_blocks, 'MAX_BLOCK_CHILDREN', 5)
+    monkeypatch.setattr(uno_blocks, 'MAX_BLOCKS_PER_REQUEST', 10)
