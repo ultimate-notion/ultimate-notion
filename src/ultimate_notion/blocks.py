@@ -1488,26 +1488,39 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
                 return 2
             case _:
                 return 1
+            
+    def collect_parents(pairs: Sequence[tuple[Block, Block]]) -> Iterator[tuple[Block, Sequence[Block]]]:
+        """Collect blocks with the same parent into a single entry again."""
+        if not pairs:
+            return
+        
+        curr_parent = pairs[0][0]
+        curr_blocks = [pairs[0][1]]
+
+        for parent, block in pairs[1:]:
+            if parent is curr_parent:
+                curr_blocks.append(block)
+            else:
+                yield curr_parent, curr_blocks
+                # start new group
+                curr_parent = parent
+                curr_blocks = [block]
+
+        yield curr_parent, curr_blocks
 
     next_batch = deque([(parent, blocks)])
+    
     while next_batch:
         batch_parent, blocks = next_batch.popleft()
         batch = _Node(block=batch_parent, root=batch_parent is parent)
-
-        if len(blocks) > MAX_BLOCK_CHILDREN:
-            next_batch.appendleft((batch_parent, blocks[MAX_BLOCK_CHILDREN:]))
-            blocks = blocks[:MAX_BLOCK_CHILDREN]
-
         n_blocks = 0
         block_stack = deque([(batch, block) for block in blocks])
+        
         while block_stack:
             block_parent, block = block_stack.popleft()  # block_parent points to the current node in the tree
-            if n_blocks + min_block_len(block) > MAX_BLOCKS_PER_REQUEST:
-                next_batch.appendleft((block_parent.block, [block] + [block for _, block in block_stack]))
-                yield batch
-            if block_parent.level + min_block_depth(block) > MAX_NESTING_LEVEL:
-                next_batch.appendleft((block_parent.block, [block] + [block for _, block in block_stack]))
-                yield batch
+            if (n_blocks + min_block_len(block) > MAX_BLOCKS_PER_REQUEST) or (block_parent.level + min_block_depth(block) > MAX_NESTING_LEVEL) or (len(block_parent.children) >= MAX_BLOCK_CHILDREN):
+                next_batch.extend(collect_parents([(block_parent.block, block), *block_stack]))
+                break
 
             block_node = _Node(block=block, level=block_parent.level + 1)
             block_parent.children.append(block_node)
@@ -1516,7 +1529,9 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
             if block.has_children and isinstance(block, ParentBlock):
                 if block_parent.level + 1 > MAX_NESTING_LEVEL:
                     next_batch.appendleft((block, block.children))
-                elif isinstance(block, Columns):
+                    break
+
+                if isinstance(block, Columns):
                     cols = [_Node(block=col, level=block_parent.level + 2) for col in block.children]
                     block_node.children.extend(cols)
                     n_blocks += len(cols)
@@ -1526,12 +1541,8 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
                     )
                 else:
                     block_parent = block_node
-                    if len(block.children) > MAX_BLOCK_CHILDREN:
-                        next_batch.appendleft((block, block.children[MAX_BLOCK_CHILDREN:]))
-
-                    block_stack.extendleft(
-                        reversed([(block_parent, child) for child in block.children[:MAX_BLOCK_CHILDREN]])
-                    )
+                    block_stack.extendleft(reversed([(block_parent, child) for child in block.children]))
+        
         yield batch
 
 
@@ -1549,15 +1560,17 @@ def _update_children(block: Block) -> None:
         _update_children(child)
 
 
-def _build_obj_ref(block: Block | Page) -> Block:
+def _build_obj_ref(node: _Node) -> Block:
     """Recursively build the obj_ref of a block and its children."""
+    block = node.block
+    children = node.children
     if not isinstance(block, Block):
         msg = f'Non-block type {type(block)} not allowed on this level of the hierarchy.'
         raise TypeError(msg)
     if isinstance(block, ParentBlock) and block.has_children and block._children is not None:
-        for child in block._children:
+        for child in node.children:
             _build_obj_ref(child)
-        block.obj_ref.value.children = [child.obj_ref for child in block._children]
+        block.obj_ref.value.children = [child.block.obj_ref for child in children]
     return block
 
 
@@ -1569,7 +1582,7 @@ def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = 
     for parent_node in batch_trees:
         parent = parent_node.block
         is_root = parent_node.root
-        blocks = [_build_obj_ref(child.block) for child in parent_node.children]
+        blocks = [_build_obj_ref(child) for child in parent_node.children]
 
         after = curr_after if is_root and curr_after is not None else None
 
@@ -1579,7 +1592,7 @@ def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = 
         parent.obj_ref.has_children = True
 
         if is_root:
-            parent = cast(ParentBlock | Page, parent)
+            parent = cast(ChildrenMixin, parent)
             parent._children = [] if parent._children is None else parent._children
             # update the parent's children cache
             if after is None:
@@ -1595,5 +1608,6 @@ def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = 
         # update the appended blocks with the returned objects from the API. This only works at the top level.
         for block, block_obj in zip(blocks, block_objs, strict=True):
             block.obj_ref.update(**block_obj.model_dump())
-        for block in blocks:
-            _update_children(block)  # recursively update children of the appended blocks
+
+    for block in blocks:
+        _update_children(block)  # recursively update children of the appended blocks
