@@ -1452,9 +1452,8 @@ class _Node:
     """Tree of nodes used to chunk blocks for the Notion API."""
 
     block: Block | Page
+    is_root: bool = False
     children: list[_Node] = field(default_factory=list)
-    root: bool = False  # true if this is the root node where everything is appended to or a nested batch
-    level: int = -1  # level of nesting, -1 for the root parent, children at level 0, etc.
 
 
 def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iterator[_Node]:
@@ -1472,92 +1471,36 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
 
     Source: https://developers.notion.com/reference/request-limits#limits-for-property-values
     """
+    # Breadth-first traversal to create batches of blocks which handles special blocks like columns and tables correctly
+    # Note that there are a few edge cases where this can still fail, e.g. a table with >100 rows or many tables with
+    # a total of more than 1000 rows/blocks. These cases are quite unlikely in practice.
+    batch = _Node(block=parent, is_root=True)
+    batch_blocks = [_Node(block=block) for block in blocks]
+    queue = deque([(batch, batch_blocks)])
+    while queue:
+        batch, batch_blocks = queue.popleft()
+        if not batch_blocks:
+            continue
 
-    def min_block_len(block: Block) -> int:
-        match block:
-            case Columns() as cols:
-                return len(cols.children)  # each column adds a block we need.
-            case Table():
-                return 2  # at least one row!
-            case _:
-                return 1
+        curr_nodes, next_nodes = batch_blocks[:MAX_BLOCK_CHILDREN], batch_blocks[MAX_BLOCK_CHILDREN:]
+        batch.children.extend(curr_nodes)
 
-    def min_block_depth(block: Block) -> int:
-        match block:
-            case Columns() | Table():
-                return 2
-            case _:
-                return 1
-            
-    def collect_parents(pairs: Sequence[tuple[Block, Block]]) -> Iterator[tuple[Block, Sequence[Block]]]:
-        """Collect blocks with the same parent into a single entry again."""
-        if not pairs:
-            return
-        
-        curr_parent = pairs[0][0]
-        curr_blocks = [pairs[0][1]]
-
-        for parent, block in pairs[1:]:
-            if parent is curr_parent:
-                curr_blocks.append(block)
-            else:
-                yield curr_parent, curr_blocks
-                # start new group
-                curr_parent = parent
-                curr_blocks = [block]
-
-        yield curr_parent, curr_blocks
-
-    next_batch = deque([(parent, blocks)])
-    
-    while next_batch:
-        batch_parent, blocks = next_batch.popleft()
-        batch = _Node(block=batch_parent, root=batch_parent is parent)
-        n_blocks = 0
-        block_stack = deque([(batch, block) for block in blocks])
-        
-        while block_stack:
-            block_parent, block = block_stack.popleft()  # block_parent points to the current node in the tree
-            if (n_blocks + min_block_len(block) > MAX_BLOCKS_PER_REQUEST) or (block_parent.level + min_block_depth(block) > MAX_NESTING_LEVEL) or (len(block_parent.children) >= MAX_BLOCK_CHILDREN):
-                next_batch.extend(collect_parents([(block_parent.block, block), *block_stack]))
-                break
-
-            block_node = _Node(block=block, level=block_parent.level + 1)
-            block_parent.children.append(block_node)
-            n_blocks += 1
-
-            if block.has_children and isinstance(block, ParentBlock):
-                if block_parent.level + 1 > MAX_NESTING_LEVEL:
-                    next_batch.appendleft((block, block.children))
-                    break
-
-                if isinstance(block, Columns):
-                    cols = [_Node(block=col, level=block_parent.level + 2) for col in block.children]
-                    block_node.children.extend(cols)
-                    n_blocks += len(cols)
-
-                    block_stack.extendleft(
-                        reversed([(col, child) for col in cols for child in cast(Column, col.block).children])
-                    )
-                else:
-                    block_parent = block_node
-                    block_stack.extendleft(reversed([(block_parent, child) for child in block.children]))
-        
+        for node in curr_nodes:
+            match node.block:
+                case Columns() as cols:
+                    col_nodes = [_Node(block=col) for col in cols.children]
+                    node.children.extend(col_nodes)
+                    for col_node in col_nodes:
+                        queue.append(
+                            (col_node, [_Node(block=child) for child in cast(Column, col_node.block).children])
+                        )
+                case Table() as table:
+                    node.children.extend([_Node(block=row) for row in table.children])
+                case ParentBlock() as parent_block if parent_block.has_children:
+                    queue.append((node, [_Node(block=child) for child in parent_block.children]))
+        if next_nodes:
+            queue.append((_Node(block=batch.block, is_root=batch.is_root), next_nodes))
         yield batch
-
-
-def _update_children(block: Block) -> None:
-    """Recursively update the children of a block from Notion."""
-    if not block.has_children or not isinstance(block, ParentBlock) or block._children is None:
-        return
-
-    session = get_active_session()
-    child_objs = session.api.blocks.children.list(block.obj_ref)
-    for child, child_obj in zip(block._children, child_objs, strict=True):
-        child.obj_ref.update(**child_obj.model_dump())
-
-    for child in block.children:
-        _update_children(child)
 
 
 def _build_obj_ref(node: _Node) -> Block:
@@ -1581,18 +1524,16 @@ def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = 
 
     for parent_node in batch_trees:
         parent = parent_node.block
-        is_root = parent_node.root
         blocks = [_build_obj_ref(child) for child in parent_node.children]
 
-        after = curr_after if is_root and curr_after is not None else None
+        after = curr_after if parent_node.is_root and curr_after is not None else None
 
         block_objs = [block.obj_ref for block in blocks]
         after_obj = None if after is None else after.obj_ref
         block_objs, after_block_objs = session.api.blocks.children.append(parent.obj_ref, block_objs, after=after_obj)
         parent.obj_ref.has_children = True
 
-        if is_root:
-            parent = cast(ChildrenMixin, parent)
+        if parent_node.is_root and isinstance(parent, ChildrenMixin):
             parent._children = [] if parent._children is None else parent._children
             # update the parent's children cache
             if after is None:
@@ -1608,6 +1549,3 @@ def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = 
         # update the appended blocks with the returned objects from the API. This only works at the top level.
         for block, block_obj in zip(blocks, block_objs, strict=True):
             block.obj_ref.update(**block_obj.model_dump())
-
-    for block in blocks:
-        _update_children(block)  # recursively update children of the appended blocks
