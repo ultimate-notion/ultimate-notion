@@ -650,3 +650,44 @@ def strict_api_limits(monkeypatch: pytest.MonkeyPatch) -> None:
     """Set very strict API limits to test appending blocks batch-wise."""
     monkeypatch.setattr(uno_blocks, 'MAX_BLOCK_CHILDREN', 5)
     monkeypatch.setattr(uno_blocks, 'MAX_BLOCKS_PER_REQUEST', 10)
+
+
+def all_blocks() -> list[uno.Block]:
+    """Return a list of one instance of each block type."""
+    img_url = uno.url('https://github.com/ultimate-notion/ultimate-notion/blob/main/docs/assets/images/favicon.png')
+    blocks = [
+        uno_blocks.TableOfContents(color=uno.Color.PINK),
+        h1_block := uno_blocks.Heading1('Heading 1', toggleable=True),
+        h2_block := uno_blocks.Heading2('Heading 2', toggleable=True),
+        uno_blocks.Heading3('Heading 3'),
+        uno_blocks.Paragraph('Paragraph'),
+        b1_block := uno_blocks.BulletedItem('Bulleted List Item'),
+        uno_blocks.Divider(),
+        uno_blocks.Callout('Callout', icon='💡'),
+        uno_blocks.Quote('Quote'),
+        uno_blocks.ToDoItem('ToDo', checked=True),
+        uno_blocks.NumberedItem('Numbered List Item'),
+        uno_blocks.Equation('E=mc^2'),
+        uno_blocks.Breadcrumb(),
+    ]
+    h1_block.append(
+        [
+            uno_blocks.Code('print("Hello World!")', language='python'),
+            uno_blocks.Paragraph('Code block above'),
+        ]
+    )
+    h2_block.append(
+        [
+            uno_blocks.Image(img_url, caption='Ultimate Notion Logo'),
+            uno_blocks.Paragraph('Image above'),
+        ]
+    )
+    b1_block.append(
+        [
+            uno_blocks.BulletedItem('Nested numbered list item in bulleted list item'),
+            table := uno_blocks.Table(2, 2),
+        ]
+    )
+    table[0] = ('Header 1', 'Header 2')
+    table[1] = ('Cell 1', 'Cell 2')
+    return blocks

@@ -7,7 +7,7 @@ from textwrap import dedent
 import pytest
 
 import ultimate_notion as uno
-from tests.conftest import assert_eventually
+from tests.conftest import all_blocks, assert_eventually
 from ultimate_notion.blocks import Block
 from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
@@ -394,3 +394,14 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
     text = 'This page has a user-added custom emoji icon '
     page.append(uno.Paragraph(uno.text(text) + custom_emoji_page.icon))
     assert page.children[0].to_markdown() == text + f'{custom_emoji_page.icon}'
+
+
+@pytest.mark.vcr()
+def test_cmp_online_offline_blocks(notion: uno.Session, root_page: uno.Page) -> None:
+    """Compare online and offline created blocks."""
+    page = notion.create_page(parent=root_page, title='Compare Online and Offline Created Blocks')
+    page.append(all_blocks())
+
+    assert page.children == all_blocks()
+    page.reload()
+    assert page.children == all_blocks()

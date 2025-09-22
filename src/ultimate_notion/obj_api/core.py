@@ -29,7 +29,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from typing_extensions import Self, TypeVar
+from typing_extensions import Self, TypeIs, TypeVar
 
 from ultimate_notion.errors import UnsetError
 from ultimate_notion.utils import is_stable_release, pydantic_apply
@@ -106,13 +106,18 @@ class UnsetType(BaseModel):
 Unset: UnsetType = UnsetType()
 
 
+def is_unset(v: Any) -> TypeIs[UnsetType]:
+    """Check if the given value is unset."""
+    return isinstance(v, UnsetType)
+
+
 @overload
 def raise_unset(obj: UnsetType) -> NoReturn: ...
 @overload
 def raise_unset(obj: T) -> T: ...
 def raise_unset(obj: T | UnsetType) -> T:
     """Raise an error if the object is unset."""
-    if isinstance(obj, UnsetType):
+    if is_unset(obj):
         msg = 'Parameter is unset and was not yet initialized by the Notion API.'
         raise UnsetError(msg)
     return obj
@@ -158,11 +163,36 @@ class GenericObject(BaseModel):
 
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
-    def __eq__(self, value: object) -> bool:
-        return super().__eq__(value)
+    def __eq__(self, other: Any) -> bool:
+        """Compare two objects field by field for equality by ignoring if one of the fields is `Unset`.
+
+        !!! warning
+
+            This is not fully consistent with `hash`! Two objects that are considered equal
+            may have different hash values if they differ in fields that are `Unset` in one of them.
+            This trade-off was made to have a more intuitive equality check while still
+            providing a reasonable hash implementation.
+        """
+        if not isinstance(other, GenericObject):
+            return NotImplemented
+
+        my_fields = self.__class__.model_fields
+        other_fields = other.__class__.model_fields
+        if set(my_fields) != set(other_fields):
+            return False  # schema must match exactly
+
+        for name in my_fields:
+            v1 = getattr(self, name, Unset)
+            v2 = getattr(other, name, Unset)
+            if is_unset(v1) or is_unset(v2):
+                continue
+            if v1 != v2:
+                return False
+
+        return True
 
     def __hash__(self) -> int:
-        # Consistent with __eq__: we hash the same values that count for equality
+        """Compute a hash value for the object by hashing all its fields."""
         frozen = _freeze(self.model_dump(mode='python'))
         return hash(frozen)
 
@@ -204,7 +234,7 @@ class GenericObject(BaseModel):
         """Serialize the object for sending it to the Notion API."""
 
         def remove_unset(key: str, value: Any) -> Any:
-            if isinstance(value, UnsetType):
+            if is_unset(value):
                 return None
             return value
 
