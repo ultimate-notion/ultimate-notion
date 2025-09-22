@@ -7,6 +7,7 @@
 - Fix: Assembling a hierarchy of blocks offline and appending it will result in automatic batching
        adhering to the Notion API limits, issue #119, #120.
 - Fix: Appended blocks are now added to session cache.
+- New: Added support for the Notion audio block, issue #123.
 
 ## Version 0.9.1, 2025-09-03
 
