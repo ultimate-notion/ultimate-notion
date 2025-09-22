@@ -109,6 +109,15 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
     Calling the block will expose the nested data in the object.
     """
 
+    def __hash__(self) -> int:
+        return hash((self.type, self.value))
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Block):
+            return NotImplemented
+
+        return self.type == other.type and self.value == other.value
+
 
 class UnsupportedBlockTypeData(GenericObject):
     """Type data for `UnsupportedBlock`."""

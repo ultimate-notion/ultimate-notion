@@ -572,7 +572,7 @@ class Heading(ColoredTextBlock[HT], ParentBlock[obj_blocks.Heading], wraps=obj_b
         self.obj_ref.value.is_toggleable = toggleable
         self._update_in_notion()
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = True) -> Self:
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
         if not self.toggleable:
             msg = 'Cannot append blocks to a non-toggleable heading.'
             raise InvalidAPIUsageError(msg)
@@ -621,9 +621,11 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
-        icon: AnyFile | Emoji | CustomEmoji | None = None,
+        icon: AnyFile | str | Emoji | CustomEmoji | None = None,
     ) -> None:
         super().__init__(text, color=color)
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+            icon = Emoji(icon)
         if icon is not None:
             self.obj_ref.value.icon = icon.obj_ref
 
@@ -868,6 +870,10 @@ class FileBaseBlock(CaptionMixin[FT], ABC, wraps=obj_blocks.FileBase):
         name: str | None = None,
     ) -> None:
         super().__init__()
+        if isinstance(file, str):
+            msg = 'Expected a file object! Use `uno.url` or upload a local file first.'
+            raise ValueError(msg)
+
         file.name = name if name is not None else file.name
         file.caption = caption if caption is not None else file.caption
         self.obj_ref.value = file.obj_ref

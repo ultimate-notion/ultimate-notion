@@ -46,7 +46,7 @@ from ultimate_notion.errors import (
     SchemaNotBoundError,
     UnsetError,
 )
-from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
+from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset, raise_unset
 from ultimate_notion.obj_api.enums import OptionGroupType
 from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
@@ -172,7 +172,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def name(self) -> str:
         """Return name of this property."""
-        if self._is_init and not isinstance(self.obj_ref.name, UnsetType):
+        if self._is_init and not is_unset(self.obj_ref.name):
             return self.obj_ref.name
         elif self._name is not None:
             return self._name
@@ -1086,7 +1086,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             # change the old default name in the target schema to what was passed during initialization
             other_db = self.schema.get_db()
 
-            if isinstance(prop_id := self.obj_ref.relation.dual_property.synced_property_id, UnsetType):
+            if is_unset(prop_id := self.obj_ref.relation.dual_property.synced_property_id):
                 msg = 'No synced property ID found in the relation object'
                 raise SchemaError(msg)
 
