@@ -487,6 +487,15 @@ def pydantic_apply(obj: PT, func: Callable[[Any, Any], Any]) -> PT:
 
     The transformed model is returned as a copy, leaving the original model unchanged.
     """
+
+    def _trans_list_elem(name: str, elem: Any) -> Any:
+        if isinstance(elem, BaseModel):
+            return pydantic_apply(elem, func)
+        elif isinstance(elem, list):  # happens for cells of a TableRow
+            return [pydantic_apply(item, func) for item in elem]
+        else:
+            return func(name, elem)
+
     upd_obj = obj.model_copy(deep=True)
     for name in upd_obj.__class__.model_fields:
         value = getattr(upd_obj, name)
@@ -496,9 +505,7 @@ def pydantic_apply(obj: PT, func: Callable[[Any, Any], Any]) -> PT:
         setattr(upd_obj, name, value := func(name, value))
 
         if isinstance(value, list):
-            new_list = [
-                pydantic_apply(item, func) if isinstance(item, BaseModel) else func(name, item) for item in value
-            ]
+            new_list = [_trans_list_elem(name, item) for item in value]
             setattr(upd_obj, name, new_list)
         elif isinstance(value, dict):
             new_dict = {

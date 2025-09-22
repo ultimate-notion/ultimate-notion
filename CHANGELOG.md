@@ -6,6 +6,7 @@
 - Fix: Pagination when appending block children no longer leads to repeated appendings.
 - Fix: Assembling a hierarchy of blocks offline and appending it will result in automatic batching
        adhering to the Notion API limits, issue #119, #120.
+- Fix: Appended blocks are now added to session cache.
 
 ## Version 0.9.1, 2025-09-03
 

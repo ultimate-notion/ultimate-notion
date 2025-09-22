@@ -203,14 +203,12 @@ class GenericObject(BaseModel):
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
 
-        def remove_unset_and_empty_children(key: str, value: Any) -> Any:
-            if key == 'children' and isinstance(value, list) and len(value) == 0:
-                return None
+        def remove_unset(key: str, value: Any) -> Any:
             if isinstance(value, UnsetType):
                 return None
             return value
 
-        filtered_obj = pydantic_apply(self, remove_unset_and_empty_children)
+        filtered_obj = pydantic_apply(self, remove_unset)
         # Notion API doesn't like "null" values
         return filtered_obj.model_dump(mode='json', exclude_none=True, by_alias=True)
 
