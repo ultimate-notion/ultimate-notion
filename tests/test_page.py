@@ -219,6 +219,8 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
 
         [📎 logo_with_text.svg](https://ultimate-notion.com/latest/assets/images/logo_with_text.svg)
 
+        <audio controls><source src="https://samplelib.com/lib/preview/mp3/sample-3s.mp3" type="audio/mpeg"></audio>
+
         ### Unsupported Stuff in Markdown
         <!--- column 1 -->
         Column 1
