@@ -33,8 +33,11 @@ jobs:
 
     - name: Install Hatch & pre-commit
       run: |
-        pip install --upgrade hatch hatch-vcs pre-commit
-        pip list
+        pipx install pre-commit
+        pipx install hatch
+        pipx inject hatch hatch-vcs
+        pipx inject hatch click==8.2.1 --force # workaround https://github.com/pypa/hatch/issues/2052
+        pipx list --include-injected
 
     - name: Configure Git for GitHub Actions bot
       run: |
