@@ -61,6 +61,7 @@ jobs:
       run: |
         pipx install pre-commit
         pipx install hatch
+        pipx inject hatch click==8.2.1 --force # workaround https://github.com/pypa/hatch/issues/2052
         hatch --version
         hatch python install ${{ matrix.python-version }}
 
