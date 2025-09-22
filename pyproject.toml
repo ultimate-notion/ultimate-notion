@@ -331,7 +331,8 @@ dependencies = [
     # Extensions
     "pymdown-extensions",
     "pygments", # Necessary for syntax highlighting in code blocks
-    "linkchecker", # Validation
+    "linkchecker", # Validation of all urls in the generated docs
+    "ruff",  # Used for formatting signatures by mkdocstrings_handlers
     ]
 [tool.hatch.envs.docs.env-vars]
 SOURCE_DATE_EPOCH = "1580601600"
