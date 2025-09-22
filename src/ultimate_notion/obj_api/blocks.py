@@ -164,9 +164,6 @@ class HeadingTypeData(ColoredTextBlockTypeData):
     """Type data for `Heading` block."""
 
     is_toggleable: bool = False
-    # note that children will not be populated when getting this block
-    # https://developers.notion.com/changelog/column-list-and-column-support
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Heading(ColoredTextBlock[HeadingTypeData]):

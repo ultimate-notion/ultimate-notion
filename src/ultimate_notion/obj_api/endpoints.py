@@ -106,7 +106,9 @@ class BlocksEndpoint(Endpoint):
                     msg = 'Number of appended blocks does not match the number of provided blocks.'
                     raise ValueError(msg)
             else:
-                appended_blocks = list(block_iter(block_id=parent_id, children=children, after=str(after.id)))
+                appended_blocks = list(
+                    block_iter(block_id=parent_id, children=children, after=str(raise_unset(after.id)))
+                )
 
             # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
             # blocks after the specified block, where we append the blocks.

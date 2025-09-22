@@ -547,24 +547,30 @@ def test_modify_table(root_page: uno.Page, notion: uno.Session) -> None:
     table[0, 2] = 'Cell 0, 2'
     table[1] = ('Cell 1, 0', 'Cell 1, 1', 'Cell 1, 2')
     page.append(table)
-    page.reload()
 
     assert table[0] == ('Cell 0, 0', 'Cell 0, 1', 'Cell 0, 2')
     assert table[1, 0] == 'Cell 1, 0'
     assert table[1, 1] == 'Cell 1, 1'
     assert table[1, 2] == 'Cell 1, 2'
+    page.reload()
+    reloaded_table = cast(uno.Table, page.children[0])
+    assert reloaded_table[0] == ('Cell 0, 0', 'Cell 0, 1', 'Cell 0, 2')
+    assert reloaded_table[1, 0] == 'Cell 1, 0'
+    assert reloaded_table[1, 1] == 'Cell 1, 1'
+    assert reloaded_table[1, 2] == 'Cell 1, 2'
 
     table.insert_row(1, ('New Cell 1, 0', 'New Cell 1, 1', 'New Cell 1, 2'))
     table.append_row(('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2'))
 
-    page.reload()
     assert table[1] == ('New Cell 1, 0', 'New Cell 1, 1', 'New Cell 1, 2')
     assert table[2] == ('Cell 1, 0', 'Cell 1, 1', 'Cell 1, 2')
     assert table[3] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
 
     table[2].delete()
-    page.reload()
     assert table[2] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
+    page.reload()
+    reloaded_table = cast(uno.Table, page.children[0])
+    assert reloaded_table[2] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
 
     table.has_header_col = True
     page.reload()

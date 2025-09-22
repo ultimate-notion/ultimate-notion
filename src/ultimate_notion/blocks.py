@@ -312,11 +312,13 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
     Parent class of all block types.
     """
 
-    _parent: Block | Page | None = None  # fallback if block is not in Notion
+    _parent: Block | Page | None = None  # fallback if block is not in Notion, e.g. offline assembly of blocks
 
     @property
     def parent(self) -> Block | Page | None:
         """Return the parent block or page, or None if not accessible."""
+        from ultimate_notion.page import Page  # noqa: PLC0415  # Avoid circular import.
+
         if self.in_notion:
             return cast(Block | Page | None, super().parent)
         else:
@@ -394,7 +396,7 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
 
 
 class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
-    """A block that holds children, only used for type checking.
+    """A block that holds children blocks, mainly used for type checking.
 
     If there was no block like that, mypy would narrow a `Block | Page` object down to a Page object if we check
     for `isinstance(i, ChildrenMixin)` as Page inherits from ChildrenMixin and Block not. This is not what we want.
@@ -1546,6 +1548,12 @@ def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = 
                 parent._children[insert_idx:insert_idx] = blocks
                 curr_after = blocks[-1]  # update to the last inserted block to continue appending after it
 
-        # update the appended blocks with the returned objects from the API. This only works at the top level.
-        for block, block_obj in zip(blocks, block_objs, strict=True):
-            block.obj_ref.update(**block_obj.model_dump())
+        for block_node, block_obj in zip(parent_node.children, block_objs, strict=True):
+            # update the appended blocks with the returned objects from the API. This only works at the top level.
+            block_node.block.obj_ref.update(**block_obj.model_dump())
+            session.cache[block_node.block.id] = block_node.block
+            if block_node.children:  # we need to update explicitly the first level for Table, Columns, etc.
+                child_objs = session.api.blocks.children.list(block_node.block.obj_ref)
+                for child_node, child_obj in zip(block_node.children, child_objs, strict=True):
+                    child_node.block.obj_ref.update(**child_obj.model_dump())
+                    session.cache[child_node.block.id] = child_node.block
