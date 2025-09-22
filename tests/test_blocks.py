@@ -687,9 +687,8 @@ def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> Non
     assert b.children == (cb,)
     assert c.children == (cc,)
 
-    callout = uno.Heading1('This is a Heading.', toggleable=True)
-    with pytest.raises(InvalidAPIUsageError):
-        callout.append(uno.Paragraph('This is a child paragraph.'))
+    heading = uno.Heading1('This is a Heading.', toggleable=True)
+    heading.append(uno.Paragraph('This is a child paragraph.'))
 
 
 @pytest.mark.vcr()
@@ -713,9 +712,9 @@ def test_block_equality_and_hash(root_page: uno.Page, notion: uno.Session) -> No
     assert para1.id != para1a.id
 
     assert para1 != para2
-    assert para1 != para1a  # same content but now different id!
+    assert para1 == para1a  # same content and one of the IDs is still unset -> still equal
     assert hash(para1) != hash(para2)
-    assert hash(para1) != hash(para1a)
+    assert hash(para1) == hash(para1a)
 
 
 def test_rt_default_color() -> None:

@@ -28,7 +28,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, TypeGuard, cast, overload
+from typing import TYPE_CHECKING, Any, TypeGuard, cast, overload
 
 import numpy as np
 from notion_client import APIResponseError
@@ -386,10 +386,10 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
             msg = 'Cannot insert a block that has no parent.'
             raise InvalidAPIUsageError(msg)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any | Block) -> bool:
         if not isinstance(other, Block):
             return NotImplemented
-        return bool(self.obj_ref == other.obj_ref)  # for type narrowing
+        return self.obj_ref == other.obj_ref
 
     def __hash__(self) -> int:
         return hash(self.obj_ref)
@@ -401,6 +401,17 @@ class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     If there was no block like that, mypy would narrow a `Block | Page` object down to a Page object if we check
     for `isinstance(i, ChildrenMixin)` as Page inherits from ChildrenMixin and Block not. This is not what we want.
     """
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, ParentBlock):
+            if isinstance(other, Block):
+                return False
+            return NotImplemented
+
+        return super().__eq__(other) and self.children == other.children
+
+    def __hash__(self) -> int:
+        return hash((super().__hash__(), *self.children))
 
 
 class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):

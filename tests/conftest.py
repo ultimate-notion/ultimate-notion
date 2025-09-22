@@ -652,7 +652,7 @@ def strict_api_limits(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(uno_blocks, 'MAX_BLOCKS_PER_REQUEST', 10)
 
 
-def all_blocks() -> list[uno.Block]:
+def all_blocks() -> tuple[uno.Block, ...]:
     """Return a list of one instance of each block type."""
     img_url = uno.url('https://github.com/ultimate-notion/ultimate-notion/blob/main/docs/assets/images/favicon.png')
     blocks = [
@@ -690,4 +690,4 @@ def all_blocks() -> list[uno.Block]:
     )
     table[0] = ('Header 1', 'Header 2')
     table[1] = ('Cell 1', 'Cell 2')
-    return blocks
+    return tuple(blocks)
