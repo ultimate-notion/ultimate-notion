@@ -397,6 +397,12 @@ class PDF(FileBase, type='pdf'):
     pdf: SerializeAsAny[FileObject] | None = None
 
 
+class Audio(FileBase, type='audio'):
+    """An audio block in Notion."""
+
+    audio: SerializeAsAny[FileObject] | None = None
+
+
 class ChildPageTypeData(GenericObject):
     """Type data for `ChildPage` block."""
 

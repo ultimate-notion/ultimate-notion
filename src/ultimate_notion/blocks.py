@@ -950,22 +950,6 @@ class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
             return f'![{alt}]({self.url})\n'
 
 
-class Video(FileBaseBlock[obj_blocks.Video], wraps=obj_blocks.Video):
-    """Video block.
-
-    !!! note
-
-        Only the caption can be modified, the URL is read-only.
-    """
-
-    def to_markdown(self) -> str:
-        """Return the video as Markdown."""
-        mime_type, _ = mimetypes.guess_type(self.url)
-        vtype = f' type="{mime_type}"' if mime_type else ''
-        md = f'<video width="320" height="240" controls><source src="{self.url}"{vtype}></video>\n'
-        return md
-
-
 class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
     """PDF block.
 
@@ -984,6 +968,48 @@ class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
         md = f'[📖 {name}]({self.url})\n'
         if self.caption:
             md += f'{self.caption.to_markdown()}\n'
+        return md
+
+
+class Video(FileBaseBlock[obj_blocks.Video], wraps=obj_blocks.Video):
+    """Video block.
+
+    !!! note
+
+        Only the caption can be modified, the URL is read-only.
+    """
+
+    def __init__(self, file: AnyFile, *, caption: str | None = None) -> None:
+        file.name = None  # Video files cannot have a name
+        super().__init__(file, caption=caption)
+
+    def to_markdown(self) -> str:
+        """Return the video as Markdown."""
+        mime_type, _ = mimetypes.guess_type(self.url)
+        vtype = f' type="{mime_type}"' if mime_type else ''
+        caption = '' if self.caption is None else self.caption.to_markdown()
+        md = f'<video width="320" height="240" controls><source src="{self.url}"{vtype}>{caption}</video>\n'
+        return md
+
+
+class Audio(FileBaseBlock[obj_blocks.Audio], wraps=obj_blocks.Audio):
+    """Audio block.
+
+    !!! note
+
+        Only the caption can be modified, the URL is read-only.
+    """
+
+    def __init__(self, file: AnyFile, *, caption: str | None = None) -> None:
+        file.name = None  # Audio files cannot have a name
+        super().__init__(file, caption=caption)
+
+    def to_markdown(self) -> str:
+        """Return the audio as Markdown."""
+        mime_type, _ = mimetypes.guess_type(self.url)
+        atype = f' type="{mime_type}"' if mime_type else ''
+        caption = '' if self.caption is None else self.caption.to_markdown()
+        md = f'<audio controls><source src="{self.url}"{atype}>{caption}</audio>\n'
         return md
 
 
@@ -1088,7 +1114,7 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
         match columns:
             case int() as n_columns:
                 if n_columns < MIN_COLS:
-                    msg = 'Number of columns must be at least 2.'
+                    msg = f'Number of columns must be at least {MIN_COLS}.'
                     raise ValueError(msg)
                 self.obj_ref.column_list.children = [obj_blocks.Column.build() for _ in range(n_columns)]
             case ratios if isinstance(ratios, Sequence) and all(isinstance(x, float | int) for x in ratios):

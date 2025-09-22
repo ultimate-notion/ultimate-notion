@@ -16,6 +16,7 @@ finally:
 
 from ultimate_notion.blocks import (
     PDF,
+    Audio,
     Block,
     Bookmark,
     Breadcrumb,
@@ -72,6 +73,7 @@ __all__ = [
     'PDF',
     'AggFunc',
     'AnyFile',  # for type hinting only
+    'Audio',
     'BGColor',
     'Block',  # for type hinting only
     'Bookmark',

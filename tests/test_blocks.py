@@ -176,42 +176,54 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
 @pytest.mark.vcr()
 def test_create_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
+    pdf_url = 'https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf'
+    pdf_name = pdf_url.rsplit('/').pop()
+    file_url = 'https://www.google.de/robots.txt'
+    file_name = file_url.rsplit('/').pop()
+    image_url = 'https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'
+    video_url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    audio_url = 'https://samplelib.com/lib/preview/mp3/sample-3s.mp3'
+
     page = notion.create_page(parent=root_page, title='Page for creating file blocks')
     children: list[uno.Block] = [
-        uno.File(uno.url('https://www.google.de/robots.txt'), name='robots.txt'),
-        uno.File(uno.url('https://www.google.de/robots.txt', name='robots.txt'), caption='Google Robots'),
-        uno.Image(uno.url('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg')),
-        uno.Image(
-            uno.url('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'), caption='Path on meadow'
-        ),
-        uno.Video(uno.url('https://www.youtube.com/watch?v=dQw4w9WgXcQ')),
-        uno.Video(uno.url('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), caption='Rick Roll'),
-        uno.PDF(uno.url('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf')),
-        uno.PDF(uno.url('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf'), caption='Dummy PDF'),
+        uno.File(uno.url(file_url)),
+        uno.File(uno.url(file_url), name='my_file.txt', caption='Google Robots'),
+        uno.Image(uno.url(image_url)),
+        uno.Image(uno.url(image_url), caption='Path on meadow'),
+        uno.Video(uno.url(video_url)),
+        uno.Video(uno.url(video_url), caption='Rick Roll'),
+        uno.PDF(uno.url(pdf_url)),
+        uno.PDF(uno.url(pdf_url), caption='Dummy PDF'),
+        uno.Audio(uno.url(audio_url)),
+        uno.Audio(uno.url(audio_url), caption='Sample Audio'),
     ]
     page.append(children)
     output = page.to_markdown()
-    exp_output = dedent("""
+    exp_output = dedent(f"""
         # Page for creating file blocks
 
-        [📎 robots.txt](https://www.google.de/robots.txt)
+        [📎 {file_name}]({file_url})
 
-        [📎 robots.txt](https://www.google.de/robots.txt)
+        [📎 my_file.txt]({file_url})
         Google Robots
 
-        ![flowers-4387827_1280.jpg](https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg)
+        ![flowers-4387827_1280.jpg]({image_url})
 
-        <figure><img src="https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg" alt="flowers-4387827_1280.jpg" /><figcaption>Path on meadow</figcaption></figure>
+        <figure><img src="{image_url}" alt="flowers-4387827_1280.jpg" /><figcaption>Path on meadow</figcaption></figure>
 
-        <video width="320" height="240" controls><source src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></video>
+        <video width="320" height="240" controls><source src="{video_url}"></video>
 
-        <video width="320" height="240" controls><source src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></video>
+        <video width="320" height="240" controls><source src="{video_url}">Rick Roll</video>
 
-        [📖 dummy.pdf](https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf)
+        [📖 {pdf_name}]({pdf_url})
 
-        [📖 dummy.pdf](https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf)
+        [📖 {pdf_name}]({pdf_url})
         Dummy PDF
-    """)  # noqa: E501
+
+        <audio controls><source src="{audio_url}" type="audio/mpeg"></audio>
+
+        <audio controls><source src="{audio_url}" type="audio/mpeg">Sample Audio</audio>
+    """)
     for exp, act in zip(exp_output.lstrip('\n').split('\n'), output.split('\n'), strict=True):
         assert exp == act
 
