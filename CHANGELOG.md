@@ -8,6 +8,7 @@
        adhering to the Notion API limits, issue #119, #120.
 - Fix: Appended blocks are now added to session cache.
 - New: Added support for the Notion audio block, issue #123.
+- New: Allow comparing offline blocks to the ones synchronized to Notion, issue #124.
 
 ## Version 0.9.1, 2025-09-03
 
