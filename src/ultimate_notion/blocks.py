@@ -1512,7 +1512,7 @@ def _build_obj_ref(node: _Node) -> Block:
     if not isinstance(block, Block):
         msg = f'Non-block type {type(block)} not allowed on this level of the hierarchy.'
         raise TypeError(msg)
-    if isinstance(block, ParentBlock) and block.has_children and block._children is not None:
+    if isinstance(block, ParentBlock) and block.has_children and hasattr(block.obj_ref.value, 'children'):
         for child in node.children:
             _build_obj_ref(child)
         block.obj_ref.value.children = [child.block.obj_ref for child in children]
