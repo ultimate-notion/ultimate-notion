@@ -6,6 +6,7 @@ import pendulum as pnd
 import pytest
 
 import ultimate_notion as uno
+from tests.conftest import URL
 from ultimate_notion import props
 from ultimate_notion.errors import InvalidAPIUsageError, PropertyError, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
@@ -13,7 +14,7 @@ from ultimate_notion.schema import Property
 
 
 @pytest.mark.vcr()
-def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -> None:
+def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, test_url: URL) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -87,7 +88,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page) -
         'checkbox': props.Checkbox(True),
         'date': props.Date(pnd.date(2021, 1, 1)),
         'email': props.Email('email@provider.com'),
-        'files': props.Files([uno.ExternalFile(name='My File', url='https://...')]),
+        'files': props.Files([uno.ExternalFile(name='My File', url=test_url.file)]),
         'multi_select': props.MultiSelect(options[0]),
         'number': props.Number(42),
         'people': props.Person(florian),
