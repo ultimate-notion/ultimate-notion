@@ -5,11 +5,12 @@ from __future__ import annotations
 import datetime as dt
 import re
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, TypeGuard
+from typing import TYPE_CHECKING, Any, TypeGuard
 from urllib.parse import urlparse
 
 import pendulum as pnd
 from typing_extensions import Self, TypeVar
+from url_normalize import url_normalize
 
 from ultimate_notion.core import Wrapper
 from ultimate_notion.emoji import CustomEmoji
@@ -33,6 +34,12 @@ RTBO_co = TypeVar('RTBO_co', bound=objs.RichTextBaseObject, default=objs.RichTex
 
 class RichTextBase(Wrapper[RTBO_co], wraps=objs.RichTextBaseObject):
     """Super class for text, equation and mentions of various kinds."""
+
+    def __init__(self, *args: Any, href: str | None, **kwargs: Any) -> None:
+        if href is not None:
+            href = url_normalize(href)
+
+        super().__init__(*args, href=href, **kwargs)
 
     @property
     def is_text(self) -> bool:

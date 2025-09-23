@@ -12,8 +12,10 @@ from uuid import UUID
 import filetype
 import pendulum as pnd
 from typing_extensions import Self, TypeVar
+from url_normalize import url_normalize
 
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
+from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import FileUploadStatus
@@ -68,7 +70,7 @@ class NotionFile(AnyFile[objs.HostedFile], wraps=objs.HostedFile):
 
     def __init__(self, *, url: str, name: str | None = None, caption: str | None = None) -> None:
         caption_obj = Text(caption).obj_ref if caption is not None else None  # [] is not accepted here by the API!
-        super().__init__(url=url, name=name, caption=caption_obj)
+        super().__init__(url=url_normalize(url), name=name, caption=caption_obj)
 
     def __str__(self) -> str:
         return f'NotionFile({self.url})'
@@ -90,7 +92,7 @@ class ExternalFile(AnyFile[objs.ExternalFile], wraps=objs.ExternalFile):
 
     def __init__(self, *, url: str, name: str | None = None, caption: str | None = None) -> None:
         caption_obj = Text(caption).obj_ref if caption is not None else None  # [] is not accepted here by the API!
-        super().__init__(url=url, name=name, caption=caption_obj)
+        super().__init__(url=url_normalize(url), name=name, caption=caption_obj)
 
     def __str__(self) -> str:
         return f'ExternalFile({self.url})'
@@ -120,6 +122,10 @@ class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
 
     poll_interval: float = 1.0
     obj_file_upload: objs.FileUpload
+
+    def __init__(self) -> None:
+        msg = 'Use the corresponding methods of a `Session` to get an uploaded file object.'
+        raise InvalidAPIUsageError(msg)
 
     def __str__(self) -> str:
         return f'UploadedFile({self.id})'

@@ -34,6 +34,7 @@ import numpy as np
 from notion_client import APIResponseError
 from tabulate import tabulate
 from typing_extensions import Self, TypeVar
+from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url
@@ -762,7 +763,7 @@ class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
 
     def __init__(self, url: str, *, caption: str | None = None) -> None:
         caption_obj = Text(caption).obj_ref if caption is not None else None
-        super().__init__(url=url, caption=caption_obj)
+        super().__init__(url=url_normalize(url), caption=caption_obj)
 
     @property
     def url(self) -> str:
@@ -771,8 +772,12 @@ class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
 
     @url.setter
     def url(self, url: str) -> None:
-        self.obj_ref.value.url = url
-        self._update_in_notion()
+        if (norm_url := url_normalize(url)) is not None:
+            self.obj_ref.value.url = norm_url
+            self._update_in_notion()
+        else:
+            msg = f'Invalid URL: {url}'
+            raise ValueError(msg)
 
     def to_markdown(self) -> str:
         title = self.caption.to_plain_text() if self.caption is not None else self.url
@@ -787,7 +792,7 @@ class Bookmark(CaptionMixin[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
 
     def __init__(self, url: str, *, caption: str | None = None) -> None:
         caption_obj = Text(caption).obj_ref if caption is not None else None
-        super().__init__(url=url, caption=caption_obj)
+        super().__init__(url=url_normalize(url), caption=caption_obj)
 
     @property
     def url(self) -> str | None:
@@ -798,9 +803,8 @@ class Bookmark(CaptionMixin[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
 
     @url.setter
     def url(self, url: str | None) -> None:
-        if url is None:
-            url = ''
-        self.obj_ref.value.url = url
+        url = url_normalize(url)
+        self.obj_ref.value.url = '' if url is None else url
         self._update_in_notion()
 
     def to_markdown(self) -> str:

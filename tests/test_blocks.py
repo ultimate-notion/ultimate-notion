@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 
 import ultimate_notion as uno
+from tests.conftest import URL
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
@@ -175,54 +176,46 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_create_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
-    pdf_url = 'https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf'
-    pdf_name = pdf_url.rsplit('/').pop()
-    file_url = 'https://www.google.de/robots.txt'
-    file_name = file_url.rsplit('/').pop()
-    image_url = 'https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'
-    video_url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    audio_url = 'https://samplelib.com/lib/preview/mp3/sample-3s.mp3'
-
+def test_create_file_blocks(root_page: uno.Page, notion: uno.Session, test_url: URL) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating file blocks')
     children: list[uno.Block] = [
-        uno.File(uno.url(file_url)),
-        uno.File(uno.url(file_url), name='my_file.txt', caption='Google Robots'),
-        uno.Image(uno.url(image_url)),
-        uno.Image(uno.url(image_url), caption='Path on meadow'),
-        uno.Video(uno.url(video_url)),
-        uno.Video(uno.url(video_url), caption='Rick Roll'),
-        uno.PDF(uno.url(pdf_url)),
-        uno.PDF(uno.url(pdf_url), caption='Dummy PDF'),
-        uno.Audio(uno.url(audio_url)),
-        uno.Audio(uno.url(audio_url), caption='Sample Audio'),
+        uno.File(uno.url(test_url.file)),
+        uno.File(uno.url(test_url.file), name='my_file.txt', caption='Google Robots'),
+        uno.Image(uno.url(test_url.img)),
+        uno.Image(uno.url(test_url.img), caption='Meadow'),
+        uno.Video(uno.url(test_url.video)),
+        uno.Video(uno.url(test_url.video), caption='Rick Roll'),
+        uno.PDF(uno.url(test_url.pdf)),
+        uno.PDF(uno.url(test_url.pdf), caption='Dummy PDF'),
+        uno.Audio(uno.url(test_url.audio)),
+        uno.Audio(uno.url(test_url.audio), caption='Sample Audio'),
     ]
     page.append(children)
     output = page.to_markdown()
     exp_output = dedent(f"""
         # Page for creating file blocks
 
-        [📎 {file_name}]({file_url})
+        [📎 {test_url.file_name}]({test_url.file})
 
-        [📎 my_file.txt]({file_url})
+        [📎 my_file.txt]({test_url.file})
         Google Robots
 
-        ![flowers-4387827_1280.jpg]({image_url})
+        ![flowers-4387827_1280.jpg]({test_url.img})
 
-        <figure><img src="{image_url}" alt="flowers-4387827_1280.jpg" /><figcaption>Path on meadow</figcaption></figure>
+        <figure><img src="{test_url.img}" alt="flowers-4387827_1280.jpg" /><figcaption>Meadow</figcaption></figure>
 
-        <video width="320" height="240" controls><source src="{video_url}"></video>
+        <video width="320" height="240" controls><source src="{test_url.video}"></video>
 
-        <video width="320" height="240" controls><source src="{video_url}">Rick Roll</video>
+        <video width="320" height="240" controls><source src="{test_url.video}">Rick Roll</video>
 
-        [📖 {pdf_name}]({pdf_url})
+        [📖 {test_url.pdf_name}]({test_url.pdf})
 
-        [📖 {pdf_name}]({pdf_url})
+        [📖 {test_url.pdf_name}]({test_url.pdf})
         Dummy PDF
 
-        <audio controls><source src="{audio_url}" type="audio/mpeg"></audio>
+        <audio controls><source src="{test_url.audio}" type="audio/mpeg"></audio>
 
-        <audio controls><source src="{audio_url}" type="audio/mpeg">Sample Audio</audio>
+        <audio controls><source src="{test_url.audio}" type="audio/mpeg">Sample Audio</audio>
     """)
     for exp, act in zip(exp_output.lstrip('\n').split('\n'), output.split('\n'), strict=True):
         assert exp == act
@@ -433,20 +426,13 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session) -> None:
+def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session, test_url: URL) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying file blocks')
     children: list[uno.Block] = [
-        file := uno.File(
-            uno.url(
-                'https://www.google.de/robots.txt',
-                name='robots.txt',
-            )
-        ),
-        image := uno.Image(
-            uno.url('https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg'), caption='Path on meadow'
-        ),
-        video := uno.Video(uno.url('https://www.youtube.com/watch?v=dQw4w9WgXcQ')),
-        pdf := uno.PDF(uno.url('https://www.iktz-hd.de/fileadmin/user_upload/dummy.pdf')),
+        file := uno.File(uno.url(test_url.file), name='robots.txt'),
+        image := uno.Image(uno.url(test_url.img), caption='Path on meadow'),
+        video := uno.Video(uno.url(test_url.video)),
+        pdf := uno.PDF(uno.url(test_url.pdf)),
     ]
     page.append(children)
 

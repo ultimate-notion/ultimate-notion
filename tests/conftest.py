@@ -28,6 +28,7 @@ import shutil
 import tempfile
 import time
 from collections.abc import Callable, Iterator
+from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -669,6 +670,7 @@ def all_blocks() -> tuple[uno.Block, ...]:
         uno_blocks.NumberedItem('Numbered List Item'),
         uno_blocks.Equation('E=mc^2'),
         uno_blocks.Breadcrumb(),
+        uno_blocks.Paragraph(uno.text('Google link', href='https://www.google.com')),
     ]
     h1_block.append(
         [
@@ -691,3 +693,34 @@ def all_blocks() -> tuple[uno.Block, ...]:
     table[0] = ('Header 1', 'Header 2')
     table[1] = ('Cell 1', 'Cell 2')
     return tuple(blocks)
+
+
+@dataclass
+class URL:
+    """Container for test URLs."""
+
+    img: str
+    file: str
+    video: str
+    pdf: str
+    audio: str
+
+    @property
+    def pdf_name(self) -> str:
+        return self.pdf.rsplit('/').pop()
+
+    @property
+    def file_name(self) -> str:
+        return self.file.rsplit('/').pop()
+
+
+@pytest.fixture(scope='module')
+def test_url() -> URL:
+    """Return a set of URLs for testing."""
+    return URL(
+        img='https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg',
+        file='https://www.google.de/robots.txt',
+        video='https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        pdf='https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf',
+        audio='https://samplelib.com/lib/preview/mp3/sample-3s.mp3',
+    )
