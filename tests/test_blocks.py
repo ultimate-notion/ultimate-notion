@@ -6,7 +6,7 @@ from typing import cast
 import pytest
 
 import ultimate_notion as uno
-from tests.conftest import URL
+from tests.conftest import URL, all_blocks
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
@@ -743,3 +743,14 @@ def test_max_nesting_level(root_page: uno.Page, notion: uno.Session) -> None:
     assert len(page.children) == n_blocks + 1
     assert len(page.children[1].children) == n_blocks  # type: ignore[attr-defined]
     assert len(page.children[1].children[0].children) == n_blocks  # type: ignore[attr-defined]
+
+
+@pytest.mark.vcr()
+def test_cmp_online_offline_blocks(notion: uno.Session, root_page: uno.Page) -> None:
+    """Compare online and offline created blocks."""
+    page = notion.create_page(parent=root_page, title='Compare Online and Offline Created Blocks')
+    page.append(all_blocks())
+
+    assert page.children == all_blocks()
+    page.reload()
+    assert page.children == all_blocks()
