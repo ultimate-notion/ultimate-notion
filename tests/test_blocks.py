@@ -10,6 +10,7 @@ from tests.conftest import URL, all_blocks
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
+from ultimate_notion.obj_api.blocks import Block as ObjBlock
 from ultimate_notion.obj_api.core import Unset
 
 
@@ -754,3 +755,76 @@ def test_cmp_online_offline_blocks(notion: uno.Session, root_page: uno.Page) -> 
     assert page.children == all_blocks()
     page.reload()
     assert page.children == all_blocks()
+
+
+@pytest.mark.vcr()
+def test_deserialized_block_children(root_page: uno.Page, notion: uno.Session) -> None:
+    """Test that deserialized blocks have their children loaded."""
+    page = notion.create_page(parent=root_page, title='Test Deserialized Block Children')
+
+    block_child_serialized_with_children = {
+        'object': 'block',
+        'has_children': True,
+        'in_trash': False,
+        'archived': False,
+        'type': 'bulleted_list_item',
+        'bulleted_list_item': {
+            'rich_text': [
+                {
+                    'type': 'text',
+                    'plain_text': 'A',
+                    'annotations': {
+                        'bold': False,
+                        'italic': False,
+                        'strikethrough': False,
+                        'underline': False,
+                        'code': False,
+                    },
+                    'text': {'content': 'A'},
+                }
+            ],
+            'color': 'default',
+            'children': [
+                {
+                    'object': 'block',
+                    'has_children': False,
+                    'in_trash': False,
+                    'archived': False,
+                    'type': 'bulleted_list_item',
+                    'bulleted_list_item': {
+                        'rich_text': [
+                            {
+                                'type': 'text',
+                                'plain_text': 'B',
+                                'annotations': {
+                                    'bold': False,
+                                    'italic': False,
+                                    'strikethrough': False,
+                                    'underline': False,
+                                    'code': False,
+                                },
+                                'text': {'content': 'B'},
+                            }
+                        ],
+                        'color': 'default',
+                        'children': [],
+                    },
+                }
+            ],
+        },
+    }
+
+    block_child = uno.Block.wrap_obj_ref(ObjBlock.model_validate(obj=block_child_serialized_with_children))
+
+    another_block_child = uno.Block.wrap_obj_ref(ObjBlock.model_validate(obj=block_child_serialized_with_children))
+
+    assert block_child == another_block_child
+
+    page.append(blocks=[block_child])
+
+    page.reload()
+    assert len(page.children) == 1
+    assert page.children[0] == block_child
+
+    # This hits an assertion error
+    assert page.children[0] == another_block_child
