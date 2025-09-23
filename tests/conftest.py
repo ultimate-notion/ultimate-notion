@@ -615,7 +615,9 @@ def delete_all_taskslists() -> None:
             'connect to the Google API now.\n'
             f'Delete `{TEST_CFG_FILE.parent / "token.json"}` and run:\n'
             'hatch run vcr-off -k test_gtask_client\n'
-            'to perform the authentication flow before rewriting the VCR cassettes.'
+            'to perform the authentication flow before rewriting the VCR cassettes.\n'
+            'Note that the missing authentication might have been recorded in the VCR cassettes!\n'
+            'So running `hatch run vcr-drop-cassettes` might be necessary as well.'
         )
         raise RuntimeError(msg) from e
 

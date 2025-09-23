@@ -386,10 +386,10 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
     todo.checked = False
 
-    embed.url = 'https://notion.so'
+    embed.url = 'https://notion.so/'
     embed.caption = uno.text('Notion Homepage')
 
-    bookmark.url = 'https://notion.so'
+    bookmark.url = 'https://notion.so/'
 
     equation.latex = r'e = mc^2'
 
@@ -419,7 +419,7 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     assert child_embed.caption == 'Notion Homepage'
 
     child_bookmark = cast(uno.Bookmark, page.children[6])
-    assert child_bookmark.url == 'https://notion.so'
+    assert child_bookmark.url == 'https://notion.so/'
 
     child_equation = cast(uno.Equation, page.children[7])
     assert child_equation.latex == r'e = mc^2'
