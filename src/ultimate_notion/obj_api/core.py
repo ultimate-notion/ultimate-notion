@@ -32,6 +32,7 @@ from pydantic import (
 from typing_extensions import Self, TypeIs, TypeVar
 
 from ultimate_notion.errors import UnsetError
+from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.utils import is_stable_release, pydantic_apply
 
 if TYPE_CHECKING:
@@ -108,7 +109,11 @@ Unset: UnsetType = UnsetType()
 
 def is_unset(v: Any) -> TypeIs[UnsetType]:
     """Check if the given value is unset."""
-    return isinstance(v, UnsetType)
+    if isinstance(v, UnsetType):
+        return True
+    elif v == Unset.model_dump(mode='python'):  # v was serialized
+        return True
+    return False
 
 
 @overload
@@ -146,16 +151,43 @@ def extract_id(text: str) -> str | None:
 
 
 def _freeze(obj: Any) -> Any:
-    """Make nested structures hashable & deterministic."""
+    """Make nested structures hashable & deterministic.
+
+    !!! note
+
+        We normalize the `color` field in some objects, since if it is `Unset`
+        and has a default value of `Color.DEFAULT` in equality comparisons.
+        We also ignore `id` fields here, e.g. in `Option` objects, since they
+        are not relevant for equality and hashing.
+    """
     if isinstance(obj, BaseModel):
         return _freeze(obj.model_dump(mode='python'))
     if isinstance(obj, dict):
-        return tuple((k, _freeze(v)) for k, v in sorted(obj.items()))
+        elems = []
+        for k, v in sorted(obj.items()):
+            if k == 'color' and is_unset(v):
+                v = _normalize_color(v)
+            elif k in {'id', 'option_ids'}:
+                continue
+            elems.append((k, _freeze(v)))
+        return tuple(elems)
     if isinstance(obj, (list, tuple)):
         return tuple(_freeze(x) for x in obj)
     if isinstance(obj, set):
         return frozenset(_freeze(x) for x in obj)
     return obj
+
+
+def _normalize_color(val: Color | UnsetType) -> Color:
+    """Normalize unset colors to Color.DEFAULT.
+
+    This is useful for ensuring consistent behavior when comparing objects. Notion API sometimes
+    demands a color field to be `Unset` but then returns the default color, which can lead to
+    unexpected behavior in equality checks and hashing.
+    """
+    if is_unset(val):
+        return Color.DEFAULT
+    return val
 
 
 class GenericObject(BaseModel):
@@ -164,36 +196,16 @@ class GenericObject(BaseModel):
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
     def __eq__(self, other: Any) -> bool:
-        """Compare two objects field by field for equality by ignoring if one of the fields is `Unset`.
-
-        !!! warning
-
-            This is not fully consistent with `hash`! Two objects that are considered equal
-            may have different hash values if they differ in fields that are `Unset` in one of them.
-            This trade-off was made to have a more intuitive equality check while still
-            providing a reasonable hash implementation.
-        """
+        """Compare two objects for equality by comparing all their fields."""
         if not isinstance(other, GenericObject):
             return NotImplemented
 
-        my_fields = self.__class__.model_fields
-        other_fields = other.__class__.model_fields
-        if set(my_fields) != set(other_fields):
-            return False  # schema must match exactly
-
-        for name in my_fields:
-            v1 = getattr(self, name, Unset)
-            v2 = getattr(other, name, Unset)
-            if is_unset(v1) or is_unset(v2):
-                continue
-            if v1 != v2:
-                return False
-
-        return True
+        # _freeze is used to guarantee the consistency with __hash__.
+        return bool(_freeze(self) == _freeze(other))
 
     def __hash__(self) -> int:
         """Compute a hash value for the object by hashing all its fields."""
-        frozen = _freeze(self.model_dump(mode='python'))
+        frozen = _freeze(self)
         return hash(frozen)
 
     @classmethod

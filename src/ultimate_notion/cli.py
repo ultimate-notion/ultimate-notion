@@ -9,7 +9,7 @@ import filetype
 import typer
 
 from ultimate_notion import Session, __version__
-from ultimate_notion.blocks import PDF, File, Image, Video
+from ultimate_notion.blocks import PDF, Audio, File, Image, Video
 from ultimate_notion.config import get_cfg, get_cfg_file
 from ultimate_notion.errors import UnknownPageError
 from ultimate_notion.page import Page
@@ -85,7 +85,7 @@ def _is_uuid(value: str) -> bool:
         return False
 
 
-def _get_block_class_for_file(file_path: Path) -> type[File | Image | Video | PDF]:
+def _get_block_class_for_file(file_path: Path) -> type[File | Image | Video | PDF | Audio]:
     """Determine the appropriate block class based on file content and extension.
 
     Uses the filetype library to detect file type by examining magic bytes,
@@ -99,6 +99,8 @@ def _get_block_class_for_file(file_path: Path) -> type[File | Image | Video | PD
             return Image
         elif mime_type.startswith('video/'):
             return Video
+        elif mime_type.startswith('audio/'):
+            return Audio
         elif mime_type == 'application/pdf':
             return PDF
 

@@ -712,7 +712,7 @@ def test_block_equality_and_hash(root_page: uno.Page, notion: uno.Session) -> No
     assert para1.id != para1a.id
 
     assert para1 != para2
-    assert para1 == para1a  # same content and one of the IDs is still unset -> still equal
+    assert para1 == para1a  # same actual content but different metadata like id, timestamp etc.
     assert hash(para1) != hash(para2)
     assert hash(para1) == hash(para1a)
 
