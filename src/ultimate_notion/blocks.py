@@ -639,8 +639,13 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         super().__init__(text, color=color)
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
             icon = Emoji(icon)
-        if icon is not None:
-            self.obj_ref.value.icon = icon.obj_ref
+        if icon is None:
+            # Use the Notion default icon instead of sending Unset, which would be replaced by Notion with their
+            # default anyway. This will get us into trouble if Notion ever changes their default icon. But for now,
+            # this is the best we can do for comparison etc.
+            icon = self.get_default_icon()
+
+        self.obj_ref.value.icon = icon.obj_ref
 
     @staticmethod
     def get_default_icon() -> Emoji:

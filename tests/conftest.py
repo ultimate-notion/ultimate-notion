@@ -667,6 +667,7 @@ def all_blocks() -> tuple[uno.Block, ...]:
         b1_block := uno_blocks.BulletedItem('Bulleted List Item'),
         uno_blocks.Divider(),
         uno_blocks.Callout('Callout', icon='💡'),
+        uno_blocks.Callout('Callout without icon'),
         uno_blocks.Quote('Quote'),
         uno_blocks.ToDoItem('ToDo', checked=True),
         uno_blocks.NumberedItem('Numbered List Item'),
