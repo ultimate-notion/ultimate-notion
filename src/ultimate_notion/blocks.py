@@ -387,12 +387,13 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
             raise InvalidAPIUsageError(msg)
 
     def __eq__(self, other: Any | Block) -> bool:
+        """Compare blocks by their content, not by their metadata like id, timestamp etc."""
         if not isinstance(other, Block):
             return NotImplemented
-        return self.obj_ref == other.obj_ref
+        return self.obj_ref.value == other.obj_ref.value
 
     def __hash__(self) -> int:
-        return hash(self.obj_ref)
+        return hash(self.obj_ref.value)
 
 
 class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):

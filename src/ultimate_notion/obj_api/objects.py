@@ -34,6 +34,7 @@ from ultimate_notion.obj_api.core import (
     TypedObject,
     Unset,
     UnsetType,
+    _normalize_color,
     extract_id,
     raise_unset,
 )
@@ -66,8 +67,7 @@ class SelectOption(GenericObject):
         if not isinstance(other, SelectOption):
             return False
 
-        my_color = Color.DEFAULT if self.color is Unset else self.color
-        other_color = Color.DEFAULT if other.color is Unset else other.color
+        my_color, other_color = _normalize_color(self.color), _normalize_color(other.color)
         return self.name == other.name and my_color == other_color and self.description == other.description
 
     def __hash__(self) -> int:
@@ -89,7 +89,8 @@ class SelectGroup(GenericObject):
         if not isinstance(other, SelectGroup):
             return False
         # we don't compare option_ids since we might not always have them (Status property can't be created)
-        return self.name == other.name and self.color == other.color
+        my_color, other_color = _normalize_color(self.color), _normalize_color(other.color)
+        return self.name == other.name and my_color == other_color
 
     def __hash__(self) -> int:
         return hash((self.name, self.color))

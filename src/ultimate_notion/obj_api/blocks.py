@@ -106,7 +106,10 @@ GO_co = TypeVar('GO_co', bound=GenericObject, default=GenericObject, covariant=T
 class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=True):
     """A standard block object in Notion.
 
-    Calling the block will expose the nested data in the object.
+    !!! note
+        The equality and hash implementation only considers the content of the block,
+        i.e., the `type` and the actual type data, but ignores meta fields like
+        `id`, `created_time`, `last_edited_time`, etc.
     """
 
     def __hash__(self) -> int:
@@ -116,6 +119,7 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
         if not isinstance(other, Block):
             return NotImplemented
 
+        # ignore meta fields, e.g. id, created_time, etc. for equality, only use content
         return self.type == other.type and self.value == other.value
 
 
