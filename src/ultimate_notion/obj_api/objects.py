@@ -353,6 +353,10 @@ class Annotations(GenericObject):
     color: Color | BGColor | UnsetType = Unset
 
 
+MAX_TEXT_OBJECT_SIZE = 2_000
+"""The max text size according to the Notion API is 2000 characters."""
+
+
 class RichTextBaseObject(TypedObject[GenericObject], polymorphic_base=True):
     """Base class for Notion rich text elements."""
 

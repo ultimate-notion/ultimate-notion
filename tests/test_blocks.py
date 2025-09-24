@@ -828,3 +828,25 @@ def test_deserialized_block_children(root_page: uno.Page, notion: uno.Session) -
 
     # This hits an assertion error
     assert page.children[0] == another_block_child
+
+
+@pytest.mark.vcr()
+def test_long_code_block(notion: uno.Session, root_page: uno.Page) -> None:
+    """Test that a long code block is handled correctly."""
+    page = notion.create_page(parent=root_page, title='Test Long Code Block')
+
+    content_length = 2_001  # Notion API limit is 2_000 characters
+    code_text = 'A' * content_length
+    block_child = uno.Code(text=code_text, language=uno.CodeLang.PYTHON)
+    another_block_child = uno.Code(text=code_text, language=uno.CodeLang.PYTHON)
+
+    assert block_child == another_block_child
+
+    page.append(blocks=[block_child])
+
+    page.reload()
+    assert len(page.children) == 1
+    assert page.children[0] == block_child
+
+    # This fails if content in a response is not split.
+    assert page.children[0] == another_block_child

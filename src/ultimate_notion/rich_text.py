@@ -18,14 +18,12 @@ from ultimate_notion.markdown import render_md, rich_texts_to_markdown
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import Unset
 from ultimate_notion.obj_api.enums import Color
+from ultimate_notion.obj_api.objects import MAX_TEXT_OBJECT_SIZE
 from ultimate_notion.user import User
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
     from ultimate_notion.page import Page
-
-MAX_TEXT_OBJECT_SIZE = 2000
-"""The max text size according to the Notion API is 2000 characters."""
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
