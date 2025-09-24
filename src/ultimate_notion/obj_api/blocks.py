@@ -146,7 +146,10 @@ def normalize_text_objs(rt_objs: list[RichTextBaseObject]) -> list[RichTextBaseO
                 content_chunk = rt_obj.text.content[i : i + MAX_TEXT_OBJECT_SIZE]
                 plain_text_chunk = rt_obj.plain_text[i : i + MAX_TEXT_OBJECT_SIZE]
                 new_rt_obj = rt_obj.model_copy(
-                    update={'text': {'content': content_chunk}, 'plain_text': plain_text_chunk}
+                    update={
+                        'text': rt_obj.text.model_copy(update={'content': content_chunk}),
+                        'plain_text': plain_text_chunk,
+                    }
                 )
                 result.append(new_rt_obj)
         else:
