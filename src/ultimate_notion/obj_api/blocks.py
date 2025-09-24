@@ -17,14 +17,15 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any, cast
+from typing import Annotated, Any, cast
 
-from pydantic import Field, SerializeAsAny
+from pydantic import AfterValidator, Field, SerializeAsAny
 from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import GenericObject, NotionEntity, TypedObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
+    MAX_TEXT_OBJECT_SIZE,
     Annotations,
     BlockRef,
     CustomEmojiObject,
@@ -36,6 +37,7 @@ from ultimate_notion.obj_api.objects import (
     MentionPage,
     ParentRef,
     RichTextBaseObject,
+    TextObject,
     UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
@@ -133,10 +135,31 @@ class UnsupportedBlock(Block[UnsupportedBlockTypeData], type='unsupported'):
     unsupported: UnsupportedBlockTypeData = Field(default_factory=UnsupportedBlockTypeData)
 
 
+def normalize_text_objs(rt_objs: list[RichTextBaseObject]) -> list[RichTextBaseObject]:
+    # When sending text objects to the Notion API the number of characters is limited to MAX_TEXT_OBJECT_SIZE,
+    # as defined under https://developers.notion.com/reference/request-limits#limits-for-property-values.
+    # The API response does not enforce this limit, though. We therefore chunk the text here to allow comparison.
+    result = []
+    for rt_obj in rt_objs:
+        if isinstance(rt_obj, TextObject) and len(rt_obj.text.content) > MAX_TEXT_OBJECT_SIZE:
+            for i in range(0, len(rt_obj.text.content), MAX_TEXT_OBJECT_SIZE):
+                content_chunk = rt_obj.text.content[i : i + MAX_TEXT_OBJECT_SIZE]
+                plain_text_chunk = rt_obj.plain_text[i : i + MAX_TEXT_OBJECT_SIZE]
+                new_rt_obj = rt_obj.model_copy(
+                    update={'text': {'content': content_chunk}, 'plain_text': plain_text_chunk}
+                )
+                result.append(new_rt_obj)
+        else:
+            result.append(rt_obj)
+    return result
+
+
 class TextBlockTypeData(GenericObject):
     """Type data for `TextBlock`."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
+    rich_text: Annotated[
+        list[SerializeAsAny[RichTextBaseObject]], AfterValidator(normalize_text_objs), Field(default_factory=list)
+    ]
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
