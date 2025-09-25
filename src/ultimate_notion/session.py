@@ -397,12 +397,17 @@ class Session:
         )
 
         if mode == FileUploadMode.SINGLE_PART:
-            self.api.uploads.send(file_upload=file_upload_obj, file=file)
+            self.api.uploads.send(file_upload=file_upload_obj, file=file, content_type=file_upload_obj.content_type)
         else:
             for part in range(1, n_parts + 1):
                 _logger.info(f'Uploading part {part}/{n_parts} of file `{file_name}`.')
                 chunk = file.read(MAX_FILE_SIZE)
-                self.api.uploads.send(file_upload=file_upload_obj, part=part, file=io.BytesIO(chunk))
+                self.api.uploads.send(
+                    file_upload=file_upload_obj,
+                    part=part,
+                    file=io.BytesIO(chunk),
+                    content_type=file_upload_obj.content_type,
+                )
             self.api.uploads.complete(file_upload=file_upload_obj)
 
         return UploadedFile.from_file_upload(file_upload_obj)
