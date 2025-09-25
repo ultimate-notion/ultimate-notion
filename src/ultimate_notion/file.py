@@ -237,9 +237,14 @@ def get_mime_type(file: BinaryIO) -> str:
     content_sample = file.read(1024)
     file.seek(current_pos)  # Reset position
 
+    # correct some MIME types to match Notion's expectations
+    mime_type_map = {
+        'audio/x-wav': 'audio/wav',  # see issue #127
+    }
+
     kind = filetype.guess(content_sample)
     if kind is not None:
-        return cast(str, kind.mime)
+        return cast(str, mime_type_map.get(kind.mime, kind.mime))
     else:
         return 'application/octet-stream'
 

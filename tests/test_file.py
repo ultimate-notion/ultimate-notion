@@ -66,3 +66,11 @@ def test_list_uploads(notion: uno.Session) -> None:
     uploaded_file.wait_until_uploaded()
     uploads = notion.list_uploads(filter=uno.FileUploadStatus.UPLOADED)
     assert len([upload for upload in uploads if upload == uploaded_file]) == 1
+
+
+@pytest.mark.file_upload
+def test_upload_wav(notion: uno.Session) -> None:
+    with open('tests/assets/sample-3s.wav', 'rb') as file:
+        file_info = notion.upload(file=file)
+
+    assert file_info.content_type == 'audio/wav'
