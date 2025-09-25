@@ -54,8 +54,11 @@ The command automatically detects the file type and creates the appropriate bloc
 
 - **Images** (`.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, etc.) → Image block
 - **Videos** (`.mp4`, `.avi`, `.mov`, `.wmv`, etc.) → Video block
+- **Audio** (`.mp3`, `.wav`, `.ogg`, `.m4a`, etc.) → Audio block
 - **PDFs** (`.pdf`) → PDF block
 - **All other files** → File block
+
+Check out all [supported file types] in the Notion docs.
 
 #### Examples
 
@@ -100,3 +103,5 @@ For detailed help on any command, use:
 ```console
 uno <command> --help
 ```
+
+[supported file types]: https://developers.notion.com/docs/working-with-files-and-media#supported-file-types
