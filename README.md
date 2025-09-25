@@ -142,7 +142,7 @@ Documentation is created using [Material for MkDocs] and hosted on [GitHub Pages
 [PyPI_ver-image]: https://img.shields.io/pypi/v/ultimate-notion.svg?logo=pypi&label=PyPI&logoColor=gold
 [PyPI_ver-link]: https://pypi.org/project/ultimate-notion/
 [PyPI_down-image]: https://img.shields.io/pypi/dm/ultimate-notion.svg?color=blue&label=Downloads&logo=pypi&logoColor=gold
-[PyPI_down-link]: https://clickpy.clickhouse.com/dashboard/ultimate-notion
+[PyPI_down-link]: https://pypistats.org/packages/ultimate-notion
 [PyPI_py-image]: https://img.shields.io/pypi/pyversions/ultimate-notion.svg?logo=python&label=Python&logoColor=gold
 [PyPI_py-link]: https://pypi.org/project/ultimate-notion/
 [hatch-image]: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
