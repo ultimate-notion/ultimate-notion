@@ -20,7 +20,7 @@ Ultimate Notion is the ultimate Python client for [Notion] with a rich set of fe
 - 🖥️ **Command line interface** — Convenient CLI for quick operations and automation scripts.
 - 🔒 **Token-based authentication** — Secure access using Notion integration tokens.
 - 🚀 **One-step setup** — Getting up to speed with a [simple setup guide](usage/getting_started.md).
-- 📜 **MIT licensed** — Released under the permissive [MIT] license for maximum flexibility.
+- 📜 **MIT licensed** — Released under the permissive [MIT license](LICENSE.txt) for maximum flexibility.
 
 👉 Want to learn more? Explore the full [feature breakdown](features.md).
 
