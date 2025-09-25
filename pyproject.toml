@@ -314,6 +314,7 @@ upgrade-pkg = "PIP_COMPILE_UPGRADE_PACKAGE='{args}' hatch env run --env {env_nam
 [tool.hatch.envs.docs]
 dependencies = [
     "hatch",  # for the release scripts in docs/scripts/
+    "hatch-vcs", # as above
     "mkdocs",
     "mkdocs-material~=9.5.48",
     # For social cards, sadly optional dependency [imaging] fails

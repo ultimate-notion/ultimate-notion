@@ -4,6 +4,7 @@
 # [constraints] locks/default.lock (SHA256: da40183acbc7092fce4b99fa3eea80a546aa4cf61c9eafd0e68d0ec0b0f4f35a)
 #
 # - hatch
+# - hatch-vcs
 # - mkdocs
 # - mkdocs-material~=9.5.48
 # - pillow
@@ -170,8 +171,12 @@ h11==0.16.0
     #   httpcore
 hatch==1.14.2
     # via hatch.envs.docs
+hatch-vcs==0.5.0
+    # via hatch.envs.docs
 hatchling==1.27.0
-    # via hatch
+    # via
+    #   hatch
+    #   hatch-vcs
 htmlmin2==0.1.13
     # via mkdocs-minify-plugin
 httpcore==1.0.9
@@ -326,6 +331,7 @@ packaging==25.0
     #   hatch
     #   hatchling
     #   mkdocs
+    #   setuptools-scm
 paginate==0.5.7
     # via mkdocs-material
 pandas==2.3.2
@@ -461,6 +467,8 @@ rsa==4.9.1
     #   google-auth
 ruff==0.13.1
     # via hatch.envs.docs
+setuptools-scm==9.2.0
+    # via hatch-vcs
 shellingham==1.5.4
     # via
     #   -c locks/default.lock
@@ -494,6 +502,7 @@ tomli==2.2.1
     #   -c locks/default.lock
     #   hatch.envs.docs
     #   hatchling
+    #   setuptools-scm
 tomli-w==1.2.0
     # via
     #   -c locks/default.lock
@@ -565,3 +574,6 @@ zipp==3.23.0
     # via importlib-metadata
 zstandard==0.25.0
     # via hatch
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
