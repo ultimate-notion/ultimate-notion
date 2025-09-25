@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.9.3
+
+- Fix: Map file type `x-wav` to `wav` and add a `mime_type` parameter to `upload`, issue #127
+
 ## Version 0.9.2, 2025-09-25
 
 - New: Add new `is_locked` property to show if a page is locked or not.
