@@ -37,6 +37,8 @@ jobs:
     - name: Install Hatch & Ultimate Notion
       run: |
         pipx install hatch
+        pipx inject hatch click==8.2.1 --force # workaround https://github.com/pypa/hatch/issues/2052
+        pipx list --include-injected
         hatch --version
         hatch python install 3.10
 
