@@ -4,7 +4,7 @@
 Ultimate Notion provides comprehensive file upload functionality that allows
 you to upload local files to Notion and import files from external URLs. You
 can then use these uploaded files in various blocks like images, videos, PDFs,
-and generic file blocks.
+and generic file blocks. Check out the list of [supported file types] for upload.
 
 ## Overview
 
@@ -220,3 +220,4 @@ This example shows:
 
 [UploadedFile]: ../../reference/ultimate_notion/file/#ultimate_notion.file.UploadedFile
 [FileUploadStatus]: ../../reference/ultimate_notion/obj_api/enums/#ultimate_notion.obj_api.enums.FileUploadStatus
+[supported file types]: https://developers.notion.com/docs/working-with-files-and-media#supported-file-types
