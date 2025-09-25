@@ -41,7 +41,7 @@ jobs:
         pipx list --include-injected
 
     - name: Set the version of docs to publish
-      run: python docs/scripts/set_release_version.py
+      run: hatch run python docs/scripts/set_release_version.py
 
     - name: Configure Git for GitHub Actions bot
       run: |
