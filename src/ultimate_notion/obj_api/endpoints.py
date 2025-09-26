@@ -555,15 +555,12 @@ class UploadsEndpoint(Endpoint):
         return FileUpload.model_validate(data)
 
     # https://developers.notion.com/reference/send-a-file-upload
-    def send(
-        self, file_upload: FileUpload, file: BinaryIO, part: int | None = None, content_type: str | None = None
-    ) -> None:
+    def send(self, file_upload: FileUpload, file: BinaryIO, part: int | None = None) -> None:
         """Send a file upload and update the file_upload object."""
         _logger.debug(f'Sending file upload with id `{file_upload.id}`.')
+        file_param = (file_upload.filename, file, file_upload.content_type)  # Undocumented, see issue #127 for reasons
         # Notion API doesn't like nulls, so we eliminate them
-        kwargs = {
-            k: v for k, v in (('file', file), ('part_number', part), ('content_type', content_type)) if v is not None
-        }
+        kwargs = {k: v for k, v in (('file', file_param), ('part_number', part)) if v is not None}
         data = cast(dict[str, Any], self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
         file_upload.update(**data)
 
