@@ -382,8 +382,8 @@ class Session:
     def upload(self, file: BinaryIO, *, file_name: str | None = None, mime_type: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
         file_name = file_name if file_name is not None else os.path.basename(getattr(file, 'name', 'unknown_file'))
-        file_size = get_file_size(file)
         mime_type = mime_type if mime_type is not None else get_mime_type(file)
+        file_size = get_file_size(file)
         if mime_type == 'application/octet-stream':
             _logger.warning(f'File `{file_name}` has unknown MIME type, falling back to text/plain.')
             mime_type = 'text/plain'  # Notion does not support application/octet-stream
@@ -402,11 +402,7 @@ class Session:
             for part in range(1, n_parts + 1):
                 _logger.info(f'Uploading part {part}/{n_parts} of file `{file_name}`.')
                 chunk = file.read(MAX_FILE_SIZE)
-                self.api.uploads.send(
-                    file_upload=file_upload_obj,
-                    part=part,
-                    file=io.BytesIO(chunk),
-                )
+                self.api.uploads.send(file_upload=file_upload_obj, part=part, file=io.BytesIO(chunk))
             self.api.uploads.complete(file_upload=file_upload_obj)
 
         return UploadedFile.from_file_upload(file_upload_obj)
