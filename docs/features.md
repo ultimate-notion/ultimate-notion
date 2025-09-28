@@ -82,8 +82,6 @@ These limitations include:
 
 - creating a [Status] property or updating the options as well as option groups. Sending a Status property within a
   create database call is currently accepted but just ignored, i.e., a database without the property will show up.
-- creating a [Unique ID] property or updating its properties like the prefix. This property type is not even mentioned
-  as one of the [database properties].
 - creating a [Wiki database], which has a special [Verification] property.
 - [updating the database schema] with respect to the options of a select/multi-select property, the formula of a
   formula property, and synced content.
@@ -105,8 +103,6 @@ These limitations include:
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
 [Status]: https://developers.notion.com/reference/property-object#status
-[Unique ID]: https://developers.notion.com/reference/page-property-values#unique-id
-[database properties]: https://developers.notion.com/reference/property-object
 [Verification]: https://developers.notion.com/reference/page-property-values#verification
 [Wiki database]: https://developers.notion.com/docs/working-with-databases#wiki-databases
 [updating the database schema]: https://developers.notion.com/reference/update-a-database#errors

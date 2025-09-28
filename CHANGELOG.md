@@ -1,8 +1,12 @@
 # Changelog
 
+## Version 0.9.4
+
+- Chg: Allow the creation of a unique ID column, which is now supported by the Notion API.
+
 ## Version 0.9.3, 2025-09-26
 
-- Fix: Map file type `audio/x-wav` to `audio/wav` and add a `mime_type` parameter to `upload`, issue #127
+- Fix: Map file type `audio/x-wav` to `audio/wav` and add a `mime_type` parameter to `upload`, issue #127.
 
 ## Version 0.9.2, 2025-09-25
 
