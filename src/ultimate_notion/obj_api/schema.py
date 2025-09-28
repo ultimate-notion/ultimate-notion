@@ -416,6 +416,10 @@ class UniqueID(Property[UniqueIDTypeData], type='unique_id'):
 
     unique_id: UniqueIDTypeData = Field(default_factory=UniqueIDTypeData)
 
+    @classmethod
+    def build(cls, prefix: str | None = None) -> UniqueID:
+        return UniqueID.model_construct(unique_id=UniqueIDTypeData(prefix=prefix))
+
 
 class VerificationTypeData(GenericObject):
     """Type data for `Verification`."""

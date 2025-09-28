@@ -23,6 +23,8 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, t
 
     options = [uno.Option(name='Option1'), uno.Option(name='Option2', color=uno.Color.RED)]
 
+    id_prefix = 'MyID44'  # must be unique in the workspace, and the Notion API cache can be quite stale
+
     class SchemaB(uno.Schema, db_title='Schema B'):
         """Actual interesting schema/db"""
 
@@ -52,7 +54,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, t
         text = uno.PropType.Text('Text')
         title = uno.PropType.Title('Title')
         url = uno.PropType.URL('URL')
-        # unique_id = uno.PropType.ID('Unique ID')  # 2025-06-30: is not yet supported by Notion API
+        unique_id = uno.PropType.ID('ID', prefix=id_prefix)
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
@@ -108,6 +110,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, t
 
     # creating a page using proper PropertyValues
     b_item1 = db_b.create_page(**kwargs)
+    assert b_item1.props.unique_id.startswith(id_prefix.upper())
 
     # creating a page using raw Python types and the Schema directly
     b_item2 = SchemaB.create(**{name: prop.value for name, prop in kwargs.items()})

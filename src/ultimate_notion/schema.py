@@ -1170,9 +1170,16 @@ class LastEditedTime(Property[obj_schema.LastEditedTime], wraps=obj_schema.LastE
 
 
 class ID(Property[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
-    """Defines a unique ID property in a database."""
+    """Defines a unique ID property in a database.
 
-    allowed_at_creation = False
+    !!! note
+        The prefix of the ID will be capitalized by Notion automatically.
+        If no prefix is provided, Notion will assign one automatically.
+        If a prefix is provided, the prefix itself must be unique in the workspace.
+    """
+
+    def __init__(self, name: str | None = None, *, prefix: str | None = None):
+        super().__init__(name=name, prefix=prefix.upper() if prefix is not None else None)
 
     @property
     def prefix(self) -> str:
