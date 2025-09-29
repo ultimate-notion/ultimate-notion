@@ -363,7 +363,7 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     two_way_prop = 'Other Back Relation'
     db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
     assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
-    db_c.reload()
+    db_c.reload(rebind_schema=False)  # since we changed something above
     assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
 
     # Delete the two-way relation property
@@ -543,3 +543,42 @@ def test_bind_db_auto(notion: uno.Session) -> None:
 
     TaskWithDbTitle.bind_db()
     assert TaskWithDbTitle.is_bound()
+
+
+@pytest.mark.vcr()
+def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page) -> None:
+    old_id_prefix = 'OLDID19'  # must be unique in the workspace, and the Notion API cache can be quite stale
+    new_id_prefix = 'NEWID29'
+
+    class Schema(uno.Schema, db_title='Unique ID Update Test'):
+        name = uno.PropType.Title('Name')
+        unique_id = uno.PropType.ID('ID', prefix=old_id_prefix)
+
+    db = notion.create_db(parent=root_page, schema=Schema)
+
+    db.schema.unique_id.prefix = new_id_prefix  # type: ignore[attr-defined]
+    db.reload()
+    assert db.schema.unique_id.prefix.startswith(new_id_prefix)  # type: ignore[attr-defined]
+
+    with pytest.raises(ValueError):
+        db.schema.unique_id.prefix = 'Invalid Prefix!'  # type: ignore[attr-defined]
+
+    db.schema.unique_id.prefix = None  # type: ignore[attr-defined]
+    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+
+    db.schema.unique_id.prefix = ''  # type: ignore[attr-defined]
+    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+
+    class NoIDPrefixSchema(uno.Schema, db_title='No Prefix ID Test'):
+        name = uno.PropType.Title('Name')
+        unique_id = uno.PropType.ID('ID')
+
+    db = notion.create_db(parent=root_page, schema=NoIDPrefixSchema)
+    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+
+    with pytest.raises(SchemaError):
+
+        class OtherSchema(uno.Schema, db_title='Unique ID Update Test'):
+            name = uno.PropType.Title('Name')
+            unique_id = uno.PropType.ID('ID', prefix=old_id_prefix)
+            other_id = uno.PropType.ID('Other ID')

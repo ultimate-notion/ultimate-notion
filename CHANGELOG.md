@@ -2,7 +2,9 @@
 
 ## Version 0.9.4
 
-- Chg: Allow the creation of a unique ID column, which is now supported by the Notion API.
+- Chg: Allow the creation of a unique ID property, which is now supported by the Notion API.
+- New: Allow changing the prefix of a unique ID property.
+- Chg: The `reload()` method of a database has a `rebind_schema` property, which is activated by default.
 
 ## Version 0.9.3, 2025-09-26
 

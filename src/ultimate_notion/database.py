@@ -166,12 +166,19 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
                 self.parent._children = None  # this forces a new retrieval of children next time
         return self
 
-    def reload(self) -> Self:
-        """Reload this database."""
+    def reload(self, *, rebind_schema: bool = True) -> Self:
+        """Reload this database.
+
+        If `rebind_schema` is `True`, the schema will be rebound to the current database.
+        Otherwise, the schema will set to the reflected schema of the current database.
+        """
+        old_schema = self.schema
         session = get_active_session()
         self.obj_ref = session.api.databases.retrieve(self.id)
         self._schema = None  # reset schema to reflect the current database
         self.schema._set_obj_refs()
+        if rebind_schema:
+            self.schema = old_schema
         return self
 
     @property
