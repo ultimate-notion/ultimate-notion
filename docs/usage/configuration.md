@@ -5,8 +5,8 @@ provide your configuration:
 
 1. **Environment variable**: Set `ULTIMATE_NOTION_CONFIG` to point to your config file
 2. **Default location**:
-   - macOS/Linux: `~/.ultimate-notion/config.toml`
-   - Windows: `$HOME/.ultimate-notion/config.toml`
+    * macOS/Linux: `~/.ultimate-notion/config.toml`
+    * Windows: `$HOME/.ultimate-notion/config.toml`
 
 ## Creating a configuration file
 
