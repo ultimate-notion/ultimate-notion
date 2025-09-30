@@ -233,7 +233,7 @@ class Number(Property[obj_schema.Number], wraps=obj_schema.Number):
         """Return the number format of this number property."""
         return self.obj_ref.number.format
 
-    @format.setter
+    @format.setter  # noqa: A003
     def format(self, new_format: NumberFormat | str) -> None:
         """Set the number format of this number property."""
         if isinstance(new_format, str):
