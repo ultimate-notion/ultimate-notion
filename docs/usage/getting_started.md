@@ -19,24 +19,37 @@ install a more recent version.
 
 ## Creating an integration
 
-Now open the web interface of [Notion], select a workspace, click <kbd>Settings</kbd> to open the account settings
-window, click <kbd>Connections</kbd> and choose <kbd>Develop or manage integrations</kbd>. This should take you to
-the [My integrations] site. Now select <kbd>+ Create new integration</kbd>, provide a name, a [logo], and select the
-Notion workspace the integration should be associated with. After that, click the <kbd>Submit</kbd> button.
+Open [Notion], select a workspace, click <kbd>⚙ Settings</kbd> in the left sidebar to open the account settings
+window, click the lower <kbd>Connections</kbd> entry on the left side bar (there are two!) and choose
+<kbd>↗ Develop or manage integrations</kbd> at the bottom. This should take you to the [My integrations] site.
+Now select <kbd>+ New integration</kbd>, provide a name, select the Notion workspace the integration should be
+associated with, a [logo] and select as type *Internal*. After that, click the <kbd>Save</kbd> button.
 
 ![Notion integration](../assets/images/notion-integration-create.png){:style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-This brings you to the Secrets site where you need to copy and save the *Internal Integration Token*, which always starts
-with `ntn_` or `secret_` when created before September 25, 2024. This token will be used by Ultimate Notion for
-authentication and must be provided in the [configuration](configuration.md).
+A popup with *✅ Integration successfully created* should come up. Click on <kbd>Configure integration settings</kbd>,
+which brings you to the *Configuration* tab of your integration's preferences. Click <kbd>Show</kbd> next to
+*Internal Integration Secret* field to copy and save the **authentication secret**, which always starts
+with `ntn_`. This secret token will be used by Ultimate Notion for authentication and must be provided in the [configuration](configuration.md).
+Under the *Capabilities* section, grant all capabilities to your integration for maximum flexibility as shown here and
+click <kbd>Save</kbd>.
+
+![Notion integration](../assets/images/notion-integration-capabilities.png){:style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
+
+Optionally, under the *Access* tab, click <kbd>+ Select pages</kbd> to grant access to your integration for certain pages.
+This can also be done later as described in the next section.
 
 ## Granting access to an integration
 
 Open Notion, i.e., the web interface or your Notion app. Make sure the integration you created shows up under
-<kbd>Settings & members</kbd> » <kbd>Connections</kbd>. Now select any page you want to access via Ultimate Notion and
-select the <kbd>···</kbd> on the upper right. In the drop-down menu, scroll down, select <kbd>+ Add connections</kbd>,
-search and select your created integration. A pop-up that you need to confirm will inform you that your integration
-will have access to the selected page as well as all its children.
+<kbd>⚙ Settings</kbd> » <kbd>Connections</kbd>. Again, there are two <kbd>Connections</kbd> entries in the left sidebar
+and the lower one in the *Workspace* section is the right one. The meatballs <kbd>⋯</kbd> menu would bring you
+back to the settings from the last section, if you need to change anything later.
+
+To actually grant access to certain pages for your integration, just open any page in Notion and select the
+meatballs <kbd>⋯</kbd> menu in the upper right corner. Select <kbd>Connections</kbd> and type in the name of your
+integration in the search field, select your integration and confirm that your integration is allowed to connect
+to your page. Your integration has now access to the selected page as well as all its children.
 
 ![Notion integration](../assets/images/notion-integration-add.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
