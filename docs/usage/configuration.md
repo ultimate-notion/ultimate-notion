@@ -1,14 +1,33 @@
 # Ultimate Notion configuration
 
-Ultimate Notion looks up the environment variable `ULTIMATE_NOTION_CONFIG` for a configuration [TOML] file.
-If this variable is not set, it defaults to `~/.ultimate-notion/config.toml` under macOS/Linux and
-`$HOME/.ultimate-notion/config.toml` under Windows systems.
+Ultimate Notion uses a [TOML] configuration file to manage settings and authentication. There are two ways to
+provide your configuration:
 
-If no configuration file is found, a default one is created automatically. This default file will set the
-Notion token to be looked up using the environment variable `NOTION_TOKEN`.
-Alternatively, you can set your token directly in the configuration file.
+1. **Environment variable**: Set `ULTIMATE_NOTION_CONFIG` to point to your config file
+2. **Default location**:
+   - macOS/Linux: `~/.ultimate-notion/config.toml`
+   - Windows: `$HOME/.ultimate-notion/config.toml`
 
-The default configuration file looks like:
+## Creating a configuration file
+
+To create a default configuration file, run:
+
+```console
+uno config
+```
+
+See the [CLI documentation](cli.md) for more configuration commands.
+
+## Configuration options
+
+The configuration file manages your Notion token and other settings. You can either:
+
+- Set your token directly in the config file
+- Use environment variables (recommended for security)
+
+### Default configuration
+
+The default configuration file contains:
 
 ```toml
 [ultimate_notion]
@@ -21,17 +40,34 @@ client_secret_json = "client_secret.json"
 token_json = "token.json"
 ```
 
-The most important key is `token` within the `ultimate_notion` section. You need to either enter the
-*Internal Integration Token* directly or set it in the referenced environment variable `NOTION_TOKEN`
-to avoid storing your token in a file.
+Let's examine each setting:
 
-Setting `debug` to `true` will generate extensive debug information, which is helpful if you want to report an [issue].
+**Environment variable syntax**: The `${env:VARIABLE_NAME|default}` format looks up environment variables.
+If the variable exists, its value is used; otherwise, the default after `|` is applied. If no default is
+provided and the variable is missing, configuration loading fails.
 
-The key `sync_state_dir` as well as the whole `google` section is only important if you want to sync an
-Ultimate Notion database with Google Tasks. All provided non-absolute paths are always relative to the
-directory of configuration file, e.g. `token.json` will reside in the same directory as `config.toml`.
+**Token (required)**: The `token` setting specifies your Notion integration token. You have two options:
 
-Note that the value `${env:ENV_VARIABLE|default}` allows you to specify that Ultimate Notion should first
-try to look up the environment variable `ENV_VARIABLE` and if not found use the `default` value. The default
-part can be omitted so that reading the configuration fails if an expected environment variable is not
-properly set.
+- **Environment variable (recommended)**: Set `export NOTION_TOKEN="ntn_your_token_here"`
+- **Direct in file**: Replace `"${env:NOTION_TOKEN}"` with `"ntn_your_token_here"`
+
+Using environment variables is more secure as it avoids storing sensitive tokens in files.
+
+**Debug mode**: The `debug` setting controls logging verbosity. Set to `true` for extensive debug information
+when reporting [issues]. You can either:
+
+- Set environment variable: `export ULTIMATE_NOTION_DEBUG=true`
+- Edit config directly: `debug = true`
+
+**Google Tasks integration**: The `sync_state_dir` and `[google]` section are only needed for syncing
+Ultimate Notion databases with Google Tasks:
+
+- `sync_state_dir`: Directory for storing sync state files
+- `client_secret_json`: Google OAuth client secret file
+- `token_json`: Google OAuth token storage
+
+All non-absolute paths are relative to the config file directory (e.g., `token.json` will be in the same
+directory as `config.toml`).
+
+[TOML]: https://toml.io/
+[issues]: https://github.com/ultimate-notion/ultimate-notion/issues

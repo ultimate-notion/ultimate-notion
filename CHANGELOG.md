@@ -6,6 +6,7 @@
 - New: Allow changing the prefix of a unique ID property.
 - Chg: The `reload()` method of a database has a `rebind_schema` property, which is activated by default.
 - Doc: Updated the Getting started docs to the current version of Notion.
+- Doc: Updated the Configuration docs.
 
 ## Version 0.9.3, 2025-09-26
 
