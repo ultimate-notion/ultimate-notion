@@ -14,104 +14,113 @@ or to install all additional dependencies, use:
 pip install 'ultimate-notion[all]'
 ```
 
-Ultimate Notion needs at least Python 3.10. Depending on your system, you might need to use [pyenv], [conda], etc. to
-install a more recent version.
+Ultimate Notion requires Python 3.10 or higher. Depending on your system, you might need to use [pyenv], [conda], etc. to install a more recent version.
 
 ## Creating an integration
 
-Open [Notion], select a workspace, click <kbd>⚙ Settings</kbd> in the left sidebar to open the account settings
-window, click the lower <kbd>Connections</kbd> entry on the left side bar (there are two!) and choose
-<kbd>↗ Develop or manage integrations</kbd> at the bottom. This should take you to the [My integrations] site.
-Now select <kbd>+ New integration</kbd>, provide a name, select the Notion workspace the integration should be
-associated with, a [logo] and select as type *Internal*. After that, click the <kbd>Save</kbd> button.
+1. Open [Notion] and select a workspace
+2. Click **⚙ Settings** in the left sidebar
+3. In the settings window, click **Connections** (in the *Workspace* section at the bottom)
+4. Click **↗ Develop or manage integrations** at the bottom
+
+This takes you to the [My integrations] page. Now:
+
+1. Click **+ New integration**
+2. Provide a name and select your workspace
+3. Optionally add a [logo]
+4. Select **Internal** as the integration type
+5. Click **Save**
 
 ![Notion integration](../assets/images/notion-integration-create.png){:style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-A popup with *✅ Integration successfully created* should come up. Click on <kbd>Configure integration settings</kbd>,
-which brings you to the *Configuration* tab of your integration's preferences. Click <kbd>Show</kbd> next to
-*Internal Integration Secret* field to copy and save the **authentication secret**, which always starts
-with `ntn_`. This secret token will be used by Ultimate Notion for authentication and must be provided in the [configuration](configuration.md).
-Under the *Capabilities* section, grant all capabilities to your integration for maximum flexibility as shown here and
-click <kbd>Save</kbd>.
+After creation, you'll see a success popup. Click **Configure integration settings** to access your integration's preferences.
+
+### Configuring your integration
+
+In the *Configuration* tab:
+
+1. Click **Show** next to *Internal Integration Secret*
+2. Copy and save the authentication token (starts with `ntn_`)
+3. Under *Capabilities*, grant all capabilities for maximum flexibility
+4. Click **Save**
 
 ![Notion integration](../assets/images/notion-integration-capabilities.png){:style="height:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-Optionally, under the *Access* tab, click <kbd>+ Select pages</kbd> to grant access to your integration for certain pages.
-This can also be done later as described in the next section.
+This token will be used by Ultimate Notion for authentication and must be provided in the [configuration](configuration.md).
 
-## Granting access to an integration
+## Granting page access
 
-Open Notion, i.e., the web interface or your Notion app. Make sure the integration you created shows up under
-<kbd>⚙ Settings</kbd> » <kbd>Connections</kbd>. Again, there are two <kbd>Connections</kbd> entries in the left sidebar
-and the lower one in the *Workspace* section is the right one. The meatballs <kbd>⋯</kbd> menu would bring you
-back to the settings from the last section, if you need to change anything later.
+Your integration needs explicit access to pages. To grant access:
 
-To actually grant access to certain pages for your integration, just open any page in Notion and select the
-meatballs <kbd>⋯</kbd> menu in the upper right corner. Select <kbd>Connections</kbd> and type in the name of your
-integration in the search field, select your integration and confirm that your integration is allowed to connect
-to your page. Your integration has now access to the selected page as well as all its children.
+1. Open any page in Notion
+2. Click the **⋯** menu in the upper right corner
+3. Select **Connections**
+4. Search for and select your integration
+5. Confirm access
 
 ![Notion integration](../assets/images/notion-integration-add.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
+Your integration now has access to this page and all its child pages.
+
+Alternatively, you can manage page access from **⚙ Settings** » **Connections** in your workspace.
+
 ## Loading a Notion page
 
-To try out if your integration works, just copy and paste the following code into your favorite editor or better [JupyterLab].
-Replace the content of `PAGE_TITLE` with the title of the page you granted access for your integration and make sure your
-token is set correctly as an environment variable or in your configuration file.
+Test your integration with this code. Replace `PAGE_TITLE` with the title of a page you've granted access to:
 
 ``` py
 --8<-- "examples/getting_started.py"
 ```
 
-Run the code and you should see the following rendered Markdown code in JupyterLab or just the plain output if you run the
-code in a terminal.
+Run the code to see the rendered output. In JupyterLab, you'll see formatted Markdown; in a terminal, you'll see plain text.
 
 ![Getting started page](../assets/images/notion-getting-started-page.png){style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-## Notion concepts in a nutshell
+## Understanding Notion concepts
 
-In Notion, everything is either a *page* or a *block*. A page contains a number of blocks, e.g., headings, text,
-bulleted lists, tables, quotes, and so on.
+### Pages and blocks
 
-An important and special block is the *database*, which may be within a page, i.e., *inline*, as a block
-or at the same hierarchy level as a *page*. Every *database* has a *schema* defined by a set of *properties*,
-i.e., columns, with specific types, e.g., number, text, url, etc., that imposes structured *properties*
-on every page within that database. Only pages contained in a database have properties.
-Notion itself also offers *linked databases* (with ↗ next to the database title), but those are not accessible
-via the API, thus you must always work with the source database. A special type of database is a
-*wiki database* that comes with a pre-defined schema, i.e., title, last-edited-time, owner, tags, verification.
+In Notion, everything is either a **page** or a **block**. A page contains blocks like headings, text, lists, tables, and quotes.
 
-Besides the properties of pages contained in a database, every page has *attributes* such as a title, cover, icon, or
-whether it is in the trash or not. The *title* attribute of a page is special and will always be included as a property
-in the schema if the page is contained in a database. The property name of the title attribute can be customized.
-Think of the title property as a human-readable identifier, which does not have to be unique! This concept is important
-when *relation* properties are used between different databases, as the title property of a linked page will show up in
-the relation property of the other database. If a page is deleted using Ultimate Notion, it is not deleted
-directly but moved to the trash can, i.e., "🗑️ Trash" in the sidebar, for a period of 30 days before it is deleted.
+### Databases
 
-A page, e.g., with title "child-page", can be contained in another page, e.g., with title "parent-page". This leads to a
-hierarchy that is typically used for structuring content. We say that "parent-page" is the *parent* of "child-page" and
-"child-page" is one of the *children* of "parent-page". A page at the root of the workspace has the workspace itself as parent.
-This concept is important as access permissions for integrations are inherited from parent pages. Permissions can
-only be granted to pages, not to complete workspaces encompassing all pages.
+A **database** is a special block type that can exist:
 
-To identify a page, block, user, comment, or even a property, Notion assigns each of them a universally unique
-identifier (UUID), i.e., 32 hexadecimal digits, potentially structured in various fields by a dash, i.e., `-`.
-Using, for instance, the UUID of a database instead of its title allows you to reference it in your code even after someone
-changes its title. The UUIDs of pages and databases can be retrieved by using the web interface of Notion or using
-<kbd>Copy link</kbd> from the <kbd>···</kbd> menu in the upper right corner. The link will have the schema:
+- Within a page (inline database)
+- At the same level as pages (full-page database)
 
-    https://www.notion.so/{TITLE-OF-PAGE}-{UUID}?{PARAMS}
+Each database has a **schema** with **properties** (columns) of specific types (text, number, URL, etc.).
+Pages within a database inherit these properties as structured data.
 
-UUIDs of other entities like blocks, properties, users, etc. can only be retrieved via the API. Ultimate Notion provides
-an `id` property on most of its objects for that. Notion also provides a shortened URL compared to the one above:
+**Note**: Linked databases (marked with ↗) aren't accessible via the API—always work with the source database.
 
-    https://notion.so/{UUID}
+### Page hierarchy and permissions
 
-For the Notion API, strings like captions and text contents are always present — even if empty — so there's no real distinction
-between `""` and unset. Ultimate Notion aligns with this by treating both as equivalent internally but returning `None` for
-empty strings to be consistent with other data types like numbers. When converting a container type, like a block,
-to strings (e.g., `str(block)`), `None` will be displayed as `""`, preserving clean, intuitive output.
+Pages can contain other pages, creating a hierarchy:
 
+- **Parent page**: Contains other pages
+- **Child pages**: Contained within another page
+- **Root pages**: Directly in the workspace
+
+Integration permissions inherit from parent pages, so granting access to a parent automatically includes all children.
+
+### Identifiers
+
+Notion assigns a **UUID** (32-character identifier) to every page, block, user, and property. These UUIDs remain
+constant even when titles change.
+
+You can find page/database UUIDs by:
+
+1. Using **Copy link** from the **···** menu
+2. Extracting from the URL: `https://www.notion.so/{TITLE}-{UUID}`
+
+### Text handling
+
+Notion treats empty strings and unset values equivalently. Ultimate Notion returns `None` for empty strings to
+maintain consistency, but displays them as `""` when converting objects to strings.
+
+[Notion]: https://www.notion.so
 [My integrations]: https://www.notion.so/my-integrations
 [logo]: ../assets/images/logo_integration.png
+[pyenv]: https://github.com/pyenv/pyenv
+[conda]: https://docs.conda.io/
