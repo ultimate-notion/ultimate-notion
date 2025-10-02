@@ -421,3 +421,19 @@ class Button(PropertyValue[obj_props.Button], wraps=obj_props.Button):
 
     def __repr__(self) -> str:
         return get_repr(self, desc=self.id)
+
+
+class Place(PropertyValue[obj_props.Place], wraps=obj_props.Place):
+    """A `PropertyItem` returned by the Notion API containing the `Place` property."""
+
+    readonly = True
+
+    @property
+    def value(self) -> None:
+        return None
+
+    def __str__(self) -> str:
+        return f'Place(id={self.id})'
+
+    def __repr__(self) -> str:
+        return get_repr(self, desc=self.id)

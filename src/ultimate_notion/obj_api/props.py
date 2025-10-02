@@ -315,6 +315,12 @@ class Button(PropertyValue, type='button'):
     button: TypeData = Field(default_factory=TypeData)
 
 
+class Place(PropertyValue, type='place'):
+    """A Notion place property value."""
+
+    place: None
+
+
 ##################
 # Property Items #
 ##################
@@ -435,6 +441,10 @@ class VerificationPropertyItem(PropertyItem, Verification, type='verification'):
 
 class ButtonPropertyItem(PropertyItem, Button, type='button'):
     """A `PropertyItem` returned by the Notion API containing the `Button` property."""
+
+
+class PlacePropertyItem(PropertyItem, Place, type='place'):
+    """A `PropertyItem` returned by the Notion API containing the `Place` property."""
 
 
 PAGINATED_PROP_VALS = (RichText, Title, People, Relation, Rollup)

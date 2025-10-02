@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.9.5
+
+- New: Add the new `Place` database/source property.
+
 ## Version 0.9.4, 2025-10-01
 
 - Chg: Allow the creation of a unique ID property, which is now supported by the Notion API.
