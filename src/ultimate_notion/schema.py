@@ -744,6 +744,12 @@ class Button(Property[obj_schema.Button], wraps=obj_schema.Button):
     allowed_at_creation = False
 
 
+class Place(Property[obj_schema.Place], wraps=obj_schema.Place):
+    """Defines a place property in a database."""
+
+    allowed_at_creation = False
+
+
 class PropType:
     """Namespace class of all property types of a database for easier access."""
 

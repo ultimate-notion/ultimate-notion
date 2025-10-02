@@ -128,7 +128,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, t
 @pytest.mark.vcr()
 def test_all_props_schema(all_props_db: uno.Database) -> None:
     schema_dct = all_props_db.schema.to_dict()
-    assert len(schema_dct) == 26
+    assert len(schema_dct) == 27
 
 
 @pytest.mark.vcr()

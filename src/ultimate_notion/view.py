@@ -436,6 +436,8 @@ def prop_type_to_polars(prop_valtype: Property | PropertyValue) -> pl.DataType:
             return pl.Object()
         case schema.Button() | props.Button():
             return pl.Object()
+        case schema.Place() | props.Place():
+            return pl.Object()
         case schema.Number() | props.Number():
             return pl.Float64()
         case schema.Select() as prop:

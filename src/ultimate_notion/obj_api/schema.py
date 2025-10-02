@@ -441,6 +441,16 @@ class Button(Property[ButtonTypeData], type='button'):
     button: ButtonTypeData = Field(default_factory=ButtonTypeData)
 
 
+class PlaceTypeData(GenericObject):
+    """Type data for `Place`."""
+
+
+class Place(Property[GenericObject], type='place'):
+    """Defines the place configuration for a database property."""
+
+    place: PlaceTypeData = Field(default_factory=PlaceTypeData)
+
+
 class RenameProp(GenericObject):
     """Property to rename a property during a database update."""
 
