@@ -3,6 +3,7 @@
 ## Version 0.9.5
 
 - New: Add the new `Place` database/source property.
+- Fix: Allow to bind a schema with a two-way target property to an existing database, issue #134.
 
 ## Version 0.9.4, 2025-10-01
 

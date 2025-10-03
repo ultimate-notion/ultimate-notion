@@ -1132,6 +1132,24 @@ class Schema(metaclass=SchemaType):
                 )
             }
 
+        # Exclude two-way targets as they are not explicitly defined in the schema
+        two_way_targets = {
+            name: prop_type
+            for name, prop_type in other_schema_dct.items()
+            if isinstance(prop_type, Relation) and prop_type._is_two_way_target
+        }
+        for name in two_way_targets:
+            del other_schema_dct[name]
+            if (
+                name in own_schema_dct
+                and isinstance(own_schema_dct[name], Relation)
+                and own_schema_dct[name].is_two_way
+            ):
+                del own_schema_dct[name]
+            else:
+                msg = f'Target property `{name}` of a two-way relation is missing in the other schema.'
+                raise SchemaError(msg)
+
         if other_schema_dct != own_schema_dct:
             props_added, props_removed, props_changed = dict_diff_str(own_schema_dct, other_schema_dct)
             msg = 'Provided schema is not consistent with the current schema of the database:\n'
