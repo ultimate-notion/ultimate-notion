@@ -31,7 +31,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, TypeGuard, cast, overload
 
 import numpy as np
-from notion_client import APIResponseError
 from tabulate import tabulate
 from typing_extensions import Self, TypeVar
 from url_normalize import url_normalize
@@ -39,7 +38,7 @@ from url_normalize import url_normalize
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import InvalidAPIUsageError
+from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -191,7 +190,7 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
             elif isinstance(child_block, ChildDatabase):
                 try:
                     ref_block = cast(Block, child_block.db)
-                except APIResponseError:
+                except UnknownDatabaseError:
                     # linked database that cannot be retrieved via API. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
                     ref_block = cast(Block, child_block)

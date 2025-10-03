@@ -19,7 +19,7 @@ from notion_client.errors import APIResponseError
 from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
-from ultimate_notion.errors import SessionError, UnknownPageError, UnknownUserError
+from ultimate_notion.errors import SessionError, UnknownDatabaseError, UnknownPageError, UnknownUserError
 from ultimate_notion.file import MAX_FILE_SIZE, UploadedFile, get_file_size, get_mime_type
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
@@ -234,7 +234,12 @@ class Session:
             db = cast(Database, self.cache[db_uuid])
         else:
             _logger.info(f'Retrieving database with id `{db_uuid}`.')
-            db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
+            try:
+                db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
+            except APIResponseError as e:
+                msg = f'Database with id `{db_uuid}` not found!'
+                _logger.warning(msg)
+                raise UnknownDatabaseError(msg) from e
             self.cache[db.id] = db
         _logger.info(f'Retrieved database `{db.title}`.')
         return db
