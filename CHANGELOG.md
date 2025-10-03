@@ -4,6 +4,7 @@
 
 - New: Add the new `Place` database/source property.
 - Fix: Allow to bind a schema with a two-way target property to an existing database, issue #134.
+- Fix: `session.get_page(PAGE)` no longer fails if parent of `Page` is not accessible by the integration, issue #135.
 
 ## Version 0.9.4, 2025-10-01
 

@@ -9,9 +9,9 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias, cast
 from uuid import UUID
 
-from notion_client.errors import APIResponseError
 from typing_extensions import Self, TypeVar
 
+from ultimate_notion.errors import UnknownDatabaseError, UnknownPageError
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
@@ -165,16 +165,16 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
             case objs.PageRef(page_id=page_id):
                 try:
                     return session.get_page(page_ref=page_id)
-                except APIResponseError as e:
-                    msg = f'Error retrieving page with id `{page_id}`: {e}'
-                    _logger.warning(msg)
+                except UnknownPageError as e:
+                    msg = f'No access to parent page with id `{page_id}`: {e}'
+                    _logger.info(msg)
                     return None
             case objs.DatabaseRef(database_id=database_id):
                 try:
                     return session.get_db(db_ref=database_id)
-                except APIResponseError as e:
-                    msg = f'Error retrieving database with id `{database_id}`: {e}'
-                    _logger.warning(msg)
+                except UnknownDatabaseError as e:
+                    msg = f'No access to parent database with id `{database_id}`: {e}'
+                    _logger.info(msg)
                     return None
             case objs.BlockRef(block_id=block_id):
                 return session.get_block(block_ref=block_id)
