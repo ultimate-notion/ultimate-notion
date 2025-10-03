@@ -298,7 +298,7 @@ dependencies = [
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
-debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb {args}"
+debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb --debug-uno -o log_cli=true {args}"
 vcr-off = "test --disable-recording {args}"
 vcr-only = "test --record-mode=none --block-network {args}"
 vcr-rewrite = "test --record-mode=rewrite {args}"

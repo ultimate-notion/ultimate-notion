@@ -210,6 +210,64 @@ def test_property_description(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
+def test_get_or_create_db(notion: uno.Session, root_page: uno.Page) -> None:  # issue #134
+    unique_id = 42  # makes sure that dbs are not even in the trash!
+
+    class Size(uno.OptionNS):
+        """Namespace for the select options of our various sizes."""
+
+        S = uno.Option(name='S', color=uno.Color.GREEN)
+        M = uno.Option(name='M', color=uno.Color.YELLOW)
+        L = uno.Option(name='L', color=uno.Color.RED)
+
+    class Item(uno.Schema, db_title=f'Item DB {unique_id}'):
+        """Database of all the items we sell."""
+
+        name = uno.PropType.Title('Name')
+        size = uno.PropType.Select('Size', options=Size)
+        price = uno.PropType.Number('Price', format=uno.NumberFormat.DOLLAR)
+        bought_by = uno.PropType.Relation('Bought by')
+
+    class Customer(uno.Schema, db_title=f'Customer DB {unique_id}'):
+        """Database of all our beloved customers."""
+
+        name = uno.PropType.Title('Name')
+        purchases = uno.PropType.Relation(
+            'Items Purchased',
+            schema=Item,
+            two_way_prop=Item.bought_by,
+        )
+
+    # first call creates the dbs
+    notion.get_or_create_db(parent=root_page, schema=Item)
+    notion.get_or_create_db(parent=root_page, schema=Customer)
+
+    # we recreate the same schema classes to make sure that we do not rely on the class identity
+    class SameItem(uno.Schema, db_title=f'Item DB {unique_id}'):
+        """Database of all the items we sell."""
+
+        name = uno.PropType.Title('Name')
+        size = uno.PropType.Select('Size', options=Size)
+        price = uno.PropType.Number('Price', format=uno.NumberFormat.DOLLAR)
+        bought_by = uno.PropType.Relation('Bought by')
+
+    class SameCustomer(uno.Schema, db_title=f'Customer DB {unique_id}'):
+        """Database of all our beloved customers."""
+
+        name = uno.PropType.Title('Name')
+        purchases = uno.PropType.Relation(
+            'Items Purchased',
+            schema=Item,
+            two_way_prop=Item.bought_by,
+        )
+
+    # second call should retrieve the dbs
+    notion.cache.clear()
+    notion.get_or_create_db(parent=root_page, schema=SameItem)
+    notion.get_or_create_db(parent=root_page, schema=SameCustomer)
+
+
+@pytest.mark.vcr()
 def test_new_task_db(new_task_db: uno.Database) -> None:
     # ToDo: Implement a proper test
     pass
