@@ -237,7 +237,7 @@ class Session:
             try:
                 db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
             except APIResponseError as e:
-                msg = f'Database with id `{db_uuid}` not found!'
+                msg = f'Database with id `{db_uuid}` does not exist or is not accessible!'
                 _logger.warning(msg)
                 raise UnknownDatabaseError(msg) from e
             self.cache[db.id] = db
@@ -289,7 +289,7 @@ class Session:
             try:
                 page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
             except APIResponseError as e:
-                msg = f'Page with id {page_uuid} not found!'
+                msg = f'Page with id {page_uuid} does not exist or is not accessible!'
                 _logger.warning(msg)
                 raise UnknownPageError(msg) from e
             self.cache[page.id] = page
