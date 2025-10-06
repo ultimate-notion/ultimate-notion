@@ -648,7 +648,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         if icon is None:
             # Use the Notion default icon instead of sending Unset, which would be replaced by Notion with their
             # default anyway. This will get us into trouble if Notion ever changes their default icon. But for now,
-            # this is the best we can do for comparison etc.
+            # this is the best we can do for comparison reasons (online vs. offline blocks), etc.
             icon = self.get_default_icon()
 
         self.obj_ref.value.icon = icon.obj_ref

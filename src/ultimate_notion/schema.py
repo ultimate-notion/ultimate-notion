@@ -854,11 +854,11 @@ class SchemaType(ABCMeta):
             non_unique_attrs = ', '.join(str(attr) for attr in attr_name_props)
             msg = (
                 f'Attribute {name} is not unique for properties {non_unique_attrs}! '
-                'Use indexing, i.e. [...], to access the property.'
+                'Use indexing, i.e. [...], to access the property'  # `.` is added by AttributeError automatically
             )
             raise AttributeError(msg) from e
         except EmptyListError as e:
-            msg = f'Schema has no property with attribute name {name}.'
+            msg = f'Schema has no property with attribute name {name}'  # `.` is added by AttributeError automatically
             raise AttributeError(msg) from e
 
     def __setattr__(cls: type[Schema], name: str, value: Any) -> None:  # type: ignore[misc]
@@ -1142,8 +1142,8 @@ class Schema(metaclass=SchemaType):
             del other_schema_dct[name]
             if (
                 name in own_schema_dct
-                and isinstance(own_schema_dct[name], Relation)
-                and own_schema_dct[name].is_two_way
+                and isinstance(rel_prop := own_schema_dct[name], Relation)
+                and rel_prop.is_two_way
             ):
                 del own_schema_dct[name]
             else:
