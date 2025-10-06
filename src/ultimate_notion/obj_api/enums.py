@@ -46,6 +46,21 @@ class Color(str, Enum):
     RED = 'red'
 
 
+class BGColor(str, Enum):
+    """Background colors for most textual blocks, e.g. paragraphs, callouts, etc."""
+
+    DEFAULT = 'default'
+    GRAY = 'gray_background'
+    BROWN = 'brown_background'
+    ORANGE = 'orange_background'
+    YELLOW = 'yellow_background'
+    GREEN = 'green_background'
+    BLUE = 'blue_background'
+    PURPLE = 'purple_background'
+    PINK = 'pink_background'
+    RED = 'red_background'
+
+
 class FormulaType(str, Enum):
     """Formula types for formulas.
 
@@ -90,21 +105,6 @@ class OptionGroupType(str, Enum):
     TO_DO = 'to_do'
     IN_PROGRESS = 'in_progress'
     COMPLETE = 'complete'
-
-
-class BGColor(str, Enum):
-    """Background colors for most textual blocks, e.g. paragraphs, callouts, etc."""
-
-    DEFAULT = 'default'
-    GRAY = 'gray_background'
-    BROWN = 'brown_background'
-    ORANGE = 'orange_background'
-    YELLOW = 'yellow_background'
-    GREEN = 'green_background'
-    BLUE = 'blue_background'
-    PURPLE = 'purple_background'
-    PINK = 'pink_background'
-    RED = 'red_background'
 
 
 class FileUploadStatus(str, Enum):

@@ -17,7 +17,7 @@ from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.markdown import render_md, rich_texts_to_markdown
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import Unset
-from ultimate_notion.obj_api.enums import Color
+from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.obj_api.objects import MAX_TEXT_OBJECT_SIZE
 from ultimate_notion.user import User
 
@@ -152,7 +152,7 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
 
     !!! note
 
-        Only used internally. Use `Text` instead.
+        Only used internally. Use `Text` instead or the `text` function (recommended).
     """
 
     def __init__(
@@ -164,7 +164,7 @@ class RichText(RichTextBase[objs.TextObject], wraps=objs.TextObject):
         strikethrough: bool = False,
         code: bool = False,
         underline: bool = False,
-        color: Color | None = None,
+        color: Color | BGColor | None = None,
         href: str | None = None,
     ) -> None:
         if len(text) > MAX_TEXT_OBJECT_SIZE:
@@ -286,10 +286,15 @@ def text(
     strikethrough: bool = False,
     code: bool = False,
     underline: bool = False,
-    color: Color | None = None,
+    color: Color | BGColor | None = None,
     href: str | None = None,
 ) -> Text:
     """Create a rich text Text object from a normal string with formatting.
+
+    !!! note
+
+        With the `color` parameter the font color or the background color can be set.
+        Unfortunately Notion's API does not allow to set both at the same time like in the Notion UI.
 
     !!! warning
 

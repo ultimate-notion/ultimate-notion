@@ -91,14 +91,16 @@ These limitations include:
 - setting the icon and cover of a database.
 - moving pages since a [page’s parent cannot be changed].
 - setting a [reminder] based on date and/or time.
-- modifying the URL of file-like blocks, e.g., `File`, `Image`, etc.
+- modifying the URL of file-like blocks, e.g., `File`, `Image`, etc. Replace the block with a new upload instead.
 - creating inline comments to start a new discussion thread.
 - resolving comments or listing unresolved comments.
 - locking or unlocking a page or database.
 - working with database button properties.
+- working with place properties.
 - retrieving a list of all custom emojis defined in the workspace.
 - changing the description of a database property.
 - resolve linked databases, i.e. views to a database.
+- setting the font and background color independently of each other for rich texts.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆
 
