@@ -40,11 +40,13 @@ def _get_default_user_agent() -> str:
     httpx_version = httpx.__version__
     notion_sdk_version = version('notion-client')
     return ' '.join(
-        f'ultimate-notion/{__version__} (https://ultimate-notion.com/)'
-        f'python/{python_version}'
-        f'{os_name}/{architecture}'
-        f'notion-sdk-py/{notion_sdk_version}'
-        f'httpx/{httpx_version}'
+        [
+            f'ultimate-notion/{__version__} (https://ultimate-notion.com/)',
+            f'python/{python_version}',
+            f'{os_name}/{architecture}',
+            f'notion-sdk-py/{notion_sdk_version}',
+            f'httpx/{httpx_version}',
+        ]
     )
 
 
