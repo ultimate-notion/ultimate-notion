@@ -193,6 +193,19 @@ assert lovelace.props['Name'] == 'Ada Lovelace'
 assert engelbart.props['Items Purchased'] == [khaki_pants, t_shirt]
 ```
 
+These access methods may also be used to update properties. The following two statements:
+
+```python
+khaki_pants.props.size = Size.S
+khaki_pants.props['Price'] = 20
+```
+
+have the same effects as:
+
+```python
+khaki_pants.update_props(size=Size.S, price=20)
+```
+
 ## Two-way & self relations
 
 Notion also supports two-way relations and so does Ultimate Notion. Taking the same example as before, imagine

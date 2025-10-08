@@ -395,3 +395,11 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
     text = 'This page has a user-added custom emoji icon '
     page.append(uno.Paragraph(uno.text(text) + custom_emoji_page.icon))
     assert page.children[0].to_markdown() == text + f'{custom_emoji_page.icon}'
+
+
+@pytest.mark.vcr()
+def test_update_props(notion: uno.Session, contacts_db: uno.Database) -> None:
+    props_page = notion.create_page(parent=contacts_db, title='My new page with properties')
+    props_page.update_props(name='John Doe', role=None)
+    assert props_page.props['Name'] == 'John Doe'
+    assert props_page.props['Role'] is None

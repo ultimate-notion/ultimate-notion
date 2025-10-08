@@ -356,6 +356,24 @@ class Page(
         self._comments = None  # forces a new retrieval of comments next time
         return self
 
+    def update_props(self, **properties: Any) -> None:
+        """Update multiple properties at once."""
+        db = self.parent_db
+
+        if db is None:
+            msg = f'Trying to set properties but page {self} is not bound to any database'
+            raise RuntimeError(msg)
+
+        # construct concrete PropertyValue for each property using the schema
+        props = {}
+        for name, p in properties.items():
+            prop: Property = getattr(db.schema, name)
+            props[prop.name] = p if isinstance(p, PropertyValue) else prop.prop_value(p).obj_ref
+
+        session = get_active_session()
+        # update the properties on the server (which will update the local data)
+        session.api.pages.update(self.obj_ref, **props)
+
 
 def is_db_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[Database]:
     """Return whether the object is a database as type guard."""
