@@ -19,8 +19,9 @@ from notion_client.errors import APIResponseError
 from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database
+from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import SessionError, UnknownDatabaseError, UnknownPageError, UnknownUserError
-from ultimate_notion.file import MAX_FILE_SIZE, UploadedFile, get_file_size, get_mime_type
+from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_size, get_mime_type
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
@@ -297,7 +298,13 @@ class Session:
         return page
 
     def create_page(
-        self, parent: Page | Database, title: Text | str | None = None, blocks: Sequence[Block] | None = None
+        self,
+        parent: Page | Database,
+        title: Text | str | None = None,
+        blocks: Sequence[Block] | None = None,
+        *,
+        cover: AnyFile | None = None,
+        icon: AnyFile | Emoji | CustomEmoji | str | None = None,
     ) -> Page:
         """Create a new page in a `parent` page or database with a given `title`.
 
@@ -307,9 +314,17 @@ class Session:
         """
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
+        cover_obj = None if cover is None else cover.obj_ref
+
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+            icon = Emoji(icon)
+        icon_obj = None if icon is None else icon.obj_ref
+
         # We don't use the `children` parameter as we would need to call `list` afterwards to get the children,
         # in order to initialize them, which would be another API call. So we append the blocks manually here.
-        page = Page.wrap_obj_ref(self.api.pages.create(parent=parent.obj_ref, title=title_obj))
+        page = Page.wrap_obj_ref(
+            self.api.pages.create(parent=parent.obj_ref, title=title_obj, cover=cover_obj, icon=icon_obj)
+        )
         self.cache[page.id] = page
 
         if blocks:
