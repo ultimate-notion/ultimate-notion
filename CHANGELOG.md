@@ -6,6 +6,7 @@
 - Fix: Allow to bind a schema with a two-way target property to an existing database, issue #134.
 - Fix: `session.get_page(PAGE)` no longer fails if parent of `Page` is not accessible by the integration, issue #135.
 - Fix: Added `BGColor` type annotation for color parameter in `text()` and `Text`, issue #140.
+- Chg: Add `cover` and `item` parameters to `PagesEndpoint.create()`, issue #144.
 
 ## Version 0.9.4, 2025-10-01
 
