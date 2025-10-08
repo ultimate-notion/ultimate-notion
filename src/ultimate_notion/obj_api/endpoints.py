@@ -337,6 +337,9 @@ class PagesEndpoint(Endpoint):
         title: Title | None = None,
         properties: dict[str, PropertyValue] | None = None,
         children: list[Block] | None = None,
+        *,
+        cover: FileObject | None = None,
+        icon: FileObject | EmojiObject | CustomEmojiObject | None = None,
     ) -> Page:
         """Add a page to the given parent (Page or Database)."""
         if parent is None:
@@ -369,6 +372,12 @@ class PagesEndpoint(Endpoint):
 
         if children is not None:
             request['children'] = [child.serialize_for_api() for child in children if child is not None]
+
+        if cover is not None:
+            request['cover'] = cover.serialize_for_api()
+
+        if icon is not None:
+            request['icon'] = icon.serialize_for_api()
 
         _logger.debug(f'Creating new page below page with id `{parent_id}`.')
         data = self.raw_api.create(**request)
