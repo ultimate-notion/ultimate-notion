@@ -53,3 +53,24 @@ def test_all_users(notion: uno.Session) -> None:
     users = notion.all_users()
     me = notion.whoami()
     assert me in users
+
+
+@pytest.mark.vcr()
+def test_create_page(notion: uno.Session, root_page: uno.Page) -> None:
+    notion_cover_url = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
+    cover_page = notion.create_page(
+        parent=root_page,
+        title='My new page created with a cover',
+        cover=uno.url(notion_cover_url),
+    )
+    assert isinstance(cover_page.cover, uno.AnyFile)
+    assert cover_page.cover == uno.ExternalFile(url=notion_cover_url)
+
+    emoji_icon = '🐍'
+    icon_page = notion.create_page(
+        parent=root_page,
+        title='My new page created with an icon',
+        icon=emoji_icon,
+    )
+    assert isinstance(icon_page.icon, uno.Emoji)
+    assert icon_page.icon == emoji_icon
