@@ -7,6 +7,7 @@
 - Fix: `session.get_page(PAGE)` no longer fails if parent of `Page` is not accessible by the integration, issue #135.
 - Fix: Added `BGColor` type annotation for color parameter in `text()` and `Text`, issue #140.
 - Chg: Add `cover` and `item` parameters to `PagesEndpoint.create()` and `Session.create_page()`, issue #144.
+- New: Add method `Page.update_props()` to allow updating multiple properties of a page at once from the high level API.
 
 ## Version 0.9.4, 2025-10-01
 
