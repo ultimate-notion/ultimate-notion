@@ -379,10 +379,11 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
         # Custom Emoji Page
 
         This page has a custom emoji :ultimate-notion: compared to 🚀.
+        💡 Callout block without an emoji
         """
     ).strip()
 
-    assert custom_emoji_page.to_markdown() == exp_md
+    assert custom_emoji_page.to_markdown().strip() == exp_md
 
     page = notion.create_page(
         parent=root_page,

@@ -43,7 +43,7 @@ from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import UnsetType, raise_unset
+from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.rich_text import Text, User
 from ultimate_notion.utils import set_attr_none
@@ -631,8 +631,8 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
 
     !!! note
 
-        The default icon is an electric light bulb, i.e. 💡 in case `None` is passed as icon.
-        It is not possible to remove the icon, but you can change it to a different emoji or a file.
+        The default icon is an electric light bulb, i.e. 💡. Currently it is not supported by the Notion API
+        to have a callout block without an icon.
     """
 
     def __init__(
@@ -640,17 +640,15 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
-        icon: AnyFile | str | Emoji | CustomEmoji | None = None,
+        icon: AnyFile | str | Emoji | CustomEmoji = '💡',
     ) -> None:
         super().__init__(text, color=color)
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
             icon = Emoji(icon)
-        if icon is None:
-            # Use the Notion default icon instead of sending Unset, which would be replaced by Notion with their
-            # default anyway. This will get us into trouble if Notion ever changes their default icon. But for now,
-            # this is the best we can do for comparison reasons (online vs. offline blocks), etc.
-            icon = self.get_default_icon()
 
+        # Setting icon to None explicitly and sending `null` to Notion does NOT remove the icon
+        # but sets it to the default icon (💡). Right now there seems to be no way to have a callout
+        # block without an icon.
         self.obj_ref.value.icon = icon.obj_ref
 
     @staticmethod
@@ -660,15 +658,14 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
 
     @property
     def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
-        if isinstance(icon := self.obj_ref.value.icon, UnsetType):
+        icon = raise_unset(self.obj_ref.value.icon)
+        if icon is None:
             return self.get_default_icon()
         else:
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: AnyFile | Emoji | CustomEmoji | None) -> None:
-        if icon is None:
-            icon = self.get_default_icon()
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji) -> None:
         self.obj_ref.value.icon = icon.obj_ref
         self._update_in_notion()
 

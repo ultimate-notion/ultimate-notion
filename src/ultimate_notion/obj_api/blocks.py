@@ -262,13 +262,24 @@ class CalloutTypeData(ColoredTextBlockTypeData):
 
     # `children` is undocumented and behaves inconsistent. It is used during creation but not filled when retrieved.
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType = Unset
+    # `Unset` means the default icon as determined by Notion, and `None` means no icon when retrieved
+    #  but is not accepted when sending to Notion.
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
 
 
 class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
     """A callout block in Notion."""
 
     callout: CalloutTypeData = Field(default_factory=CalloutTypeData)  # type: ignore[arg-type]
+
+    # This would work if the Notion API would accept `null` for `icon` to have no icon but does not.
+    # def serialize_for_api(self) -> dict[str, Any]:
+    #     """Serialize the object for sending it to the Notion API."""
+    #     model_data = super().serialize_for_api()
+    #     # Everywhere else we have to remove "null" values but `callout` is an exception to have no icon
+    #     if self.callout.icon is None:
+    #         model_data['callout']['icon'] = None
+    #     return model_data
 
 
 class BulletedListItemTypeData(ColoredTextBlockTypeData):
