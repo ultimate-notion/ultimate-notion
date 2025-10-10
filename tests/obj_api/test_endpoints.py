@@ -52,3 +52,31 @@ def test_create_page(
     )
     assert isinstance(icon_page.icon, objects.EmojiObject)
     assert icon_page.icon == objects.EmojiObject.build(emoji_icon)
+
+
+@pytest.mark.vcr()
+def test_update_page(notion: uno.Session, contacts_db: uno.Database) -> None:
+    page = notion.api.pages.create(
+        parent=contacts_db.obj_ref,
+        title=Title('My new page created by obj_api').obj_ref,
+    )
+
+    notion.api.pages.update(
+        page,
+        properties={
+            name: contacts_db.schema.get_prop(name).prop_value(value).obj_ref
+            for name, value in (('Name', 'John Doe'), ('Role', None))
+        },
+    )
+    assert page.properties['Name'].value == 'John Doe'
+    assert page.properties['Role'].value is None
+
+    notion_cover_url = 'https://www.notion.so/images/page-cover/woodcuts_2.jpg'
+    notion.api.pages.update(page, cover=uno.url(notion_cover_url).obj_ref)
+    assert isinstance(page.cover, objects.FileObject)
+    assert page.cover == uno.ExternalFile(url=notion_cover_url).obj_ref
+
+    emoji_icon = '🐍'
+    notion.api.pages.update(page, icon=uno.Emoji(emoji_icon).obj_ref)
+    assert isinstance(page.icon, objects.EmojiObject)
+    assert page.icon == objects.EmojiObject.build(emoji_icon)

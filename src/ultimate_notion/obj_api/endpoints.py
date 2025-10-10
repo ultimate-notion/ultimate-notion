@@ -406,12 +406,51 @@ class PagesEndpoint(Endpoint):
         return Page.model_validate(data)
 
     # https://developers.notion.com/reference/patch-page
-    def update(self, page: Page, **properties: PropertyValue) -> None:
+    def update(
+        self,
+        page: Page,
+        *,
+        properties: dict[str, PropertyValue] | None = None,
+        cover: FileObject | UnsetType | None = Unset,
+        icon: FileObject | EmojiObject | CustomEmojiObject | UnsetType | None = Unset,
+        in_trash: bool | UnsetType = Unset,
+    ) -> None:
         """Update the Page object properties on the server."""
         page_id = raise_unset(page.id)
         _logger.debug(f'Updating info on page with id `{page_id}`.')
-        props = {name: value.serialize_for_api() if value is not None else None for name, value in properties.items()}
-        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, properties=props))
+
+        request: dict[str, Any] = {}
+
+        if properties is not None:
+            request['properties'] = {
+                name: value.serialize_for_api() if value is not None else None for name, value in properties.items()
+            }
+
+        if cover is not Unset:
+            if cover is None:
+                _logger.debug(f'Removing cover from page with id `{page_id}`.')
+                request['cover'] = None
+            else:
+                _logger.debug(f'Setting cover on page with id `{page_id}`.')
+                request['cover'] = cover.serialize_for_api()  # type: ignore[union-attr]
+
+        if icon is not Unset:
+            if icon is None:
+                _logger.debug(f'Removing icon from page with id `{page_id}`.')
+                request['icon'] = None
+            else:
+                _logger.debug(f'Setting icon on page with id `{page_id}`.')
+                request['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
+
+        if in_trash is not Unset:
+            if in_trash:
+                _logger.debug(f'Deleting page with id `{page_id}`.')
+                request['archived'] = True
+            else:
+                _logger.debug(f'Restoring page with id `{page_id}`.')
+                request['archived'] = False
+
+        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **request))
         page.update(**data)
 
     def set_attr(
