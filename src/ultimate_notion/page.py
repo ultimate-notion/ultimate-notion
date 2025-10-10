@@ -84,7 +84,7 @@ class PagePropertiesNS(Mapping[str, Any]):
 
         session = get_active_session()
         # update the property on the server (which will update the local data)
-        session.api.pages.update(self._page.obj_ref, **{prop_name: value.obj_ref})
+        session.api.pages.update(self._page.obj_ref, properties={prop_name: value.obj_ref})
 
     def _check_schema(self) -> None:
         if self._schema is None:
@@ -213,7 +213,7 @@ class Page(
         title = Title(text)
         title_prop_name = self.obj_ref._get_title_prop_name()
         session = get_active_session()
-        session.api.pages.update(self.obj_ref, **{title_prop_name: title.obj_ref})
+        session.api.pages.update(self.obj_ref, properties={title_prop_name: title.obj_ref})
 
     @property
     def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | None:
@@ -372,7 +372,7 @@ class Page(
 
         session = get_active_session()
         # update the properties on the server (which will update the local data)
-        session.api.pages.update(self.obj_ref, **props)
+        session.api.pages.update(self.obj_ref, properties=props)
 
 
 def is_db_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[Database]:

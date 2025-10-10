@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.10.0
+
+- Chg: Alter `PagesEndpoint.update()` method signature to include `cover`, `item` and `in_trash` parameters.
+
 ## Version 0.9.5
 
 - New: Add the new `Place` database/source property.
