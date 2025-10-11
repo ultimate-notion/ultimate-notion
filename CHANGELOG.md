@@ -1,9 +1,5 @@
 # Changelog
 
-## Version 0.10.0
-
-- Chg: Alter `PagesEndpoint.update()` method signature to include `cover`, `item` and `in_trash` parameters.
-
 ## Version 0.9.5
 
 - New: Add the new `Place` database/source property.
@@ -12,6 +8,7 @@
 - Fix: Added `BGColor` type annotation for color parameter in `text()` and `Text`, issue #140.
 - Chg: Add `cover` and `item` parameters to `PagesEndpoint.create()` and `Session.create_page()`, issue #144.
 - New: Add method `Page.update_props()` to allow updating multiple properties of a page at once from the high level API.
+- Chg: Alter `PagesEndpoint.update()` method signature to include `cover`, `item` and `in_trash` parameters, issue #144.
 
 ## Version 0.9.4, 2025-10-01
 
