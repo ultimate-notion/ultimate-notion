@@ -27,21 +27,24 @@ jobs:
       max-parallel: 0  # set to 1 to avoid time-outs and conflicts when speaking to the Notion API
       fail-fast: true # kill everything after first error to save resources
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.10', '3.11', '3.12', '3.13']
-        exclude:
-          - os: windows-latest
+        include:
+          # Linux - all Python versions
+          - os: ubuntu-latest
+            python-version: '3.10'
+          - os: ubuntu-latest
             python-version: '3.11'
-          - os: windows-latest
+          - os: ubuntu-latest
             python-version: '3.12'
+          - os: ubuntu-latest
+            python-version: '3.13'
+          - os: ubuntu-latest
+            python-version: '3.14'
+          # Windows - only Python 3.10
           - os: windows-latest
-            python-version: '3.13'
+            python-version: '3.10'
+          # macOS - only Python 3.10
           - os: macos-latest
-            python-version: '3.11'
-          - os: macos-latest
-            python-version: '3.12'
-          - os: macos-latest
-            python-version: '3.13'
+            python-version: '3.10'
 
     steps:
     - name: Checkout
@@ -92,4 +95,5 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
+          path-to-lcov: coverage.lcov
           path-to-lcov: coverage.lcov
