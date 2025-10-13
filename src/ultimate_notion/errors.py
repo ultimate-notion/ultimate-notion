@@ -79,3 +79,11 @@ class ReadOnlyPropertyError(SchemaError):
 
 class PropertyError(SchemaError):
     """Raised when there is an issue with a property in the schema."""
+
+
+class CLIError(UltimateNotionError):
+    """Raised for CLI-specific errors that should show clean messages without traceback."""
+
+    def __init__(self, message: str, original_exception: Exception | None = None):
+        self.original_exception = original_exception
+        super().__init__(message)

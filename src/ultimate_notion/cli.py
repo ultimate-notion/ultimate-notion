@@ -7,6 +7,7 @@ from uuid import UUID
 
 import filetype
 import typer
+from rich.console import Console
 
 from ultimate_notion import Session, __version__
 from ultimate_notion.blocks import PDF, Audio, File, Image, Video
@@ -16,6 +17,27 @@ from ultimate_notion.page import Page
 from ultimate_notion.utils import pydantic_to_toml
 
 _logger = logging.getLogger(__name__)
+console = Console()
+
+
+def handle_exceptions(*, verbose: bool = False):
+    """Decorator to handle exceptions based on verbose mode."""
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                if verbose:
+                    raise  # Re-raise to show full traceback
+                else:
+                    # Show clean error message
+                    console.print(f'[red]Error:[/red] {e!s}')
+                    raise typer.Exit(1) from None
+
+        return wrapper
+
+    return decorator
 
 
 class LogLevel(str, enum.Enum):
@@ -46,34 +68,50 @@ def main(log_level: Annotated[LogLevel, typer.Option(help='Log level')] = LogLev
 
 
 @app.command()
-def config() -> None:
+def config(
+    *,
+    verbose: Annotated[bool, typer.Option('--verbose', '-v', help='Show detailed error information')] = False,
+) -> None:
     """Display the current configuration file path and contents"""
-    cfg_file = get_cfg_file()
-    cfg = get_cfg()
 
-    typer.echo(f'Config file: {cfg_file}')
-    typer.echo('Configuration:')
-    typer.echo('-' * 40)
-    toml_string = pydantic_to_toml(cfg)
-    typer.echo(toml_string)
+    @handle_exceptions(verbose=verbose)
+    def _config():
+        cfg_file = get_cfg_file()
+        cfg = get_cfg()
+
+        typer.echo(f'Config file: {cfg_file}')
+        typer.echo('Configuration:')
+        typer.echo('-' * 40)
+        toml_string = pydantic_to_toml(cfg)
+        typer.echo(toml_string)
+
+    _config()
 
 
 @app.command()
-def info() -> None:
+def info(
+    *,
+    verbose: Annotated[bool, typer.Option('--verbose', '-v', help='Show detailed error information')] = False,
+) -> None:
     """Display information about the Notion integration"""
-    typer.echo(f'Python version: {sys.version}')
-    typer.echo(f'Ultimate Notion version: {__version__}')
-    with Session() as session:
-        this_integration = session.whoami()
 
-    typer.echo('Notion integration:')
-    typer.echo(f'- name: {this_integration.name}')
-    typer.echo(f'- id: {this_integration.id}')
+    @handle_exceptions(verbose=verbose)
+    def _info():
+        typer.echo(f'Python version: {sys.version}')
+        typer.echo(f'Ultimate Notion version: {__version__}')
+        with Session() as session:
+            this_integration = session.whoami()
 
-    typer.echo('Workspace info:')
-    if workspace_info := this_integration.workspace_info:
-        for key, value in workspace_info.model_dump().items():
-            typer.echo(f'- {key}: {value}')
+        typer.echo('Notion integration:')
+        typer.echo(f'- name: {this_integration.name}')
+        typer.echo(f'- id: {this_integration.id}')
+
+        typer.echo('Workspace info:')
+        if workspace_info := this_integration.workspace_info:
+            for key, value in workspace_info.model_dump().items():
+                typer.echo(f'- {key}: {value}')
+
+    _info()
 
 
 def _is_uuid(value: str) -> bool:
@@ -129,6 +167,8 @@ def _find_page_by_name(session: Session, page_name: str) -> Page:
 def upload(
     file_name: Annotated[str, typer.Argument(help='Path to the file to upload')],
     notion_page: Annotated[str, typer.Argument(help='Page name or UUID to upload the file to')],
+    *,
+    verbose: Annotated[bool, typer.Option('--verbose', '-v', help='Show detailed error information')] = False,
 ) -> None:
     """Upload a file to a Notion page and append it as a block.
 
@@ -142,36 +182,41 @@ def upload(
     The page can be specified either by name or by UUID. If specified by name,
     the name must be unique (exact match).
     """
-    file_path = Path(file_name)
 
-    # Check if file exists
-    if not file_path.exists():
-        typer.echo(f"Error: File '{file_name}' does not exist", err=True)
-        raise typer.Exit(1)
+    @handle_exceptions(verbose=verbose)
+    def _upload():
+        file_path = Path(file_name)
 
-    if not file_path.is_file():
-        typer.echo(f"Error: '{file_name}' is not a file", err=True)
-        raise typer.Exit(1)
+        # Check if file exists
+        if not file_path.exists():
+            typer.echo(f"Error: File '{file_name}' does not exist", err=True)
+            raise typer.Exit(1)
 
-    with Session() as session:
-        # Determine if notion_page is a UUID or name
-        if _is_uuid(notion_page):
-            try:
-                page = session.get_page(notion_page)
-                _logger.info(f"Found page by UUID: '{page.title}' (ID: {page.id})")
-            except UnknownPageError as err:
-                typer.echo(f"Error: Page with UUID '{notion_page}' not found", err=True)
-                raise typer.Exit(1) from err
-        else:
-            _logger.info(f"Searching for page with name: '{notion_page}'")
-            page = _find_page_by_name(session, notion_page)
-            _logger.info(f"Found page: '{page.title}' (ID: {page.id})")
+        if not file_path.is_file():
+            typer.echo(f"Error: '{file_name}' is not a file", err=True)
+            raise typer.Exit(1)
 
-        _logger.info(f'Uploading file: {file_path.name}')
-        with open(file_path, 'rb') as f:
-            uploaded_file = session.upload(f, file_name=file_path.name)
+        with Session() as session:
+            # Determine if notion_page is a UUID or name
+            if _is_uuid(notion_page):
+                try:
+                    page = session.get_page(notion_page)
+                    _logger.info(f"Found page by UUID: '{page.title}' (ID: {page.id})")
+                except UnknownPageError as err:
+                    typer.echo(f"Error: Page with UUID '{notion_page}' not found", err=True)
+                    raise typer.Exit(1) from err
+            else:
+                _logger.info(f"Searching for page with name: '{notion_page}'")
+                page = _find_page_by_name(session, notion_page)
+                _logger.info(f"Found page: '{page.title}' (ID: {page.id})")
 
-        block_class = _get_block_class_for_file(file_path)
-        block = block_class(uploaded_file)
-        page.append(block)
-        _logger.info(f"Successfully appended {block_class.__name__} block to page '{page.title}'")
+            _logger.info(f'Uploading file: {file_path.name}')
+            with open(file_path, 'rb') as f:
+                uploaded_file = session.upload(f, file_name=file_path.name)
+
+            block_class = _get_block_class_for_file(file_path)
+            block = block_class(uploaded_file)
+            page.append(block)
+            _logger.info(f"Successfully appended {block_class.__name__} block to page '{page.title}'")
+
+    _upload()
