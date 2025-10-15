@@ -74,3 +74,11 @@ def test_upload_wav(notion: uno.Session) -> None:
         file_info = notion.upload(file=file)
 
     assert file_info.content_type == 'audio/wav'
+
+
+@pytest.mark.file_upload
+def test_upload_svg(notion: uno.Session) -> None:
+    with open('docs/assets/images/favicon.svg', 'rb') as file:
+        file_info = notion.upload(file=file)
+
+    assert file_info.content_type == 'image/svg+xml'
