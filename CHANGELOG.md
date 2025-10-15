@@ -10,6 +10,7 @@
 - New: Add method `Page.update_props()` to allow updating multiple properties of a page at once from the high level API.
 - Chg: Alter `PagesEndpoint.update()` method signature to include `cover`, `item` and `in_trash` parameters, issue #144.
 - Fix: Have a nicer CLI output in case of an exception.
+- Fix: Determing the correct mime type of a file, which is now done using `mimetypes` instead of `filetypes`, issue #141.
 
 ## Version 0.9.5, 2025-10-24
 

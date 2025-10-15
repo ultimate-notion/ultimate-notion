@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import io
+import mimetypes
 import time
 from abc import ABC, abstractmethod
-from typing import BinaryIO, cast
+from typing import BinaryIO
 from urllib.parse import urlparse
 from uuid import UUID
 
-import filetype
 import pendulum as pnd
 from typing_extensions import Self, TypeVar
 from url_normalize import url_normalize
@@ -222,31 +222,31 @@ def get_file_size(file: BinaryIO) -> int:
     return file_size
 
 
-def get_mime_type(file: BinaryIO) -> str:
+def get_mime_type(file: BinaryIO, filename: str | None = None) -> str:
     """Detect the MIME type of a file.
-
-    This function preserves the current file position.
 
     Args:
         file: The binary file object to analyze
+        filename: Optional filename to help with MIME type detection
 
     Returns:
         The detected MIME type, or 'application/octet-stream' if unknown
     """
-    current_pos = file.tell()
-    content_sample = file.read(1024)
-    file.seek(current_pos)  # Reset position
 
-    # correct some MIME types to match Notion's expectations
-    mime_type_map = {
-        'audio/x-wav': 'audio/wav',  # see issue #127
-    }
+    def _get_mime_type(filename: str) -> str:
+        mime_type, _ = mimetypes.guess_type(filename, strict=True)
+        if mime_type is None:
+            mime_type = 'application/octet-stream'
 
-    kind = filetype.guess(content_sample)
-    if kind is not None:
-        return cast(str, mime_type_map.get(kind.mime, kind.mime))
+    if filename:
+        mime_type = _get_mime_type(filename)
+    elif hasattr(file, 'name') and file.name:
+        mime_type = _get_mime_type(file.name)
     else:
-        return 'application/octet-stream'
+        msg = 'Cannot determine MIME type without filename or file.name attribute.'
+        raise ValueError(msg)
+
+    return mime_type
 
 
 def url(url: str, *, name: str | None = None, caption: str | None = None) -> NotionFile | ExternalFile:
