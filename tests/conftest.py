@@ -69,27 +69,26 @@ FORMULA_DB = 'Formula DB'
 # Original configuration file for the tests. The environment variables will be altered in some tests temporarily.
 TEST_CFG_FILE = get_cfg_file()
 
+# Mutually exclusive pytest markers, that are not run by default and enabled via command line flags
+PYTEST_MARKERS = ['check_latest_release', 'file_upload']
+
 
 def pytest_addoption(parser: Parser) -> None:
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
-    parser.addoption(
-        '--check-latest-release',
-        action='store_true',
-        default=False,
-        help='Run tests that check the latest release on PyPI.',
-    )
     parser.addoption(
         '--debug-uno',
         action='store_true',
         default=False,
         help='Enable DEBUG logging for Ultimate Notion.',
     )
-    parser.addoption(
-        '--file-upload',
-        action='store_true',
-        default=False,
-        help='Run tests that upload files to Notion.',
-    )
+    for marker in PYTEST_MARKERS:
+        flag = f'--{marker.replace("_", "-")}'
+        parser.addoption(
+            flag,
+            action='store_true',
+            default=False,
+            help=f'Use flag `{flag}` to run tests marked with `{marker}`.',
+        )
 
 
 def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: pytest.TestReport) -> None:
@@ -104,29 +103,35 @@ def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """Define test selection based on command line flags."""
-    # Handle check_latest_release marker
-    marker_name = 'check_latest_release'
-    flag_name = f'--{marker_name.replace("_", "-")}'
-    if config.getoption(flag_name):
-        release_tests = [item for item in items if marker_name in item.keywords]
-        if not release_tests:
-            pytest.skip(f'No tests with marker `{marker_name}` found!')
-        items[:] = release_tests
-    else:
-        skip_release_test = pytest.mark.skip(reason=f'use flag `{flag_name}` to run')
-        for item in items:
-            if marker_name in item.keywords:
-                item.add_marker(skip_release_test)
 
-    # Handle file_upload marker - only if check_latest_release didn't already filter
-    if not config.getoption('--check-latest-release'):
-        file_upload_marker = 'file_upload'
-        file_upload_flag = f'--{file_upload_marker.replace("_", "-")}'
-        if not config.getoption(file_upload_flag):
-            skip_file_upload = pytest.mark.skip(reason=f'use flag `{file_upload_flag}` to run file upload tests')
-            for item in items:
-                if file_upload_marker in item.keywords:
-                    item.add_marker(skip_file_upload)
+    def get_marker_option() -> str | None:
+        markers = set()
+        for marker in PYTEST_MARKERS:
+            flag = f'--{marker.replace("_", "-")}'
+            if config.getoption(flag):
+                markers.add(marker)
+        if len(markers) == 1:
+            return markers.pop()
+        elif len(markers) > 1:
+            msg = f'Use only one of the mutually exclusive markers {PYTEST_MARKERS} at a time!'
+            raise ValueError(msg)
+        else:
+            return None
+
+    marker = get_marker_option()
+    if marker is None:
+        for item in items:
+            markers = set(item.keywords) & set(PYTEST_MARKERS)
+            if markers:
+                marker = markers.pop()
+                flag = f'--{marker.replace("_", "-")}'
+                skip_reason = pytest.mark.skip(reason=f'use flag `{flag}` to run {marker}')
+                item.add_marker(skip_reason)
+    else:
+        selected_tests = [item for item in items if marker in item.keywords]
+        if not selected_tests:
+            pytest.skip(f'No tests with marker `{marker}` found!')
+        items[:] = selected_tests
 
 
 def exec_pyfile(file_path: str) -> None:
