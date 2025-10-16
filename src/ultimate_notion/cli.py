@@ -1,8 +1,9 @@
 import enum
 import logging
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, ParamSpec, TypeVar
 from uuid import UUID
 
 import filetype
@@ -20,11 +21,15 @@ _logger = logging.getLogger(__name__)
 console = Console()
 
 
-def handle_exceptions(*, verbose: bool = False):
+P = ParamSpec('P')
+R = TypeVar('R')
+
+
+def handle_exceptions(*, verbose: bool = False) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """Decorator to handle exceptions based on verbose mode."""
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             try:
                 return func(*args, **kwargs)
             except Exception as e:
@@ -75,7 +80,7 @@ def config(
     """Display the current configuration file path and contents"""
 
     @handle_exceptions(verbose=verbose)
-    def _config():
+    def _config() -> None:
         cfg_file = get_cfg_file()
         cfg = get_cfg()
 
@@ -96,7 +101,7 @@ def info(
     """Display information about the Notion integration"""
 
     @handle_exceptions(verbose=verbose)
-    def _info():
+    def _info() -> None:
         typer.echo(f'Python version: {sys.version}')
         typer.echo(f'Ultimate Notion version: {__version__}')
         with Session() as session:
@@ -184,7 +189,7 @@ def upload(
     """
 
     @handle_exceptions(verbose=verbose)
-    def _upload():
+    def _upload() -> None:
         file_path = Path(file_name)
 
         # Check if file exists
