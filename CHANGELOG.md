@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.9.5
+## Version 0.9.6
 
 - New: Add the new `Place` database/source property.
 - Fix: Allow to bind a schema with a two-way target property to an existing database, issue #134.
@@ -10,6 +10,10 @@
 - New: Add method `Page.update_props()` to allow updating multiple properties of a page at once from the high level API.
 - Chg: Alter `PagesEndpoint.update()` method signature to include `cover`, `item` and `in_trash` parameters, issue #144.
 - Fix: Have a nicer CLI output in case of an exception.
+
+## Version 0.9.5, 2025-10-24
+
+- Fix: Pin  `notion-sdk-py` to version 2.5 as version 2.6 has breaking changes, issue #153.
 
 ## Version 0.9.4, 2025-10-01
 
