@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.9.5, 2025-10-24
+
+- Fix: Pin  `notion-sdk-py` to version 2.5 as version 2.6 has breaking changes, issue #153.
+
 ## Version 0.9.4, 2025-10-01
 
 - Chg: Allow the creation of a unique ID property, which is now supported by the Notion API.
