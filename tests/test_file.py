@@ -69,16 +69,22 @@ def test_list_uploads(notion: uno.Session) -> None:
 
 
 @pytest.mark.file_upload
-def test_upload_wav(notion: uno.Session) -> None:
+def test_upload_wav(notion: uno.Session, root_page: uno.Page) -> None:
     with open('tests/assets/sample-3s.wav', 'rb') as file:
-        file_info = notion.upload(file=file)
+        uploaded_file = notion.upload(file=file)
 
-    assert file_info.content_type == 'audio/wav'
+    assert uploaded_file.content_type == 'audio/wav'
+
+    page = notion.create_page(parent=root_page, title='Test Page with a WAV file')
+    page.append(uno.Audio(uploaded_file, caption='An uploaded WAV audio'))
 
 
 @pytest.mark.file_upload
-def test_upload_svg(notion: uno.Session) -> None:
+def test_upload_svg(notion: uno.Session, root_page: uno.Page) -> None:
     with open('docs/assets/images/favicon.svg', 'rb') as file:
-        file_info = notion.upload(file=file)
+        uploaded_file = notion.upload(file=file)
 
-    assert file_info.content_type == 'image/svg+xml'
+    assert uploaded_file.content_type == 'image/svg+xml'
+
+    page = notion.create_page(parent=root_page, title='Test Page with an SVG file')
+    page.append(uno.Image(uploaded_file, caption='An uploaded SVG image'))
