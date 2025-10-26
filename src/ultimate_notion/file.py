@@ -237,6 +237,7 @@ def get_mime_type(file: BinaryIO, filename: str | None = None) -> str:
         mime_type, _ = mimetypes.guess_type(filename, strict=True)
         if mime_type is None:
             mime_type = 'application/octet-stream'
+        return mime_type
 
     if filename:
         mime_type = _get_mime_type(filename)
