@@ -364,14 +364,12 @@ class Page(
             msg = f'Trying to set properties but page {self} is not bound to any database'
             raise RuntimeError(msg)
 
-        # construct concrete PropertyValue for each property using the schema
         props = {}
         for name, p in properties.items():
             prop: Property = getattr(db.schema, name)
-            props[prop.name] = p if isinstance(p, PropertyValue) else prop.prop_value(p).obj_ref
+            props[prop.name] = p.obj_ref if isinstance(p, PropertyValue) else prop.prop_value(p).obj_ref
 
         session = get_active_session()
-        # update the properties on the server (which will update the local data)
         session.api.pages.update(self.obj_ref, properties=props)
 
 

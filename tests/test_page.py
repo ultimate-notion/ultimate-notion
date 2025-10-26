@@ -403,3 +403,7 @@ def test_update_props(notion: uno.Session, contacts_db: uno.Database) -> None:
     props_page.update_props(name='John Doe', role=None)
     assert props_page.props['Name'] == 'John Doe'
     assert props_page.props['Role'] is None
+
+    props_page = notion.get_page(props_page.id)
+    assert props_page.props['Name'] == 'John Doe'
+    assert props_page.props['Role'] is None
