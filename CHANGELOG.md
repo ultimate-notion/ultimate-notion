@@ -11,6 +11,7 @@
 - Chg: Alter `PagesEndpoint.update()` method signature to include `cover`, `item` and `in_trash` parameters, issue #144.
 - Fix: Have a nicer CLI output in case of an exception.
 - Fix: Determing the correct mime type of a file, which is now done using `mimetypes` instead of `filetypes`, issue #141.
+- New: Add the new `workspace_id` field to the `Bot`.
 
 ## Version 0.9.5, 2025-10-24
 

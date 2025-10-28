@@ -2,20 +2,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from uuid import UUID
 
 from typing_extensions import TypeVar
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
 
-if TYPE_CHECKING:
-    from uuid import UUID
-
 
 class WorkSpaceInfo(objs.WorkSpaceLimits):
     """Workspace information for a bot user."""
 
+    workspace_id: UUID
     name: str
 
 
@@ -101,8 +99,9 @@ class Bot(User[objs.Bot], wraps=objs.Bot):
     @property
     def workspace_info(self) -> WorkSpaceInfo:
         """Return the workspace info of this bot, if available."""
+        workspace_id = self.obj_ref.bot.workspace_id
         kwargs = self.obj_ref.bot.workspace_limits.model_dump()
-        return WorkSpaceInfo(name=self.obj_ref.bot.workspace_name, **kwargs)
+        return WorkSpaceInfo(name=self.obj_ref.bot.workspace_name, workspace_id=workspace_id, **kwargs)
 
 
 class UnknownUser(User[objs.UnknownUser], wraps=objs.UnknownUser):
