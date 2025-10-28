@@ -334,10 +334,10 @@ class PagesEndpoint(Endpoint):
     def create(
         self,
         parent: ParentRef | Page | Database,
+        *,
         title: Title | None = None,
         properties: dict[str, PropertyValue] | None = None,
         children: list[Block] | None = None,
-        *,
         cover: FileObject | None = None,
         icon: FileObject | EmojiObject | CustomEmojiObject | None = None,
     ) -> Page:
