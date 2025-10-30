@@ -488,9 +488,12 @@ class MentionLink(MentionBase, type='link_mention'):
 
 
 class BotTypeData(GenericObject):
-    """Type data for a `Bot`."""
+    """Type data for a `Bot`.
 
-    workspace_id: UUID
+    Fields are optional as bots are incomplete in some contexts like `CreatedBy` properties.
+    """
+
+    workspace_id: UUID | None = None
     owner: WorkspaceRef | MentionUser | None = None
     workspace_name: str | None = None
     workspace_limits: WorkSpaceLimits = Field(default_factory=WorkSpaceLimits)
@@ -502,7 +505,7 @@ class Bot(User[BotTypeData], type='bot'):
     # Even if stated otherwise in the docs, `bot` type data is optional and for instance
     # not present when a new page is created by a bot within a database with a `CreatedBy` Property.
     # For ease of use, we include a default instance of the bot type data.
-    bot: BotTypeData = Field(default_factory=BotTypeData)  # type: ignore[arg-type]
+    bot: BotTypeData = Field(default_factory=BotTypeData)
 
 
 class MentionPage(MentionBase[ObjectRef], type='page'):
