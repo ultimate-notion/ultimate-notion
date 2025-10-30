@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime, timezone
 
 import pendulum as pnd
@@ -14,7 +15,9 @@ from ultimate_notion.schema import Property
 
 
 @pytest.mark.vcr()
-def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, test_url: URL) -> None:
+def test_all_createable_props_schema(
+    notion: uno.Session, root_page: uno.Page, dummy_urls: URL, get_id_prefix: Callable[[str], str]
+) -> None:
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -23,7 +26,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, t
 
     options = [uno.Option(name='Option1'), uno.Option(name='Option2', color=uno.Color.RED)]
 
-    id_prefix = 'MyID44'  # must be unique in the workspace, and the Notion API cache can be quite stale
+    id_prefix = get_id_prefix('ALLCOLS')  # must be unique in the workspace, also considering pages in the bin
 
     class SchemaB(uno.Schema, db_title='Schema B'):
         """Actual interesting schema/db"""
@@ -90,7 +93,7 @@ def test_all_createable_props_schema(notion: uno.Session, root_page: uno.Page, t
         'checkbox': props.Checkbox(True),
         'date': props.Date(pnd.date(2021, 1, 1)),
         'email': props.Email('email@provider.com'),
-        'files': props.Files([uno.ExternalFile(name='My File', url=test_url.file)]),
+        'files': props.Files([uno.ExternalFile(name='My File', url=dummy_urls.file)]),
         'multi_select': props.MultiSelect(options[0]),
         'number': props.Number(42),
         'people': props.Person(florian),
@@ -546,9 +549,9 @@ def test_bind_db_auto(notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page) -> None:
-    old_id_prefix = 'OLDID19'  # must be unique in the workspace, and the Notion API cache can be quite stale
-    new_id_prefix = 'NEWID29'
+def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page, get_id_prefix: Callable[[str], str]) -> None:
+    old_id_prefix = get_id_prefix('OLDID')
+    new_id_prefix = get_id_prefix('NEWID')
 
     class Schema(uno.Schema, db_title='Unique ID Update Test'):
         name = uno.PropType.Title('Name')

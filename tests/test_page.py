@@ -398,7 +398,15 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
 
 
 @pytest.mark.vcr()
-def test_update_props(notion: uno.Session, contacts_db: uno.Database) -> None:
+def test_update_props(notion: uno.Session, root_page: uno.Page) -> None:
+    class ContactsDB(uno.Schema):
+        name = uno.PropType.Title('Name')
+        role = uno.PropType.Text('Role')
+
+    contacts_db = notion.create_db(
+        parent=root_page, title='Contacts DB for low-level page update test', schema=ContactsDB
+    )
+
     props_page = notion.create_page(parent=contacts_db, title='My new page with properties')
     props_page.update_props(name='John Doe', role=None)
     assert props_page.props['Name'] == 'John Doe'

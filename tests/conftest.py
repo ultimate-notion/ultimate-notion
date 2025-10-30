@@ -31,7 +31,8 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from random import randint
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, patch
 
 import pydantic
@@ -723,7 +724,7 @@ class URL:
 
 
 @pytest.fixture(scope='module')
-def test_url() -> URL:
+def dummy_urls() -> URL:
     """Return a set of URLs for testing."""
     return URL(
         img='https://cdn.pixabay.com/photo/2019/08/06/09/16/flowers-4387827_1280.jpg',
@@ -732,3 +733,29 @@ def test_url() -> URL:
         pdf='https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf',
         audio='https://samplelib.com/lib/preview/mp3/sample-3s.mp3',
     )
+
+
+@pytest.fixture(scope='function')
+def get_id_prefix(notion: uno.Session, root_page: uno.Page) -> Callable[[str], str]:
+    """Return a unique id prefix for the test module.
+
+    This is necessary as prefixes must be unique within the workspace. For VCR.py
+    we need to have a stable prefix per module. Note that even the prefix of a deleted
+    database is still reserved in Notion!
+    """
+
+    def make_prefix(suffix: str) -> str:
+        state_page = notion.get_or_create_page(parent=root_page, title=f'State Page for ID Prefix {suffix}')
+        if not state_page.children:
+            upper_bound = int('9' * (10 - len(suffix)))  # Notion restriction to prefix length of 1
+            state_block = uno.Paragraph(f'{suffix}{randint(0, upper_bound)}')  # noqa: S311
+            state_page.append(state_block)
+
+        state_page.reload()  # this saves actually the state in VCR.py
+        id_prefix = cast(uno.Paragraph, state_page.children[0]).rich_text
+        if id_prefix is None:
+            msg = 'Could not retrieve ID prefix from state page!'
+            raise ValueError(msg)
+        return id_prefix
+
+    return make_prefix

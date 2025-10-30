@@ -177,46 +177,46 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_create_file_blocks(root_page: uno.Page, notion: uno.Session, test_url: URL) -> None:
+def test_create_file_blocks(root_page: uno.Page, notion: uno.Session, dummy_urls: URL) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating file blocks')
     children: list[uno.Block] = [
-        uno.File(uno.url(test_url.file)),
-        uno.File(uno.url(test_url.file), name='my_file.txt', caption='Google Robots'),
-        uno.Image(uno.url(test_url.img)),
-        uno.Image(uno.url(test_url.img), caption='Meadow'),
-        uno.Video(uno.url(test_url.video)),
-        uno.Video(uno.url(test_url.video), caption='Rick Roll'),
-        uno.PDF(uno.url(test_url.pdf)),
-        uno.PDF(uno.url(test_url.pdf), caption='Dummy PDF'),
-        uno.Audio(uno.url(test_url.audio)),
-        uno.Audio(uno.url(test_url.audio), caption='Sample Audio'),
+        uno.File(uno.url(dummy_urls.file)),
+        uno.File(uno.url(dummy_urls.file), name='my_file.txt', caption='Google Robots'),
+        uno.Image(uno.url(dummy_urls.img)),
+        uno.Image(uno.url(dummy_urls.img), caption='Meadow'),
+        uno.Video(uno.url(dummy_urls.video)),
+        uno.Video(uno.url(dummy_urls.video), caption='Rick Roll'),
+        uno.PDF(uno.url(dummy_urls.pdf)),
+        uno.PDF(uno.url(dummy_urls.pdf), caption='Dummy PDF'),
+        uno.Audio(uno.url(dummy_urls.audio)),
+        uno.Audio(uno.url(dummy_urls.audio), caption='Sample Audio'),
     ]
     page.append(children)
     output = page.to_markdown()
     exp_output = dedent(f"""
         # Page for creating file blocks
 
-        [📎 {test_url.file_name}]({test_url.file})
+        [📎 {dummy_urls.file_name}]({dummy_urls.file})
 
-        [📎 my_file.txt]({test_url.file})
+        [📎 my_file.txt]({dummy_urls.file})
         Google Robots
 
-        ![flowers-4387827_1280.jpg]({test_url.img})
+        ![flowers-4387827_1280.jpg]({dummy_urls.img})
 
-        <figure><img src="{test_url.img}" alt="flowers-4387827_1280.jpg" /><figcaption>Meadow</figcaption></figure>
+        <figure><img src="{dummy_urls.img}" alt="flowers-4387827_1280.jpg" /><figcaption>Meadow</figcaption></figure>
 
-        <video width="320" height="240" controls><source src="{test_url.video}"></video>
+        <video width="320" height="240" controls><source src="{dummy_urls.video}"></video>
 
-        <video width="320" height="240" controls><source src="{test_url.video}">Rick Roll</video>
+        <video width="320" height="240" controls><source src="{dummy_urls.video}">Rick Roll</video>
 
-        [📖 {test_url.pdf_name}]({test_url.pdf})
+        [📖 {dummy_urls.pdf_name}]({dummy_urls.pdf})
 
-        [📖 {test_url.pdf_name}]({test_url.pdf})
+        [📖 {dummy_urls.pdf_name}]({dummy_urls.pdf})
         Dummy PDF
 
-        <audio controls><source src="{test_url.audio}" type="audio/mpeg"></audio>
+        <audio controls><source src="{dummy_urls.audio}" type="audio/mpeg"></audio>
 
-        <audio controls><source src="{test_url.audio}" type="audio/mpeg">Sample Audio</audio>
+        <audio controls><source src="{dummy_urls.audio}" type="audio/mpeg">Sample Audio</audio>
     """)
     for exp, act in zip(exp_output.lstrip('\n').split('\n'), output.split('\n'), strict=True):
         assert exp == act
@@ -427,13 +427,13 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session, test_url: URL) -> None:
+def test_modify_file_blocks(root_page: uno.Page, notion: uno.Session, dummy_urls: URL) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying file blocks')
     children: list[uno.Block] = [
-        file := uno.File(uno.url(test_url.file), name='robots.txt'),
-        image := uno.Image(uno.url(test_url.img), caption='Path on meadow'),
-        video := uno.Video(uno.url(test_url.video)),
-        pdf := uno.PDF(uno.url(test_url.pdf)),
+        file := uno.File(uno.url(dummy_urls.file), name='robots.txt'),
+        image := uno.Image(uno.url(dummy_urls.img), caption='Path on meadow'),
+        video := uno.Video(uno.url(dummy_urls.video)),
+        pdf := uno.PDF(uno.url(dummy_urls.pdf)),
     ]
     page.append(children)
 
