@@ -21,10 +21,119 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPSwuCQBSF9/6KYdqW46MHuoqgVhZYkSBuzJls8kn32hTRf49RaNfmbr6Pc859
-        G4TQQtac+oRiCgWM9A0kIB1rJnsSRvg8HLl1dvfRbhO78W21j8LBEJjm2knoKZRT/gh41q0TOkCU
-        WApNty9SC0V0ePkL71qeougbHMuZTSxv4rhHy/Onnm8vTG9ux4MIorwEsi60eUVswWdMKWXmTZOX
-        Im0lmFlTsf4B9rBZB+IObFkJpsuA/dlvfIwvzE8jWAEBAAA=
+        H4sIAAAAAAAC/4WQwU7DMAyG730Kq+etBcRpt2pUYpchQXdCHLLESsPSuCTpYEx9d5K0EhNC2in6
+        7S+WP58zgBytJZuv4BxCiJwEhnR/c7uYCh06x2Ss5c/4MaDz0DIByhyZVgLY4Fs0XnHmFRngFkWM
+        TLsC6q8euUcBT1Wg4A4Y52EaeDqgWYAmqcIPooNCIAsUJlm4MraAF0Rove/dqiwFHlFTj9YVkkhq
+        LDh1pUqsP5VOSbNUpvzEfUQ5GUcal72l97BYkc+K6QQuGL6mDPMt/upvZuX1r+M8IZGCOqZMBKWm
+        PdOXPYvMUepFsTqd/KKtafKMQDwVWfU9Ff6BmlOf1mmRCbT5DIzpfZuNnGd+iEb5blvtmsd622zW
+        VVM/RHzMxuwH1VrBt/sBAAA=
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Server:
+      - ESF
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      WWW-Authenticate:
+      - Bearer realm="https://accounts.google.com/", error="invalid_token"
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+      x-l2-request-path:
+      - l2-managed-14
+    status:
+      code: 401
+      message: Unauthorized
+- request:
+    body: grant_type=refresh_token&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ftasks
+    headers:
+      accept-encoding:
+      - gzip, deflate
+      content-type:
+      - application/x-www-form-urlencoded
+      user-agent:
+      - secret...
+      x-goog-api-client:
+      - gl-python/3.10.9 auth/2.40.3 cred-type/u
+    method: POST
+    uri: https://oauth2.googleapis.com/token
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/1XQS3OCMBQF4L2/wnFdFEPBxw5LQcQHog7ghokYSIiYGFJQO/3vrbrq9p6558x8
+        3612uwPTFFVVIhlF58643blBMOpC1dwSwwN1PVdIkpczTPiuMLa7O9bjZbQv9QPwkef7yNSL9+h+
+        ynhaixpzmzdBYjq+XS4RrYPgHPtzK8X71WVuLMUsBcHxviqGrAHZ0kBTF6SOFoUuvnlX3b0DxctF
+        f2rmMGi0bHLOV6GjXY4qWBfDSxR+bmu7pqGdCSaKYR4fAFsjhww0JR4tjgqVlKsXM9JKl0+3lGrE
+        tST8yGPPPMQbM1hs7PXUicCC7KXl8P7mHFo6xSUjm51duo0K1EHn7WGCrpwIVCXkIaLpo9HzWqWM
+        owcRlpJX416vaZpuzlh+QpCTqpuysge/JO5JWNHq1fRkTeTt9ThBUCDxSgTK/ibwCz75twiMoQpA
+        6+cX/X/Pf6ABAAA=
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Expires:
+      - Mon, 01 Jan 1990 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - scaffolding on HTTPServer2
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"title": "My new tasklist"}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      content-length:
+      - '28'
+      content-type:
+      - application/json
+      user-agent:
+      - secret...
+      x-goog-api-client:
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+    method: POST
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/3WPPQ+CMBRFd35FU1ehFCQaJuOCA5igBJW4NFqxoXzEV6zG+N9NIXFzecs5ufe+
+        t4UQrkRzwSHCikEFE3NjAQpPDRMDYYfVehd1fb6fPXeRptmh6ON0NLhipXFO+Jg1m22eSDlLT3iE
+        SijJDU1eqOEamXD5C++7C1N8aPBcL7Cpa/tuRoPQp6G/cOh8XowicHmNRVMZ86ZUByEhWmunbNtS
+        ctYJcM5tTYYHyIOSHvgdyLLmxJQB+bPf+lhf3GMflQEBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -67,14 +176,14 @@ interactions:
       x-goog-api-client:
       - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/QWtxSTd0b3RWNFZ3ZjBRWQ?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/aXBHSGpuVW4xSGw1TXZuLQ?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPSwuCQBSF9/6KYdqW46MHuoqgVhZYkSBuzJls8kn32hTRf49RaNfmbr6Pc859
-        G4TQQtac+oRiCgWM9A0kIB1rJnsSRvg8HLl1dvfRbhO78W21j8LBEJjm2knoKZRT/gh41q0TOkCU
-        WApNty9SC0V0ePkL71qeougbHMuZTSxv4rhHy/Onnm8vTG9ux4MIorwEsi60eUVswWdMKWXmTZOX
-        Im0lmFlTsf4B9rBZB+IObFkJpsuA/dlvfIwvzE8jWAEBAAA=
+        H4sIAAAAAAAC/3WPPQ+CMBRFd35FU1ehFCQaJuOCA5igBJW4NFqxoXzEV6zG+N9NIXFzecs5ufe+
+        t4UQrkRzwSHCikEFE3NjAQpPDRMDYYfVehd1fb6fPXeRptmh6ON0NLhipXFO+Jg1m22eSDlLT3iE
+        SijJDU1eqOEamXD5C++7C1N8aPBcL7Cpa/tuRoPQp6G/cOh8XowicHmNRVMZ86ZUByEhWmunbNtS
+        ctYJcM5tTYYHyIOSHvgdyLLmxJQB+bPf+lhf3GMflQEBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -121,12 +230,12 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/62QT0/CQBDF73yKTb3SbrsFmu1JTTExUrDQSEQ81HbFpX/jLiyU8N3tLiYNicTE
-        eJlk8t7Mm/kdOgBoKS0SzQUaj1jKrmQdUcaZ1pUi4dFKikstEzgP9WJSzcqldhIpJzlr1JemAeCg
-        6sWFakTpVKm+N7T8+h7562E9rgN74qU7P7xp+ueB75Wi9bc3IC/Hj/FaPETx9w3KwCnPiNq5B6EM
-        baVNlUScqEBkop5uWjoyQ2vgIsftY8NxnEVrZiR7H9Eile4PzivmQiiEMFZlucpIVFFmxGUO1V9w
-        a8ENI58MXucEZpIY/PUlFXTs/gVXMOe7WZiYb/Z0Pr5b2Iv17XQe/ATpKaC9ZDtK4s3wEqSCCCCD
-        srOgc1Z93cQ6skMTuz3sWo6BB9Y/srrwz4lQU187x84Xjz0WCZ8CAAA=
+        H4sIAAAAAAAC/62QT0/CQBDF73yKTb3SbrcFKj2pKUEjRSsNFsRDA0tduv0Td+sihO9udzFpSCQm
+        xsskk/dm3sxv3wJAS0m+0lyg8Zil7ELWEWGcaW0pYh4nUlxoTpgmTF9HQSoW2lEkHGesVl/qBoC9
+        qmcXqhGlE6X63gD5uzvL3wx2411gP3jp1g+v637W871CNP7mBsvL+o/LjbiPl983KAMnnGK18xOE
+        MrSRqnIVc6wCLdPq6CbSLTNEPddy3G7fcBxn3pgZpusRyVPpfuO8ZC6EQggjKYqE4rgkzFgWGVR/
+        wQ8EK4bfGbzKMKSSGPz1JRV0aP8FVxzd3E6GZTV97mwnQ4HCaF6Ngp8gzcJ8/DT1Ke0E5yDlWAAZ
+        RE+CTll1dWTqds2q69rItS8N9K+szvxzJFTX19ah9QVxKlnfnwIAAA==
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -169,7 +278,7 @@ interactions:
       x-goog-api-client:
       - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
     method: DELETE
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/QWtxSTd0b3RWNFZ3ZjBRWQ
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/aXBHSGpuVW4xSGw1TXZuLQ
   response:
     body:
       string: ''

@@ -19,6 +19,113 @@ interactions:
   response:
     body:
       string: !!binary |
+        H4sIAAAAAAAC/4WQwU7DMAyG730Kq+etBcRpt2pUYpchQXdCHLLESsPSuCTpYEx9d5K0EhNC2in6
+        7S+WP58zgBytJZuv4BxCiJwEhnR/c7uYCh06x2Ss5c/4MaDz0DIByhyZVgLY4Fs0XnHmFRngFkWM
+        TLsC6q8euUcBT1Wg4A4Y52EaeDqgWYAmqcIPooNCIAsUJlm4MraAF0Rove/dqiwFHlFTj9YVkkhq
+        LDh1pUqsP5VOSbNUpvzEfUQ5GUcal72l97BYkc+K6QQuGL6mDPMt/upvZuX1r+M8IZGCOqZMBKWm
+        PdOXPYvMUepFsTqd/KKtafKMQDwVWfU9Ff6BmlOf1mmRCbT5DIzpfZuNnGd+iEb5blvtmsd622zW
+        VVM/RHzMxuwH1VrBt/sBAAA=
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Server:
+      - ESF
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      WWW-Authenticate:
+      - Bearer realm="https://accounts.google.com/", error="invalid_token"
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+      x-l2-request-path:
+      - l2-managed-14
+    status:
+      code: 401
+      message: Unauthorized
+- request:
+    body: grant_type=refresh_token&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ftasks
+    headers:
+      accept-encoding:
+      - gzip, deflate
+      content-type:
+      - application/x-www-form-urlencoded
+      user-agent:
+      - secret...
+      x-goog-api-client:
+      - gl-python/3.10.9 auth/2.40.3 cred-type/u
+    method: POST
+    uri: https://oauth2.googleapis.com/token
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/1XQyXKCQBCA4XuewvIcFAZU9Aa4IAYVRJBcpkYcGEQYYdg0lXePyynX7ur+q76f
+        j06ni4IAMwZLmuCsO+l0bwiMe4hXnHi4AhXKToleJxseUsJx42Thz4JGMUb5UeBI5iXCmg3zQ1Y3
+        Udr4nihW+j6lWpvlpq5t7xe4ORfS1l5DzVKQuQyLMr3gLLAHniDXC9WYW/oQ4sqiAEoEho6/tiJ1
+        uo1yV+TYLKqTle4SB7ffc+buM6VtpewUGIoxOLQeJ4Bm6h7tk9V6Al0UIdciONDM+/KcblymCYZM
+        vgKkRf5KCeWdYpu7R25xAGZs+h4+WsDhkUqafHsTpTLZRDzgR93Ppwlur3GBGYyfIuJgPH5NWUCv
+        +ElEyvLKJv1+0zS9iNLogtE1Zr2Apn1UlaRfIpaw96cXKyxv70MVowIX702Bw0eCvOHhvyIYyjwQ
+        P37/AB4q4OqgAQAA
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Expires:
+      - Mon, 01 Jan 1990 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - scaffolding on HTTPServer2
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      content-length:
+      - '0'
+      user-agent:
+      - secret...
+      x-goog-api-client:
+      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+    method: GET
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
+  response:
+    body:
+      string: !!binary |
         H4sIAAAAAAAC/4WQzU7DMBCE73kKy1xJnBho2pyolFIh6rZI4RAoBys1wc2vWLemqfruxKZSTojL
         SKtvdmd3Tw5CuJD1FkcIKw4FXBldSFCArw0UiucGbvCDq+vxNJ2n85cN/oVSiQp6+tYXCJ2s/jnQ
         tlguLWXxLGDdI2W7Wbfsnm9WcfHNkmlfpyMWN3rwDzvQuJqss51+4tllB2tQUpXCzjyixIQOaN9u
