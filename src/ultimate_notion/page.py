@@ -356,7 +356,7 @@ class Page(
         self._comments = None  # forces a new retrieval of comments next time
         return self
 
-    def update_props(self, **properties: Any) -> None:
+    def update_props(self, **kwargs: Any) -> None:
         """Update multiple properties at once."""
         db = self.parent_db
 
@@ -365,9 +365,9 @@ class Page(
             raise RuntimeError(msg)
 
         props = {}
-        for name, p in properties.items():
+        for name, value in kwargs.items():
             prop: Property = getattr(db.schema, name)
-            props[prop.name] = p.obj_ref if isinstance(p, PropertyValue) else prop.prop_value(p).obj_ref
+            props[prop.name] = value.obj_ref if isinstance(value, PropertyValue) else prop.prop_value(value).obj_ref
 
         session = get_active_session()
         session.api.pages.update(self.obj_ref, properties=props)

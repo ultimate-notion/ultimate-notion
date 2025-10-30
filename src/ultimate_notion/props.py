@@ -90,23 +90,29 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):  # noqa
 class Title(PropertyValue[obj_props.Title], wraps=obj_props.Title):
     """Title property value."""
 
-    def __init__(self, text: str):
+    def __init__(self, text: str | None):
+        text = text or ''
         super().__init__(rt.Text(text).obj_ref)
 
     @property
-    def value(self) -> rt.Text:
-        return rt.Text.wrap_obj_ref(self.obj_ref.title)
+    def value(self) -> rt.Text | None:
+        if not (title := self.obj_ref.title):
+            return None
+        return rt.Text.wrap_obj_ref(title)
 
 
 class Text(PropertyValue[obj_props.RichText], wraps=obj_props.RichText):
     """Rich text property value."""
 
-    def __init__(self, text: str):
+    def __init__(self, text: str | None):
+        text = text or ''
         super().__init__(rt.Text(text).obj_ref)
 
     @property
-    def value(self) -> rt.Text:
-        return rt.Text.wrap_obj_ref(self.obj_ref.rich_text)
+    def value(self) -> rt.Text | None:
+        if not (rich_text := self.obj_ref.rich_text):
+            return None
+        return rt.Text.wrap_obj_ref(rich_text)
 
 
 class Number(PropertyValue[obj_props.Number], wraps=obj_props.Number):
