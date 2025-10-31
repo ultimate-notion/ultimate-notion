@@ -41,15 +41,23 @@ class RichTextBase(Wrapper[RTBO_co], wraps=objs.RichTextBaseObject):
 
     @property
     def is_text(self) -> bool:
+        """Return True if this rich text object is a Text."""
         return isinstance(self, RichText)
 
     @property
     def is_equation(self) -> bool:
+        """Return True if this rich text object is a Math (equation)."""
         return isinstance(self, Math)
 
     @property
     def is_mention(self) -> bool:
+        """Return True if this rich text object is a Mention."""
         return isinstance(self, Mention)
+
+    @property
+    def plain_text(self) -> str:
+        """Return the plain text representation of this rich text object."""
+        return self.obj_ref.plain_text
 
 
 class Math(RichTextBase[objs.EquationObject], wraps=objs.EquationObject):
@@ -192,10 +200,35 @@ class Text(str):
 
         self._rich_texts: list[RichTextBase] = []
         if isinstance(text, Text):
-            self._rich_texts = text._rich_texts
+            self._rich_texts = self._compact(text._rich_texts)
         else:
             for part in chunky(text):
                 self._rich_texts.append(RichText(part))
+
+    @staticmethod
+    def _compact(rich_texts: list[RichTextBase]) -> list[RichTextBase]:
+        """Compact the internal list of rich texts by merging adjacent ones with the same style and href."""
+        if not rich_texts:
+            return []
+
+        compacted = [rich_texts[0]]
+        for rt in rich_texts[1:]:
+            last = compacted.pop()
+            if (
+                last.is_text
+                and rt.is_text
+                and last.obj_ref.annotations == rt.obj_ref.annotations
+                and last.obj_ref.href == rt.obj_ref.href
+            ):
+                for part in chunky(rt.plain_text):
+                    merged = RichText(part)
+                    merged.obj_ref.annotations = last.obj_ref.annotations
+                    merged.obj_ref.href = last.obj_ref.href
+                    compacted.append(merged)
+            else:
+                compacted.append(rt)
+
+        return compacted
 
     @property
     def rich_texts(self) -> tuple[RichTextBase, ...]:
@@ -208,7 +241,7 @@ class Text(str):
         rich_texts = [RichTextBase.wrap_obj_ref(obj_ref) for obj_ref in obj_refs]
         plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
         obj = cls(plain_text)
-        obj._rich_texts = rich_texts
+        obj._rich_texts = cls._compact(rich_texts)
         return obj
 
     @property
@@ -271,7 +304,7 @@ class Text(str):
         match other:
             case CustomEmoji():  # got to wrap CusomEmoji in a Mention
                 return Text.wrap_obj_ref([*self.obj_ref, *mention(other).obj_ref])
-            case str():
+            case str() | Text():
                 return Text.wrap_obj_ref([*self.obj_ref, *Text(other).obj_ref])
             case _:
                 msg = f'Cannot concatenate {type(other)} to construct a RichText object.'
