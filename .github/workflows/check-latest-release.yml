@@ -29,10 +29,11 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Ensure latest pip & install pipx
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install -q pipx
+    - name: Setup pip with version constraint
+      uses: ./.github/actions/setup-pip
+
+    - name: Install pipx
+      run: python -m pip install -q pipx
 
     - name: Install Hatch & Ultimate Notion
       run: |

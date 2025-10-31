@@ -55,10 +55,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Ensure latest pip & install pipx
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install -q pipx
+    - name: Setup pip with version constraint
+      uses: ./.github/actions/setup-pip
+
+    - name: Install pipx
+      run: python -m pip install -q pipx
 
     - name: Install Hatch & pre-commit
       run: |

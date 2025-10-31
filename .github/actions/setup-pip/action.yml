@@ -1,0 +1,13 @@
+name: 'Setup Pip with Version Constraint'
+description: 'Install pip with a specific version constraint'
+inputs:
+  pip-version:
+    description: 'Pip version constraint (e.g., "pip < 25.3")'
+    required: false
+    default: 'pip < 25.3'
+runs:
+  using: 'composite'
+  steps:
+    - name: Ensure pip version
+      shell: bash
+      run: python -m pip install --upgrade "${{ inputs.pip-version }}"
