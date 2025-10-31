@@ -79,6 +79,8 @@ BLOCK_URL_LONG_RE = re.compile(
 T = TypeVar('T')  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
 
 
+# ToDo: Replace with MISSING when stable: https://docs.pydantic.dev/latest/concepts/experimental/#missing-sentinel
+# Or use typing_extensions.Sentinel instead.
 class UnsetType(BaseModel):
     """Sentinel type for missing default values.
 

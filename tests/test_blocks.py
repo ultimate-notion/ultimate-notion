@@ -850,3 +850,21 @@ def test_long_code_block(notion: uno.Session, root_page: uno.Page) -> None:
 
     # This fails if content in a response is not split.
     assert page.children[0] == another_block_child
+
+
+@pytest.mark.vcr()
+def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) -> None:
+    """Test that a locally created block with rich text is equal to a remotely created one."""
+    page = notion.create_page(parent=root_page, title='Test Local Remote Text Equality')
+    text = uno.text(text='A') + uno.text(text='B')
+    block_child = uno.Paragraph(text=text)
+    another_block_child = uno.Paragraph(text=text)
+    assert block_child == another_block_child
+
+    page.append(blocks=[block_child])
+    page.reload()
+
+    assert len(page.children) == 1
+    assert page.children[0] == block_child
+
+    assert page.children[0] == another_block_child
