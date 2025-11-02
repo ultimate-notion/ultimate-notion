@@ -14,6 +14,9 @@ concurrency:
   group: build-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
+env:
+  PIP_VERSION: "pip < 25.3"
+
 jobs:
   pure-python-wheel:
     name: Build a pure Python wheel
@@ -25,16 +28,8 @@ jobs:
           # Fetch all tags
           fetch-depth: 0
 
-      - name: Setup pip with version constraint
-        uses: ./.github/actions/setup-pip
-
-      - name: Install pipx
-        run: python -m pip install -q pipx
-
-      - name: Install Hatch & pre-commit
-        run: |
-          pip install --upgrade hatch hatch-vcs pre-commit
-          pip list
+      - name: Setup environment requirements
+        uses: ./.github/actions/setup-venv-reqs
 
       - name: Build distributions
         run: hatch build

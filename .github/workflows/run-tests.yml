@@ -55,20 +55,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Setup pip with version constraint
-      uses: ./.github/actions/setup-pip
+    - name: Setup environment requirements
+      uses: ./.github/actions/setup-venv-reqs
 
-    - name: Install pipx
-      run: python -m pip install -q pipx
-
-    - name: Install Hatch & pre-commit
+    - name: Install Python version
       run: |
-        pipx install pre-commit
-        pipx install hatch
-        pipx inject hatch hatch-vcs
-        pipx inject hatch click==8.2.1 --force # workaround https://github.com/pypa/hatch/issues/2052
-        pipx list --include-injected
-        hatch --version
         hatch python install ${{ matrix.python-version }}
 
     - name: Lint
