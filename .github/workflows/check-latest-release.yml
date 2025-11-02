@@ -29,19 +29,11 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Setup pip with version constraint
-      uses: ./.github/actions/setup-pip
+    - name: Setup environment requirements
+      uses: ./.github/actions/setup-venv-reqs
 
-    - name: Install pipx
-      run: python -m pip install -q pipx
-
-    - name: Install Hatch & Ultimate Notion
-      run: |
-        pipx install hatch
-        pipx inject hatch click==8.2.1 --force # workaround https://github.com/pypa/hatch/issues/2052
-        pipx list --include-injected
-        hatch --version
-        hatch python install 3.10
+    - name: Install Hatch Python version
+      run: hatch python install 3.10
 
     - name: Run tests to check latest release
       run: hatch run prod:test

@@ -1,0 +1,21 @@
+name: 'Setup Pip with Version Constraint'
+description: 'Install pip with a specific version constraint'
+inputs:
+  pip-version:
+    description: 'Pip version constraint (e.g., "pip < 25.3")'
+    required: false
+    default: 'pip < 25.3'
+runs:
+  using: 'composite'
+  steps:
+    - name: Ensure pip version, install pipx, hatch, etc.
+      shell: bash
+      env:
+        PIPX_DEFAULT_VENV_CREATE_SYSTEM: '1'  # make sure that PIX defaults to installed pip version
+      run: |
+        python -m pip install --upgrade "${{ inputs.pip-version }}" pipx
+        pipx install pre-commit
+        pipx install hatch
+        pipx inject hatch hatch-vcs
+        pipx inject hatch click==8.2.1 --force # workaround https://github.com/pypa/hatch/issues/2052
+        pipx list --include-injected
