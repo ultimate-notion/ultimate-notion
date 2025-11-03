@@ -60,8 +60,8 @@ with open('LICENSE.txt', 'rb') as file:
 
 ### MIME Type Detection
 
-Ultimate Notion automatically detects MIME types for uploaded files using the `filetype` library. If the MIME type
-cannot be determined, it defaults to `text/plain` since Notion doesn't support `application/octet-stream`.
+Ultimate Notion automatically detects MIME types for uploaded files using the suffix of the file name.
+If the MIME type cannot be determined, it defaults to `application/octet-stream` since Notion doesn't support `text/plain`.
 
 ## External URL Import
 

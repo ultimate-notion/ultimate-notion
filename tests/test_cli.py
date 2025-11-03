@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from typer.testing import CliRunner
+from typer.testing import CliRunner, Result
 
 import ultimate_notion as uno
 from ultimate_notion import Session, __version__
@@ -38,6 +38,15 @@ def test_setup_logging_configures_correctly(mock_basic_config: Mock) -> None:
         format='[%(asctime)s] %(levelname)s:%(name)s:%(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
     )
+
+
+def assert_cli_success(result: Result) -> None:
+    """Assert CLI command succeeded and optionally check output."""
+    if result.exception:
+        raise result.exception
+
+    error_msg = f'Command failed (exit_code={result.exit_code})\nstdout: {result.stdout}\nstderr: {result.stderr}'
+    assert result.exit_code == 0, error_msg
 
 
 def test_config_command_displays_configuration(custom_config: Path) -> None:
@@ -71,7 +80,7 @@ def test_info_command_displays_system_and_notion_info(notion: Session) -> None:
 
         result = runner.invoke(app, ['info'])
 
-    assert result.exit_code == 0
+    assert_cli_success(result)
 
     # Check system information
     assert f'Python version: {sys.version}' in result.stdout
@@ -93,13 +102,13 @@ def test_log_level_option_affects_logging() -> None:
     # Test with debug level
     with patch('ultimate_notion.cli.setup_logging') as mock_setup:
         result = runner.invoke(app, ['--log-level', 'debug', 'config'])
-        assert result.exit_code == 0
+        assert_cli_success(result)
         mock_setup.assert_called_with(LogLevel.DEBUG)
 
     # Test with error level
     with patch('ultimate_notion.cli.setup_logging') as mock_setup:
         result = runner.invoke(app, ['--log-level', 'error', 'config'])
-        assert result.exit_code == 0
+        assert_cli_success(result)
         mock_setup.assert_called_with(LogLevel.ERROR)
 
 
@@ -116,7 +125,7 @@ def test_upload_image_by_page_name(notion: Session, root_page: uno.Page) -> None
 
         result = runner.invoke(app, ['upload', image_path, str(test_page.title)])
 
-    assert result.exit_code == 0
+    assert_cli_success(result)
     # Verify the block was actually added
     test_page.reload()
     assert len(test_page.children) > 0
@@ -174,7 +183,7 @@ def test_upload_pdf_by_uuid(notion: Session, root_page: uno.Page, tmp_path: Path
 
         result = runner.invoke(app, ['upload', str(pdf_file), str(test_page.id)])
 
-    assert result.exit_code == 0
+    assert_cli_success(result)
 
     # Verify the block was actually added
     test_page.reload()
@@ -262,7 +271,7 @@ def test_upload_generic_file(notion: Session, root_page: uno.Page, tmp_path: Pat
 
         result = runner.invoke(app, ['upload', str(text_file), 'CLI Upload Generic File Test'])
 
-    assert result.exit_code == 0
+    assert_cli_success(result)
 
     # Verify the block was actually added
     test_page.reload()

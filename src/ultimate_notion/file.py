@@ -6,6 +6,7 @@ import io
 import mimetypes
 import time
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import BinaryIO
 from urllib.parse import urlparse
 from uuid import UUID
@@ -222,7 +223,7 @@ def get_file_size(file: BinaryIO) -> int:
     return file_size
 
 
-def get_mime_type(file: BinaryIO, filename: str | None = None) -> str:
+def get_mime_type(file: BinaryIO | str | Path) -> str:
     """Detect the MIME type of a file.
 
     Args:
@@ -239,14 +240,20 @@ def get_mime_type(file: BinaryIO, filename: str | None = None) -> str:
             mime_type = 'application/octet-stream'
         return mime_type
 
-    if filename:
-        mime_type = _get_mime_type(filename)
-    elif hasattr(file, 'name') and file.name:
+    if isinstance(file, str):
+        mime_type = _get_mime_type(file)
+    elif hasattr(file, 'name') and file.name:  # BinaryIO and Path have 'name' attribute
         mime_type = _get_mime_type(file.name)
     else:
         msg = 'Cannot determine MIME type without filename or file.name attribute.'
         raise ValueError(msg)
 
+    # correct some MIME types to match Notion's expectations
+    mime_type_map = {
+        'audio/x-wav': 'audio/wav',  # see issue #127
+    }
+
+    mime_type = mime_type_map.get(mime_type, mime_type)
     return mime_type
 
 

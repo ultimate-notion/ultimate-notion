@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Annotated, ParamSpec, TypeVar
 from uuid import UUID
 
-import filetype
 import typer
 from rich.console import Console
 
@@ -14,6 +13,7 @@ from ultimate_notion import Session, __version__
 from ultimate_notion.blocks import PDF, Audio, File, Image, Video
 from ultimate_notion.config import get_cfg, get_cfg_file
 from ultimate_notion.errors import UnknownPageError
+from ultimate_notion.file import get_mime_type
 from ultimate_notion.page import Page
 from ultimate_notion.utils import pydantic_to_toml
 
@@ -129,23 +129,16 @@ def _is_uuid(value: str) -> bool:
 
 
 def _get_block_class_for_file(file_path: Path) -> type[File | Image | Video | PDF | Audio]:
-    """Determine the appropriate block class based on file content and extension.
-
-    Uses the filetype library to detect file type by examining magic bytes,
-    falling back to extension-based detection if needed.
-    """
-    # First try to detect by examining file content
-    kind = filetype.guess(str(file_path))
-    if kind is not None:
-        mime_type = kind.mime
-        if mime_type.startswith('image/'):
-            return Image
-        elif mime_type.startswith('video/'):
-            return Video
-        elif mime_type.startswith('audio/'):
-            return Audio
-        elif mime_type == 'application/pdf':
-            return PDF
+    """Determine the appropriate block class based on file extension."""
+    mime_type = get_mime_type(file_path)
+    if mime_type.startswith('image/'):
+        return Image
+    elif mime_type.startswith('video/'):
+        return Video
+    elif mime_type.startswith('audio/'):
+        return Audio
+    elif mime_type == 'application/pdf':
+        return PDF
 
     return File
 
