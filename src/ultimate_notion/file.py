@@ -227,8 +227,7 @@ def get_mime_type(file: BinaryIO | str | Path) -> str:
     """Detect the MIME type of a file.
 
     Args:
-        file: The binary file object to analyze
-        filename: Optional filename to help with MIME type detection
+        file: file handle, file path or file name
 
     Returns:
         The detected MIME type, or 'application/octet-stream' if unknown
