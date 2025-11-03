@@ -226,7 +226,7 @@ class Text(str):
                     merged.obj_ref.href = last.obj_ref.href
                     compacted.append(merged)
             else:
-                compacted.append(rt)
+                compacted.extend([last, rt])
 
         return compacted
 

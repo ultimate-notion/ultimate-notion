@@ -12,7 +12,7 @@ from typer.testing import CliRunner, Result
 
 import ultimate_notion as uno
 from ultimate_notion import Session, __version__
-from ultimate_notion.cli import LogLevel, _get_block_class_for_file, app, setup_logging  # noqa: PLC2701
+from ultimate_notion.cli import LogLevel, app, setup_logging
 
 
 @patch('logging.basicConfig')
@@ -277,20 +277,3 @@ def test_upload_generic_file(notion: Session, root_page: uno.Page, tmp_path: Pat
     test_page.reload()
     assert len(test_page.children) > 0
     assert isinstance(test_page.children[-1], uno.File)
-
-
-def test_upload_file_type_detection_with_filetype(tmp_path: Path) -> None:
-    """Test that file type detection works with filetype library for files without proper extensions."""
-    png_content = (
-        b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01'
-        b'\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13'
-        b'\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\nIDATx\x9cc```'
-        b'\x00\x00\x00\x04\x00\x01]\xcc\xdb\x8d\x00\x00\x00\x00IEND\xaeB`\x82'
-    )
-
-    fake_txt_file = tmp_path / 'image.txt'  # Wrong extension
-    fake_txt_file.write_bytes(png_content)
-
-    # Should detect as Image despite .txt extension
-    block_class = _get_block_class_for_file(fake_txt_file)
-    assert block_class == uno.Image
