@@ -95,3 +95,21 @@ def test_rich_text() -> None:
     assert text.to_markdown() == 'Simple Text **and a bold text**'
     assert uno.text(text).to_markdown() == 'Simple Text and a bold text'  # converted to plain text
     # ToDo: Extend this test!
+
+
+def test_rich_text_concatenation() -> None:
+    t1 = uno.text(text='A', code=False)
+    t2 = uno.text(text='B', code=False)
+    t3 = uno.text(text='C', code=False)
+
+    result = t1 + t2 + t3
+    assert result.to_plain_text() == 'ABC'
+    assert len(result._rich_texts) == 1
+
+    t1 = uno.text(text='A', code=False)
+    t2 = uno.text(text='B', code=True)
+    t3 = uno.text(text='C', code=False)
+
+    result = t1 + t2 + t3
+    assert result.to_plain_text() == 'ABC'
+    assert len(result._rich_texts) == 3

@@ -220,7 +220,7 @@ class Text(str):
                 and last.obj_ref.annotations == rt.obj_ref.annotations
                 and last.obj_ref.href == rt.obj_ref.href
             ):
-                for part in chunky(rt.plain_text):
+                for part in chunky(last.plain_text + rt.plain_text):
                     merged = RichText(part)
                     merged.obj_ref.annotations = last.obj_ref.annotations
                     merged.obj_ref.href = last.obj_ref.href

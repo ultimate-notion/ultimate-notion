@@ -855,7 +855,7 @@ def test_long_code_block(notion: uno.Session, root_page: uno.Page) -> None:
 @pytest.mark.vcr()
 def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) -> None:
     """Test that a locally created block with rich text is equal to a remotely created one."""
-    page = notion.create_page(parent=root_page, title='Test Local Remote Text Equality')
+    page = notion.create_page(parent=root_page, title='Test Local Remote Text Equality 1')
     text = uno.text(text='A') + uno.text(text='B')
     block_child = uno.Paragraph(text=text)
     another_block_child = uno.Paragraph(text=text)
@@ -866,5 +866,23 @@ def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) ->
 
     assert len(page.children) == 1
     assert page.children[0] == block_child
+    assert page.children[0] == another_block_child
 
+    page = notion.create_page(parent=root_page, title='Test Local Remote Text Equality 2')
+    t1 = uno.text(text='A', code=True)
+    t2 = uno.text(text=' ', code=False)
+    t3 = uno.text(text='+', code=False)
+    t4 = uno.text(text=' ', code=False)
+    t5 = uno.text(text='B', code=True)
+
+    block_child = uno.Paragraph(text=t1 + t2 + t3 + t4 + t5)
+    another_block_child = uno.Paragraph(text=t1 + t2 + t3 + t4 + t5)
+
+    assert block_child == another_block_child
+
+    page.append(blocks=[block_child])
+    page.reload()
+
+    assert len(page.children) == 1
+    assert page.children[0] == block_child
     assert page.children[0] == another_block_child
