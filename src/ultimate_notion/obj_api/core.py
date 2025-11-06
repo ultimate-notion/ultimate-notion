@@ -393,7 +393,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
             msg = f'Duplicate subtype for class - {name} :: {cls}'
             raise ValueError(msg)
 
-        _logger.debug('registered new subtype: %s => %s', name, cls)
+        _logger.debug('Registered new subtype: %s => %s', name, cls)
         cls._typemap[name] = cls
 
     @model_validator(mode='wrap')
@@ -408,9 +408,6 @@ class TypedObject(GenericObject, Generic[TO_co]):
         if isinstance(value, cls):
             return handler(value)
 
-        if not cls._polymorphic_base:  # breaks the recursion
-            return handler(value)
-
         if not isinstance(value, dict):
             msg = "Invalid 'data' object"
             raise ValueError(msg)
@@ -421,11 +418,14 @@ class TypedObject(GenericObject, Generic[TO_co]):
 
         type_name = value.get('type')
 
+        if (not cls._polymorphic_base) and cls.model_fields['type'].default == type_name:  # breaks the recursion
+            return handler(value)
+
         if type_name is None:
             _logger.warning(f'Missing type in data {value}. Most likely a User object without type')
             msg = f"Missing 'type' in data {value}"
-            if value['object'] == 'user':
-                type_name = 'unknown'  # for the unofficial type objects.UnknownUser
+            if value.get('object') == 'user':
+                type_name = 'unknown'  # for the unofficial type obj_api.objects.UnknownUser
             else:
                 raise ValueError(msg)
 
@@ -436,6 +436,16 @@ class TypedObject(GenericObject, Generic[TO_co]):
             raise ValueError(msg)
 
         return sub_cls(**value)
+
+    @classmethod
+    def build(cls, *args: Any, **kwargs: Any) -> Self:
+        """Build non-polymorphic instances of TypedObject by adding the proper `type` parameter."""
+        if cls._polymorphic_base:
+            msg = 'Cannot build instance of polymorphic base class directly.'
+            raise ValueError(msg)
+
+        kwargs['type'] = cls.model_fields['type'].default
+        return cls(*args, **kwargs)
 
     @property
     def value(self) -> TO_co:

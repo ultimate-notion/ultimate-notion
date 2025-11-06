@@ -24,7 +24,7 @@ def convert_to_notion_obj(
 ) -> Block | Page | Database | PropertyItem | User | GenericObject | FileUpload:
     """Convert a dictionary to the corresponding subtype of Notion Object.
 
-    Used in the ObjectList below the convert the results from the Notion API.
+    Used in the ObjectList below to convert the results from the Notion API.
     """
     obj_field = 'object'
 
