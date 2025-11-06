@@ -13,6 +13,7 @@
 - Fix: Determing the correct mime type of a file, which is now done using `mimetypes` instead of `filetypes`, issue #141.
 - New: Add the new `workspace_id` field to the `Bot`.
 - Fix: Unify texts locally the same way as remote, which is necessary for comparison, issue #136.
+- Fix: Resolution of polymorphic `TypedObject`, which led to wrong schema inference, issue #134.
 
 ## Version 0.9.5, 2025-10-24
 
