@@ -67,7 +67,7 @@ def test_parent_subpages(notion: uno.Session, root_page: uno.Page) -> None:
 
 @pytest.mark.vcr()
 def test_parent_children(intro_page: uno.Page) -> None:
-    assert all(isinstance(block, Block) for block in intro_page.children)
+    assert all(isinstance(block, Block) for block in intro_page.blocks)
 
 
 @pytest.mark.vcr()

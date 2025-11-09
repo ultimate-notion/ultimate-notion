@@ -36,7 +36,7 @@ from typing_extensions import Self, TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion
-from ultimate_notion.core import NotionEntity, get_active_session, get_url
+from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_db, is_page
 from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
@@ -199,8 +199,8 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         return [cast(Block, session.cache.setdefault(block.id, block)) for block in child_blocks]
 
     @property
-    def children(self) -> tuple[Block, ...]:
-        """Return the children of this block."""
+    def children(self) -> tuple[Block | Page | Database, ...]:
+        """Return the children of this block, which are blocks but might also be pages and databases."""
         if self.in_notion:
             if self._children is None:
                 self._children = self._gen_children_cache()
@@ -210,6 +210,11 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         else:
             children = ()
         return children
+
+    @property
+    def blocks(self) -> tuple[Block, ...]:
+        """Return all contained blocks within this block (excluding child pages and databases)"""
+        return tuple(block for block in self.children if not is_page(block) and not is_db(block))
 
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
         """Append a block or a sequence of blocks to the content of this block.
@@ -1159,7 +1164,17 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
                 raise TypeError(msg)
 
     def __getitem__(self, index: int) -> Column:
-        return cast(Column, self.children[index])
+        return cast(Column, self.blocks[index])
+
+    @property
+    def columns(self) -> tuple[Column, ...]:
+        """Return all columns of this multi-column block."""
+        return tuple(cast(Column, col) for col in super().children)
+
+    @property
+    def children(self) -> tuple[Column, ...]:
+        """Return all columns of this multi-column block. Alias for `columns`."""
+        return self.columns
 
     def add_column(self, index: int | None = None) -> Self:
         """Add a new column to this block of columns at the given index.
@@ -1170,13 +1185,13 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
         To specify the width ratio of the new column, use the `width_ratios` property.
         """
         if index is None:
-            index = len(self.children)
-        if 0 <= index <= len(self.children):
+            index = len(self.columns)
+        if 0 <= index <= len(self.columns):
             new_col = Column.wrap_obj_ref(obj_blocks.Column.build())
-            super().append(new_col, after=self.children[index - 1] if index > 0 else None)
+            super().append(new_col, after=self.columns[index - 1] if index > 0 else None)
             return self
         else:
-            msg = f'Column index must be between 0 and {len(self.children)} (inclusive).'
+            msg = f'Column index must be between 0 and {len(self.blocks)} (inclusive).'
             raise IndexError(msg)
 
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:  # noqa: PLR6301
@@ -1187,7 +1202,7 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
     def to_markdown(self) -> str:
         """Return the content of all columns as Markdown."""
         cols = []
-        for i, block in enumerate(self.children):
+        for i, block in enumerate(self.columns):
             md = md_comment(f'column {i + 1}')
             cols.append(md + block.to_markdown())
         return '\n'.join(cols)
@@ -1195,13 +1210,13 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
     @property
     def width_ratios(self) -> tuple[float | None, ...]:
         """Return the width ratios of the columns."""
-        return tuple(cast(Column, col).width_ratio for col in self.children)
+        return tuple(col.width_ratio for col in self.columns)
 
     @width_ratios.setter
     def width_ratios(self, ratios: Sequence[float | int]) -> None:
         """Set the width ratios of the columns."""
-        if len(ratios) != len(self.children):
-            msg = f'Ratios must have the same length as the number of columns ({len(self.children)}).'
+        if len(ratios) != len(self.columns):
+            msg = f'Ratios must have the same length as the number of columns ({len(self.columns)}).'
             raise ValueError(msg)
 
         if not isinstance(ratios, Sequence) or not all(isinstance(x, float | int) for x in ratios):
@@ -1213,9 +1228,8 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
 
         ratios_arr = np.array(ratios, dtype=float)
         ratios_arr /= ratios_arr.sum()  # normalize ratios to sum to 1 as asked by the Notion API
-        for col, ratio in zip(self.children, ratios_arr, strict=False):
-            obj_ref = cast(obj_blocks.Column, col.obj_ref)
-            obj_ref.column.width_ratio = ratio
+        for col, ratio in zip(self.columns, ratios_arr, strict=False):
+            col.obj_ref.column.width_ratio = ratio
             col._update_in_notion(exclude_attrs=['column.children'])
 
 
@@ -1267,7 +1281,7 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
         else:
             row_idx, col_idx = index, None
 
-        if not (0 <= row_idx < len(self.children)):
+        if not (0 <= row_idx < len(self.rows)):
             msg = 'Row index out of range'
             raise IndexError(msg)
 
@@ -1288,7 +1302,7 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
 
     def __getitem__(self, index: int | tuple[int, int]) -> Text | TableRow | None:
         row_idx, col_idx = self._check_index(index)
-        row = self.children[row_idx]
+        row = self.rows[row_idx]
         return row if col_idx is None else row[col_idx]
 
     def __setitem__(
@@ -1297,7 +1311,7 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
         value: str | Sequence[str | None] | None,
     ) -> None:
         row_idx, col_idx = self._check_index(index)
-        row = self.children[row_idx]
+        row = self.rows[row_idx]
         row_obj = row.obj_ref
         if col_idx is None:
             if not isinstance(value, Sequence) or len(value) != self.width:
@@ -1320,9 +1334,14 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
             self._children[row_idx] = TableRow.wrap_obj_ref(row_obj)  # needed to call __new__ on the TableRow
 
     @property
-    def children(self) -> tuple[TableRow, ...]:
+    def rows(self) -> tuple[TableRow, ...]:
         """Return all rows of the table."""
         return tuple(cast(TableRow, block) for block in super().children)
+
+    @property
+    def children(self) -> tuple[TableRow, ...]:
+        """Return all rows of the table. Alias for `rows`."""
+        return self.rows
 
     @property
     def width(self) -> int:
@@ -1333,7 +1352,7 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
     def shape(self) -> tuple[int, int]:
         """Return the shape of the table."""
         n_cols = self.width
-        n_rows = len(self.children)
+        n_rows = len(self.rows)
         return n_rows, n_cols
 
     @property
@@ -1359,23 +1378,23 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
     def to_markdown(self) -> str:
         """Return the table as Markdown."""
         headers = 'firstrow' if self.has_header_row else [''] * self.width
-        return tabulate(self.children, headers, tablefmt='github') + '\n'
+        return tabulate(self.rows, headers, tablefmt='github') + '\n'
 
     def insert_row(self, index: int, values: Sequence[str]) -> Self:
         """Insert a new row at the given index."""
-        if not (1 <= index <= len(self.children)):
-            msg = f'Columns can only be inserted from index 1 to {len(self.children)}.'
+        if not (1 <= index <= len(self.rows)):
+            msg = f'Columns can only be inserted from index 1 to {len(self.rows)}.'
             raise IndexError(msg)
         if len(values) != self.width:
             msg = 'Length of passed value does not match width of table.'
             raise ValueError(msg)
 
-        self.append(TableRow(*values), after=self.children[index - 1])
+        self.append(TableRow(*values), after=self.rows[index - 1])
         return self
 
     def append_row(self, values: Sequence[str]) -> Self:
         """Append a new row to the table."""
-        return self.insert_row(len(self.children), values)
+        return self.insert_row(len(self.rows), values)
 
 
 class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
@@ -1497,14 +1516,6 @@ class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.Unsupport
         return '<kbd>Unsupported block</kbd>\n'
 
 
-def traverse_blocks(blocks: Sequence[Block]) -> Iterator[Block]:
-    """Recursively traverse blocks and their children in depth-first order."""
-    for block in blocks:
-        yield block
-        if block.has_children and isinstance(block, ChildrenMixin):
-            yield from traverse_blocks(block.children)
-
-
 @dataclass
 class _Node:
     """Tree of nodes used to chunk blocks for the Notion API."""
@@ -1546,16 +1557,14 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
         for node in curr_nodes:
             match node.block:
                 case Columns() as cols:
-                    col_nodes = [_Node(block=col) for col in cols.children]
+                    col_nodes = [_Node(block=col) for col in cols.columns]
                     node.children.extend(col_nodes)
                     for col_node in col_nodes:
-                        queue.append(
-                            (col_node, [_Node(block=child) for child in cast(Column, col_node.block).children])
-                        )
+                        queue.append((col_node, [_Node(block=child) for child in cast(Column, col_node.block).blocks]))
                 case Table() as table:
-                    node.children.extend([_Node(block=row) for row in table.children])
+                    node.children.extend([_Node(block=row) for row in table.rows])
                 case ParentBlock() as parent_block if parent_block.has_children:
-                    queue.append((node, [_Node(block=child) for child in parent_block.children]))
+                    queue.append((node, [_Node(block=child) for child in parent_block.blocks]))
         if next_nodes:
             queue.append((_Node(block=batch.block, is_root=batch.is_root), next_nodes))
         yield batch

@@ -9,7 +9,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias, cast
 from uuid import UUID
 
-from typing_extensions import Self, TypeVar
+from typing_extensions import Self, TypeIs, TypeVar
 
 from ultimate_notion.errors import UnknownDatabaseError, UnknownPageError
 from ultimate_notion.obj_api import core as obj_core
@@ -24,6 +24,8 @@ GT_co = TypeVar('GT_co', bound=obj_core.GenericObject, default=obj_core.GenericO
 if TYPE_CHECKING:
     from pydantic_core import SchemaSerializer
 
+    from ultimate_notion.database import Database
+    from ultimate_notion.page import Page
     from ultimate_notion.session import Session
     from ultimate_notion.user import User
 
@@ -223,3 +225,13 @@ def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
     type_str = str(name) if name is not None else obj.__class__.__name__
     desc_str = str(desc) if desc is not None else str(obj)
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
+
+
+def is_db(obj: NotionEntity | None) -> TypeIs[Database]:
+    """Return whether the object is a database as type guard."""
+    return obj is not None and obj.is_db
+
+
+def is_page(obj: NotionEntity | None) -> TypeIs[Page]:
+    """Return whether the object is a page as type guard."""
+    return obj is not None and obj.is_page
