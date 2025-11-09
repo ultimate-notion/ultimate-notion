@@ -35,7 +35,7 @@ class Wrapper(Generic[GT_co], ABC):
 
     _obj_ref: GT_co
 
-    _obj_api_map: ClassVar[dict[type[GT_co], type[Wrapper]]] = {}  # type: ignore[misc]
+    _obj_api_map: ClassVar[dict[type[GT_co], type[Wrapper]]] = {}
 
     def __init_subclass__(cls, wraps: type[GT_co], **kwargs: Any):
         super().__init_subclass__(**kwargs)
