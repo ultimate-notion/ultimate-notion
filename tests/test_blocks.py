@@ -481,7 +481,7 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page.reload()
 
     cols = cast(uno.Columns, page.children[0])
-    col = cast(uno.Column, cols.children[0])
+    col = cols.columns[0]
     paragraph = cast(uno.Paragraph, col.children[0])
     assert paragraph == right
     assert left.reload().is_deleted
@@ -721,7 +721,7 @@ def test_max_children_length(root_page: uno.Page, notion: uno.Session) -> None:
     assert len(page.children) == len(blocks)
 
     ablocks = [uno.Paragraph(f'Another Paragraph {i}') for i in range(n_blocks)]
-    page.append(ablocks, after=page.children[2])
+    page.append(ablocks, after=page.blocks[2])
     assert page.children[3] == ablocks[0]
     assert len(page.children) == 2 * n_blocks
     assert page.children[3 + n_blocks] == blocks[3]
@@ -734,16 +734,16 @@ def test_max_nesting_level(root_page: uno.Page, notion: uno.Session) -> None:
     # add a 1st level of nesting
     blocks[0].append([uno.BulletedItem(f'Nested Point {i}') for i in range(n_blocks)])
     # add a 2nd level of nesting
-    blocks[0].children[0].append([uno.BulletedItem(f'Deeply Nested Point {i}') for i in range(n_blocks)])  # type: ignore[attr-defined]
+    blocks[0].blocks[0].append([uno.BulletedItem(f'Deeply Nested Point {i}') for i in range(n_blocks)])  # type: ignore[attr-defined]
 
     page = notion.create_page(
         parent=root_page, title='Page for testing max nesting level', blocks=[uno.Paragraph('Intro')]
     )
     page.append(blocks)
 
-    assert len(page.children) == n_blocks + 1
-    assert len(page.children[1].children) == n_blocks  # type: ignore[attr-defined]
-    assert len(page.children[1].children[0].children) == n_blocks  # type: ignore[attr-defined]
+    assert len(page.blocks) == n_blocks + 1
+    assert len(page.blocks[1].blocks) == n_blocks  # type: ignore[attr-defined]
+    assert len(page.blocks[1].blocks[0].blocks) == n_blocks  # type: ignore[attr-defined]
 
 
 @pytest.mark.vcr()
