@@ -585,3 +585,31 @@ def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page, get_id_
             name = uno.PropType.Title('Name')
             unique_id = uno.PropType.ID('ID', prefix=old_id_prefix)
             other_id = uno.PropType.ID('Other ID')
+
+
+@pytest.mark.vcr()
+def test_place_property(notion: uno.Session, root_page: uno.Page) -> None:
+    """Test the Place property value and property classes."""
+
+    class Location(uno.Schema, db_title='Place Property Test'):
+        name = uno.PropType.Title('Name')
+        location = uno.PropType.Place('Location')
+
+    notion.create_db(parent=root_page, schema=Location)
+
+    my_place = Location.create(
+        name='My Place',
+        location=uno.PlaceDict(
+            lat=52.5200,
+            lon=13.4050,
+            aws_place_id='ChIJAVkDPzdOqEcRcDteW0YgIQQ',
+            google_place_id='ChIJAVkDPzdOqEcRcDteW0',
+            address='Berlin, Germany',
+        ),
+    )
+    val = my_place.props.location
+    assert val.lat == 52.5200
+    assert val.lon == 13.4050
+    assert val.aws_place_id == 'ChIJAVkDPzdOqEcRcDteW0YgIQQ'
+    assert val.google_place_id == 'ChIJAVkDPzdOqEcRcDteW0'
+    assert val.address == 'Berlin, Germany'

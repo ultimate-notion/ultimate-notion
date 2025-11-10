@@ -15,10 +15,10 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from pydantic import Field, SerializeAsAny, field_validator, model_serializer
-from typing_extensions import Self
+from typing_extensions import NotRequired, Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
@@ -315,6 +315,17 @@ class Button(PropertyValue, type='button'):
     button: TypeData = Field(default_factory=TypeData)
 
 
+class PlaceDict(TypedDict):
+    """Dictionary type for Place property values."""
+
+    lat: float
+    lon: float
+    name: NotRequired[str]
+    address: NotRequired[str]
+    aws_place_id: NotRequired[str]
+    google_place_id: NotRequired[str]
+
+
 class Place(PropertyValue, type='place'):
     """A Notion place property value."""
 
@@ -327,6 +338,11 @@ class Place(PropertyValue, type='place'):
         google_place_id: str | None = None
 
     place: TypeData | None = None
+
+    @classmethod
+    def build(cls, place: PlaceDict | None) -> Self:
+        place_obj = cls.TypeData(**place) if place is not None else None
+        return cast(Self, cls.model_construct(place=place_obj))
 
 
 ##################

@@ -60,6 +60,7 @@ from ultimate_notion.obj_api.enums import (
     OptionGroupType,
     VState,
 )
+from ultimate_notion.obj_api.props import PlaceDict
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.page import Page
 from ultimate_notion.query import Condition, prop
@@ -110,6 +111,7 @@ __all__ = [
     'OptionNS',
     'Page',  # for type hinting only
     'Paragraph',
+    'PlaceDict',
     'PropType',
     'Property',  # for type hinting only
     'Quote',
