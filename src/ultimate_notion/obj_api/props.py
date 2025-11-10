@@ -318,7 +318,15 @@ class Button(PropertyValue, type='button'):
 class Place(PropertyValue, type='place'):
     """A Notion place property value."""
 
-    place: None
+    class TypeData(GenericObject):
+        lat: float
+        lon: float
+        name: str | None = None
+        address: str | None = None
+        aws_place_id: str | None = None
+        google_place_id: str | None = None
+
+    place: TypeData | None = None
 
 
 ##################

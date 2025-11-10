@@ -435,8 +435,8 @@ class Place(PropertyValue[obj_props.Place], wraps=obj_props.Place):
     readonly = True
 
     @property
-    def value(self) -> None:
-        return None
+    def value(self) -> obj_props.Place.TypeData | None:
+        return self.obj_ref.place
 
     def __str__(self) -> str:
         return f'Place(id={self.id})'
