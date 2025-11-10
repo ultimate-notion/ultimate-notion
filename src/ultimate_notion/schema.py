@@ -749,7 +749,7 @@ class Button(Property[obj_schema.Button], wraps=obj_schema.Button):
 
 
 class PropType:
-    """Namespace class of all property types of a database for easier access."""
+    """Namespace class of all creatable property types of a database for easier access."""
 
     Title = Title
     Text = Text
@@ -772,7 +772,6 @@ class PropType:
     LastEditedTime = LastEditedTime
     LastEditedBy = LastEditedBy
     ID = ID
-    Verification = Verification
     Place = Place
 
 
