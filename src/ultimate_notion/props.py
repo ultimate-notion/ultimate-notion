@@ -263,6 +263,26 @@ class Relations(PropertyValue[obj_props.Relation], wraps=obj_props.Relation):
         return [session.get_page(ref_obj.id) for ref_obj in self.obj_ref.relation]
 
 
+class Place(PropertyValue[obj_props.Place], wraps=obj_props.Place):
+    """A `PropertyItem` returned by the Notion API containing the `Place` property."""
+
+    def __init__(
+        self,
+        place: obj_props.PlaceDict | None = None,
+    ):
+        super().__init__({} if place is None else place)
+
+    @property
+    def value(self) -> obj_props.Place.TypeData | None:
+        return self.obj_ref.place
+
+    def __str__(self) -> str:
+        return f'Place(id={self.id})'
+
+    def __repr__(self) -> str:
+        return get_repr(self, desc=self.id)
+
+
 #############################
 # Read-Only Property Values #
 #############################
@@ -424,22 +444,6 @@ class Button(PropertyValue[obj_props.Button], wraps=obj_props.Button):
 
     def __str__(self) -> str:
         return f'Button(id={self.id})'
-
-    def __repr__(self) -> str:
-        return get_repr(self, desc=self.id)
-
-
-class Place(PropertyValue[obj_props.Place], wraps=obj_props.Place):
-    """A `PropertyItem` returned by the Notion API containing the `Place` property."""
-
-    readonly = True
-
-    @property
-    def value(self) -> obj_props.Place.TypeData | None:
-        return self.obj_ref.place
-
-    def __str__(self) -> str:
-        return f'Place(id={self.id})'
 
     def __repr__(self) -> str:
         return get_repr(self, desc=self.id)

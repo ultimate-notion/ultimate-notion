@@ -732,6 +732,10 @@ class ID(Property[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
         self._update_prop(self.obj_ref)
 
 
+class Place(Property[obj_schema.Place], wraps=obj_schema.Place):
+    """Defines a place property in a database."""
+
+
 class Verification(Property[obj_schema.Verification], wraps=obj_schema.Verification):
     """Defines a unique ID property in a database."""
 
@@ -740,12 +744,6 @@ class Verification(Property[obj_schema.Verification], wraps=obj_schema.Verificat
 
 class Button(Property[obj_schema.Button], wraps=obj_schema.Button):
     """Defines a button property in a database."""
-
-    allowed_at_creation = False
-
-
-class Place(Property[obj_schema.Place], wraps=obj_schema.Place):
-    """Defines a place property in a database."""
 
     allowed_at_creation = False
 
@@ -775,6 +773,7 @@ class PropType:
     LastEditedBy = LastEditedBy
     ID = ID
     Verification = Verification
+    Place = Place
 
 
 class SchemaType(ABCMeta):
