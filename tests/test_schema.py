@@ -595,21 +595,33 @@ def test_place_property(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         location = uno.PropType.Place('Location')
 
-    notion.create_db(parent=root_page, schema=Location)
+    db = notion.create_db(parent=root_page, schema=Location)
+
+    berlin_place_data = {
+        'lat': 52.5200,
+        'lon': 13.4050,
+        'aws_place_id': 'ChIJAVkDPzdOqEcRcDteW0YgIQQ',
+        'google_place_id': 'ChIJAVkDPzdOqEcRcDteW0',
+        'address': 'Berlin, Germany',
+    }
+
+    def assert_place_values(place_value, expected_data):
+        """Helper to assert all place property values match expected data."""
+        for attr, expected_val in expected_data.items():
+            assert getattr(place_value, attr) == expected_val, f'{attr} mismatch'
 
     my_place = Location.create(
         name='My Place',
-        location=uno.PlaceDict(
-            lat=52.5200,
-            lon=13.4050,
-            aws_place_id='ChIJAVkDPzdOqEcRcDteW0YgIQQ',
-            google_place_id='ChIJAVkDPzdOqEcRcDteW0',
-            address='Berlin, Germany',
-        ),
+        location=uno.PlaceDict(**berlin_place_data),
     )
-    val = my_place.props.location
-    assert val.lat == 52.5200
-    assert val.lon == 13.4050
-    assert val.aws_place_id == 'ChIJAVkDPzdOqEcRcDteW0YgIQQ'
-    assert val.google_place_id == 'ChIJAVkDPzdOqEcRcDteW0'
-    assert val.address == 'Berlin, Germany'
+    no_place = Location.create(name='No Place')
+
+    assert_place_values(my_place.props.location, berlin_place_data)
+    assert no_place.props.location is None
+
+    db.reload()
+    for place in db.get_all_pages():
+        if place.id == my_place.id:
+            assert_place_values(place.props.location, berlin_place_data)
+        elif place.id == no_place.id:
+            assert place.props.location is None
