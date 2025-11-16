@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pendulum as pnd
+import pytest
 
+from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
+
+if TYPE_CHECKING:
+    import ultimate_notion as uno
 
 
 def test_date_range(tz_berlin: str) -> None:
@@ -46,3 +51,10 @@ def test_date_range(tz_berlin: str) -> None:
     assert obj.end == datetime_interval.end
     assert obj.time_zone == 'UTC'
     assert obj.to_pendulum() == datetime_interval
+
+
+@pytest.mark.vcr()
+def test_pageref(intro_page: uno.Page) -> None:
+    page_ref = objs.PageRef(page_id=intro_page.id)
+    obj_link_to_page = obj_blocks.LinkToPage(link_to_page=page_ref, type='link_to_page')
+    assert obj_link_to_page.link_to_page.page_id == intro_page.id
