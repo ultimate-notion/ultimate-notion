@@ -20,7 +20,7 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 import pendulum as pnd
@@ -188,9 +188,6 @@ def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
     return ObjectRef.build(obj).id
 
 
-T = TypeVar('T', default=Any)
-
-
 class DatabaseRef(ParentRef[UUID], type='database_id'):
     """Reference a database."""
 
@@ -275,22 +272,6 @@ class WorkSpaceLimits(GenericObject):
     """Limits for a Notion workspace."""
 
     max_file_upload_size_in_bytes: int | None = None
-
-
-# ToDo: Delete Me
-class UnknownUserTypeData(GenericObject):
-    """Type data for an `UnknownUser`."""
-
-
-# ToDo: Delete ME
-class UnknownUser(User[UnknownUserTypeData], type='unknown'):
-    """Represents an unknown user in Notion.
-
-    This is a unofficial placeholder for a user that is not recognized by the API.
-    """
-
-    name: Literal['Unknown User'] = 'Unknown User'
-    unknown: UnknownUserTypeData = Field(default_factory=UnknownUserTypeData)
 
 
 class Annotations(GenericObject):

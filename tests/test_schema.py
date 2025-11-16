@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import datetime, timezone
+from typing import Any
 
 import pendulum as pnd
 import pytest
@@ -597,22 +598,22 @@ def test_place_property(notion: uno.Session, root_page: uno.Page) -> None:
 
     db = notion.create_db(parent=root_page, schema=Location)
 
-    berlin_place_data = {
-        'lat': 52.5200,
-        'lon': 13.4050,
-        'aws_place_id': 'ChIJAVkDPzdOqEcRcDteW0YgIQQ',
-        'google_place_id': 'ChIJAVkDPzdOqEcRcDteW0',
-        'address': 'Berlin, Germany',
-    }
+    berlin_place_data = uno.PlaceDict(
+        lat=52.5200,
+        lon=13.4050,
+        aws_place_id='ChIJAVkDPzdOqEcRcDteW0YgIQQ',
+        google_place_id='ChIJAVkDPzdOqEcRcDteW0',
+        address='Berlin, Germany',
+    )
 
-    def assert_place_values(place_value, expected_data):
+    def assert_place_values(place_value: Any, expected_data: uno.PlaceDict) -> None:
         """Helper to assert all place property values match expected data."""
         for attr, expected_val in expected_data.items():
             assert getattr(place_value, attr) == expected_val, f'{attr} mismatch'
 
     my_place = Location.create(
         name='My Place',
-        location=uno.PlaceDict(**berlin_place_data),
+        location=berlin_place_data,
     )
     no_place = Location.create(name='No Place')
 

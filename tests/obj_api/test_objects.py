@@ -57,4 +57,4 @@ def test_date_range(tz_berlin: str) -> None:
 def test_pageref(intro_page: uno.Page) -> None:
     page_ref = objs.PageRef(page_id=intro_page.id)
     obj_link_to_page = obj_blocks.LinkToPage(link_to_page=page_ref, type='link_to_page')
-    assert obj_link_to_page.link_to_page.page_id == intro_page.id
+    assert cast(objs.PageRef, obj_link_to_page.link_to_page).page_id == intro_page.id

@@ -14,6 +14,8 @@
 - New: Add the new `workspace_id` field to the `Bot`.
 - Fix: Unify texts locally the same way as remote, which is necessary for comparison, issue #136 & #160.
 - Fix: Resolution of polymorphic `TypedObject`, which led to wrong schema inference, issue #134.
+- Fix: Resolution of user reference in mention object, issue #166.
+- Chg: Removed the low level `UnknownUser` object as it is just a `UserRef`, issue #166.
 
 ## Version 0.9.5, 2025-10-24
 
