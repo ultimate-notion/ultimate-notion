@@ -28,13 +28,12 @@ from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
-from ultimate_notion.obj_api.objects import UnknownUser as UnknownUserObj
 from ultimate_notion.obj_api.objects import get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.rich_text import Text
 from ultimate_notion.schema import DefaultSchema, Schema
-from ultimate_notion.user import Bot, User
+from ultimate_notion.user import Bot, UnknownUser, User
 from ultimate_notion.utils import SList
 
 _logger = logging.getLogger(__name__)
@@ -372,7 +371,8 @@ class Session:
                 _logger.warning(msg)
                 if raise_on_unknown:
                     raise UnknownUserError(msg) from e
-                user_obj = UnknownUserObj(id=user_uuid, object='user', type='unknown')
+                else:  # we do not cache!
+                    return UnknownUser(id=user_uuid)
             user = User.wrap_obj_ref(user_obj)
             self.cache[user.id] = user
 

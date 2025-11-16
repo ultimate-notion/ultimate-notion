@@ -8,6 +8,7 @@ from typing_extensions import TypeVar
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import UserRef
 
 
 class WorkSpaceInfo(objs.WorkSpaceLimits):
@@ -104,7 +105,7 @@ class Bot(User[objs.Bot], wraps=objs.Bot):
         return WorkSpaceInfo(name=self.obj_ref.bot.workspace_name, workspace_id=workspace_id, **kwargs)
 
 
-class UnknownUser(User[objs.UnknownUser], wraps=objs.UnknownUser):
+class UnknownUser(User[objs.User], wraps=UserRef):
     """A user that is unknown, i.e. no longer part of the workspace."""
 
     def __str__(self) -> str:
