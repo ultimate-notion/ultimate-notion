@@ -31,11 +31,13 @@ from ultimate_notion.obj_api.core import (
     GenericObject,
     NotionEntity,
     NotionObject,
+    ObjectRef,
+    ParentRef,
     TypedObject,
     Unset,
     UnsetType,
+    UserRef,
     _normalize_color,
-    extract_id,
     raise_unset,
 )
 from ultimate_notion.obj_api.enums import BGColor, Color, FileUploadStatus
@@ -178,36 +180,6 @@ class LinkObject(GenericObject):
     url: str
 
 
-class ObjectRef(GenericObject):
-    """A general-purpose object reference in the Notion API."""
-
-    id: UUID
-
-    @classmethod
-    def build(cls, ref: ParentRef | GenericObject | UUID | str) -> ObjectRef:
-        """Compose a reference to an object from the given reference.
-
-        Strings may be either UUID's or URL's to Notion content.
-        """
-
-        match ref:
-            case ObjectRef():
-                return ref.model_copy(deep=True)
-            case ParentRef() if isinstance(ref.value, UUID):
-                # ParentRefs are typed objects with a nested UUID
-                return cls.model_construct(id=ref.value)
-            case GenericObject() if hasattr(ref, 'id'):
-                # Re-compose the ObjectReference from the internal ID
-                return cls.build(ref.id)
-            case UUID():
-                return cls.model_construct(id=ref)
-            case str() if (id_str := extract_id(ref)) is not None:
-                return cls.model_construct(id=UUID(id_str))
-            case _:
-                msg = f'Cannot interpret {ref} of type {type(ref)} as a reference to an object.'
-                raise ValueError(msg)
-
-
 def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
     """Retrieves a UUID from an object reference.
 
@@ -217,16 +189,6 @@ def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
 
 
 T = TypeVar('T', default=Any)
-
-
-class ParentRef(TypedObject[T], ABC, polymorphic_base=True):
-    """Reference another block as a parent.
-
-    Notion API: [Parent Object](https://developers.notion.com/reference/parent-object)
-
-    Note: This class is simply a placeholder for the typed concrete *Ref classes.
-          Callers should always instantiate the intended concrete versions.
-    """
 
 
 class DatabaseRef(ParentRef[UUID], type='database_id'):
@@ -283,18 +245,6 @@ class CommentRef(ParentRef[UUID], type='comment_id'):
         return CommentRef.model_construct(comment_id=ref.id)
 
 
-class UserRef(NotionObject, object='user'):
-    """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, etc."""
-
-    id: UUID
-
-    @classmethod
-    def build(cls, user_ref: User | str | UUID) -> UserRef:
-        """Compose a PageRef from the given reference object."""
-        ref = ObjectRef.build(user_ref)
-        return UserRef.model_construct(id=ref.id)
-
-
 # ToDo: Use new syntax when requires-python >= 3.12
 GO_co = TypeVar('GO_co', bound=GenericObject, default=GenericObject, covariant=True)
 
@@ -327,10 +277,12 @@ class WorkSpaceLimits(GenericObject):
     max_file_upload_size_in_bytes: int | None = None
 
 
+# ToDo: Delete Me
 class UnknownUserTypeData(GenericObject):
     """Type data for an `UnknownUser`."""
 
 
+# ToDo: Delete ME
 class UnknownUser(User[UnknownUserTypeData], type='unknown'):
     """Represents an unknown user in Notion.
 

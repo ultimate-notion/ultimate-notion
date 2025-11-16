@@ -16,6 +16,7 @@ from __future__ import annotations
 import builtins
 import logging
 import re
+from abc import ABC
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, cast, overload
 from uuid import UUID
@@ -36,7 +37,7 @@ from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.utils import is_stable_release, pydantic_apply
 
 if TYPE_CHECKING:
-    from ultimate_notion.obj_api.objects import ParentRef, UserRef
+    from ultimate_notion.obj_api.objects import User
 
 
 _logger = logging.getLogger(__name__)
@@ -321,6 +322,48 @@ class NotionObject(UniqueObject):
         return val
 
 
+class ObjectRef(GenericObject):
+    """A general-purpose object reference in the Notion API."""
+
+    id: UUID
+
+    @classmethod
+    def build(cls, ref: ParentRef | GenericObject | UUID | str) -> ObjectRef:
+        """Compose a reference to an object from the given reference.
+
+        Strings may be either UUID's or URL's to Notion content.
+        """
+
+        match ref:
+            case ObjectRef():
+                return ref.model_copy(deep=True)
+            case ParentRef() if isinstance(ref.value, UUID):
+                # ParentRefs are typed objects with a nested UUID
+                return cls.model_construct(id=ref.value)
+            case GenericObject() if hasattr(ref, 'id'):
+                # Re-compose the ObjectReference from the internal ID
+                return cls.build(ref.id)
+            case UUID():
+                return cls.model_construct(id=ref)
+            case str() if (id_str := extract_id(ref)) is not None:
+                return cls.model_construct(id=UUID(id_str))
+            case _:
+                msg = f'Cannot interpret {ref} of type {type(ref)} as a reference to an object.'
+                raise ValueError(msg)
+
+
+class UserRef(NotionObject, object='user'):
+    """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, unknown user, etc."""
+
+    id: UUID
+
+    @classmethod
+    def build(cls, user_ref: User | str | UUID) -> UserRef:
+        """Compose a PageRef from the given reference object."""
+        ref = ObjectRef.build(user_ref)
+        return UserRef.model_construct(id=ref.id)
+
+
 class NotionEntity(NotionObject):
     """A materialized entity, which was created by a user."""
 
@@ -425,8 +468,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
             _logger.warning(f'Missing type in data {value}. Most likely a User object without type')
             msg = f"Missing 'type' in data {value}"
             if value.get('object') == 'user':
-                type_name = 'unknown'  # for the unofficial type obj_api.objects.UnknownUser
-                value['type'] = type_name
+                return UserRef.model_construct(**value)
             else:
                 raise ValueError(msg)
 
@@ -460,3 +502,13 @@ class TypedObject(GenericObject, Generic[TO_co]):
         # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
         # This is still the most programmatic way it seems without adding too much complexity.
         setattr(self, self.type, val)
+
+
+class ParentRef(TypedObject[T], ABC, polymorphic_base=True):
+    """Reference another block as a parent.
+
+    Notion API: [Parent Object](https://developers.notion.com/reference/parent-object)
+
+    Note: This class is simply a placeholder for the typed concrete *Ref classes.
+          Callers should always instantiate the intended concrete versions.
+    """

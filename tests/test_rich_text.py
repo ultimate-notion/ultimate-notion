@@ -4,6 +4,7 @@ import pendulum as pnd
 import pytest
 
 import ultimate_notion as uno
+from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.rich_text import camel_case, decapitalize, is_url, snake_case
 
 
@@ -113,3 +114,13 @@ def test_rich_text_concatenation() -> None:
     result = t1 + t2 + t3
     assert result.to_plain_text() == 'ABC'
     assert len(result._rich_texts) == 3
+
+
+@pytest.mark.vcr()
+def test_mention_serialize_deserialize(person: uno.User) -> None:
+    my_text = uno.mention(person)
+    paragraph = uno.Paragraph(text=my_text)
+    serialized_paragraph = paragraph.obj_ref.serialize_for_api()
+    obj_api_paragraph = obj_blocks.Block.model_validate(serialized_paragraph)
+    new_paragraph = uno.Block.wrap_obj_ref(obj_api_paragraph)
+    assert paragraph == new_paragraph
