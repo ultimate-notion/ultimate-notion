@@ -102,6 +102,8 @@ exclude = [
 # External Tools #
 ##################
 
+# Mypy configuration
+
 [tool.mypy]
 python_version = "3.10"
 plugins = ["pydantic.mypy"]
@@ -125,6 +127,8 @@ warn_no_return = true
 warn_redundant_casts = true
 warn_unused_configs = true
 
+# Pytest configuration
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q --doctest-glob='*.md'"
@@ -139,6 +143,8 @@ env_files = [
     ".vscode/.env"
 ]
 
+# Coverage configuration
+
 [tool.coverage.run]
 branch = true
 source = ["src/ultimate_notion"]
@@ -146,7 +152,6 @@ omit = [
   "_version.py",  # automatically created by hatch-vcs, not in repo
   "tests/*",  # no need to cover tests
 ]
-
 
 [tool.coverage.paths]
 source = [
@@ -173,6 +178,8 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+
+# Ruff configuration
 
 [tool.ruff]
 line-length = 120
@@ -257,6 +264,11 @@ ban-relative-imports = "all"
 "examples/*" = ["T201"]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
+
+# Pyright configuration
+
+[tool.pyright]
+typeCheckingMode = "strict"
 
 
 ###########################
@@ -358,6 +370,7 @@ build-check = [
 dependencies = [
     "mypy==1.18.2",
     "ruff==0.14.3", # make sure this is consistent with .pre-commit-config.yaml, thus pinned!
+    "pyright~=1.1", # no automatic testing, just additionally to mypy
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [
