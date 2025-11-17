@@ -77,9 +77,6 @@ BLOCK_URL_LONG_RE = re.compile(
 )
 
 
-T = TypeVar('T', default=Any)  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
-
-
 # ToDo: Replace with MISSING when stable: https://docs.pydantic.dev/latest/concepts/experimental/#missing-sentinel
 # Or use typing_extensions.Sentinel instead.
 class UnsetType(BaseModel):
@@ -465,11 +462,10 @@ class TypedObject(GenericObject, Generic[TO_co]):
         type_name = value.get('type')
 
         if type_name is None:
-            _logger.warning(f'Missing type in data {value}. Most likely a User object without type')
-            msg = f"Missing 'type' in data {value}"
             if value.get('object') == 'user':
                 return UserRef.model_construct(**value)
             else:
+                msg = f"Missing 'type' in data {value}"
                 raise ValueError(msg)
 
         sub_cls = cls._typemap.get(type_name)
@@ -502,6 +498,9 @@ class TypedObject(GenericObject, Generic[TO_co]):
         # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
         # This is still the most programmatic way it seems without adding too much complexity.
         setattr(self, self.type, val)
+
+
+T = TypeVar('T', default=Any)  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
 
 
 class ParentRef(TypedObject[T], ABC, polymorphic_base=True):
