@@ -267,8 +267,9 @@ ban-relative-imports = "all"
 
 # Pyright configuration
 
-[tool.pyright]
-typeCheckingMode = "strict"
+# VSCode starts using pyright settings from pyproject.toml automatically
+# [tool.pyright]
+# typeCheckingMode = "strict"
 
 
 ###########################
@@ -309,6 +310,7 @@ dependencies = [
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
+test-next-release = "export ULTIMATE_NOTION_PYDANTIC_EXTRA='ignore' && hatch run test {args} && hatch run test --file-upload {args}"
 debug =  "test --no-cov -s --pdb --pdbcls=IPython.core.debugger:Pdb --debug-uno -o log_cli=true {args}"
 vcr-off = "test --disable-recording {args}"
 vcr-only = "test --record-mode=none --block-network {args}"

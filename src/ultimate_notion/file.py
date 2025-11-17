@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import io
 import mimetypes
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, Literal
 from urllib.parse import urlparse
 from uuid import UUID
 
@@ -110,6 +111,13 @@ class ExternalFile(AnyFile[objs.ExternalFile], wraps=objs.ExternalFile):
         return self.obj_ref.external.url
 
 
+class FileImportStatus(objs.FileImportTypeData):
+    """Base class for import status information."""
+
+    status: Literal['success', 'error']
+    imported_time: dt.datetime | None = None
+
+
 class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
     """Information about a file that has been uploaded to Notion.
 
@@ -180,11 +188,27 @@ class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
         return self.obj_file_upload.content_length
 
     @property
-    def file_import_result(self) -> objs.FileImportSuccess | objs.FileImportError | None:
+    def file_import_result(self) -> FileImportStatus:
         """Return the file import result of the uploaded file."""
-        if result := self.obj_file_upload.file_import_result:
-            return result
-        return None
+        status: Literal['success', 'error']
+        match result := self.obj_file_upload.file_import_result:
+            case objs.FileImportSuccess():
+                status = 'success'
+                kwargs = result.success.model_dump()
+                imported_time = result.imported_time
+            case objs.FileImportError():
+                status = 'error'
+                kwargs = result.error.model_dump()
+                imported_time = result.imported_time
+            case None:
+                status = 'error'
+                kwargs = {}
+                imported_time = None
+            case _:
+                msg = f'Unknown file import result type: {type(result)}'
+                raise RuntimeError(msg)
+
+        return FileImportStatus.model_construct(imported_time=imported_time, status=status, **kwargs)
 
     def update_status(self) -> Self:
         """Update the uploaded file information."""
