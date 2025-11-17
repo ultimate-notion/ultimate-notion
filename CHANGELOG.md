@@ -16,6 +16,8 @@
 - Fix: Resolution of polymorphic `TypedObject`, which led to wrong schema inference, issue #134.
 - Fix: Resolution of user reference in mention object, issue #166.
 - Chg: Removed the low level `UnknownUser` object as it is just a `UserRef`, issue #166.
+- Fix: Uploading a file via an import URL was cast to a `None` instead of `FileImportSuccess`.
+- Chg: Return `FileUploadStatus` in `UploadedFile.file_import_result` for easier usage.
 
 ## Version 0.9.5, 2025-10-24
 

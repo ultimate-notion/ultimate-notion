@@ -40,7 +40,7 @@ def test_import_url(root_page: uno.Page, notion: uno.Session) -> None:
     page.append(uno.Video(uploaded_file, caption='An imported image from URL'))
 
     assert uploaded_file.file_name == 'bunny_movie.mp4'
-    assert uploaded_file.file_import_result.type == 'success'  # type: ignore[union-attr]
+    assert uploaded_file.file_import_result.status == 'success'
     assert uploaded_file.expiry_time is not None
     assert uploaded_file.status == uno.FileUploadStatus.UPLOADED
     assert uploaded_file.content_type == 'application/mp4'

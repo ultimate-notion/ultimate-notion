@@ -58,3 +58,25 @@ def test_pageref(intro_page: uno.Page) -> None:
     page_ref = objs.PageRef(page_id=intro_page.id)
     obj_link_to_page = obj_blocks.LinkToPage(link_to_page=page_ref, type='link_to_page')
     assert cast(objs.PageRef, obj_link_to_page.link_to_page).page_id == intro_page.id
+
+
+@pytest.mark.vcr()
+def test_bot_type_data(person: uno.User) -> None:
+    # we test if the owner is really resolved correctly in case of
+    # pydantic extra='forbid' and 'ignore' settings
+    workspace = {
+        'type': 'workspace',
+        'workspace': True,
+    }
+    user_mention = objs.MentionUser(user=person.obj_ref).model_dump()
+
+    for owner in (workspace, user_mention):
+        kwargs = {
+            'workspace_id': '12345678-1234-1234-1234-1234567890ab',
+            'owner': owner,
+            'workspace_name': 'Test Bot Workspace',
+            # no workspace_limit for this test
+        }
+        bot_data = objs.BotTypeData(**kwargs)
+        assert bot_data.owner is not None
+        assert bot_data.owner.model_dump() == owner

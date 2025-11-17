@@ -679,17 +679,21 @@ class FileImportTypeData(GenericObject):
     status_code: int | None = None
 
 
-class FileImportSuccess(TypedObject[GenericObject], type='success'):
-    """Result of a successful file import operation."""
+class FileImportResult(TypedObject[GenericObject], polymorphic_base=True):
+    """Base class for file import results."""
 
     imported_time: dt.datetime | None = None
+
+
+class FileImportSuccess(FileImportResult, type='success'):
+    """Result of a successful file import operation."""
+
     success: FileImportTypeData
 
 
-class FileImportError(TypedObject[GenericObject], type='error'):
+class FileImportError(FileImportResult, type='error'):
     """Result of a failed file import operation."""
 
-    imported_time: dt.datetime | None = None
     error: FileImportTypeData
 
 
@@ -716,7 +720,7 @@ class FileUpload(NotionObject, object='file_upload'):
     number_of_parts: NumberOfParts | None = None
     upload_url: str | None = None
     complete_url: str | None = None
-    file_import_result: FileImportSuccess | FileImportError | None = None
+    file_import_result: FileImportResult | None = None
     archived: bool  # undocumented but sent by the API
     created_by: User  # undocumented but sent by the API
 
