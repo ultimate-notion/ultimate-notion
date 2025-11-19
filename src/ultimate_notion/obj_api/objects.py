@@ -252,6 +252,14 @@ class User(TypedObject[GO_co], UserRef, MentionMixin, polymorphic_base=True):
     name: str | None = None
     avatar_url: str | None = None
 
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, UserRef):
+            return self.id == other.id
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionUser.build_mention_from(self, style=style)
 

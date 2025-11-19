@@ -10,8 +10,10 @@ from tests.conftest import URL, all_blocks
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.blocks import ChildrenMixin
 from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
+from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.blocks import Block as ObjBlock
-from ultimate_notion.obj_api.core import Unset
+from ultimate_notion.obj_api.core import Unset, UserRef
+from ultimate_notion.rich_text import Text
 
 
 @pytest.mark.vcr()
@@ -883,6 +885,32 @@ def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) ->
     page.append(blocks=[block_child])
     page.reload()
 
+    assert len(page.children) == 1
+    assert page.children[0] == block_child
+    assert page.children[0] == another_block_child
+
+
+@pytest.mark.vcr()
+def test_local_remote_mention_block_cmp(root_page: uno.Page, notion: uno.Session, person: uno.User) -> None:
+    page = notion.create_page(parent=root_page, title='Test Local Remote Mention Block CMP')
+    user_ref = UserRef(id=person.id)
+    mention_user = objs.MentionUser(user=user_ref)
+    mention_obj = objs.MentionObject(
+        mention=mention_user,
+        annotations=objs.Annotations(),
+        plain_text=f'@{person.id}',
+        href=None,
+        type='mention',
+    )
+    mention_text = Text.wrap_obj_ref(obj_refs=[mention_obj])
+
+    block_child = uno.Paragraph(text=mention_text)
+    another_block_child = uno.Paragraph(text=mention_text)
+    assert block_child == another_block_child
+
+    page.append(blocks=[block_child])
+
+    page.reload()
     assert len(page.children) == 1
     assert page.children[0] == block_child
     assert page.children[0] == another_block_child
