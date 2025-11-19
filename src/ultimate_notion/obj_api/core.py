@@ -150,32 +150,20 @@ def extract_id(text: str) -> str | None:
     return None
 
 
-def _freeze(obj: Any) -> Any:
-    """Make nested structures hashable & deterministic.
+def _freeze(obj: GenericObject) -> tuple[Any, ...]:
+    """Make nested structures hashable & deterministic."""
 
-    !!! note
+    def _recurse(obj: Any) -> Any:
+        if isinstance(obj, dict):
+            return tuple((k, _recurse(v)) for k, v in sorted(obj.items()))
+        if isinstance(obj, (list, tuple)):
+            return tuple(_recurse(x) for x in obj)
+        if isinstance(obj, set):
+            return frozenset(_recurse(x) for x in obj)
+        return obj
 
-        We normalize the `color` field in some objects, since if it is `Unset`
-        and has a default value of `Color.DEFAULT` in equality comparisons.
-        We also ignore `id` fields here, e.g. in `Option` objects, since they
-        are not relevant for equality and hashing.
-    """
-    if isinstance(obj, BaseModel):
-        return _freeze(obj.model_dump(mode='python'))
-    if isinstance(obj, dict):
-        elems = []
-        for k, v in sorted(obj.items()):
-            if k == 'color' and is_unset(v):
-                v = _normalize_color(v)
-            elif k in {'id', 'option_ids'}:
-                continue
-            elems.append((k, _freeze(v)))
-        return tuple(elems)
-    if isinstance(obj, (list, tuple)):
-        return tuple(_freeze(x) for x in obj)
-    if isinstance(obj, set):
-        return frozenset(_freeze(x) for x in obj)
-    return obj
+    obj = _normalize_model(obj)
+    return _recurse(obj.model_dump(mode='python'))
 
 
 def _normalize_color(val: Color | UnsetType) -> Color:
@@ -193,19 +181,23 @@ def _normalize_color(val: Color | UnsetType) -> Color:
 class GenericObject(BaseModel):
     """The base for all API objects."""
 
+    _frozen: bool = False  # for computing hash and equality
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
     def __eq__(self, other: Any) -> bool:
         """Compare two objects for equality by comparing all their fields."""
-        if not isinstance(other, GenericObject):
+        # Require exact same runtime type (not just isinstance) to avoid comparing different subclasses
+        # This also means that delegation takes place, e.g. for UserRef vs User
+        if type(self) is not type(other):
             return NotImplemented
 
         # _freeze is used to guarantee the consistency with __hash__.
-        return bool(_freeze(self) == _freeze(other))
+        return BaseModel.__eq__(_normalize_model(self), _normalize_model(other))
 
     def __hash__(self) -> int:
         """Compute a hash value for the object by hashing all its fields."""
         frozen = _freeze(self)
+        # ToDo: Still a bug as it is not really consistent with __eq__, UserRef vs User for example
         return hash(frozen)
 
     @classmethod
@@ -258,6 +250,42 @@ class GenericObject(BaseModel):
     def build(cls, *args: Any, **kwargs: Any) -> Self:
         """Use the standard constructur to build the instance. Will be overwritten for more complex types."""
         return cls(*args, **kwargs)
+
+
+T = TypeVar('T', default=Any)  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
+
+
+def _normalize_model(obj: T) -> T:
+    """Normalize the model for comparison and hashing.
+
+    !!! note
+
+        We normalize the `color` field in some objects, since if it is `Unset`
+        and has a default value of `Color.DEFAULT` in equality comparisons.
+        We also ignore `id` fields here, e.g. in `Option` objects, since they
+        are not relevant for equality and hashing.
+    """
+
+    def _recurse(obj: Any) -> Any:
+        if isinstance(obj, GenericObject):
+            # Create a copy to avoid modifying the original
+            obj_copy = obj.model_copy()
+            for field_name in type(obj_copy).model_fields:
+                field_value = getattr(obj_copy, field_name)
+                if field_name in {'id', 'option_ids'}:
+                    setattr(obj_copy, field_name, Unset)
+                elif field_name == 'color' and is_unset(field_value):
+                    setattr(obj_copy, field_name, _normalize_color(field_value))
+                else:
+                    setattr(obj_copy, field_name, _recurse(field_value))
+            return obj_copy
+        if isinstance(obj, dict):
+            return {k: _recurse(v) for k, v in obj.items()}
+        if isinstance(obj, (list, tuple, set)):
+            return type(obj)(_recurse(x) for x in obj)
+        return obj
+
+    return cast(T, _recurse(obj))
 
 
 class UniqueObject(GenericObject):
@@ -498,9 +526,6 @@ class TypedObject(GenericObject, Generic[TO_co]):
         # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
         # This is still the most programmatic way it seems without adding too much complexity.
         setattr(self, self.type, val)
-
-
-T = TypeVar('T', default=Any)  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
 
 
 class ParentRef(TypedObject[T], ABC, polymorphic_base=True):
