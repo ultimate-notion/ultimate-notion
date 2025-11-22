@@ -221,14 +221,6 @@ class FormulaTypeData(GenericObject):
         # ToDo: Implement a way to compare these expressions, which is possible in principle.
         return isinstance(other, FormulaTypeData)
 
-    def __hash__(self) -> int:
-        """Return a hash of the Formula TypeData.
-
-        Since __eq__ always returns True due to API expression transformation,
-        we use a constant hash to maintain consistency with equality.
-        """
-        return hash(self.__class__)
-
 
 class Formula(Property[FormulaTypeData], type='formula'):
     """Defines the formula configuration for a database property."""
@@ -251,9 +243,6 @@ class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
         if not isinstance(other, PropertyRelation):
             return NotImplemented
         return self.database_id == other.database_id
-
-    def __hash__(self) -> int:
-        return hash(self.database_id)
 
 
 class SinglePropertyRelationTypeData(GenericObject):
@@ -287,10 +276,6 @@ class DualPropertyRelationTypeData(GenericObject):
             return NotImplemented
         # we skip the id as this is set by the Notion API.
         return self.synced_property_name == other.synced_property_name
-
-    def __hash__(self) -> int:
-        """Return a hash of the DualPropertyRelation TypeData based on synced_property_name."""
-        return hash(self.synced_property_name)
 
 
 class DualPropertyRelation(PropertyRelation[DualPropertyRelationTypeData], type='dual_property'):
@@ -347,10 +332,6 @@ class RollupTypeData(GenericObject):
             and self.relation_property_name == value.relation_property_name
             and self.rollup_property_name == value.rollup_property_name
         )
-
-    def __hash__(self) -> int:
-        """Return a hash of the Rollup TypeData based on function and property names."""
-        return hash((self.function, self.relation_property_name, self.rollup_property_name))
 
 
 class Rollup(Property[RollupTypeData], type='rollup'):

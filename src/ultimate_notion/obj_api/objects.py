@@ -72,12 +72,6 @@ class SelectOption(GenericObject):
         my_color, other_color = _normalize_color(self.color), _normalize_color(other.color)
         return self.name == other.name and my_color == other_color and self.description == other.description
 
-    def __hash__(self) -> int:
-        """Return a hash of the SelectOption based on name, color, and description."""
-        # Convert description list to tuple for hashing if it exists
-        desc_tuple = tuple(self.description) if self.description else None
-        return hash((self.name, self.color, desc_tuple))
-
 
 class SelectGroup(GenericObject):
     """Group of options for status objects."""
@@ -93,9 +87,6 @@ class SelectGroup(GenericObject):
         # we don't compare option_ids since we might not always have them (Status property can't be created)
         my_color, other_color = _normalize_color(self.color), _normalize_color(other.color)
         return self.name == other.name and my_color == other_color
-
-    def __hash__(self) -> int:
-        return hash((self.name, self.color))
 
 
 class MentionMixin(ABC):
@@ -256,9 +247,6 @@ class User(TypedObject[GO_co], UserRef, MentionMixin, polymorphic_base=True):
         if isinstance(other, UserRef):
             return self.id == other.id
         return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        return super().__hash__()
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionUser.build_mention_from(self, style=style)
