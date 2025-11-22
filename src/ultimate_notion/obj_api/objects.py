@@ -38,6 +38,7 @@ from ultimate_notion.obj_api.core import (
     UnsetType,
     UserRef,
     _normalize_color,
+    is_unset,
     raise_unset,
 )
 from ultimate_notion.obj_api.enums import BGColor, Color, FileUploadStatus
@@ -444,13 +445,16 @@ class MentionPage(MentionBase[ObjectRef], type='page'):
     page: SerializeAsAny[ObjectRef]
 
     @classmethod
-    def build_mention_from(cls, page: Page, *, style: Annotations | None = None) -> MentionObject:
-        page_ref = ObjectRef.build(page)
+    def build_mention_from(cls, page: Page | PageRef | ObjectRef, *, style: Annotations | None = None) -> MentionObject:
+        page_ref = ObjectRef.build(page) if not isinstance(page, ObjectRef) else page
         mention = cls.model_construct(page=page_ref)
-        # note that `href` is always `None` for page mentions
+        if not (isinstance(page, PageRef | ObjectRef) or is_unset(page.url)):
+            href = page.url
+        else:
+            href = f'https://www.notion.so/{page_ref.id}'
         return MentionObject.model_construct(
-            plain_text=rich_text_to_str(page.title),
-            href=None,
+            plain_text=f'Page {page_ref.id}' if isinstance(page, PageRef | ObjectRef) else rich_text_to_str(page.title),
+            href=href,
             annotations=Unset if style is None else deepcopy(style),
             mention=mention,
         )
