@@ -39,7 +39,6 @@ from ultimate_notion.obj_api.core import (
     UserRef,
     _normalize_color,
     is_unset,
-    raise_unset,
 )
 from ultimate_notion.obj_api.enums import BGColor, Color, FileUploadStatus
 from ultimate_notion.utils import DateTimeOrRange, parse_dt_str
@@ -466,13 +465,17 @@ class MentionDatabase(MentionBase[ObjectRef], type='database'):
     database: SerializeAsAny[ObjectRef]
 
     @classmethod
-    def build_mention_from(cls, db: Database, *, style: Annotations | None = None) -> MentionObject:
-        db_ref = ObjectRef.build(db)
+    def build_mention_from(
+        cls, db: Database | DatabaseRef | ObjectRef, *, style: Annotations | None = None
+    ) -> MentionObject:
+        db_ref = ObjectRef.build(db) if not isinstance(db, ObjectRef) else db
         mention = cls.model_construct(database=db_ref)
-        # note that `href` is always `None` for database mentions
-        db_title = raise_unset(db.title)
+        if not (isinstance(db, DatabaseRef | ObjectRef) or is_unset(db.title)):
+            db_title = rich_text_to_str(db.title)
+        else:
+            db_title = f'Database {db_ref.id}'
         return MentionObject.model_construct(
-            plain_text=rich_text_to_str(db_title),
+            plain_text=db_title,
             ref=None,
             annotations=Unset if style is None else deepcopy(style),
             mention=mention,

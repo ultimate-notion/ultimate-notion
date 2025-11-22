@@ -865,7 +865,9 @@ def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) ->
 
 
 @pytest.mark.vcr()
-def test_local_remote_mention_block_cmp(root_page: uno.Page, notion: uno.Session, person: uno.User) -> None:
+def test_local_remote_mention_block_cmp(
+    root_page: uno.Page, notion: uno.Session, person: uno.User, task_db: uno.Database
+) -> None:
     # Test user mention
     page = notion.create_page(parent=root_page, title='Test Local Remote User Mention Block CMP')
     user_ref = UserRef(id=person.id)
@@ -895,6 +897,21 @@ def test_local_remote_mention_block_cmp(root_page: uno.Page, notion: uno.Session
 
     page.append(blocks=[block_child])
 
+    page.reload()
+    assert len(page.children) == 1
+    assert page.children[0] == block_child
+    assert page.children[0] == another_block_child
+
+    # Test database mention
+    page = notion.create_page(parent=root_page, title='Test Local Remote Database Mention Block CMP')
+    db_obj_ref = ObjectRef(id=task_db.id)
+    mention_obj = objs.MentionDatabase.build_mention_from(db=db_obj_ref, style=objs.Annotations())
+    mention_text = Text.wrap_obj_ref(obj_refs=[mention_obj])
+
+    block_child = uno.Paragraph(text=mention_text)
+    another_block_child = uno.Paragraph(text=mention_text)
+    assert block_child == another_block_child
+    page.append(blocks=[block_child])
     page.reload()
     assert len(page.children) == 1
     assert page.children[0] == block_child
