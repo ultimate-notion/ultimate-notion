@@ -379,13 +379,14 @@ class MentionUser(MentionBase[User | UserRef], type='user'):
     user: SerializeAsAny[User | UserRef]
 
     @classmethod
-    def build_mention_from(cls, user: User, *, style: Annotations | None = None) -> MentionObject:
+    def build_mention_from(cls, user: User | UserRef, *, style: Annotations | None = None) -> MentionObject:
         # When creating a user mention, we need to send only the id, not the full object.
-        user_ref = UserRef.build(user)
+        user_ref = UserRef.build(user) if isinstance(user, User) else user
         mention = cls.model_construct(user=user_ref)
         # note that `href` is always `None` for user mentions, also we prepend the '@' to mimic server side
         return MentionObject.model_construct(
-            plain_text=f'@{user.name}',
+            # Note that in case of UserRef, we set an dummy name that will be replaced by the Notion server later.
+            plain_text=f'@{user.name}' if isinstance(user, User) else f'@{user_ref.id}',
             href=None,
             annotations=Unset if style is None else deepcopy(style),
             mention=mention,

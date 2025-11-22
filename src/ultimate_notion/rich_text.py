@@ -239,7 +239,7 @@ class Text(str):
     def wrap_obj_ref(cls, obj_refs: list[objs.RichTextBaseObject] | None) -> Self:
         obj_refs = [] if obj_refs is None else obj_refs
         rich_texts = [RichTextBase.wrap_obj_ref(obj_ref) for obj_ref in obj_refs]
-        plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if text)
+        plain_text = ''.join(text.obj_ref.plain_text for text in rich_texts if isinstance(text.obj_ref.plain_text, str))
         obj = cls(plain_text)
         obj._rich_texts = cls._compact(rich_texts)
         return obj

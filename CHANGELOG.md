@@ -19,6 +19,7 @@
 - Fix: Uploading a file via an import URL was cast to a `None` instead of `FileImportSuccess`.
 - Chg: Return `FileUploadStatus` in `UploadedFile.file_import_result` for easier usage.
 - Fix: All objects are no longer `hash`able as they are mutable and thus the former behaviour was semantically incorrect.
+- Fix: Comparison of off-/online `MentionObject`s works, also when `UserRef` is used.
 
 ## Version 0.9.5, 2025-10-24
 

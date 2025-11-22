@@ -868,14 +868,7 @@ def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) ->
 def test_local_remote_mention_block_cmp(root_page: uno.Page, notion: uno.Session, person: uno.User) -> None:
     page = notion.create_page(parent=root_page, title='Test Local Remote Mention Block CMP')
     user_ref = UserRef(id=person.id)
-    mention_user = objs.MentionUser(user=user_ref)
-    mention_obj = objs.MentionObject(
-        mention=mention_user,
-        annotations=objs.Annotations(),
-        plain_text=f'@{person.id}',
-        href=None,
-        type='mention',
-    )
+    mention_obj = objs.MentionUser.build_mention_from(user=user_ref, style=objs.Annotations())
     mention_text = Text.wrap_obj_ref(obj_refs=[mention_obj])
 
     block_child = uno.Paragraph(text=mention_text)

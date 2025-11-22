@@ -134,17 +134,17 @@ def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
             return rt.is_equation
 
         for idx, text in enumerate(rich_texts):
+            plain_text = text.obj_ref.plain_text
             if is_math(text):
-                md_rich_texts[idx] = '$' + text.obj_ref.plain_text.strip() + '$'
+                md_rich_texts[idx] = '$' + plain_text.strip() + '$'
             elif is_mention(text):
-                obj_ref = text.obj_ref
                 match text.type:
                     case 'user' | 'date':
-                        md_rich_texts[idx] = f'[{obj_ref.plain_text}]()'  # @ is already included
+                        md_rich_texts[idx] = f'[{plain_text}]()'  # @ is already included
                     case 'custom_emoji':
-                        md_rich_texts[idx] = f'{obj_ref.plain_text}'  # parentheses are already included
+                        md_rich_texts[idx] = f'{plain_text}'  # parentheses are already included
                     case _:
-                        md_rich_texts[idx] = f'↗[{obj_ref.plain_text}]({obj_ref.href})'
+                        md_rich_texts[idx] = f'↗[{plain_text}]({text.obj_ref.href})'
 
     def find_span(
         rich_texts: list[RichTextBase], style_cond: Callable[[RichTextBase], bool]

@@ -255,6 +255,10 @@ def _normalize_model(obj: T) -> T:
                     setattr(obj_copy, field_name, Unset)
                 elif field_name == 'color' and is_unset(field_value):
                     setattr(obj_copy, field_name, _normalize_color(field_value))
+                elif isinstance(obj, TypedObject) and obj.type == 'mention' and field_name == 'plain_text':
+                    setattr(
+                        obj_copy, field_name, Unset
+                    )  # allows comparing offline-built mentions with UserRef to online ones
                 else:
                     setattr(obj_copy, field_name, _recurse(field_value))
             return obj_copy
