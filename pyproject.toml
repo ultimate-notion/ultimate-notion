@@ -228,6 +228,8 @@ select = [
     "RUF100", # Automatically remove unused # noqa directives
 ]
 ignore = [
+    # Allow defining __eq__ without __hash__ as it is set to None in `GenericObject` anyway
+    "PLW1641",
     # Allow non-abstract empty methods in abstract base classes
     "B027",
     # Allow boolean positional values in function calls, like `dict.get(... True)`

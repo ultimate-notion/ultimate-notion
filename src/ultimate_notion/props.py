@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 PV_co = TypeVar('PV_co', bound=obj_props.PropertyValue, default=obj_props.PropertyValue, covariant=True)
 
 
-class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):  # noqa: PLW1641
+class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
     """Base class for Notion property values.
 
     Used to map high-level objects to low-level Notion-API objects

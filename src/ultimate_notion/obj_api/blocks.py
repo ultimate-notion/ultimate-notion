@@ -114,9 +114,6 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
         `id`, `created_time`, `last_edited_time`, etc.
     """
 
-    def __hash__(self) -> int:
-        return hash((self.type, self.value))
-
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Block):
             return NotImplemented

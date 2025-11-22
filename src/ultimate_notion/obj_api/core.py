@@ -150,37 +150,10 @@ def extract_id(text: str) -> str | None:
     return None
 
 
-def _freeze(obj: GenericObject) -> tuple[Any, ...]:
-    """Make nested structures hashable & deterministic."""
-
-    def _recurse(obj: Any) -> Any:
-        if isinstance(obj, dict):
-            return tuple((k, _recurse(v)) for k, v in sorted(obj.items()))
-        if isinstance(obj, (list, tuple)):
-            return tuple(_recurse(x) for x in obj)
-        if isinstance(obj, set):
-            return frozenset(_recurse(x) for x in obj)
-        return obj
-
-    obj = _normalize_model(obj)
-    return _recurse(obj.model_dump(mode='python'))
-
-
-def _normalize_color(val: Color | UnsetType) -> Color:
-    """Normalize unset colors to Color.DEFAULT.
-
-    This is useful for ensuring consistent behavior when comparing objects. Notion API sometimes
-    demands a color field to be `Unset` but then returns the default color, which can lead to
-    unexpected behavior in equality checks and hashing.
-    """
-    if is_unset(val):
-        return Color.DEFAULT
-    return val
-
-
 class GenericObject(BaseModel):
     """The base for all API objects."""
 
+    __hash__: ClassVar[None] = None  # type: ignore[assignment]
     _frozen: bool = False  # for computing hash and equality
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
@@ -193,12 +166,6 @@ class GenericObject(BaseModel):
 
         # _freeze is used to guarantee the consistency with __hash__.
         return BaseModel.__eq__(_normalize_model(self), _normalize_model(other))
-
-    def __hash__(self) -> int:
-        """Compute a hash value for the object by hashing all its fields."""
-        frozen = _freeze(self)
-        # ToDo: Still a bug as it is not really consistent with __eq__, UserRef vs User for example
-        return hash(frozen)
 
     @classmethod
     def _set_field_default(cls, name: str, default: str) -> None:
@@ -253,6 +220,18 @@ class GenericObject(BaseModel):
 
 
 T = TypeVar('T', default=Any)  # ToDo: use new syntax in Python 3.12 and consider using default = in Python 3.13+
+
+
+def _normalize_color(val: Color | UnsetType) -> Color:
+    """Normalize unset colors to Color.DEFAULT.
+
+    This is useful for ensuring consistent behavior when comparing objects. Notion API sometimes
+    demands a color field to be `Unset` but then returns the default color, which can lead to
+    unexpected behavior in equality checks and hashing.
+    """
+    if is_unset(val):
+        return Color.DEFAULT
+    return val
 
 
 def _normalize_model(obj: T) -> T:

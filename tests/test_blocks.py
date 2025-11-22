@@ -9,7 +9,7 @@ import ultimate_notion as uno
 from tests.conftest import URL, all_blocks
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.blocks import ChildrenMixin
-from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
+from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.blocks import Block as ObjBlock
 from ultimate_notion.obj_api.core import Unset, UserRef
@@ -678,32 +678,6 @@ def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> Non
 
     heading = uno.Heading1('This is a Heading.', toggleable=True)
     heading.append(uno.Paragraph('This is a child paragraph.'))
-
-
-@pytest.mark.vcr()
-def test_block_equality_and_hash(root_page: uno.Page, notion: uno.Session) -> None:
-    para1 = uno.Paragraph(text='Some text')
-    para2 = uno.Paragraph(text='Different text')
-    para1a = uno.Paragraph(text='Some text')
-
-    assert para1 != para2
-    assert hash(para1) != hash(para2)
-    assert para1 == para1a
-    assert hash(para1) == hash(para1a)
-
-    with pytest.raises(UnsetError):
-        assert para1.id != para2.id
-
-    page = notion.create_page(parent=root_page, title='Page for testing block equality and hash')
-    page.append([para1, para2, para1a])
-
-    assert para1.id != para2.id
-    assert para1.id != para1a.id
-
-    assert para1 != para2
-    assert para1 == para1a  # same actual content but different metadata like id, timestamp etc.
-    assert hash(para1) != hash(para2)
-    assert hash(para1) == hash(para1a)
 
 
 def test_rt_default_color() -> None:
