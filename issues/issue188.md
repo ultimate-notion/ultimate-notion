@@ -1,0 +1,409 @@
+# Migration of Ultimate-Notion to the Notion API-Version 2025-09-03
+
+This issue is tracked under: https://github.com/ultimate-notion/ultimate-notion/issues/118
+The library notion-sdk-py supports the Notion API-Version 2025-09-03 from version 2.6.0 on (use 2.7.0).
+The Upgrading howto is under: https://developers.notion.com/docs/upgrade-guide-2025-09-03
+
+> **Status**: The API version 2025-09-03 was released on September 3rd, 2025. The old API version
+> is now deprecated. Migration should proceed promptly.
+
+## Conceptual Changes
+
+In API-Version 2025-09-03:
+- What was previously called a **"database"** is now called a **"data source"** (or "datasource")
+- A new **"database"** concept is introduced that can encompass multiple data sources
+- Data sources are now first-class API objects with their own endpoints and properties
+- The old single-data-source database model maps 1:1 to a data source in the new model
+
+This is essentially a terminology shift where the granular data container (with schema, properties, pages)
+is now the "data source", while "database" becomes a higher-level grouping concept.
+
+## Naming Convention
+
+We adopt a **full-word naming convention** throughout the codebase:
+
+| Old Name | New Name | Concept |
+|----------|----------|---------|
+| `*_db` | `*_datasource` | Data source (formerly database) |
+| n/a | `*_database` | New database container concept |
+| `DBQueryBuilder` | `DataSourceQueryBuilder` | Query builder for data sources |
+| `db_only` | `datasource_only` | Filter parameter |
+| `_bind_db` | `_bind_datasource` | Internal binding method |
+
+**Rationale:**
+- `ds` is ambiguous (dataset, datastore, downstream) while `db` is universally understood
+- With two similar concepts (`database` vs `datasource`), abbreviations become confusing
+- Full words improve readability: `get_datasource()` vs `get_ds()`
+- Better autocomplete: `session.get_data` clearly shows both `get_database` and `get_datasource`
+
+## Impact Analysis
+
+### Files Requiring Changes
+
+**Low-level obj_api layer:**
+- `src/ultimate_notion/obj_api/endpoints.py` - Add `DataSourcesEndpoint`, modify `DatabasesEndpoint`
+- `src/ultimate_notion/obj_api/blocks.py` - Add `DataSource` NotionObject, keep `Database` for new concept
+- `src/ultimate_notion/obj_api/objects.py` - Add `DataSourceRef`, potentially modify `DatabaseRef`
+- `src/ultimate_notion/obj_api/schema.py` - Relations now may need `data_source_id` alongside `database_id`
+- `src/ultimate_notion/obj_api/query.py` - Rename `DBQueryBuilder` to `DataSourceQueryBuilder`
+
+**High-level API layer:**
+- `src/ultimate_notion/database.py` - Rename `Database` to `DataSource`, create new `Database` class
+- `src/ultimate_notion/session.py` - Rename all `*_db` methods to `*_datasource`, add new `*_database` methods
+- `src/ultimate_notion/blocks.py` - Update `DataObject` hierarchy, add `ChildDataSource` block type
+- `src/ultimate_notion/page.py` - Pages belong to data sources, not databases
+- `src/ultimate_notion/schema.py` - Schema binds to data sources
+- `src/ultimate_notion/query.py` - Queries target data sources
+- `src/ultimate_notion/view.py` - Views are of data sources
+
+**Other files with "database" references (316 occurrences across 24 files):**
+- `src/ultimate_notion/core.py`
+- `src/ultimate_notion/props.py`
+- `src/ultimate_notion/rich_text.py`
+- `src/ultimate_notion/errors.py`
+- `src/ultimate_notion/comment.py`
+- `src/ultimate_notion/__init__.py`
+- `src/ultimate_notion/adapters/google/tasks/sync.py`
+
+## Detailed Migration Steps
+
+### Phase 1: Preparation & Analysis
+
+1. **Create a feature branch** for the migration work
+2. **Document current API behavior** by running full test suite with VCR recording
+   ```bash
+   hatch run vcr-rewrite
+   ```
+3. **Review notion-sdk-py 2.6.0 source** to understand new endpoint signatures:
+   - Check `notion_client/api_endpoints.py` for new `DataSourcesEndpoint`
+   - Identify parameter changes in `DatabasesEndpoint`
+
+### Phase 2: Low-Level obj_api Layer Changes
+
+#### Step 2.1: Update `pyproject.toml`
+```toml
+# Change from:
+"notion-client~=2.5.0",
+# To:
+"notion-client~=2.7.0",
+```
+Run `hatch run upgrade-pkg notion-client` to update locks.
+
+#### Step 2.2: Add DataSource to `obj_api/blocks.py`
+```python
+class DataSource(DataObject, MentionMixin, object='data_source'):
+    """A data source record type (formerly 'database' in pre-2025-09-03 API)."""
+
+    title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    url: str | UnsetType = Unset
+    public_url: str | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
+    cover: SerializeAsAny[FileObject] | None = None
+    properties: dict[str, SerializeAsAny[Property]]
+    description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    is_inline: bool = False
+    database_id: UUID | UnsetType = Unset  # NEW: reference to parent database
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        return MentionDataSource.build_mention_from(self, style=style)
+```
+
+Keep existing `Database` class but repurpose it for the new database concept:
+```python
+class Database(DataObject, object='database'):
+    """A database that can contain multiple data sources (new 2025-09-03 concept)."""
+
+    title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    data_sources: list[DataSourceRef] = Field(default_factory=list)
+    # ... other new database fields
+```
+
+#### Step 2.3: Add references to `obj_api/objects.py`
+```python
+class DataSourceRef(ParentRef, type='data_source_id'):
+    """Reference to a DataSource, primarily used as parent reference."""
+
+    data_source_id: UUID
+
+    @classmethod
+    def build(cls, ref: DataSource | str | UUID) -> DataSourceRef:
+        # ... implementation
+```
+
+#### Step 2.4: Update `obj_api/schema.py` for Relations
+The `Relation` property needs to support both `database_id` (for the new database) and `data_source_id`:
+```python
+class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
+    """Defines common configuration for a property relation."""
+
+    database_id: UUID | UnsetType = Unset  # Keep for backwards compat or new DB concept
+    data_source_id: UUID | UnsetType = Unset  # NEW: actual target for queries
+```
+
+#### Step 2.5: Create `DataSourcesEndpoint` in `obj_api/endpoints.py`
+```python
+class DataSourcesEndpoint(Endpoint):
+    """Interface to the 'data_sources' endpoint of the Notion API."""
+
+    @property
+    def raw_api(self) -> NCDataSourcesEndpoint:
+        """Return the underlying endpoint in the Notion SDK."""
+        return self.api.client.data_sources  # or whatever notion-sdk-py calls it
+
+    def create(self, parent: Page, schema: Mapping[str, Property], ...) -> DataSource:
+        """Add a data source to the given Page parent."""
+        # Implementation similar to current DatabasesEndpoint.create
+
+    def retrieve(self, dsref: DataSource | str | UUID) -> DataSource:
+        """Return the DataSource with the given ID."""
+
+    def update(self, ds: DataSource, ...) -> None:
+        """Update the DataSource object on the server."""
+
+    def delete(self, ds: DataSource) -> DataSource:
+        """Delete (archive) the specified DataSource."""
+
+    def query(self, ds: DataSource | UUID | str) -> DataSourceQueryBuilder:
+        """Initialize a new Query object for the data source."""
+```
+
+Update `NotionAPI.__init__`:
+```python
+def __init__(self, client: NCClient):
+    self.client = client
+    self.blocks = BlocksEndpoint(self)
+    self.data_sources = DataSourcesEndpoint(self)  # NEW
+    self.databases = DatabasesEndpoint(self)  # MODIFIED for new database concept
+    self.pages = PagesEndpoint(self)
+    # ...
+```
+
+#### Step 2.6: Update `obj_api/query.py`
+- Rename `DBQueryBuilder` to `DataSourceQueryBuilder`
+- Update `SearchQueryBuilder` filter to use `data_source` instead of `database`:
+  ```python
+  def filter(self, *, page_only: bool = False, datasource_only: bool = False) -> Self:
+      # Change filter["value"] from "database" to "data_source"
+  ```
+
+### Phase 3: High-Level API Layer Changes
+
+#### Step 3.1: Rename in `database.py`
+```python
+# Rename class
+class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource):
+    """A Notion data source (formerly 'database' in pre-2025-09-03 API).
+
+    This object always represents an original data source, not a linked one.
+    """
+    # ... keep most implementation, update docstrings and references
+```
+
+Create new Database class for the new concept:
+```python
+class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
+    """A Notion database that can contain multiple data sources.
+
+    New in API version 2025-09-03.
+    """
+
+    @property
+    def data_sources(self) -> list[DataSource]:
+        """Return all data sources in this database."""
+        # ...
+```
+
+#### Step 3.2: Update `session.py` Methods
+Rename and update methods using full words for clarity (no abbreviations):
+```python
+# Old -> New naming (datasource methods - the workhorse, formerly "database")
+create_db      -> create_datasource
+search_db      -> search_datasource
+get_db         -> get_datasource
+get_or_create_db -> get_or_create_datasource
+
+# New database methods (container concept)
+create_database(self, ...) -> Database
+search_database(self, name: str | None = None, ...) -> SList[Database]
+get_database(self, db_ref: UUID | str, ...) -> Database
+get_or_create_database(self, ...) -> Database
+```
+
+This naming convention:
+- Uses full words (`datasource`, `database`) instead of abbreviations (`db`, `ds`)
+- Clearly distinguishes the two concepts when both appear in code
+- Works well with autocomplete (`session.get_data` shows both options clearly)
+
+#### Step 3.3: Update `schema.py`
+- Schema binds to `DataSource`, not `Database`
+- Update `_bind_db` to `_bind_datasource`
+- Update relation property classes
+
+#### Step 3.4: Update `query.py`
+- `Query` class works with `DataSource`
+- Update type hints and docstrings
+
+#### Step 3.5: Update `blocks.py`
+- Add `ChildDataSource` block type (analogous to `ChildDatabase`)
+- Update `DataObject` hierarchy if needed
+
+#### Step 3.6: Update `page.py`
+- Pages can be children of data sources
+- Update parent resolution logic
+
+### Phase 4: Backwards Compatibility Layer (Optional but Recommended)
+
+To ease migration for users, provide aliases:
+```python
+# In __init__.py
+from ultimate_notion.database import DataSource
+# Backwards compatibility alias
+Database = DataSource  # Deprecated, will be removed in v2.0
+
+import warnings
+def __getattr__(name):
+    if name == "Database":
+        warnings.warn(
+            "Database is deprecated, use DataSource instead",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return DataSource
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+```
+
+### Phase 5: Testing
+
+#### Step 5.1: Update Test Files
+All test files in `tests/` need updating:
+- `tests/test_database.py` -> rename to `tests/test_datasource.py` or update in place
+- Update all fixtures and test functions
+- Add new tests for the new `Database` concept
+
+#### Step 5.2: Rewrite VCR Cassettes
+```bash
+hatch run vcr-drop-cassettes
+hatch run vcr-rewrite
+```
+
+#### Step 5.3: Run Full Test Suite
+```bash
+hatch run test
+hatch run lint:all
+```
+
+### Phase 6: Documentation Updates
+
+1. **Update all docstrings** with new terminology
+2. **Update `docs/`** markdown files:
+   - `features.md` - list DataSource as the new primary object
+   - `getting_started.md` - update examples
+   - All API reference docs
+3. **Update `CHANGELOG.md`** with breaking changes
+4. **Update `README.md`** examples if needed
+
+### Phase 7: Release Preparation
+
+1. **Bump version** (major version bump due to breaking changes)
+2. **Update migration guide** in documentation
+3. **Test against production** with a staging Notion workspace
+4. **Create release notes** highlighting:
+   - Breaking changes
+   - Migration path
+   - New features (multi-datasource databases)
+
+## Additional Items (Often Overlooked)
+
+### Error Classes (`errors.py`)
+```python
+# Rename
+UnknownDatabaseError -> UnknownDataSourceError
+EmptyDBError -> EmptyDataSourceError
+
+# Update docstrings
+SchemaNotBoundError  # "not bound to a database" -> "not bound to a data source"
+SchemaError          # "issues with the schema of a database" -> "...of a data source"
+```
+
+### Mentions (`obj_api/objects.py`)
+```python
+# Rename
+MentionDatabase -> MentionDataSource
+
+# Keep MentionDatabase as alias for backwards compatibility during transition
+```
+
+### Public Exports (`__init__.py`)
+```python
+# Current export
+from ultimate_notion.database import Database
+
+# New exports
+from ultimate_notion.datasource import DataSource
+from ultimate_notion.database import Database  # new container concept
+
+# __all__ updates
+'Database',     # new container concept
+'DataSource',   # formerly Database
+```
+
+### Schema Internal Methods (`schema.py`)
+```python
+# Rename internal methods
+_bind_db -> _bind_datasource
+is_bound -> is_bound  # keep, but update docstring "bound to a data source"
+
+# Update TYPE_CHECKING imports
+from ultimate_notion.datasource import DataSource  # was: database import Database
+```
+
+### Block Types
+- `ChildDatabase` in `obj_api/blocks.py` -> keep for new concept
+- Add `ChildDataSource` block type
+- Update `blocks.py` high-level wrappers accordingly
+
+### File Renames
+Consider renaming files for clarity:
+- `database.py` -> `datasource.py` (move new Database class elsewhere or keep both in same file)
+- `test_database.py` -> `test_datasource.py`
+
+### Cache Considerations
+- `Session.cache` uses UUIDs as keys
+- Data sources and databases will have different UUIDs, so no collision
+- But cache type hints need updating: `dict[UUID, DataObject | User]`
+
+### Type Hints Throughout
+Many files have type hints like:
+```python
+def some_func(db: Database) -> ...:
+```
+These need systematic updates to use `DataSource` where appropriate.
+
+## Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Notion API behavior differs from docs | Medium | High | Test thoroughly with real API, not just VCR |
+| notion-sdk-py 2.7.0 has bugs | Low | Medium | Pin exact version, monitor issues |
+| User code breaks silently | Medium | High | Provide clear deprecation warnings |
+| VCR cassettes incompatible | High | Low | Plan for full rewrite |
+| Relations break due to new IDs | Medium | High | Test relation scenarios extensively |
+
+## Open Questions
+
+1. Does the new `Database` concept require workspace-level permissions we don't have?
+2. How do existing linked databases behave in the new model?
+3. Are there any endpoints that still use `database_id` vs `data_source_id` inconsistently?
+4. What happens to webhooks - do we need to handle new event types?
+
+## Estimated Effort
+
+- Phase 1 (Preparation): 0.5 days
+- Phase 2 (Low-level): 2-3 days
+- Phase 3 (High-level): 2-3 days
+- Phase 4 (Backwards compat): 0.5 days
+- Phase 5 (Testing): 2-3 days
+- Phase 6 (Documentation): 1-2 days
+- Phase 7 (Release): 0.5 days
+
+**Total: ~10-13 days of focused work**
