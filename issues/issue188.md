@@ -407,3 +407,90 @@ These need systematic updates to use `DataSource` where appropriate.
 - Phase 7 (Release): 0.5 days
 
 **Total: ~10-13 days of focused work**
+
+---
+
+## Progress Log
+
+### 2025-11-24: Phase 1 & 2 Completed
+
+#### Commits Made
+
+1. **`a2fbdb5c` - docs: Add detailed migration plan for Notion API 2025-09-03**
+   - Created this comprehensive migration plan document
+   - Documented conceptual changes, naming conventions, and 7-phase approach
+   - Added risk assessment and effort estimates
+
+2. **`f73c8d2d` - build: Upgrade notion-client to ~=2.7.0**
+   - Updated `pyproject.toml` dependency from `~=2.5.0` to `~=2.7.0`
+   - notion-sdk-py 2.7.0 provides `DataSourcesEndpoint` with retrieve, query, create, update methods
+   - `DatabasesEndpoint.query` moved to `DataSourcesEndpoint.query`
+
+3. **`1efa7ba9` - feat(obj_api): Add DataSource class and DataSourcesEndpoint for API 2025-09-03**
+
+   **Changes to `obj_api/blocks.py`:**
+   - Added `DataSource` class (formerly Database functionality) with `object='data_source'`
+   - Added `database_id` field to DataSource for parent reference
+   - Updated `Database` class to container concept with `data_sources` list
+   - Added `ChildDataSource` and `ChildDataSourceTypeData` block types
+   - Updated imports for `DataSourceRef` and `MentionDataSource`
+
+   **Changes to `obj_api/objects.py`:**
+   - Added `DataSourceRef` class with `data_source_id` field and `build()` method
+   - Added `MentionDataSource` class with `build_mention_from()` method
+   - Updated TYPE_CHECKING import to include `DataSource`
+   - Updated docstrings for `DatabaseRef` and `MentionDatabase`
+
+   **Changes to `obj_api/schema.py`:**
+   - Updated `PropertyRelation` to use `data_source_id` as primary key (was `database_id`)
+   - Made `database_id` optional with `UnsetType`
+   - Updated `SinglePropertyRelation.build_relation()` to use `dsref` parameter
+   - Updated `DualPropertyRelation.build_relation()` to use `dsref` parameter
+   - Updated docstrings to reference "data source" instead of "database"
+
+   **Changes to `obj_api/endpoints.py`:**
+   - Added `DataSourcesEndpoint` class with full CRUD operations:
+     - `create()`, `retrieve()`, `update()`, `delete()`, `restore()`, `query()`
+   - Updated `DatabasesEndpoint`:
+     - Removed `schema` parameter from `create()` and `update()` (moved to DataSource)
+     - Removed `query()` method (moved to DataSourcesEndpoint)
+     - Removed `delete()` and `restore()` methods
+     - Updated docstrings to reflect container concept
+   - Updated `PagesEndpoint.create()` to accept `DataSource` instead of `Database`
+   - Added `NCDataSourcesEndpoint` TYPE_CHECKING import
+   - Updated `NotionAPI.__init__` to include `data_sources` endpoint
+
+   **Changes to `obj_api/query.py`:**
+   - Renamed `DBQueryBuilder` → `DataSourceQueryBuilder`
+   - Renamed `DBQuery` → `DataSourceQuery`
+   - Renamed `DBSort` → `DataSourceSort`
+   - Updated `SearchQueryBuilder.filter()` parameter from `db_only` to `datasource_only`
+   - Updated search filter value from `'database'` to `'data_source'`
+   - Updated `DataSourceQueryBuilder` to use `data_source_id` parameter
+   - Updated TypeVar bound from `Page | Database` to `Page | DataSource`
+
+#### Current State
+
+- **Low-level obj_api layer**: Complete
+- **High-level API layer**: Not started (25 mypy errors expected)
+- **Tests**: Not updated
+- **Documentation**: Not updated
+
+#### Mypy Errors (Expected)
+
+All 25 errors are in the high-level API layer, which still references the old Database concept:
+- `session.py`: 4 errors (uses old `DatabasesEndpoint` methods)
+- `schema.py`: 8 errors (references `Database.properties`, old endpoint methods)
+- `query.py`: 4 errors (references `DBSort`, `databases.query`)
+- `database.py`: 4 errors (references old endpoint methods)
+- `tests/obj_api/test_endpoints.py`: 2 errors (passes `Database` to `pages.create`)
+- `utils.py`: 1 error (unrelated pendulum issue)
+
+#### Next Steps
+
+Phase 3 (High-level API) should:
+1. Rename `database.py` to `datasource.py`
+2. Update `Database` class to `DataSource` in high-level API
+3. Update `session.py` methods (`get_db` → `get_datasource`, etc.)
+4. Update `schema.py` bindings to use DataSource
+5. Update `query.py` high-level Query class
