@@ -29,9 +29,11 @@ from ultimate_notion.obj_api.objects import (
     Annotations,
     BlockRef,
     CustomEmojiObject,
+    DataSourceRef,
     EmojiObject,
     FileObject,
     MentionDatabase,
+    MentionDataSource,
     MentionMixin,
     MentionObject,
     MentionPage,
@@ -55,8 +57,12 @@ class DataObject(NotionEntity, ABC):
     last_edited_by: UserRef | UnsetType = Unset
 
 
-class Database(DataObject, MentionMixin, object='database'):
-    """A database record type."""
+class DataSource(DataObject, MentionMixin, object='data_source'):
+    """A data source record type (formerly 'database' in pre-2025-09-03 API).
+
+    A data source contains the schema (properties) and pages. In API version 2025-09-03+,
+    databases are containers that can hold multiple data sources.
+    """
 
     title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     url: str | UnsetType = Unset
@@ -66,6 +72,27 @@ class Database(DataObject, MentionMixin, object='database'):
     properties: dict[str, SerializeAsAny[Property]]
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
+    database_id: str | UnsetType = Unset  # Reference to parent database container
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        return MentionDataSource.build_mention_from(self, style=style)
+
+
+class Database(DataObject, MentionMixin, object='database'):
+    """A database container that can hold multiple data sources (new in API 2025-09-03+).
+
+    In the new API model, databases are containers that group related data sources.
+    The actual schema/properties are now on the DataSource objects.
+    """
+
+    title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    url: str | UnsetType = Unset
+    public_url: str | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
+    cover: SerializeAsAny[FileObject] | None = None
+    description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    is_inline: bool = False
+    data_sources: list[DataSourceRef] = Field(default_factory=list)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionDatabase.build_mention_from(self, style=style)
@@ -469,9 +496,21 @@ class ChildDatabaseTypeData(GenericObject):
 
 
 class ChildDatabase(Block[ChildDatabaseTypeData], type='child_database'):
-    """A child database block in Notion."""
+    """A child database block in Notion (container concept in API 2025-09-03+)."""
 
     child_database: ChildDatabaseTypeData
+
+
+class ChildDataSourceTypeData(GenericObject):
+    """Type data for `ChildDataSource` block."""
+
+    title: str
+
+
+class ChildDataSource(Block[ChildDataSourceTypeData], type='child_data_source'):
+    """A child data source block in Notion (formerly 'child_database' in pre-2025-09-03 API)."""
+
+    child_data_source: ChildDataSourceTypeData
 
 
 class ColumnTypeData(GenericObject):
