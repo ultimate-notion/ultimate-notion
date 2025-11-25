@@ -430,6 +430,188 @@ These need systematic updates to use `DataSource` where appropriate.
 
 ## Progress Log
 
+### 2025-11-25: Phase 3 & 4 Completed + Database Class Added
+
+#### Session Summary
+
+After completing Phases 1 & 2 (low-level obj_api layer), we continued with:
+
+**Phase 3: High-Level API Migration (Database → DataSource with `ds` abbreviation)**
+
+Key decisions made during this phase:
+1. **Naming Convention Change**: Initially planned to use full words (`datasource`), but reconsidered and adopted `ds` abbreviation to reduce verbosity
+   - Rationale: `data_source_id` (14 chars) vs `ds_id` (5 chars) significantly reduces code length
+   - Pattern: `ds` = data source (specific), `db` = database (container)
+   - The old `Database` class is now `DataSource`; `Database` is a NEW concept (collection of data sources)
+
+2. **Git Workflow Lesson**:
+   - **NEVER use `git add -A` or `git add .`** - always specify exact file paths
+   - Added `issues/` to `.gitignore` to prevent accidental commits of test/debug files
+
+#### Commits Made
+
+**Session Start: Continuing from Phase 3**
+
+1. **`118f3554` - Phase 3: Migrate high-level API from Database to DataSource**
+   - Renamed `Database` class to `DataSource` in `src/ultimate_notion/database.py`
+   - Updated all properties: `is_database` → `is_ds`
+   - Updated `__init__.py` exports: `Database` → `DataSource`
+
+2. **`87aa0b32` - Use 'ds' abbreviation refactoring**
+
+   **Files modified:**
+   - `src/ultimate_notion/session.py`: All methods renamed
+     - `create_db()` → `create_ds()`
+     - `search_db()` → `search_ds()`
+     - `get_db()` → `get_ds()`
+     - `get_or_create_db()` → `get_or_create_ds()`
+
+   - `src/ultimate_notion/schema.py`: Schema binding updated
+     - `_db` → `_ds`
+     - `bind_db()` → `bind_ds()`
+     - `get_db()` → `get_ds()`
+
+   - `src/ultimate_notion/query.py`: Query class updated
+     - `Query.datasource` → `Query.ds`
+     - All condition methods: `datasource` parameter → `ds`
+
+   - `src/ultimate_notion/view.py`: View class updated
+     - `View.datasource` → `View.ds`
+
+   - `src/ultimate_notion/page.py`: Page properties updated
+     - `parent_datasource` → `parent_ds`
+     - `sub_datasources` → `sub_dss`
+     - `in_datasource` → `in_ds`
+
+   - `src/ultimate_notion/core.py`: Type guards updated
+     - `is_datasource()` → `is_ds()`
+     - Property `is_datasource` → `is_ds`
+
+   - `src/ultimate_notion/blocks.py`: Block types updated
+     - `ChildDatabase.datasource` → `ChildDatabase.ds`
+     - Updated type guard usage
+
+   - `src/ultimate_notion/database.py`: DataSource class properties
+     - `is_datasource` → `is_ds`
+
+   - `src/ultimate_notion/adapters/google/tasks/sync.py`: Adapter updated
+     - Updated references to `parent_ds`
+
+3. **`f4d3fa1c` - Add .env to .gitignore**
+   - Prevented accidental commits of environment files
+
+**Phase 4: Update Examples and Tests**
+
+4. **`269062d3` - Phase 4: Update examples and tests with new ds API**
+
+   **Examples updated:**
+   - `examples/simple_taskdb.py`: `create_db()` → `create_ds()`
+   - `examples/sync_google_tasks.py`: All database methods updated (4 occurrences)
+   - `examples/getting_started.py`: No changes needed (no DB usage)
+   - `examples/file_upload.py`: No changes needed (no DB usage)
+
+   **Test fixtures updated (tests/conftest.py):**
+   - Import: `Database` → `DataSource`
+   - All fixture return types: `Database` → `DataSource`
+   - All fixture method calls: `search_db()` → `search_ds()`, `create_db()` → `create_ds()`
+   - Fixture names kept same for compatibility: `contacts_db`, `task_db`, `article_db`, etc.
+   - `notion_cleanups` fixture: Updated to use `search_ds()`, `parent_ds`, type checks
+
+   **Test files updated:**
+   - `tests/test_examples.py`: `search_db()` → `search_ds()`
+   - `tests/test_session.py`: `search_db()` → `search_ds()`, `get_db()` → `get_ds()`
+   - `tests/test_blocks.py`: `create_db()` → `create_ds()`
+   - `tests/test_page.py`:
+     - All `create_db()` → `create_ds()`
+     - Properties: `in_db` → `in_ds`, `parent_db` → `parent_ds`
+   - `tests/test_query.py`: All `create_db()` → `create_ds()` (8 occurrences)
+   - `tests/test_database.py`: All database methods updated (16 occurrences)
+   - `tests/test_schema.py`: All database methods updated (16 occurrences)
+   - `tests/obj_api/test_endpoints.py`: `create_db()` → `create_ds()`
+
+   **Migration doc updated:**
+   - Clarified `ds` vs `db` naming convention
+   - `ds` = data sources (what was "database")
+   - `db` = NEW database collections (not yet implemented)
+
+**Add NEW Database Class**
+
+5. **`6b2fa708` - feat: Add NEW Database class for database collections**
+
+   **New Database class added to `src/ultimate_notion/database.py`:**
+   ```python
+   class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
+       """A Notion database - a collection that can contain multiple data sources.
+
+       This is a NEW concept introduced in API version 2025-09-03.
+       """
+   ```
+
+   Features:
+   - Basic properties: `title`, `is_db`
+   - Placeholder `data_sources` property (raises `NotImplementedError`)
+   - Proper `__eq__`, `__hash__`, `__str__`, `__repr__` methods
+
+   **Exports updated:**
+   - `__init__.py`: Added `Database` to imports and `__all__`
+   - Both `Database` and `DataSource` now exported
+
+   **Test type hints fixed:**
+   - `tests/test_view.py`: All `uno.Database` → `uno.DataSource` (6 functions)
+   - `tests/test_query.py`: `uno.Database` → `uno.DataSource`
+   - `tests/test_rich_text.py`: `uno.Database` → `uno.DataSource`
+
+   **Other changes:**
+   - Added `issues/` to `.gitignore`
+   - Fixed linting issues (EM101, RUF022)
+
+#### Current State After This Session
+
+**Completed:**
+- ✅ Phase 1: Preparation & low-level obj_api updates
+- ✅ Phase 2: notion-client upgrade to 2.7.0
+- ✅ Phase 3: High-level API migration (Database → DataSource with `ds` abbreviation)
+- ✅ Phase 4: Examples and tests updated
+- ✅ NEW `Database` class added (placeholder for future collection implementation)
+
+**Code Statistics:**
+- 11 source files modified in Phase 3 refactoring
+- 11 test files updated in Phase 4
+- 4 example files checked (2 updated)
+- Total: `ds` abbreviation used consistently across ~150+ occurrences
+- 0 occurrences of old API (`create_db`, `search_db`, etc.) remaining in examples/tests
+
+**Type Safety:**
+- Style checks: ✅ All passing
+- Some mypy errors remaining (~60) due to confusion between old fixtures typed as `Database`
+  in some files - need systematic review
+
+**Not Yet Implemented:**
+- `Database` class is a placeholder
+- `Database.data_sources` property raises `NotImplementedError`
+- No session methods for database collections (`create_db`, `search_db` for the NEW concept)
+- Full database collection functionality requires additional implementation
+
+**Known Issues to Address:**
+1. Mypy confusion in some test files where fixtures are still seen as `Database` type
+2. Need to add session methods for the NEW `Database` concept when ready to implement
+3. Need to implement `Database.data_sources` property logic
+4. VCR cassettes need complete rewrite (Phase 5)
+
+**Next Steps (Phase 5):**
+1. Drop all VCR cassettes: `hatch run vcr-drop-cassettes`
+2. Rewrite cassettes: `hatch run vcr-rewrite`
+3. Run full test suite: `hatch run test`
+4. Fix any remaining type errors
+5. Verify all tests pass with new API
+
+**Git Best Practices Learned:**
+- ⚠️ **NEVER use `git add -A` or `git add .`**
+- ✅ Always specify exact file paths: `git add src/file.py tests/file.py`
+- ✅ Use `.gitignore` for directories like `issues/` that shouldn't be committed
+
+---
+
 ### 2025-11-24: Phase 1 & 2 Completed
 
 #### Commits Made
