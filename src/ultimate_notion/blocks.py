@@ -36,7 +36,7 @@ from typing_extensions import Self, TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion
-from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_datasource, is_page
+from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import InvalidAPIUsageError, UnknownDataSourceError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
@@ -189,7 +189,7 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 child_blocks[idx] = cast(Block, child_block.page)
             elif isinstance(child_block, ChildDatabase):
                 try:
-                    ref_block = cast(Block, child_block.datasource)
+                    ref_block = cast(Block, child_block.ds)
                 except UnknownDataSourceError:
                     # linked data source that cannot be retrieved via API. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
@@ -214,7 +214,7 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     @property
     def blocks(self) -> tuple[Block, ...]:
         """Return all contained blocks within this block (excluding child pages and data sources)"""
-        return tuple(block for block in self.children if not is_page(block) and not is_datasource(block))
+        return tuple(block for block in self.children if not is_page(block) and not is_ds(block))
 
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
         """Append a block or a sequence of blocks to the content of this block.
@@ -1105,10 +1105,10 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         return None
 
     @property
-    def datasource(self) -> DataSource:
+    def ds(self) -> DataSource:
         """Return the actual DataSource object."""
         sess = get_active_session()
-        return sess.get_datasource(self.id)
+        return sess.get_ds(self.id)
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return the child database as Markdown."""

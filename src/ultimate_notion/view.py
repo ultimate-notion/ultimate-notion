@@ -34,10 +34,10 @@ T = TypeVar('T')
 
 
 class View(Sequence[Page]):
-    def __init__(self, datasource: DataSource, pages: Sequence[Page], query: Query):
-        self.datasource = datasource
+    def __init__(self, ds: DataSource, pages: Sequence[Page], query: Query):
+        self.ds = ds
         self._query = query
-        self._title_col = datasource.schema.get_title_prop().name
+        self._title_col = ds.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
         self._pages: NDArray[Any] = np.array(pages)
         self._row_indices: NDArray[Any]
@@ -57,11 +57,11 @@ class View(Sequence[Page]):
 
     def clone(self) -> View:
         """Clone the current view."""
-        return deepcopy_with_sharing(self, shared_attributes=['datasource', '_pages', '_query'])
+        return deepcopy_with_sharing(self, shared_attributes=['ds', '_pages', '_query'])
 
     def _get_columns(self, title_col: str) -> NDArray[Any]:
         """Make sure title column is the first columns."""
-        cols = list(self.datasource.schema.to_dict().keys())
+        cols = list(self.ds.schema.to_dict().keys())
         cols.insert(0, cols.pop(cols.index(title_col)))
         return np.array(cols)
 
@@ -125,8 +125,8 @@ class View(Sequence[Page]):
 
     def to_pydantic(self) -> list[BaseModel]:
         """Convert the view to a list of Pydantic models."""
-        model = self.datasource.schema.to_pydantic_model(with_ro_props=True)
-        is_prop_ro = {prop.name: prop.readonly for prop in self.datasource.schema.get_props()}
+        model = self.ds.schema.to_pydantic_model(with_ro_props=True)
+        is_prop_ro = {prop.name: prop.readonly for prop in self.ds.schema.get_props()}
 
         def get_prop(page: Page, prop: str) -> PropertyValue | Any:
             prop_value = page.props._get_property(prop)
@@ -164,7 +164,7 @@ class View(Sequence[Page]):
         """Create a Polars schema for the view."""
         import polars as pl  # noqa: PLC0415
 
-        ds_schema = self.datasource.schema.to_dict()
+        ds_schema = self.ds.schema.to_dict()
         pl_schema: dict[str, pl.DataType] = {}
         for col in self.columns:
             if col in ds_schema:
@@ -263,7 +263,7 @@ class View(Sequence[Page]):
         return iter(self.to_pages())
 
     def __repr__(self) -> str:
-        return get_repr(self, desc=self.datasource.title)
+        return get_repr(self, desc=self.ds.title)
 
     def __str__(self) -> str:
         return self.as_table()

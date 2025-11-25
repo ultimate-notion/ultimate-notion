@@ -124,7 +124,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
 
     def _update_prop(self, prop_obj: GO_co) -> GO_co:  # type: ignore[misc] # breaking covariance
         """Update the attributes of this property from a schema."""
-        db = self._get_owner().get_datasource()
+        db = self._get_owner().get_ds()
         session = get_active_session()
         session.api.data_sources.update(db.obj_ref, schema={self.name: prop_obj})
         return cast(GO_co, db.obj_ref.properties[self.name])
@@ -138,7 +138,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
             Use `prop.attr_name = "..."` to change the attribute name of a property `prop` within a schema.
         """
         schema = self._get_owner()
-        db = schema.get_datasource()
+        db = schema.get_ds()
         session = get_active_session()
         schema_obj: dict[str, obj_schema.RenameProp | None] = (
             {self.name: None} if new_name is None else {self.name: obj_schema.RenameProp(name=new_name)}
@@ -477,7 +477,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     def _make_obj_ref(self) -> obj_schema.Relation:
         """Create the low-level object reference for this relation."""
         try:
-            db = self.schema.get_datasource()
+            db = self.schema.get_ds()
         except SchemaNotBoundError as e:
             msg = f"A database with schema '{self.schema.__name__}' needs to be created first!"
             raise RelationError(msg) from e
@@ -505,7 +505,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         """Schema of the relation database."""
         if self._rel_schema is None and self._get_owner().is_bound():
             session = get_active_session()
-            self._rel_schema = session.get_datasource(self.obj_ref.relation.data_source_id).schema
+            self._rel_schema = session.get_ds(self.obj_ref.relation.data_source_id).schema
         elif self._rel_schema is not None and self._rel_schema is not SelfRef:
             return self._rel_schema
         else:
@@ -517,9 +517,9 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     def schema(self, new_schema: type[Schema]) -> None:
         """Set the schema of the relation database."""
         if self.is_two_way:
-            new_rel = obj_schema.DualPropertyRelation.build_relation(new_schema.get_datasource().id)
+            new_rel = obj_schema.DualPropertyRelation.build_relation(new_schema.get_ds().id)
         else:
-            new_rel = obj_schema.SinglePropertyRelation.build_relation(new_schema.get_datasource().id)
+            new_rel = obj_schema.SinglePropertyRelation.build_relation(new_schema.get_ds().id)
         self.obj_ref.relation = new_rel.relation
         self._update_prop(self.obj_ref)
         self._rel_schema = new_schema
@@ -532,7 +532,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         """
         two_way_prop_rel = cast(obj_schema.DualPropertyRelation, self.obj_ref.relation)
         tmp_prop_name = raise_unset(two_way_prop_rel.dual_property.synced_property_name)
-        db = self.schema.get_datasource()
+        db = self.schema.get_ds()
         db.reload(rebind_schema=False)
         if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
             back_ref_prop_type.name = new_prop_name  # rename the property in the target schema
@@ -558,7 +558,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         The `new_prop_name` is the name of the property in the target schema.
         """
 
-        if (db := self.schema.get_datasource()) is None:
+        if (db := self.schema.get_ds()) is None:
             msg = 'The target schema of the relation is not bound to a database'
             raise RelationError(msg)
 
@@ -611,7 +611,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             session = get_active_session()
 
             # change the old default name in the target schema to what was passed during initialization
-            other_db = self.schema.get_datasource()
+            other_db = self.schema.get_ds()
 
             if is_unset(prop_id := self.obj_ref.relation.dual_property.synced_property_id):
                 msg = 'No synced property ID found in the relation object'
@@ -621,7 +621,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             session.api.data_sources.update(other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
-            our_db = self._get_owner().get_datasource()
+            our_db = self._get_owner().get_ds()
             session.api.data_sources.update(our_db.obj_ref, schema={})  # sync obj_ref
             our_db.schema._set_obj_refs()
 
@@ -836,7 +836,7 @@ class SchemaType(ABCMeta):
             prop_type._attr_name = rich_text.snake_case(prop_name)
 
         session = get_active_session()
-        session.api.data_sources.update(cls.get_datasource().obj_ref, schema={prop_name: prop_type.obj_ref})
+        session.api.data_sources.update(cls.get_ds().obj_ref, schema={prop_name: prop_type.obj_ref})
 
         cls._props.append(prop_type)
         cls._set_obj_refs()
@@ -917,7 +917,7 @@ class Schema(metaclass=SchemaType):
     _db_title: rich_text.Text | None
     _db_id: str | None
     _db_desc: rich_text.Text | None
-    _datasource: DataSource | None = None
+    _ds: DataSource | None = None
     _props: list[Property]
 
     def __init_subclass__(cls, db_title: str | None = None, db_id: str | None = None, **kwargs: Any):
@@ -954,7 +954,7 @@ class Schema(metaclass=SchemaType):
     @classmethod
     def create(cls, **kwargs: Any) -> Page:
         """Create a page using this schema with a bound data source."""
-        return cls.get_datasource().create_page(**kwargs)
+        return cls.get_ds().create_page(**kwargs)
 
     @classmethod
     def get_props(cls) -> list[Property]:
@@ -976,7 +976,7 @@ class Schema(metaclass=SchemaType):
         except EmptyListError as e:
             if default is Unset:
                 if cls.is_bound():
-                    msg = f'Property `{prop_name}` not found in schema of `{cls._datasource}`.'
+                    msg = f'Property `{prop_name}` not found in schema of `{cls._ds}`.'
                 else:
                     msg = f'Property `{prop_name}` not found in unbound schema.'
                 raise SchemaError(msg) from e
@@ -1160,44 +1160,44 @@ class Schema(metaclass=SchemaType):
             raise SchemaError(msg)
 
     @classmethod
-    def get_datasource(cls) -> DataSource:
+    def get_ds(cls) -> DataSource:
         """Get the data source that is bound to this schema."""
-        if cls._datasource is not None:  # is_bound() cannot be used here due to type checker
-            return cls._datasource
+        if cls._ds is not None:  # is_bound() cannot be used here due to type checker
+            return cls._ds
         else:
             raise SchemaNotBoundError(cls)
 
     @classmethod
-    def _bind_datasource(cls, datasource: DataSource) -> None:
-        """Bind this schema to the corresponding data source for back-reference without setting it in `datasource`."""
+    def _bind_ds(cls, ds: DataSource) -> None:
+        """Bind this schema to the corresponding data source for back-reference without setting it in `ds`."""
         # Needed to break the recursion when setting a schema in DataSource
-        cls._datasource = datasource
+        cls._ds = ds
         cls._set_obj_refs()
 
     @classmethod
-    def bind_datasource(cls, datasource: DataSource | None = None) -> None:
+    def bind_ds(cls, ds: DataSource | None = None) -> None:
         """Bind this schema to the corresponding data source for back-reference and vice versa.
 
         If `None` (default) is passed, search for the data source using `db_id` or `db_title`
         and bind it to this schema.
         """
-        if datasource is None:
+        if ds is None:
             sess = get_active_session()
             if cls._db_id is not None:
-                datasource = sess.get_datasource(cls._db_id)
+                ds = sess.get_ds(cls._db_id)
             elif cls._db_title is not None:
-                datasource = sess.search_datasource(cls._db_title).item()
+                ds = sess.search_ds(cls._db_title).item()
             else:
                 msg = 'Neither a data source ID nor a title is set to bind the schema automatically.'
                 raise InvalidAPIUsageError(msg)
 
-        datasource.schema = cls
-        cls._bind_datasource(datasource)
+        ds.schema = cls
+        cls._bind_ds(ds)
 
     @classmethod
     def is_bound(cls) -> bool:
         """Determines if the schema is bound to a data source."""
-        return cls._datasource is not None
+        return cls._ds is not None
 
     @classmethod
     def _get_fwd_rels(cls) -> list[Relation]:
@@ -1222,7 +1222,7 @@ class Schema(metaclass=SchemaType):
         """Initialise all forward self-referencing relations."""
         if not cls._has_self_refs():
             return
-        db = cls.get_datasource()  # raises if not bound!
+        db = cls.get_ds()  # raises if not bound!
         for prop_type in cls._get_self_refs():
             prop_type._rel_schema = cls  # replace placeholder `SelfRef` with this schema
 
@@ -1236,7 +1236,7 @@ class Schema(metaclass=SchemaType):
         """Initialise all rollup properties that reference the same schema."""
         if not cls._has_self_refs():
             return
-        db = cls.get_datasource()  # raises if not bound!
+        db = cls.get_ds()  # raises if not bound!
 
         self_ref_rollups = [prop for prop in cls.get_props() if isinstance(prop, Rollup) and prop.is_self_ref]
         new_props_schema = {prop.name: prop.obj_ref for prop in self_ref_rollups} or None
@@ -1258,7 +1258,7 @@ class Schema(metaclass=SchemaType):
     @classmethod
     def _set_obj_refs(cls) -> None:
         """Map obj_refs from the properties of the schema to obj_ref.properties of the bound database."""
-        db_props_dct = cls.get_datasource().obj_ref.properties
+        db_props_dct = cls.get_ds().obj_ref.properties
         for prop_name, prop_type in cls.to_dict().items():
             obj_ref = db_props_dct.get(prop_name)
             if obj_ref:

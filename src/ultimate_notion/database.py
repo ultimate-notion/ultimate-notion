@@ -111,7 +111,7 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
         raise NotImplementedError
 
     @property
-    def is_datasource(self) -> bool:
+    def is_ds(self) -> bool:
         """Return whether the object is a data source."""
         return True
 
@@ -121,13 +121,13 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
         cls_name = f'{camel_case(title)}Schema'
         attrs = {'_props': [Property.wrap_obj_ref(v) for v in obj_ref.properties.values()]}
         schema: type[Schema] = type(cls_name, (Schema,), attrs, db_title=title)
-        schema._bind_datasource(self)
+        schema._bind_ds(self)
         return schema
 
     def _set_schema(self, schema: type[Schema], *, during_init: bool) -> None:
         """Set a custom schema in order to change the Python variables names."""
         self.schema.assert_consistency_with(schema, during_init=during_init)
-        schema._bind_datasource(self)
+        schema._bind_ds(self)
         self._schema = schema
 
     @property
@@ -190,7 +190,7 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
     @property
     def query(self) -> Query:
         """Return a Query object to build and execute a data source query."""
-        return Query(datasource=self)
+        return Query(ds=self)
 
     def get_all_pages(self) -> View:
         """Retrieve all pages and return a view."""

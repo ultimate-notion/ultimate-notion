@@ -72,7 +72,7 @@ class PagePropertiesNS(Mapping[str, Any]):
 
     def __setitem__(self, prop_name: str, value: Any) -> None:
         # Todo: use the schema of the database to see which properties are writeable at all.
-        db = self._page.parent_datasource
+        db = self._page.parent_ds
 
         if db is None:
             msg = f'Trying to set a property but page {self._page} is not bound to any database'
@@ -138,7 +138,7 @@ class Page(
 
     def _create_page_props_ns(self) -> PagePropertiesNS:
         """Create a namespace for the properties of this page defind by the database."""
-        schema = None if self.parent_datasource is None else self.parent_datasource.schema
+        schema = None if self.parent_ds is None else self.parent_ds.schema
         return PagePropertiesNS(page=self, schema=schema)
 
     def __str__(self) -> str:
@@ -177,26 +177,26 @@ class Page(
         return [block for block in self.children if is_page_guard(block)]
 
     @property
-    def sub_datasources(self) -> list[DataSource]:
+    def sub_dss(self) -> list[DataSource]:
         """Return all contained data sources within this page."""
-        return [block for block in self.children if is_datasource_guard(block)]
+        return [block for block in self.children if is_ds_guard(block)]
 
     @property
-    def parent_datasource(self) -> DataSource | None:
+    def parent_ds(self) -> DataSource | None:
         """If this page is located in a data source return the data source or None otherwise.
 
         This is a convenience method to avoid the need to check and cast the type of the parent.
         """
 
-        if is_datasource_guard(self.parent):
+        if is_ds_guard(self.parent):
             return self.parent
         else:
             return None
 
     @property
-    def in_datasource(self) -> bool:
+    def in_ds(self) -> bool:
         """Return True if this page is located in a data source."""
-        return self.parent_datasource is not None
+        return self.parent_ds is not None
 
     @property
     def title(self) -> Text | None:
@@ -358,7 +358,7 @@ class Page(
 
     def update_props(self, **kwargs: Any) -> None:
         """Update multiple properties at once."""
-        db = self.parent_datasource
+        db = self.parent_ds
 
         if db is None:
             msg = f'Trying to set properties but page {self} is not bound to any database'
@@ -373,9 +373,9 @@ class Page(
         session.api.pages.update(self.obj_ref, properties=props)
 
 
-def is_datasource_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[DataSource]:
+def is_ds_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[DataSource]:
     """Return whether the object is a data source as type guard."""
-    return isinstance(obj, NotionEntity) and obj.is_datasource
+    return isinstance(obj, NotionEntity) and obj.is_ds
 
 
 def is_page_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[Page]:

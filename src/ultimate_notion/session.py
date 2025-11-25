@@ -157,7 +157,7 @@ class Session:
         _logger.info(f'Retrieved `{type(block)}` block.')
         return block
 
-    def create_datasource(
+    def create_ds(
         self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
     ) -> DataSource:
         """Create a new data source within a page.
@@ -196,12 +196,12 @@ class Session:
         self.cache[ds.id] = ds
         return ds
 
-    def create_datasources(self, parents: Page | list[Page], schemas: list[type[Schema]]) -> list[DataSource]:
+    def create_dss(self, parents: Page | list[Page], schemas: list[type[Schema]]) -> list[DataSource]:
         """Create new data sources in the right order in case there are relations between them."""
         # ToDo: Implement
         raise NotImplementedError
 
-    def search_datasource(
+    def search_ds(
         self, name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
     ) -> SList[DataSource]:
         """Search a data source by name or return all if `name` is None.
@@ -229,7 +229,7 @@ class Session:
             data_sources = [ds for ds in data_sources if not ds.is_deleted]
         return SList(data_sources)
 
-    def get_datasource(self, ds_ref: UUID | str, *, use_cache: bool = True) -> DataSource:
+    def get_ds(self, ds_ref: UUID | str, *, use_cache: bool = True) -> DataSource:
         """Retrieve Notion data source by uuid."""
         ds_uuid = get_uuid(ds_ref)
         if use_cache and ds_uuid in self.cache:
@@ -247,12 +247,12 @@ class Session:
         _logger.info(f'Retrieved data source `{ds.title}`.')
         return ds
 
-    def get_or_create_datasource(self, parent: Page, schema: type[Schema]) -> DataSource:
+    def get_or_create_ds(self, parent: Page, schema: type[Schema]) -> DataSource:
         """Get or create the data source."""
-        data_sources = SList(ds for ds in self.search_datasource(schema._db_title) if ds.parent == parent)
+        data_sources = SList(ds for ds in self.search_ds(schema._db_title) if ds.parent == parent)
         if len(data_sources) == 0:
-            ds = self.create_datasource(parent, schema=schema)
-            while not [ds for ds in self.search_datasource(schema._db_title) if ds.parent == parent]:
+            ds = self.create_ds(parent, schema=schema)
+            while not [ds for ds in self.search_ds(schema._db_title) if ds.parent == parent]:
                 _logger.info(f'Waiting for data source `{ds.title}` to be fully created.')
                 time.sleep(1)
             return ds

@@ -173,7 +173,7 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
                     return None
             case objs.DatabaseRef(database_id=database_id):
                 try:
-                    return session.get_datasource(ds_ref=database_id)
+                    return session.get_ds(ds_ref=database_id)
                 except UnknownDataSourceError as e:
                     msg = f'No access to parent data source with id `{database_id}`: {e}'
                     _logger.info(msg)
@@ -198,7 +198,7 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
         return False
 
     @property
-    def is_datasource(self) -> bool:
+    def is_ds(self) -> bool:
         """Return whether the object is a data source."""
         return False
 
@@ -227,9 +227,9 @@ def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
 
 
-def is_datasource(obj: NotionEntity | None) -> TypeIs[DataSource]:
+def is_ds(obj: NotionEntity | None) -> TypeIs[DataSource]:
     """Return whether the object is a data source as type guard."""
-    return obj is not None and obj.is_datasource
+    return obj is not None and obj.is_ds
 
 
 def is_page(obj: NotionEntity | None) -> TypeIs[Page]:

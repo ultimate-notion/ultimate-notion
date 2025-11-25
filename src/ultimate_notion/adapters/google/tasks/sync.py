@@ -53,7 +53,7 @@ class SyncGTasks(SyncTask):
         # We remove all cached pages from the database to make sure we get the latest version
         cache = get_active_session().cache
         cached_pages = [
-            obj_id for obj_id, obj in cache.items() if isinstance(obj, Page) and obj.parent_datasource == self.notion_db
+            obj_id for obj_id, obj in cache.items() if isinstance(obj, Page) and obj.parent_ds == self.notion_db
         ]
         for page_id in cached_pages:
             del cache[page_id]
