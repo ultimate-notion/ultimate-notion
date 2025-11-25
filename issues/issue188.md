@@ -20,21 +20,27 @@ is now the "data source", while "database" becomes a higher-level grouping conce
 
 ## Naming Convention
 
-We adopt a **full-word naming convention** throughout the codebase:
+We adopt a **`ds` abbreviation** for data sources throughout the codebase:
 
 | Old Name | New Name | Concept |
 |----------|----------|---------|
-| `*_db` | `*_datasource` | Data source (formerly database) |
-| n/a | `*_database` | New database container concept |
-| `DBQueryBuilder` | `DataSourceQueryBuilder` | Query builder for data sources |
-| `db_only` | `datasource_only` | Filter parameter |
-| `_bind_db` | `_bind_datasource` | Internal binding method |
+| `*_db` | `*_ds` | Data source (formerly database) |
+| n/a | `*_database` | New database container concept (collection of data sources) |
+| `DBQueryBuilder` | `DataSourceQueryBuilder` | Query builder for data sources (kept full name in obj_api) |
+| `db_only` | `ds_only` | Filter parameter |
+| `_bind_db` | `_bind_ds` | Internal binding method |
 
 **Rationale:**
-- `ds` is ambiguous (dataset, datastore, downstream) while `db` is universally understood
-- With two similar concepts (`database` vs `datasource`), abbreviations become confusing
-- Full words improve readability: `get_datasource()` vs `get_ds()`
-- Better autocomplete: `session.get_data` clearly shows both `get_database` and `get_datasource`
+- Using `ds` for data sources keeps the API concise and reduces verbosity
+- `db` is reserved for the NEW Database concept (collection of data sources)
+- This creates a clear distinction: `ds` = single data source, `db` = database collection
+- Example: `session.create_ds()` for data sources, `session.create_db()` for databases (future)
+- The pattern: `ds` is more specific (data source), `db` is the container (database)
+
+**Important Distinction:**
+- `DataSource` (abbreviated as `ds`) = What Notion previously called a "database" - a single data source with schema, properties, and pages
+- `Database` (abbreviated as `db`) = NEW concept in API 2025-09-03 - a collection/container that can hold multiple data sources
+- **No backward compatibility alias needed**: The old `Database` class is now `DataSource`, and `Database` is a completely new class for the new concept
 
 ## Impact Analysis
 
@@ -48,13 +54,14 @@ We adopt a **full-word naming convention** throughout the codebase:
 - `src/ultimate_notion/obj_api/query.py` - Rename `DBQueryBuilder` to `DataSourceQueryBuilder`
 
 **High-level API layer:**
-- `src/ultimate_notion/database.py` - Rename `Database` to `DataSource`, create new `Database` class
-- `src/ultimate_notion/session.py` - Rename all `*_db` methods to `*_datasource`, add new `*_database` methods
+- `src/ultimate_notion/database.py` - Rename `Database` to `DataSource` (keep file as `database.py`, can hold both classes)
+- `src/ultimate_notion/database.py` - Add new `Database` class for the NEW container concept
+- `src/ultimate_notion/session.py` - Rename all `*_db` methods to `*_ds`, add new `*_database` methods for collections
 - `src/ultimate_notion/blocks.py` - Update `DataObject` hierarchy, add `ChildDataSource` block type
-- `src/ultimate_notion/page.py` - Pages belong to data sources, not databases
-- `src/ultimate_notion/schema.py` - Schema binds to data sources
-- `src/ultimate_notion/query.py` - Queries target data sources
-- `src/ultimate_notion/view.py` - Views are of data sources
+- `src/ultimate_notion/page.py` - Pages belong to data sources (parent_ds, in_ds properties)
+- `src/ultimate_notion/schema.py` - Schema binds to data sources (_bind_ds method)
+- `src/ultimate_notion/query.py` - Queries target data sources (Query.ds attribute)
+- `src/ultimate_notion/view.py` - Views are of data sources (View.ds attribute)
 
 **Other files with "database" references (316 occurrences across 24 files):**
 - `src/ultimate_notion/core.py`
@@ -188,23 +195,29 @@ def __init__(self, client: NCClient):
 
 ### Phase 3: High-Level API Layer Changes
 
-#### Step 3.1: Rename in `database.py`
+#### Step 3.1: Update `database.py`
+
+**Keep the file as `database.py`** - it will contain both classes:
+
 ```python
-# Rename class
+# Rename the existing Database class to DataSource
 class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource):
     """A Notion data source (formerly 'database' in pre-2025-09-03 API).
 
     This object always represents an original data source, not a linked one.
+    A data source has a schema, properties, and contains pages.
     """
     # ... keep most implementation, update docstrings and references
+    # Update properties: is_database -> is_ds, etc.
 ```
 
-Create new Database class for the new concept:
+**Create NEW Database class** for the container concept:
 ```python
 class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
-    """A Notion database that can contain multiple data sources.
+    """A Notion database - a collection that can contain multiple data sources.
 
-    New in API version 2025-09-03.
+    This is a NEW concept introduced in API version 2025-09-03.
+    Think of it as a container or grouping mechanism for related data sources.
     """
 
     @property
@@ -213,30 +226,35 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         # ...
 ```
 
-#### Step 3.2: Update `session.py` Methods
-Rename and update methods using full words for clarity (no abbreviations):
-```python
-# Old -> New naming (datasource methods - the workhorse, formerly "database")
-create_db      -> create_datasource
-search_db      -> search_datasource
-get_db         -> get_datasource
-get_or_create_db -> get_or_create_datasource
+**Important**: Both classes live in `database.py` - no file rename needed.
 
-# New database methods (container concept)
-create_database(self, ...) -> Database
-search_database(self, name: str | None = None, ...) -> SList[Database]
-get_database(self, db_ref: UUID | str, ...) -> Database
-get_or_create_database(self, ...) -> Database
+#### Step 3.2: Update `session.py` Methods
+Rename and update methods using `ds` abbreviation for data sources:
+```python
+# Old API -> New API naming
+
+# Data source methods (what was previously called "database")
+create_db      -> create_ds         # Create a data source
+search_db      -> search_ds         # Search for data sources
+get_db         -> get_ds            # Get a data source by ID
+get_or_create_db -> get_or_create_ds # Get or create a data source
+
+# Database methods (NEW concept - collection of data sources)
+# Note: create_db() will be used for the NEW Database class once implemented
+# For now, we only have data sources (ds), so only *_ds methods exist
 ```
 
 This naming convention:
-- Uses full words (`datasource`, `database`) instead of abbreviations (`db`, `ds`)
-- Clearly distinguishes the two concepts when both appear in code
-- Works well with autocomplete (`session.get_data` shows both options clearly)
+- Uses `ds` abbreviation for data sources (concise, reduces verbosity)
+- Keeps `db` for the future Database collection concept (when implemented)
+- Creates clear distinction: `ds` = single data source, `db` = database collection
+- Example: `session.create_ds()` for data sources, `session.create_db()` for databases (future)
 
 #### Step 3.3: Update `schema.py`
 - Schema binds to `DataSource`, not `Database`
-- Update `_bind_db` to `_bind_datasource`
+- Update `_bind_db` to `_bind_ds`
+- Update `_datasource` to `_ds` (internal attribute)
+- Update `get_datasource()` to `get_ds()`
 - Update relation property classes
 
 #### Step 3.4: Update `query.py`
@@ -251,26 +269,26 @@ This naming convention:
 - Pages can be children of data sources
 - Update parent resolution logic
 
-### Phase 4: Backwards Compatibility Layer (Optional but Recommended)
+### Phase 4: Update Examples and Tests
 
-To ease migration for users, provide aliases:
+**No backwards compatibility alias needed!**
+
+The old `Database` class is now `DataSource`, and `Database` is a completely NEW class for the new database collection concept. These are two distinct objects:
+
+- `DataSource` = what was previously called "database" (single data source with schema)
+- `Database` = NEW container concept (collection of data sources)
+
+Update all examples and tests:
 ```python
-# In __init__.py
-from ultimate_notion.database import DataSource
-# Backwards compatibility alias
-Database = DataSource  # Deprecated, will be removed in v2.0
+# Old code
+db = notion.create_db(parent, schema=MySchema)
 
-import warnings
-def __getattr__(name):
-    if name == "Database":
-        warnings.warn(
-            "Database is deprecated, use DataSource instead",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        return DataSource
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+# New code
+ds = notion.create_ds(parent, schema=MySchema)  # Create a data source
+db = notion.create_db(...)  # NEW: Create a database collection (when implemented)
 ```
+
+Note: For now, only `*_ds` methods exist since Database collections are not yet implemented.
 
 ### Phase 5: Testing
 

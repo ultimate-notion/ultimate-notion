@@ -43,7 +43,7 @@ from vcr import VCR
 from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
-from ultimate_notion import Database, Option, Page, Session, User, schema
+from ultimate_notion import DataSource, Option, Page, Session, User, schema
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.adapters.google.tasks import GTasksClient
 from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, ENV_ULTIMATE_NOTION_DEBUG, get_cfg_file, get_or_create_cfg
@@ -339,9 +339,9 @@ def person(notion_cached: Session) -> User:
 
 
 @vcr_fixture(scope='module')
-def contacts_db(notion_cached: Session) -> Database:
+def contacts_db(notion_cached: Session) -> DataSource:
     """Return a test database."""
-    return notion_cached.search_db(CONTACTS_DB).item()
+    return notion_cached.search_ds(CONTACTS_DB).item()
 
 
 @vcr_fixture(scope='module')
@@ -351,7 +351,7 @@ def root_page(notion_cached: Session) -> Page:
 
 
 @pytest.fixture(scope='function')
-def article_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
+def article_db(notion_cached: Session, root_page: Page) -> Iterator[DataSource]:
     """Simple database of articles."""
 
     class Article(schema.Schema, db_title='Articles'):
@@ -359,7 +359,7 @@ def article_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
         cost = schema.Number('Cost', format=schema.NumberFormat.DOLLAR)
         desc = schema.Text('Description')
 
-    db = notion_cached.create_db(parent=root_page, schema=Article)
+    db = notion_cached.create_ds(parent=root_page, schema=Article)
     yield db
     db.delete()
 
@@ -380,21 +380,21 @@ def intro_page(notion_cached: Session) -> Page:
 
 
 @vcr_fixture(scope='module')
-def all_props_db(notion_cached: Session) -> Database:
+def all_props_db(notion_cached: Session) -> DataSource:
     """Return manually created database with all properties, also AI properties."""
-    return notion_cached.search_db(ALL_PROPS_DB).item()
+    return notion_cached.search_ds(ALL_PROPS_DB).item()
 
 
 @vcr_fixture(scope='module')
-def wiki_db(notion_cached: Session) -> Database:
+def wiki_db(notion_cached: Session) -> DataSource:
     """Return manually created wiki db."""
-    return notion_cached.search_db(WIKI_DB).item()
+    return notion_cached.search_ds(WIKI_DB).item()
 
 
 @vcr_fixture(scope='module')
-def formula_db(notion_cached: Session) -> Database:
+def formula_db(notion_cached: Session) -> DataSource:
     """Return manually created formula db."""
-    return notion_cached.search_db(FORMULA_DB).item()
+    return notion_cached.search_ds(FORMULA_DB).item()
 
 
 @vcr_fixture(scope='module')
@@ -458,21 +458,21 @@ def static_pages(  # noqa: PLR0917
 
 
 @vcr_fixture(scope='module')
-def task_db(notion_cached: Session) -> Database:
+def task_db(notion_cached: Session) -> DataSource:
     """Return manually created wiki db."""
-    return notion_cached.search_db(TASK_DB).item()
+    return notion_cached.search_ds(TASK_DB).item()
 
 
 @vcr_fixture(scope='module')
 def static_dbs(
-    all_props_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database, formula_db: Database
-) -> set[Database]:
+    all_props_db: DataSource, wiki_db: DataSource, contacts_db: DataSource, task_db: DataSource, formula_db: DataSource
+) -> set[DataSource]:
     """Return all static pages for the unit tests."""
     return {all_props_db, wiki_db, contacts_db, task_db, formula_db}
 
 
 @pytest.fixture(scope='function')
-def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
+def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[DataSource]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
         Option('In Progress', color=uno.Color.BLUE),
@@ -571,14 +571,14 @@ def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
         # parent = schema.Relation('Parent Task', schema.SelfRef)
         # subs = schema.Relation('Sub-Tasks', schema.SelfRef, two_way_prop=parent)
 
-    db = notion_cached.create_db(parent=root_page, schema=Tasklist)
+    db = notion_cached.create_ds(parent=root_page, schema=Tasklist)
     yield db
     db.delete()
 
 
 @vcr_fixture(scope='module', autouse=True)
 def notion_cleanups(
-    notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]
+    notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[DataSource]
 ) -> Iterator[None]:
     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
 
@@ -587,7 +587,7 @@ def notion_cleanups(
     """
 
     def clean() -> None:
-        for db in notion_cached.search_db():
+        for db in notion_cached.search_ds():
             if db.ancestors[0] == root_page and db not in static_dbs:
                 db.delete()
         for page in notion_cached.search_page():
@@ -597,9 +597,9 @@ def notion_cleanups(
             if (
                 ancestors
                 and ancestors[0] == root_page
-                and page.parent_db not in static_dbs
+                and page.parent_ds not in static_dbs
                 # skip if any ancestor page or database was already deleted
-                and not any(isinstance(p, Page | Database) and p.is_deleted for p in ancestors)
+                and not any(isinstance(p, Page | DataSource) and p.is_deleted for p in ancestors)
             ):
                 page.delete()
 
