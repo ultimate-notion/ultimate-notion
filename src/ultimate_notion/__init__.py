@@ -47,7 +47,7 @@ from ultimate_notion.blocks import (
     Video,
 )
 from ultimate_notion.core import Workspace, WorkspaceType, get_active_session
-from ultimate_notion.database import Database
+from ultimate_notion.database import DataSource
 from ultimate_notion.emoji import Emoji
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, url
 from ultimate_notion.obj_api.enums import (
@@ -87,7 +87,7 @@ __all__ = [
     'Column',
     'Columns',
     'Condition',  # for type hinting only
-    'Database',
+    'DataSource',
     'DateTimeOrRange',  # for type hinting only
     'Divider',
     'Embed',

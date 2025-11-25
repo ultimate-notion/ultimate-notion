@@ -11,7 +11,7 @@ from uuid import UUID
 
 from typing_extensions import Self, TypeIs, TypeVar
 
-from ultimate_notion.errors import UnknownDatabaseError, UnknownPageError
+from ultimate_notion.errors import UnknownDataSourceError, UnknownPageError
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
@@ -24,7 +24,7 @@ GT_co = TypeVar('GT_co', bound=obj_core.GenericObject, default=obj_core.GenericO
 if TYPE_CHECKING:
     from pydantic_core import SchemaSerializer
 
-    from ultimate_notion.database import Database
+    from ultimate_notion.database import DataSource
     from ultimate_notion.page import Page
     from ultimate_notion.session import Session
     from ultimate_notion.user import User
@@ -173,9 +173,9 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
                     return None
             case objs.DatabaseRef(database_id=database_id):
                 try:
-                    return session.get_db(db_ref=database_id)
-                except UnknownDatabaseError as e:
-                    msg = f'No access to parent database with id `{database_id}`: {e}'
+                    return session.get_datasource(ds_ref=database_id)
+                except UnknownDataSourceError as e:
+                    msg = f'No access to parent data source with id `{database_id}`: {e}'
                     _logger.info(msg)
                     return None
             case objs.BlockRef(block_id=block_id):
@@ -198,8 +198,8 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
         return False
 
     @property
-    def is_db(self) -> bool:
-        """Return whether the object is a database."""
+    def is_datasource(self) -> bool:
+        """Return whether the object is a data source."""
         return False
 
 
@@ -227,9 +227,9 @@ def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
 
 
-def is_db(obj: NotionEntity | None) -> TypeIs[Database]:
-    """Return whether the object is a database as type guard."""
-    return obj is not None and obj.is_db
+def is_datasource(obj: NotionEntity | None) -> TypeIs[DataSource]:
+    """Return whether the object is a data source as type guard."""
+    return obj is not None and obj.is_datasource
 
 
 def is_page(obj: NotionEntity | None) -> TypeIs[Page]:
