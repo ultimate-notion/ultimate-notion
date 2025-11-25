@@ -435,7 +435,7 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
 
 
 @pytest.mark.vcr()
-def test_query_new_task_db(new_task_db: uno.Database) -> None:
+def test_query_new_task_db(new_task_db: uno.DataSource) -> None:
     all_pages = new_task_db.query.execute()
     assert len(all_pages) == 0
 

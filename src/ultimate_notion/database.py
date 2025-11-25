@@ -242,3 +242,67 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
     def _to_markdown(self) -> str:
         """Return the reference to this data source as Markdown."""
         return f'[**🗄️ {self.title}**]({self.block_url})\n'
+
+
+class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
+    """A Notion database - a collection that can contain multiple data sources.
+
+    This is a NEW concept introduced in API version 2025-09-03. A database acts as
+    a container or grouping mechanism for related data sources.
+
+    Note: This class is currently a placeholder for future implementation.
+    The Notion API 2025-09-03 introduces this concept, but full support requires
+    additional implementation work.
+    """
+
+    def __str__(self) -> str:
+        if self.title:
+            return str(self.title)
+        else:
+            return 'Untitled Database'
+
+    def __repr__(self) -> str:
+        return get_repr(self)
+
+    @property
+    def title(self) -> str | Text | None:
+        """Return the title of this database as rich text."""
+        if title := raise_unset(self.obj_ref.title):
+            return Text.wrap_obj_ref(title)
+        return None
+
+    @title.setter
+    def title(self, text: str | Text | None) -> None:
+        """Set the title of this database."""
+        if text is None:
+            text = ''
+        if not isinstance(text, Text):
+            text = Text.from_plain_text(text)
+        session = get_active_session()
+        session.api.databases.update(self.obj_ref, title=text.obj_ref)
+
+    @property
+    def is_db(self) -> bool:
+        """Check if this is a database (always True for Database objects)."""
+        return True
+
+    @property
+    def data_sources(self) -> list[DataSource]:
+        """Return all data sources in this database.
+
+        Note: This is a placeholder implementation. Full support requires additional work.
+        """
+        # TODO: Implement fetching data sources from this database
+        # This would involve querying the data_sources endpoint with a filter for database_id
+        msg = 'Database.data_sources is not yet implemented'
+        raise NotImplementedError(msg)
+
+    def __eq__(self, other: object) -> bool:
+        """Compare Database objects."""
+        if isinstance(other, Database):
+            return self.id == other.id
+        return False
+
+    def __hash__(self) -> int:
+        """Hash the Database object."""
+        return hash(self.id)

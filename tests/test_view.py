@@ -9,7 +9,7 @@ from ultimate_notion.props import PropertyValue
 
 
 @pytest.mark.vcr()
-def test_select(contacts_db: uno.Database) -> None:
+def test_select(contacts_db: uno.DataSource) -> None:
     view = contacts_db.get_all_pages()
 
     sub_view = view.select('Name', 'Role')
@@ -23,7 +23,7 @@ def test_select(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_rows(contacts_db: uno.Database) -> None:
+def test_rows(contacts_db: uno.DataSource) -> None:
     view = contacts_db.get_all_pages()
     rows = view.to_rows()
     assert len(rows) == len(view)
@@ -35,7 +35,7 @@ def test_rows(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_index(contacts_db: uno.Database) -> None:
+def test_index(contacts_db: uno.DataSource) -> None:
     view = contacts_db.get_all_pages()
     assert not view.has_index
     view = view.with_index('my_index')
@@ -50,7 +50,7 @@ def test_index(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_clone(contacts_db: uno.Database) -> None:
+def test_clone(contacts_db: uno.DataSource) -> None:
     view = contacts_db.get_all_pages()
     assert len(view) == 10
     short_view = view.limit(3)
@@ -59,7 +59,7 @@ def test_clone(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_reverse(contacts_db: uno.Database) -> None:
+def test_reverse(contacts_db: uno.DataSource) -> None:
     short_view = contacts_db.get_all_pages().limit(3)
     row_0 = short_view.get_row(0)
     row_2 = short_view.get_row(2)
@@ -69,7 +69,7 @@ def test_reverse(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_to_pandas(task_db: uno.Database, all_props_db: uno.Database) -> None:
+def test_to_pandas(task_db: uno.DataSource, all_props_db: uno.DataSource) -> None:
     view = task_db.get_all_pages()
     df = view.to_pandas()
     assert len(view) == len(df)
@@ -80,7 +80,7 @@ def test_to_pandas(task_db: uno.Database, all_props_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_to_polars(task_db: uno.Database, all_props_db: uno.Database) -> None:
+def test_to_polars(task_db: uno.DataSource, all_props_db: uno.DataSource) -> None:
     view = task_db.get_all_pages()
     df = view.to_polars()
     assert len(view) == len(df)
@@ -91,7 +91,7 @@ def test_to_polars(task_db: uno.Database, all_props_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_to_pydantic(task_db: uno.Database) -> None:
+def test_to_pydantic(task_db: uno.DataSource) -> None:
     view = task_db.get_all_pages()
     tasks = view.to_pydantic()
     assert len(view) == len(tasks)
