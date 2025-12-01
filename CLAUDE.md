@@ -2,9 +2,11 @@
 
 ## 1. Project Overview
 
-Ultimate-Notion is a pythonic, high-level API for Notion. It provides a comprehensive interface to interact with Notion's API, allowing users to manage pages, databases (data sources), blocks, and more.
+Ultimate-Notion is a pythonic, high-level API for Notion. It provides a comprehensive interface to interact
+with Notion's API, allowing users to manage pages, databases (data sources), blocks, and more.
 
 **Current Major Work**: Migration to Notion API 2025-09-03
+
 - Migrating from "database" terminology to "data source" for what Notion previously called databases
 - Introducing a NEW "Database" concept that represents collections of data sources
 - Adopting `ds` abbreviation for data sources, reserving `db` for the new database collections
@@ -12,12 +14,14 @@ Ultimate-Notion is a pythonic, high-level API for Notion. It provides a comprehe
 ## 2. Key Technologies & Conventions
 
 ### Core Technologies
+
 - **Python**: 3.10+ with full type hints
 - **Pydantic**: For data validation and object modeling
 - **notion-client**: Official Notion SDK (currently 2.7.0 for API 2025-09-03)
 - **VCR.py**: For recording and replaying HTTP interactions in tests
 
 ### Code Conventions
+
 - **Type Safety**: Full mypy type checking required
 - **Code Style**: Ruff for linting and formatting
 - **Naming Conventions**:
@@ -28,6 +32,7 @@ Ultimate-Notion is a pythonic, high-level API for Notion. It provides a comprehe
   - Use UPPER_CASE for constants
 
 ### Git Workflow
+
 - **NEVER use `git add -A` or `git add .`** - always specify exact file paths
 - Always use conventional commit messages
 - Include co-authorship footer for AI-assisted commits
@@ -38,12 +43,14 @@ Ultimate-Notion is a pythonic, high-level API for Notion. It provides a comprehe
 ### Two-Layer Design
 
 **Low-Level Layer (`obj_api/`):**
+
 - Direct mapping to Notion API objects
 - Pydantic models for all API types
 - Minimal business logic
 - Used by high-level layer
 
 **High-Level Layer:**
+
 - Pythonic, user-friendly API
 - Wraps low-level objects with `DataObject` pattern
 - Provides schema definitions, queries, views
@@ -52,17 +59,20 @@ Ultimate-Notion is a pythonic, high-level API for Notion. It provides a comprehe
 ### Key Patterns
 
 **DataObject Wrapper Pattern:**
+
 ```python
 class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource):
     """High-level wrapper for data source objects"""
 ```
 
 **Schema Binding:**
+
 - Schemas bind to data sources using `bind_ds()`
 - Properties are defined using `PropType` descriptors
 - Automatic property mapping and validation
 
 **Type Guards:**
+
 - Use `TypeIs` for proper type narrowing
 - Prefer `isinstance()` checks for simple cases
 - Type guards: `is_ds()`, `is_page()`, etc.
@@ -71,7 +81,7 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
 
 ### Source Code Structure
 
-```
+```shell
 src/ultimate_notion/
 ├── obj_api/              # Low-level API layer
 │   ├── blocks.py         # Block type definitions (DataSource, Database, Page, etc.)
@@ -103,7 +113,8 @@ src/ultimate_notion/
 ## 5. Testing
 
 ### Test Structure
-```
+
+```shell
 tests/
 ├── cassettes/           # VCR cassettes for recorded API calls
 ├── conftest.py          # Test fixtures and configuration
@@ -148,24 +159,28 @@ hatch run vcr-only
 ## 6. Important Files & Directories
 
 ### Configuration Files
+
 - `pyproject.toml`: Project dependencies, scripts, and tool configuration
 - `.gitignore`: Git ignore patterns (includes `issues/` for test files)
 - `CLAUDE.md`: This file - project documentation for Claude
 - `issues/issue188.md`: Migration plan for Notion API 2025-09-03
 
 ### Migration Documentation
+
 - **`issues/issue188.md`**: Complete migration plan and progress log
   - Detailed phase-by-phase migration steps
   - Progress log with all commits
   - Known issues and next steps
 
 ### Source Directories
+
 - `src/ultimate_notion/`: Main source code
 - `tests/`: Test suite
 - `examples/`: Usage examples
 - `docs/`: Documentation (Markdown-based)
 
 ### Ignored Directories
+
 - `issues/`: Test files and debugging scripts (in .gitignore)
 - `.ultimate-notion/`: Local configuration
 - `.venv*/`: Virtual environments
@@ -219,17 +234,14 @@ hatch run vcr-rewrite -k test_name
 
 ### Conventional Commits Format
 
-```
+```text
 <type>(<scope>): <description>
 
-[optional body]
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
+🤖 [optional body]
 ```
 
 ### Types
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `refactor`: Code refactoring
@@ -239,6 +251,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - `build`: Build system changes
 
 ### Scopes
+
 - `obj_api`: Low-level API layer
 - `session`: Session management
 - `schema`: Schema system
@@ -247,7 +260,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### Examples
 
-```
+```text
 feat(obj_api): Add DataSource class and DataSourcesEndpoint for API 2025-09-03
 
 refactor: Use 'ds' abbreviation for data source throughout codebase
@@ -258,6 +271,7 @@ docs: Add comprehensive progress log for Phase 3 & 4
 ## 9. Migration Status (API 2025-09-03)
 
 ### Completed Phases
+
 - ✅ Phase 1: Preparation and analysis
 - ✅ Phase 2: Low-level obj_api layer migration
 - ✅ Phase 3: High-level API migration (Database → DataSource with `ds` abbreviation)
@@ -265,29 +279,34 @@ docs: Add comprehensive progress log for Phase 3 & 4
 - ✅ NEW Database class added (placeholder)
 
 ### Current State
+
 - All source code uses `ds` for data sources
 - All tests and examples updated
 - `DataSource` class: What was previously called "database"
 - `Database` class: NEW concept for collections (placeholder implementation)
 
 ### Next Steps (Phase 5)
+
 1. Rewrite VCR cassettes
 2. Run full test suite
 3. Fix remaining type errors
 4. Verify all tests pass
 
 ### Key Terminology
+
 - **DataSource** (`ds`): A single data source with schema and pages (formerly "database")
 - **Database** (`db`): A collection of data sources (NEW in API 2025-09-03, not yet implemented)
 
 ## 10. Important Notes for AI Assistants
 
 ### Critical Git Rules
+
 - **NEVER use `git add -A` or `git add .`**
 - Always stage specific files: `git add src/file.py tests/file.py`
 - The `issues/` directory is in `.gitignore` - use `git add -f` if needed
 
 ### Code Review Checklist
+
 1. Type hints present and correct
 2. Docstrings for public methods
 3. Tests updated for changes
@@ -295,12 +314,14 @@ docs: Add comprehensive progress log for Phase 3 & 4
 5. No VCR cassette changes unless intentional
 
 ### Common Pitfalls
+
 1. **VCR cassettes**: Never commit cassette changes accidentally
 2. **Dynamic values in tests**: Avoid `datetime.now()`, use fixed dates
 3. **Type narrowing**: Use `isinstance()` or proper type guards, not just boolean checks
 4. **Schema binding**: Remember to bind schemas to data sources before use
 
 ### When in Doubt
+
 - Check `issues/issue188.md` for migration context
 - Review existing code patterns in similar modules
 - Run `hatch run lint:all` before committing
