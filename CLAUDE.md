@@ -4,19 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Ultimate Notion is a high-level Python client for the Notion API providing a Pythonic, object-oriented interface built on top of `notion-sdk-py`.
+Ultimate Notion is a high-level Python client for the Notion API providing a Pythonic, object-oriented interface
+built on top of `notion-sdk-py`.
 
 ## Commands
 
 ### Running Python Commands
 
 Always use hatch for Python commands:
+
 ```bash
 hatch run <command>              # Use default environment
 hatch run vscode:<command>       # Use vscode environment (for IDE integration)
 ```
 
 ### Testing
+
 ```bash
 hatch run test                   # Run tests with VCR recording (records once)
 hatch run vcr-only               # Offline tests using existing cassettes
@@ -26,6 +29,7 @@ hatch run test -k "test_name"    # Run single test
 ```
 
 ### Linting and Type Checking
+
 ```bash
 hatch run lint:all               # Run mypy + ruff checks (run before submitting)
 hatch run lint:fix               # Auto-fix ruff issues
@@ -34,6 +38,7 @@ hatch run lint:style             # Run ruff only
 ```
 
 ### Documentation
+
 ```bash
 hatch run docs:serve             # Local docs server at localhost:8000
 hatch run docs:build             # Build docs
@@ -51,11 +56,13 @@ The `Wrapper[GT]` class in `core.py` bridges both layers via the `obj_ref` attri
 ### Polymorphic Object System
 
 All obj_api classes inherit from base types with automatic type resolution:
+
 - `TypedObject[T]` - polymorphic base with `type` field (blocks, properties)
 - `NotionObject` - top-level resources with `object` field (pages, databases, users)
 - `GenericObject` - basic Pydantic model for nested data
 
 Example pattern:
+
 ```python
 class PropertyValue(TypedObject[Any], polymorphic_base=True):
     # Base class automatically resolves to correct subtype
@@ -75,6 +82,7 @@ class HighLevelObject(Wrapper[LowLevelObject], wraps=LowLevelObject):
 ### UnsetType Pattern
 
 Use `Unset` sentinel for optional API fields where `None` has semantic meaning (e.g., "delete"):
+
 ```python
 from ultimate_notion.obj_api.core import Unset, UnsetType
 
@@ -91,11 +99,13 @@ class SomeObject(GenericObject):
 ## Key File Locations
 
 ### Core Infrastructure
+
 - `session.py` - API client and object caching
 - `core.py` - Base wrapper classes and session management
 - `config.py` - Configuration handling with TOML files
 
 ### Object Model (obj_api/)
+
 - `core.py` - Base Pydantic models with polymorphism
 - `objects.py` - Shared object types (users, references)
 - `blocks.py` - Block types
@@ -103,6 +113,7 @@ class SomeObject(GenericObject):
 - `schema.py` - Database schema/property definitions
 
 ### High-Level API
+
 - `page.py`, `database.py`, `blocks.py` - Main user-facing objects
 - `schema.py` - Database schema with property classes
 - `query.py` - Database querying with conditions
