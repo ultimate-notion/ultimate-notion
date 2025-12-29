@@ -44,11 +44,15 @@ class FilterQueryError(ValueError, UltimateNotionError):
     """An exception that is raised when a filter query is invalid."""
 
 
-class EmptyListError(UltimateNotionError):
+class SListError(UltimateNotionError):
+    """Base class for all exceptions in SList."""
+
+
+class EmptyListError(SListError):
     """Custom exception for an empty list in SList."""
 
 
-class MultipleItemsError(UltimateNotionError):
+class MultipleItemsError(SListError):
     """Custom exception for a list with multiple items in SList."""
 
 

@@ -91,7 +91,7 @@ def wrap_icon(
 
 
 class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
-    """The base type for all data-related types, i.e, pages, databases and blocks."""
+    """The base type for all data-related types, i.e, pages, databases, data sources and blocks."""
 
     @property
     def block_url(self) -> str:

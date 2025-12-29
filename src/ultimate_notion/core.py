@@ -120,6 +120,33 @@ WorkspaceType: TypeAlias = Literal[_Workspace.ROOT]
 NE_co = TypeVar('NE_co', bound=obj_core.NotionEntity, default=obj_core.NotionEntity, covariant=True)
 
 
+def resolve_ref(obj_ref: obj_core.NotionEntity) -> NotionEntity | WorkspaceType | None:
+    """Resolve a low-level NotionEntity reference to a high-level NotionEntity object."""
+    session = get_active_session()
+    match obj_ref:
+        case objs.WorkspaceRef():
+            return Workspace
+        case objs.PageRef(page_id=page_id):
+            try:
+                return session.get_page(page_ref=page_id)
+            except UnknownPageError as e:
+                msg = f'No access to parent page with id `{page_id}`: {e}'
+                _logger.info(msg)
+                return None
+        case objs.DatabaseRef(database_id=database_id):
+            try:
+                return session.get_ds(ds_ref=database_id)
+            except UnknownDataSourceError as e:
+                msg = f'No access to parent data source with id `{database_id}`: {e}'
+                _logger.info(msg)
+                return None
+        case objs.BlockRef(block_id=block_id):
+            return session.get_block(block_ref=block_id)
+        case _:
+            msg = f'Unknown object reference {type(obj_ref)}'
+            raise RuntimeError(msg)
+
+
 class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     def __eq__(self, other: object) -> bool:
         if other is None:
@@ -158,31 +185,8 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def parent(self) -> NotionEntity | WorkspaceType | None:
         """Return the parent Notion entity, Workspace if the workspace is the parent, or None if not accessible."""
-        session = get_active_session()
         parent = raise_unset(self.obj_ref.parent)
-
-        match parent:
-            case objs.WorkspaceRef():
-                return Workspace
-            case objs.PageRef(page_id=page_id):
-                try:
-                    return session.get_page(page_ref=page_id)
-                except UnknownPageError as e:
-                    msg = f'No access to parent page with id `{page_id}`: {e}'
-                    _logger.info(msg)
-                    return None
-            case objs.DatabaseRef(database_id=database_id):
-                try:
-                    return session.get_ds(ds_ref=database_id)
-                except UnknownDataSourceError as e:
-                    msg = f'No access to parent data source with id `{database_id}`: {e}'
-                    _logger.info(msg)
-                    return None
-            case objs.BlockRef(block_id=block_id):
-                return session.get_block(block_ref=block_id)
-            case _:
-                msg = f'Unknown parent reference {type(parent)}'
-                raise RuntimeError(msg)
+        return resolve_ref(parent)
 
     @property
     def ancestors(self) -> tuple[NotionEntity, ...]:
@@ -195,6 +199,11 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def is_page(self) -> bool:
         """Return whether the object is a page."""
+        return False
+
+    @property
+    def is_db(self) -> bool:
+        """Return whether the object is a database."""
         return False
 
     @property

@@ -71,8 +71,7 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, SerializeAsAny[Property]]
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
-    is_inline: bool = False
-    database_id: str | UnsetType = Unset  # Reference to parent database container
+    database_parent: SerializeAsAny[ParentRef] | UnsetType = Unset
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionDataSource.build_mention_from(self, style=style)

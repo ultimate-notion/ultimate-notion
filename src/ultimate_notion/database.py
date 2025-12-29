@@ -10,12 +10,12 @@ from __future__ import annotations
 from typing import Any
 
 from pydantic import ValidationError
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
-from ultimate_notion.core import get_active_session, get_repr
+from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr, resolve_ref
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
+from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError, SListError
 from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api.core import raise_unset
@@ -23,37 +23,15 @@ from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case
 from ultimate_notion.schema import Property, Schema
+from ultimate_notion.utils import SList
 from ultimate_notion.view import View
 
+# ToDo: Use new syntax when requires-python >= 3.12
+DC_co = TypeVar('DC_co', bound=obj_blocks.Database | obj_blocks.DataSource, covariant=True)
 
-class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource):
-    """A Notion data source (formerly 'database' in pre-2025-09-03 API).
 
-    A data source contains the schema (properties) and pages. This object always
-    represents an original data source, not a linked one.
-
-    API reference: https://developers.notion.com/docs/working-with-databases
-    """
-
-    _schema: type[Schema] | None = None
-
-    def __str__(self) -> str:
-        if self.title:
-            return str(self.title)
-        else:
-            return 'Untitled'
-
-    def _repr_html_(self) -> str:  # noqa: PLW3201
-        """Called by JupyterLab automatically"""
-        return str(self)
-
-    def __repr__(self) -> str:
-        return get_repr(self)
-
-    @property
-    def url(self) -> str:
-        """Return the URL of this data source."""
-        return raise_unset(self.obj_ref.url)
+class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
+    """Base class for presentation-related functionality in data sources and databases."""
 
     @property
     def title(self) -> str | Text | None:
@@ -104,16 +82,30 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
         cover = self.obj_ref.cover
         return AnyFile.wrap_obj_ref(cover) if cover is not None else None
 
-    @property
-    def is_wiki(self) -> bool:
-        """Return whether the data source is a wiki."""
-        # ToDo: Implement using the verification property
-        raise NotImplementedError
 
-    @property
-    def is_ds(self) -> bool:
-        """Return whether the object is a data source."""
-        return True
+class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSource):
+    """A Notion data source.
+
+    A data source contains the schema (properties) and pages. This object always
+    represents an original data source, not a linked one.
+
+    API reference: https://developers.notion.com/reference/data-source
+    """
+
+    _schema: type[Schema] | None = None
+
+    def __str__(self) -> str:
+        if self.title:
+            return str(self.title)
+        else:
+            return 'Untitled'
+
+    def _repr_html_(self) -> str:  # noqa: PLW3201
+        """Called by JupyterLab automatically"""
+        return str(self)
+
+    def __repr__(self) -> str:
+        return get_repr(self)
 
     def _reflect_schema(self, obj_ref: obj_blocks.DataSource) -> type[Schema]:
         """Reflection about the data source schema."""
@@ -143,17 +135,9 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
         self._set_schema(schema, during_init=False)
 
     @property
-    def is_inline(self) -> bool:
-        """Return whether the data source is inline."""
-        return self.obj_ref.is_inline
-
-    @is_inline.setter
-    def is_inline(self, inline: bool) -> None:
-        """Set whether the data source is inline."""
-        if self.is_inline != inline:
-            session = get_active_session()
-            session.api.data_sources.update(self.obj_ref, inline=inline)
-            self.obj_ref.is_inline = inline
+    def is_ds(self) -> bool:
+        """Return whether the object is a data source."""
+        return True
 
     def delete(self) -> Self:
         """Delete this data source."""
@@ -205,6 +189,12 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
         """Return whether the data source is empty."""
         return len(self) == 0
 
+    @property
+    def db_parent(self) -> NotionEntity | WorkspaceType | None:
+        """Return the parent of the database of this data source, if any."""
+        db_parent = raise_unset(self.obj_ref.database_parent)
+        return resolve_ref(db_parent)
+
     def __bool__(self) -> bool:
         """Overwrite default behaviour."""
         msg = 'Use .is_empty instead of bool(ds) to check if a data source is empty.'
@@ -244,15 +234,10 @@ class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource)
         return f'[**🗄️ {self.title}**]({self.block_url})\n'
 
 
-class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
+class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
     """A Notion database - a collection that can contain multiple data sources.
 
-    This is a NEW concept introduced in API version 2025-09-03. A database acts as
-    a container or grouping mechanism for related data sources.
-
-    Note: This class is currently a placeholder for future implementation.
-    The Notion API 2025-09-03 introduces this concept, but full support requires
-    additional implementation work.
+    API reference: https://developers.notion.com/docs/working-with-databases
     """
 
     def __str__(self) -> str:
@@ -264,39 +249,6 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def __repr__(self) -> str:
         return get_repr(self)
 
-    @property
-    def title(self) -> str | Text | None:
-        """Return the title of this database as rich text."""
-        if title := raise_unset(self.obj_ref.title):
-            return Text.wrap_obj_ref(title)
-        return None
-
-    @title.setter
-    def title(self, text: str | Text | None) -> None:
-        """Set the title of this database."""
-        if text is None:
-            text = ''
-        if not isinstance(text, Text):
-            text = Text.from_plain_text(text)
-        session = get_active_session()
-        session.api.databases.update(self.obj_ref, title=text.obj_ref)
-
-    @property
-    def is_db(self) -> bool:
-        """Check if this is a database (always True for Database objects)."""
-        return True
-
-    @property
-    def data_sources(self) -> list[DataSource]:
-        """Return all data sources in this database.
-
-        Note: This is a placeholder implementation. Full support requires additional work.
-        """
-        # TODO: Implement fetching data sources from this database
-        # This would involve querying the data_sources endpoint with a filter for database_id
-        msg = 'Database.data_sources is not yet implemented'
-        raise NotImplementedError(msg)
-
     def __eq__(self, other: object) -> bool:
         """Compare Database objects."""
         if isinstance(other, Database):
@@ -306,3 +258,56 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def __hash__(self) -> int:
         """Hash the Database object."""
         return hash(self.id)
+
+    @property
+    def url(self) -> str:
+        """Return the public URL of this database."""
+        return raise_unset(self.obj_ref.url)
+
+    @property
+    def public_url(self) -> str | None:
+        """Return the public URL of this database, if available."""
+        return self.obj_ref.public_url
+
+    @property
+    def is_inline(self) -> bool:
+        """Return whether the database is inline."""
+        return self.obj_ref.is_inline
+
+    @is_inline.setter
+    def is_inline(self, inline: bool) -> None:
+        """Set whether the database is inline."""
+        if self.is_inline != inline:
+            session = get_active_session()
+            session.api.databases.update(self.obj_ref, inline=inline)
+            self.obj_ref.is_inline = inline
+
+    @property
+    def is_db(self) -> bool:
+        """Check if this is a database (always True for Database objects)."""
+        return True
+
+    @property
+    def data_sources(self) -> SList[DataSource]:
+        """Return all data sources in this database."""
+        return SList(DataSource.wrap_obj_ref(ds) for ds in self.obj_ref.data_sources)
+
+    @property
+    def query(self) -> Query:
+        """Return a Query object of the database if it has a single data source."""
+        try:
+            ds = self.data_sources.item()
+        except SListError as e:
+            msg = 'Database must have exactly one data source to create a query.'
+            raise RuntimeError(msg) from e
+        return Query(ds=ds)
+
+    def get_all_pages(self) -> SList[View]:
+        """Retrieve all pages of all databases as a list of views."""
+        return SList(query.execute() for query in (Query(ds=ds) for ds in self.data_sources))
+
+    @property
+    def is_wiki(self) -> bool:
+        """Return whether the database is a wiki."""
+        # ToDo: Implement using the verification property
+        raise NotImplementedError
