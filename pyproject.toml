@@ -284,8 +284,8 @@ requires = ["hatch-pip-compile~=1.11.5"]
 # Default environment
 [tool.hatch.envs.default]
 type = "pip-compile"
-python = "3.10"
-post-install-commands = ["pre-commit install"]
+# python = "..." # use hatch default, latest installed. For CI, we set HATCH_PYTHON explicitly.
+post-install-commands = ["hatch run pre-commit install"]
 features = ["google", "polars", "pandas"]  # state them explicitly, not just "all", to avoid installing ultimate-notion from PyPI!
 pip-compile-installer = "pip"  # or "uv"
 pip-compile-constraint = "default"  # keep locks between default & others consistent
@@ -310,6 +310,7 @@ dependencies = [
     "matplotlib",
     "vcrpy~=5.1",  # even in version 7.0 the async tests like sync_google_tasks.py don't work
 ]
+
 [tool.hatch.envs.default.scripts]
 test = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/ultimate_notion --cov=tests --record-mode once {args}"
 test-next-release = "export ULTIMATE_NOTION_PYDANTIC_EXTRA='ignore' && hatch run test {args} && hatch run test --file-upload {args}"
