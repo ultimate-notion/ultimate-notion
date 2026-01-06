@@ -6,9 +6,10 @@ import logging
 from collections.abc import Awaitable, Callable, Iterator
 from typing import Annotated, Any, Generic, TypeVar, cast
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, ValidationError
 from pydantic.functional_validators import BeforeValidator
 
+from ultimate_notion.config import get_cfg
 from ultimate_notion.obj_api.blocks import Block, Database, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.objects import Comment, FileUpload, User
@@ -155,7 +156,12 @@ class EndpointIterator(Generic[T]):
             _logger.debug(msg)
 
             result_page = self._endpoint(start_cursor=self.next_cursor, **kwargs)
-            obj_or_list = self._model_validate(result_page)
+            try:
+                obj_or_list = self._model_validate(result_page)
+            except ValidationError as e:
+                if get_cfg().ultimate_notion.debug:
+                    _logger.exception('Validation error when parsing endpoint result:\n %s', e.errors())
+                raise
 
             if isinstance(obj_or_list, ObjectList):
                 for obj in obj_or_list.results:
