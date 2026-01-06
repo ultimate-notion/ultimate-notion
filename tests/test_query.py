@@ -114,7 +114,7 @@ def test_date_query(root_page: uno.Page, notion: uno.Session) -> None:
         created = uno.PropType.CreatedTime('Created')
         last_edited = uno.PropType.LastEditedTime('Last Edited')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     now = pnd.now()
     page_no_date = db.create_page(name='no_date')
     page_tw = db.create_page(name='this week', date=now)
@@ -202,7 +202,7 @@ def test_text_query(root_page: uno.Page, notion: uno.Session) -> None:
         email = uno.PropType.Email('Email')
         url = uno.PropType.URL('URL')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     page_empty = db.create_page()
     page_john_doe = db.create_page(
         title='John', name='John Doe', phone='123-456-7890', email='john.doe@gmail.com', url='https://john.doe.com'
@@ -261,7 +261,7 @@ def test_number_query(root_page: uno.Page, notion: uno.Session) -> None:
         title = uno.PropType.Title('Title')
         number = uno.PropType.Number('Number')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     page_empty = db.create_page()
     page_1 = db.create_page(title='1', number=1)
     page_2 = db.create_page(title='1', number=2)
@@ -306,7 +306,7 @@ def test_select_query(root_page: uno.Page, notion: uno.Session) -> None:
         select = uno.PropType.Select('Select', options=status_options)
         multi_select = uno.PropType.MultiSelect('Multi-Select', options=status_options)
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     page_empty = db.create_page()
     page_1 = db.create_page(title='Done', select=done, multi_select=[done, ongoing])
     page_2 = db.create_page(title='In Progress', select=ongoing, multi_select=[backlog, ongoing])
@@ -360,7 +360,7 @@ def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session) -> None:
         files = uno.PropType.Files('Files')
         check = uno.PropType.Checkbox('Checkbox')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
 
     page_empty = db.create_page()
 
@@ -399,7 +399,7 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
         people = uno.PropType.Person('People')
         relation = uno.PropType.Relation('Relation', schema=uno.SelfRef)
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
 
     page_empty = db.create_page()
     page_florian = db.create_page(title='Florian', people=[person])
@@ -435,7 +435,7 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
 
 
 @pytest.mark.vcr()
-def test_query_new_task_db(new_task_db: uno.Database) -> None:
+def test_query_new_task_db(new_task_db: uno.DataSource) -> None:
     all_pages = new_task_db.query.execute()
     assert len(all_pages) == 0
 
@@ -523,7 +523,7 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
         title = uno.PropType.Title('Title')
         formula = uno.PropType.Formula('Formula', formula='prop("Title")')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
 
     query = db.query.filter(uno.prop('Formula').is_empty())
     assert set(query.execute()) == set()
@@ -558,7 +558,7 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session) -> None:
             rollup_number_prop_arr, relation=relation, rollup=number, calculate=uno.AggFunc.SHOW_ORIGINAL
         )
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     item_1 = db.create_page(title='Item 1', number=42, date='2024-11-25 14:08:00+00:00')
     item_2 = db.create_page(title='Item 2', number=72, date='1981-11-23 08:02:00+01:00', relation=item_1)
     item_3 = db.create_page(title='Item 3', number=12, date='2024-11-25 14:08:00+00:00', relation=(item_1, item_2))

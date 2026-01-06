@@ -54,7 +54,7 @@ def test_db_inline(notion: uno.Session, root_page: uno.Page) -> None:
         cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
         desc = uno.PropType.Text('Description')
 
-    db = notion.create_db(parent=root_page, schema=Article, inline=True)
+    db = notion.create_ds(parent=root_page, schema=Article, inline=True)
     assert db.is_inline
     db.is_inline = False
     assert not db.is_inline
@@ -72,7 +72,7 @@ def test_db_without_title(notion: uno.Session, root_page: uno.Page) -> None:
         cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
         desc = uno.PropType.Text('Description')
 
-    db = notion.create_db(parent=root_page, schema=Article)
+    db = notion.create_ds(parent=root_page, schema=Article)
     assert db.title is None
     assert db.description is None
     db.delete()
@@ -87,12 +87,12 @@ def test_db_with_title(notion: uno.Session, root_page: uno.Page) -> None:
         cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
         desc = uno.PropType.Text('Description')
 
-    db = notion.create_db(parent=root_page, schema=Article, title='Overwritten Title')
+    db = notion.create_ds(parent=root_page, schema=Article, title='Overwritten Title')
     assert db.title == 'Overwritten Title'
     assert db.description is None
     db.delete()
 
-    db = notion.create_db(parent=root_page, title='No Schema Used')
+    db = notion.create_ds(parent=root_page, title='No Schema Used')
     assert db.title == 'No Schema Used'
     assert db.description is None
     db.delete()
@@ -109,7 +109,7 @@ def test_db_with_docstring(notion: uno.Session, root_page: uno.Page) -> None:
         cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
         desc = uno.PropType.Text('Description')
 
-    db = notion.create_db(parent=root_page, schema=Article)
+    db = notion.create_ds(parent=root_page, schema=Article)
     assert db.title is None
     assert db.description == 'My articles'
     db.delete()
@@ -136,7 +136,7 @@ def test_title_setter(notion: uno.Session, article_db: uno.Database) -> None:
     assert article_db.title == new_title
     # clear cache and retrieve the database again to be sure it was udpated on the server side
     del notion.cache[article_db.id]
-    article_db = notion.get_db(article_db.id)
+    article_db = notion.get_ds(article_db.id)
     assert article_db.title == new_title
     article_db.title = uno.text(old_title)
     assert article_db.title == old_title
@@ -154,7 +154,7 @@ def test_description_setter(notion: uno.Session, article_db: uno.Database) -> No
 
     # clear cache and retrieve the database again to be sure it was udpated on the server side
     del notion.cache[article_db.id]
-    article_db = notion.get_db(article_db.id)
+    article_db = notion.get_ds(article_db.id)
     assert article_db.description == new_description
     article_db.description = None
     assert article_db.description is None
@@ -162,7 +162,7 @@ def test_description_setter(notion: uno.Session, article_db: uno.Database) -> No
 
 @pytest.mark.vcr()
 def test_delete_restore_db(notion: uno.Session, root_page: uno.Page) -> None:
-    db = notion.create_db(root_page)
+    db = notion.create_ds(root_page)
     assert not db.is_deleted
     db.delete()
     assert db.is_deleted
@@ -172,7 +172,7 @@ def test_delete_restore_db(notion: uno.Session, root_page: uno.Page) -> None:
 
 @pytest.mark.vcr()
 def test_reload_db(notion: uno.Session, root_page: uno.Page) -> None:
-    db = notion.create_db(root_page)
+    db = notion.create_ds(root_page)
     old_obj_id = id(db.obj_ref)
     db.reload()
     assert old_obj_id != id(db.obj_ref)
@@ -181,8 +181,8 @@ def test_reload_db(notion: uno.Session, root_page: uno.Page) -> None:
 @pytest.mark.vcr()
 def test_parent_subdbs(notion: uno.Session, root_page: uno.Page) -> None:
     parent = notion.create_page(root_page, title='Parent')
-    db1 = notion.create_db(parent)
-    db2 = notion.create_db(parent)
+    db1 = notion.create_ds(parent)
+    db2 = notion.create_ds(parent)
 
     assert db1.parent == parent
     assert db2.parent == parent
@@ -193,7 +193,7 @@ def test_parent_subdbs(notion: uno.Session, root_page: uno.Page) -> None:
 
 @pytest.mark.vcr()
 def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page) -> None:
-    db = notion.create_db(root_page)
+    db = notion.create_ds(root_page)
     num_pages = int(1.1 * MAX_PAGE_SIZE)
     db.title = f'DB test with {num_pages} pages'
     for i in range(1, num_pages + 1):
@@ -239,8 +239,8 @@ def test_get_or_create_db(notion: uno.Session, root_page: uno.Page) -> None:  # 
         )
 
     # first call creates the dbs
-    notion.get_or_create_db(parent=root_page, schema=Item)
-    notion.get_or_create_db(parent=root_page, schema=Customer)
+    notion.get_or_create_ds(parent=root_page, schema=Item)
+    notion.get_or_create_ds(parent=root_page, schema=Customer)
 
     # we recreate the same schema classes to make sure that we do not rely on the class identity
     class SameItem(uno.Schema, db_title=f'Item DB {unique_id}'):
@@ -263,8 +263,8 @@ def test_get_or_create_db(notion: uno.Session, root_page: uno.Page) -> None:  # 
 
     # second call should retrieve the dbs
     notion.cache.clear()
-    notion.get_or_create_db(parent=root_page, schema=SameItem)
-    notion.get_or_create_db(parent=root_page, schema=SameCustomer)
+    notion.get_or_create_ds(parent=root_page, schema=SameItem)
+    notion.get_or_create_ds(parent=root_page, schema=SameCustomer)
 
 
 @pytest.mark.vcr()

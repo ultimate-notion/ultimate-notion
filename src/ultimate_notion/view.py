@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     import polars as pl
     from numpy.typing import NDArray
 
-    from ultimate_notion.database import Database
+    from ultimate_notion.database import DataSource
     from ultimate_notion.props import PropertyValue
     from ultimate_notion.query import Query
 
@@ -34,10 +34,10 @@ T = TypeVar('T')
 
 
 class View(Sequence[Page]):
-    def __init__(self, database: Database, pages: Sequence[Page], query: Query):
-        self.database = database
+    def __init__(self, ds: DataSource, pages: Sequence[Page], query: Query):
+        self.ds = ds
         self._query = query
-        self._title_col = database.schema.get_title_prop().name
+        self._title_col = ds.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
         self._pages: NDArray[Any] = np.array(pages)
         self._row_indices: NDArray[Any]
@@ -57,17 +57,17 @@ class View(Sequence[Page]):
 
     def clone(self) -> View:
         """Clone the current view."""
-        return deepcopy_with_sharing(self, shared_attributes=['database', '_pages', '_query'])
+        return deepcopy_with_sharing(self, shared_attributes=['ds', '_pages', '_query'])
 
     def _get_columns(self, title_col: str) -> NDArray[Any]:
         """Make sure title column is the first columns."""
-        cols = list(self.database.schema.to_dict().keys())
+        cols = list(self.ds.schema.to_dict().keys())
         cols.insert(0, cols.pop(cols.index(title_col)))
         return np.array(cols)
 
     @property
     def columns(self) -> list[str]:
-        """Columns/properties of the database view aligned with the elements of a row."""
+        """Columns/properties of the data source view aligned with the elements of a row."""
         cols = list(self._columns[self._col_indices])
         if self.has_icon:
             cols.insert(0, self._icon_name)
@@ -125,8 +125,8 @@ class View(Sequence[Page]):
 
     def to_pydantic(self) -> list[BaseModel]:
         """Convert the view to a list of Pydantic models."""
-        model = self.database.schema.to_pydantic_model(with_ro_props=True)
-        is_prop_ro = {prop.name: prop.readonly for prop in self.database.schema.get_props()}
+        model = self.ds.schema.to_pydantic_model(with_ro_props=True)
+        is_prop_ro = {prop.name: prop.readonly for prop in self.ds.schema.get_props()}
 
         def get_prop(page: Page, prop: str) -> PropertyValue | Any:
             prop_value = page.props._get_property(prop)
@@ -164,11 +164,11 @@ class View(Sequence[Page]):
         """Create a Polars schema for the view."""
         import polars as pl  # noqa: PLC0415
 
-        db_schema = self.database.schema.to_dict()
+        ds_schema = self.ds.schema.to_dict()
         pl_schema: dict[str, pl.DataType] = {}
         for col in self.columns:
-            if col in db_schema:
-                prop_type: Property | PropertyValue = db_schema[col]
+            if col in ds_schema:
+                prop_type: Property | PropertyValue = ds_schema[col]
                 if isinstance(prop_type, schema.Rollup | schema.Relation | schema.Formula):
                     prop_type = probed_type if (probed_type := self._probe_col_type(col)) is not None else prop_type
                 pl_schema[col] = prop_type_to_polars(prop_type)
@@ -179,7 +179,7 @@ class View(Sequence[Page]):
             elif col == self._id_name:
                 pl_schema[col] = pl.String()
             else:
-                msg = f'Column `{col}` not found in database schema.'
+                msg = f'Column `{col}` not found in data source schema.'
                 raise RuntimeError(msg)
         return pl_schema
 
@@ -232,7 +232,7 @@ class View(Sequence[Page]):
             return tabulate(rows, headers=cols, tablefmt=tablefmt)
 
     def show(self, *, simple: bool | None = None) -> None:
-        """Show the database as human-readable table."""
+        """Show the data source as human-readable table."""
         if simple:
             tablefmt = 'simple'
         elif simple is None:
@@ -263,7 +263,7 @@ class View(Sequence[Page]):
         return iter(self.to_pages())
 
     def __repr__(self) -> str:
-        return get_repr(self, desc=self.database.title)
+        return get_repr(self, desc=self.ds.title)
 
     def __str__(self) -> str:
         return self.as_table()

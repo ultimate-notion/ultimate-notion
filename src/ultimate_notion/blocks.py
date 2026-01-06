@@ -36,9 +36,9 @@ from typing_extensions import Self, TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion
-from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_db, is_page
+from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError
+from ultimate_notion.errors import InvalidAPIUsageError, UnknownDataSourceError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -49,7 +49,7 @@ from ultimate_notion.rich_text import Text, User
 from ultimate_notion.utils import set_attr_none
 
 if TYPE_CHECKING:
-    from ultimate_notion.database import Database
+    from ultimate_notion.database import DataSource
     from ultimate_notion.page import Page
 
 
@@ -91,7 +91,7 @@ def wrap_icon(
 
 
 class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
-    """The base type for all data-related types, i.e, pages, databases and blocks."""
+    """The base type for all data-related types, i.e, pages, databases, data sources and blocks."""
 
     @property
     def block_url(self) -> str:
@@ -189,9 +189,9 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 child_blocks[idx] = cast(Block, child_block.page)
             elif isinstance(child_block, ChildDatabase):
                 try:
-                    ref_block = cast(Block, child_block.db)
-                except UnknownDatabaseError:
-                    # linked database that cannot be retrieved via API. Check the docs:
+                    ref_block = cast(Block, child_block.ds)
+                except UnknownDataSourceError:
+                    # linked data source that cannot be retrieved via API. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
                     ref_block = cast(Block, child_block)
                 child_blocks[idx] = ref_block
@@ -199,8 +199,8 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         return [cast(Block, session.cache.setdefault(block.id, block)) for block in child_blocks]
 
     @property
-    def children(self) -> tuple[Block | Page | Database, ...]:
-        """Return the children of this block, which are blocks but might also be pages and databases."""
+    def children(self) -> tuple[Block | Page | DataSource, ...]:
+        """Return the children of this block, which are blocks but might also be pages and data sources."""
         if self.in_notion:
             if self._children is None:
                 self._children = self._gen_children_cache()
@@ -213,8 +213,8 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
 
     @property
     def blocks(self) -> tuple[Block, ...]:
-        """Return all contained blocks within this block (excluding child pages and databases)"""
-        return tuple(block for block in self.children if not is_page(block) and not is_db(block))
+        """Return all contained blocks within this block (excluding child pages and data sources)"""
+        return tuple(block for block in self.children if not is_page(block) and not is_ds(block))
 
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
         """Append a block or a sequence of blocks to the content of this block.
@@ -1082,19 +1082,19 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
 class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatabase):
     """Child database block.
 
-    This block is used to represent a database if it is a child of e.g. a page.
-    We try to resolve it via the API to get the actual database object. This does not work
+    This block is used to represent a data source if it is a child of e.g. a page.
+    We try to resolve it via the API to get the actual data source object. This does not work
     if it is a `linked database` as mentioned in the Notion API docs:
     https://developers.notion.com/reference/retrieve-a-database
 
     !!! note
 
-        To create a child database block as an end-user, create a new database with the corresponding parent.
+        To create a child database block as an end-user, create a new data source with the corresponding parent.
         This block is used only internally.
     """
 
     def __init__(self) -> None:
-        msg = 'To create a child database block, create a new database with the corresponding parent.'
+        msg = 'To create a child database block, create a new data source with the corresponding parent.'
         raise InvalidAPIUsageError(msg)
 
     @property
@@ -1105,14 +1105,14 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         return None
 
     @property
-    def db(self) -> Database:
-        """Return the actual Database object."""
+    def ds(self) -> DataSource:
+        """Return the actual DataSource object."""
         sess = get_active_session()
-        return sess.get_db(self.id)
+        return sess.get_ds(self.id)
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return the child database as Markdown."""
-        return '<kbd>↗️ Linked database (unsupported)</kbd>'
+        return '<kbd>↗️ Linked data source (unsupported)</kbd>'
 
 
 class Column(ParentBlock[obj_blocks.Column], wraps=obj_blocks.Column):

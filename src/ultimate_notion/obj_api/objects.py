@@ -44,7 +44,7 @@ from ultimate_notion.obj_api.enums import BGColor, Color, FileUploadStatus
 from ultimate_notion.utils import DateTimeOrRange, parse_dt_str
 
 if TYPE_CHECKING:
-    from ultimate_notion.obj_api.blocks import Block, Database, Page
+    from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Page
 
 
 class SelectOption(GenericObject):
@@ -180,7 +180,7 @@ def get_uuid(obj: str | UUID | ParentRef | NotionObject | BlockRef) -> UUID:
 
 
 class DatabaseRef(ParentRef[UUID], type='database_id'):
-    """Reference a database."""
+    """Reference a database (container for data sources in API 2025-09-03+)."""
 
     database_id: UUID
 
@@ -189,6 +189,18 @@ class DatabaseRef(ParentRef[UUID], type='database_id'):
         """Compose a DatabaseRef from the given reference object."""
         ref = ObjectRef.build(db_ref)
         return DatabaseRef.model_construct(database_id=ref.id)
+
+
+class DataSourceRef(ParentRef[UUID], type='data_source_id'):
+    """Reference a data source (formerly 'database' in pre-2025-09-03 API)."""
+
+    data_source_id: UUID
+
+    @classmethod
+    def build(cls, ds_ref: DataSource | str | UUID) -> DataSourceRef:
+        """Compose a DataSourceRef from the given reference object."""
+        ref = ObjectRef.build(ds_ref)
+        return DataSourceRef.model_construct(data_source_id=ref.id)
 
 
 class PageRef(ParentRef[UUID], type='page_id'):
@@ -460,7 +472,7 @@ class MentionPage(MentionBase[ObjectRef], type='page'):
 
 
 class MentionDatabase(MentionBase[ObjectRef], type='database'):
-    """Nested database information for `Mention` properties."""
+    """Nested database information for `Mention` properties (new container concept in API 2025-09-03+)."""
 
     database: SerializeAsAny[ObjectRef]
 
@@ -476,6 +488,29 @@ class MentionDatabase(MentionBase[ObjectRef], type='database'):
             db_title = f'Database {db_ref.id}'
         return MentionObject.model_construct(
             plain_text=db_title,
+            ref=None,
+            annotations=Unset if style is None else deepcopy(style),
+            mention=mention,
+        )
+
+
+class MentionDataSource(MentionBase[ObjectRef], type='data_source'):
+    """Nested data source information for `Mention` properties (formerly 'database' in pre-2025-09-03 API)."""
+
+    data_source: SerializeAsAny[ObjectRef]
+
+    @classmethod
+    def build_mention_from(
+        cls, ds: DataSource | DataSourceRef | ObjectRef, *, style: Annotations | None = None
+    ) -> MentionObject:
+        ds_ref = ObjectRef.build(ds) if not isinstance(ds, ObjectRef) else ds
+        mention = cls.model_construct(data_source=ds_ref)
+        if not (isinstance(ds, DataSourceRef | ObjectRef) or is_unset(ds.title)):
+            ds_title = rich_text_to_str(ds.title)
+        else:
+            ds_title = f'DataSource {ds_ref.id}'
+        return MentionObject.model_construct(
+            plain_text=ds_title,
             ref=None,
             annotations=Unset if style is None else deepcopy(style),
             mention=mention,

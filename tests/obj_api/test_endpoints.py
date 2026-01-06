@@ -23,7 +23,7 @@ def test_create_page(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         role = uno.PropType.Text('Role')
 
-    contacts_db = notion.create_db(
+    contacts_db = notion.create_ds(
         parent=root_page, title='Contacts DB for low-level page creation test', schema=ContactsDB
     )
 
@@ -60,7 +60,7 @@ def test_update_page(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         role = uno.PropType.Text('Role')
 
-    contacts_db = notion.create_db(
+    contacts_db = notion.create_ds(
         parent=root_page, title='Contacts DB for low-level page update test', schema=ContactsDB
     )
 

@@ -17,10 +17,10 @@ def test_raise_for_status(notion: uno.Session) -> None:
 
 @pytest.mark.vcr()
 def test_search_get_db(notion: uno.Session) -> None:
-    db_by_name = notion.search_db(CONTACTS_DB).item()
+    db_by_name = notion.search_ds(CONTACTS_DB).item()
     assert db_by_name.title == CONTACTS_DB
 
-    db_by_id = notion.get_db(db_by_name.id)
+    db_by_id = notion.get_ds(db_by_name.id)
     assert db_by_id.id == db_by_name.id
 
 

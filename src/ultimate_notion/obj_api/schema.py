@@ -233,16 +233,19 @@ class Formula(Property[FormulaTypeData], type='formula'):
 
 
 class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
-    """Defines common configuration for a property relation."""
+    """Defines common configuration for a property relation.
 
-    database_id: UUID
-    data_source_id: str | None = None  # 2025-09-03 update: https://developers.notion.com/docs/upgrade-guide-2025-09-03
+    In API 2025-09-03+, relations primarily use `data_source_id` to reference the target data source.
+    The `database_id` field references the parent database container.
+    """
+
+    data_source_id: UUID  # Primary target reference in API 2025-09-03+
+    database_id: UUID | UnsetType = Unset  # Reference to parent database container
 
     def __eq__(self, other: object) -> bool:
-        # ToDo: Consider data_source_id when Update 2025-09-03 is implemented.
         if not isinstance(other, PropertyRelation):
             return NotImplemented
-        return self.database_id == other.database_id
+        return self.data_source_id == other.data_source_id
 
 
 class SinglePropertyRelationTypeData(GenericObject):
@@ -250,17 +253,17 @@ class SinglePropertyRelationTypeData(GenericObject):
 
 
 class SinglePropertyRelation(PropertyRelation[SinglePropertyRelationTypeData], type='single_property'):
-    """Defines a one-way relation configuration for a database property."""
+    """Defines a one-way relation configuration for a data source property."""
 
     single_property: SinglePropertyRelationTypeData = Field(default_factory=SinglePropertyRelationTypeData)
 
     @classmethod
-    def build_relation(cls, dbref: UUID) -> Relation:
-        """Create a `single_property` relation using the target database reference.
+    def build_relation(cls, dsref: UUID) -> Relation:
+        """Create a `single_property` relation using the target data source reference.
 
-        `dbref` must be either a string or UUID.
+        `dsref` must be either a string or UUID.
         """
-        rel = SinglePropertyRelation.model_construct(database_id=dbref)
+        rel = SinglePropertyRelation.model_construct(data_source_id=dsref)
         return Relation.model_construct(relation=rel)
 
 
@@ -279,7 +282,7 @@ class DualPropertyRelationTypeData(GenericObject):
 
 
 class DualPropertyRelation(PropertyRelation[DualPropertyRelationTypeData], type='dual_property'):
-    """Defines a two-way relation configuration for a database property.
+    """Defines a two-way relation configuration for a data source property.
 
     If a two-way relation property X relates to Y then the two-way relation property Y relates to X.
     """
@@ -287,20 +290,20 @@ class DualPropertyRelation(PropertyRelation[DualPropertyRelationTypeData], type=
     dual_property: DualPropertyRelationTypeData = Field(default_factory=DualPropertyRelationTypeData)
 
     @classmethod
-    def build_relation(cls, dbref: UUID) -> Relation:
-        """Create a `dual_property` relation using the target database reference.
+    def build_relation(cls, dsref: UUID) -> Relation:
+        """Create a `dual_property` relation using the target data source reference.
 
-        `dbref` must be either a string or UUID.
+        `dsref` must be either a string or UUID.
         """
         # No `synced_property_name` is set since it will be ignored by the Notion API.
         # Thus we first get the default two-way relation name, which we gonna change later.
         # See: https://developers.notion.com/reference/property-schema-object#dual-property-relation-configuration
-        rel = DualPropertyRelation.model_construct(database_id=dbref)
+        rel = DualPropertyRelation.model_construct(data_source_id=dsref)
         return Relation.model_construct(relation=rel)
 
 
 class Relation(Property[SinglePropertyRelation | DualPropertyRelation], type='relation'):
-    """Defines the relation configuration for a database property."""
+    """Defines the relation configuration for a data source property."""
 
     relation: SinglePropertyRelation | DualPropertyRelation
 
