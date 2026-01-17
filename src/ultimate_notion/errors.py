@@ -32,6 +32,10 @@ class UnknownDataSourceError(UltimateNotionError):
     """Raised when the data source is unknown."""
 
 
+class UnknownDatabaseError(UltimateNotionError):
+    """Raised when the database is unknown."""
+
+
 class InvalidAPIUsageError(UltimateNotionError):
     """Raised when the API is used in an invalid way."""
 

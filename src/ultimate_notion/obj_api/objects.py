@@ -195,6 +195,7 @@ class DataSourceRef(ParentRef[UUID], type='data_source_id'):
     """Reference a data source (formerly 'database' in pre-2025-09-03 API)."""
 
     data_source_id: UUID
+    database_id: UUID | UnsetType = Unset
 
     @classmethod
     def build(cls, ds_ref: DataSource | str | UUID) -> DataSourceRef:

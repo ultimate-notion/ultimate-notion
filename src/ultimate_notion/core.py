@@ -11,7 +11,7 @@ from uuid import UUID
 
 from typing_extensions import Self, TypeIs, TypeVar
 
-from ultimate_notion.errors import UnknownDataSourceError, UnknownPageError
+from ultimate_notion.errors import UnknownDatabaseError, UnknownDataSourceError, UnknownPageError
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
@@ -136,8 +136,15 @@ def resolve_ref(obj_ref: obj_core.NotionEntity) -> NotionEntity | WorkspaceType 
         case objs.DatabaseRef(database_id=database_id):
             try:
                 return session.get_ds(ds_ref=database_id)
+            except UnknownDatabaseError as e:
+                msg = f'No access to parent database with id `{database_id}`: {e}'
+                _logger.info(msg)
+                return None
+        case objs.DataSourceRef(data_source_id=data_source_id):
+            try:
+                return session.get_ds(ds_ref=data_source_id)
             except UnknownDataSourceError as e:
-                msg = f'No access to parent data source with id `{database_id}`: {e}'
+                msg = f'No access to parent data source with id `{data_source_id}`: {e}'
                 _logger.info(msg)
                 return None
         case objs.BlockRef(block_id=block_id):

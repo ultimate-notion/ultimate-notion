@@ -187,7 +187,6 @@ class Page(
 
         This is a convenience method to avoid the need to check and cast the type of the parent.
         """
-
         if is_ds_guard(self.parent):
             return self.parent
         else:

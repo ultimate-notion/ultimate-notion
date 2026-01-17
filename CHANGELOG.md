@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.10, 2026-
+
+- New: Better logging of model validation errors, issue #152.
+- New: Implement the new data source Notion API version 2025-09-03, issue #118.
+
 ## Version 0.9.6, 2025-11-23
 
 - New: Add the new `Place` database/source property.

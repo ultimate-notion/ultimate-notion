@@ -53,7 +53,7 @@ if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
 
 # Manually created DBs and Pages in Notion for testing purposes
-TESTS_PAGE = 'Tests'  # root page for all tests with connected Notion integration
+TESTS_PAGE = 'Ultimate Notion Tests'  # root page for all tests with connected Notion integration
 ALL_PROPS_DB = 'All Properties DB'  # DB with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
