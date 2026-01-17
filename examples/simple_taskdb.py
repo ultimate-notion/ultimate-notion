@@ -53,7 +53,7 @@ class Task(uno.Schema, db_title='My task list'):
 
 with uno.Session() as notion:
     parent = notion.search_page(PARENT_PAGE).item()
-    task_db = notion.create_db(parent=parent, schema=Task)
+    task_db = notion.create_ds(parent=parent, schema=Task)
 
     # just create 10 random tasks for demonstration
     Task.create(

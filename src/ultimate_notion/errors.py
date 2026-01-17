@@ -28,6 +28,10 @@ class UnknownPageError(UltimateNotionError):
     """Raised when the page is unknown."""
 
 
+class UnknownDataSourceError(UltimateNotionError):
+    """Raised when the data source is unknown."""
+
+
 class UnknownDatabaseError(UltimateNotionError):
     """Raised when the database is unknown."""
 
@@ -36,32 +40,36 @@ class InvalidAPIUsageError(UltimateNotionError):
     """Raised when the API is used in an invalid way."""
 
 
-class EmptyDBError(UltimateNotionError):
-    """A special exception that tells us that a database is empty during probing."""
+class EmptyDataSourceError(UltimateNotionError):
+    """A special exception that tells us that a data source is empty during probing."""
 
 
 class FilterQueryError(ValueError, UltimateNotionError):
     """An exception that is raised when a filter query is invalid."""
 
 
-class EmptyListError(UltimateNotionError):
+class SListError(UltimateNotionError):
+    """Base class for all exceptions in SList."""
+
+
+class EmptyListError(SListError):
     """Custom exception for an empty list in SList."""
 
 
-class MultipleItemsError(UltimateNotionError):
+class MultipleItemsError(SListError):
     """Custom exception for a list with multiple items in SList."""
 
 
 class SchemaError(UltimateNotionError):
-    """Raised when there are issues with the schema of a database."""
+    """Raised when there are issues with the schema of a data source."""
 
 
 class SchemaNotBoundError(SchemaError):
-    """Raised when the schema is not bound to a database."""
+    """Raised when the schema is not bound to a data source."""
 
     def __init__(self, schema: type[Schema]):
         self.schema = schema
-        msg = f'Schema {schema.__name__} is not bound to any database'
+        msg = f'Schema {schema.__name__} is not bound to any data source'
         super().__init__(msg)
 
 

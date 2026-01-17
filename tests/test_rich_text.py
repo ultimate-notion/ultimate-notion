@@ -50,7 +50,7 @@ def test_is_url() -> None:
 
 @pytest.mark.vcr()
 def test_mention(
-    person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.Database, notion: uno.Session
+    person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.DataSource, notion: uno.Session
 ) -> None:
     user_mention = uno.mention(person)
     page_mention = uno.mention(md_text_page)

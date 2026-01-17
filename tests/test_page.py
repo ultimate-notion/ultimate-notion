@@ -253,15 +253,15 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
 
 @pytest.mark.vcr()
 def test_parent_db(notion: uno.Session, root_page: uno.Page) -> None:
-    db = notion.create_db(root_page)
+    db = notion.create_ds(root_page)
     db.title = 'Parent DB'
     page_in_db = db.create_page()
-    assert page_in_db.in_db
-    assert page_in_db.parent_db is db
+    assert page_in_db.in_ds
+    assert page_in_db.parent_ds is db
 
     page_not_in_db = notion.create_page(root_page, 'Page not in DB')
-    assert not page_not_in_db.in_db
-    assert page_not_in_db.parent_db is None
+    assert not page_not_in_db.in_ds
+    assert page_not_in_db.parent_ds is None
 
 
 @pytest.mark.vcr()
@@ -279,8 +279,8 @@ def test_more_than_max_refs_per_relation_property(notion: uno.Session, root_page
         name = uno.PropType.Title('Name')
         purchases = uno.PropType.Relation('Items Purchased', schema=Item, two_way_prop=Item.bought_by)
 
-    item_db = notion.create_db(parent=root_page, schema=Item)
-    customer_db = notion.create_db(parent=root_page, schema=Customer)
+    item_db = notion.create_ds(parent=root_page, schema=Item)
+    customer_db = notion.create_ds(parent=root_page, schema=Customer)
     customer = customer_db.create_page(name='Customer 1')
 
     n_prop_items = MAX_ITEMS_PER_PROPERTY + 5
@@ -303,7 +303,7 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
         name = uno.PropType.Title('Name')
         desc = uno.PropType.Text('Description')
 
-    notion.create_db(parent=root_page, schema=Item)
+    notion.create_ds(parent=root_page, schema=Item)
 
     # generate a text that will have internally more than MAX_ITEMS_PER_PROPERTY mentions parts
     n_mentions = 2 * MAX_ITEMS_PER_PROPERTY
@@ -345,7 +345,7 @@ def test_option_page_props(notion: uno.Session, root_page: uno.Page) -> None:
         status = uno.PropType.Select('Status', options=select_options)
         multi_status = uno.PropType.MultiSelect('Multi Status', options=multi_select_options)
 
-    notion.create_db(parent=root_page, schema=Schema)
+    notion.create_ds(parent=root_page, schema=Schema)
     page1 = Schema.create(title='Page 1', status='Open', multi_status=['Option 1'])
     page2 = Schema.create(title='Page 2', status='In Progress', multi_status=['Option 1', 'Option 2'])
 
@@ -403,7 +403,7 @@ def test_update_props(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         role = uno.PropType.Text('Role')
 
-    contacts_db = notion.create_db(
+    contacts_db = notion.create_ds(
         parent=root_page, title='Contacts DB for low-level page update test', schema=ContactsDB
     )
 

@@ -24,7 +24,7 @@ from ultimate_notion.templates import page_html
 from ultimate_notion.utils import SList, is_notebook
 
 if TYPE_CHECKING:
-    from ultimate_notion.database import Database
+    from ultimate_notion.database import DataSource
     from ultimate_notion.schema import Schema
 
 
@@ -72,7 +72,7 @@ class PagePropertiesNS(Mapping[str, Any]):
 
     def __setitem__(self, prop_name: str, value: Any) -> None:
         # Todo: use the schema of the database to see which properties are writeable at all.
-        db = self._page.parent_db
+        db = self._page.parent_ds
 
         if db is None:
             msg = f'Trying to set a property but page {self._page} is not bound to any database'
@@ -138,7 +138,7 @@ class Page(
 
     def _create_page_props_ns(self) -> PagePropertiesNS:
         """Create a namespace for the properties of this page defind by the database."""
-        schema = None if self.parent_db is None else self.parent_db.schema
+        schema = None if self.parent_ds is None else self.parent_ds.schema
         return PagePropertiesNS(page=self, schema=schema)
 
     def __str__(self) -> str:
@@ -177,26 +177,25 @@ class Page(
         return [block for block in self.children if is_page_guard(block)]
 
     @property
-    def subdbs(self) -> list[Database]:
-        """Return all contained databases within this page"""
-        return [block for block in self.children if is_db_guard(block)]
+    def sub_dss(self) -> list[DataSource]:
+        """Return all contained data sources within this page."""
+        return [block for block in self.children if is_ds_guard(block)]
 
     @property
-    def parent_db(self) -> Database | None:
-        """If this page is located in a database return the database or None otherwise.
+    def parent_ds(self) -> DataSource | None:
+        """If this page is located in a data source return the data source or None otherwise.
 
         This is a convenience method to avoid the need to check and cast the type of the parent.
         """
-
-        if is_db_guard(self.parent):
+        if is_ds_guard(self.parent):
             return self.parent
         else:
             return None
 
     @property
-    def in_db(self) -> bool:
-        """Return True if this page is located in a database."""
-        return self.parent_db is not None
+    def in_ds(self) -> bool:
+        """Return True if this page is located in a data source."""
+        return self.parent_ds is not None
 
     @property
     def title(self) -> Text | None:
@@ -358,7 +357,7 @@ class Page(
 
     def update_props(self, **kwargs: Any) -> None:
         """Update multiple properties at once."""
-        db = self.parent_db
+        db = self.parent_ds
 
         if db is None:
             msg = f'Trying to set properties but page {self} is not bound to any database'
@@ -373,9 +372,9 @@ class Page(
         session.api.pages.update(self.obj_ref, properties=props)
 
 
-def is_db_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[Database]:
-    """Return whether the object is a database as type guard."""
-    return isinstance(obj, NotionEntity) and obj.is_db
+def is_ds_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[DataSource]:
+    """Return whether the object is a data source as type guard."""
+    return isinstance(obj, NotionEntity) and obj.is_ds
 
 
 def is_page_guard(obj: NotionEntity | WorkspaceType | None) -> TypeIs[Page]:

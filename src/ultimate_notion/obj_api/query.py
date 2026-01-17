@@ -1,4 +1,4 @@
-"""Provides an interactive query builder for Notion databases."""
+"""Provides an interactive query builder for Notion data sources."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from uuid import UUID
 from pydantic import ConfigDict, Field, SerializeAsAny, field_validator
 from typing_extensions import TypeVar
 
-from ultimate_notion.obj_api.blocks import Database, Page
+from ultimate_notion.obj_api.blocks import DataSource, Page
 from ultimate_notion.obj_api.core import GenericObject
 from ultimate_notion.obj_api.enums import SortDirection, TimestampKind
 from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE, EndpointIterator
@@ -219,8 +219,8 @@ class CompoundFilter(QueryFilter):
     or_: list[SerializeAsAny[QueryFilter]] | None = Field(None, alias='or')
 
 
-class DBSort(GenericObject):
-    """Sort instruction when querying a database"""
+class DataSourceSort(GenericObject):
+    """Sort instruction when querying a data source."""
 
     property: str
     direction: SortDirection
@@ -234,7 +234,7 @@ class SearchSort(GenericObject):
 
 
 class Query(GenericObject, ABC):
-    """Abstract query object in Notion for searching pages/databases and querying databases"""
+    """Abstract query object in Notion for searching pages/data sources and querying data sources."""
 
     filter: SerializeAsAny[QueryFilter] | None = None
     start_cursor: UUID | None = None
@@ -256,22 +256,22 @@ class Query(GenericObject, ABC):
 
 
 class SearchQuery(Query):
-    """Query object in Notion for searching pages & databases"""
+    """Query object in Notion for searching pages & data sources."""
 
     sort: SearchSort | None = None
 
 
-class DBQuery(Query):
-    """Query object in Notion for querying a database"""
+class DataSourceQuery(Query):
+    """Query object in Notion for querying a data source."""
 
-    sorts: list[DBSort] | None = None
+    sorts: list[DataSourceSort] | None = None
 
 
-T = TypeVar('T', bound=Page | Database, default=Page | Database)
+T = TypeVar('T', bound=Page | DataSource, default=Page | DataSource)
 
 
 class QueryBuilder(Generic[T], ABC):
-    """General query builder for the Notion search & database query API"""
+    """General query builder for the Notion search & data source query API."""
 
     query: Query
     endpoint: NCEndpointCall
@@ -290,7 +290,7 @@ class QueryBuilder(Generic[T], ABC):
 
 
 class SearchQueryBuilder(QueryBuilder[T]):
-    """Search query builder to search for pages and databases
+    """Search query builder to search for pages and data sources.
 
     By default and not changed by `sort`, then the most recently edited results are returned first.
 
@@ -306,21 +306,21 @@ class SearchQueryBuilder(QueryBuilder[T]):
         match self.filter:
             case SearchFilter(property='object', value='page'):
                 _logger.debug(f'Searching for pages with title: {self.params["query"]}')
-            case SearchFilter(property='object', value='database'):
-                _logger.debug(f'Searching for databases with title: {self.params["query"]}')
+            case SearchFilter(property='object', value='data_source'):
+                _logger.debug(f'Searching for data sources with title: {self.params["query"]}')
             case None:
-                _logger.debug(f'Searching for pages and databases with title: {self.params["query"]}')
+                _logger.debug(f'Searching for pages and data sources with title: {self.params["query"]}')
         return super().execute(**nc_params)
 
-    def filter(self, *, page_only: bool = False, db_only: bool = False) -> SearchQueryBuilder[T]:
-        """Filter for pages or databases only"""
-        if not (page_only ^ db_only):
-            msg = 'Either `page_only` or `db_only` must be true, not both.'
+    def filter(self, *, page_only: bool = False, datasource_only: bool = False) -> SearchQueryBuilder[T]:
+        """Filter for pages or data sources only."""
+        if not (page_only ^ datasource_only):
+            msg = 'Either `page_only` or `datasource_only` must be true, not both.'
             raise ValueError(msg)
         elif page_only:
             value = 'page'
-        else:  # db_only
-            value = 'database'
+        else:  # datasource_only
+            value = 'data_source'
 
         builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
         builder.query.filter = SearchFilter(property='object', value=value)
@@ -335,35 +335,35 @@ class SearchQueryBuilder(QueryBuilder[T]):
         return builder
 
 
-class DBQueryBuilder(QueryBuilder[Page]):
-    """Query builder to query a database.
+class DataSourceQueryBuilder(QueryBuilder[Page]):
+    """Query builder to query a data source.
 
-    Notion API: https://developers.notion.com/reference/post-search
+    Notion API: https://developers.notion.com/reference/post-data-source-query
     """
 
-    query: DBQuery
+    query: DataSourceQuery
 
-    def __init__(self, endpoint: NCEndpointCall, db_id: str):
-        super().__init__(endpoint=endpoint, query=DBQuery(), params={'database_id': db_id})
+    def __init__(self, endpoint: NCEndpointCall, data_source_id: str):
+        super().__init__(endpoint=endpoint, query=DataSourceQuery(), params={'data_source_id': data_source_id})
 
     def execute(self, **nc_params: int | str) -> Iterator[Page]:
-        _logger.debug(f'Searching for pages in database with id: {self.params["database_id"]}')
+        _logger.debug(f'Searching for pages in data source with id: {self.params["data_source_id"]}')
         return super().execute(**nc_params)
 
-    def filter(self, condition: QueryFilter) -> DBQueryBuilder:
+    def filter(self, condition: QueryFilter) -> DataSourceQueryBuilder:
         """Add the given filter to the query."""
-        builder = DBQueryBuilder(self.endpoint, db_id=self.params['database_id'])
+        builder = DataSourceQueryBuilder(self.endpoint, data_source_id=self.params['data_source_id'])
         if self.query.sorts is not None:
             builder.query.sorts = [sort.model_copy(deep=True) for sort in self.query.sorts]
         builder.query.filter = condition
         return builder
 
-    def sort(self, sort_orders: DBSort | list[DBSort]) -> DBQueryBuilder:
+    def sort(self, sort_orders: DataSourceSort | list[DataSourceSort]) -> DataSourceQueryBuilder:
         """Add the given sort elements to the query."""
-        if isinstance(sort_orders, DBSort):
+        if isinstance(sort_orders, DataSourceSort):
             sort_orders = [sort_orders]
 
-        builder = DBQueryBuilder(self.endpoint, db_id=self.params['database_id'])
+        builder = DataSourceQueryBuilder(self.endpoint, data_source_id=self.params['data_source_id'])
         if self.query.filter is not None:
             builder.query.filter = self.query.filter.model_copy(deep=True)
         builder.query.sorts = sort_orders

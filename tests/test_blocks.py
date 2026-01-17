@@ -228,7 +228,7 @@ def test_create_file_blocks(root_page: uno.Page, notion: uno.Session, dummy_urls
 def test_create_child_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating child blocks')
     subpage = notion.create_page(parent=page, title='Subpage')
-    subdb = notion.create_db(parent=page)
+    subdb = notion.create_ds(parent=page)
     assert page.children == (subpage, subdb)  # This works as we only compare the IDs
     page.reload()
     assert page.children == (subpage, subdb)

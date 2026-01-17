@@ -93,6 +93,32 @@ This often provides additional considerations and avoids unnecessary work.
    ```
    These settings will also be respected by [pytest] using [pytest-dotenv].
 
+### Setup the unit tests
+
+Ultimate Notion has two ways to deal with unit tests. Most unit tests are recorded on cassettes
+using [VCR.py], which allows to record unit tests that need internet connection and replay them
+without the need of being online, also way faster. So to run existing unit tests, you can just
+use `hatch run vcr-only` and everything should work. For new unit tests, you need to have
+copy the *Ultimate Notion Tests* template into your workspace and set your unit tests up
+so that they can access them.
+
+1. Open the [Ultimate Notion Tests] website and click `Duplicate` on the upper left corner.
+2. Login to Notion and select to which workspace you want to add the template.
+3. In Notion, the `Ultimate Notion Tests` page should show up in your sidebar.
+   Hover over it and click the menu <kbd>⋯</kbd>, then select `Copy link` to extract the
+   *page id* for the step below.
+4. Set up a Notion integration for testing with all permissions as described in the [Getting started] docs.
+   Copy the *Internal integration secret* for the step below.
+5. Create a file `.vscode/.env` within your cloned repository with the following content:
+   ```cfg
+   NOTION_TOKEN=YOUR_INTERNAL_INTEGRATION_SECRET
+   ULTIMATE_NOTION_CONFIG=/PATH/TO/YOUR/CONFIG/.ultimate-notion/config.toml
+   ROOT_PAGE_ID=PAGE_ID_AS_EXTRACTED_ABOVE.
+   ```
+   where you replace the values accordingly.
+
+This should allow you to record new unit tests with `hatch run test -k NEW_TEST`.
+
 ### Implement your changes
 
 1. Create a branch to hold your changes:
@@ -169,3 +195,6 @@ This often provides additional considerations and avoids unnecessary work.
 [VS Code]: https://code.visualstudio.com/
 [GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files
 [mkdocs]: https://www.mkdocs.org/
+[Ultimate Notion Tests]: https://north-tile-42e.notion.site/Ultimate-Notion-Tests-2d8289fbc2b58168bc9ac92273808b70
+[VCR.py]: https://vcrpy.readthedocs.io/
+[Getting started]: https://ultimate-notion.com/latest/usage/getting_started/#creating-an-integration

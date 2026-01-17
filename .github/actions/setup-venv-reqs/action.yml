@@ -12,11 +12,11 @@ runs:
       shell: bash
       env:
         PIPX_DEFAULT_VENV_CREATE_SYSTEM: '1'  # make sure that PIX defaults to installed pip version
+        PIPX_HOME: "${{ github.workspace }}/.pipx"
       run: |
         python -m pip install --upgrade "${{ inputs.pip-version }}" pipx
         pipx install pre-commit
         pipx inject pre-commit "${{ inputs.pip-version }}"
         pipx install hatch
-        pipx inject hatch hatch-vcs "${{ inputs.pip-version }}"
-        pipx inject hatch click==8.2.1 --force # workaround https://github.com/pypa/hatch/issues/2052
+        pipx inject hatch hatch-vcs hatch-pip-compile "${{ inputs.pip-version }}"
         pipx list --include-injected

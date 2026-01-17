@@ -58,12 +58,12 @@ class BlockList(ObjectList, type='block'):
     block: TypeData
 
 
-class PageOrDatabaseList(ObjectList, type='page_or_database'):
-    """A list of Page or Database objects returned by the Notion API."""
+class PageOrDataSourceList(ObjectList, type='page_or_data_source'):
+    """A list of Page or DataSource objects returned by the Notion API."""
 
     class TypeData(GenericObject): ...
 
-    page_or_database: TypeData
+    page_or_data_source: TypeData
 
 
 class UserList(ObjectList, type='user'):
