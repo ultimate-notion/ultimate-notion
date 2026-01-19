@@ -157,9 +157,7 @@ class Session:
         _logger.info(f'Retrieved `{type(block)}` block.')
         return block
 
-    def create_ds(
-        self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
-    ) -> DataSource:
+    def create_ds(self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None) -> DataSource:
         """Create a new data source within a page.
 
         In case a title and a schema are provided, title overrides the schema's `db_title` attribute if it exists.
@@ -181,7 +179,7 @@ class Session:
 
         title_obj = title.obj_ref if title is not None else None
         schema_dct = {prop.name: prop.obj_ref for prop in ds_schema.get_props() if prop._is_init_ready}
-        ds_obj = self.api.data_sources.create(parent=parent.obj_ref, title=title_obj, schema=schema_dct, inline=inline)
+        ds_obj = self.api.data_sources.create(parent=parent.obj_ref, title=title_obj, schema=schema_dct)
 
         ds: DataSource = DataSource.wrap_obj_ref(ds_obj)
 
@@ -195,11 +193,6 @@ class Session:
 
         self.cache[ds.id] = ds
         return ds
-
-    def create_dss(self, parents: Page | list[Page], schemas: list[type[Schema]]) -> list[DataSource]:
-        """Create new data sources in the right order in case there are relations between them."""
-        # ToDo: Implement
-        raise NotImplementedError
 
     def search_ds(
         self, name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False

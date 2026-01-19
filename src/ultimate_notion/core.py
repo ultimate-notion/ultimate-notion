@@ -135,7 +135,7 @@ def resolve_ref(obj_ref: obj_core.NotionEntity) -> NotionEntity | WorkspaceType 
                 return None
         case objs.DatabaseRef(database_id=database_id):
             try:
-                return session.get_ds(ds_ref=database_id)
+                return session.get_db(db_ref=database_id)
             except UnknownDatabaseError as e:
                 msg = f'No access to parent database with id `{database_id}`: {e}'
                 _logger.info(msg)
