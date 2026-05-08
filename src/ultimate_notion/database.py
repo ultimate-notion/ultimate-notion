@@ -120,7 +120,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
 
     def _set_schema(self, schema: type[Schema], *, during_init: bool) -> None:
         """Set a custom schema in order to change the Python variables names."""
-        self.schema.assert_consistency_with(schema, during_init=during_init)
+        self.schema.assert_consistency_with(schema, during_init=during_init, partial=schema._partial)
         schema._bind_db(self)
         self._schema = schema
 
