@@ -178,14 +178,22 @@ class GenericObject(BaseModel):
             name: the named attribute in the class
             default: the new default value for the named field
         """
-        # Rebuild model to avoid UserWarning about shadowing an attribute in parent.
-        # More details here: https://github.com/pydantic/pydantic/issues/6966
         field = cls.model_fields.get(name)
         if field is None:
             msg = f'No field of name {name} in {cls.__name__} found!'
             raise ValueError(msg)
         field.default = default
         field.validate_default = False
+        # Also set the default as a class attribute so pydantic treats it as a *declared*
+        # default. Since pydantic 2.13, mutating only `FieldInfo.default` no longer propagates
+        # through generic parameterizations (e.g. `Person(User[PersonTypeData])` losing the
+        # `object='user'` default inherited from `User`), whereas declared defaults do.
+        # See: https://github.com/ultimate-notion/ultimate-notion/issues/189
+        # Note: on pydantic <=2.6 this surfaces a benign "Field name shadows an attribute in
+        # parent" UserWarning (silenced in pydantic 2.7+); it has no functional impact.
+        setattr(cls, name, default)
+        # Rebuild model to avoid UserWarning about shadowing an attribute in parent.
+        # More details here: https://github.com/pydantic/pydantic/issues/6966
         cls.model_rebuild(force=True)
 
     # https://github.com/pydantic/pydantic/discussions/3139

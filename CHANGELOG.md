@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fix: Add support for `pydantic` 2.13, which previously broke parsing of Notion user objects (e.g. people properties), issue #189.
+
 ## Version 0.9.6, 2025-11-23
 
 - New: Add the new `Place` database/source property.
