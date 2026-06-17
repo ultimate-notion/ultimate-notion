@@ -263,6 +263,13 @@ def _normalize_model(obj: T) -> T:
                     setattr(obj_copy, field_name, Unset)
                 elif field_name == 'color' and is_unset(field_value):
                     setattr(obj_copy, field_name, _normalize_color(field_value))
+                elif field_name == 'annotations' and is_unset(field_value):
+                    # An `Unset` annotation means default styling, which the Notion API returns as a
+                    # fully populated `Annotations` object. Normalize so that offline-built objects
+                    # (e.g. mentions built with `style=None`) compare equal to their online counterparts.
+                    from ultimate_notion.obj_api.objects import Annotations  # noqa: PLC0415  # Avoid circular import.
+
+                    setattr(obj_copy, field_name, _recurse(Annotations()))
                 elif isinstance(obj, TypedObject) and obj.type == 'mention' and field_name in {'plain_text', 'href'}:
                     # allows comparing offline-built mentions to online ones, e.g. UserRef
                     setattr(obj_copy, field_name, Unset)

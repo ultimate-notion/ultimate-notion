@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from textwrap import dedent
 from typing import cast
+from uuid import uuid4
 
 import pytest
 
@@ -687,6 +688,34 @@ def test_rt_default_color() -> None:
     para_2.rich_text = rich_text
 
     assert para_1.obj_ref.serialize_for_api() == para_2.obj_ref.serialize_for_api()
+
+
+def test_unstyled_mention_equals_default_annotations() -> None:
+    """A mention built with `style=None` must compare equal to the default annotations the API returns.
+
+    Regression test for https://github.com/ultimate-notion/ultimate-notion/issues/174: a mention
+    built without a style has `annotations` set to `Unset`, while the Notion API returns a fully
+    populated `Annotations` object with `color=Color.DEFAULT`. Both represent default styling and
+    must therefore be considered equal.
+    """
+    user_id = uuid4()
+    user_ref = UserRef(id=user_id)
+
+    # Offline mention without any style, as built e.g. internally when no annotations are given.
+    unstyled_mention = objs.MentionUser.build_mention_from(user=user_ref, style=None)
+    unstyled_block = uno.Paragraph(text=Text.wrap_obj_ref(obj_refs=[unstyled_mention]))
+    assert unstyled_mention.annotations is Unset
+
+    # Mention with explicit default annotations, mimicking what the Notion API returns on read.
+    default_mention = objs.MentionUser.build_mention_from(user=user_ref, style=objs.Annotations())
+    default_block = uno.Paragraph(text=Text.wrap_obj_ref(obj_refs=[default_mention]))
+
+    assert unstyled_block == default_block
+
+    # A non-default style must still differ.
+    bold_mention = objs.MentionUser.build_mention_from(user=user_ref, style=objs.Annotations(bold=True))
+    bold_block = uno.Paragraph(text=Text.wrap_obj_ref(obj_refs=[bold_mention]))
+    assert unstyled_block != bold_block
 
 
 @pytest.mark.vcr()
