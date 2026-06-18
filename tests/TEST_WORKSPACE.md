@@ -65,18 +65,24 @@ Notes:
 
 ## 2. `Wiki DB`
 
-1. Create a full-page database titled exactly `Wiki DB` with these properties:
+A wiki can only be created from a **page**, not a database — a database's **•••** menu
+has no "Turn into wiki" — and the `Verification` property the tests require is added
+only by the wiki conversion. So:
 
-   | Property name | Type | Configuration |
+1. Create a normal **page** titled exactly `Wiki DB` under the root page.
+2. In the left sidebar, hover that page → **•••** → **Turn into wiki**. This converts it
+   to a wiki and automatically adds the **`Owner`** (Person) and **`Verification`**
+   properties to its database. (If you don't see "Turn into wiki", the page may need to
+   be a top-level/teamspace page — create it there and connect your integration to it.)
+3. Open the wiki's database and adjust its properties so it has exactly these five:
+
+   | Property name | Type | Source |
    | --- | --- | --- |
-   | `Page` | Title | — |
-   | `Owner` | Person | — |
-   | `Tags` | Multi-select | Options: `Onboarding` (Blue), `Design` (Green) |
-   | `Last edited time` | Last edited time | — |
-
-2. Turn it into a wiki: open the database's **•••** menu → **Turn into wiki**.
-   This automatically adds the **`Verification`** property the tests expect; you do
-   not add it manually.
+   | `Page` | Title | rename the title property to `Page` |
+   | `Owner` | Person | added by the wiki conversion |
+   | `Verification` | Verification | added by the wiki conversion |
+   | `Tags` | Multi-select — `Onboarding` (Blue), `Design` (Green) | add manually |
+   | `Last edited time` | Last edited time | add manually |
 
 ## 3. `Custom Emoji Page`
 
