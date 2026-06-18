@@ -153,7 +153,6 @@ def extract_id(text: str) -> str | None:
 class GenericObject(BaseModel):
     """The base for all API objects."""
 
-    __hash__: ClassVar[None] = None  # type: ignore[assignment]
     _frozen: bool = False  # for computing hash and equality
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
