@@ -168,7 +168,7 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     @property
     def _has_children_field(self) -> bool:
         """Return whether the object has a `children` field."""
-        return isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children')
+        return isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren)
 
     def _gen_children_cache(self) -> list[Block]:
         """Generate the children cache."""
@@ -179,8 +179,8 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         session = get_active_session()
         child_blocks_objs = list(session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref)))
         self.obj_ref.has_children = bool(child_blocks_objs)  # update the property manually to avoid API call
-        if self._has_children_field:
-            self.obj_ref.value.children = child_blocks_objs  # type: ignore[attr-defined] # update the children attribute
+        if isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren):
+            self.obj_ref.value.children = child_blocks_objs  # update the children attribute
 
         child_blocks: list[Block] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
 
@@ -422,9 +422,10 @@ class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     @classmethod
     def wrap_obj_ref(cls: type[Self], obj_ref: B_co, /) -> Self:  # type: ignore[misc] # breaking covariance
         self = super().wrap_obj_ref(obj_ref)
-        if obj_ref.has_children and hasattr(self.obj_ref.value, 'children') and self.obj_ref.value.children:
-            self._children = [Block.wrap_obj_ref(child) for child in self.obj_ref.value.children]
-            self.obj_ref.value.children = []  # clear children to avoid confusion during comparison
+        value = self.obj_ref.value
+        if obj_ref.has_children and isinstance(value, obj_blocks.WithChildren) and value.children:
+            self._children = [Block.wrap_obj_ref(child) for child in value.children]
+            value.children = []  # clear children to avoid confusion during comparison
         return self
 
 
@@ -1577,10 +1578,11 @@ def _build_obj_ref(node: _Node) -> Block:
     if not isinstance(block, Block):
         msg = f'Non-block type {type(block)} not allowed on this level of the hierarchy.'
         raise TypeError(msg)
-    if isinstance(block, ParentBlock) and block.has_children and hasattr(block.obj_ref.value, 'children'):
+    value = block.obj_ref.value
+    if isinstance(block, ParentBlock) and block.has_children and isinstance(value, obj_blocks.WithChildren):
         for child in node.children:
             _build_obj_ref(child)
-        block.obj_ref.value.children = [child.block.obj_ref for child in children]
+        value.children = [child.block.obj_ref for child in children]
     return block
 
 
