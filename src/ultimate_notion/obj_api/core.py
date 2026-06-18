@@ -419,7 +419,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
         }
     """
 
-    type: str = Field(default=None)  # type: ignore  # avoids mypy errors as this is set in __pydantic_init_subclass__
+    type: str | None = Field(default=None)
     """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
     _typemap: ClassVar[dict[str, builtins.type[TypedObject]]]
@@ -512,9 +512,17 @@ class TypedObject(GenericObject, Generic[TO_co]):
         return cls(*args, **kwargs)
 
     @property
+    def _type_name(self) -> str:
+        """Return the registered `type` name, which is always a string on concrete subclasses."""
+        if self.type is None:
+            msg = f"'type' is not set on {type(self).__name__}; it is only set on concrete subclasses"
+            raise ValueError(msg)
+        return self.type
+
+    @property
     def value(self) -> TO_co:
         """Return the nested object."""
-        return cast(TO_co, getattr(self, self.type))
+        return cast(TO_co, getattr(self, self._type_name))
 
     @value.setter
     def value(self, val: TO_co) -> None:  # type: ignore[misc]  # breaking covariance
@@ -522,7 +530,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
         # we are breaking covariance here but going down the Protocol way didn't work out
         # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
         # This is still the most programmatic way it seems without adding too much complexity.
-        setattr(self, self.type, val)
+        setattr(self, self._type_name, val)
 
 
 class ParentRef(TypedObject[T], ABC, polymorphic_base=True):

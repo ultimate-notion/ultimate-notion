@@ -171,8 +171,9 @@ class BlocksEndpoint(Endpoint):
         if isinstance(block, FileBase):
             # The Notiopn API does not support setting a new typed FileObject, e.g. `external` or `file`
             # It even must be removed from the params
-            dtype = params[block.type].pop('type')
-            del params[block.type][dtype]
+            block_type = block._type_name
+            dtype = params[block_type].pop('type')
+            del params[block_type][dtype]
 
         # Typing in notion_client sucks, so we cast
         data = cast(dict[str, Any], self.raw_api.update(block_id.hex, **params))
