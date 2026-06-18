@@ -24,6 +24,7 @@
 - Chg: Return `FileUploadStatus` in `UploadedFile.file_import_result` for easier usage.
 - Fix: All objects are no longer `hash`able as they are mutable and thus the former behaviour was semantically incorrect.
 - Fix: Comparison of off-/online `MentionObject`s works, also when `UserRef` or an `ObjectRef` to a page is used, issue #170.
+- Fix: An `Unset` `annotations` (e.g. a mention built with `style=None`) now compares equal to the default `Annotations` returned by the Notion API, issue #174.
 
 ## Version 0.9.5, 2025-10-24
 
