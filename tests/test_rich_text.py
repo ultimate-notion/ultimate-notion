@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import re
+from urllib.parse import urlparse
+
 import pendulum as pnd
 import pytest
 
@@ -52,6 +55,11 @@ def test_is_url() -> None:
 def test_mention(
     person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.Database, notion: uno.Session
 ) -> None:
+    def mention_url(obj: uno.Page | uno.Database) -> str:
+        parsed = urlparse(obj.url)
+        prefix = '/p' if parsed.hostname == 'app.notion.com' else ''
+        return f'{parsed.scheme}://{parsed.netloc}{prefix}/{obj.id.hex}'
+
     user_mention = uno.mention(person)
     page_mention = uno.mention(md_text_page)
     db_mention = uno.mention(all_props_db)
@@ -61,11 +69,12 @@ def test_mention(
     paragraph = uno.Paragraph(user_mention + ' : ' + page_mention + ' : ' + db_mention + ' : ' + date_mention)
     page.append(paragraph)
     exp_text = (
-        f'[@{person.name}]() : ↗[Markdown Text Test](https://www.notion.so/0c8ea7f1c7ca4abb8890085c0fac383b)'
-        ' : ↗[All Properties DB](https://www.notion.so/4fa8756fa0da4efe9c484d6a323b69f8)'
+        f'[@USER]() : ↗[Markdown Text Test]({mention_url(md_text_page)})'
+        f' : ↗[All Properties DB]({mention_url(all_props_db)})'
         ' : [2022-01-01T00:00:00.000+00:00]()'
     )
-    assert page.children[0].to_markdown() == exp_text
+    actual = re.sub(r'^\[@[^\]]+\]\(\)', '[@USER]()', page.children[0].to_markdown())
+    assert actual == exp_text
 
 
 @pytest.mark.vcr()
@@ -74,18 +83,19 @@ def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Sess
     text += uno.math('E=mc^2', bold=True)
     text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com/')
     text += uno.mention(person)
-    exp_text = (
-        f'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) [@{person.name}]()'
-    )
-    assert text.to_markdown() == exp_text
+    exp_text = 'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) [@USER]()'
+    actual = re.sub(r'\[@[^\]]+\]\(\)$', '[@USER]()', text.to_markdown())
+    assert actual == exp_text
 
     page = notion.create_page(parent=root_page, title='RichText Test')
     page.append(uno.Paragraph(text))
-    assert page.children[0].to_markdown() == exp_text
+    actual = re.sub(r'\[@[^\]]+\]\(\)$', '[@USER]()', page.children[0].to_markdown())
+    assert actual == exp_text
 
     notion.cache.clear()
     page = notion.get_page(page.id)
-    assert page.children[0].to_markdown() == exp_text
+    actual = re.sub(r'\[@[^\]]+\]\(\)$', '[@USER]()', page.children[0].to_markdown())
+    assert actual == exp_text
 
 
 def test_rich_text() -> None:

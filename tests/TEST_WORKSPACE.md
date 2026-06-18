@@ -1,14 +1,14 @@
 # Building the manual test objects
 
 Most of the objects the live tests expect can be created with the Notion API and
-will eventually be produced by a bootstrap script. **Three of them cannot be created
+are produced by the workspace bootstrap script. **Three of them cannot be created
 through the API at all** and must be built by hand in the Notion UI, because they use
 features Notion does not expose in its public API:
 
 | Object | Why it must be built by hand |
 | --- | --- |
 | `All Properties DB` | Contains **AI Autofill** properties and a **Button** property, neither of which the API can create. |
-| `Wiki DB` | Is a database that has been **turned into a wiki**, which adds a `Verification` property; the API cannot create wikis. |
+| `Wiki DB` | Is an ordinary page that has been **turned into a wiki**; the API cannot perform that conversion. |
 | `Custom Emoji Page` | Its icon is a **custom (uploaded) emoji**; the API can reference custom emoji but cannot upload them. |
 
 Create all three **inside the root page** you shared with your integration (see the
@@ -114,11 +114,15 @@ only by the wiki conversion. So:
 These three are only the objects the API **cannot** create. A full live run / cassette
 re-record also needs the remaining named objects (`Contacts DB`, `Task DB`, `Formula DB`,
 the `Getting Started` / markdown / embed / comment pages, etc.) to exist under the same
-root page. Those *can* be created with the API and will be produced by a bootstrap
-script (tracked in [issue #194]); until that script lands they have to be created by
-hand too.
+root page. Create any missing API-creatable objects with:
+
+```console
+NOTION_TOKEN=ntn_... UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
+```
+
+The script is idempotent and leaves existing objects unchanged. Some content-sensitive
+tests still require the richer recorded fixture content; the bootstrap creates the
+minimum useful structure and seed rows needed to inspect and extend a fresh workspace.
 
 Once every named object exists under your shared root page, re-record with
 `hatch run vcr-rewrite`.
-
-[issue #194]: https://github.com/ultimate-notion/ultimate-notion/issues/194

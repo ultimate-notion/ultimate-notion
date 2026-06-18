@@ -23,6 +23,8 @@ def test_all_createable_props_schema(
     get_id_prefix: Callable[[str], str],
     person: uno.User,
 ) -> None:
+    notion.cache[person.id] = person
+
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
