@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fix: Add support for `pydantic` 2.13, which previously broke parsing of Notion user objects (e.g. people properties), issue #189.
+- Fix: Accept the new `is_archived` field the Notion API sends on pages and databases, which previously broke `search_page()`/`search_db()` in development mode, issue #202.
 
 ## Version 0.9.6, 2025-11-23
 

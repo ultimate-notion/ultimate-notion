@@ -61,7 +61,7 @@ def test_mention(
     paragraph = uno.Paragraph(user_mention + ' : ' + page_mention + ' : ' + db_mention + ' : ' + date_mention)
     page.append(paragraph)
     exp_text = (
-        '[@Florian Wilhelm]() : ↗[Markdown Text Test](https://www.notion.so/0c8ea7f1c7ca4abb8890085c0fac383b)'
+        f'[@{person.name}]() : ↗[Markdown Text Test](https://www.notion.so/0c8ea7f1c7ca4abb8890085c0fac383b)'
         ' : ↗[All Properties DB](https://www.notion.so/4fa8756fa0da4efe9c484d6a323b69f8)'
         ' : [2022-01-01T00:00:00.000+00:00]()'
     )
@@ -75,7 +75,7 @@ def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Sess
     text += uno.text(' and this is a mention: ', href='https://ultimate-notion.com/')
     text += uno.mention(person)
     exp_text = (
-        'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) [@Florian Wilhelm]()'
+        f'This is an equation: **$E=mc^2$** [and this is a mention:](https://ultimate-notion.com/) [@{person.name}]()'
     )
     assert text.to_markdown() == exp_text
 
