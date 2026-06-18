@@ -17,7 +17,7 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Annotated, Any, cast
+from typing import Annotated, Any, Generic, cast
 
 from pydantic import AfterValidator, Field, SerializeAsAny
 from typing_extensions import TypeVar
@@ -122,6 +122,20 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
         return self.type == other.type and self.value == other.value
 
 
+# ToDo: Use new syntax when requires-python >= 3.12
+CB = TypeVar('CB', bound=Block, default=Block)  # invariant, as it is used in the mutable `children` list
+
+
+class WithChildren(GenericObject, ABC, Generic[CB]):
+    """Type data mixin for blocks that can hold child blocks.
+
+    Provides a common base so that type data carrying `children` can be detected and narrowed
+    with `isinstance`, e.g. when populating the children cache from the API.
+    """
+
+    children: list[SerializeAsAny[CB]] = Field(default_factory=list)
+
+
 class UnsupportedBlockTypeData(GenericObject):
     """Type data for `UnsupportedBlock`."""
 
@@ -184,10 +198,8 @@ class ColoredTextBlock(TextBlock[CTB_co]):
     """A standard abstract text block object in Notion with color."""
 
 
-class ParagraphTypeData(ColoredTextBlockTypeData):
+class ParagraphTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Paragraph` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):
@@ -224,10 +236,8 @@ class Heading3(Heading, type='heading_3'):
     heading_3: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
-class QuoteTypeData(ColoredTextBlockTypeData):
+class QuoteTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Quote` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
@@ -254,11 +264,13 @@ class Code(TextBlock[CodeTypeData], type='code'):
     code: CodeTypeData = Field(default_factory=CodeTypeData)
 
 
-class CalloutTypeData(ColoredTextBlockTypeData):
-    """Type data for `Callout` block."""
+class CalloutTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
+    """Type data for `Callout` block.
 
-    # `children` is undocumented and behaves inconsistent. It is used during creation but not filled when retrieved.
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    Note: `children` is undocumented and behaves inconsistently. It is used during creation but not
+    filled when retrieved.
+    """
+
     # `Unset` means the default icon as determined by Notion, and `None` means no icon when retrieved
     #  but is not accepted when sending to Notion.
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
@@ -279,10 +291,8 @@ class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
     #     return model_data
 
 
-class BulletedListItemTypeData(ColoredTextBlockTypeData):
+class BulletedListItemTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `BulletedListItem` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class BulletedListItem(ColoredTextBlock[BulletedListItemTypeData], type='bulleted_list_item'):
@@ -291,10 +301,8 @@ class BulletedListItem(ColoredTextBlock[BulletedListItemTypeData], type='bullete
     bulleted_list_item: BulletedListItemTypeData = Field(default_factory=BulletedListItemTypeData)
 
 
-class NumberedListItemTypeData(ColoredTextBlockTypeData):
+class NumberedListItemTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `NumberedListItem` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class NumberedListItem(ColoredTextBlock[NumberedListItemTypeData], type='numbered_list_item'):
@@ -303,11 +311,10 @@ class NumberedListItem(ColoredTextBlock[NumberedListItemTypeData], type='numbere
     numbered_list_item: NumberedListItemTypeData = Field(default_factory=NumberedListItemTypeData)
 
 
-class ToDoTypeData(ColoredTextBlockTypeData):
+class ToDoTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `ToDo` block."""
 
     checked: bool = False
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class ToDo(ColoredTextBlock[ToDoTypeData], type='to_do'):
@@ -316,10 +323,8 @@ class ToDo(ColoredTextBlock[ToDoTypeData], type='to_do'):
     to_do: ToDoTypeData = Field(default_factory=ToDoTypeData)
 
 
-class ToggleTypeData(ColoredTextBlockTypeData):
+class ToggleTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Toggle` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Toggle(ColoredTextBlock[ToggleTypeData], type='toggle'):
@@ -474,12 +479,13 @@ class ChildDatabase(Block[ChildDatabaseTypeData], type='child_database'):
     child_database: ChildDatabaseTypeData
 
 
-class ColumnTypeData(GenericObject):
-    """Type data for `Column` block."""
+class ColumnTypeData(WithChildren[Block]):
+    """Type data for `Column` block.
 
-    # note that children will not be populated when getting this block
-    # https://developers.notion.com/changelog/column-list-and-column-support
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    Note that `children` will not be populated when getting this block.
+    See https://developers.notion.com/changelog/column-list-and-column-support
+    """
+
     width_ratio: float | None = None
 
 
@@ -493,11 +499,13 @@ class Column(Block[ColumnTypeData], type='column'):
         return Column.model_construct(column=ColumnTypeData.model_construct(children=[], width_ratio=width_ratio))
 
 
-class ColumnListTypeData(GenericObject):
-    """Type data for `ColumnList` block."""
+class ColumnListTypeData(WithChildren[Column]):
+    """Type data for `ColumnList` block.
 
-    # note that children will not be populated when getting this block
-    # https://developers.notion.com/changelog/column-list-and-column-support
+    Note that `children` will not be populated when getting this block.
+    See https://developers.notion.com/changelog/column-list-and-column-support
+    """
+
     children: list[Column] = Field(default_factory=list)
 
 
@@ -523,14 +531,16 @@ class TableRow(Block[TableRowTypeData], type='table_row'):
         return TableRow.model_construct(table_row=TableRowTypeData.model_construct(cells=[[] for _ in range(n_cells)]))
 
 
-class TableTypeData(GenericObject):
-    """Type data for `Table` block."""
+class TableTypeData(WithChildren[TableRow]):
+    """Type data for `Table` block.
+
+    Note that `children` will not be populated when getting this block.
+    See https://developers.notion.com/reference/block#table-blocks
+    """
 
     table_width: int = 0
     has_column_header: bool = False
     has_row_header: bool = False
-    # note that children will not be populated when getting this block
-    # https://developers.notion.com/reference/block#table-blocks
     children: list[TableRow] = Field(default_factory=list)
 
 
@@ -546,11 +556,10 @@ class LinkToPage(Block[ParentRef], type='link_to_page'):
     link_to_page: SerializeAsAny[ParentRef]
 
 
-class SyncedBlockTypeData(GenericObject):
+class SyncedBlockTypeData(WithChildren[Block]):
     """Type data for `SyncedBlock` block."""
 
     synced_from: BlockRef | None = None
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
@@ -567,10 +576,8 @@ class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
         return model_data
 
 
-class TemplateTypeData(TextBlockTypeData):
+class TemplateTypeData(TextBlockTypeData, WithChildren[Block]):
     """Type data for `Template` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Template(TextBlock[TemplateTypeData], type='template'):
