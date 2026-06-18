@@ -121,7 +121,9 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 4. **Create and share a root page.** In your test workspace create a page that
    acts as the parent for all test content, then connect your integration to it
    via the page's ••• menu → *Connections*. Sharing the parent grants the
-   integration access to everything created beneath it.
+   integration access to everything created beneath it. By default the suite
+   looks for a page titled `Tests`; set the `UNO_TEST_ROOT_PAGE` environment
+   variable to point it at a page with a different title.
 
 5. **Point the configuration at the token.** Set `NOTION_TOKEN` to the secret
    from step 3 (see the `.vscode/.env` example above); the Ultimate Notion config
