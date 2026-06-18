@@ -199,7 +199,7 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
     if hasattr(obj, '__deepcopy__'):
         # Undo hack
         obj.__deepcopy__ = deepcopy_method
-        del clone.__deepcopy__  # type: ignore[attr-defined]
+        del clone.__dict__['__deepcopy__']
 
     return clone
 
