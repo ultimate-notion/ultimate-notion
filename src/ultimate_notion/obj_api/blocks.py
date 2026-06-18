@@ -122,6 +122,13 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
         # ignore meta fields, e.g. id, created_time, etc. for equality, only use content
         return self.type == other.type and self.value == other.value
 
+    def serialize_for_api(self) -> dict[str, Any]:
+        """Serialize the block for sending it to the Notion API."""
+        data = super().serialize_for_api()
+        for key in ('has_children', 'in_trash', 'archived', 'is_archived'):
+            data.pop(key, None)
+        return data
+
 
 class UnsupportedBlockTypeData(GenericObject):
     """Type data for `UnsupportedBlock`."""
@@ -189,6 +196,7 @@ class ParagraphTypeData(ColoredTextBlockTypeData):
     """Type data for `Paragraph` block."""
 
     children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
 
 
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):

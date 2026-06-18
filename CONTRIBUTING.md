@@ -129,17 +129,18 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
    from step 3 (see the `.vscode/.env` example above); the Ultimate Notion config
    resolves the token from this environment variable by default.
 
+6. **Bootstrap the API-creatable objects.** Run:
+
+   ```console
+   UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
+   ```
+
+   The command is idempotent and leaves existing objects unchanged.
+
 !!! note
-    Running the full suite live currently also expects a set of manually created
-    objects in the workspace (a root page named `Tests`, databases such as
-    `All Properties DB`, `Wiki DB`, `Contacts DB`, `Task DB` and `Formula DB`, and
-    several content pages). Most of these can be created with the API, but three
-    (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use features the API
-    cannot create and must be built by hand — see
+    Three objects (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use
+    features the API cannot create and must be built by hand — see
     [`tests/TEST_WORKSPACE.md`](tests/TEST_WORKSPACE.md) for exact instructions.
-    Removing this hard-coded, workspace-specific setup so that any maintainer can
-    re-record cassettes is tracked in
-    [issue #194](https://github.com/ultimate-notion/ultimate-notion/issues/194).
 
 ### Implement your changes
 

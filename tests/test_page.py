@@ -147,6 +147,8 @@ def test_title_attr(notion: uno.Session, root_page: uno.Page) -> None:
 
 @pytest.mark.vcr()
 def test_created_edited_by(notion: uno.Session, root_page: uno.Page) -> None:
+    notion.whoami()
+    notion.all_users()
     assert isinstance(root_page.created_by, uno.User)
     assert isinstance(root_page.last_edited_by, uno.User)
 

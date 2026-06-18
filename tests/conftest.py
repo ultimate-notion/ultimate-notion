@@ -251,7 +251,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
-def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
+def vcr_fixture(scope: str, *, autouse: bool = False, shared: bool = False) -> Callable[..., Any]:
     """Return a VCR fixture for module/session-level fixtures"""
     if scope not in {'module', 'session'}:
         msg = f'Use this only for module or session scope, not {scope}!'
@@ -262,12 +262,13 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
         is_generator = inspect.isgeneratorfunction(func)
 
         def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR | MagicMock, str]:
-            if scope == 'module':
+            if scope == 'module' and not shared:
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
                 cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
-            else:  # scope == 'session'
+            else:
                 cassette_dir = str(request.config.rootdir / 'tests' / 'cassettes' / 'fixtures')
-                cassette_name = f'sess_{func.__name__}.yaml'
+                prefix = 'mod' if scope == 'module' else 'sess'
+                cassette_name = f'{prefix}_{func.__name__}.yaml'
 
             vcr_config = vcr_config.copy()  # to avoid changing the original config
             vcr_config |= {'cassette_library_dir': cassette_dir}
@@ -359,15 +360,14 @@ def notion(notion_cached: Session) -> Iterator[Session]:
         yield notion_cached
 
 
-@pytest.fixture(scope='module')
+@vcr_fixture(scope='module', shared=True)
 def person(notion_cached: Session) -> User:
     """Return a user object for testing.
 
-    Resolves to the integration's own bot user so the test suite is not tied to a
-    specific workspace member. Every workspace has exactly one bot for the connected
-    integration, so this needs no configuration and works in any workspace.
+    Use the first user visible to the integration so the suite is not tied to a
+    specific workspace member.
     """
-    return notion_cached.whoami()
+    return notion_cached.all_users()[0]
 
 
 @vcr_fixture(scope='module')
