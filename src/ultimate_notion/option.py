@@ -67,23 +67,25 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
 
 
 class OptionNSType(type):
-    """Metaclass to implement `len` for type `OptionNS` itself, not an instance of it."""
+    """Metaclass providing class-level operations for `OptionNS` namespaces.
 
-    # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
+    These operate on the namespace class itself, not on instances of it, so they live on the
+    metaclass. Typing the receiver this way (rather than annotating `cls` as `type[OptionNS]`)
+    lets mypy resolve the methods without a `type: ignore`.
+    """
 
-    def __len__(cls: type[OptionNS]) -> int:  # type: ignore[misc]
+    def to_list(cls) -> list[Option]:
+        """Convert the namespace to a list as needed by the (Multi)Select property types."""
+        return [
+            getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
+        ]
+
+    def __len__(cls) -> int:
         return len(cls.to_list())
 
 
 class OptionNS(metaclass=OptionNSType):
     """Option namespace to simplify working with (Multi-)Select options."""
-
-    @classmethod
-    def to_list(cls) -> list[Option]:
-        """Convert the enum to a list as needed by the (Multi)Select property types."""
-        return [
-            getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
-        ]
 
 
 class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
