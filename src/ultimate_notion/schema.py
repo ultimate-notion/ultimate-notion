@@ -782,6 +782,11 @@ class SchemaType(ABCMeta):
     letting it behave like a dictionary for the properties although it is a class, not an instance.
     """
 
+    # The properties live on the schema class itself, so `_props` and the methods operating on it
+    # belong on the metaclass. Defining them here (rather than annotating `cls` as `type[Schema]`
+    # on instance-less metaclass methods) lets mypy resolve them without a `type: ignore`.
+    _props: list[Property]
+
     # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments
     def __new__(metacls, name: str, bases: tuple[type, ...], namespace: dict[str, object], **kwargs: Any) -> SchemaType:
         # This collects all schema properties under `_props`. Using __prepare__ doesn't work as referencing
@@ -805,6 +810,10 @@ class SchemaType(ABCMeta):
             prop._owner = cast(type[Schema], cls)
 
         return cls
+
+    def get_props(cls) -> list[Property]:
+        """Get all properties of this schema."""
+        return cls._props
 
     def __str__(cls: type[Schema]) -> str:  # type: ignore[misc]
         # We can only overwrite __str__ for a class in a metaclass
@@ -844,7 +853,7 @@ class SchemaType(ABCMeta):
         if isinstance(prop_type, Relation) and (prop_type._two_way_prop is not None):
             prop_type._rename_two_way_prop(prop if isinstance(prop := prop_type._two_way_prop, str) else prop.name)
 
-    def __getattr__(cls: type[Schema], name: str) -> Property:  # type: ignore[misc]
+    def __getattr__(cls, name: str) -> Property:
         attr_name_props = SList([prop for prop in cls.get_props() if prop._attr_name == name])
         try:
             return attr_name_props.item()
@@ -880,10 +889,10 @@ class SchemaType(ABCMeta):
         else:
             super().__setattr__(name, value)  # type: ignore[misc]  # no clue why this results in a type problem
 
-    def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
+    def __len__(cls) -> int:
         return len(cls.get_props())
 
-    def __iter__(cls: type[Schema]) -> Iterator[Property]:  # type: ignore[misc]
+    def __iter__(cls) -> Iterator[Property]:
         return (prop for prop in cls.get_props())
 
 
@@ -955,11 +964,6 @@ class Schema(metaclass=SchemaType):
     def create(cls, **kwargs: Any) -> Page:
         """Create a page using this schema with a bound database."""
         return cls.get_db().create_page(**kwargs)
-
-    @classmethod
-    def get_props(cls) -> list[Property]:
-        """Get all properties of this schema."""
-        return cls._props
 
     @overload
     @classmethod
