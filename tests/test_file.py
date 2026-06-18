@@ -44,7 +44,8 @@ def test_import_url(root_page: uno.Page, notion: uno.Session) -> None:
     assert uploaded_file.expiry_time is not None
     assert uploaded_file.status == uno.FileUploadStatus.UPLOADED
     assert uploaded_file.content_type == 'application/mp4'
-    assert uploaded_file.content_length >= 20_000_000  # type: ignore[operator]
+    assert uploaded_file.content_length is not None
+    assert uploaded_file.content_length >= 20_000_000
 
 
 @pytest.mark.file_upload
