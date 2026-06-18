@@ -157,9 +157,9 @@ def normalize_text_objs(rt_objs: list[RichTextBaseObject]) -> list[RichTextBaseO
 class TextBlockTypeData(GenericObject):
     """Type data for `TextBlock`."""
 
-    rich_text: Annotated[
-        list[SerializeAsAny[RichTextBaseObject]], AfterValidator(normalize_text_objs), Field(default_factory=list)
-    ]
+    rich_text: Annotated[list[SerializeAsAny[RichTextBaseObject]], AfterValidator(normalize_text_objs)] = Field(
+        default_factory=list
+    )
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -193,7 +193,7 @@ class ParagraphTypeData(ColoredTextBlockTypeData):
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):
     """A paragraph block in Notion."""
 
-    paragraph: ParagraphTypeData = Field(default_factory=ParagraphTypeData)  # type: ignore[arg-type]
+    paragraph: ParagraphTypeData = Field(default_factory=ParagraphTypeData)
 
 
 class HeadingTypeData(ColoredTextBlockTypeData):
@@ -209,19 +209,19 @@ class Heading(ColoredTextBlock[HeadingTypeData]):
 class Heading1(Heading, type='heading_1'):
     """A heading_1 block in Notion."""
 
-    heading_1: HeadingTypeData = Field(default_factory=HeadingTypeData)  # type: ignore[arg-type]
+    heading_1: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class Heading2(Heading, type='heading_2'):
     """A heading_2 block in Notion."""
 
-    heading_2: HeadingTypeData = Field(default_factory=HeadingTypeData)  # type: ignore[arg-type]
+    heading_2: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class Heading3(Heading, type='heading_3'):
     """A heading_3 block in Notion."""
 
-    heading_3: HeadingTypeData = Field(default_factory=HeadingTypeData)  # type: ignore[arg-type]
+    heading_3: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class QuoteTypeData(ColoredTextBlockTypeData):
@@ -233,7 +233,7 @@ class QuoteTypeData(ColoredTextBlockTypeData):
 class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
     """A quote block in Notion."""
 
-    quote: QuoteTypeData = Field(default_factory=QuoteTypeData)  # type: ignore[arg-type]
+    quote: QuoteTypeData = Field(default_factory=QuoteTypeData)
 
 
 class CaptionMixin(GenericObject, ABC):
@@ -251,7 +251,7 @@ class CodeTypeData(TextBlockTypeData, CaptionMixin):
 class Code(TextBlock[CodeTypeData], type='code'):
     """A code block in Notion."""
 
-    code: CodeTypeData = Field(default_factory=CodeTypeData)  # type: ignore[arg-type]
+    code: CodeTypeData = Field(default_factory=CodeTypeData)
 
 
 class CalloutTypeData(ColoredTextBlockTypeData):
@@ -267,7 +267,7 @@ class CalloutTypeData(ColoredTextBlockTypeData):
 class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
     """A callout block in Notion."""
 
-    callout: CalloutTypeData = Field(default_factory=CalloutTypeData)  # type: ignore[arg-type]
+    callout: CalloutTypeData = Field(default_factory=CalloutTypeData)
 
     # This would work if the Notion API would accept `null` for `icon` to have no icon but does not.
     # def serialize_for_api(self) -> dict[str, Any]:
@@ -288,7 +288,7 @@ class BulletedListItemTypeData(ColoredTextBlockTypeData):
 class BulletedListItem(ColoredTextBlock[BulletedListItemTypeData], type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
-    bulleted_list_item: BulletedListItemTypeData = Field(default_factory=BulletedListItemTypeData)  # type: ignore[arg-type]
+    bulleted_list_item: BulletedListItemTypeData = Field(default_factory=BulletedListItemTypeData)
 
 
 class NumberedListItemTypeData(ColoredTextBlockTypeData):
@@ -300,7 +300,7 @@ class NumberedListItemTypeData(ColoredTextBlockTypeData):
 class NumberedListItem(ColoredTextBlock[NumberedListItemTypeData], type='numbered_list_item'):
     """A numbered list item in Notion."""
 
-    numbered_list_item: NumberedListItemTypeData = Field(default_factory=NumberedListItemTypeData)  # type: ignore[arg-type]
+    numbered_list_item: NumberedListItemTypeData = Field(default_factory=NumberedListItemTypeData)
 
 
 class ToDoTypeData(ColoredTextBlockTypeData):
@@ -313,7 +313,7 @@ class ToDoTypeData(ColoredTextBlockTypeData):
 class ToDo(ColoredTextBlock[ToDoTypeData], type='to_do'):
     """A todo list item in Notion."""
 
-    to_do: ToDoTypeData = Field(default_factory=ToDoTypeData)  # type: ignore[arg-type]
+    to_do: ToDoTypeData = Field(default_factory=ToDoTypeData)
 
 
 class ToggleTypeData(ColoredTextBlockTypeData):
@@ -325,7 +325,7 @@ class ToggleTypeData(ColoredTextBlockTypeData):
 class Toggle(ColoredTextBlock[ToggleTypeData], type='toggle'):
     """A toggle list item in Notion."""
 
-    toggle: ToggleTypeData = Field(default_factory=ToggleTypeData)  # type: ignore[arg-type]
+    toggle: ToggleTypeData = Field(default_factory=ToggleTypeData)
 
 
 class DividerTypeData(GenericObject):
@@ -576,4 +576,4 @@ class TemplateTypeData(TextBlockTypeData):
 class Template(TextBlock[TemplateTypeData], type='template'):
     """A template block in Notion."""
 
-    template: TemplateTypeData = Field(default_factory=TemplateTypeData)  # type: ignore[arg-type]
+    template: TemplateTypeData = Field(default_factory=TemplateTypeData)
