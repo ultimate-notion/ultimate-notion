@@ -310,7 +310,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     @property
     def value_type(self) -> FormulaType | None:
         """Return the type of the formula result."""
-        return FormulaType(self.obj_ref.formula.type) if self.obj_ref.formula else None
+        return FormulaType(self.obj_ref.formula._type_name) if self.obj_ref.formula else None
 
 
 class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):

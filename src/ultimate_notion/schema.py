@@ -206,7 +206,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def prop_value(self) -> type[PropertyValue]:
         """Return the corresponding property value of this property."""
-        return PropertyValue._type_value_map[self.obj_ref.type]
+        return PropertyValue._type_value_map[self.obj_ref._type_name]
 
     @property
     def readonly(self) -> bool:

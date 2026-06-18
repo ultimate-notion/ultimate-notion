@@ -135,7 +135,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
     @property
     def type(self) -> str:
         """Type of the mention, e.g. user, page, etc."""
-        return self.obj_ref.mention.type
+        return self.obj_ref.mention._type_name
 
 
 def mention(
