@@ -49,16 +49,19 @@ recorded cassette `tests/cassettes/fixtures/mod_all_props_db.yaml`).
 | `ID` | ID (unique ID) | — |
 | `Place` | Place | Newer Notion property; add it from the property-type menu. |
 | `Button` | Button | **API cannot create.** Add any action (e.g. nothing/no-op is fine). |
-| `AI summary` | AI Autofill → **AI summary** | **API cannot create.** Appears as text via the API. |
-| `AI key info` | AI Autofill → **Key info** | **API cannot create.** |
-| `AI custom` | AI Autofill → **Custom autofill** | **API cannot create.** |
+| `AI summary` | AI Autofill (Text output) | **API cannot create.** |
+| `AI key info` | AI Autofill (Text output) | **API cannot create.** |
+| `AI custom` | AI Autofill (Text output) | **API cannot create.** |
 
 Notes:
-- The AI Autofill properties are under **+ → AI Autofill** when adding a property.
-  They require AI to be enabled for your workspace.
-- If your Notion plan does not offer a given AI option, create the closest available
-  AI Autofill property and keep the name (`AI summary` / `AI key info` / `AI custom`);
-  the tests treat them as text.
+- **Names are matched exactly (and are case-sensitive).** Notion gives new properties
+  default names that differ from the table — e.g. the title is `Name`, and you get
+  `Multi-select`, `Person`, `Files & media`, `Phone`, and a relation auto-named
+  `Related to All Properties DB`. Rename each to match the table exactly.
+- **AI Autofill properties:** add via **+ → AI Autofill → + New AI Autofill** and choose
+  **`Text`** as the output type, then name the property (`AI summary` / `AI key info` /
+  `AI custom`). The AI prompt itself is irrelevant — the tests only care that the
+  property exists and is exposed as text. Requires AI to be enabled for your workspace.
 
 ## 2. `Wiki DB`
 
@@ -102,7 +105,14 @@ Notes:
 
 ## After building the three objects
 
-The remaining named objects (`Contacts DB`, `Task DB`, `Formula DB`, the markdown
-pages, etc.) can be created with the API. Once the three manual objects above exist
-under your shared root page, the suite has everything it needs and the cassettes can
-be re-recorded with `hatch run vcr-rewrite`.
+These three are only the objects the API **cannot** create. A full live run / cassette
+re-record also needs the remaining named objects (`Contacts DB`, `Task DB`, `Formula DB`,
+the `Getting Started` / markdown / embed / comment pages, etc.) to exist under the same
+root page. Those *can* be created with the API and will be produced by a bootstrap
+script (tracked in [issue #194]); until that script lands they have to be created by
+hand too.
+
+Once every named object exists under your shared root page, re-record with
+`hatch run vcr-rewrite`.
+
+[issue #194]: https://github.com/ultimate-notion/ultimate-notion/issues/194
