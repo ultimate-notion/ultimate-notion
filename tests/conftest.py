@@ -334,8 +334,13 @@ def notion(notion_cached: Session) -> Iterator[Session]:
 
 @pytest.fixture(scope='module')
 def person(notion_cached: Session) -> User:
-    """Return a user object for testing."""
-    return notion_cached.search_user('Florian Wilhelm').item()
+    """Return a user object for testing.
+
+    Resolves to the integration's own bot user so the test suite is not tied to a
+    specific workspace member. Every workspace has exactly one bot for the connected
+    integration, so this needs no configuration and works in any workspace.
+    """
+    return notion_cached.whoami()
 
 
 @vcr_fixture(scope='module')
