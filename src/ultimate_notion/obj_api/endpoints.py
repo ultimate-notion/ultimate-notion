@@ -16,7 +16,7 @@ from uuid import UUID
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
-from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
+from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset, raise_unset
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
@@ -426,21 +426,21 @@ class PagesEndpoint(Endpoint):
                 name: value.serialize_for_api() if value is not None else None for name, value in properties.items()
             }
 
-        if cover is not Unset:
+        if not is_unset(cover):
             if cover is None:
                 _logger.debug(f'Removing cover from page with id `{page_id}`.')
                 request['cover'] = None
             else:
                 _logger.debug(f'Setting cover on page with id `{page_id}`.')
-                request['cover'] = cover.serialize_for_api()  # type: ignore[union-attr]
+                request['cover'] = cover.serialize_for_api()
 
-        if icon is not Unset:
+        if not is_unset(icon):
             if icon is None:
                 _logger.debug(f'Removing icon from page with id `{page_id}`.')
                 request['icon'] = None
             else:
                 _logger.debug(f'Setting icon on page with id `{page_id}`.')
-                request['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
+                request['icon'] = icon.serialize_for_api()
 
         if in_trash is not Unset:
             if in_trash:
@@ -470,21 +470,21 @@ class PagesEndpoint(Endpoint):
         page_id = PageRef.build(page).page_id
         props: dict[str, Any] = {}
 
-        if cover is not Unset:
+        if not is_unset(cover):
             if cover is None:
                 _logger.debug(f'Removing cover from page with id `{page_id}`.')
                 props['cover'] = None
             else:
                 _logger.debug(f'Setting cover on page with id `{page_id}`.')
-                props['cover'] = cover.serialize_for_api()  # type: ignore[union-attr]
+                props['cover'] = cover.serialize_for_api()
 
-        if icon is not Unset:
+        if not is_unset(icon):
             if icon is None:
                 _logger.debug(f'Removing icon from page with id `{page_id}`.')
                 props['icon'] = None
             else:
                 _logger.debug(f'Setting icon on page with id `{page_id}`.')
-                props['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
+                props['icon'] = icon.serialize_for_api()
 
         if in_trash is not Unset:
             if in_trash:
