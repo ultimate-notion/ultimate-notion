@@ -306,7 +306,7 @@ class NotionObject(UniqueObject):
     defines the general object type, e.g. `page`, `database`, `user`, `block`, ...
     """
 
-    object: str = Field(default=None)  # type: ignore # avoids mypy plugin errors as this is set in __init_subclass__
+    object: str | None = Field(default=None)
     """`object` is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ..."""
 
     request_id: UUID | None = None
