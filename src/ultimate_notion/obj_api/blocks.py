@@ -51,6 +51,7 @@ class DataObject(NotionEntity, ABC):
 
     in_trash: bool = False  # used to be `archived`
     archived: bool = False  # ToDo: Deprecated but still partially used in Notion. Check to remove in v1.0!
+    is_archived: bool = False  # newer duplicate of `archived` sent by the API
 
     last_edited_by: UserRef | UnsetType = Unset
 
