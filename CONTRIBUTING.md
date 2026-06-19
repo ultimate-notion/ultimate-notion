@@ -140,7 +140,8 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 !!! note
     Three objects (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use
     features the API cannot create and must be built by hand. See
-    [`tests/TEST_WORKSPACE.md`](tests/TEST_WORKSPACE.md) for exact instructions.
+    [`tests/TEST_WORKSPACE.md`](https://github.com/ultimate-notion/ultimate-notion/blob/main/tests/TEST_WORKSPACE.md)
+    for exact instructions.
 
 ### Implement your changes
 
