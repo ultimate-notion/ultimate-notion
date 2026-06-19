@@ -10,6 +10,7 @@ import os
 import time
 from typing import Any
 
+import typer
 from notion_client import Client
 
 DEFAULT_ROOT_TITLE = 'Tests'
@@ -89,7 +90,7 @@ class Bootstrap:
         children: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         if page := self.find_exact(title, 'page'):
-            print(f'page exists: {title}')
+            typer.echo(f'page exists: {title}')
             return page
         page = sync_object(
             self.client.pages.create(
@@ -98,7 +99,7 @@ class Bootstrap:
                 children=children or [],
             ),
         )
-        print(f'created page: {title}')
+        typer.echo(f'created page: {title}')
         time.sleep(0.4)
         return page
 
@@ -111,7 +112,7 @@ class Bootstrap:
         icon: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         if database := self.find_exact(title, 'database'):
-            print(f'database exists: {title}')
+            typer.echo(f'database exists: {title}')
             return database
         kwargs: dict[str, Any] = {
             'parent': {'page_id': self.root['id']},
@@ -123,7 +124,7 @@ class Bootstrap:
         if icon is not None:
             kwargs['icon'] = icon
         database = sync_object(self.client.databases.create(**kwargs))
-        print(f'created database: {title}')
+        typer.echo(f'created database: {title}')
         time.sleep(0.7)
         return database
 
@@ -147,10 +148,10 @@ class Bootstrap:
 
     def ensure_wiki_shell(self) -> None:
         if self.find_exact('Wiki DB', 'database'):
-            print('wiki exists: Wiki DB')
+            typer.echo('wiki exists: Wiki DB')
             return
         self.create_page('Wiki DB')
-        print('manual step: open the Wiki DB page and select ... -> Turn into wiki')
+        typer.echo('manual step: open the Wiki DB page and select ... -> Turn into wiki')
 
     def ensure_contacts_db(self) -> None:
         database = self.create_database(
@@ -183,7 +184,7 @@ class Bootstrap:
             icon={'type': 'emoji', 'emoji': '🤝'},
         )
         if self.database_rows(database):
-            print('Contacts DB already has rows')
+            typer.echo('Contacts DB already has rows')
             return
         roles = [
             'Project Manager',
@@ -209,7 +210,7 @@ class Bootstrap:
                     'Team Member': {'checkbox': idx % 2 == 0},
                 },
             )
-        print('seeded Contacts DB: 10 rows')
+        typer.echo('seeded Contacts DB: 10 rows')
 
     def ensure_task_db(self) -> None:
         database = self.create_database(
@@ -245,7 +246,7 @@ class Bootstrap:
             description='My personal task list of all the important stuff I have to do',
         )
         if self.database_rows(database):
-            print('Task DB already has rows')
+            typer.echo('Task DB already has rows')
             return
         rows = [
             ('Run first Marathon', 'In Progress', '✹ High', '2026-07-01T12:00:00.000+00:00'),
@@ -263,7 +264,7 @@ class Bootstrap:
                     'Due Date': {'date': {'start': due_date}},
                 },
             )
-        print('seeded Task DB: 3 rows')
+        typer.echo('seeded Task DB: 3 rows')
 
     def ensure_formula_db(self) -> None:
         database = self.create_database(
@@ -286,7 +287,7 @@ class Bootstrap:
             },
         )
         if self.database_rows(database):
-            print('Formula DB already has rows')
+            typer.echo('Formula DB already has rows')
             return
         for title, tags in (('Item 1', ['Done', 'In Progress']), ('Item 2', ['In Progress'])):
             self.create_database_page(
@@ -298,7 +299,7 @@ class Bootstrap:
                     'Date Source': {'date': {'start': '2024-11-25T14:08:00.000+00:00'}},
                 },
             )
-        print('seeded Formula DB: 2 rows')
+        typer.echo('seeded Formula DB: 2 rows')
 
     def ensure_static_pages(self) -> None:
         self.create_page(
@@ -394,7 +395,7 @@ class Bootstrap:
             ('Custom Emoji Page', 'page'),
         ):
             status = 'ready' if self.find_exact(title, kind) else 'manual setup required'
-            print(f'{title}: {status}')
+            typer.echo(f'{title}: {status}')
 
     def run(self) -> None:
         self.ensure_wiki_shell()
