@@ -409,20 +409,28 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     db = notion.create_db(parent=root_page, schema=Schema)
 
     # Change the number format of the number property
-    assert db.schema['Number'].format == uno.NumberFormat.DOLLAR  # type: ignore[attr-defined]
-    db.schema['Number'].format = uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
-    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    number = db.schema['Number']
+    assert isinstance(number, uno.PropType.Number)
+    assert number.format == uno.NumberFormat.DOLLAR
+    number.format = uno.NumberFormat.PERCENT
+    assert number.format == uno.NumberFormat.PERCENT
     db.reload()
-    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
-    db.schema['Number'].format = uno.NumberFormat.EURO.value  # type: ignore[attr-defined]
-    assert db.schema['Number'].format == uno.NumberFormat.EURO  # type: ignore[attr-defined]
+    number = db.schema['Number']
+    assert isinstance(number, uno.PropType.Number)
+    assert number.format == uno.NumberFormat.PERCENT
+    number.format = uno.NumberFormat.EURO.value
+    assert number.format == uno.NumberFormat.EURO
 
     # Change the formula property
-    assert db.schema['Formula'].formula.startswith(block_ref(db.schema['Name']))  # type: ignore[attr-defined]
-    db.schema['Formula'].formula = 'prop("Category")'  # type: ignore[attr-defined]
-    assert db.schema['Formula'].formula == 'prop("Category")'  # type: ignore[attr-defined]
+    formula = db.schema['Formula']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith(block_ref(db.schema['Name']))
+    formula.formula = 'prop("Category")'
+    assert formula.formula == 'prop("Category")'
     db.reload()
-    assert db.schema['Formula'].formula.startswith(block_ref(db.schema['Category']))  # type: ignore[attr-defined]
+    formula = db.schema['Formula']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith(block_ref(db.schema['Category']))
 
     # Change the select options of the select and multi-select properties
     for prop in ('Category', 'Tags'):
