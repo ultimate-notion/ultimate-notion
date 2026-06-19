@@ -250,9 +250,11 @@ class _GTaskListData(GObject):
 class GTaskList:
     """Representation of a Google Task List.
 
-    A task list is a collection of tasks. Unlike [`GTask`][], it is therefore not
+    A task list is a collection of tasks. Unlike
+    [`GTask`][ultimate_notion.adapters.google.tasks.client.GTask], it is therefore not
     a pydantic `BaseModel` itself but wraps its JSON fields in one. This lets
-    iterating over a task list yield its [`GTask`][]s instead of the
+    iterating over a task list yield its
+    [`GTask`][ultimate_notion.adapters.google.tasks.client.GTask]s instead of the
     `(field, value)` pairs that pydantic's `BaseModel.__iter__` produces.
     """
 
