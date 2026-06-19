@@ -419,14 +419,12 @@ class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     def __hash__(self) -> int:
         return hash((super().__hash__(), *self.children))
 
-    @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: B_co, /) -> Self:  # type: ignore[misc] # breaking covariance
-        self = super().wrap_obj_ref(obj_ref)
+    def _finalize_wrap(self) -> None:
+        super()._finalize_wrap()
         value = self.obj_ref.value
-        if obj_ref.has_children and isinstance(value, obj_blocks.WithChildren) and value.children:
+        if self.obj_ref.has_children and isinstance(value, obj_blocks.WithChildren) and value.children:
             self._children = [Block.wrap_obj_ref(child) for child in value.children]
             value.children = []  # clear children to avoid confusion during comparison
-        return self
 
 
 class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):

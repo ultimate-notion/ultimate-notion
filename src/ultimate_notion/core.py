@@ -79,9 +79,18 @@ class Wrapper(Generic[GT_co], ABC):
         if cls is hl_cls:
             hl_obj = hl_cls.__new__(hl_cls)
             hl_obj._obj_ref = obj_ref
+            hl_obj._finalize_wrap()
             return cast(Self, hl_obj)
         else:
             return cast(Self, hl_cls.wrap_obj_ref(obj_ref))
+
+    def _finalize_wrap(self) -> None:
+        """Run subclass-specific initialisation after `wrap_obj_ref` has set `_obj_ref`.
+
+        Subclasses override this to derive state from `obj_ref` (e.g. an attribute name or child
+        blocks). It is an instance method rather than a parameter of `wrap_obj_ref` so that it does
+        not take the covariant type variable in an input position, which would break covariance.
+        """
 
     @property
     def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT_co]]:

@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Annotated, Any, TypeAlias, cast, overload
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeVar
 
 import ultimate_notion.obj_api.core as obj_core
 import ultimate_notion.obj_api.schema as obj_schema
@@ -153,12 +153,10 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
 
         schema._set_obj_refs()
 
-    @classmethod
-    def wrap_obj_ref(cls, obj_ref: GO_co) -> Self:  # type: ignore[misc] # breaking covariance
-        """Wrap the object reference for this property."""
-        obj = super().wrap_obj_ref(obj_ref)
-        obj._attr_name = rich_text.snake_case(obj.name)
-        return obj
+    def _finalize_wrap(self) -> None:
+        """Derive the attribute name from the wrapped property's name."""
+        super()._finalize_wrap()
+        self._attr_name = rich_text.snake_case(self.name)
 
     def delete(self) -> None:
         """Delete this property from the schema."""
