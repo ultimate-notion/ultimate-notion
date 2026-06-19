@@ -110,22 +110,10 @@ plugins = ["pydantic.mypy"]
 files = ["src/ultimate_notion", "tests", "examples"]
 show_column_numbers = true
 pretty = true
-follow_imports = "normal"
 ignore_missing_imports = true # missing stubs like pytest
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+strict = true
 disallow_untyped_calls = false
 disallow_untyped_decorators = false
-disallow_any_generics = true
-disallow_any_unimported = false
-disallow_any_expr = false
-disallow_any_explicit = false
-disallow_any_decorated = false
-warn_return_any = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_redundant_casts = true
-warn_unused_configs = true
 
 # Pytest configuration
 
