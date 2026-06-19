@@ -319,9 +319,13 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
         db.schema['Number'] = uno.PropType.Formula('New Name', formula='prop("Name") + "!"')
 
     db.schema['Number'] = uno.PropType.Formula(formula='prop("Name") + "!"')
-    assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+    formula = db.schema['Number']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith('{{notion:block_property:title:')
     db.reload()
-    assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+    formula = db.schema['Number']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith('{{notion:block_property:title:')
 
     db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)
     assert db.schema.number.format == uno.NumberFormat.PERCENT
