@@ -22,7 +22,15 @@ from typing import Annotated, Any, Generic, cast
 from pydantic import AfterValidator, Field, SerializeAsAny
 from typing_extensions import TypeVar
 
-from ultimate_notion.obj_api.core import GenericObject, NotionEntity, TypedObject, Unset, UnsetType
+from ultimate_notion.obj_api.core import (
+    GenericObject,
+    NotionEntity,
+    ParentRef,
+    TypedObject,
+    Unset,
+    UnsetType,
+    UserRef,
+)
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     MAX_TEXT_OBJECT_SIZE,
@@ -35,10 +43,8 @@ from ultimate_notion.obj_api.objects import (
     MentionMixin,
     MentionObject,
     MentionPage,
-    ParentRef,
     RichTextBaseObject,
     TextObject,
-    UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import Property

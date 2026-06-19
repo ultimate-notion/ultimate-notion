@@ -20,17 +20,15 @@ from typing import TYPE_CHECKING, Any, TypedDict, cast
 from pydantic import Field, SerializeAsAny, field_validator, model_serializer
 from typing_extensions import NotRequired, Self
 
-from ultimate_notion.obj_api.core import GenericObject, NotionObject, Unset, UnsetType
-from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
+from ultimate_notion.obj_api.core import GenericObject, NotionObject, ObjectRef, TypedObject, Unset, UnsetType
+from ultimate_notion.obj_api.enums import AggFunc, FormulaType, RollupType, VState
 from ultimate_notion.obj_api.objects import (
     DateRange,
     FileObject,
-    ObjectRef,
     RichTextBaseObject,
-    TypedObject,
+    SelectOption,
     User,
 )
-from ultimate_notion.obj_api.schema import AggFunc, SelectOption
 from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:

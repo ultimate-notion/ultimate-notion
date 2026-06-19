@@ -16,7 +16,16 @@ from uuid import UUID
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
-from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset, raise_unset
+from ultimate_notion.obj_api.core import (
+    GenericObject,
+    ObjectRef,
+    ParentRef,
+    Unset,
+    UnsetType,
+    UserRef,
+    is_unset,
+    raise_unset,
+)
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
@@ -27,13 +36,9 @@ from ultimate_notion.obj_api.objects import (
     EmojiObject,
     FileObject,
     FileUpload,
-    GenericObject,
-    ObjectRef,
     PageRef,
-    ParentRef,
     RichTextBaseObject,
     User,
-    UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DBQueryBuilder, SearchQueryBuilder

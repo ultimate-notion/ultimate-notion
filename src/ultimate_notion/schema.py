@@ -47,8 +47,8 @@ from ultimate_notion.errors import (
     UnsetError,
 )
 from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset, raise_unset
-from ultimate_notion.obj_api.enums import OptionGroupType
-from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
+from ultimate_notion.obj_api.enums import AggFunc, NumberFormat, OptionGroupType
+from ultimate_notion.obj_api.objects import SelectGroup
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
 from ultimate_notion.props import PropertyValue
 from ultimate_notion.utils import SList, dict_diff_str, is_notebook
@@ -362,7 +362,7 @@ class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
         """Return the options of this status property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.status.options]
 
-    def _extract_groups(self) -> list[tuple[obj_schema.SelectGroup, list[Option]]]:
+    def _extract_groups(self) -> list[tuple[SelectGroup, list[Option]]]:
         """Extract options from a group."""
 
         def get_id(option: Option) -> str:

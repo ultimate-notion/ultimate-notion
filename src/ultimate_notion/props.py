@@ -14,12 +14,14 @@ from typing_extensions import Self, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
-from ultimate_notion.core import Wrapper, get_active_session, get_repr, raise_unset
+from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.file import AnyFile
+from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
-from ultimate_notion.obj_api.objects import DateRange, DateTimeOrRange
+from ultimate_notion.obj_api.objects import DateRange
 from ultimate_notion.option import Option
 from ultimate_notion.user import User
+from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
     from ultimate_notion.page import Page

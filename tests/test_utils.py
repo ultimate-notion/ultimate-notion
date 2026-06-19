@@ -9,6 +9,7 @@ from numpy.testing import assert_array_equal
 from numpy.typing import NDArray
 
 from ultimate_notion import utils
+from ultimate_notion.errors import EmptyListError, MultipleItemsError
 
 
 def test_find_indices() -> None:
@@ -26,13 +27,13 @@ def test_find_indices() -> None:
 def test_slist() -> None:
     lst = utils.SList(range(3))
     assert isinstance(lst, list)
-    with pytest.raises(utils.MultipleItemsError):
+    with pytest.raises(MultipleItemsError):
         lst.item()
     lst = utils.SList([42])
     item = lst.item()
     assert item == 42
     lst = utils.SList([])
-    with pytest.raises(utils.EmptyListError):
+    with pytest.raises(EmptyListError):
         lst.item()
 
 

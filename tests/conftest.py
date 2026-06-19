@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
 from random import randint
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 from unittest.mock import MagicMock, patch
 
 import pydantic
@@ -43,7 +43,7 @@ from vcr import VCR
 from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
-from ultimate_notion import Database, Option, Page, Session, User, schema
+from ultimate_notion import Database, NumberFormat, Option, Page, Session, User, schema
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.adapters.google.tasks import GTasksClient
 from ultimate_notion.config import (
@@ -104,8 +104,10 @@ def pytest_addoption(parser: Parser) -> None:
         )
 
 
-def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: pytest.TestReport) -> None:
+def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo[Any], report: pytest.TestReport) -> None:
     """Handle exceptions raised in the tests and provide a bit more output for some exceptions."""
+    if call.excinfo is None:
+        return
     exc_value = call.excinfo.value
 
     if isinstance(exc_value, pydantic.ValidationError):
@@ -272,7 +274,9 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
-def vcr_fixture(scope: str, *, autouse: bool = False, shared: bool = False) -> Callable[..., Any]:
+def vcr_fixture(
+    scope: Literal['module', 'session'], *, autouse: bool = False, shared: bool = False
+) -> Callable[..., Any]:
     """Return a VCR fixture for module/session-level fixtures"""
     if scope not in {'module', 'session'}:
         msg = f'Use this only for module or session scope, not {scope}!'
@@ -287,7 +291,7 @@ def vcr_fixture(scope: str, *, autouse: bool = False, shared: bool = False) -> C
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
                 cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
             else:
-                cassette_dir = str(request.config.rootdir / 'tests' / 'cassettes' / 'fixtures')
+                cassette_dir = str(request.config.rootpath / 'tests' / 'cassettes' / 'fixtures')
                 prefix = 'mod' if scope == 'module' else 'sess'
                 cassette_name = f'{prefix}_{func.__name__}.yaml'
 
@@ -409,7 +413,7 @@ def article_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
 
     class Article(schema.Schema, db_title='Articles'):
         name = schema.Title('Name')
-        cost = schema.Number('Cost', format=schema.NumberFormat.DOLLAR)
+        cost = schema.Number('Cost', format=NumberFormat.DOLLAR)
         desc = schema.Text('Description')
 
     db = notion_cached.create_db(parent=root_page, schema=Article)

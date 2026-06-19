@@ -6,7 +6,10 @@ import ultimate_notion as uno
 
 
 def test_workspace_sentinel() -> None:
-    assert uno.Workspace != 'workspace_root'
+    # The sentinel must be a distinct object, not its underlying string value. Compare against an
+    # ``object``-typed value so the (intentional) cross-type check is not rejected by strict equality.
+    not_workspace: object = 'workspace_root'
+    assert uno.Workspace != not_workspace
     assert_type(uno.Workspace, uno.WorkspaceType)
 
     def func() -> str | uno.WorkspaceType:
