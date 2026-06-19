@@ -638,14 +638,18 @@ def test_nested_bullet_items(root_page: uno.Page, notion: uno.Session) -> None:
 def test_color_code_block(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for color code block')
     code_block = uno.Code('print("Hello, world!")', language='python')
-    assert code_block.obj_ref.code.rich_text[0].annotations.color is Unset  # type: ignore[union-attr]
+    annotations = code_block.obj_ref.code.rich_text[0].annotations
+    assert isinstance(annotations, objs.Annotations)
+    assert annotations.color is Unset
     page.append(code_block)
 
     assert page.children == (code_block,)
     assert code_block.language == 'python'
     # Note that None was replaced with Color.DEFAULT by the API. Sending it directly
     # would have prevented the python code coloring from being applied in the Notion UI.
-    assert code_block.obj_ref.code.rich_text[0].annotations.color is uno.Color.DEFAULT  # type: ignore[union-attr]
+    annotations = code_block.obj_ref.code.rich_text[0].annotations
+    assert isinstance(annotations, objs.Annotations)
+    assert annotations.color is uno.Color.DEFAULT
 
 
 @pytest.mark.vcr()
