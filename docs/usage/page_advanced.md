@@ -344,7 +344,7 @@ Let's see how we can mention a person, page, database or even a date.
 ```python
 from datetime import datetime
 
-person = notion.search_user('Florian Wilhelm').item()
+person = notion.all_users()[0]  # any user visible to the integration
 dummy_db = notion.create_db(parent=root_page)
 dummy_db.title = 'Dummy DB'
 intro_page = notion.search_page('Getting Started').item()
