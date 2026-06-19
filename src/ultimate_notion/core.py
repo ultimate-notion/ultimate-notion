@@ -72,11 +72,11 @@ class Wrapper(Generic[GT_co], ABC):
     def wrap_obj_ref(cls: type[Self], obj_ref: GT_co, /) -> Self:  # type: ignore[misc] # breaking covariance
         """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
         hl_cls = cls._obj_api_map[type(obj_ref)]
-        # To allow for `Block.wrap_obj_ref` to work call a specific 'wrap_obj_ref' if it exists,
-        # e.g. `RichText.wrap_obj_ref` we need to break a potential recursion in the MRO.
-        if cls.wrap_obj_ref.__func__ is hl_cls.wrap_obj_ref.__func__:  # type: ignore[attr-defined]
-            # ToDo: remove type ignore when https://github.com/python/mypy/issues/14123 is fixed
-            # break recursion
+        # Resolving `obj_ref` may yield a more specific high-level class than `cls`, e.g. calling
+        # `Block.wrap_obj_ref` on a paragraph object resolves `hl_cls` to `Paragraph`. In that case we
+        # hand off to that class' `wrap_obj_ref` so its specialised wrapping (e.g. children handling) runs.
+        # Once `cls` already is the resolved class we build the object directly to break the recursion.
+        if cls is hl_cls:
             hl_obj = hl_cls.__new__(hl_cls)
             hl_obj._obj_ref = obj_ref
             return cast(Self, hl_obj)
