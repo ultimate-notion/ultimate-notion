@@ -387,11 +387,15 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
 
     # Change target from SchemaA to SchemaB for one-way and two-way relations
     for rel in ('Relation', 'Relation two-way'):
-        assert db_c.schema[rel].schema == db_a.schema  # type: ignore[attr-defined]
-        db_c.schema[rel].schema = db_b.schema  # type: ignore[attr-defined]
-        assert db_c.schema[rel].schema == db_b.schema  # type: ignore[attr-defined]
+        relation = db_c.schema[rel]
+        assert isinstance(relation, uno.PropType.Relation)
+        assert relation.schema == db_a.schema
+        relation.schema = db_b.schema
+        assert relation.schema == db_b.schema
         db_c.reload()
-        assert db_c.schema[rel].schema == db_b.schema  # type: ignore[attr-defined]
+        relation = db_c.schema[rel]
+        assert isinstance(relation, uno.PropType.Relation)
+        assert relation.schema == db_b.schema
 
     # change the options of the (multi-)select property
     options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
