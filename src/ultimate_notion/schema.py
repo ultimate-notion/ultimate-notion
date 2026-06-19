@@ -73,7 +73,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     allowed_at_creation = True
     """If the Notion API allows to create a new database with a property of this type"""
     _name: str | None = None  # name given by the user, not the Notion API, will match when set
-    _owner: type[Schema] | None = None  # back reference to the schema
+    _owner: SchemaType | None = None  # back reference to the schema
     _attr_name: str | None = None  # name of the attribute within the schema holding the Property
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Property:
@@ -115,7 +115,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
         """Determines if the property is ready to be initialized"""
         return True
 
-    def _get_owner(self) -> type[Schema]:
+    def _get_owner(self) -> SchemaType:
         """Get the owner schema of this property."""
         if self._owner is None:
             msg = f'The property {self.name} is not bound to a Schema!'
@@ -809,7 +809,7 @@ class SchemaType(ABCMeta):
 
         cls = super().__new__(metacls, name, bases, dict(namespace), **kwargs)
         for prop in props:
-            prop._owner = cast(type[Schema], cls)
+            prop._owner = cls
 
         return cls
 
@@ -820,6 +820,25 @@ class SchemaType(ABCMeta):
     def is_bound(cls) -> bool:
         """Determines if the schema is bound to a database."""
         return cls._database is not None
+
+    def get_db(cls) -> Database:
+        """Get the database that is bound to this schema."""
+        if cls._database is not None:  # is_bound() cannot be used here due to type checker
+            return cls._database
+        else:
+            raise SchemaNotBoundError(cls)
+
+    def to_dict(cls) -> dict[str, Property]:
+        """Convert this schema to a dictionary of property names and corresponding types."""
+        return {prop.name: prop for prop in cls.get_props()}
+
+    def _set_obj_refs(cls) -> None:
+        """Map obj_refs from the properties of the schema to obj_ref.properties of the bound database."""
+        db_props_dct = cls.get_db().obj_ref.properties
+        for prop_name, prop_type in cls.to_dict().items():
+            obj_ref = db_props_dct.get(prop_name)
+            if obj_ref:
+                prop_type.obj_ref = obj_ref
 
     @overload
     def get_prop(cls, prop_name: str, *, default: UnsetType = ...) -> Property: ...
@@ -870,7 +889,7 @@ class SchemaType(ABCMeta):
     def __delitem__(cls, prop_name: str) -> None:
         cls.get_prop(prop_name).delete()
 
-    def __setitem__(cls: type[Schema], prop_name: str, prop_type: Property) -> None:  # type: ignore[misc]
+    def __setitem__(cls, prop_name: str, prop_type: Property) -> None:
         if prop_type._name is not None:
             msg = (
                 f'Property `{prop_name}` already has a name and thus the `name` parameter of `{prop_type}` must '
@@ -913,7 +932,7 @@ class SchemaType(ABCMeta):
             msg = f'Schema has no property with attribute name {name}'  # `.` is added by AttributeError automatically
             raise AttributeError(msg) from e
 
-    def __setattr__(cls: type[Schema], name: str, value: Any) -> None:  # type: ignore[misc]
+    def __setattr__(cls, name: str, value: Any) -> None:
         # Overwrite runtime setting of class attributes
         if isinstance(value, Property):
             curr_attr = getattr(cls, name, None)
@@ -932,7 +951,7 @@ class SchemaType(ABCMeta):
                 msg = f'Cannot override non-property `{name}` of type `{type(curr_attr)}`.'
                 raise PropertyError(msg)
         else:
-            super().__setattr__(name, value)  # type: ignore[misc]  # no clue why this results in a type problem
+            super().__setattr__(name, value)
 
     def __len__(cls) -> int:
         return len(cls.get_props())
@@ -1074,11 +1093,6 @@ class Schema(metaclass=SchemaType):
         return model
 
     @classmethod
-    def to_dict(cls) -> dict[str, Property]:
-        """Convert this schema to a dictionary of property names and corresponding types."""
-        return {prop.name: prop for prop in cls.get_props()}
-
-    @classmethod
     def show(cls, *, simple: bool | None = None) -> None:
         """Show the schema as html or as simple table."""
         if simple:
@@ -1164,14 +1178,6 @@ class Schema(metaclass=SchemaType):
             raise SchemaError(msg)
 
     @classmethod
-    def get_db(cls) -> Database:
-        """Get the database that is bound to this schema."""
-        if cls._database is not None:  # is_bound() cannot be used here due to type checker
-            return cls._database
-        else:
-            raise SchemaNotBoundError(cls)
-
-    @classmethod
     def _bind_db(cls, db: Database) -> None:
         """Bind this schema to the corresponding database for back-reference without setting it in `db`."""
         # Needed to break the recursion when setting a schema in Database
@@ -1253,15 +1259,6 @@ class Schema(metaclass=SchemaType):
         for prop_type in cls.to_dict().values():
             if isinstance(prop_type, Relation) and prop_type.is_two_way:
                 prop_type._update_bwd_rel()
-
-    @classmethod
-    def _set_obj_refs(cls) -> None:
-        """Map obj_refs from the properties of the schema to obj_ref.properties of the bound database."""
-        db_props_dct = cls.get_db().obj_ref.properties
-        for prop_name, prop_type in cls.to_dict().items():
-            obj_ref = db_props_dct.get(prop_name)
-            if obj_ref:
-                prop_type.obj_ref = obj_ref
 
 
 class DefaultSchema(Schema):
