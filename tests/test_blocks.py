@@ -739,7 +739,9 @@ def test_max_nesting_level(root_page: uno.Page, notion: uno.Session) -> None:
     # add a 1st level of nesting
     blocks[0].append([uno.BulletedItem(f'Nested Point {i}') for i in range(n_blocks)])
     # add a 2nd level of nesting
-    blocks[0].blocks[0].append([uno.BulletedItem(f'Deeply Nested Point {i}') for i in range(n_blocks)])  # type: ignore[attr-defined]
+    nested = blocks[0].blocks[0]
+    assert isinstance(nested, uno.BulletedItem)
+    nested.append([uno.BulletedItem(f'Deeply Nested Point {i}') for i in range(n_blocks)])
 
     page = notion.create_page(
         parent=root_page, title='Page for testing max nesting level', blocks=[uno.Paragraph('Intro')]
@@ -747,8 +749,12 @@ def test_max_nesting_level(root_page: uno.Page, notion: uno.Session) -> None:
     page.append(blocks)
 
     assert len(page.blocks) == n_blocks + 1
-    assert len(page.blocks[1].blocks) == n_blocks  # type: ignore[attr-defined]
-    assert len(page.blocks[1].blocks[0].blocks) == n_blocks  # type: ignore[attr-defined]
+    first_nested = page.blocks[1]
+    assert isinstance(first_nested, uno.BulletedItem)
+    assert len(first_nested.blocks) == n_blocks
+    second_nested = first_nested.blocks[0]
+    assert isinstance(second_nested, uno.BulletedItem)
+    assert len(second_nested.blocks) == n_blocks
 
 
 @pytest.mark.vcr()
