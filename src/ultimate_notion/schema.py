@@ -782,10 +782,12 @@ class SchemaType(ABCMeta):
     letting it behave like a dictionary for the properties although it is a class, not an instance.
     """
 
-    # The properties live on the schema class itself, so `_props` and the methods operating on it
-    # belong on the metaclass. Defining them here (rather than annotating `cls` as `type[Schema]`
-    # on instance-less metaclass methods) lets mypy resolve them without a `type: ignore`.
+    # The properties live on the schema class itself, so `_props` (and the bound database in
+    # `_database`) and the methods operating on them belong on the metaclass. Defining them here
+    # (rather than annotating `cls` as `type[Schema]` on instance-less metaclass methods) lets mypy
+    # resolve them without a `type: ignore`.
     _props: list[Property]
+    _database: Database | None
 
     # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments
     def __new__(metacls, name: str, bases: tuple[type, ...], namespace: dict[str, object], **kwargs: Any) -> SchemaType:
@@ -815,6 +817,28 @@ class SchemaType(ABCMeta):
         """Get all properties of this schema."""
         return cls._props
 
+    def is_bound(cls) -> bool:
+        """Determines if the schema is bound to a database."""
+        return cls._database is not None
+
+    @overload
+    def get_prop(cls, prop_name: str, *, default: UnsetType = ...) -> Property: ...
+    @overload
+    def get_prop(cls, prop_name: str, *, default: T) -> Property | T: ...
+
+    def get_prop(cls, prop_name: str, *, default: object = Unset) -> Property | T:
+        """Get a specific property from this schema assuming that property names are unique."""
+        try:
+            return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
+        except EmptyListError as e:
+            if default is Unset:
+                if cls.is_bound():
+                    msg = f'Property `{prop_name}` not found in schema of `{cls._database}`.'
+                else:
+                    msg = f'Property `{prop_name}` not found in unbound schema.'
+                raise SchemaError(msg) from e
+            return cast(T, default)
+
     def as_table(cls, tablefmt: str | None = None) -> str:
         """Return the schema in a given string table format.
 
@@ -840,10 +864,10 @@ class SchemaType(ABCMeta):
         # We can only overwrite __str__ for a class in a metaclass
         return cls.as_table(tablefmt='simple')
 
-    def __getitem__(cls: type[Schema], prop_name: str) -> Property:  # type: ignore[misc]
+    def __getitem__(cls, prop_name: str) -> Property:
         return cls.get_prop(prop_name)
 
-    def __delitem__(cls: type[Schema], prop_name: str) -> None:  # type: ignore[misc]
+    def __delitem__(cls, prop_name: str) -> None:
         cls.get_prop(prop_name).delete()
 
     def __setitem__(cls: type[Schema], prop_name: str, prop_type: Property) -> None:  # type: ignore[misc]
@@ -985,27 +1009,6 @@ class Schema(metaclass=SchemaType):
     def create(cls, **kwargs: Any) -> Page:
         """Create a page using this schema with a bound database."""
         return cls.get_db().create_page(**kwargs)
-
-    @overload
-    @classmethod
-    def get_prop(cls, prop_name: str, *, default: UnsetType = ...) -> Property: ...
-    @overload
-    @classmethod
-    def get_prop(cls, prop_name: str, *, default: T) -> Property | T: ...
-
-    @classmethod
-    def get_prop(cls, prop_name: str, *, default: object = Unset) -> Property | T:
-        """Get a specific property from this schema assuming that property names are unique."""
-        try:
-            return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
-        except EmptyListError as e:
-            if default is Unset:
-                if cls.is_bound():
-                    msg = f'Property `{prop_name}` not found in schema of `{cls._database}`.'
-                else:
-                    msg = f'Property `{prop_name}` not found in unbound schema.'
-                raise SchemaError(msg) from e
-            return cast(T, default)
 
     @classmethod
     def has_prop(cls, prop_name: str) -> bool:
@@ -1194,11 +1197,6 @@ class Schema(metaclass=SchemaType):
 
         db.schema = cls
         cls._bind_db(db)
-
-    @classmethod
-    def is_bound(cls) -> bool:
-        """Determines if the schema is bound to a database."""
-        return cls._database is not None
 
     @classmethod
     def _get_fwd_rels(cls) -> list[Relation]:
