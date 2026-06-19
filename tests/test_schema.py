@@ -438,28 +438,34 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
 
     # Change the select options of the select and multi-select properties
     for prop in ('Category', 'Tags'):
-        curr_cats = db.schema[prop].options  # type: ignore[attr-defined]
+        select = db.schema[prop]
+        assert isinstance(select, (uno.PropType.Select, uno.PropType.MultiSelect))
+        curr_cats = select.options
         assert [cat.name for cat in curr_cats] == ['Cat1', 'Cat2']
 
         new_cat = uno.Option(name='Cat3', color=uno.Color.RED)
         # Adding a new category to the select options
-        db.schema[prop].options = [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        select.options = [*curr_cats, new_cat]
 
-        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        assert select.options == [*curr_cats, new_cat]
         db.reload()
-        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        select = db.schema[prop]
+        assert isinstance(select, (uno.PropType.Select, uno.PropType.MultiSelect))
+        assert select.options == [*curr_cats, new_cat]
 
         # Removing a category from the select options
-        db.schema[prop].options = [new_cat]  # type: ignore[attr-defined]
-        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
+        select.options = [new_cat]
+        assert select.options == [new_cat]
         db.reload()
-        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
+        select = db.schema[prop]
+        assert isinstance(select, (uno.PropType.Select, uno.PropType.MultiSelect))
+        assert select.options == [new_cat]
 
         # Updating a category in the select options
         with pytest.raises(InvalidAPIUsageError):
             exist_option = uno.Option(name='Cat3', color=uno.Color.GREEN)
             # trying to update the color of an existing option
-            db.schema[prop].options = [exist_option]  # type: ignore[attr-defined]
+            select.options = [exist_option]
 
 
 @pytest.mark.vcr()
@@ -475,8 +481,12 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
 
     # Check the schema properties
     assert isinstance(db.schema.name, uno.PropType.Title)
-    assert db.schema.cat.options == options  # type: ignore[attr-defined]
-    assert db.schema.tags.options == options  # type: ignore[attr-defined]
+    cat = db.schema.cat
+    assert isinstance(cat, uno.PropType.Select)
+    assert cat.options == options
+    tags = db.schema.tags
+    assert isinstance(tags, uno.PropType.MultiSelect)
+    assert tags.options == options
 
     class ConsistentSchema(uno.Schema):
         my_name = uno.PropType.Title('Name')
@@ -487,8 +497,12 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
 
     # Check the schema attribute names
     assert isinstance(db.schema.my_name, uno.PropType.Title)
-    assert db.schema.my_cat.options == options  # type: ignore[attr-defined]
-    assert db.schema.my_tags.options == options  # type: ignore[attr-defined]
+    my_cat = db.schema.my_cat
+    assert isinstance(my_cat, uno.PropType.Select)
+    assert my_cat.options == options
+    my_tags = db.schema.my_tags
+    assert isinstance(my_tags, uno.PropType.MultiSelect)
+    assert my_tags.options == options
     assert not hasattr(db.schema, 'name')
     assert not hasattr(db.schema, 'cat')
     assert not hasattr(db.schema, 'tags')
