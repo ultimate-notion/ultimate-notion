@@ -41,7 +41,7 @@ def test_append_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page.append([h2, h3, h4])
     page.append(h21, after=h2)
 
-    added_children = (h1, h2, h21, h3, h4)
+    added_children: tuple[uno.Block, ...] = (h1, h2, h21, h3, h4)
     assert page.children == added_children
     assert all(pchild is achild for pchild, achild in zip(page.children, added_children, strict=True))
 

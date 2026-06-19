@@ -20,6 +20,7 @@ from ultimate_notion.obj_api.core import Unset
 from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.obj_api.objects import MAX_TEXT_OBJECT_SIZE
 from ultimate_notion.user import User
+from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -115,7 +116,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
     def __init__(
         self,
-        target: User | Page | Database | CustomEmoji | objs.DateTimeOrRange,
+        target: User | Page | Database | CustomEmoji | DateTimeOrRange,
         *,
         bold: bool = False,
         italic: bool = False,
@@ -139,7 +140,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
 
 def mention(
-    target: User | Page | Database | CustomEmoji | objs.DateTimeOrRange,
+    target: User | Page | Database | CustomEmoji | DateTimeOrRange,
     *,
     bold: bool = False,
     italic: bool = False,

@@ -6,6 +6,10 @@
 # - mypy==1.18.2
 # - ruff==0.14.5
 # - pyright~=1.1
+# - types-tabulate
+# - pandas-stubs
+# - pytest
+# - hypothesis
 # - httpx>=0.27
 # - notion-client~=2.5.0
 # - tabulate>=0.9
@@ -61,6 +65,8 @@ exceptiongroup==1.3.0
     # via
     #   -c locks/default.lock
     #   anyio
+    #   hypothesis
+    #   pytest
 google-api-core==2.28.1
     # via
     #   -c locks/default.lock
@@ -107,6 +113,10 @@ httpx==0.28.1
     #   -c locks/default.lock
     #   hatch.envs.lint
     #   notion-client
+hypothesis==6.147.0
+    # via
+    #   -c locks/default.lock
+    #   hatch.envs.lint
 idna==3.11
     # via
     #   -c locks/default.lock
@@ -114,6 +124,10 @@ idna==3.11
     #   httpx
     #   requests
     #   url-normalize
+iniconfig==2.3.0
+    # via
+    #   -c locks/default.lock
+    #   pytest
 markdown-it-py==4.0.0
     # via
     #   -c locks/default.lock
@@ -143,6 +157,7 @@ numpy==2.2.6
     #   -c locks/default.lock
     #   hatch.envs.lint
     #   pandas
+    #   pandas-stubs
 oauthlib==3.3.1
     # via
     #   -c locks/default.lock
@@ -151,16 +166,23 @@ packaging==25.0
     # via
     #   -c locks/default.lock
     #   hatch.envs.lint
+    #   pytest
 pandas==2.3.3
     # via
     #   -c locks/default.lock
     #   hatch.envs.lint
+pandas-stubs==2.3.3.260113
+    # via hatch.envs.lint
 pathspec==0.12.1
     # via mypy
 pendulum==3.1.0
     # via
     #   -c locks/default.lock
     #   hatch.envs.lint
+pluggy==1.6.0
+    # via
+    #   -c locks/default.lock
+    #   pytest
 polars==1.35.2
     # via
     #   -c locks/default.lock
@@ -199,6 +221,7 @@ pydantic-core==2.41.5
 pygments==2.19.2
     # via
     #   -c locks/default.lock
+    #   pytest
     #   rich
 pyparsing==3.2.5
     # via
@@ -206,6 +229,10 @@ pyparsing==3.2.5
     #   httplib2
 pyright==1.1.407
     # via hatch.envs.lint
+pytest==9.0.0
+    # via
+    #   -c locks/default.lock
+    #   hatch.envs.lint
 python-dateutil==2.9.0.post0
     # via
     #   -c locks/default.lock
@@ -246,6 +273,10 @@ sniffio==1.3.1
     # via
     #   -c locks/default.lock
     #   anyio
+sortedcontainers==2.4.0
+    # via
+    #   -c locks/default.lock
+    #   hypothesis
 tabulate==0.9.0
     # via
     #   -c locks/default.lock
@@ -255,6 +286,7 @@ tomli==2.3.0
     #   -c locks/default.lock
     #   hatch.envs.lint
     #   mypy
+    #   pytest
 tomli-w==1.2.0
     # via
     #   -c locks/default.lock
@@ -263,6 +295,10 @@ typer==0.20.0
     # via
     #   -c locks/default.lock
     #   hatch.envs.lint
+types-pytz==2026.2.0.20260518
+    # via pandas-stubs
+types-tabulate==0.10.0.20260508
+    # via hatch.envs.lint
 typing-extensions==4.15.0
     # via
     #   -c locks/default.lock

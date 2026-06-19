@@ -11,11 +11,12 @@ from emoji import demojize, emojize, is_emoji
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.obj_api import objects as objs
+from ultimate_notion.obj_api.core import TypedObject
 
-TO = TypeVar('TO', bound=objs.TypedObject)
+TO = TypeVar('TO', bound=TypedObject)
 
 
-class EmojiBase(Wrapper[TO], str, ABC, wraps=objs.TypedObject):
+class EmojiBase(Wrapper[TO], str, ABC, wraps=TypedObject):
     """Base class for emoji objects, which behave like str."""
 
     @property

@@ -13,7 +13,7 @@ import pytest
 
 import ultimate_notion as uno
 from ultimate_notion.errors import SchemaError
-from ultimate_notion.obj_api.query import MAX_PAGE_SIZE
+from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE
 
 from .conftest import CONTACTS_DB
 

@@ -21,6 +21,7 @@ import pendulum as pnd
 import tomli_w
 from numpy.typing import NDArray
 from packaging.version import Version
+from pendulum.tz import local_timezone
 from pydantic import BaseModel
 from typing_extensions import Self
 
@@ -383,7 +384,7 @@ def temp_timezone(tz: str | pnd.Timezone) -> Iterator[None]:
     if not isinstance(tz, pnd.Timezone):
         tz = pnd.timezone(tz)
 
-    current_tz = pnd.local_timezone()
+    current_tz = local_timezone()
     if not isinstance(current_tz, pnd.Timezone):
         msg = f'Expected a Timezone object but got type {type(current_tz)}.'
         raise RuntimeError(msg)

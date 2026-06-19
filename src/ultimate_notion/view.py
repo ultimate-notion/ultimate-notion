@@ -15,8 +15,8 @@ from ultimate_notion import props, schema
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.file import ExternalFile, NotionFile
 from ultimate_notion.obj_api.enums import FormulaType, RollupType
+from ultimate_notion.option import Option
 from ultimate_notion.page import Page
-from ultimate_notion.props import Option
 from ultimate_notion.rich_text import html_img
 from ultimate_notion.schema import Property
 from ultimate_notion.user import User

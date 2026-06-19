@@ -46,7 +46,8 @@ from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
-from ultimate_notion.rich_text import Text, User
+from ultimate_notion.rich_text import Text
+from ultimate_notion.user import User
 from ultimate_notion.utils import set_attr_none
 
 if TYPE_CHECKING:
@@ -1474,7 +1475,7 @@ class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBl
             raise RuntimeError(msg)
 
         obj = obj_blocks.SyncedBlock.build()
-        obj.synced_block.synced_from = obj_blocks.BlockRef.build(self.obj_ref)
+        obj.synced_block.synced_from = objs.BlockRef.build(self.obj_ref)
         return self.wrap_obj_ref(obj)
 
     def to_markdown(self, *, with_comment: bool = True) -> str:
