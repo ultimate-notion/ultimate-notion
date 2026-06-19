@@ -8,12 +8,35 @@ import argparse
 import inspect
 import os
 import time
-from typing import Any
+from collections.abc import Callable
+from typing import Any, ParamSpec, TypeVar
 
 import typer
 from notion_client import Client
+from notion_client.errors import HTTPResponseError
 
 DEFAULT_ROOT_TITLE = 'Tests'
+MAX_REQUEST_ATTEMPTS = 5
+
+P = ParamSpec('P')
+T = TypeVar('T')
+
+
+def request_with_retry(call: Callable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
+    """Retry Notion rate-limit and overload responses as instructed by the API."""
+    for attempt in range(MAX_REQUEST_ATTEMPTS):
+        try:
+            return call(*args, **kwargs)
+        except HTTPResponseError as error:
+            if error.status not in {429, 529} or attempt == MAX_REQUEST_ATTEMPTS - 1:
+                raise
+            retry_after = error.headers.get('Retry-After')
+            delay = int(retry_after) if retry_after is not None else 2**attempt
+            typer.echo(f'Notion asked us to retry in {delay}s.', err=True)
+            time.sleep(delay)
+
+    msg = 'Notion request retry loop exited unexpectedly.'
+    raise RuntimeError(msg)
 
 
 def sync_object(response: Any) -> dict[str, Any]:
@@ -67,7 +90,8 @@ class Bootstrap:
 
     def search_exact(self, title: str, kind: str) -> list[dict[str, Any]]:
         response = sync_object(
-            self.client.search(
+            request_with_retry(
+                self.client.search,
                 query=title,
                 filter={'property': 'object', 'value': kind},
                 page_size=100,
@@ -93,14 +117,14 @@ class Bootstrap:
             typer.echo(f'page exists: {title}')
             return page
         page = sync_object(
-            self.client.pages.create(
+            request_with_retry(
+                self.client.pages.create,
                 parent={'page_id': parent_id or self.root['id']},
                 properties={'title': {'title': rich_text(title)}},
                 children=children or [],
             ),
         )
         typer.echo(f'created page: {title}')
-        time.sleep(0.4)
         return page
 
     def create_database(
@@ -123,14 +147,13 @@ class Bootstrap:
             kwargs['description'] = rich_text(description)
         if icon is not None:
             kwargs['icon'] = icon
-        database = sync_object(self.client.databases.create(**kwargs))
+        database = sync_object(request_with_retry(self.client.databases.create, **kwargs))
         typer.echo(f'created database: {title}')
-        time.sleep(0.7)
         return database
 
     def database_rows(self, database: dict[str, Any]) -> list[dict[str, Any]]:
         response = sync_object(
-            self.client.databases.query(database_id=database['id'], page_size=100),
+            request_with_retry(self.client.databases.query, database_id=database['id'], page_size=100),
         )
         return object_list(response.get('results'))
 
@@ -143,8 +166,7 @@ class Bootstrap:
     ) -> None:
         values = {title_prop: {'title': rich_text(title)}}
         values.update(properties or {})
-        self.client.pages.create(parent={'database_id': database['id']}, properties=values)
-        time.sleep(0.25)
+        request_with_retry(self.client.pages.create, parent={'database_id': database['id']}, properties=values)
 
     def ensure_wiki_shell(self) -> None:
         if self.find_exact('Wiki DB', 'database'):
