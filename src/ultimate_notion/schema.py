@@ -122,11 +122,11 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
             raise PropertyError(msg)
         return self._owner
 
-    def _update_prop(self, prop_obj: GO_co) -> GO_co:  # type: ignore[misc] # breaking covariance
+    def _update_prop(self) -> GO_co:
         """Update the attributes of this property from a schema."""
         db = self._get_owner().get_db()
         session = get_active_session()
-        session.api.databases.update(db=db.obj_ref, schema={self.name: prop_obj})
+        session.api.databases.update(db=db.obj_ref, schema={self.name: self.obj_ref})
         return cast(GO_co, db.obj_ref.properties[self.name])
 
     def _rename_prop(self, new_name: str | None) -> None:
@@ -239,7 +239,7 @@ class Number(Property[obj_schema.Number], wraps=obj_schema.Number):
         if isinstance(new_format, str):
             new_format = NumberFormat(new_format)
         self.obj_ref.number.format = new_format
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Select(Property[obj_schema.Select], wraps=obj_schema.Select):
@@ -275,7 +275,7 @@ class Select(Property[obj_schema.Select], wraps=obj_schema.Select):
             raise InvalidAPIUsageError(msg)
 
         self.obj_ref.select.options = [option.obj_ref for option in new_options]
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
@@ -312,7 +312,7 @@ class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect
             raise InvalidAPIUsageError(msg)
 
         self.obj_ref.multi_select.options = [option.obj_ref for option in new_options]
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
@@ -433,7 +433,7 @@ class Formula(Property[obj_schema.Formula], wraps=obj_schema.Formula):
     def formula(self, formula: str) -> None:
         """Set the formula of this property."""
         self.obj_ref.formula.expression = formula
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
@@ -521,7 +521,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         else:
             new_rel = obj_schema.SinglePropertyRelation.build_relation(new_schema.get_db().id)
         self.obj_ref.relation = new_rel.relation
-        self._update_prop(self.obj_ref)
+        self._update_prop()
         self._rel_schema = new_schema
 
     def _rename_two_way_prop(self, new_prop_name: str) -> None:
@@ -569,14 +569,14 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             target_two_way_prop = self.two_way_prop.name
             new_rel = obj_schema.SinglePropertyRelation.build_relation(db.id)
             self.obj_ref.relation = new_rel.relation
-            self.obj_ref = self._update_prop(self.obj_ref)
+            self.obj_ref = self._update_prop()
             # Strangely enough, the two-way property is not removed from the target schema
             # also it is no longer a two-way relation.
             del target_schema[target_two_way_prop]
         else:
             new_rel = obj_schema.DualPropertyRelation.build_relation(db.id)
             self.obj_ref.relation = cast(obj_schema.DualPropertyRelation, new_rel.relation)
-            self.obj_ref = self._update_prop(self.obj_ref)
+            self.obj_ref = self._update_prop()
             self._rename_two_way_prop(prop_name)
 
         self._rel_schema = None  # Don't rely on the initialization of the schema
@@ -729,7 +729,7 @@ class ID(Property[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
     def prefix(self, prefix: str | None) -> None:
         """Set the prefix of the unique ID."""
         self.obj_ref.unique_id.prefix = self._norm_prefix(prefix)
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Place(Property[obj_schema.Place], wraps=obj_schema.Place):
