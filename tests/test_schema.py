@@ -565,25 +565,30 @@ def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page, get_id_
 
     db = notion.create_db(parent=root_page, schema=Schema)
 
-    db.schema.unique_id.prefix = new_id_prefix  # type: ignore[attr-defined]
+    unique_id = db.schema.unique_id
+    assert isinstance(unique_id, uno.PropType.ID)
+
+    unique_id.prefix = new_id_prefix
     db.reload()
-    assert db.schema.unique_id.prefix.startswith(new_id_prefix)  # type: ignore[attr-defined]
+    assert unique_id.prefix.startswith(new_id_prefix)
 
     with pytest.raises(ValueError):
-        db.schema.unique_id.prefix = 'Invalid Prefix!'  # type: ignore[attr-defined]
+        unique_id.prefix = 'Invalid Prefix!'
 
-    db.schema.unique_id.prefix = None  # type: ignore[attr-defined]
-    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+    unique_id.prefix = None
+    assert unique_id.prefix == ''
 
-    db.schema.unique_id.prefix = ''  # type: ignore[attr-defined]
-    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+    unique_id.prefix = ''
+    assert unique_id.prefix == ''
 
     class NoIDPrefixSchema(uno.Schema, db_title='No Prefix ID Test'):
         name = uno.PropType.Title('Name')
         unique_id = uno.PropType.ID('ID')
 
     db = notion.create_db(parent=root_page, schema=NoIDPrefixSchema)
-    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+    unique_id = db.schema.unique_id
+    assert isinstance(unique_id, uno.PropType.ID)
+    assert unique_id.prefix == ''
 
     with pytest.raises(SchemaError):
 
