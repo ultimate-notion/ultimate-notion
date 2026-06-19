@@ -228,8 +228,8 @@ Creating a 4x6 table with 4 rows and 6 columns where the first row is a header r
 ```python
 table = uno.Table(4, 3, header_row=True, header_col=False)
 table[0] = ('First name', 'Last name', 'Sports')
-table[1, 0] = 'Florian'
-table[1, 1] = 'Wilhelm'
+table[1, 0] = 'Jane'
+table[1, 1] = 'Doe'
 table[1, 2] = 'Running and bicycling'
 
 page.append(table)
