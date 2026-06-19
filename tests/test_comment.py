@@ -11,7 +11,11 @@ def test_list_comments(comment_page: uno.Page) -> None:
     assert len(comments) == 5
     comment = comments[4]
     assert comment.text == 'Another comment'
-    assert comment.user.name == 'Flo-Bot'
+    # The comment's author is a workspace-specific user whose name varies per
+    # maintainer re-recording the cassette, so assert that the author resolves to
+    # a known workspace user rather than checking a hard-coded name.
+    assert not comment.user.is_unknown
+    assert comment.user.name
 
 
 @pytest.mark.vcr()
