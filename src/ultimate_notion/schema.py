@@ -815,7 +815,28 @@ class SchemaType(ABCMeta):
         """Get all properties of this schema."""
         return cls._props
 
-    def __str__(cls: type[Schema]) -> str:  # type: ignore[misc]
+    def as_table(cls, tablefmt: str | None = None) -> str:
+        """Return the schema in a given string table format.
+
+        Some table formats:
+
+        - plain: no pseudographics
+        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
+        - github: GitHub flavored Markdown
+        - simple_grid: uses dashes & pipes to separate cells
+        - html: standard html markup
+
+        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
+        """
+        if tablefmt is None:
+            tablefmt = 'html' if is_notebook() else 'simple'
+
+        headers = ['Name', 'Property', 'Attribute']
+        rows = [(prop.name, prop, prop.attr_name) for prop in cls.get_props()]
+
+        return tabulate(rows, headers=headers, tablefmt=tablefmt)
+
+    def __str__(cls) -> str:
         # We can only overwrite __str__ for a class in a metaclass
         return cls.as_table(tablefmt='simple')
 
@@ -1053,30 +1074,6 @@ class Schema(metaclass=SchemaType):
     def to_dict(cls) -> dict[str, Property]:
         """Convert this schema to a dictionary of property names and corresponding types."""
         return {prop.name: prop for prop in cls.get_props()}
-
-    @classmethod
-    def as_table(cls, tablefmt: str | None = None) -> str:
-        """Return the schema in a given string table format.
-
-        Some table formats:
-
-        - plain: no pseudographics
-        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
-        - github: GitHub flavored Markdown
-        - simple_grid: uses dashes & pipes to separate cells
-        - html: standard html markup
-
-        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
-        """
-        if tablefmt is None:
-            tablefmt = 'html' if is_notebook() else 'simple'
-
-        headers = ['Name', 'Property', 'Attribute']
-        rows = []
-        for prop in cls.get_props():
-            rows.append((prop.name, prop, prop.attr_name))
-
-        return tabulate(rows, headers=headers, tablefmt=tablefmt)
 
     @classmethod
     def show(cls, *, simple: bool | None = None) -> None:
