@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime as dt
 from collections.abc import Callable, Iterator, Sequence
 from html import escape as htmlescape
 from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
@@ -144,7 +145,7 @@ class View(Sequence[Page]):
 
         # remove index as pandas uses its own
         view = self.without_index() if self.has_index else self
-        data = rec_apply(cmplx_to_str, self.to_rows())
+        data = [list(row) for row in rec_apply(cmplx_to_str, self.to_rows())]
 
         return pd.DataFrame(data, columns=view.columns)
 
@@ -189,6 +190,14 @@ class View(Sequence[Page]):
 
         data = rec_apply(cmplx_to_str, self.to_rows())
         schema = self._to_polars_schema()
+        for row in data:
+            for idx, col in enumerate(self.columns):
+                if (
+                    isinstance(schema[col], pl.Datetime)
+                    and isinstance(row[idx], dt.date)
+                    and not isinstance(row[idx], dt.datetime)
+                ):
+                    row[idx] = dt.datetime.combine(row[idx], dt.time())
         return pl.DataFrame(data=data, schema=schema, orient='row')
 
     def _html_for_icon(self, rows: list[Any], cols: list[str]) -> list[Any]:

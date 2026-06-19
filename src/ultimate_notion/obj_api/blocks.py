@@ -51,6 +51,7 @@ class DataObject(NotionEntity, ABC):
 
     in_trash: bool = False  # used to be `archived`
     archived: bool = False  # ToDo: Deprecated but still partially used in Notion. Check to remove in v1.0!
+    is_archived: bool = False  # newer duplicate of `archived` sent by the API
 
     last_edited_by: UserRef | UnsetType = Unset
 
@@ -120,6 +121,13 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
 
         # ignore meta fields, e.g. id, created_time, etc. for equality, only use content
         return self.type == other.type and self.value == other.value
+
+    def serialize_for_api(self) -> dict[str, Any]:
+        """Serialize the block for sending it to the Notion API."""
+        data = super().serialize_for_api()
+        for key in ('has_children', 'in_trash', 'archived', 'is_archived'):
+            data.pop(key, None)
+        return data
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -200,6 +208,8 @@ class ColoredTextBlock(TextBlock[CTB_co]):
 
 class ParagraphTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Paragraph` block."""
+
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
 
 
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):

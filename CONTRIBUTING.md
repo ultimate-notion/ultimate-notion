@@ -93,6 +93,55 @@ This often provides additional considerations and avoids unnecessary work.
    ```
    These settings will also be respected by [pytest] using [pytest-dotenv].
 
+### Set up a Notion test workspace
+
+Most tests replay recorded HTTP interactions (VCR cassettes) and need no network
+access; run them with `hatch run vcr-only`. You only need your own Notion
+workspace and integration token if you want to **run the tests live** against the
+Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
+
+1. **Create an internal integration.** Open [My integrations] and click
+   *New integration*. Choose **Internal**, associate it with the workspace you
+   want to use for testing, and give it a name.
+
+2. **Enable the required capabilities.** On the integration's *Capabilities* tab
+   enable:
+   - **Read**, **Update** and **Insert** content, because the tests create, modify and
+     delete pages and databases.
+   - A **Read user information** option (with or without email addresses is fine).
+     This is **required**: several tests call `Session.all_users()`, which Notion
+     rejects with `403 "Personal access tokens cannot list users."` for tokens
+     that lack this capability. For the same reason you must use an **internal
+     integration token**, not a personal access token. The latter can never list
+     users.
+
+3. **Copy the token.** From the integration's *Configuration* page copy the
+   *Internal Integration Secret*. It looks like `ntn_…`.
+
+4. **Create and share a root page.** In your test workspace create a page that
+   acts as the parent for all test content, then connect your integration to it
+   via the page's ••• menu → *Connections*. Sharing the parent grants the
+   integration access to everything created beneath it. By default the suite
+   looks for a page titled `Tests`; set the `UNO_TEST_ROOT_PAGE` environment
+   variable to point it at a page with a different title.
+
+5. **Point the configuration at the token.** Set `NOTION_TOKEN` to the secret
+   from step 3 (see the `.vscode/.env` example above); the Ultimate Notion config
+   resolves the token from this environment variable by default.
+
+6. **Bootstrap the API-creatable objects.** Run:
+
+   ```console
+   UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
+   ```
+
+   The command is idempotent and leaves existing objects unchanged.
+
+!!! note
+    Three objects (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use
+    features the API cannot create and must be built by hand. See
+    [`tests/TEST_WORKSPACE.md`](tests/TEST_WORKSPACE.md) for exact instructions.
+
 ### Implement your changes
 
 1. Create a branch to hold your changes:
@@ -169,3 +218,4 @@ This often provides additional considerations and avoids unnecessary work.
 [VS Code]: https://code.visualstudio.com/
 [GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files
 [mkdocs]: https://www.mkdocs.org/
+[My integrations]: https://www.notion.so/my-integrations

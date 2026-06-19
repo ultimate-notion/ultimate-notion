@@ -17,8 +17,14 @@ from ultimate_notion.schema import Property
 
 @pytest.mark.vcr()
 def test_all_createable_props_schema(
-    notion: uno.Session, root_page: uno.Page, dummy_urls: URL, get_id_prefix: Callable[[str], str]
+    notion: uno.Session,
+    root_page: uno.Page,
+    dummy_urls: URL,
+    get_id_prefix: Callable[[str], str],
+    person: uno.User,
 ) -> None:
+    notion.cache[person.id] = person
+
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -72,7 +78,6 @@ def test_all_createable_props_schema(
     with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(last_edited_time=datetime.now(tz=timezone.utc))
 
-    florian = notion.search_user('Florian Wilhelm').item()
     myself = notion.whoami()
 
     with pytest.raises(ReadOnlyPropertyError):
@@ -97,7 +102,7 @@ def test_all_createable_props_schema(
         'files': props.Files([uno.ExternalFile(name='My File', url=dummy_urls.file)]),
         'multi_select': props.MultiSelect(options[0]),
         'number': props.Number(42),
-        'people': props.Person(florian),
+        'people': props.Person(person),
         'phone_number': props.Phone('+1 234 567 890'),
         'relation': props.Relations([a_item1, a_item2]),
         'relation_twoway': props.Relations([a_item1, a_item2]),

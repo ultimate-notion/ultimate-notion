@@ -52,8 +52,14 @@ from ultimate_notion.utils import temp_attr, temp_timezone
 if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
 
+# Name of the environment variable that overrides the title of the root test page.
+# This lets a maintainer point the suite at the root page they shared with their own
+# integration without having to name it `Tests`. The default keeps the recorded
+# cassettes (which searched for `Tests`) working unchanged.
+ENV_TEST_ROOT_PAGE = 'UNO_TEST_ROOT_PAGE'
+
 # Manually created DBs and Pages in Notion for testing purposes
-TESTS_PAGE = 'Tests'  # root page for all tests with connected Notion integration
+TESTS_PAGE = os.environ.get(ENV_TEST_ROOT_PAGE, 'Tests')  # root page for all tests with connected Notion integration
 ALL_PROPS_DB = 'All Properties DB'  # DB with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
@@ -245,7 +251,7 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
-def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
+def vcr_fixture(scope: str, *, autouse: bool = False, shared: bool = False) -> Callable[..., Any]:
     """Return a VCR fixture for module/session-level fixtures"""
     if scope not in {'module', 'session'}:
         msg = f'Use this only for module or session scope, not {scope}!'
@@ -256,12 +262,13 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
         is_generator = inspect.isgeneratorfunction(func)
 
         def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR | MagicMock, str]:
-            if scope == 'module':
+            if scope == 'module' and not shared:
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
                 cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
-            else:  # scope == 'session'
+            else:
                 cassette_dir = str(request.config.rootdir / 'tests' / 'cassettes' / 'fixtures')
-                cassette_name = f'sess_{func.__name__}.yaml'
+                prefix = 'mod' if scope == 'module' else 'sess'
+                cassette_name = f'{prefix}_{func.__name__}.yaml'
 
             vcr_config = vcr_config.copy()  # to avoid changing the original config
             vcr_config |= {'cassette_library_dir': cassette_dir}
@@ -318,6 +325,27 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
     return decorator
 
 
+def require_page(notion: Session, title: str) -> Page:
+    """Return the named page, or skip the test if the workspace does not contain it.
+
+    A fresh workspace will not have the manually created test objects, so depending
+    tests skip with a helpful message instead of erroring. See the "Set up a Notion
+    test workspace" section in `CONTRIBUTING.md`.
+    """
+    pages = notion.search_page(title)
+    if not pages:
+        pytest.skip(f'Test workspace has no page titled {title!r}; see CONTRIBUTING.md.')
+    return pages.item()
+
+
+def require_db(notion: Session, title: str) -> Database:
+    """Return the named database, or skip the test if the workspace does not contain it."""
+    dbs = notion.search_db(title)
+    if not dbs:
+        pytest.skip(f'Test workspace has no database titled {title!r}; see CONTRIBUTING.md.')
+    return dbs.item()
+
+
 @pytest.fixture(scope='module')
 def notion_cached() -> Iterator[Session]:
     """Return the notion session used for live testing."""
@@ -332,22 +360,26 @@ def notion(notion_cached: Session) -> Iterator[Session]:
         yield notion_cached
 
 
-@pytest.fixture(scope='module')
+@vcr_fixture(scope='module', shared=True)
 def person(notion_cached: Session) -> User:
-    """Return a user object for testing."""
-    return notion_cached.search_user('Florian Wilhelm').item()
+    """Return a user object for testing.
+
+    Use the first user visible to the integration so the suite is not tied to a
+    specific workspace member.
+    """
+    return notion_cached.all_users()[0]
 
 
 @vcr_fixture(scope='module')
 def contacts_db(notion_cached: Session) -> Database:
     """Return a test database."""
-    return notion_cached.search_db(CONTACTS_DB).item()
+    return require_db(notion_cached, CONTACTS_DB)
 
 
 @vcr_fixture(scope='module')
 def root_page(notion_cached: Session) -> Page:
     """Return the page reference used as parent page for live testing."""
-    return notion_cached.search_page(TESTS_PAGE).item()
+    return require_page(notion_cached, TESTS_PAGE)
 
 
 @pytest.fixture(scope='function')
@@ -376,61 +408,61 @@ def page_hierarchy(notion_cached: Session, root_page: Page) -> Iterator[tuple[Pa
 @vcr_fixture(scope='module')
 def intro_page(notion_cached: Session) -> Page:
     """Return the default 'Getting Started' page."""
-    return notion_cached.search_page(GETTING_STARTED_PAGE).item()
+    return require_page(notion_cached, GETTING_STARTED_PAGE)
 
 
 @vcr_fixture(scope='module')
 def all_props_db(notion_cached: Session) -> Database:
     """Return manually created database with all properties, also AI properties."""
-    return notion_cached.search_db(ALL_PROPS_DB).item()
+    return require_db(notion_cached, ALL_PROPS_DB)
 
 
 @vcr_fixture(scope='module')
 def wiki_db(notion_cached: Session) -> Database:
     """Return manually created wiki db."""
-    return notion_cached.search_db(WIKI_DB).item()
+    return require_db(notion_cached, WIKI_DB)
 
 
 @vcr_fixture(scope='module')
 def formula_db(notion_cached: Session) -> Database:
     """Return manually created formula db."""
-    return notion_cached.search_db(FORMULA_DB).item()
+    return require_db(notion_cached, FORMULA_DB)
 
 
 @vcr_fixture(scope='module')
 def md_text_page(notion_cached: Session) -> Page:
     """Return a page with markdown text content."""
-    return notion_cached.search_page(MD_TEXT_TEST_PAGE).item()
+    return require_page(notion_cached, MD_TEXT_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def md_page(notion_cached: Session) -> Page:
     """Return a page with markdown content."""
-    return notion_cached.search_page(MD_PAGE_TEST_PAGE).item()
+    return require_page(notion_cached, MD_PAGE_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def md_subpage(notion_cached: Session) -> Page:
     """Return a page with markdown content."""
-    return notion_cached.search_page(MD_SUBPAGE_TEST_PAGE).item()
+    return require_page(notion_cached, MD_SUBPAGE_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def embed_page(notion_cached: Session) -> Page:
     """Return a page with embed/inline/linked & unfurl content."""
-    return notion_cached.search_page(EMBED_TEST_PAGE).item()
+    return require_page(notion_cached, EMBED_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def comment_page(notion_cached: Session) -> Page:
     """Return a page with comments."""
-    return notion_cached.search_page(COMMENT_PAGE).item()
+    return require_page(notion_cached, COMMENT_PAGE)
 
 
 @vcr_fixture(scope='module')
 def custom_emoji_page(notion_cached: Session) -> Page:
     """Return a page with a custom emoji."""
-    return notion_cached.search_page(CUSTOM_EMOJI_PAGE).item()
+    return require_page(notion_cached, CUSTOM_EMOJI_PAGE)
 
 
 @pytest.fixture(scope='module')
@@ -460,7 +492,7 @@ def static_pages(  # noqa: PLR0917
 @vcr_fixture(scope='module')
 def task_db(notion_cached: Session) -> Database:
     """Return manually created wiki db."""
-    return notion_cached.search_db(TASK_DB).item()
+    return require_db(notion_cached, TASK_DB)
 
 
 @vcr_fixture(scope='module')
