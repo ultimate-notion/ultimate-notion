@@ -64,8 +64,15 @@ class Wrapper(Generic[GT_co], ABC):
         return self._obj_ref
 
     @obj_ref.setter
-    def obj_ref(self, value: GT_co) -> None:  # type: ignore[misc] # breaking covariance
-        """Set the low-level Notion-API object reference."""
+    def obj_ref(self: Wrapper[obj_core.GenericObject], value: obj_core.GenericObject) -> None:
+        """Set the low-level Notion-API object reference.
+
+        Both `self` and `value` are typed against `GenericObject` (the upper bound of the covariant
+        `GT_co`) rather than `GT_co` itself: a covariant type variable may not appear in an input
+        position. Viewing `self` as `Wrapper[GenericObject]` is sound precisely because `Wrapper` is
+        covariant, and it makes the assignment to `_obj_ref` type-check without breaking covariance.
+        The getter still narrows the return type to `GT_co`.
+        """
         self._obj_ref = value
 
     @classmethod

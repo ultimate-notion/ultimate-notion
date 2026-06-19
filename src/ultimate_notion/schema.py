@@ -495,7 +495,11 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         return self._obj_ref
 
     @obj_ref.setter
-    def obj_ref(self, new_obj_ref: obj_schema.Relation) -> None:
+    def obj_ref(self: Wrapper[obj_core.GenericObject], new_obj_ref: obj_core.GenericObject) -> None:
+        # Mirrors `Wrapper.obj_ref`'s setter: the parameter is widened to `GenericObject` (the upper
+        # bound of the covariant type variable) so it stays contravariant with the base, and viewing
+        # `self` as `Wrapper[GenericObject]` keeps the assignment sound. The getter above still
+        # narrows the return type to `obj_schema.Relation`.
         self._obj_ref = new_obj_ref
 
     @property
