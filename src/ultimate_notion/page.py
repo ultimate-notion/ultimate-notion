@@ -130,11 +130,9 @@ class Page(
 
     props: PagePropertiesNS
 
-    @classmethod
-    def wrap_obj_ref(cls, obj_ref: obj_blocks.Page, /) -> Self:
-        obj = super().wrap_obj_ref(obj_ref)
-        obj.props = obj._create_page_props_ns()
-        return obj
+    def _finalize_wrap(self) -> None:
+        super()._finalize_wrap()
+        self.props = self._create_page_props_ns()
 
     def _create_page_props_ns(self) -> PagePropertiesNS:
         """Create a namespace for the properties of this page defind by the database."""
