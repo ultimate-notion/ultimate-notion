@@ -46,7 +46,13 @@ import ultimate_notion as uno
 from ultimate_notion import Database, Option, Page, Session, User, schema
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.adapters.google.tasks import GTasksClient
-from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, ENV_ULTIMATE_NOTION_DEBUG, get_cfg_file, get_or_create_cfg
+from ultimate_notion.config import (
+    ENV_NOTION_TOKEN,
+    ENV_ULTIMATE_NOTION_CFG,
+    ENV_ULTIMATE_NOTION_DEBUG,
+    get_cfg_file,
+    get_or_create_cfg,
+)
 from ultimate_notion.utils import temp_attr, temp_timezone
 
 if TYPE_CHECKING:
@@ -145,6 +151,21 @@ def exec_pyfile(file_path: str) -> None:
     """Executes a Python module as a script, as if it was called from the command line."""
     code = compile(Path(file_path).read_text(encoding='utf-8'), file_path, 'exec')
     exec(code, {'__MODULE__': '__main__'})  # noqa: S102
+
+
+@pytest.fixture(scope='session', autouse=True)
+def offline_replay_token(request: SubRequest) -> None:
+    """Provide a dummy Notion token for pure offline replay (`hatch run vcr-only`).
+
+    With `--record-mode=none` the network is blocked and every interaction is
+    replayed from a cassette, so the token is never actually sent. Supplying a
+    placeholder lets contributors run the offline suite with no credentials, as
+    promised in `CONTRIBUTING.md`. Live and (re-)recording runs are untouched: a
+    real token must be provided via `NOTION_TOKEN` for those.
+    """
+    replay_only = request.config.getoption('--record-mode') == 'none'
+    if replay_only and not os.environ.get(ENV_NOTION_TOKEN):
+        os.environ[ENV_NOTION_TOKEN] = 'secret...'  # never sent; the network is blocked during replay
 
 
 @pytest.fixture(scope='session', autouse=True)
