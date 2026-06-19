@@ -4,16 +4,41 @@ The script is idempotent: objects that already exist are left unchanged.
 Set NOTION_TOKEN and share the root page with the integration before running it.
 """
 
-from __future__ import annotations
-
 import argparse
+import inspect
 import os
 import time
-from typing import Any, cast
+from typing import Any
 
 from notion_client import Client
 
 DEFAULT_ROOT_TITLE = 'Tests'
+
+
+def sync_object(response: Any) -> dict[str, Any]:
+    """Validate a JSON object returned by the synchronous Notion client."""
+    if inspect.isawaitable(response):
+        msg = 'The workspace bootstrap requires the synchronous Notion client.'
+        raise TypeError(msg)
+    if not isinstance(response, dict):
+        msg = f'Expected a JSON object from Notion, got {type(response).__name__}.'
+        raise TypeError(msg)
+    return response
+
+
+def object_list(value: Any) -> list[dict[str, Any]]:
+    """Validate a list of JSON objects."""
+    if not isinstance(value, list):
+        msg = f'Expected a JSON array from Notion, got {type(value).__name__}.'
+        raise TypeError(msg)
+
+    result = []
+    for item in value:
+        if not isinstance(item, dict):
+            msg = f'Expected a JSON object in the Notion response, got {type(item).__name__}.'
+            raise TypeError(msg)
+        result.append(item)
+    return result
 
 
 def rich_text(text: str) -> list[dict[str, Any]]:
@@ -40,8 +65,7 @@ class Bootstrap:
         self.root = root
 
     def search_exact(self, title: str, kind: str) -> list[dict[str, Any]]:
-        response = cast(
-            dict[str, Any],
+        response = sync_object(
             self.client.search(
                 query=title,
                 filter={'property': 'object', 'value': kind},
@@ -67,8 +91,7 @@ class Bootstrap:
         if page := self.find_exact(title, 'page'):
             print(f'page exists: {title}')
             return page
-        page = cast(
-            dict[str, Any],
+        page = sync_object(
             self.client.pages.create(
                 parent={'page_id': parent_id or self.root['id']},
                 properties={'title': {'title': rich_text(title)}},
@@ -99,17 +122,16 @@ class Bootstrap:
             kwargs['description'] = rich_text(description)
         if icon is not None:
             kwargs['icon'] = icon
-        database = cast(dict[str, Any], self.client.databases.create(**kwargs))
+        database = sync_object(self.client.databases.create(**kwargs))
         print(f'created database: {title}')
         time.sleep(0.7)
         return database
 
     def database_rows(self, database: dict[str, Any]) -> list[dict[str, Any]]:
-        response = cast(
-            dict[str, Any],
+        response = sync_object(
             self.client.databases.query(database_id=database['id'], page_size=100),
         )
-        return cast(list[dict[str, Any]], response['results'])
+        return object_list(response.get('results'))
 
     def create_database_page(
         self,
