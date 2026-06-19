@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ultimate_notion.schema import Schema
+    from ultimate_notion.schema import SchemaType
 
 
 class UltimateNotionError(Exception):
@@ -59,7 +59,7 @@ class SchemaError(UltimateNotionError):
 class SchemaNotBoundError(SchemaError):
     """Raised when the schema is not bound to a database."""
 
-    def __init__(self, schema: type[Schema]):
+    def __init__(self, schema: SchemaType):
         self.schema = schema
         msg = f'Schema {schema.__name__} is not bound to any database'
         super().__init__(msg)
