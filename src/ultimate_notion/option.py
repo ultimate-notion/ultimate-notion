@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.errors import UnsetError
+from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
 from ultimate_notion.obj_api.enums import Color, OptionGroupType
@@ -120,7 +121,7 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
         super().__init__(name=name, color=color, option_ids=option_ids)
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: objs.SelectGroup, /, *, options: list[Option] | None = None) -> OptionGroup:
+    def wrap_obj_ref(cls, obj_ref: obj_core.GenericObject, /, *, options: list[Option] | None = None) -> OptionGroup:
         """Convienence constructor for the group of options."""
         obj = super().wrap_obj_ref(obj_ref)
         obj._options = [] if options is None else options

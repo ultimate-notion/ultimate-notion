@@ -35,9 +35,9 @@ class Wrapper(Generic[GT_co], ABC):
 
     _obj_ref: GT_co
 
-    _obj_api_map: ClassVar[dict[type[GT_co], type[Wrapper]]] = {}
+    _obj_api_map: ClassVar[dict[type[obj_core.GenericObject], type[Wrapper]]] = {}
 
-    def __init_subclass__(cls, wraps: type[GT_co], **kwargs: Any):
+    def __init_subclass__(cls, wraps: type[obj_core.GenericObject], **kwargs: Any):
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[wraps] = cls
 
@@ -45,9 +45,9 @@ class Wrapper(Generic[GT_co], ABC):
         # Needed for wrap_obj_ref and its call to __new__ to work!
         return super().__new__(cls)
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self: Wrapper[obj_core.GenericObject], *args: Any, **kwargs: Any):
         """Default constructor that also builds `obj_ref`."""
-        obj_api_type: type[GT_co] = self._obj_api_map_inv[self.__class__]
+        obj_api_type = self._obj_api_map_inv[self.__class__]
         self._obj_ref = obj_api_type.build(*args, **kwargs)
 
     def __pydantic_serializer__(self) -> SchemaSerializer:  # noqa: PLW3201
@@ -76,8 +76,13 @@ class Wrapper(Generic[GT_co], ABC):
         self._obj_ref = value
 
     @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: GT_co, /) -> Self:  # type: ignore[misc] # breaking covariance
-        """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
+    def wrap_obj_ref(cls: type[Self], obj_ref: obj_core.GenericObject, /) -> Self:
+        """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion.
+
+        `obj_ref` is typed against `GenericObject` (the upper bound of the covariant `GT_co`) rather
+        than `GT_co` itself, since a covariant type variable may not appear in an input position. The
+        concrete high-level class is resolved at runtime from the registry keyed on `type(obj_ref)`.
+        """
         hl_cls = cls._obj_api_map[type(obj_ref)]
         # Resolving `obj_ref` may yield a more specific high-level class than `cls`, e.g. calling
         # `Block.wrap_obj_ref` on a paragraph object resolves `hl_cls` to `Paragraph`. In that case we
@@ -100,7 +105,7 @@ class Wrapper(Generic[GT_co], ABC):
         """
 
     @property
-    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT_co]]:
+    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[obj_core.GenericObject]]:
         return {v: k for k, v in self._obj_api_map.items()}
 
 

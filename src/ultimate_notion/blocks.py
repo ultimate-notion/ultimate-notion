@@ -42,6 +42,7 @@ from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
@@ -1246,7 +1247,12 @@ class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_bl
             self.obj_ref.table_row.cells[idx] = Text(cell).obj_ref
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: obj_blocks.TableRow, /) -> TableRow:
+    def wrap_obj_ref(cls, obj_ref: obj_core.GenericObject, /) -> TableRow:
+        # `obj_ref` is typed against the covariant upper bound `GenericObject`; the registry guarantees
+        # that `TableRow.wrap_obj_ref` is only ever handed a `TableRow` object.
+        if not isinstance(obj_ref, obj_blocks.TableRow):
+            msg = f'Expected a `TableRow` object, got `{type(obj_ref).__name__}`'
+            raise TypeError(msg)
         row = TableRow(*[Text.wrap_obj_ref(cell) if cell else None for cell in obj_ref.table_row.cells])
         row.obj_ref = obj_ref
         return row

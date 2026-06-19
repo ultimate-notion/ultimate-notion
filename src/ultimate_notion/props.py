@@ -42,10 +42,6 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
         type_name = wraps.model_fields['type'].get_default()
         cls._type_value_map[type_name] = cls
 
-    @property
-    def _obj_api_type(self) -> type[obj_props.PropertyValue]:
-        return self._obj_api_map_inv[self.__class__]
-
     def __init__(self, values: Any | Sequence[Any]):
         if isinstance(values, Sequence) and not isinstance(values, str | bytes):
             values = [value.obj_ref if isinstance(value, Wrapper) else value for value in values]
