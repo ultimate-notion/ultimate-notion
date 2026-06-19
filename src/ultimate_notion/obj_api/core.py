@@ -524,11 +524,13 @@ class TypedObject(GenericObject, Generic[TO_co]):
         return cast(TO_co, getattr(self, self._type_name))
 
     @value.setter
-    def value(self, val: TO_co) -> None:  # type: ignore[misc]  # breaking covariance
-        """Set the nested object."""
-        # we are breaking covariance here but going down the Protocol way didn't work out
-        # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
-        # This is still the most programmatic way it seems without adding too much complexity.
+    def value(self, val: object) -> None:
+        """Set the nested object.
+
+        The setter accepts ``object`` rather than the covariant ``TO_co``: a covariant type
+        variable may not appear in an input position, and ``TO_co`` is unbounded so ``object``
+        is its upper bound. The getter still narrows the return type to ``TO_co``.
+        """
         setattr(self, self._type_name, val)
 
 
