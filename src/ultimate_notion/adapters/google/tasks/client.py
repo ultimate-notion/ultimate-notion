@@ -241,10 +241,60 @@ class GTask(GObject):
         return self
 
 
-class GTaskList(GObject):
-    """Representation of a Google Task List."""
+class _GTaskListData(GObject):
+    """Pydantic representation of the JSON fields of a Google Task List."""
 
     kind: Literal[Kind.TASK_LIST]
+
+
+class GTaskList:
+    """Representation of a Google Task List.
+
+    A task list is a collection of tasks. Unlike [`GTask`][], it is therefore not
+    a pydantic `BaseModel` itself but wraps its JSON fields in one. This lets
+    iterating over a task list yield its [`GTask`][]s instead of the
+    `(field, value)` pairs that pydantic's `BaseModel.__iter__` produces.
+    """
+
+    def __init__(self, resource: Resource, **data: Any) -> None:
+        self._data = _GTaskListData(resource=resource, **data)
+
+    @property
+    def _resource(self) -> Resource:
+        return self._data._resource
+
+    @property
+    def id(self) -> str:  # A003
+        """Returns the ID of this task list."""
+        return self._data.id
+
+    @property
+    def kind(self) -> Kind:
+        """Returns the kind of this Google object."""
+        return self._data.kind
+
+    @property
+    def etag(self) -> str:
+        """Returns the ETag of this task list."""
+        return self._data.etag
+
+    @property
+    def updated(self) -> datetime:
+        """Returns the time this task list was last updated."""
+        return self._data.updated
+
+    @property
+    def self_link(self) -> HttpUrl:
+        """Returns the API URL of this task list."""
+        return self._data.self_link
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, GTaskList):
+            return self._data == other._data
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        return hash(self._data)
 
     def all_tasks(self, *, show_deleted: bool = False) -> list[GTask]:
         """Returns a list of all tasks, completed or not, in this task list."""
@@ -270,7 +320,7 @@ class GTaskList(GObject):
 
         return tasks
 
-    def __iter__(self) -> Iterator[GTask]:  # type: ignore[override]
+    def __iter__(self) -> Iterator[GTask]:
         """Returns an iterator over all tasks in this task list."""
         yield from self.all_tasks()
 
@@ -321,20 +371,20 @@ class GTaskList(GObject):
     @property
     def title(self) -> str:
         """Returns the title of this task list."""
-        return self.title_
+        return self._data.title_
 
     @title.setter
     def title(self, new_title: str) -> None:
         """Sets the title of this task list."""
         resource = self._resource.tasklists()
         resp = resource.patch(tasklist=self.id, body={'title': new_title}).execute()
-        self._update(resp)
+        self._data._update(resp)
 
     def reload(self) -> GTaskList:
         """Reloads this task list from the API."""
         resource = self._resource.tasklists()
         resp = resource.get(tasklist=self.id).execute()
-        self._update(resp)
+        self._data._update(resp)
         return self
 
 
