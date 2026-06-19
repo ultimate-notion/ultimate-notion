@@ -96,7 +96,7 @@ This often provides additional considerations and avoids unnecessary work.
 ### Set up a Notion test workspace
 
 Most tests replay recorded HTTP interactions (VCR cassettes) and need no network
-access — run them with `hatch run vcr-only`. You only need your own Notion
+access; run them with `hatch run vcr-only`. You only need your own Notion
 workspace and integration token if you want to **run the tests live** against the
 Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 
@@ -106,13 +106,13 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 
 2. **Enable the required capabilities.** On the integration's *Capabilities* tab
    enable:
-   - **Read**, **Update** and **Insert** content — the tests create, modify and
+   - **Read**, **Update** and **Insert** content, because the tests create, modify and
      delete pages and databases.
    - A **Read user information** option (with or without email addresses is fine).
      This is **required**: several tests call `Session.all_users()`, which Notion
      rejects with `403 "Personal access tokens cannot list users."` for tokens
      that lack this capability. For the same reason you must use an **internal
-     integration token**, not a personal access token — the latter can never list
+     integration token**, not a personal access token. The latter can never list
      users.
 
 3. **Copy the token.** From the integration's *Configuration* page copy the
@@ -139,7 +139,7 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 
 !!! note
     Three objects (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use
-    features the API cannot create and must be built by hand — see
+    features the API cannot create and must be built by hand. See
     [`tests/TEST_WORKSPACE.md`](tests/TEST_WORKSPACE.md) for exact instructions.
 
 ### Implement your changes
