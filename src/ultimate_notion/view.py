@@ -252,7 +252,7 @@ class View(Sequence[Page]):
         table_str = self.as_table(tablefmt=tablefmt)
 
         if is_notebook() and (tablefmt == 'html'):
-            from IPython.display import display_html  # noqa: PLC0415  # ty: ignore[unresolved-import]
+            from IPython.display import display_html  # noqa: PLC0415
 
             display_html(table_str)
         else:

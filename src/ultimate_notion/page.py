@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from typing_extensions import Self, TypeIs
 
@@ -94,7 +94,7 @@ class PagePropertiesNS(Mapping[str, Any]):
 
     def __getattr__(self, attr_name: str) -> Any:
         self._check_schema()
-        prop = cast(Property, getattr(self._schema, attr_name))
+        prop = getattr(self._schema, attr_name)
         return self[prop.name]
 
     def __setattr__(self, attr_name: str, value: Any) -> None:
@@ -102,7 +102,7 @@ class PagePropertiesNS(Mapping[str, Any]):
             return super().__setattr__(attr_name, value)
 
         self._check_schema()
-        prop = cast(Property, getattr(self._schema, attr_name))
+        prop = getattr(self._schema, attr_name)
         self[prop.name] = value
 
     def __iter__(self) -> Iterator[str]:
@@ -323,7 +323,7 @@ class Page(
         if simple:
             print(md)  # noqa: T201
         else:
-            from IPython.core.display import display_markdown  # noqa: PLC0415  # ty: ignore[unresolved-import]
+            from IPython.core.display import display_markdown  # noqa: PLC0415
 
             display_markdown(md, raw=True)
 

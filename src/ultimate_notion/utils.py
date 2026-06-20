@@ -62,7 +62,7 @@ def safe_list_get(lst: Sequence[T], idx: int, *, default: T | None = None) -> T 
 def is_notebook() -> bool:
     """Determine if we are running within a Jupyter notebook."""
     try:
-        from IPython import get_ipython  # noqa: PLC0415  # ty: ignore[unresolved-import]
+        from IPython.core.getipython import get_ipython  # noqa: PLC0415
     except ModuleNotFoundError:
         return False  # Probably standard Python interpreter
     else:
