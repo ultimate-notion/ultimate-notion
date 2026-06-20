@@ -117,7 +117,6 @@ disallow_untyped_decorators = false
 [[tool.mypy.overrides]]
 # Third-party libraries shipping neither type information nor stubs on typeshed
 module = [
-    "googleapiclient.*",
     "google_auth_oauthlib.*",
     "IPython",
     "IPython.*",
@@ -378,6 +377,7 @@ dependencies = [
     "pyright~=1.1", # no automatic testing, just additionally to mypy
     "types-tabulate", # stubs for tabulate, otherwise mypy needs --install-types
     "pandas-stubs", # stubs for pandas
+    "google-api-python-client-stubs", # stubs for the Google Tasks adapter
     # Typed test deps so mypy checks against their real types instead of ignoring them
     "pytest",
     "hypothesis",

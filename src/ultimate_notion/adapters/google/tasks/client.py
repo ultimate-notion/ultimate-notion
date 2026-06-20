@@ -18,22 +18,41 @@ from collections.abc import Iterator
 from datetime import date, datetime, time, timezone
 from enum import Enum
 from types import TracebackType
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import Resource, build
+from googleapiclient.discovery import build
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from ultimate_notion.config import Config, get_or_create_cfg
 from ultimate_notion.utils import SList, is_stable_release
 
+if TYPE_CHECKING:
+    # `_apis` only exists in google-api-python-client-stubs, not at runtime, so this
+    # import lives under TYPE_CHECKING. It types the dynamically-built Tasks service
+    # resource returned by `build('tasks', 'v1', ...)`, giving the chained
+    # `.tasklists()` / `.tasks()` calls real types instead of `Any`.
+    from googleapiclient._apis.tasks.v1.resources import TasksResource as TasksServiceResource
+    from googleapiclient._apis.tasks.v1.schemas import Task, TaskList
+
 DEFAULT_LIST_ID_LEN = 32
 """Length of the ID of the Google default tasklist."""
 MAX_RESULTS_PER_PAGE = 100
 """Maximum number of results per page when fetching all tasks."""
+
+
+def _drop_none(**kwargs: Any) -> dict[str, Any]:
+    """Drop keyword arguments whose value is `None`.
+
+    The Google Tasks discovery stubs type optional parameters (page tokens, parents, ...)
+    as required, while the underlying API treats an omitted parameter the same as the
+    `None` the higher-level code passes. Dropping them keeps the typed calls honest
+    without changing behaviour.
+    """
+    return {key: value for key, value in kwargs.items() if value is not None}
 
 
 class Scope(str, Enum):
@@ -77,9 +96,9 @@ class GObject(BaseModel):
     etag: str
     updated: datetime
     self_link: HttpUrl = Field(..., alias='selfLink')
-    _resource: Resource
+    _resource: TasksServiceResource
 
-    def __init__(self, resource: Resource, **data: Any) -> None:
+    def __init__(self, resource: TasksServiceResource, **data: Any) -> None:
         super().__init__(**data)
         self._resource = resource
 
@@ -92,7 +111,7 @@ class GObject(BaseModel):
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def _update(self, resp: dict[str, str]) -> None:
+    def _update(self, resp: Task | TaskList) -> None:
         """Updates this object with the given response from the API."""
         new_obj_dct = dict(resp, resource=self._resource)
         new_obj = self.model_validate(new_obj_dct)
@@ -154,7 +173,9 @@ class GTask(GObject):
         due_date = assert_datetime(due_date)
         due_date_str = due_date if due_date is None else due_date.isoformat()
         resource = self._resource.tasks()
-        resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'due': due_date_str}).execute()
+        # A `None` value clears the due date; the generated TypedDict only models `str`.
+        body = cast('Task', {'due': due_date_str})
+        resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body=body).execute()
         self._update(resp)
 
     @property
@@ -166,7 +187,9 @@ class GTask(GObject):
     def notes(self, new_notes: str | None) -> None:
         """Sets the notes of this task."""
         resource = self._resource.tasks()
-        resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'notes': new_notes}).execute()
+        # A `None` value clears the notes; the generated TypedDict only models `str`.
+        body = cast('Task', {'notes': new_notes})
+        resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body=body).execute()
         self._update(resp)
 
     @property
@@ -206,7 +229,7 @@ class GTask(GObject):
         """Moves this task to the behind the given task."""
         previous_id = None if previous is None else previous.id
         resource = self._resource.tasks()
-        resp = resource.move(tasklist=self.tasklist_id, task=self.id, previous=previous_id).execute()
+        resp = resource.move(tasklist=self.tasklist_id, task=self.id, **_drop_none(previous=previous_id)).execute()
         self._update(resp)
         return self
 
@@ -225,7 +248,7 @@ class GTask(GObject):
         parent_id = None if parent is None else parent.id
 
         resource = self._resource.tasks()
-        resp = resource.move(tasklist=self.tasklist_id, task=self.id, parent=parent_id).execute()
+        resp = resource.move(tasklist=self.tasklist_id, task=self.id, **_drop_none(parent=parent_id)).execute()
         self._update(resp)
 
     @property
@@ -258,11 +281,11 @@ class GTaskList:
     `(field, value)` pairs that pydantic's `BaseModel.__iter__` produces.
     """
 
-    def __init__(self, resource: Resource, **data: Any) -> None:
+    def __init__(self, resource: TasksServiceResource, **data: Any) -> None:
         self._data = _GTaskListData(resource=resource, **data)
 
     @property
-    def _resource(self) -> Resource:
+    def _resource(self) -> TasksServiceResource:
         return self._data._resource
 
     @property
@@ -308,10 +331,10 @@ class GTaskList:
             results = resource.list(
                 tasklist=self.id,
                 maxResults=MAX_RESULTS_PER_PAGE,
-                pageToken=page_token,
                 showCompleted=True,
                 showHidden=True,
                 showDeleted=show_deleted,
+                **_drop_none(pageToken=page_token),
             ).execute()
             items = results.get('items', [])
             tasks.extend([GTask(resource=self._resource, **item) for item in items])
@@ -350,7 +373,7 @@ class GTaskList:
         """Creates a new task."""
         due = assert_datetime(due)
         resource = self._resource.tasks()
-        body = {'title': title}
+        body: Task = {'title': title}
         if due is not None:
             body['due'] = due.isoformat()
         task = resource.insert(tasklist=self.id, body=body).execute()
@@ -396,7 +419,7 @@ class GTasksClient:
     read_only: bool
     _scopes: list[str]
     _config: Config
-    resource: Resource
+    resource: TasksServiceResource
 
     def __init__(self, config: Config | None = None, *, read_only: bool = False) -> None:
         self.read_only = read_only
@@ -406,7 +429,7 @@ class GTasksClient:
         self._config = config
         self.resource = self._build_resource()
 
-    def _build_resource(self) -> Resource:
+    def _build_resource(self) -> TasksServiceResource:
         if self._config.google is None:
             msg = 'Configurtion has no `google` section!'
             raise RuntimeError(msg)
@@ -449,7 +472,9 @@ class GTasksClient:
         tasklists = []
 
         while True:
-            results = self.resource.tasklists().list(maxResults=max_results, pageToken=page_token).execute()
+            results = (
+                self.resource.tasklists().list(**_drop_none(maxResults=max_results, pageToken=page_token)).execute()
+            )
             items = results.get('items', [])
             tasklists.extend([GTaskList(resource=self.resource, **item) for item in items])
 
