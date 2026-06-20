@@ -1109,7 +1109,7 @@ class Schema(metaclass=SchemaType):
         if is_notebook() and (tablefmt == 'html'):
             from IPython.display import display_html  # noqa: PLC0415
 
-            display_html(table_str)
+            display_html(table_str)  # type: ignore[no-untyped-call]
         else:
             print(table_str)  # noqa: T201
 
