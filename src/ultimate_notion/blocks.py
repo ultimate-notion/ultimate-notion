@@ -133,7 +133,7 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
         Pages and databases are moved to the trash, blocks are deleted permanently.
         """
         session = get_active_session()
-        self.obj_ref = cast(DO_co, session.api.blocks.delete(self.id))
+        self.obj_ref = session.api.blocks.delete(self.id)
         self._delete_me_from_parent()
         return self
 
@@ -339,7 +339,7 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
     def reload(self) -> Self:
         """Reload the block from the API."""
         session = get_active_session()
-        self.obj_ref = cast(B_co, session.api.blocks.retrieve(self.id))
+        self.obj_ref = session.api.blocks.retrieve(self.id)
         return self
 
     def _update_in_notion(self, *, exclude_attrs: Sequence[str] | None = None) -> None:

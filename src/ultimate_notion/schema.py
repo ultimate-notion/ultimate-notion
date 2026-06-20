@@ -577,7 +577,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             del target_schema[target_two_way_prop]
         else:
             new_rel = obj_schema.DualPropertyRelation.build_relation(db.id)
-            self.obj_ref.relation = cast(obj_schema.DualPropertyRelation, new_rel.relation)
+            self.obj_ref.relation = new_rel.relation
             self.obj_ref = self._update_prop()
             self._rename_two_way_prop(prop_name)
 
@@ -800,7 +800,7 @@ class SchemaType(ABCMeta):
 
         for b in bases:
             for prop in getattr(b, '_props', []):
-                prop = cast(Property, deepcopy(prop))
+                prop = deepcopy(prop)
                 props.append(prop)
 
         for attr, val in list(namespace.items()):
