@@ -9,7 +9,7 @@ import time
 from collections.abc import Sequence
 from threading import RLock
 from types import TracebackType
-from typing import Any, BinaryIO, ClassVar, cast
+from typing import Any, BinaryIO, ClassVar, TypeVar, cast
 from uuid import UUID
 
 import httpx
@@ -23,7 +23,6 @@ from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import SessionError, UnknownDatabaseError, UnknownPageError, UnknownUserError
 from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_size, get_mime_type
 from ultimate_notion.obj_api import create_notion_client
-from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.objects import get_uuid
@@ -35,6 +34,9 @@ from ultimate_notion.user import Bot, UnknownUser, User
 from ultimate_notion.utils import SList
 
 _logger = logging.getLogger(__name__)
+
+# ToDo: Use new syntax when requires-python >= 3.12
+T_cache = TypeVar('T_cache', bound='DataObject | User')
 
 
 class Session:
@@ -142,6 +144,10 @@ class Session:
             msg = 'Invalid API reponse'
             raise SessionError(msg) from err
 
+    def _cache_add(self, obj: T_cache) -> T_cache:
+        """Cache `obj` keyed by its id, returning the already-cached instance if one exists."""
+        return cast(T_cache, self.cache.setdefault(obj.id, obj))
+
     def get_block(self, block_ref: UUID | str, *, use_cache: bool = True) -> Block:
         """Retrieve a single block by an object reference."""
         block_uuid = get_uuid(block_ref)
@@ -214,10 +220,7 @@ class Session:
         query = self.api.search(db_name).filter(db_only=True)
         if reverse:
             query.sort(ascending=True)
-        dbs = [
-            cast(Database, self.cache.setdefault(raise_unset(db.id), Database.wrap_obj_ref(db)))
-            for db in query.execute()
-        ]
+        dbs = [self._cache_add(Database.wrap_obj_ref(db)) for db in query.execute()]
         if exact and db_name is not None:
             dbs = [db for db in dbs if db.title == db_name]
         if not deleted:
@@ -268,10 +271,7 @@ class Session:
         query = self.api.search(title).filter(page_only=True)
         if reverse:
             query.sort(ascending=True)
-        pages = [
-            cast(Page, self.cache.setdefault(raise_unset(page_obj.id), Page.wrap_obj_ref(page_obj)))
-            for page_obj in query.execute()
-        ]
+        pages = [self._cache_add(Page.wrap_obj_ref(page_obj)) for page_obj in query.execute()]
         if exact and title is not None:
             pages = [page for page in pages if page.title == title]
         return SList(pages)
@@ -385,7 +385,7 @@ class Session:
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace."""
         _logger.info('Retrieving all users.')
-        return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
+        return [self._cache_add(User.wrap_obj_ref(user)) for user in self.api.users.list()]
 
     def whoami(self) -> Bot:
         """Return the integration as bot object."""
@@ -393,7 +393,7 @@ class Session:
         if self._own_bot_id is None:
             user = self.api.users.me()
             self._own_bot_id = user.id
-            return cast(Bot, self.cache.setdefault(user.id, Bot.wrap_obj_ref(user)))
+            return self._cache_add(Bot.wrap_obj_ref(user))
         else:
             return cast(Bot, self.cache[self._own_bot_id])
 
