@@ -18,7 +18,7 @@ from collections.abc import Iterator
 from datetime import date, datetime, time, timezone
 from enum import Enum
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, cast
 
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
@@ -42,6 +42,17 @@ DEFAULT_LIST_ID_LEN = 32
 """Length of the ID of the Google default tasklist."""
 MAX_RESULTS_PER_PAGE = 100
 """Maximum number of results per page when fetching all tasks."""
+
+_M = TypeVar('_M', bound='GObject')
+
+
+def _build(model: type[_M], resource: TasksServiceResource, **data: Any) -> _M:
+    """Construct a `GObject` from an API response whose fields are only known at runtime.
+
+    The `**data` comes from the Google Tasks API as a dynamic dict, which static type
+    checkers cannot match against the model fields; this helper localizes that.
+    """
+    return model(resource=resource, **data)
 
 
 def _drop_none(**kwargs: Any) -> dict[str, Any]:
@@ -240,7 +251,7 @@ class GTask(GObject):
             return None
         resource = self._resource.tasks()
         resp = resource.get(tasklist=self.tasklist_id, task=self.parent_id).execute()
-        return GTask(resource=self._resource, **resp)  # ty: ignore[invalid-argument-type, missing-argument, unknown-argument]
+        return _build(GTask, resource=self._resource, **resp)
 
     @parent.setter
     def parent(self, parent: GTask | None) -> None:
@@ -282,7 +293,7 @@ class GTaskList:
     """
 
     def __init__(self, resource: TasksServiceResource, **data: Any) -> None:
-        self._data = _GTaskListData(resource=resource, **data)  # ty: ignore[unknown-argument]
+        self._data = _build(_GTaskListData, resource=resource, **data)
 
     @property
     def _resource(self) -> TasksServiceResource:
@@ -337,7 +348,7 @@ class GTaskList:
                 **_drop_none(pageToken=page_token),
             ).execute()
             items = results.get('items', [])
-            tasks.extend([GTask(resource=self._resource, **item) for item in items])  # ty: ignore[invalid-argument-type, missing-argument, unknown-argument]
+            tasks.extend([_build(GTask, resource=self._resource, **item) for item in items])
 
             page_token = results.get('nextPageToken')
             if page_token is None:
@@ -367,7 +378,7 @@ class GTaskList:
         """Returns the task with the given ID."""
         resource = self._resource.tasks()
         task = resource.get(tasklist=self.id, task=task_id).execute()
-        return GTask(resource=self._resource, **task)  # ty: ignore[invalid-argument-type, missing-argument, unknown-argument]
+        return _build(GTask, resource=self._resource, **task)
 
     def create_task(self, title: str, due: date | datetime | None = None) -> GTask:
         """Creates a new task."""
@@ -377,7 +388,7 @@ class GTaskList:
         if due is not None:
             body['due'] = due.isoformat()
         task = resource.insert(tasklist=self.id, body=body).execute()
-        return GTask(resource=self._resource, **task)  # ty: ignore[invalid-argument-type, missing-argument, unknown-argument]
+        return _build(GTask, resource=self._resource, **task)
 
     @property
     def is_default(self) -> bool:

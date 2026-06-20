@@ -16,7 +16,7 @@ import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
 from ultimate_notion.file import AnyFile
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset, raise_unset
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
 from ultimate_notion.obj_api.objects import DateRange
 from ultimate_notion.option import Option
@@ -65,7 +65,9 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
 
     @property
     def id(self) -> str:
-        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
+        if is_unset(obj_id := self.obj_ref.id):
+            raise_unset(obj_id)
+        return obj_id
 
     def __repr__(self) -> str:
         return get_repr(self)
@@ -182,10 +184,8 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
     """Multi-select property value."""
 
     def __init__(self, options: str | Option | Sequence[str | Option]):
-        if not isinstance(options, Sequence | str) or isinstance(options, str):
-            options = [options]
-        options = [Option(option) if isinstance(option, str) else option for option in options]  # ty: ignore[invalid-assignment]
-        super().__init__(options)
+        option_seq: Sequence[str | Option] = [options] if isinstance(options, str | Option) else options
+        super().__init__([Option(option) if isinstance(option, str) else option for option in option_seq])
 
     @property
     def value(self) -> list[Option] | None:

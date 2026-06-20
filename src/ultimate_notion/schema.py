@@ -165,7 +165,9 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def id(self) -> str | None:
         """Return identifier of this property."""
-        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
+        if is_unset(obj_id := self.obj_ref.id):
+            raise_unset(obj_id)
+        return obj_id
 
     @property
     def name(self) -> str:

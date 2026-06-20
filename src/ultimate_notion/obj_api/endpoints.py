@@ -7,6 +7,7 @@ is referred to as `raw_api`.
 
 from __future__ import annotations
 
+import builtins
 import logging
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
@@ -94,10 +95,10 @@ class BlocksEndpoint(Endpoint):
         def append(
             self,
             parent: ParentRef | GenericObject | UUID | str,
-            blocks: list[Block],  # ty: ignore[invalid-type-form]
+            blocks: builtins.list[Block],
             *,
             after: Block | None = None,
-        ) -> tuple[list[Block], list[Block]]:  # ty: ignore[invalid-type-form]
+        ) -> tuple[builtins.list[Block], builtins.list[Block]]:
             """Add the given blocks as children of the specified parent.
 
             The blocks info of the passed blocks will be updated and returned as first part of a tuple.
@@ -557,7 +558,7 @@ class CommentsEndpoint(Endpoint):
         return self.api.client.comments
 
     # https://developers.notion.com/reference/create-a-comment
-    def create(self, page: Page | UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:  # ty: ignore[invalid-type-form]
+    def create(self, page: Page | UUID | str, rich_text: builtins.list[RichTextBaseObject]) -> Comment:
         """Create a comment on the specified Page."""
         page_ref = PageRef.build(page)
         _logger.debug(f'Creating a comment on page with id `{page_ref.page_id}.')
@@ -566,7 +567,7 @@ class CommentsEndpoint(Endpoint):
         return Comment.model_validate(data)
 
     # https://developers.notion.com/reference/create-a-comment
-    def append(self, discussion_id: UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:  # ty: ignore[invalid-type-form]
+    def append(self, discussion_id: UUID | str, rich_text: builtins.list[RichTextBaseObject]) -> Comment:
         """Append a comment to the specified discussion."""
         _logger.debug(f'Appending a comment to discussion with id `{discussion_id}`.')
         rich_text_json = [rt.serialize_for_api() for rt in rich_text]

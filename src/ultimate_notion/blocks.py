@@ -44,7 +44,7 @@ from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset, raise_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.rich_text import Text
 from ultimate_notion.user import User
@@ -110,8 +110,11 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
     def last_edited_by(self) -> User:
         """Return the user who last edited the block."""
         session = get_active_session()
-        last_edit_user_ref = raise_unset(self.obj_ref.last_edited_by)
-        return session.get_user(raise_unset(last_edit_user_ref.id))  # ty: ignore[unresolved-attribute]
+        if is_unset(last_edit_user_ref := self.obj_ref.last_edited_by):
+            raise_unset(last_edit_user_ref)
+        if is_unset(user_id := last_edit_user_ref.id):
+            raise_unset(user_id)
+        return session.get_user(user_id)
 
     @property
     def has_children(self) -> bool:
@@ -352,21 +355,20 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
 
     def replace(self, blocks: Block | Sequence[Block]) -> None:
         """Replace this block with another block or blocks."""
-        if not isinstance(blocks, Sequence):
-            blocks = [blocks]
+        block_seq: Sequence[Block] = [blocks] if isinstance(blocks, Block) else blocks
 
         if self.is_deleted:
             msg = 'Cannot replace a deleted block.'
             raise InvalidAPIUsageError(msg)
 
-        for block in blocks:  # do complete sanity check first
-            if block.in_notion:  # ty: ignore[unresolved-attribute]
+        for block in block_seq:  # do complete sanity check first
+            if block.in_notion:
                 msg = f'Cannot replace with a block {block} that is already in Notion.'
                 raise InvalidAPIUsageError(msg)
 
         if self.parent is not None and isinstance(self.parent, ChildrenMixin):
-            for block in reversed(blocks):
-                self.parent.append(block, after=self)  # ty: ignore[invalid-argument-type]
+            for block in reversed(block_seq):
+                self.parent.append(block, after=self)
         else:
             msg = 'Cannot replace a block that has no parent.'
             raise InvalidAPIUsageError(msg)
@@ -375,20 +377,19 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
 
     def insert_after(self, blocks: Block | Sequence[Block]) -> None:
         """Insert a block or several blocks after this block."""
-        if not isinstance(blocks, Sequence):
-            blocks = [blocks]
+        block_seq: Sequence[Block] = [blocks] if isinstance(blocks, Block) else blocks
 
         if self.is_deleted:
             msg = 'Cannot insert a block after a deleted block.'
             raise InvalidAPIUsageError(msg)
 
-        for block in blocks:  # do complete sanity check first
-            if block.in_notion:  # ty: ignore[unresolved-attribute]
+        for block in block_seq:  # do complete sanity check first
+            if block.in_notion:
                 msg = f'Cannot insert block {block} that is already in Notion.'
                 raise InvalidAPIUsageError(msg)
 
         if self.parent is not None and isinstance(self.parent, ChildrenMixin):
-            self.parent.append(blocks, after=self)
+            self.parent.append(block_seq, after=self)
         else:
             msg = 'Cannot insert a block that has no parent.'
             raise InvalidAPIUsageError(msg)

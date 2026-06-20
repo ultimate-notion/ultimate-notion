@@ -131,8 +131,7 @@ ignore_missing_imports = true
 # are suppressed with inline `# ty: ignore[...]` comments; new code is expected
 # to be clean.
 
-[tool.ty.environment]
-python-version = "3.10"
+# The Python version is inferred from `requires-python` above (>=3.10).
 
 [tool.ty.src]
 include = ["src/ultimate_notion", "tests", "examples"]
@@ -392,7 +391,7 @@ build-check = [
 dependencies = [
     "mypy==1.18.2",
     "ruff==0.14.5", # make sure this is consistent with .pre-commit-config.yaml, thus pinned!
-    "ty==0.0.44", # runs additionally to mypy, pinned as the rule set is still pre-1.0 and changes between releases
+    "ty==0.0.51", # runs additionally to mypy, pinned as the rule set is still pre-1.0 and changes between releases
     "pyright~=1.1", # no automatic testing, just additionally to mypy
     "types-tabulate", # stubs for tabulate, otherwise mypy needs --install-types
     "pandas-stubs", # stubs for pandas

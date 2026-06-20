@@ -14,7 +14,7 @@ from typing_extensions import Self, TypeIs, TypeVar
 from ultimate_notion.errors import UnknownDatabaseError, UnknownPageError
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset, raise_unset
 
 _logger = logging.getLogger(__name__)
 
@@ -119,7 +119,9 @@ class NotionObject(Wrapper[NO_co], ABC, wraps=obj_core.NotionObject):
     @property
     def id(self) -> UUID | str:
         """Return the ID of the block."""
-        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
+        if is_unset(obj_id := self.obj_ref.id):
+            raise_unset(obj_id)
+        return obj_id
 
     @property
     def in_notion(self) -> bool:
@@ -157,24 +159,33 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def id(self) -> UUID:
         """Return the ID of the entity."""
-        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
+        if is_unset(obj_id := self.obj_ref.id):
+            raise_unset(obj_id)
+        return obj_id
 
     @property
     def created_time(self) -> dt.datetime:
         """Return the time when the block was created."""
-        return raise_unset(self.obj_ref.created_time)  # ty: ignore[invalid-return-type]
+        if is_unset(created_time := self.obj_ref.created_time):
+            raise_unset(created_time)
+        return created_time
 
     @property
     def created_by(self) -> User:
         """Return the user who created the block."""
         session = get_active_session()
-        created_by = raise_unset(self.obj_ref.created_by)
-        return session.get_user(raise_unset(created_by.id), raise_on_unknown=False)  # ty: ignore[unresolved-attribute]
+        if is_unset(created_by := self.obj_ref.created_by):
+            raise_unset(created_by)
+        if is_unset(user_id := created_by.id):
+            raise_unset(user_id)
+        return session.get_user(user_id, raise_on_unknown=False)
 
     @property
     def last_edited_time(self) -> dt.datetime:
         """Return the time when the block was last edited."""
-        return raise_unset(self.obj_ref.last_edited_time)  # ty: ignore[invalid-return-type]
+        if is_unset(last_edited_time := self.obj_ref.last_edited_time):
+            raise_unset(last_edited_time)
+        return last_edited_time
 
     @property
     def parent(self) -> NotionEntity | WorkspaceType | None:

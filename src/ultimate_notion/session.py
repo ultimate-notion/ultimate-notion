@@ -25,7 +25,7 @@ from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset, raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.objects import get_uuid
@@ -216,10 +216,11 @@ class Session:
         query = cast(obj_query.SearchQueryBuilder[obj_blocks.Database], self.api.search(db_name).filter(db_only=True))
         if reverse:
             query.sort(ascending=True)
-        dbs = [
-            cast(Database, self.cache.setdefault(raise_unset(db.id), Database.wrap_obj_ref(db)))  # ty: ignore[no-matching-overload]
-            for db in query.execute()
-        ]
+        dbs = []
+        for db in query.execute():
+            if is_unset(db_id := db.id):
+                raise_unset(db_id)
+            dbs.append(cast(Database, self.cache.setdefault(db_id, Database.wrap_obj_ref(db))))
         if exact and db_name is not None:
             dbs = [db for db in dbs if db.title == db_name]
         if not deleted:
@@ -270,10 +271,11 @@ class Session:
         query = cast(obj_query.SearchQueryBuilder[obj_blocks.Page], self.api.search(title).filter(page_only=True))
         if reverse:
             query.sort(ascending=True)
-        pages = [
-            cast(Page, self.cache.setdefault(raise_unset(page_obj.id), Page.wrap_obj_ref(page_obj)))  # ty: ignore[no-matching-overload]
-            for page_obj in query.execute()
-        ]
+        pages = []
+        for page_obj in query.execute():
+            if is_unset(page_id := page_obj.id):
+                raise_unset(page_id)
+            pages.append(cast(Page, self.cache.setdefault(page_id, Page.wrap_obj_ref(page_obj))))
         if exact and title is not None:
             pages = [page for page in pages if page.title == title]
         return SList(pages)
