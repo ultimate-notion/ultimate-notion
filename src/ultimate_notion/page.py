@@ -325,7 +325,7 @@ class Page(
         else:
             from IPython.core.display import display_markdown  # noqa: PLC0415
 
-            display_markdown(md, raw=True)
+            display_markdown(md, raw=True)  # type: ignore[no-untyped-call]
 
     def delete(self) -> Self:
         """Delete this page.

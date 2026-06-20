@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 from pydantic import BaseModel, Field
 from typing_extensions import Self
@@ -14,7 +14,6 @@ from ultimate_notion import props, schema
 from ultimate_notion.core import get_active_session
 from ultimate_notion.errors import EmptyDBError, FilterQueryError
 from ultimate_notion.obj_api import query as obj_query
-from ultimate_notion.obj_api.core import is_unset, raise_unset
 from ultimate_notion.obj_api.enums import ArrayQuantifier, FormulaType, RollupType, SortDirection
 from ultimate_notion.option import Option
 from ultimate_notion.page import Page
@@ -225,8 +224,7 @@ class PropertyCondition(Condition, ABC):
             except StopIteration as e:
                 msg = f'The database {db} is empty.'
                 raise EmptyDBError(msg) from e
-            page_obj_id = raise_unset(page_obj.id)
-            self._probe_page = cast(Page, session.cache.setdefault(page_obj_id, Page.wrap_obj_ref(page_obj)))  # ty: ignore[no-matching-overload]
+            self._probe_page = session._cache_add(Page.wrap_obj_ref(page_obj))
 
         return self._probe_page
 
@@ -843,11 +841,7 @@ class Query:
         if sort_objs := self._sorts_obj_ref():
             query_obj = query_obj.sort(sort_objs)
 
-        pages = []
-        for page in query_obj.execute():
-            if is_unset(page_id := page.id):
-                raise_unset(page_id)
-            pages.append(cast(Page, session.cache.setdefault(page_id, Page.wrap_obj_ref(page))))
+        pages = [session._cache_add(Page.wrap_obj_ref(page)) for page in query_obj.execute()]
         return View(database=self.database, pages=pages, query=self)
 
     def filter(self, expr: Condition) -> Query:

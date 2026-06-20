@@ -454,11 +454,11 @@ class GTasksClient:
             msg = f'File {secret_path} does not exist!'
             raise RuntimeError(msg)
 
-        creds = Credentials.from_authorized_user_file(token_path, self._scopes) if token_path.exists() else None
+        creds = Credentials.from_authorized_user_file(token_path, self._scopes) if token_path.exists() else None  # type: ignore[no-untyped-call]
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
-                    creds.refresh(Request())
+                    creds.refresh(Request())  # type: ignore[no-untyped-call]
                 except RefreshError as e:
                     msg = f'Error refreshing token. Please delete {token_path} and try again!'
                     raise RuntimeError(msg) from e
