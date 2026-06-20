@@ -195,10 +195,10 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 except UnknownDatabaseError:
                     # linked database that cannot be retrieved via API. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
-                    ref_block = cast(Block, child_block)
+                    ref_block = child_block
                 child_blocks[idx] = ref_block
 
-        return [cast(Block, session.cache.setdefault(block.id, block)) for block in child_blocks]
+        return [session._cache_add(block) for block in child_blocks]
 
     @property
     def children(self) -> tuple[Block | Page | Database, ...]:
