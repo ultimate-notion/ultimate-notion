@@ -121,17 +121,6 @@ module = [
 ]
 ignore_missing_imports = true
 
-[[tool.mypy.overrides]]
-# IPython ships no type information. Skip following it so its untyped helpers
-# (display_html, get_ipython, ...) are treated as Any whether or not IPython is
-# installed, instead of triggering no-untyped-call under strict mode.
-module = [
-    "IPython",
-    "IPython.*",
-]
-follow_imports = "skip"
-follow_imports_for_stubs = true
-
 # Pytest configuration
 
 [tool.pytest.ini_options]
