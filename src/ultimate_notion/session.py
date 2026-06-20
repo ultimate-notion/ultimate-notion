@@ -22,9 +22,7 @@ from ultimate_notion.database import Database
 from ultimate_notion.emoji import CustomEmoji, Emoji
 from ultimate_notion.errors import SessionError, UnknownDatabaseError, UnknownPageError, UnknownUserError
 from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_size, get_mime_type
-from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
-from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
@@ -176,7 +174,7 @@ class Session:
         else:
             title = None  # Anonymous database without a title.
 
-        db_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
+        db_schema: type[Schema] = DefaultSchema if schema is None else schema
         _logger.info(f'Creating database `{title or "<NoTitle>"}` in page `{parent.title}` with schema:\n{db_schema}')
 
         title_obj = title.obj_ref if title is not None else None
@@ -213,7 +211,7 @@ class Session:
             deleted: include deleted databases in search
         """
         _logger.info(f'Searching for database with name `{db_name}`.')
-        query = cast(obj_query.SearchQueryBuilder[obj_blocks.Database], self.api.search(db_name).filter(db_only=True))
+        query = self.api.search(db_name).filter(db_only=True)
         if reverse:
             query.sort(ascending=True)
         dbs = [
@@ -267,7 +265,7 @@ class Session:
             reverse: search in the reverse order, i.e. the least recently edited results first
         """
         _logger.info(f'Searching for page with title `{title}`.')
-        query = cast(obj_query.SearchQueryBuilder[obj_blocks.Page], self.api.search(title).filter(page_only=True))
+        query = self.api.search(title).filter(page_only=True)
         if reverse:
             query.sort(ascending=True)
         pages = [
