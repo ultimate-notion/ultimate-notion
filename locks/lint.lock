@@ -8,6 +8,7 @@
 # - pyright~=1.1
 # - types-tabulate
 # - pandas-stubs
+# - google-api-python-client-stubs
 # - pytest
 # - hypothesis
 # - httpx>=0.27
@@ -75,6 +76,9 @@ google-api-python-client==2.187.0
     # via
     #   -c locks/default.lock
     #   hatch.envs.lint
+    #   google-api-python-client-stubs
+google-api-python-client-stubs==1.31.0
+    # via hatch.envs.lint
 google-auth==2.41.1
     # via
     #   -c locks/default.lock
@@ -295,6 +299,8 @@ typer==0.20.0
     # via
     #   -c locks/default.lock
     #   hatch.envs.lint
+types-httplib2==0.31.2.20260408
+    # via google-api-python-client-stubs
 types-pytz==2026.2.0.20260518
     # via pandas-stubs
 types-tabulate==0.10.0.20260508
@@ -305,6 +311,7 @@ typing-extensions==4.15.0
     #   hatch.envs.lint
     #   anyio
     #   exceptiongroup
+    #   google-api-python-client-stubs
     #   mistune
     #   mypy
     #   pydantic
