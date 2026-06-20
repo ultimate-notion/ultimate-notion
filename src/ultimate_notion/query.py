@@ -45,23 +45,23 @@ class PageProperty(BaseModel):
     def __hash__(self) -> int:
         return hash((self.name, self.sort))
 
-    def __eq__(self, other: Any) -> Condition:  # type: ignore[override]
+    def __eq__(self, other: Any) -> Condition:  # type: ignore[override]  # ty: ignore[invalid-method-override]
         return Equals(prop=self, value=other)
 
-    def __ne__(self, other: Any) -> Condition:  # type: ignore[override]
+    def __ne__(self, other: Any) -> Condition:  # type: ignore[override]  # ty: ignore[invalid-method-override]
         return EqualsNot(prop=self, value=other)
 
     def __gt__(self, value: Any) -> Condition:
-        return GreaterThan(prop=self, value=value)
+        return GreaterThan(prop=self, value=value)  # ty: ignore[missing-argument]
 
     def __lt__(self, value: Any) -> Condition:
-        return LessThan(prop=self, value=value)
+        return LessThan(prop=self, value=value)  # ty: ignore[missing-argument]
 
     def __ge__(self, value: Any) -> Condition:
-        return GreaterThanOrEqualTo(prop=self, value=value)
+        return GreaterThanOrEqualTo(prop=self, value=value)  # ty: ignore[missing-argument]
 
     def __le__(self, value: Any) -> Condition:
-        return LessThanOrEqualTo(prop=self, value=value)
+        return LessThanOrEqualTo(prop=self, value=value)  # ty: ignore[missing-argument]
 
     def __repr__(self) -> str:
         return f"prop('{self.name}')"
@@ -88,25 +88,25 @@ class PageProperty(BaseModel):
         return IsNotEmpty(prop=self, value=True)
 
     def this_week(self) -> Condition:
-        return ThisWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
+        return ThisWeek(prop=self, value=obj_query.DateCondition.EmptyObject())  # ty: ignore[missing-argument]
 
     def past_week(self) -> Condition:
-        return PastWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
+        return PastWeek(prop=self, value=obj_query.DateCondition.EmptyObject())  # ty: ignore[missing-argument]
 
     def past_month(self) -> Condition:
-        return PastMonth(prop=self, value=obj_query.DateCondition.EmptyObject())
+        return PastMonth(prop=self, value=obj_query.DateCondition.EmptyObject())  # ty: ignore[missing-argument]
 
     def past_year(self) -> Condition:
-        return PastYear(prop=self, value=obj_query.DateCondition.EmptyObject())
+        return PastYear(prop=self, value=obj_query.DateCondition.EmptyObject())  # ty: ignore[missing-argument]
 
     def next_week(self) -> Condition:
-        return NextWeek(prop=self, value=obj_query.DateCondition.EmptyObject())
+        return NextWeek(prop=self, value=obj_query.DateCondition.EmptyObject())  # ty: ignore[missing-argument]
 
     def next_month(self) -> Condition:
-        return NextMonth(prop=self, value=obj_query.DateCondition.EmptyObject())
+        return NextMonth(prop=self, value=obj_query.DateCondition.EmptyObject())  # ty: ignore[missing-argument]
 
     def next_year(self) -> Condition:
-        return NextYear(prop=self, value=obj_query.DateCondition.EmptyObject())
+        return NextYear(prop=self, value=obj_query.DateCondition.EmptyObject())  # ty: ignore[missing-argument]
 
     def asc(self) -> Self:
         self.sort = SortDirection.ASCENDING
@@ -214,7 +214,7 @@ class PropertyCondition(Condition, ABC):
                 msg = f'The database {db} is empty.'
                 raise EmptyDBError(msg) from e
             page_obj_id = raise_unset(page_obj.id)
-            self._probe_page = cast(Page, session.cache.setdefault(page_obj_id, Page.wrap_obj_ref(page_obj)))
+            self._probe_page = cast(Page, session.cache.setdefault(page_obj_id, Page.wrap_obj_ref(page_obj)))  # ty: ignore[no-matching-overload]
 
         return self._probe_page
 
@@ -266,9 +266,9 @@ class IsEmpty(PropertyCondition):
             case schema.Number():
                 kwargs['number'] = obj_query.NumberCondition(**{self._condition_kw: self.value})
             case schema.Select():
-                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})
+                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})  # ty: ignore[invalid-argument-type]
             case schema.MultiSelect():
-                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
+                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})  # ty: ignore[invalid-argument-type]
             case schema.Date():
                 kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
             case schema.Person():
@@ -291,7 +291,7 @@ class IsEmpty(PropertyCondition):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})  # ty: ignore[invalid-argument-type]
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -321,7 +321,7 @@ class IsEmpty(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition(**kwargs)  # ty: ignore[invalid-argument-type]
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
@@ -333,11 +333,11 @@ class IsEmpty(PropertyCondition):
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}  # ty: ignore[invalid-argument-type]
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)  # ty: ignore[invalid-argument-type]
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}()'
@@ -364,7 +364,7 @@ class Equals(PropertyCondition):
             case schema.Checkbox():
                 kwargs['checkbox'] = obj_query.CheckboxCondition(**{self._condition_kw: bool(self.value)})
             case schema.Select():
-                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})
+                kwargs['select'] = obj_query.SelectCondition(**{self._condition_kw: str(self.value)})  # ty: ignore[invalid-argument-type]
             case schema.Date() if self._condition_kw == 'equals':  # date has no `does_not_equal` condition
                 kwargs['date'] = obj_query.DateCondition(**{self._condition_kw: self.value})
             case schema.Formula():
@@ -380,7 +380,7 @@ class Equals(PropertyCondition):
                     case FormulaType.BOOLEAN:
                         condition = obj_query.CheckboxCondition(**{self._condition_kw: bool(self.value)})
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})  # ty: ignore[invalid-argument-type]
 
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
@@ -411,7 +411,7 @@ class Equals(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition(**kwargs)  # ty: ignore[invalid-argument-type]
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition(**{self._condition_kw: self.value})
@@ -423,11 +423,11 @@ class Equals(PropertyCondition):
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}  # ty: ignore[invalid-argument-type]
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)  # ty: ignore[invalid-argument-type]
 
     def __repr__(self) -> str:
         return f'{self.prop} == {self._value_str}'
@@ -466,7 +466,7 @@ class InEquality(PropertyCondition, ABC):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})  # ty: ignore[invalid-argument-type]
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -496,7 +496,7 @@ class InEquality(PropertyCondition, ABC):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition(**kwargs)  # ty: ignore[invalid-argument-type]
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition(**{self._num_condition_kw: self.value})
@@ -508,11 +508,11 @@ class InEquality(PropertyCondition, ABC):
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}  # ty: ignore[invalid-argument-type]
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)  # ty: ignore[invalid-argument-type]
 
     @abstractmethod
     def __repr__(self) -> str: ...
@@ -561,7 +561,7 @@ class Contains(PropertyCondition):
             case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
                 kwargs['rich_text'] = obj_query.TextCondition(**{self._condition_kw: self.value})
             case schema.MultiSelect():
-                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})
+                kwargs['multi_select'] = obj_query.MultiSelectCondition(**{self._condition_kw: str(self.value)})  # ty: ignore[invalid-argument-type]
             case schema.Person() if isinstance(self.value, User):
                 kwargs['people'] = obj_query.PeopleCondition(**{self._condition_kw: self.value.id})
             case schema.Relation() if isinstance(self.value, Page):
@@ -576,7 +576,7 @@ class Contains(PropertyCondition):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})  # ty: ignore[invalid-argument-type]
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -598,16 +598,16 @@ class Contains(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition(**kwargs)  # ty: ignore[invalid-argument-type]
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}  # ty: ignore[invalid-argument-type]
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)  # ty: ignore[invalid-argument-type]
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}({self._value_str})'
@@ -636,7 +636,7 @@ class StartsWith(PropertyCondition):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})  # ty: ignore[invalid-argument-type]
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -658,16 +658,16 @@ class StartsWith(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition(**kwargs)  # ty: ignore[invalid-argument-type]
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition(**{self.prop.quantifier.value: condition})}  # ty: ignore[invalid-argument-type]
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)  # ty: ignore[invalid-argument-type]
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}({self._value_str})'
@@ -696,7 +696,7 @@ class DateCondition(PropertyCondition, ABC):
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition(**{formula_type.formula_kwarg: condition})  # ty: ignore[invalid-argument-type]
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -726,7 +726,7 @@ class DateCondition(PropertyCondition, ABC):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition(**kwargs)  # ty: ignore[invalid-argument-type]
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.DATE:
                         condition = obj_query.DateCondition(**{self._condition_kw: self.value})
@@ -735,11 +735,11 @@ class DateCondition(PropertyCondition, ABC):
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition(**{rollup_kwarg: condition})}  # ty: ignore[invalid-argument-type]
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter(property=self.prop.name, **kwargs)  # ty: ignore[invalid-argument-type]
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}()'
@@ -777,7 +777,7 @@ class And(Condition):
     terms: list[Condition]
 
     def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
-        return obj_query.CompoundFilter(and_=[term.create_obj_ref(db) for term in self.terms])
+        return obj_query.CompoundFilter(and_=[term.create_obj_ref(db) for term in self.terms])  # ty: ignore[unknown-argument]
 
     def __repr__(self) -> str:
         terms = [f'({term})' if not term.is_method else str(term) for term in self.terms]
@@ -788,7 +788,7 @@ class Or(Condition):
     terms: list[Condition]
 
     def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
-        return obj_query.CompoundFilter(or_=[term.create_obj_ref(db) for term in self.terms])
+        return obj_query.CompoundFilter(or_=[term.create_obj_ref(db) for term in self.terms])  # ty: ignore[unknown-argument]
 
     def __repr__(self) -> str:
         terms = [f'({term})' if not term.is_method else str(term) for term in self.terms]
@@ -832,7 +832,7 @@ class Query:
             query_obj = query_obj.sort(sort_objs)
 
         pages = [
-            cast(Page, session.cache.setdefault(raise_unset(page.id), Page.wrap_obj_ref(page)))
+            cast(Page, session.cache.setdefault(raise_unset(page.id), Page.wrap_obj_ref(page)))  # ty: ignore[no-matching-overload]
             for page in query_obj.execute()
         ]
         return View(database=self.database, pages=pages, query=self)

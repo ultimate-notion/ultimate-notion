@@ -102,7 +102,7 @@ class Bot(User[objs.Bot], wraps=objs.Bot):
         """Return the workspace info of this bot, if available."""
         workspace_id = self.obj_ref.bot.workspace_id
         kwargs = self.obj_ref.bot.workspace_limits.model_dump()
-        return WorkSpaceInfo(name=self.obj_ref.bot.workspace_name, workspace_id=workspace_id, **kwargs)
+        return WorkSpaceInfo(name=self.obj_ref.bot.workspace_name, workspace_id=workspace_id, **kwargs)  # ty: ignore[invalid-argument-type]
 
 
 class UnknownUser(User[objs.User], wraps=UserRef):

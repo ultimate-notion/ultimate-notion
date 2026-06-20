@@ -324,7 +324,7 @@ class SearchQueryBuilder(QueryBuilder[T]):
 
         builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
         builder.query.filter = SearchFilter(property='object', value=value)
-        return builder
+        return builder  # ty: ignore[invalid-return-type]
 
     def sort(self, *, ascending: bool) -> SearchQueryBuilder[T]:
         """Add the given sort elements to the query."""
@@ -332,7 +332,7 @@ class SearchQueryBuilder(QueryBuilder[T]):
 
         builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
         builder.query.sort = SearchSort(timestamp=TimestampKind.LAST_EDITED_TIME, direction=direction)
-        return builder
+        return builder  # ty: ignore[invalid-return-type]
 
 
 class DBQueryBuilder(QueryBuilder[Page]):

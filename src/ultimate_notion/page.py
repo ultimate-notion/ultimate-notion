@@ -158,12 +158,12 @@ class Page(
     @property
     def is_locked(self) -> bool:
         """Return whether the page is locked for editing."""
-        return raise_unset(self.obj_ref.is_locked)
+        return raise_unset(self.obj_ref.is_locked)  # ty: ignore[invalid-return-type]
 
     @property
     def url(self) -> str:
         """Return the URL of this page."""
-        return raise_unset(self.obj_ref.url)
+        return raise_unset(self.obj_ref.url)  # ty: ignore[invalid-return-type]
 
     @property
     def public_url(self) -> str | None:
@@ -319,7 +319,7 @@ class Page(
         if simple:
             print(md)  # noqa: T201
         else:
-            from IPython.core.display import display_markdown  # noqa: PLC0415
+            from IPython.core.display import display_markdown  # noqa: PLC0415  # ty: ignore[unresolved-import]
 
             display_markdown(md, raw=True)
 

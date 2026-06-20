@@ -132,12 +132,12 @@ class GTask(GObject):
     @property
     def tasklist(self) -> GTaskList:
         """Returns the task list this task belongs to."""
-        tasklist = self._resource.tasklists().get(tasklist=self.tasklist_id).execute()
+        tasklist = self._resource.tasklists().get(tasklist=self.tasklist_id).execute()  # ty: ignore[unresolved-attribute]
         return GTaskList(resource=self._resource, **tasklist)
 
     def delete(self) -> GTask:
         """Deletes this task."""
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resource.delete(tasklist=self.tasklist_id, task=self.id).execute()
         resp = resource.get(tasklist=self.tasklist_id, task=self.id).execute()
         self._update(resp)
@@ -153,7 +153,7 @@ class GTask(GObject):
         """Sets the due date of this task."""
         due_date = assert_datetime(due_date)
         due_date_str = due_date if due_date is None else due_date.isoformat()
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'due': due_date_str}).execute()
         self._update(resp)
 
@@ -165,7 +165,7 @@ class GTask(GObject):
     @notes.setter
     def notes(self, new_notes: str | None) -> None:
         """Sets the notes of this task."""
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'notes': new_notes}).execute()
         self._update(resp)
 
@@ -177,7 +177,7 @@ class GTask(GObject):
     @title.setter
     def title(self, new_title: str) -> None:
         """Sets the title of this task."""
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.patch(tasklist=self.tasklist_id, task=self.id, body={'title': new_title}).execute()
         self._update(resp)
 
@@ -189,7 +189,7 @@ class GTask(GObject):
     @is_completed.setter
     def is_completed(self, completed: bool) -> None:
         """Sets the completed status of this task."""
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.patch(
             tasklist=self.tasklist_id,
             task=self.id,
@@ -205,7 +205,7 @@ class GTask(GObject):
     def position_after(self, previous: GTask | None = None) -> GTask:
         """Moves this task to the behind the given task."""
         previous_id = None if previous is None else previous.id
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.move(tasklist=self.tasklist_id, task=self.id, previous=previous_id).execute()
         self._update(resp)
         return self
@@ -215,16 +215,16 @@ class GTask(GObject):
         """Returns the parent task of this task."""
         if self.parent_id is None:
             return None
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.get(tasklist=self.tasklist_id, task=self.parent_id).execute()
-        return GTask(resource=self._resource, **resp)
+        return GTask(resource=self._resource, **resp)  # ty: ignore[unknown-argument]
 
     @parent.setter
     def parent(self, parent: GTask | None) -> None:
         """Sets the parent of this task."""
         parent_id = None if parent is None else parent.id
 
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.move(tasklist=self.tasklist_id, task=self.id, parent=parent_id).execute()
         self._update(resp)
 
@@ -235,7 +235,7 @@ class GTask(GObject):
 
     def reload(self) -> GTask:
         """Reloads this task from the API."""
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         resp = resource.get(tasklist=self.tasklist_id, task=self.id).execute()
         self._update(resp)
         return self
@@ -259,7 +259,7 @@ class GTaskList:
     """
 
     def __init__(self, resource: Resource, **data: Any) -> None:
-        self._data = _GTaskListData(resource=resource, **data)
+        self._data = _GTaskListData(resource=resource, **data)  # ty: ignore[unknown-argument]
 
     @property
     def _resource(self) -> Resource:
@@ -300,7 +300,7 @@ class GTaskList:
 
     def all_tasks(self, *, show_deleted: bool = False) -> list[GTask]:
         """Returns a list of all tasks, completed or not, in this task list."""
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         page_token = None
         tasks = []
 
@@ -314,7 +314,7 @@ class GTaskList:
                 showDeleted=show_deleted,
             ).execute()
             items = results.get('items', [])
-            tasks.extend([GTask(resource=self._resource, **item) for item in items])
+            tasks.extend([GTask(resource=self._resource, **item) for item in items])  # ty: ignore[unknown-argument]
 
             page_token = results.get('nextPageToken')
             if page_token is None:
@@ -342,19 +342,19 @@ class GTaskList:
 
     def get_task(self, task_id: str) -> GTask:
         """Returns the task with the given ID."""
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         task = resource.get(tasklist=self.id, task=task_id).execute()
-        return GTask(resource=self._resource, **task)
+        return GTask(resource=self._resource, **task)  # ty: ignore[unknown-argument]
 
     def create_task(self, title: str, due: date | datetime | None = None) -> GTask:
         """Creates a new task."""
         due = assert_datetime(due)
-        resource = self._resource.tasks()
+        resource = self._resource.tasks()  # ty: ignore[unresolved-attribute]
         body = {'title': title}
         if due is not None:
             body['due'] = due.isoformat()
         task = resource.insert(tasklist=self.id, body=body).execute()
-        return GTask(resource=self._resource, **task)
+        return GTask(resource=self._resource, **task)  # ty: ignore[unknown-argument]
 
     @property
     def is_default(self) -> bool:
@@ -366,7 +366,7 @@ class GTaskList:
         if len(self.id) == DEFAULT_LIST_ID_LEN:
             msg = 'This is the default tasklist and thus cannot be deleted!'
             raise RuntimeError(msg)
-        resource = self._resource.tasklists()
+        resource = self._resource.tasklists()  # ty: ignore[unresolved-attribute]
         resource.delete(tasklist=self.id).execute()
         # We return None as the object is deleted
 
@@ -378,13 +378,13 @@ class GTaskList:
     @title.setter
     def title(self, new_title: str) -> None:
         """Sets the title of this task list."""
-        resource = self._resource.tasklists()
+        resource = self._resource.tasklists()  # ty: ignore[unresolved-attribute]
         resp = resource.patch(tasklist=self.id, body={'title': new_title}).execute()
         self._data._update(resp)
 
     def reload(self) -> GTaskList:
         """Reloads this task list from the API."""
-        resource = self._resource.tasklists()
+        resource = self._resource.tasklists()  # ty: ignore[unresolved-attribute]
         resp = resource.get(tasklist=self.id).execute()
         self._data._update(resp)
         return self
@@ -449,7 +449,7 @@ class GTasksClient:
         tasklists = []
 
         while True:
-            results = self.resource.tasklists().list(maxResults=max_results, pageToken=page_token).execute()
+            results = self.resource.tasklists().list(maxResults=max_results, pageToken=page_token).execute()  # ty: ignore[unresolved-attribute]
             items = results.get('items', [])
             tasklists.extend([GTaskList(resource=self.resource, **item) for item in items])
 
@@ -464,7 +464,7 @@ class GTasksClient:
 
         If no ID is given, the default task list is returned.
         """
-        tasklist = self.resource.tasklists().get(tasklist=tasklist_id).execute()
+        tasklist = self.resource.tasklists().get(tasklist=tasklist_id).execute()  # ty: ignore[unresolved-attribute]
         return GTaskList(resource=self.resource, **tasklist)
 
     def search_tasklist(self, title: str) -> SList[GTaskList]:
@@ -474,7 +474,7 @@ class GTasksClient:
 
     def create_tasklist(self, title: str) -> GTaskList:
         """Creates a new task list."""
-        tasklist = self.resource.tasklists().insert(body={'title': title}).execute()
+        tasklist = self.resource.tasklists().insert(body={'title': title}).execute()  # ty: ignore[unresolved-attribute]
         return GTaskList(resource=self.resource, **tasklist)
 
     def get_or_create_tasklist(self, title: str) -> GTaskList:

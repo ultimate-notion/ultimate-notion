@@ -106,9 +106,9 @@ class Session:
 
     def __exit__(
         self,
-        exc_type: type[BaseException],
-        exc_value: BaseException,
-        traceback: TracebackType,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None:
         self.close()
 
@@ -217,7 +217,7 @@ class Session:
         if reverse:
             query.sort(ascending=True)
         dbs = [
-            cast(Database, self.cache.setdefault(raise_unset(db.id), Database.wrap_obj_ref(db)))
+            cast(Database, self.cache.setdefault(raise_unset(db.id), Database.wrap_obj_ref(db)))  # ty: ignore[no-matching-overload]
             for db in query.execute()
         ]
         if exact and db_name is not None:
@@ -271,7 +271,7 @@ class Session:
         if reverse:
             query.sort(ascending=True)
         pages = [
-            cast(Page, self.cache.setdefault(raise_unset(page_obj.id), Page.wrap_obj_ref(page_obj)))
+            cast(Page, self.cache.setdefault(raise_unset(page_obj.id), Page.wrap_obj_ref(page_obj)))  # ty: ignore[no-matching-overload]
             for page_obj in query.execute()
         ]
         if exact and title is not None:

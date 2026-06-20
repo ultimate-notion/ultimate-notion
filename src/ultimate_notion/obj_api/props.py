@@ -99,7 +99,7 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, dt_spec: str | DateTimeOrRange) -> Self:
+    def build(cls, dt_spec: str | DateTimeOrRange) -> Self:  # ty: ignore[invalid-method-override]
         """Create a new Date from the native values."""
         return cast(Self, cls.model_construct(date=DateRange.build(dt_spec)))
 
@@ -202,7 +202,7 @@ class Relation(PropertyValue, type='relation'):
     has_more: bool = False
 
     @classmethod
-    def build(cls, pages: Sequence[Page]) -> Self:
+    def build(cls, pages: Sequence[Page]) -> Self:  # ty: ignore[invalid-method-override]
         """Return a `Relation` property with the specified pages."""
         return cast(Self, cls.model_construct(relation=[ObjectRef.build(page) for page in pages]))
 
@@ -338,7 +338,7 @@ class Place(PropertyValue, type='place'):
     place: TypeData | None = None
 
     @classmethod
-    def build(cls, place: PlaceDict | None) -> Self:
+    def build(cls, place: PlaceDict | None) -> Self:  # ty: ignore[invalid-method-override]
         place_obj = cls.TypeData(**place) if place is not None else None
         return cast(Self, cls.model_construct(place=place_obj))
 

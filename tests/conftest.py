@@ -39,8 +39,8 @@ import pydantic
 import pytest
 from _pytest.fixtures import SubRequest
 from google.auth.exceptions import RefreshError
-from vcr import VCR
-from vcr import mode as vcr_mode
+from vcr import VCR  # ty: ignore[unresolved-import]
+from vcr import mode as vcr_mode  # ty: ignore[unresolved-import]
 
 import ultimate_notion as uno
 from ultimate_notion import Database, NumberFormat, Option, Page, Session, User, schema
@@ -289,11 +289,13 @@ def vcr_fixture(
         def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR | MagicMock, str]:
             if scope == 'module' and not shared:
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
-                cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
+                cassette_name = (
+                    f'mod_{func.__name__}.yaml'  # same cassette for all modules!  # ty: ignore[unresolved-attribute]
+                )
             else:
                 cassette_dir = str(request.config.rootpath / 'tests' / 'cassettes' / 'fixtures')
                 prefix = 'mod' if scope == 'module' else 'sess'
-                cassette_name = f'{prefix}_{func.__name__}.yaml'
+                cassette_name = f'{prefix}_{func.__name__}.yaml'  # ty: ignore[unresolved-attribute]
 
             vcr_config = vcr_config.copy()  # to avoid changing the original config
             vcr_config |= {'cassette_library_dir': cassette_dir}

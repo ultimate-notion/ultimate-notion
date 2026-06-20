@@ -47,14 +47,14 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def url(self) -> str:
         """Return the URL of this database."""
-        return raise_unset(self.obj_ref.url)
+        return raise_unset(self.obj_ref.url)  # ty: ignore[invalid-return-type]
 
     @property
     def title(self) -> str | Text | None:
         """Return the title of this database as rich text."""
         # `str` added as return value but always RichText returned, which inherits from str.
         if title := raise_unset(self.obj_ref.title):
-            return Text.wrap_obj_ref(title)
+            return Text.wrap_obj_ref(title)  # ty: ignore[invalid-argument-type]
         return None
 
     @title.setter
@@ -71,7 +71,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def description(self) -> Text | None:
         """Return the description of this database as rich text."""
         if desc := raise_unset(self.obj_ref.description):
-            return Text.wrap_obj_ref(desc)
+            return Text.wrap_obj_ref(desc)  # ty: ignore[invalid-argument-type]
         return None
 
     @description.setter

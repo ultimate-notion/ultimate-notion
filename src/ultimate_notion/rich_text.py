@@ -129,7 +129,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
             bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
         )
         if isinstance(target, dt.datetime | dt.date | pnd.Interval):
-            self.obj_ref = objs.DateRange.build(target).build_mention(style=annotations)
+            self.obj_ref = objs.DateRange.build(target).build_mention(style=annotations)  # ty: ignore[invalid-argument-type]
         else:
             self.obj_ref = target.obj_ref.build_mention(style=annotations)
 

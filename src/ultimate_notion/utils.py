@@ -62,7 +62,7 @@ def safe_list_get(lst: Sequence[T], idx: int, *, default: T | None = None) -> T 
 def is_notebook() -> bool:
     """Determine if we are running within a Jupyter notebook."""
     try:
-        from IPython import get_ipython  # noqa: PLC0415
+        from IPython import get_ipython  # noqa: PLC0415  # ty: ignore[unresolved-import]
     except ModuleNotFoundError:
         return False  # Probably standard Python interpreter
     else:
@@ -132,7 +132,7 @@ def find_indices(
         total_set = np.array(total_set)
     mask = np.isin(total_set, elements)
     indices = np.where(mask)[0]
-    lookup = dict(zip(total_set[mask], indices, strict=True))
+    lookup = dict(zip(total_set[mask], indices, strict=True))  # ty: ignore[invalid-argument-type]
     result = np.array([lookup.get(x) for x in elements])
     return result
 
@@ -186,7 +186,7 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
     if hasattr(obj, '__deepcopy__'):
         # Do hack to prevent infinite recursion in call to deepcopy
         deepcopy_method = obj.__deepcopy__
-        obj.__deepcopy__ = None
+        obj.__deepcopy__ = None  # ty: ignore[invalid-assignment]
 
     for attr in shared_attributes:
         del obj.__dict__[attr]
@@ -199,7 +199,7 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
 
     if hasattr(obj, '__deepcopy__'):
         # Undo hack
-        obj.__deepcopy__ = deepcopy_method
+        obj.__deepcopy__ = deepcopy_method  # ty: ignore[invalid-assignment]
         del clone.__dict__['__deepcopy__']
 
     return clone
@@ -340,7 +340,7 @@ def parse_dt_str(dt_str: str) -> DateTimeOrRange:
             return dt_spec
         case pnd.Interval():
             # We extend the interval to the full day if only a date is given
-            start, end = set_tz(dt_spec.start), set_tz(dt_spec.end)
+            start, end = set_tz(dt_spec.start), set_tz(dt_spec.end)  # ty: ignore[invalid-argument-type]
             if not isinstance(dt_spec.start, pnd.DateTime):
                 start = pnd.datetime(start.year, start.month, start.day, 0, 0, 0)
             if not isinstance(dt_spec.end, pnd.DateTime):

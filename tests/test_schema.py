@@ -243,7 +243,7 @@ def test_to_pydantic_model() -> None:
     rw_props_model = Schema.to_pydantic_model(with_ro_props=False)
     rw_props_item = rw_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2']})
     assert len(rw_props_item.__class__.model_fields) == 2
-    assert isinstance(rw_props_item.name, PropertyValue)  # type: ignore[attr-defined]
+    assert isinstance(rw_props_item.name, PropertyValue)  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
     all_props_model = Schema.to_pydantic_model(with_ro_props=True)
     created_on = props.CreatedTime(pnd.parse('2021-01-01T12:00:00Z'))
@@ -365,22 +365,22 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     db_c = notion.create_db(parent=root_page, schema=SchemaC)
 
     # Set a two-way relation property
-    assert db_c.schema['Relation'].two_way_prop is None  # type: ignore[attr-defined]
+    assert db_c.schema['Relation'].two_way_prop is None  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
     two_way_prop = 'Back Relation'
-    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
     db_c.reload()
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
     # Try renaming the two-way relation property
     two_way_prop = 'Other Back Relation'
-    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
     db_c.reload(rebind_schema=False)  # since we changed something above
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
     # Delete the two-way relation property
-    db_c.schema['Relation'].two_way_prop = None  # type: ignore[attr-defined]
+    db_c.schema['Relation'].two_way_prop = None  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
     assert two_way_prop not in [prop.name for prop in db_a.schema]
     db_a.reload()
     assert two_way_prop not in [prop.name for prop in db_a.schema]

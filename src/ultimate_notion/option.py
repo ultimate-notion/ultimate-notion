@@ -43,7 +43,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     @property
     def id(self) -> str:
         """ID of the option."""
-        return raise_unset(self.obj_ref.id)
+        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
 
     @property
     def name(self) -> str:
@@ -54,7 +54,7 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     def color(self) -> Color:
         """Color of the option."""
         try:
-            return raise_unset(self.obj_ref.color)
+            return raise_unset(self.obj_ref.color)  # ty: ignore[invalid-return-type]
         except UnsetError:  # i.e. unset value
             return Color.DEFAULT
 

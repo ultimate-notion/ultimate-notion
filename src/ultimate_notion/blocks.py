@@ -111,7 +111,7 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
         """Return the user who last edited the block."""
         session = get_active_session()
         last_edit_user_ref = raise_unset(self.obj_ref.last_edited_by)
-        return session.get_user(raise_unset(last_edit_user_ref.id))
+        return session.get_user(raise_unset(last_edit_user_ref.id))  # ty: ignore[unresolved-attribute]
 
     @property
     def has_children(self) -> bool:
@@ -360,13 +360,13 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
             raise InvalidAPIUsageError(msg)
 
         for block in blocks:  # do complete sanity check first
-            if block.in_notion:
+            if block.in_notion:  # ty: ignore[unresolved-attribute]
                 msg = f'Cannot replace with a block {block} that is already in Notion.'
                 raise InvalidAPIUsageError(msg)
 
         if self.parent is not None and isinstance(self.parent, ChildrenMixin):
             for block in reversed(blocks):
-                self.parent.append(block, after=self)
+                self.parent.append(block, after=self)  # ty: ignore[invalid-argument-type]
         else:
             msg = 'Cannot replace a block that has no parent.'
             raise InvalidAPIUsageError(msg)
@@ -383,7 +383,7 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
             raise InvalidAPIUsageError(msg)
 
         for block in blocks:  # do complete sanity check first
-            if block.in_notion:
+            if block.in_notion:  # ty: ignore[unresolved-attribute]
                 msg = f'Cannot insert block {block} that is already in Notion.'
                 raise InvalidAPIUsageError(msg)
 
@@ -567,7 +567,7 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.P
 HT = TypeVar('HT', bound=obj_blocks.Heading)
 
 
-class Heading(ColoredTextBlock[HT], ParentBlock[obj_blocks.Heading], wraps=obj_blocks.Heading):
+class Heading(ColoredTextBlock[HT], ParentBlock[obj_blocks.Heading], wraps=obj_blocks.Heading):  # ty: ignore[invalid-generic-class]
     """Abstract Heading block.
 
     Parent class of all heading block types.
@@ -668,7 +668,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         if icon is None:
             return self.get_default_icon()
         else:
-            return wrap_icon(icon)
+            return wrap_icon(icon)  # ty: ignore[invalid-argument-type]
 
     @icon.setter
     def icon(self, icon: AnyFile | Emoji | CustomEmoji) -> None:
@@ -1587,7 +1587,7 @@ def _build_obj_ref(node: _Node) -> Block:
     if isinstance(block, ParentBlock) and block.has_children and isinstance(value, obj_blocks.WithChildren):
         for child in node.children:
             _build_obj_ref(child)
-        value.children = [child.block.obj_ref for child in children]
+        value.children = [child.block.obj_ref for child in children]  # ty: ignore[invalid-assignment]
     return block
 
 

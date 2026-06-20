@@ -119,7 +119,7 @@ class NotionObject(Wrapper[NO_co], ABC, wraps=obj_core.NotionObject):
     @property
     def id(self) -> UUID | str:
         """Return the ID of the block."""
-        return raise_unset(self.obj_ref.id)
+        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
 
     @property
     def in_notion(self) -> bool:
@@ -157,24 +157,24 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def id(self) -> UUID:
         """Return the ID of the entity."""
-        return raise_unset(self.obj_ref.id)
+        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
 
     @property
     def created_time(self) -> dt.datetime:
         """Return the time when the block was created."""
-        return raise_unset(self.obj_ref.created_time)
+        return raise_unset(self.obj_ref.created_time)  # ty: ignore[invalid-return-type]
 
     @property
     def created_by(self) -> User:
         """Return the user who created the block."""
         session = get_active_session()
         created_by = raise_unset(self.obj_ref.created_by)
-        return session.get_user(raise_unset(created_by.id), raise_on_unknown=False)
+        return session.get_user(raise_unset(created_by.id), raise_on_unknown=False)  # ty: ignore[unresolved-attribute]
 
     @property
     def last_edited_time(self) -> dt.datetime:
         """Return the time when the block was last edited."""
-        return raise_unset(self.obj_ref.last_edited_time)
+        return raise_unset(self.obj_ref.last_edited_time)  # ty: ignore[invalid-return-type]
 
     @property
     def parent(self) -> NotionEntity | WorkspaceType | None:

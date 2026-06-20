@@ -323,7 +323,7 @@ class RollupTypeData(GenericObject):
     def validate_enum_field(cls, field: str) -> AggFunc:
         return AggFunc(field)
 
-    def __eq__(self, value: object) -> bool:
+    def __eq__(self, value: object) -> bool:  # ty: ignore[invalid-method-override]
         """Compare Rollup objects by all attributes except id."""
         if not isinstance(value, RollupTypeData):
             return NotImplemented

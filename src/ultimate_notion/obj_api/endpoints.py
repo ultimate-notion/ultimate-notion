@@ -92,8 +92,12 @@ class BlocksEndpoint(Endpoint):
 
         # https://developers.notion.com/reference/patch-block-children
         def append(
-            self, parent: ParentRef | GenericObject | UUID | str, blocks: list[Block], *, after: Block | None = None
-        ) -> tuple[list[Block], list[Block]]:
+            self,
+            parent: ParentRef | GenericObject | UUID | str,
+            blocks: list[Block],  # ty: ignore[invalid-type-form]
+            *,
+            after: Block | None = None,
+        ) -> tuple[list[Block], list[Block]]:  # ty: ignore[invalid-type-form]
             """Add the given blocks as children of the specified parent.
 
             The blocks info of the passed blocks will be updated and returned as first part of a tuple.
@@ -456,7 +460,7 @@ class PagesEndpoint(Endpoint):
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 request['archived'] = False
 
-        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **request))
+        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **request))  # ty: ignore[unresolved-attribute]
         page.update(**data)
 
     def set_attr(
@@ -553,7 +557,7 @@ class CommentsEndpoint(Endpoint):
         return self.api.client.comments
 
     # https://developers.notion.com/reference/create-a-comment
-    def create(self, page: Page | UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:
+    def create(self, page: Page | UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:  # ty: ignore[invalid-type-form]
         """Create a comment on the specified Page."""
         page_ref = PageRef.build(page)
         _logger.debug(f'Creating a comment on page with id `{page_ref.page_id}.')
@@ -562,7 +566,7 @@ class CommentsEndpoint(Endpoint):
         return Comment.model_validate(data)
 
     # https://developers.notion.com/reference/create-a-comment
-    def append(self, discussion_id: UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:
+    def append(self, discussion_id: UUID | str, rich_text: list[RichTextBaseObject]) -> Comment:  # ty: ignore[invalid-type-form]
         """Append a comment to the specified discussion."""
         _logger.debug(f'Appending a comment to discussion with id `{discussion_id}`.')
         rich_text_json = [rt.serialize_for_api() for rt in rich_text]

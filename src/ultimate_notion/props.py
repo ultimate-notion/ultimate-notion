@@ -65,7 +65,7 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
 
     @property
     def id(self) -> str:
-        return raise_unset(self.obj_ref.id)
+        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
 
     def __repr__(self) -> str:
         return get_repr(self)
@@ -184,7 +184,7 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
     def __init__(self, options: str | Option | Sequence[str | Option]):
         if not isinstance(options, Sequence | str) or isinstance(options, str):
             options = [options]
-        options = [Option(option) if isinstance(option, str) else option for option in options]
+        options = [Option(option) if isinstance(option, str) else option for option in options]  # ty: ignore[invalid-assignment]
         super().__init__(options)
 
     @property

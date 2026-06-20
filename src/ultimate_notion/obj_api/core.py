@@ -91,8 +91,8 @@ class UnsetType(BaseModel):
     def __new__(cls, *args: Any, **kwargs: Any) -> UnsetType:
         # Ensure only one instance is created, allowing `is` to work correctly
         if not hasattr(cls, '_instance'):
-            cls._instance = super().__new__(cls)
-        return cls._instance
+            cls._instance = super().__new__(cls)  # ty: ignore[invalid-assignment]
+        return cls._instance  # ty: ignore[unresolved-attribute]
 
     # Marker field that survives serialization to identify unset values
     unset_marker: bool = Field(default=True, exclude=False)
@@ -363,7 +363,7 @@ class ObjectRef(GenericObject):
                 return cls.model_construct(id=ref.value)
             case GenericObject() if hasattr(ref, 'id'):
                 # Re-compose the ObjectReference from the internal ID
-                return cls.build(ref.id)
+                return cls.build(ref.id)  # ty: ignore[invalid-argument-type]
             case UUID():
                 return cls.model_construct(id=ref)
             case str() if (id_str := extract_id(ref)) is not None:

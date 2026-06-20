@@ -165,7 +165,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def id(self) -> str | None:
         """Return identifier of this property."""
-        return raise_unset(self.obj_ref.id)
+        return raise_unset(self.obj_ref.id)  # ty: ignore[invalid-return-type]
 
     @property
     def name(self) -> str:
@@ -536,7 +536,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         tmp_prop_name = raise_unset(two_way_prop_rel.dual_property.synced_property_name)
         db = self.schema.get_db()
         db.reload(rebind_schema=False)
-        if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
+        if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:  # ty: ignore[invalid-argument-type]
             back_ref_prop_type.name = new_prop_name  # rename the property in the target schema
             back_ref_prop_type._attr_name = rich_text.snake_case(new_prop_name)
 
@@ -549,7 +549,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             return self._two_way_prop
         elif self._is_init and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
             prop_name = raise_unset(self.obj_ref.relation.dual_property.synced_property_name)
-            return self.schema.get_prop(prop_name) if prop_name else None
+            return self.schema.get_prop(prop_name) if prop_name else None  # ty: ignore[invalid-argument-type]
         else:
             return None
 
@@ -619,7 +619,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
                 msg = 'No synced property ID found in the relation object'
                 raise SchemaError(msg)
 
-            schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_prop_name)}
+            schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_prop_name)}  # ty: ignore[invalid-argument-type]
             session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
@@ -1063,7 +1063,7 @@ class Schema(metaclass=SchemaType):
             return py_type if isinstance(py_type, PropertyValue) else prop_value(py_type)
 
         kwargs: dict[str, Any] = {
-            prop.attr_name: Annotated[prop.prop_value, Field(default=None, alias=prop.name)]
+            prop.attr_name: Annotated[prop.prop_value, Field(default=None, alias=prop.name)]  # ty: ignore[invalid-type-form]
             for prop in cls.get_rw_props()
         }
         validators: dict[str, Any] = {
@@ -1075,7 +1075,8 @@ class Schema(metaclass=SchemaType):
 
         if with_ro_props:
             kwargs |= {
-                prop.attr_name: Annotated[prop.prop_value, Field(alias=prop.name)] for prop in cls.get_ro_props()
+                prop.attr_name: Annotated[prop.prop_value, Field(alias=prop.name)]  # ty: ignore[invalid-type-form]
+                for prop in cls.get_ro_props()
             }
             validators |= {
                 f'{prop.attr_name}_validator': field_validator(prop.attr_name, mode='before')(
@@ -1107,7 +1108,7 @@ class Schema(metaclass=SchemaType):
         table_str = cls.as_table(tablefmt)
 
         if is_notebook() and (tablefmt == 'html'):
-            from IPython.display import display_html  # noqa: PLC0415
+            from IPython.display import display_html  # noqa: PLC0415  # ty: ignore[unresolved-import]
 
             display_html(table_str)
         else:
