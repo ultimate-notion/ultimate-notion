@@ -531,7 +531,10 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         This is necessary as a two-way relation is created with a default name,
         which is rather a bug in the Notion API itself.
         """
-        two_way_prop_rel = cast(obj_schema.DualPropertyRelation, self.obj_ref.relation)
+        two_way_prop_rel = self.obj_ref.relation
+        if not isinstance(two_way_prop_rel, obj_schema.DualPropertyRelation):
+            msg = f'Expected a `DualPropertyRelation`, got `{type(two_way_prop_rel).__name__}`.'
+            raise TypeError(msg)
         tmp_prop_name = raise_unset(two_way_prop_rel.dual_property.synced_property_name)
         db = self.schema.get_db()
         db.reload(rebind_schema=False)
