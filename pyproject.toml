@@ -113,20 +113,14 @@ pretty = true
 strict = true
 
 # ty configuration
-# ty runs additionally to mypy (see the `lint` hatch env). Existing diagnostics
-# are suppressed with inline `# ty: ignore[...]` comments; new code is expected
-# to be clean.
-
-# The Python version is inferred from `requires-python` above (>=3.10).
 
 [tool.ty.src]
 include = ["src/ultimate_notion", "tests", "examples"]
 
-[tool.ty.rules]
-# `# type: ignore[...]` comments that mypy needs but ty considers unused. Kept as a
-# blanket rule because these are scattered; mypy-only casts that ty considers redundant
-# are suppressed inline with `# ty: ignore[redundant-cast]` instead.
-unused-type-ignore-comment = "ignore"
+[tool.ty.analysis]
+# Only honour `# ty: ignore`, not mypy's `# type: ignore` (which ty would otherwise
+# report as unused). Suppress ty diagnostics with `# ty: ignore[...]`.
+respect-type-ignore-comments = false
 
 # Pytest configuration
 
@@ -376,7 +370,7 @@ build-check = [
 dependencies = [
     "mypy==1.18.2",
     "ruff==0.14.5", # make sure this is consistent with .pre-commit-config.yaml, thus pinned!
-    "ty==0.0.51", # runs additionally to mypy, pinned as the rule set is still pre-1.0 and changes between releases
+    "ty==0.0.51",
     "pyright~=1.1", # no automatic testing, just additionally to mypy
     "types-tabulate", # stubs for tabulate, otherwise mypy needs --install-types
     "pandas-stubs", # stubs for pandas
