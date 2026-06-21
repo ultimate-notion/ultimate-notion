@@ -148,6 +148,14 @@ class Session:
         """Cache `obj` keyed by its id, returning the already-cached instance if one exists."""
         return cast(T_cache, self.cache.setdefault(obj.id, obj))
 
+    def _cache_get(self, key: UUID, expected_type: type[T_cache]) -> T_cache:
+        """Return the cached object under `key`, narrowed to `expected_type`."""
+        obj = self.cache[key]
+        if not isinstance(obj, expected_type):
+            msg = f'Cached object `{key}` is a `{type(obj).__name__}`, expected `{expected_type.__name__}`.'
+            raise TypeError(msg)
+        return obj
+
     def get_block(self, block_ref: UUID | str, *, use_cache: bool = True) -> Block:
         """Retrieve a single block by an object reference."""
         block_uuid = get_uuid(block_ref)
@@ -232,7 +240,7 @@ class Session:
         db_uuid = get_uuid(db_ref)
         if use_cache and db_uuid in self.cache:
             _logger.info(f'Retrieving cached database with id `{db_uuid}`.')
-            db = cast(Database, self.cache[db_uuid])
+            db = self._cache_get(db_uuid, Database)
         else:
             _logger.info(f'Retrieving database with id `{db_uuid}`.')
             try:
@@ -281,7 +289,7 @@ class Session:
         page_uuid = get_uuid(page_ref)
         if use_cache and page_uuid in self.cache:
             _logger.info(f'Retrieving cached page with id `{page_uuid}`.')
-            page = cast(Page, self.cache[page_uuid])
+            page = self._cache_get(page_uuid, Page)
         else:
             _logger.info(f'Retrieving page with id `{page_uuid}`.')
             try:
@@ -359,7 +367,7 @@ class Session:
 
         if use_cache and user_uuid in self.cache:
             _logger.info(f'Retrieving cached user with id `{user_uuid}`.')
-            user = cast(User, self.cache[user_uuid])
+            user = self._cache_get(user_uuid, User)
         else:
             _logger.info(f'Retrieving user with id `{user_uuid}`.')
             try:
@@ -395,7 +403,7 @@ class Session:
             self._own_bot_id = user.id
             return self._cache_add(Bot.wrap_obj_ref(user))
         else:
-            return cast(Bot, self.cache[self._own_bot_id])
+            return self._cache_get(self._own_bot_id, Bot)
 
     def upload(self, file: BinaryIO, *, file_name: str | None = None, mime_type: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
