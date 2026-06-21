@@ -11,12 +11,13 @@ from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject, wrap
 from ultimate_notion.comment import Discussion
 from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr
 from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import render_md
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text
@@ -158,12 +159,16 @@ class Page(
     @property
     def is_locked(self) -> bool:
         """Return whether the page is locked for editing."""
-        return raise_unset(self.obj_ref.is_locked)
+        if is_unset(is_locked := self.obj_ref.is_locked):
+            raise UnsetError()
+        return is_locked
 
     @property
     def url(self) -> str:
         """Return the URL of this page."""
-        return raise_unset(self.obj_ref.url)
+        if is_unset(url := self.obj_ref.url):
+            raise UnsetError()
+        return url
 
     @property
     def public_url(self) -> str | None:

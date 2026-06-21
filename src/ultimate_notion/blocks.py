@@ -38,13 +38,13 @@ from url_normalize import url_normalize
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_db, is_page
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError
+from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError, UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.rich_text import Text
 from ultimate_notion.user import User
@@ -110,8 +110,11 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
     def last_edited_by(self) -> User:
         """Return the user who last edited the block."""
         session = get_active_session()
-        last_edit_user_ref = raise_unset(self.obj_ref.last_edited_by)
-        return session.get_user(raise_unset(last_edit_user_ref.id))
+        if is_unset(last_edit_user_ref := self.obj_ref.last_edited_by):
+            raise UnsetError()
+        if is_unset(last_edit_user_id := last_edit_user_ref.id):
+            raise UnsetError()
+        return session.get_user(last_edit_user_id)
 
     @property
     def has_children(self) -> bool:
@@ -664,7 +667,8 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
 
     @property
     def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
-        icon = raise_unset(self.obj_ref.value.icon)
+        if is_unset(icon := self.obj_ref.value.icon):
+            raise UnsetError()
         if icon is None:
             return self.get_default_icon()
         else:
@@ -1065,9 +1069,9 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
     @property
     def title(self) -> str | None:
         """Return the title of the child page."""
-        if title := raise_unset(self.obj_ref.child_page.title):
-            return title
-        return None
+        if is_unset(title := self.obj_ref.child_page.title):
+            raise UnsetError()
+        return title if title else None
 
     @property
     def page(self) -> Page:
@@ -1101,9 +1105,9 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
     @property
     def title(self) -> str | None:
         """Return the title of the child database"""
-        if title := raise_unset(self.obj_ref.child_database.title):
-            return title
-        return None
+        if is_unset(title := self.obj_ref.child_database.title):
+            raise UnsetError()
+        return title if title else None
 
     @property
     def db(self) -> Database:

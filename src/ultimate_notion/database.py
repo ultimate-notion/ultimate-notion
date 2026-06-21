@@ -10,10 +10,10 @@ from typing_extensions import Self
 from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import get_active_session, get_repr
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
+from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError, UnsetError
 from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api import blocks as obj_blocks
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case
@@ -47,15 +47,17 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def url(self) -> str:
         """Return the URL of this database."""
-        return raise_unset(self.obj_ref.url)
+        if is_unset(url := self.obj_ref.url):
+            raise UnsetError()
+        return url
 
     @property
     def title(self) -> str | Text | None:
         """Return the title of this database as rich text."""
         # `str` added as return value but always RichText returned, which inherits from str.
-        if title := raise_unset(self.obj_ref.title):
-            return Text.wrap_obj_ref(title)
-        return None
+        if is_unset(title := self.obj_ref.title):
+            raise UnsetError()
+        return Text.wrap_obj_ref(title) if title else None
 
     @title.setter
     def title(self, text: str | Text | None) -> None:
@@ -70,9 +72,9 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def description(self) -> Text | None:
         """Return the description of this database as rich text."""
-        if desc := raise_unset(self.obj_ref.description):
-            return Text.wrap_obj_ref(desc)
-        return None
+        if is_unset(desc := self.obj_ref.description):
+            raise UnsetError()
+        return Text.wrap_obj_ref(desc) if desc else None
 
     @description.setter
     def description(self, text: str | Text | None) -> None:

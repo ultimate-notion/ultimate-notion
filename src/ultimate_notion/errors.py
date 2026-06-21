@@ -15,6 +15,9 @@ class UltimateNotionError(Exception):
 class UnsetError(UltimateNotionError):
     """Raised when an unset value is accessed before being initialized by the Notion API."""
 
+    def __init__(self, msg: str = 'Parameter is unset and was not yet initialized by the Notion API.') -> None:
+        super().__init__(msg)
+
 
 class SessionError(UltimateNotionError):
     """Raised when there are issues with the Notion session."""

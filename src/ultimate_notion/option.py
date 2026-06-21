@@ -6,7 +6,7 @@ from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.errors import UnsetError
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
+from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.enums import Color, OptionGroupType
 from ultimate_notion.rich_text import Text
 
@@ -43,7 +43,9 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     @property
     def id(self) -> str:
         """ID of the option."""
-        return raise_unset(self.obj_ref.id)
+        if is_unset(id_ := self.obj_ref.id):
+            raise UnsetError()
+        return id_
 
     @property
     def name(self) -> str:
@@ -53,10 +55,9 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     @property
     def color(self) -> Color:
         """Color of the option."""
-        try:
-            return raise_unset(self.obj_ref.color)
-        except UnsetError:  # i.e. unset value
+        if is_unset(color := self.obj_ref.color):  # i.e. unset value
             return Color.DEFAULT
+        return color
 
     @property
     def description(self) -> str:
