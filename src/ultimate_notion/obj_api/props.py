@@ -60,7 +60,7 @@ class PropertyValue(TypedObject[Any], polymorphic_base=True):
 
         In practice, this is like calling __init__ with the corresponding keyword.
         """
-        return cast(Self, cls.model_construct(**{cls.model_fields['type'].get_default(): value}))
+        return cast(Self, cls.model_construct(**{cls.model_fields['type'].get_default(): value}))  # ty: ignore[redundant-cast]
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
@@ -101,7 +101,7 @@ class Date(PropertyValue, type='date'):
     @classmethod
     def build(cls, dt_spec: str | DateTimeOrRange) -> Self:  # ty: ignore[invalid-method-override]
         """Create a new Date from the native values."""
-        return cast(Self, cls.model_construct(date=DateRange.build(dt_spec)))
+        return cast(Self, cls.model_construct(date=DateRange.build(dt_spec)))  # ty: ignore[redundant-cast]
 
 
 class Status(PropertyValue, type='status'):
@@ -204,7 +204,7 @@ class Relation(PropertyValue, type='relation'):
     @classmethod
     def build(cls, pages: Sequence[Page]) -> Self:  # ty: ignore[invalid-method-override]
         """Return a `Relation` property with the specified pages."""
-        return cast(Self, cls.model_construct(relation=[ObjectRef.build(page) for page in pages]))
+        return cast(Self, cls.model_construct(relation=[ObjectRef.build(page) for page in pages]))  # ty: ignore[redundant-cast]
 
 
 class RollupObject(TypedObject, ABC, polymorphic_base=True):
@@ -340,7 +340,7 @@ class Place(PropertyValue, type='place'):
     @classmethod
     def build(cls, place: PlaceDict | None) -> Self:  # ty: ignore[invalid-method-override]
         place_obj = cls.TypeData(**place) if place is not None else None
-        return cast(Self, cls.model_construct(place=place_obj))
+        return cast(Self, cls.model_construct(place=place_obj))  # ty: ignore[redundant-cast]
 
 
 ##################

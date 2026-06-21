@@ -123,11 +123,10 @@ strict = true
 include = ["src/ultimate_notion", "tests", "examples"]
 
 [tool.ty.rules]
-# These two clash with mypy-driven suppressions/casts that must stay:
-# `# type: ignore[...]` comments mypy needs but ty considers unused, and
-# `cast(...)` calls mypy needs but ty considers redundant.
+# `# type: ignore[...]` comments that mypy needs but ty considers unused. Kept as a
+# blanket rule because these are scattered; mypy-only casts that ty considers redundant
+# are suppressed inline with `# ty: ignore[redundant-cast]` instead.
 unused-type-ignore-comment = "ignore"
-redundant-cast = "ignore"
 
 # Pytest configuration
 

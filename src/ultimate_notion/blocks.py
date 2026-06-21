@@ -665,11 +665,12 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
 
     @property
     def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
-        icon = raise_unset(self.obj_ref.value.icon)
+        if is_unset(icon := self.obj_ref.value.icon):
+            raise_unset(icon)
         if icon is None:
             return self.get_default_icon()
         else:
-            return wrap_icon(icon)  # ty: ignore[invalid-argument-type]
+            return wrap_icon(icon)
 
     @icon.setter
     def icon(self, icon: AnyFile | Emoji | CustomEmoji) -> None:

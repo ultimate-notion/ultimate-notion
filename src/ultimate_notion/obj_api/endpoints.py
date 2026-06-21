@@ -438,7 +438,8 @@ class PagesEndpoint(Endpoint):
         in_trash: bool | UnsetType = Unset,
     ) -> None:
         """Update the Page object properties on the server."""
-        page_id = raise_unset(page.id)
+        if is_unset(page_id := page.id):
+            raise_unset(page_id)
         _logger.debug(f'Updating info on page with id `{page_id}`.')
 
         request: dict[str, Any] = {}
@@ -472,7 +473,7 @@ class PagesEndpoint(Endpoint):
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 request['archived'] = False
 
-        data = self._as_dict(self.raw_api.update(page_id.hex, **request))  # ty: ignore[unresolved-attribute]
+        data = self._as_dict(self.raw_api.update(page_id.hex, **request))
         page.update(**data)
 
     def set_attr(

@@ -534,10 +534,11 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         which is rather a bug in the Notion API itself.
         """
         two_way_prop_rel = cast(obj_schema.DualPropertyRelation, self.obj_ref.relation)
-        tmp_prop_name = raise_unset(two_way_prop_rel.dual_property.synced_property_name)
+        if is_unset(tmp_prop_name := two_way_prop_rel.dual_property.synced_property_name):
+            raise_unset(tmp_prop_name)
         db = self.schema.get_db()
         db.reload(rebind_schema=False)
-        if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:  # ty: ignore[invalid-argument-type]
+        if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
             back_ref_prop_type.name = new_prop_name  # rename the property in the target schema
             back_ref_prop_type._attr_name = rich_text.snake_case(new_prop_name)
 
@@ -549,8 +550,9 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
                 self._two_way_prop = self._get_owner().get_prop(self._two_way_prop)
             return self._two_way_prop
         elif self._is_init and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
-            prop_name = raise_unset(self.obj_ref.relation.dual_property.synced_property_name)
-            return self.schema.get_prop(prop_name) if prop_name else None  # ty: ignore[invalid-argument-type]
+            if is_unset(prop_name := self.obj_ref.relation.dual_property.synced_property_name):
+                raise_unset(prop_name)
+            return self.schema.get_prop(prop_name) if prop_name else None
         else:
             return None
 

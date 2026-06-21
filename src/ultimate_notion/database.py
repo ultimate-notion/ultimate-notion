@@ -55,9 +55,9 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def title(self) -> str | Text | None:
         """Return the title of this database as rich text."""
         # `str` added as return value but always RichText returned, which inherits from str.
-        if title := raise_unset(self.obj_ref.title):
-            return Text.wrap_obj_ref(title)  # ty: ignore[invalid-argument-type]
-        return None
+        if is_unset(title := self.obj_ref.title):
+            raise_unset(title)
+        return Text.wrap_obj_ref(title) if title else None
 
     @title.setter
     def title(self, text: str | Text | None) -> None:
@@ -72,9 +72,9 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def description(self) -> Text | None:
         """Return the description of this database as rich text."""
-        if desc := raise_unset(self.obj_ref.description):
-            return Text.wrap_obj_ref(desc)  # ty: ignore[invalid-argument-type]
-        return None
+        if is_unset(desc := self.obj_ref.description):
+            raise_unset(desc)
+        return Text.wrap_obj_ref(desc) if desc else None
 
     @description.setter
     def description(self, text: str | Text | None) -> None:
