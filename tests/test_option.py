@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import cast
-
 import pytest
 
 import ultimate_notion as uno
@@ -10,7 +8,8 @@ from ultimate_notion.schema import MultiSelect, Select, Status
 
 @pytest.mark.vcr()
 def test_status_options_groups(all_props_db: uno.Database) -> None:
-    status_prop_type = cast(Status, all_props_db.schema.get_prop('Status'))
+    status_prop_type = all_props_db.schema.get_prop('Status')
+    assert isinstance(status_prop_type, Status)
     all_options = ['Not started', 'In progress', 'Done']
     assert [option.name for option in status_prop_type.options] == all_options
 
@@ -23,13 +22,15 @@ def test_status_options_groups(all_props_db: uno.Database) -> None:
 
 @pytest.mark.vcr()
 def test_select_options(all_props_db: uno.Database) -> None:
-    select_prop_type = cast(Select, all_props_db.schema.get_prop('Select'))
+    select_prop_type = all_props_db.schema.get_prop('Select')
+    assert isinstance(select_prop_type, Select)
     all_options = ['Option1', 'Option2']
     assert [option.name for option in select_prop_type.options] == all_options
 
 
 @pytest.mark.vcr()
 def test_multi_select_options(all_props_db: uno.Database) -> None:
-    multi_select_prop_type = cast(MultiSelect, all_props_db.schema.get_prop('Multi-Select'))
+    multi_select_prop_type = all_props_db.schema.get_prop('Multi-Select')
+    assert isinstance(multi_select_prop_type, MultiSelect)
     all_options = ['MultiOption1', 'MultiOption2']
     assert [option.name for option in multi_select_prop_type.options] == all_options
