@@ -1165,7 +1165,11 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
                 raise TypeError(msg)
 
     def __getitem__(self, index: int) -> Column:
-        return cast(Column, self.blocks[index])
+        column = self.blocks[index]
+        if not isinstance(column, Column):
+            msg = f'Expected a `Column` at index {index}, got `{type(column).__name__}`.'
+            raise TypeError(msg)
+        return column
 
     @property
     def columns(self) -> tuple[Column, ...]:
@@ -1459,7 +1463,11 @@ class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBl
             return self
         elif (synced_from := self.obj_ref.synced_block.synced_from) is not None:
             session = get_active_session()
-            return cast(SyncedBlock, session.get_block(objs.get_uuid(synced_from)))
+            original = session.get_block(objs.get_uuid(synced_from))
+            if not isinstance(original, SyncedBlock):
+                msg = f'Expected original of synced block to be a `SyncedBlock`, got `{type(original).__name__}`.'
+                raise TypeError(msg)
+            return original
         else:
             msg = 'Unknown synced block, neither original nor synced!'
             raise RuntimeError(msg)
