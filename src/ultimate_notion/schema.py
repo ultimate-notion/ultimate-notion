@@ -51,7 +51,7 @@ from ultimate_notion.obj_api.enums import AggFunc, NumberFormat, OptionGroupType
 from ultimate_notion.obj_api.objects import SelectGroup
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.utils import SList, dict_diff_str, is_notebook
+from ultimate_notion.utils import SList, dict_diff_str, display_html, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -1109,9 +1109,7 @@ class Schema(metaclass=SchemaType):
         table_str = cls.as_table(tablefmt)
 
         if is_notebook() and (tablefmt == 'html'):
-            from IPython.display import display_html  # noqa: PLC0415
-
-            display_html(table_str)  # type: ignore[no-untyped-call]
+            display_html(table_str)
         else:
             print(table_str)  # noqa: T201
 

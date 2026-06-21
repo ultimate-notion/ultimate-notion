@@ -22,7 +22,7 @@ from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text
 from ultimate_notion.schema import Property
 from ultimate_notion.templates import page_html
-from ultimate_notion.utils import SList, is_notebook
+from ultimate_notion.utils import SList, display_markdown, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -319,9 +319,7 @@ class Page(
         if simple:
             print(md)  # noqa: T201
         else:
-            from IPython.core.display import display_markdown  # noqa: PLC0415
-
-            display_markdown(md, raw=True)  # type: ignore[no-untyped-call]
+            display_markdown(md, raw=True)
 
     def delete(self) -> Self:
         """Delete this page.
