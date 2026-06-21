@@ -161,7 +161,11 @@ class Session:
         block_uuid = get_uuid(block_ref)
         if use_cache and block_uuid in self.cache:
             _logger.info(f'Retrieving cached block with id `{block_uuid}`.')
-            block = cast(Block, self.cache[block_uuid])
+            cached_obj = self.cache[block_uuid]
+            if not isinstance(cached_obj, Block):
+                msg = f'Cached object `{block_uuid}` is a `{type(cached_obj).__name__}`, expected a `Block`.'
+                raise TypeError(msg)
+            block = cached_obj
         else:
             _logger.info(f'Retrieving block with id `{block_uuid}`.')
             block = Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
