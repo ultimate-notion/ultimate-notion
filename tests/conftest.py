@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
 from random import randint
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 from unittest.mock import MagicMock, patch
 
 import pydantic
@@ -274,6 +274,14 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
+class _NamedFunc(Protocol):
+    """A callable with a `__name__`, i.e. a plain function (which `Callable` does not model)."""
+
+    __name__: str
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+
+
 def vcr_fixture(
     scope: Literal['module', 'session'], *, autouse: bool = False, shared: bool = False
 ) -> Callable[..., Any]:
@@ -282,20 +290,18 @@ def vcr_fixture(
         msg = f'Use this only for module or session scope, not {scope}!'
         raise ValueError(msg)
 
-    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    def decorator(func: _NamedFunc) -> Callable[..., Any]:
         args = inspect.signature(func).parameters  # to inject the fixtures into the wrapper
         is_generator = inspect.isgeneratorfunction(func)
 
         def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR | MagicMock, str]:
             if scope == 'module' and not shared:
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
-                cassette_name = (
-                    f'mod_{func.__name__}.yaml'  # same cassette for all modules!  # ty: ignore[unresolved-attribute]
-                )
+                cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
             else:
                 cassette_dir = str(request.config.rootpath / 'tests' / 'cassettes' / 'fixtures')
                 prefix = 'mod' if scope == 'module' else 'sess'
-                cassette_name = f'{prefix}_{func.__name__}.yaml'  # ty: ignore[unresolved-attribute]
+                cassette_name = f'{prefix}_{func.__name__}.yaml'
 
             vcr_config = vcr_config.copy()  # to avoid changing the original config
             vcr_config |= {'cassette_library_dir': cassette_dir}
