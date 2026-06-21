@@ -17,7 +17,7 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Annotated, Any, Generic, cast
+from typing import Annotated, Any, Generic
 
 from pydantic import AfterValidator, Field, SerializeAsAny
 from typing_extensions import TypeVar
@@ -101,7 +101,10 @@ class Page(DataObject, MentionMixin, object='page'):
     def title(self) -> list[RichTextBaseObject]:
         """Retrieve the title of the page from page properties."""
         title_prop_name = self._get_title_prop_name()
-        title_prop = cast(Title, self.properties[title_prop_name])
+        title_prop = self.properties[title_prop_name]
+        if not isinstance(title_prop, Title):
+            msg = f'Expected a `Title` property, got `{type(title_prop).__name__}`.'
+            raise TypeError(msg)
         return title_prop.title
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:

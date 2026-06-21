@@ -38,13 +38,13 @@ from url_normalize import url_normalize
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_db, is_page
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError
+from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError, UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import is_unset, raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.rich_text import Text
 from ultimate_notion.user import User
@@ -111,10 +111,10 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
         """Return the user who last edited the block."""
         session = get_active_session()
         if is_unset(last_edit_user_ref := self.obj_ref.last_edited_by):
-            raise_unset(last_edit_user_ref)
-        if is_unset(user_id := last_edit_user_ref.id):
-            raise_unset(user_id)
-        return session.get_user(user_id)
+            raise UnsetError()
+        if is_unset(last_edit_user_id := last_edit_user_ref.id):
+            raise UnsetError()
+        return session.get_user(last_edit_user_id)
 
     @property
     def has_children(self) -> bool:
@@ -666,7 +666,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
     @property
     def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
         if is_unset(icon := self.obj_ref.value.icon):
-            raise_unset(icon)
+            raise UnsetError()
         if icon is None:
             return self.get_default_icon()
         else:
@@ -1067,9 +1067,9 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
     @property
     def title(self) -> str | None:
         """Return the title of the child page."""
-        if title := raise_unset(self.obj_ref.child_page.title):
-            return title
-        return None
+        if is_unset(title := self.obj_ref.child_page.title):
+            raise UnsetError()
+        return title if title else None
 
     @property
     def page(self) -> Page:
@@ -1103,9 +1103,9 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
     @property
     def title(self) -> str | None:
         """Return the title of the child database"""
-        if title := raise_unset(self.obj_ref.child_database.title):
-            return title
-        return None
+        if is_unset(title := self.obj_ref.child_database.title):
+            raise UnsetError()
+        return title if title else None
 
     @property
     def db(self) -> Database:
@@ -1167,12 +1167,22 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
                 raise TypeError(msg)
 
     def __getitem__(self, index: int) -> Column:
-        return cast(Column, self.blocks[index])
+        column = self.blocks[index]
+        if not isinstance(column, Column):
+            msg = f'Expected a `Column` at index {index}, got `{type(column).__name__}`.'
+            raise TypeError(msg)
+        return column
 
     @property
     def columns(self) -> tuple[Column, ...]:
         """Return all columns of this multi-column block."""
-        return tuple(cast(Column, col) for col in super().children)
+        columns: list[Column] = []
+        for col in super().children:
+            if not isinstance(col, Column):
+                msg = f'Expected a `Column` child, got `{type(col).__name__}`.'
+                raise TypeError(msg)
+            columns.append(col)
+        return tuple(columns)
 
     @property
     def children(self) -> tuple[Column, ...]:
@@ -1344,7 +1354,13 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
     @property
     def rows(self) -> tuple[TableRow, ...]:
         """Return all rows of the table."""
-        return tuple(cast(TableRow, block) for block in super().children)
+        rows: list[TableRow] = []
+        for block in super().children:
+            if not isinstance(block, TableRow):
+                msg = f'Expected a `TableRow` child, got `{type(block).__name__}`.'
+                raise TypeError(msg)
+            rows.append(block)
+        return tuple(rows)
 
     @property
     def children(self) -> tuple[TableRow, ...]:
@@ -1461,7 +1477,11 @@ class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBl
             return self
         elif (synced_from := self.obj_ref.synced_block.synced_from) is not None:
             session = get_active_session()
-            return cast(SyncedBlock, session.get_block(objs.get_uuid(synced_from)))
+            original = session.get_block(objs.get_uuid(synced_from))
+            if not isinstance(original, SyncedBlock):
+                msg = f'Expected original of synced block to be a `SyncedBlock`, got `{type(original).__name__}`.'
+                raise TypeError(msg)
+            return original
         else:
             msg = 'Unknown synced block, neither original nor synced!'
             raise RuntimeError(msg)
@@ -1567,8 +1587,8 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
                 case Columns() as cols:
                     col_nodes = [_Node(block=col) for col in cols.columns]
                     node.children.extend(col_nodes)
-                    for col_node in col_nodes:
-                        queue.append((col_node, [_Node(block=child) for child in cast(Column, col_node.block).blocks]))
+                    for col_node, col in zip(col_nodes, cols.columns, strict=True):
+                        queue.append((col_node, [_Node(block=child) for child in col.blocks]))
                 case Table() as table:
                     node.children.extend([_Node(block=row) for row in table.rows])
                 case ParentBlock() as parent_block if parent_block.has_children:

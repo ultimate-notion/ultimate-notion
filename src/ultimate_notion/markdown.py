@@ -11,7 +11,8 @@ import numpy as np
 from mistune.directives import FencedDirective, TableOfContents
 from numpy.typing import NDArray
 
-from ultimate_notion.obj_api.core import is_unset, raise_unset
+from ultimate_notion.errors import UnsetError
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.utils import rank
 
 if TYPE_CHECKING:
@@ -159,12 +160,12 @@ def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
         if left is not None:
             yield left, len(rich_texts) - 1
 
-    def add_underlines(md_rich_texts: list[str], rich_texts: list[RichTextBase]) -> None:
-        def is_underlined(rt: RichTextBase) -> bool:
-            if is_unset(annotations := rt.obj_ref.annotations):
-                raise_unset(annotations)
-            return annotations.underline
+    def is_underlined(rt: RichTextBase) -> bool:
+        if is_unset(annotations := rt.obj_ref.annotations):
+            raise UnsetError()
+        return annotations.underline
 
+    def add_underlines(md_rich_texts: list[str], rich_texts: list[RichTextBase]) -> None:
         for left, right in find_span(rich_texts, is_underlined):
             md_rich_texts[left] = '<u>' + md_rich_texts[left]
             md_rich_texts[right] += '</u>'

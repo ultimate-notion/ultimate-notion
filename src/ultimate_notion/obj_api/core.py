@@ -18,7 +18,7 @@ import logging
 import re
 from abc import ABC
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, cast, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, cast
 from uuid import UUID
 
 from pydantic import (
@@ -32,7 +32,6 @@ from pydantic import (
 )
 from typing_extensions import Self, TypeIs, TypeVar
 
-from ultimate_notion.errors import UnsetError
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.utils import is_stable_release, pydantic_apply
 
@@ -114,18 +113,6 @@ def is_unset(v: Any) -> TypeIs[UnsetType]:
     elif v == Unset.model_dump(mode='python'):  # v was serialized
         return True
     return False
-
-
-@overload
-def raise_unset(obj: UnsetType) -> NoReturn: ...
-@overload
-def raise_unset(obj: T) -> T: ...
-def raise_unset(obj: T | UnsetType) -> T:
-    """Raise an error if the object is unset."""
-    if is_unset(obj):
-        msg = 'Parameter is unset and was not yet initialized by the Notion API.'
-        raise UnsetError(msg)
-    return obj
 
 
 def extract_id(text: str) -> str | None:

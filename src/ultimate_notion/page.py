@@ -11,18 +11,19 @@ from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject, wrap
 from ultimate_notion.comment import Discussion
 from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr
 from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import render_md
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
-from ultimate_notion.obj_api.core import is_unset, raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text
 from ultimate_notion.schema import Property
 from ultimate_notion.templates import page_html
-from ultimate_notion.utils import SList, is_notebook
+from ultimate_notion.utils import SList, display_markdown, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -159,14 +160,14 @@ class Page(
     def is_locked(self) -> bool:
         """Return whether the page is locked for editing."""
         if is_unset(is_locked := self.obj_ref.is_locked):
-            raise_unset(is_locked)
+            raise UnsetError()
         return is_locked
 
     @property
     def url(self) -> str:
         """Return the URL of this page."""
         if is_unset(url := self.obj_ref.url):
-            raise_unset(url)
+            raise UnsetError()
         return url
 
     @property
@@ -323,9 +324,7 @@ class Page(
         if simple:
             print(md)  # noqa: T201
         else:
-            from IPython.core.display import display_markdown  # noqa: PLC0415
-
-            display_markdown(md, raw=True)  # type: ignore[no-untyped-call]
+            display_markdown(md, raw=True)
 
     def delete(self) -> Self:
         """Delete this page.

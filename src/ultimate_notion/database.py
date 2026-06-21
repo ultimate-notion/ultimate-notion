@@ -10,10 +10,10 @@ from typing_extensions import Self
 from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import get_active_session, get_repr
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError
+from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError, UnsetError
 from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api import blocks as obj_blocks
-from ultimate_notion.obj_api.core import is_unset, raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case
@@ -48,7 +48,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def url(self) -> str:
         """Return the URL of this database."""
         if is_unset(url := self.obj_ref.url):
-            raise_unset(url)
+            raise UnsetError()
         return url
 
     @property
@@ -56,7 +56,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         """Return the title of this database as rich text."""
         # `str` added as return value but always RichText returned, which inherits from str.
         if is_unset(title := self.obj_ref.title):
-            raise_unset(title)
+            raise UnsetError()
         return Text.wrap_obj_ref(title) if title else None
 
     @title.setter
@@ -73,7 +73,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
     def description(self) -> Text | None:
         """Return the description of this database as rich text."""
         if is_unset(desc := self.obj_ref.description):
-            raise_unset(desc)
+            raise UnsetError()
         return Text.wrap_obj_ref(desc) if desc else None
 
     @description.setter

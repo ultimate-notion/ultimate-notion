@@ -11,11 +11,12 @@ import builtins
 import logging
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, BinaryIO, cast
+from typing import TYPE_CHECKING, Any, BinaryIO
 from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
 
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
 from ultimate_notion.obj_api.core import (
     GenericObject,
@@ -25,7 +26,6 @@ from ultimate_notion.obj_api.core import (
     UnsetType,
     UserRef,
     is_unset,
-    raise_unset,
 )
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
@@ -130,9 +130,9 @@ class BlocksEndpoint(Endpoint):
                     msg = 'Number of appended blocks does not match the number of provided blocks.'
                     raise ValueError(msg)
             else:
-                appended_blocks = list(
-                    block_iter(block_id=parent_id, children=children, after=str(raise_unset(after.id)))
-                )
+                if is_unset(after_id := after.id):
+                    raise UnsetError()
+                appended_blocks = list(block_iter(block_id=parent_id, children=children, after=str(after_id)))
 
             # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
             # blocks after the specified block, where we append the blocks.
@@ -188,7 +188,11 @@ class BlocksEndpoint(Endpoint):
 
         The block info will be updated to the latest version from the server.
         """
-        block_id = cast(UUID, raise_unset(block.id))  # don't get why mypy needs this cast
+        if is_unset(block_id := block.id):
+            raise UnsetError()
+        if not isinstance(block_id, UUID):
+            msg = f'Expected block id to be a `UUID`, got `{type(block_id).__name__}`.'
+            raise TypeError(msg)
         _logger.debug(f'Updating block with id `{block_id}`.')
         params = block.serialize_for_api()
 
@@ -439,7 +443,7 @@ class PagesEndpoint(Endpoint):
     ) -> None:
         """Update the Page object properties on the server."""
         if is_unset(page_id := page.id):
-            raise_unset(page_id)
+            raise UnsetError()
         _logger.debug(f'Updating info on page with id `{page_id}`.')
 
         request: dict[str, Any] = {}

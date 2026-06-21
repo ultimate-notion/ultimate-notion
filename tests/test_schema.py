@@ -12,7 +12,7 @@ from tests.conftest import URL
 from ultimate_notion import props
 from ultimate_notion.errors import InvalidAPIUsageError, PropertyError, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.schema import Property
+from ultimate_notion.schema import Property, Relation
 
 
 @pytest.mark.vcr()
@@ -164,8 +164,12 @@ def test_two_way_prop(notion: uno.Session, root_page: uno.Page) -> None:
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
 
-    assert db_b.schema.relation_twoway.two_way_prop is SchemaA.relation  # type: ignore
-    assert db_a.schema.relation.two_way_prop is SchemaB.relation_twoway  # type: ignore
+    relation_twoway = db_b.schema.relation_twoway
+    assert isinstance(relation_twoway, Relation)
+    assert relation_twoway.two_way_prop is SchemaA.relation
+    relation = db_a.schema.relation
+    assert isinstance(relation, Relation)
+    assert relation.two_way_prop is SchemaB.relation_twoway
 
 
 @pytest.mark.vcr()
@@ -178,7 +182,9 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
 
     db_a = notion.create_db(parent=root_page, schema=SchemaA)
 
-    assert db_a.schema.relation.schema is db_a.schema  # type: ignore
+    relation = db_a.schema.relation
+    assert isinstance(relation, Relation)
+    assert relation.schema is db_a.schema
 
 
 # ToDo: Reactivate after the bug on the Notion API side is fixed that adding a two-way relation property
@@ -364,23 +370,32 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     db_b = notion.create_db(parent=root_page, schema=SchemaB)
     db_c = notion.create_db(parent=root_page, schema=SchemaC)
 
+    def get_relation(schema: type[uno.Schema], name: str) -> Relation:
+        prop = schema[name]
+        assert isinstance(prop, Relation)
+        return prop
+
+    def two_way_prop_name(schema: type[uno.Schema], name: str) -> str | None:
+        two_way = get_relation(schema, name).two_way_prop
+        return two_way.name if two_way is not None else None
+
     # Set a two-way relation property
-    assert db_c.schema['Relation'].two_way_prop is None  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    assert get_relation(db_c.schema, 'Relation').two_way_prop is None
     two_way_prop = 'Back Relation'
-    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    get_relation(db_c.schema, 'Relation').two_way_prop = two_way_prop
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
     db_c.reload()
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
 
     # Try renaming the two-way relation property
     two_way_prop = 'Other Back Relation'
-    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    get_relation(db_c.schema, 'Relation').two_way_prop = two_way_prop
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
     db_c.reload(rebind_schema=False)  # since we changed something above
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
 
     # Delete the two-way relation property
-    db_c.schema['Relation'].two_way_prop = None  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+    get_relation(db_c.schema, 'Relation').two_way_prop = None
     assert two_way_prop not in [prop.name for prop in db_a.schema]
     db_a.reload()
     assert two_way_prop not in [prop.name for prop in db_a.schema]

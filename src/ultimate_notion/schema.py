@@ -46,12 +46,12 @@ from ultimate_notion.errors import (
     SchemaNotBoundError,
     UnsetError,
 )
-from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset, raise_unset
+from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.enums import AggFunc, NumberFormat, OptionGroupType
 from ultimate_notion.obj_api.objects import SelectGroup
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.utils import SList, dict_diff_str, is_notebook
+from ultimate_notion.utils import SList, dict_diff_str, display_html, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
@@ -164,9 +164,9 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def id(self) -> str | None:
         """Return identifier of this property."""
-        if is_unset(obj_id := self.obj_ref.id):
-            raise_unset(obj_id)
-        return obj_id
+        if is_unset(id_ := self.obj_ref.id):
+            raise UnsetError()
+        return id_
 
     @property
     def name(self) -> str:
@@ -533,9 +533,12 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         This is necessary as a two-way relation is created with a default name,
         which is rather a bug in the Notion API itself.
         """
-        two_way_prop_rel = cast(obj_schema.DualPropertyRelation, self.obj_ref.relation)
+        two_way_prop_rel = self.obj_ref.relation
+        if not isinstance(two_way_prop_rel, obj_schema.DualPropertyRelation):
+            msg = f'Expected a `DualPropertyRelation`, got `{type(two_way_prop_rel).__name__}`.'
+            raise TypeError(msg)
         if is_unset(tmp_prop_name := two_way_prop_rel.dual_property.synced_property_name):
-            raise_unset(tmp_prop_name)
+            raise UnsetError()
         db = self.schema.get_db()
         db.reload(rebind_schema=False)
         if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
@@ -551,7 +554,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             return self._two_way_prop
         elif self._is_init and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
             if is_unset(prop_name := self.obj_ref.relation.dual_property.synced_property_name):
-                raise_unset(prop_name)
+                raise UnsetError()
             return self.schema.get_prop(prop_name) if prop_name else None
         else:
             return None
@@ -1111,9 +1114,7 @@ class Schema(metaclass=SchemaType):
         table_str = cls.as_table(tablefmt)
 
         if is_notebook() and (tablefmt == 'html'):
-            from IPython.display import display_html  # noqa: PLC0415
-
-            display_html(table_str)  # type: ignore[no-untyped-call]
+            display_html(table_str)
         else:
             print(table_str)  # noqa: T201
 
