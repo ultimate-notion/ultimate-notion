@@ -39,7 +39,7 @@ import pydantic
 import pytest
 from _pytest.fixtures import SubRequest
 from google.auth.exceptions import RefreshError
-from vcr import VCR
+from vcr import VCR  # type: ignore[import-untyped]
 from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
