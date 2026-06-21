@@ -106,9 +106,9 @@ class Session:
 
     def __exit__(
         self,
-        exc_type: type[BaseException],
-        exc_value: BaseException,
-        traceback: TracebackType,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None:
         self.close()
 
