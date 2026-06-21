@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
 from random import randint
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal
 from unittest.mock import MagicMock, patch
 
 import pydantic
@@ -809,7 +809,9 @@ def get_id_prefix(notion: uno.Session, root_page: uno.Page) -> Callable[[str], s
             state_page.append(state_block)
 
         state_page.reload()  # this saves actually the state in VCR.py
-        id_prefix = cast(uno.Paragraph, state_page.children[0]).rich_text
+        first_child = state_page.children[0]
+        assert isinstance(first_child, uno.Paragraph)
+        id_prefix = first_child.rich_text
         if id_prefix is None:
             msg = 'Could not retrieve ID prefix from state page!'
             raise ValueError(msg)

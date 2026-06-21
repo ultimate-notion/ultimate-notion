@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from textwrap import dedent
-from typing import cast
 from uuid import uuid4
 
 import pytest
@@ -344,8 +343,12 @@ def test_nested_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     p2.append(uno.Paragraph('Nested Paragraph'))
 
     assert len(page.children) == 3
-    assert cast(ChildrenMixin, page.children[1]).children == (p1,)
-    assert len(cast(ChildrenMixin, page.children[2]).children) == 1
+    child1 = page.children[1]
+    assert isinstance(child1, ChildrenMixin)
+    assert child1.children == (p1,)
+    child2 = page.children[2]
+    assert isinstance(child2, ChildrenMixin)
+    assert len(child2.children) == 1
 
 
 @pytest.mark.vcr()
@@ -399,33 +402,41 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
     page.reload()
 
-    child_paragraph = cast(uno.Paragraph, page.children[0])
+    child_paragraph = page.children[0]
+    assert isinstance(child_paragraph, uno.Paragraph)
     assert child_paragraph.color == uno.Color.PINK
     assert child_paragraph.rich_text == 'Pink paragraph'
 
-    child_code = cast(uno.Code, page.children[1])
+    child_code = page.children[1]
+    assert isinstance(child_code, uno.Code)
     assert child_code.language == uno.CodeLang.JAVASCRIPT
     assert child_code.caption == uno.text('JavaScript Code')
     child_code.caption = None
     child_code.reload()
     assert child_code.caption is None
 
-    child_heading = cast(uno.Heading1, page.children[2])
+    child_heading = page.children[2]
+    assert isinstance(child_heading, uno.Heading1)
     assert child_heading.toggleable is False
 
-    child_callout = cast(uno.Callout, page.children[3])
+    child_callout = page.children[3]
+    assert isinstance(child_callout, uno.Callout)
     assert child_callout.icon == '👍'
 
-    child_todo = cast(uno.ToDoItem, page.children[4])
+    child_todo = page.children[4]
+    assert isinstance(child_todo, uno.ToDoItem)
     assert child_todo.checked is False
 
-    child_embed = cast(uno.Embed, page.children[5])
+    child_embed = page.children[5]
+    assert isinstance(child_embed, uno.Embed)
     assert child_embed.caption == 'Notion Homepage'
 
-    child_bookmark = cast(uno.Bookmark, page.children[6])
+    child_bookmark = page.children[6]
+    assert isinstance(child_bookmark, uno.Bookmark)
     assert child_bookmark.url == 'https://notion.so/'
 
-    child_equation = cast(uno.Equation, page.children[7])
+    child_equation = page.children[7]
+    assert isinstance(child_equation, uno.Equation)
     assert child_equation.latex == r'e = mc^2'
 
 
@@ -483,28 +494,31 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     cols[0].delete()
     page.reload()
 
-    cols = cast(uno.Columns, page.children[0])
-    col = cols.columns[0]
-    paragraph = cast(uno.Paragraph, col.children[0])
+    reloaded_cols = page.children[0]
+    assert isinstance(reloaded_cols, uno.Columns)
+    col = reloaded_cols.columns[0]
+    paragraph = col.children[0]
+    assert isinstance(paragraph, uno.Paragraph)
     assert paragraph == right
     assert left.reload().is_deleted
 
     with pytest.raises(IndexError):
-        cols.add_column(index=-1)
+        reloaded_cols.add_column(index=-1)
     with pytest.raises(IndexError):
-        cols.add_column(index=len(cols.children) + 1)
+        reloaded_cols.add_column(index=len(reloaded_cols.children) + 1)
 
-    cols.add_column(index=1)
-    cols[1].append(new_right := uno.Paragraph('New Column 1'))
+    reloaded_cols.add_column(index=1)
+    reloaded_cols[1].append(new_right := uno.Paragraph('New Column 1'))
     page.reload()
 
-    cols = cast(uno.Columns, page.children[0])
-    left_col, right_col = cast(list[uno.Column], cols.children)
+    reloaded_cols = page.children[0]
+    assert isinstance(reloaded_cols, uno.Columns)
+    left_col, right_col = reloaded_cols.children
     assert left_col.children == (right,)
     assert right_col.children == (new_right,)
 
     with pytest.raises(InvalidAPIUsageError):
-        cols.append(uno.Paragraph('This is a paragraph'))
+        reloaded_cols.append(uno.Paragraph('This is a paragraph'))
 
 
 @pytest.mark.vcr()
@@ -555,7 +569,8 @@ def test_modify_table(root_page: uno.Page, notion: uno.Session) -> None:
     assert table[1, 1] == 'Cell 1, 1'
     assert table[1, 2] == 'Cell 1, 2'
     page.reload()
-    reloaded_table = cast(uno.Table, page.children[0])
+    reloaded_table = page.children[0]
+    assert isinstance(reloaded_table, uno.Table)
     assert reloaded_table[0] == ('Cell 0, 0', 'Cell 0, 1', 'Cell 0, 2')
     assert reloaded_table[1, 0] == 'Cell 1, 0'
     assert reloaded_table[1, 1] == 'Cell 1, 1'
@@ -571,7 +586,8 @@ def test_modify_table(root_page: uno.Page, notion: uno.Session) -> None:
     table[2].delete()
     assert table[2] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
     page.reload()
-    reloaded_table = cast(uno.Table, page.children[0])
+    reloaded_table = page.children[0]
+    assert isinstance(reloaded_table, uno.Table)
     assert reloaded_table[2] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
 
     table.has_header_col = True

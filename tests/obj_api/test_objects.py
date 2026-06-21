@@ -30,8 +30,10 @@ def test_date_range(tz_berlin: str) -> None:
     assert obj.time_zone == tz_berlin
     assert obj.to_pendulum() == datetime
 
-    start = cast(pnd.DateTime, pnd.parse('2024-01-01', exact=True))
-    end = cast(pnd.DateTime, pnd.parse('2024-01-03', exact=True))
+    # `pnd.parse` of a date-only string returns a `Date`, but `pnd.interval` is typed
+    # to require `DateTime`, so cast to satisfy the (overly strict) stub.
+    start = cast('pnd.DateTime', pnd.parse('2024-01-01', exact=True))
+    end = cast('pnd.DateTime', pnd.parse('2024-01-03', exact=True))
     date_interval = pnd.interval(start=start, end=end)
     obj = objs.DateRange.build(date_interval)
     assert isinstance(obj.start, dt.date)
@@ -41,9 +43,11 @@ def test_date_range(tz_berlin: str) -> None:
     assert obj.time_zone is None
     assert obj.to_pendulum() == date_interval
 
-    start = cast(pnd.DateTime, pnd.parse('2024-01-01 10:00', exact=True))
-    end = cast(pnd.DateTime, pnd.parse('2024-01-03 12:00', exact=True))
-    datetime_interval = pnd.interval(start=start, end=end)
+    dt_start = pnd.parse('2024-01-01 10:00', exact=True)
+    dt_end = pnd.parse('2024-01-03 12:00', exact=True)
+    assert isinstance(dt_start, pnd.DateTime)
+    assert isinstance(dt_end, pnd.DateTime)
+    datetime_interval = pnd.interval(start=dt_start, end=dt_end)
     obj = objs.DateRange.build(datetime_interval)
     assert isinstance(obj.start, dt.datetime)
     assert obj.start == datetime_interval.start
@@ -57,7 +61,9 @@ def test_date_range(tz_berlin: str) -> None:
 def test_pageref(intro_page: uno.Page) -> None:
     page_ref = objs.PageRef(page_id=intro_page.id)
     obj_link_to_page = obj_blocks.LinkToPage(link_to_page=page_ref, type='link_to_page')
-    assert cast(objs.PageRef, obj_link_to_page.link_to_page).page_id == intro_page.id
+    link_to_page = obj_link_to_page.link_to_page
+    assert isinstance(link_to_page, objs.PageRef)
+    assert link_to_page.page_id == intro_page.id
 
 
 @pytest.mark.vcr()
