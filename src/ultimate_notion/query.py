@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydantic import BaseModel, Field
 from typing_extensions import Self
@@ -439,8 +439,8 @@ class EqualsNot(Equals):
 
 
 class InEquality(PropertyCondition, ABC):
-    _num_condition_kw: str
-    _date_condition_kw: str
+    _num_condition_kw: ClassVar[str]
+    _date_condition_kw: ClassVar[str]
 
     def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
@@ -677,7 +677,7 @@ class EndsWith(StartsWith):
 
 
 class DateCondition(PropertyCondition, ABC):
-    _condition_kw: str
+    _condition_kw: ClassVar[str]
     is_method: bool = True
 
     def _create_obj_ref_kwargs(self, db: Database, prop_type: Property) -> dict[str, obj_query.Condition]:
