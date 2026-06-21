@@ -57,6 +57,10 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+# The Notion SDK types its responses as `Any | Awaitable[Any]`; validate them into a
+# real `dict[str, Any]` so the result is correctly typed for `**`-unpacking.
+_DictAdapter = TypeAdapter(dict[str, Any])
+
 
 class NotionAPI:
     """Object-based Notion API (pydantic) with all endpoints."""
@@ -77,6 +81,16 @@ class Endpoint:
     """Baseclass of the Notion API endpoints."""
 
     api: NotionAPI
+
+    @staticmethod
+    def _as_dict(data: Any) -> dict[str, Any]:
+        """Validate a notion_client response into a `dict[str, Any]`.
+
+        The Notion SDK types its responses as `Any | Awaitable[Any]`, which breaks
+        `**`-unpacking the result. Validating through a `TypeAdapter` both narrows the
+        type and checks at runtime that the response really is a mapping.
+        """
+        return _DictAdapter.validate_python(data)
 
 
 class BlocksEndpoint(Endpoint):
@@ -180,8 +194,7 @@ class BlocksEndpoint(Endpoint):
             dtype = params[block_type].pop('type')
             del params[block_type][dtype]
 
-        # Typing in notion_client sucks, so we cast
-        data = cast(dict[str, Any], self.raw_api.update(block_id.hex, **params))
+        data = self._as_dict(self.raw_api.update(block_id.hex, **params))
         block.update(**data)
 
 
@@ -270,9 +283,7 @@ class DatabasesEndpoint(Endpoint):
         _logger.debug(f'Updating info of database with id `{db.id}`.')
 
         if request := self._build_request(schema=schema, title=title, description=description, inline=inline):
-            # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
-            # Typing in notion_client sucks, thus we cast
-            data = cast(dict[str, Any], self.raw_api.update(str(db.id), **request))
+            data = self._as_dict(self.raw_api.update(str(db.id), **request))
             db.update(**data)
 
     def delete(self, db: Database) -> Database:
@@ -456,7 +467,7 @@ class PagesEndpoint(Endpoint):
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 request['archived'] = False
 
-        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **request))
+        data = self._as_dict(self.raw_api.update(page_id.hex, **request))
         page.update(**data)
 
     def set_attr(
@@ -500,7 +511,7 @@ class PagesEndpoint(Endpoint):
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 props['archived'] = False
 
-        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **props))
+        data = self._as_dict(self.raw_api.update(page_id.hex, **props))
         page.update(**data)
 
 
@@ -615,14 +626,14 @@ class UploadsEndpoint(Endpoint):
         file_param = (file_upload.filename, file, file_upload.content_type)  # see issue #127 for reasons
         # Notion API doesn't like nulls, so we eliminate them
         kwargs = {k: v for k, v in (('file', file_param), ('part_number', part)) if v is not None}
-        data = cast(dict[str, Any], self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
+        data = self._as_dict(self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/complete-a-file-upload
     def complete(self, file_upload: FileUpload) -> None:
         """Complete the file upload and update the file_upload object."""
         _logger.debug(f'Completing file upload with id `{file_upload.id}`.')
-        data = cast(dict[str, Any], self.raw_api.complete(file_upload_id=str(file_upload.id)))
+        data = self._as_dict(self.raw_api.complete(file_upload_id=str(file_upload.id)))
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/retrieve-a-file-upload
