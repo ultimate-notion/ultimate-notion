@@ -20,7 +20,15 @@ from ultimate_notion.page import Page
 from ultimate_notion.rich_text import html_img
 from ultimate_notion.schema import Property
 from ultimate_notion.user import User
-from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook, rec_apply
+from ultimate_notion.utils import (
+    SList,
+    deepcopy_with_sharing,
+    display_html,
+    find_index,
+    find_indices,
+    is_notebook,
+    rec_apply,
+)
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -259,9 +267,7 @@ class View(Sequence[Page]):
         table_str = self.as_table(tablefmt=tablefmt)
 
         if is_notebook() and (tablefmt == 'html'):
-            from IPython.display import display_html  # noqa: PLC0415
-
-            display_html(table_str)  # type: ignore[no-untyped-call]
+            display_html(table_str)
         else:
             print(table_str)  # noqa: T201
 

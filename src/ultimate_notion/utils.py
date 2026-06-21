@@ -75,6 +75,30 @@ def is_notebook() -> bool:
             return False  # Other type (?)
 
 
+def display_html(html: str, *, raw: bool = False) -> None:
+    """Render HTML in the active Jupyter frontend.
+
+    Wraps IPython's untyped ``display_html`` so its missing annotations stay
+    contained at this single boundary instead of leaking to every call site.
+    """
+    from IPython.display import display_html as ipy_display_html  # noqa: PLC0415
+
+    render: Callable[..., None] = ipy_display_html
+    render(html, raw=raw)
+
+
+def display_markdown(markdown: str, *, raw: bool = False) -> None:
+    """Render Markdown in the active Jupyter frontend.
+
+    Wraps IPython's untyped ``display_markdown`` so its missing annotations stay
+    contained at this single boundary instead of leaking to every call site.
+    """
+    from IPython.core.display import display_markdown as ipy_display_markdown  # noqa: PLC0415
+
+    render: Callable[..., None] = ipy_display_markdown
+    render(markdown, raw=raw)
+
+
 class StoredRetvalsFunctor(Generic[P, T]):
     """A decorator that stores the return values of a function for later use."""
 
