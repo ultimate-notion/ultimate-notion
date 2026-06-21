@@ -168,14 +168,14 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     as the Notion API often doesn't send the `children` property back in the response.
     """
 
-    _children: list[Block] | None = None
+    _children: list[Block | Page | Database] | None = None
 
     @property
     def _has_children_field(self) -> bool:
         """Return whether the object has a `children` field."""
         return isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren)
 
-    def _gen_children_cache(self) -> list[Block]:
+    def _gen_children_cache(self) -> list[Block | Page | Database]:
         """Generate the children cache."""
         if self.is_deleted:
             msg = 'Cannot retrieve children of a deleted block from Notion.'
@@ -187,14 +187,15 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         if isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren):
             self.obj_ref.value.children = child_blocks_objs  # update the children attribute
 
-        child_blocks: list[Block] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
+        child_blocks: list[Block | Page | Database] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
 
         for idx, child_block in enumerate(child_blocks):
             if isinstance(child_block, ChildPage):
-                child_blocks[idx] = cast(Block, child_block.page)
+                child_blocks[idx] = child_block.page
             elif isinstance(child_block, ChildDatabase):
+                ref_block: Block | Database
                 try:
-                    ref_block = cast(Block, child_block.db)
+                    ref_block = child_block.db
                 except UnknownDatabaseError:
                     # linked database that cannot be retrieved via API. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
