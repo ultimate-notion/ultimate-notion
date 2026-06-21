@@ -1174,7 +1174,13 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
     @property
     def columns(self) -> tuple[Column, ...]:
         """Return all columns of this multi-column block."""
-        return tuple(cast(Column, col) for col in super().children)
+        columns: list[Column] = []
+        for col in super().children:
+            if not isinstance(col, Column):
+                msg = f'Expected a `Column` child, got `{type(col).__name__}`.'
+                raise TypeError(msg)
+            columns.append(col)
+        return tuple(columns)
 
     @property
     def children(self) -> tuple[Column, ...]:
@@ -1346,7 +1352,13 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
     @property
     def rows(self) -> tuple[TableRow, ...]:
         """Return all rows of the table."""
-        return tuple(cast(TableRow, block) for block in super().children)
+        rows: list[TableRow] = []
+        for block in super().children:
+            if not isinstance(block, TableRow):
+                msg = f'Expected a `TableRow` child, got `{type(block).__name__}`.'
+                raise TypeError(msg)
+            rows.append(block)
+        return tuple(rows)
 
     @property
     def children(self) -> tuple[TableRow, ...]:
@@ -1573,8 +1585,8 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
                 case Columns() as cols:
                     col_nodes = [_Node(block=col) for col in cols.columns]
                     node.children.extend(col_nodes)
-                    for col_node in col_nodes:
-                        queue.append((col_node, [_Node(block=child) for child in cast(Column, col_node.block).blocks]))
+                    for col_node, col in zip(col_nodes, cols.columns, strict=True):
+                        queue.append((col_node, [_Node(block=child) for child in col.blocks]))
                 case Table() as table:
                     node.children.extend([_Node(block=row) for row in table.rows])
                 case ParentBlock() as parent_block if parent_block.has_children:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from collections.abc import Callable, Iterator, Sequence
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import numpy as np
 from pydantic import BaseModel
@@ -89,11 +89,18 @@ class View(Sequence[Page]):
         if isinstance(idx, slice):
             return tuple(pages)
         else:
-            return cast(Page, pages)
+            return self._as_page(pages)
 
     def get_page(self, idx: int, /) -> Page:
         """Retrieve a page by index of the view."""
-        return cast(Page, self._pages[self._row_indices[idx]])
+        return self._as_page(self._pages[self._row_indices[idx]])
+
+    @staticmethod
+    def _as_page(page: Any) -> Page:
+        if not isinstance(page, Page):
+            msg = f'Expected a `Page`, got `{type(page).__name__}`.'
+            raise TypeError(msg)
+        return page
 
     def search_page(self, name: str) -> SList[Page]:
         """Retrieve a page from this view by name"""
