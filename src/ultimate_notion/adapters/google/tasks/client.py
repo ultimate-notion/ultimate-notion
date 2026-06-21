@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, cast
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import InstalledAppFlow  # type: ignore[import-untyped]
 from googleapiclient.discovery import build
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 

@@ -112,15 +112,6 @@ show_column_numbers = true
 pretty = true
 strict = true
 
-[[tool.mypy.overrides]]
-# Third-party libraries shipping neither type information nor stubs on typeshed
-module = [
-    "google_auth_oauthlib.*",
-    "vcr",
-    "vcr.*",
-]
-ignore_missing_imports = true
-
 # ty configuration
 # ty runs additionally to mypy (see the `lint` hatch env). Existing diagnostics
 # are suppressed with inline `# ty: ignore[...]` comments; new code is expected
@@ -396,6 +387,7 @@ dependencies = [
     "hypothesis",
     "ipython", # ships py.typed, so mypy checks against its real types
     "sybil", # ships py.typed, so mypy checks against its real types
+    "vcrpy~=5.1", # untyped, but installed so its import resolves to import-untyped rather than import-not-found
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [

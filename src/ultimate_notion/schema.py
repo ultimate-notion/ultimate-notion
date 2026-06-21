@@ -93,8 +93,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
             return NotImplemented
-        other_obj_ref = cast(GO_co, other.obj_ref)
-        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
+        return bool((self.obj_ref.type == other.obj_ref.type) and (self.obj_ref.value == other.obj_ref.value))
 
     def __hash__(self) -> int:
         return hash((self.obj_ref.type, self.obj_ref.value))

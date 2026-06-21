@@ -14,6 +14,7 @@
 # - hypothesis
 # - ipython
 # - sybil
+# - vcrpy~=5.1
 # - httpx>=0.27
 # - notion-client~=2.5.0
 # - tabulate>=0.9
@@ -144,6 +145,7 @@ idna==3.11
     #   httpx
     #   requests
     #   url-normalize
+    #   yarl
 iniconfig==2.3.0
     # via
     #   -c locks/default.lock
@@ -172,6 +174,10 @@ mistune==3.1.4
     # via
     #   -c locks/default.lock
     #   hatch.envs.lint
+multidict==6.7.0
+    # via
+    #   -c locks/default.lock
+    #   yarl
 mypy==1.18.2
     # via hatch.envs.lint
 mypy-extensions==1.1.0
@@ -235,6 +241,10 @@ prompt-toolkit==3.0.52
     # via
     #   -c locks/default.lock
     #   ipython
+propcache==0.4.1
+    # via
+    #   -c locks/default.lock
+    #   yarl
 proto-plus==1.26.1
     # via
     #   -c locks/default.lock
@@ -295,6 +305,10 @@ pytz==2025.2
     # via
     #   -c locks/default.lock
     #   pandas
+pyyaml==6.0.3
+    # via
+    #   -c locks/default.lock
+    #   vcrpy
 requests==2.32.5
     # via
     #   -c locks/default.lock
@@ -378,6 +392,7 @@ typing-extensions==4.15.0
     #   google-api-python-client-stubs
     #   ipython
     #   mistune
+    #   multidict
     #   mypy
     #   pydantic
     #   pydantic-core
@@ -405,7 +420,19 @@ urllib3==2.2.3
     # via
     #   -c locks/default.lock
     #   requests
+vcrpy==5.1.0
+    # via
+    #   -c locks/default.lock
+    #   hatch.envs.lint
 wcwidth==0.2.14
     # via
     #   -c locks/default.lock
     #   prompt-toolkit
+wrapt==2.0.1
+    # via
+    #   -c locks/default.lock
+    #   vcrpy
+yarl==1.22.0
+    # via
+    #   -c locks/default.lock
+    #   vcrpy

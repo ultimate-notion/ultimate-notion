@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import pendulum as pnd
 from typing_extensions import Self, TypeVar
@@ -55,8 +55,7 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PropertyValue):
             return NotImplemented
-        other_obj_ref = cast(PV_co, other.obj_ref)
-        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
+        return bool((self.obj_ref.type == other.obj_ref.type) and (self.obj_ref.value == other.obj_ref.value))
 
     @property
     @abstractmethod
