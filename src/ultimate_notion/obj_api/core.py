@@ -26,6 +26,7 @@ from pydantic import (
     ConfigDict,
     Field,
     SerializeAsAny,
+    ValidationError,
     ValidatorFunctionWrapHandler,
     field_validator,
     model_validator,
@@ -474,7 +475,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
 
         if type_name is None:
             if value.get('object') == 'user':
-                return UserRef.model_construct(**value)
+                return UserRef(**value)
             else:
                 msg = f"Missing 'type' in data {value}"
                 raise ValueError(msg)
@@ -485,7 +486,13 @@ class TypedObject(GenericObject, Generic[TO_co]):
             msg = f'Unsupported sub-type: {type_name}'
             raise ValueError(msg)
 
-        return sub_cls(**value)
+        try:  # we cannot use sub_cls.model_validate here since we use meta class params like `object`/`type`
+            typed_obj = sub_cls(**value)
+        except ValidationError as e:
+            msg = f'Error constructing {sub_cls} for type {type_name}:\n{e}'
+            raise RuntimeError(msg) from e
+
+        return typed_obj
 
     @classmethod
     def build(cls, *args: Any, **kwargs: Any) -> Self:
