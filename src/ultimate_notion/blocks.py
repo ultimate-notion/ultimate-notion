@@ -536,7 +536,7 @@ class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_
     def to_markdown(self) -> str:
         """Return the code content of this block as Markdown."""
         lang = self.obj_ref.value.language
-        return f'```{lang}\n{super().to_markdown()}\n```'
+        return f'```{lang.value}\n{super().to_markdown()}\n```'
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
