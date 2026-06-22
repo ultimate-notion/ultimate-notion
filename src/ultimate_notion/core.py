@@ -6,7 +6,7 @@ import datetime as dt
 import logging
 from abc import ABC
 from enum import Enum
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias
 from uuid import UUID
 
 from typing_extensions import Self, TypeIs, TypeVar
@@ -92,9 +92,14 @@ class Wrapper(Generic[GT_co], ABC):
             hl_obj = hl_cls.__new__(hl_cls)
             hl_obj._obj_ref = obj_ref
             hl_obj._finalize_wrap()
-            return cast(Self, hl_obj)
         else:
-            return cast(Self, hl_cls.wrap_obj_ref(obj_ref))
+            hl_obj = hl_cls.wrap_obj_ref(obj_ref)
+        # `cls is hl_cls` makes `hl_obj` an instance of `cls`, while the recursive branch resolves a
+        # more specific subclass of `cls`; either way the guard narrows `hl_obj` to `Self` for mypy.
+        if not isinstance(hl_obj, cls):
+            msg = f'Resolved high-level class `{type(hl_obj).__name__}` is not a `{cls.__name__}`.'
+            raise TypeError(msg)
+        return hl_obj
 
     def _finalize_wrap(self) -> None:
         """Run subclass-specific initialisation after `wrap_obj_ref` has set `_obj_ref`.
