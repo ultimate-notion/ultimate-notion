@@ -15,7 +15,7 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, TypedDict, cast
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from pydantic import Field, SerializeAsAny, field_validator, model_serializer
 from typing_extensions import NotRequired, Self
@@ -60,7 +60,11 @@ class PropertyValue(TypedObject[Any], polymorphic_base=True):
 
         In practice, this is like calling __init__ with the corresponding keyword.
         """
-        return cast(Self, cls.model_construct(**{cls.model_fields['type'].get_default(): value}))
+        obj = cls.model_construct(**{cls.model_fields['type'].get_default(): value})
+        if not isinstance(obj, cls):
+            msg = f'Expected {cls.__name__}, got {type(obj).__name__}'
+            raise TypeError(msg)
+        return obj
 
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the object for sending it to the Notion API."""
@@ -101,7 +105,11 @@ class Date(PropertyValue, type='date'):
     @classmethod
     def build(cls, dt_spec: str | DateTimeOrRange) -> Self:
         """Create a new Date from the native values."""
-        return cast(Self, cls.model_construct(date=DateRange.build(dt_spec)))
+        obj = cls.model_construct(date=DateRange.build(dt_spec))
+        if not isinstance(obj, cls):
+            msg = f'Expected {cls.__name__}, got {type(obj).__name__}'
+            raise TypeError(msg)
+        return obj
 
 
 class Status(PropertyValue, type='status'):
@@ -204,7 +212,11 @@ class Relation(PropertyValue, type='relation'):
     @classmethod
     def build(cls, pages: Sequence[Page]) -> Self:
         """Return a `Relation` property with the specified pages."""
-        return cast(Self, cls.model_construct(relation=[ObjectRef.build(page) for page in pages]))
+        obj = cls.model_construct(relation=[ObjectRef.build(page) for page in pages])
+        if not isinstance(obj, cls):
+            msg = f'Expected {cls.__name__}, got {type(obj).__name__}'
+            raise TypeError(msg)
+        return obj
 
 
 class RollupObject(TypedObject, ABC, polymorphic_base=True):
@@ -340,7 +352,11 @@ class Place(PropertyValue, type='place'):
     @classmethod
     def build(cls, place: PlaceDict | None) -> Self:
         place_obj = cls.TypeData(**place) if place is not None else None
-        return cast(Self, cls.model_construct(place=place_obj))
+        obj = cls.model_construct(place=place_obj)
+        if not isinstance(obj, cls):
+            msg = f'Expected {cls.__name__}, got {type(obj).__name__}'
+            raise TypeError(msg)
+        return obj
 
 
 ##################
