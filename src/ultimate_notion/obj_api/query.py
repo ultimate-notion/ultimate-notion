@@ -322,17 +322,17 @@ class SearchQueryBuilder(QueryBuilder[T]):
         else:  # db_only
             value = 'database'
 
-        builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
+        builder = type(self)(self.endpoint, text=self.params.get('query'))
         builder.query.filter = SearchFilter(property='object', value=value)
-        return builder  # ty: ignore[invalid-return-type]
+        return builder
 
     def sort(self, *, ascending: bool) -> SearchQueryBuilder[T]:
         """Add the given sort elements to the query."""
         direction = SortDirection.ASCENDING if ascending else SortDirection.DESCENDING
 
-        builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
+        builder = type(self)(self.endpoint, text=self.params.get('query'))
         builder.query.sort = SearchSort(timestamp=TimestampKind.LAST_EDITED_TIME, direction=direction)
-        return builder  # ty: ignore[invalid-return-type]
+        return builder
 
 
 class DBQueryBuilder(QueryBuilder[Page]):
