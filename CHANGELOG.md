@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## Version 0.9.8, 2026-06-22
+
 - Fix: Tolerate page/database objects that omit `properties`, which the `search` endpoint returns for stripped-down records (e.g. trashed or limited-access pages) and which previously broke `search_page()`/`search_db()`, issue #273.
 
 ## Version 0.9.7, 2026-06-22
