@@ -210,7 +210,7 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
     if hasattr(obj, '__deepcopy__'):
         # Do hack to prevent infinite recursion in call to deepcopy
         deepcopy_method = obj.__deepcopy__
-        obj.__deepcopy__ = None
+        obj.__dict__['__deepcopy__'] = None
 
     for attr in shared_attributes:
         del obj.__dict__[attr]
@@ -223,7 +223,7 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
 
     if hasattr(obj, '__deepcopy__'):
         # Undo hack
-        obj.__deepcopy__ = deepcopy_method
+        obj.__dict__['__deepcopy__'] = deepcopy_method
         del clone.__dict__['__deepcopy__']
 
     return clone
