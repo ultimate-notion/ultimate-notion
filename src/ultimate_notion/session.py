@@ -216,11 +216,6 @@ class Session:
         self.cache[db.id] = db
         return db
 
-    def create_dbs(self, parents: Page | list[Page], schemas: list[type[Schema]]) -> list[Database]:
-        """Create new databases in the right order in case there a relations between them."""
-        # ToDo: Implement
-        raise NotImplementedError
-
     def search_db(
         self, db_name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
     ) -> SList[Database]:
