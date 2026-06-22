@@ -93,12 +93,31 @@ This often provides additional considerations and avoids unnecessary work.
    ```
    These settings will also be respected by [pytest] using [pytest-dotenv].
 
+### Set up the unit tests
+
+Ultimate Notion deals with unit tests in two ways. Most tests are recorded as
+cassettes using [VCR.py], which captures the HTTP interactions a test makes the
+first time it runs against the Notion API and replays them on subsequent runs.
+This lets the suite run offline and much faster, with no Notion account needed:
+
+```console
+hatch run vcr-only
+```
+
+You only need your own Notion workspace and integration token if you want to
+**run the tests live** against the Notion API, or to **add a new test** or
+**re-record an existing cassette**:
+
+```console
+hatch run vcr-rewrite          # re-record all cassettes
+hatch run test -k NEW_TEST     # run/record a specific test live
+```
+
+Running tests live requires a configured test workspace, described next.
+
 ### Set up a Notion test workspace
 
-Most tests replay recorded HTTP interactions (VCR cassettes) and need no network
-access; run them with `hatch run vcr-only`. You only need your own Notion
-workspace and integration token if you want to **run the tests live** against the
-Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
+You only need this section to run the tests live or to re-record cassettes.
 
 1. **Create an internal integration.** Open [My integrations] and click
    *New integration*. Choose **Internal**, associate it with the workspace you
@@ -219,4 +238,5 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 [VS Code]: https://code.visualstudio.com/
 [GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files
 [mkdocs]: https://www.mkdocs.org/
+[VCR.py]: https://vcrpy.readthedocs.io/
 [My integrations]: https://www.notion.so/my-integrations
