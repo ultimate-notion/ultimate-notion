@@ -118,8 +118,6 @@ strict = true
 include = ["src/ultimate_notion", "tests", "examples"]
 
 [tool.ty.analysis]
-# Only honour `# ty: ignore`, not mypy's `# type: ignore` (which ty would otherwise
-# report as unused). Suppress ty diagnostics with `# ty: ignore[...]`.
 respect-type-ignore-comments = false
 
 # Pytest configuration
