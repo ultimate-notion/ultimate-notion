@@ -9,7 +9,7 @@ import time
 from collections.abc import Sequence
 from threading import RLock
 from types import TracebackType
-from typing import Any, BinaryIO, ClassVar, TypeVar, cast
+from typing import Any, BinaryIO, ClassVar, TypeVar
 from uuid import UUID
 
 import httpx
@@ -146,7 +146,11 @@ class Session:
 
     def _cache_add(self, obj: T_cache) -> T_cache:
         """Cache `obj` keyed by its id, returning the already-cached instance if one exists."""
-        return cast(T_cache, self.cache.setdefault(obj.id, obj))
+        cached = self.cache.setdefault(obj.id, obj)
+        if not isinstance(cached, type(obj)):
+            msg = f'Cached object `{obj.id}` is a `{type(cached).__name__}`, expected `{type(obj).__name__}`.'
+            raise TypeError(msg)
+        return cached
 
     def _cache_get(self, key: UUID, expected_type: type[T_cache]) -> T_cache:
         """Return the cached object under `key`, narrowed to `expected_type`."""
