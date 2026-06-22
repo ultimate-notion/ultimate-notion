@@ -28,7 +28,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, TypeGuard, cast, overload
+from typing import TYPE_CHECKING, Any, TypeGuard, overload
 
 import numpy as np
 from tabulate import tabulate
@@ -252,6 +252,13 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         if not blocks:
             return self
 
+        from ultimate_notion.page import Page  # noqa: PLC0415  # Avoid circular import.
+
+        parent_obj = self
+        if not isinstance(parent_obj, (Block, Page)):
+            msg = f'Cannot append children to a `{type(parent_obj).__name__}`.'
+            raise TypeError(msg)
+
         if sync is True and not self.in_notion:
             msg = 'Cannot append blocks synchronously to a block that is not in Notion.'
             raise InvalidAPIUsageError(msg)
@@ -268,11 +275,11 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 raise InvalidAPIUsageError(msg)
             self.obj_ref.has_children = True
             for block in blocks:
-                block._parent = cast(Block, self)  # set fallback parent for offline use
+                block._parent = parent_obj  # set fallback parent for offline use
             # Don't store it in the potential `children` field of the obj_ref and let the Notion API do it.
             self._children.extend(blocks)
         else:  # self.in_notion and sync is not False
-            blocks_iter = _chunk_blocks_for_api(cast(ParentBlock, self), blocks)
+            blocks_iter = _chunk_blocks_for_api(parent_obj, blocks)
             _append_block_chunks(blocks_iter, after=after)
 
         return self
@@ -330,10 +337,13 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
         """Return the parent block or page, or None if not accessible."""
         from ultimate_notion.page import Page  # noqa: PLC0415  # Avoid circular import.
 
-        if self.in_notion:
-            return cast(Block | Page | None, super().parent)
-        else:
+        if not self.in_notion:
             return self._parent
+        parent = super().parent
+        if parent is not None and not isinstance(parent, (Block, Page)):
+            msg = f'Expected the parent to be a block or page, got `{type(parent).__name__}`.'
+            raise TypeError(msg)
+        return parent
 
     @property
     def discussions(self) -> tuple[Discussion, ...]:
