@@ -19,6 +19,32 @@ import ultimate_notion as uno
 DEFAULT_ROOT_TITLE = 'Tests'
 MAX_REQUEST_ATTEMPTS = 5
 
+# The exact set of objects the live test suite expects to find in the workspace.
+# Keep these in sync with the title constants in `tests/conftest.py`. The audit step
+# uses them to report anything else the integration can see (stray records) and to
+# flag any expected object that is missing, so a search returns a known, stable set.
+EXPECTED_PAGE_TITLES = frozenset(
+    {
+        DEFAULT_ROOT_TITLE,  # 'Tests' (or the value of UNO_TEST_ROOT_PAGE)
+        'Getting Started',
+        'Markdown Text Test',
+        'Markdown Test',
+        'Markdown SubPage Test',
+        'Embed/Inline/Linked & Unfurl',
+        'Comments',
+        'Custom Emoji Page',
+    }
+)
+EXPECTED_DATABASE_TITLES = frozenset(
+    {
+        'Contacts DB',
+        'Task DB',
+        'Formula DB',
+        'All Properties DB',
+        'Wiki DB',  # an ordinary page until it is manually turned into a wiki
+    }
+)
+
 P = ParamSpec('P')
 T = TypeVar('T')
 
@@ -100,9 +126,11 @@ class Formulas(uno.Schema, db_title='Formula DB'):
 
 
 class Bootstrap:
-    def __init__(self, notion: uno.Session, root_title: str) -> None:
+    def __init__(self, notion: uno.Session, root_title: str, *, prune: bool = False) -> None:
         self.notion = notion
         self.client = notion.client
+        self.root_title = root_title
+        self.prune = prune
         root = self.find_page(root_title)
         if root is None:
             msg = f'Root page {root_title!r} was not found. Share it with the integration first.'
@@ -307,6 +335,119 @@ class Bootstrap:
             status = 'ready' if obj is not None else 'manual setup required'
             typer.echo(f'{title}: {status}')
 
+    @classmethod
+    def for_audit(cls, notion: uno.Session, *, prune: bool = False) -> 'Bootstrap':
+        """Construct an instance for the read-only audit, skipping the root-page lookup.
+
+        The audit only uses the raw Notion client, so it works even against a released
+        package version that still has the issue #273 validation bug, and against a
+        workspace whose root page has not been shared yet.
+        """
+        self = cls.__new__(cls)
+        self.notion = notion
+        self.client = notion.client
+        self.prune = prune
+        return self
+
+    def iter_visible(self, object_type: str) -> 'list[dict[str, Any]]':
+        """Return every object of `object_type` ('page'/'database') the integration can see."""
+        results: list[dict[str, Any]] = []
+        cursor: str | None = None
+        while True:
+            kwargs: dict[str, Any] = {
+                'filter': {'property': 'object', 'value': object_type},
+                'page_size': 100,
+            }
+            if cursor is not None:
+                kwargs['start_cursor'] = cursor
+            response = json_object(self.client.search(**kwargs))
+            results.extend(json_object(item) for item in response.get('results', []))
+            if not response.get('has_more'):
+                return results
+            cursor = response.get('next_cursor')
+
+    @staticmethod
+    def raw_title(obj: dict[str, Any]) -> str | None:
+        """Best-effort plain-text title from a raw page/database object, or None if untitled.
+
+        Returns None for the stripped-down, property-less objects Notion returns for
+        trashed / limited-access records (see issue #273).
+        """
+        if obj.get('object') == 'database':
+            parts = obj.get('title') or []
+        else:
+            parts = []
+            for prop in (obj.get('properties') or {}).values():
+                if isinstance(prop, dict) and prop.get('type') == 'title':
+                    parts = prop.get('title') or []
+                    break
+        text = ''.join(part.get('plain_text', '') for part in parts if isinstance(part, dict))
+        return text or None
+
+    def audit_workspace_objects(self) -> None:
+        """Report everything the integration can see and flag drift from the expected set.
+
+        A perpetually-red weekly live job is invisible, and stray records (trashed,
+        orphaned or limited-access leftovers) silently break searches (issue #273). This
+        reports stray and missing objects so a fresh or polluted workspace is obvious, and
+        optionally prunes accessible stray pages when run with `--prune`.
+        """
+        expected_titles = EXPECTED_PAGE_TITLES | EXPECTED_DATABASE_TITLES
+        pages = self.iter_visible('page')
+        databases = self.iter_visible('database')
+
+        visible_titles: set[str] = set()
+        property_less = 0
+        stray: list[dict[str, Any]] = []
+        for obj in (*pages, *databases):
+            title = self.raw_title(obj)
+            if title is None:
+                property_less += 1
+            else:
+                visible_titles.add(title)
+            if title not in expected_titles:  # None (property-less) is never expected
+                stray.append(obj)
+
+        typer.echo('')
+        typer.echo(f'audit: {len(pages)} page(s), {len(databases)} database(s) visible to the integration')
+        typer.echo(f'audit: {property_less} object(s) with no resolvable title (property-less or untitled)')
+
+        missing = sorted(expected_titles - visible_titles)
+        if missing:
+            typer.echo(f'audit: MISSING expected object(s): {", ".join(missing)}', err=True)
+        else:
+            typer.echo('audit: all expected objects are present')
+
+        if not stray:
+            typer.echo('audit: no stray objects; the workspace matches the expected set')
+            return
+
+        typer.echo(f'audit: {len(stray)} stray object(s) not in the expected set:', err=True)
+        for obj in stray:
+            title = self.raw_title(obj)
+            label = repr(title) if title is not None else '<untitled/property-less>'
+            in_trash = obj.get('in_trash', obj.get('archived', False))
+            typer.echo(f'  - {obj.get("object")} {obj.get("id")} {label}{" [in trash]" if in_trash else ""}', err=True)
+
+        if self.prune:
+            self.prune_stray(stray)
+        else:
+            typer.echo('audit: re-run with --prune to move accessible stray pages to trash', err=True)
+
+    def prune_stray(self, stray: list[dict[str, Any]]) -> None:
+        """Best-effort move stray pages to trash. Skips databases and inaccessible objects."""
+        pruned = 0
+        for obj in stray:
+            if obj.get('object') != 'page' or obj.get('in_trash') or obj.get('archived'):
+                continue
+            try:
+                request_with_retry(self.client.pages.update, page_id=str(obj['id']), in_trash=True)
+            except HTTPResponseError as error:
+                typer.echo(f'  could not prune {obj.get("id")}: {error}', err=True)
+                continue
+            pruned += 1
+        typer.echo(f'audit: pruned {pruned} stray page(s) to trash')
+
     def run(self) -> None:
         self.ensure_wiki_shell()
         self.ensure_contacts_db()
@@ -314,6 +455,7 @@ class Bootstrap:
         self.ensure_formula_db()
         self.ensure_static_pages()
         self.audit_manual_objects()
+        self.audit_workspace_objects()
 
 
 def main() -> None:
@@ -323,12 +465,25 @@ def main() -> None:
         default=os.environ.get('UNO_TEST_ROOT_PAGE', DEFAULT_ROOT_TITLE),
         help='Title of the root page shared with the integration.',
     )
+    parser.add_argument(
+        '--prune',
+        action='store_true',
+        help='Move accessible stray pages (not in the expected set) to trash. Off by default.',
+    )
+    parser.add_argument(
+        '--audit-only',
+        action='store_true',
+        help='Skip object creation; only audit what the integration can see (read-only by default).',
+    )
     args = parser.parse_args()
     token = os.environ.get('NOTION_TOKEN')
     if not token:
         parser.error('NOTION_TOKEN must be set')
     with uno.Session(client=RetryingClient(auth=token)) as notion:
-        Bootstrap(notion, args.root_title).run()
+        if args.audit_only:
+            Bootstrap.for_audit(notion, prune=args.prune).audit_workspace_objects()
+        else:
+            Bootstrap(notion, args.root_title, prune=args.prune).run()
 
 
 if __name__ == '__main__':

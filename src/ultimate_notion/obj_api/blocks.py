@@ -70,7 +70,7 @@ class Database(DataObject, MentionMixin, object='database'):
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, SerializeAsAny[Property]]
+    properties: dict[str, SerializeAsAny[Property]] = Field(default_factory=dict)
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
 
@@ -85,7 +85,7 @@ class Page(DataObject, MentionMixin, object='page'):
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, PropertyValue]
+    properties: dict[str, PropertyValue] = Field(default_factory=dict)
     is_locked: bool | UnsetType = Unset
 
     def _get_title_prop_name(self) -> str:

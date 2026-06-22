@@ -124,5 +124,19 @@ The script is idempotent and leaves existing objects unchanged. Some content-sen
 tests still require the richer recorded fixture content; the bootstrap creates the
 minimum useful structure and seed rows needed to inspect and extend a fresh workspace.
 
+After creating objects, the script runs an **audit**: it lists every page and database
+the integration can see, reports any **missing** expected object, and lists **stray**
+objects that are not part of the expected set (`EXPECTED_PAGE_TITLES` /
+`EXPECTED_DATABASE_TITLES` in `scripts/bootstrap_test_workspace.py`, kept in sync with
+the title constants in `tests/conftest.py`). Stray records — trashed, orphaned or
+limited-access leftovers, including property-less objects — are what silently break
+`search_page()`/`search_db()` (issue #273), so a clean audit means a search returns a
+known, stable result set. The audit is **report-only** by default; pass `--prune` to
+move accessible stray pages to trash:
+
+```console
+NOTION_TOKEN=ntn_... hatch run bootstrap-test-workspace --prune
+```
+
 Once every named object exists under your shared root page, re-record with
 `hatch run vcr-rewrite`.
