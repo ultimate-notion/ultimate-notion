@@ -356,7 +356,7 @@ def test_option_page_props(notion: uno.Session, root_page: uno.Page) -> None:
     page1.props.status = s_options['Blocked']
     assert page1.props.status.name == 'Blocked'
     page1.props.status = 'Closed'
-    assert page1.props.status.name == 'Closed'  # ty: ignore[unresolved-attribute]
+    assert page1.props.status == s_options['Closed']
 
     assert page2.props.multi_status == [ms_options['Option 1'], ms_options['Option 2']]
     page2.props.multi_status = [ms_options['Option 1']]
