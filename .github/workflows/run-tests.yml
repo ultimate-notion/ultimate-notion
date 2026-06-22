@@ -16,7 +16,7 @@ env:
   PYTHONUNBUFFERED: "1"
   FORCE_COLOR: "1"
   NOTION_TOKEN: "${{ secrets.NOTION_AUTH_TOKEN }}"
-  PIP_COMPILE_DISABLE: true
+  # PIP_COMPILE_DISABLE: true  # would make sense but it's a bug in https://github.com/juftin/hatch-pip-compile/pull/100
   PIPX_HOME: "${{ github.workspace }}/.pipx"
 
 jobs:
@@ -49,18 +49,31 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v6
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
       with:
-        python-version: ${{ matrix.python-version }}
+        fetch-depth: 0  # for git tags
 
     - name: Setup environment requirements
       uses: ./.github/actions/setup-venv-reqs
 
-    - name: Install Python version
+    - name: Install Python version (Linux/macOS)
+      if: runner.os != 'Windows'
+      shell: bash
       run: |
         hatch python install ${{ matrix.python-version }}
+        # Save the path to the installed Python version to the environment for later injection
+        PY="$(hatch --no-color python find ${{ matrix.python-version }} | tr -d '\n')"
+        printf 'HATCH_PYTHON=%s\n' "$PY" >> "$GITHUB_ENV"
+        cat "$GITHUB_ENV"
+
+    - name: Install Python version (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        hatch python install "${{ matrix.python-version }}"
+        # Save the path to the installed Python version to the environment for later injection
+        $PY = (hatch --no-color python find "${{ matrix.python-version }}").Trim()
+        "HATCH_PYTHON=$PY" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        Get-Content $env:GITHUB_ENV
 
     - name: Lint
       if: matrix.python-version == '3.10' && runner.os == 'Linux'
