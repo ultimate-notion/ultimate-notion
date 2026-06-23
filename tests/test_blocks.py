@@ -701,6 +701,29 @@ def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> Non
     heading.append(uno.Paragraph('This is a child paragraph.'))
 
 
+def test_serialize_strips_meta_from_nested_children() -> None:
+    """Read-only block meta fields must not leak into nested children when serializing.
+
+    Regression test for https://github.com/ultimate-notion/ultimate-notion/issues/291: nested
+    children are serialized via pydantic's recursive `model_dump`, not each child's
+    `serialize_for_api`, so the meta strip has to walk the whole tree. `is_archived` in particular
+    is rejected by Notion's append-children endpoint, turning a latent leak into a hard `400`.
+    """
+    top = uno.Callout('top')
+    mid = uno.Callout('mid')
+    inner = uno.Callout('inner')
+    top.obj_ref.value.children = [mid.obj_ref]
+    mid.obj_ref.value.children = [inner.obj_ref]
+
+    data = top.obj_ref.serialize_for_api()
+    meta_fields = ('has_children', 'in_trash', 'archived', 'is_archived')
+
+    child = data['callout']['children'][0]
+    grandchild = child['callout']['children'][0]
+    for level in (data, child, grandchild):
+        assert not any(field in level for field in meta_fields)
+
+
 def test_rt_default_color() -> None:
     para_1 = uno.Paragraph(text='Hello')
     para_2 = uno.Paragraph(text='')

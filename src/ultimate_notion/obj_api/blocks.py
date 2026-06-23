@@ -134,9 +134,30 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the block for sending it to the Notion API."""
         data = super().serialize_for_api()
-        for key in ('has_children', 'in_trash', 'archived', 'is_archived'):
-            data.pop(key, None)
+        _strip_block_meta_fields(data)
         return data
+
+
+# Read-only meta fields the Notion API rejects on create/append payloads. `is_archived`
+# is in particular rejected outright (issue #291), so it must not leak into nested children.
+_API_EXCLUDED_BLOCK_FIELDS = ('has_children', 'in_trash', 'archived', 'is_archived')
+
+
+def _strip_block_meta_fields(data: Any) -> None:
+    """Recursively remove read-only block meta fields from a serialized block tree.
+
+    Nested children are serialized via pydantic's recursive `model_dump` rather than by
+    calling each child's `serialize_for_api`, so the top-level strip never reaches them.
+    Walking the serialized tree here ensures every nested child block is cleaned too.
+    """
+    if isinstance(data, dict):
+        for key in _API_EXCLUDED_BLOCK_FIELDS:
+            data.pop(key, None)
+        for value in data.values():
+            _strip_block_meta_fields(value)
+    elif isinstance(data, list):
+        for item in data:
+            _strip_block_meta_fields(item)
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
