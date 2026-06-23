@@ -724,6 +724,40 @@ def test_serialize_strips_meta_from_nested_children() -> None:
         assert not any(field in level for field in meta_fields)
 
 
+@pytest.mark.vcr()
+def test_append_nested_children_single_call(root_page: uno.Page, notion: uno.Session) -> None:
+    """Appending a block that already carries nested children must succeed in a single API call.
+
+    Live counterpart to `test_serialize_strips_meta_from_nested_children`. Regression test for
+    https://github.com/ultimate-notion/ultimate-notion/issues/291: read-only meta fields (notably
+    `is_archived`) leaking into nested children made Notion's append-children endpoint reject the
+    whole request with a hard 400. The tree is assembled offline and appended in one
+    `page.append(top)` call, so the entire nesting goes to the append endpoint at once.
+    """
+    page = notion.create_page(parent=root_page, title='Page for appending nested children')
+    top = uno.Callout('top')
+    mid = uno.Callout('mid')
+    inner = uno.Callout('inner')
+    top.append(mid)
+    mid.append(inner)
+
+    page.append(top)
+
+    assert page.children == (top,)
+    assert top.children == (mid,)
+    assert mid.children == (inner,)
+
+    page.reload()
+
+    assert len(page.children) == 1
+    reloaded_top = page.children[0]
+    assert isinstance(reloaded_top, ChildrenMixin)
+    assert len(reloaded_top.children) == 1
+    reloaded_mid = reloaded_top.children[0]
+    assert isinstance(reloaded_mid, ChildrenMixin)
+    assert len(reloaded_mid.children) == 1
+
+
 def test_rt_default_color() -> None:
     para_1 = uno.Paragraph(text='Hello')
     para_2 = uno.Paragraph(text='')
