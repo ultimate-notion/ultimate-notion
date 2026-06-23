@@ -28,7 +28,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, TypeGuard, cast, overload
+from typing import TYPE_CHECKING, Any, TypeGuard, overload
 
 import numpy as np
 from tabulate import tabulate
@@ -38,14 +38,16 @@ from url_normalize import url_normalize
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import InvalidAPIUsageError, UnknownDataSourceError
+from ultimate_notion.errors import InvalidAPIUsageError, UnknownDataSourceError, UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
-from ultimate_notion.rich_text import Text, User
+from ultimate_notion.rich_text import Text
+from ultimate_notion.user import User
 from ultimate_notion.utils import set_attr_none
 
 if TYPE_CHECKING:
@@ -108,8 +110,11 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
     def last_edited_by(self) -> User:
         """Return the user who last edited the block."""
         session = get_active_session()
-        last_edit_user_ref = raise_unset(self.obj_ref.last_edited_by)
-        return session.get_user(raise_unset(last_edit_user_ref.id))
+        if is_unset(last_edit_user_ref := self.obj_ref.last_edited_by):
+            raise UnsetError()
+        if is_unset(last_edit_user_id := last_edit_user_ref.id):
+            raise UnsetError()
+        return session.get_user(last_edit_user_id)
 
     @property
     def has_children(self) -> bool:
@@ -131,7 +136,7 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
         Pages and databases are moved to the trash, blocks are deleted permanently.
         """
         session = get_active_session()
-        self.obj_ref = cast(DO_co, session.api.blocks.delete(self.id))
+        self.obj_ref = session.api.blocks.delete(self.id)
         self._delete_me_from_parent()
         return self
 
@@ -163,14 +168,14 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     as the Notion API often doesn't send the `children` property back in the response.
     """
 
-    _children: list[Block] | None = None
+    _children: list[Block | Page | DataSource] | None = None
 
     @property
     def _has_children_field(self) -> bool:
         """Return whether the object has a `children` field."""
-        return isinstance(self.obj_ref, obj_blocks.Block) and hasattr(self.obj_ref.value, 'children')
+        return isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren)
 
-    def _gen_children_cache(self) -> list[Block]:
+    def _gen_children_cache(self) -> list[Block | Page | DataSource]:
         """Generate the children cache."""
         if self.is_deleted:
             msg = 'Cannot retrieve children of a deleted block from Notion.'
@@ -179,24 +184,25 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         session = get_active_session()
         child_blocks_objs = list(session.api.blocks.children.list(parent=objs.get_uuid(self.obj_ref)))
         self.obj_ref.has_children = bool(child_blocks_objs)  # update the property manually to avoid API call
-        if self._has_children_field:
-            self.obj_ref.value.children = child_blocks_objs  # type: ignore[attr-defined] # update the children attribute
+        if isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren):
+            self.obj_ref.value.children = child_blocks_objs  # update the children attribute
 
-        child_blocks: list[Block] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
+        child_blocks: list[Block | Page | DataSource] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
 
         for idx, child_block in enumerate(child_blocks):
             if isinstance(child_block, ChildPage):
-                child_blocks[idx] = cast(Block, child_block.page)
+                child_blocks[idx] = child_block.page
             elif isinstance(child_block, ChildDatabase):
+                ref_block: Block | DataSource
                 try:
-                    ref_block = cast(Block, child_block.ds)
+                    ref_block = child_block.ds
                 except UnknownDataSourceError:
                     # linked data source that cannot be retrieved via API. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
-                    ref_block = cast(Block, child_block)
+                    ref_block = child_block
                 child_blocks[idx] = ref_block
 
-        return [cast(Block, session.cache.setdefault(block.id, block)) for block in child_blocks]
+        return [session._cache_add(block) for block in child_blocks]
 
     @property
     def children(self) -> tuple[Block | Page | DataSource, ...]:
@@ -246,6 +252,13 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         if not blocks:
             return self
 
+        from ultimate_notion.page import Page  # noqa: PLC0415  # Avoid circular import.
+
+        parent_obj = self
+        if not isinstance(parent_obj, (Block, Page)):
+            msg = f'Cannot append children to a `{type(parent_obj).__name__}`.'
+            raise TypeError(msg)
+
         if sync is True and not self.in_notion:
             msg = 'Cannot append blocks synchronously to a block that is not in Notion.'
             raise InvalidAPIUsageError(msg)
@@ -262,11 +275,11 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 raise InvalidAPIUsageError(msg)
             self.obj_ref.has_children = True
             for block in blocks:
-                block._parent = cast(Block, self)  # set fallback parent for offline use
+                block._parent = parent_obj  # set fallback parent for offline use
             # Don't store it in the potential `children` field of the obj_ref and let the Notion API do it.
             self._children.extend(blocks)
         else:  # self.in_notion and sync is not False
-            blocks_iter = _chunk_blocks_for_api(cast(ParentBlock, self), blocks)
+            blocks_iter = _chunk_blocks_for_api(parent_obj, blocks)
             _append_block_chunks(blocks_iter, after=after)
 
         return self
@@ -324,10 +337,13 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
         """Return the parent block or page, or None if not accessible."""
         from ultimate_notion.page import Page  # noqa: PLC0415  # Avoid circular import.
 
-        if self.in_notion:
-            return cast(Block | Page | None, super().parent)
-        else:
+        if not self.in_notion:
             return self._parent
+        parent = super().parent
+        if parent is not None and not isinstance(parent, (Block, Page)):
+            msg = f'Expected the parent to be a block or page, got `{type(parent).__name__}`.'
+            raise TypeError(msg)
+        return parent
 
     @property
     def discussions(self) -> tuple[Discussion, ...]:
@@ -337,7 +353,7 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
     def reload(self) -> Self:
         """Reload the block from the API."""
         session = get_active_session()
-        self.obj_ref = cast(B_co, session.api.blocks.retrieve(self.id))
+        self.obj_ref = session.api.blocks.retrieve(self.id)
         return self
 
     def _update_in_notion(self, *, exclude_attrs: Sequence[str] | None = None) -> None:
@@ -419,13 +435,12 @@ class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     def __hash__(self) -> int:
         return hash((super().__hash__(), *self.children))
 
-    @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: B_co, /) -> Self:  # type: ignore[misc] # breaking covariance
-        self = super().wrap_obj_ref(obj_ref)
-        if obj_ref.has_children and hasattr(self.obj_ref.value, 'children') and self.obj_ref.value.children:
-            self._children = [Block.wrap_obj_ref(child) for child in self.obj_ref.value.children]
-            self.obj_ref.value.children = []  # clear children to avoid confusion during comparison
-        return self
+    def _finalize_wrap(self) -> None:
+        super()._finalize_wrap()
+        value = self.obj_ref.value
+        if self.obj_ref.has_children and isinstance(value, obj_blocks.WithChildren) and value.children:
+            self._children = [Block.wrap_obj_ref(child) for child in value.children]
+            value.children = []  # clear children to avoid confusion during comparison
 
 
 class CaptionMixin(Block[B_co], wraps=obj_blocks.Block):
@@ -521,7 +536,7 @@ class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_
     def to_markdown(self) -> str:
         """Return the code content of this block as Markdown."""
         lang = self.obj_ref.value.language
-        return f'```{lang}\n{super().to_markdown()}\n```'
+        return f'```{lang.value}\n{super().to_markdown()}\n```'
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -663,7 +678,8 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
 
     @property
     def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
-        icon = raise_unset(self.obj_ref.value.icon)
+        if is_unset(icon := self.obj_ref.value.icon):
+            raise UnsetError()
         if icon is None:
             return self.get_default_icon()
         else:
@@ -1064,9 +1080,9 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
     @property
     def title(self) -> str | None:
         """Return the title of the child page."""
-        if title := raise_unset(self.obj_ref.child_page.title):
-            return title
-        return None
+        if is_unset(title := self.obj_ref.child_page.title):
+            raise UnsetError()
+        return title if title else None
 
     @property
     def page(self) -> Page:
@@ -1100,9 +1116,9 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
     @property
     def title(self) -> str | None:
         """Return the title of the child database"""
-        if title := raise_unset(self.obj_ref.child_database.title):
-            return title
-        return None
+        if is_unset(title := self.obj_ref.child_database.title):
+            raise UnsetError()
+        return title if title else None
 
     @property
     def ds(self) -> DataSource:
@@ -1164,12 +1180,22 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
                 raise TypeError(msg)
 
     def __getitem__(self, index: int) -> Column:
-        return cast(Column, self.blocks[index])
+        column = self.blocks[index]
+        if not isinstance(column, Column):
+            msg = f'Expected a `Column` at index {index}, got `{type(column).__name__}`.'
+            raise TypeError(msg)
+        return column
 
     @property
     def columns(self) -> tuple[Column, ...]:
         """Return all columns of this multi-column block."""
-        return tuple(cast(Column, col) for col in super().children)
+        columns: list[Column] = []
+        for col in super().children:
+            if not isinstance(col, Column):
+                msg = f'Expected a `Column` child, got `{type(col).__name__}`.'
+                raise TypeError(msg)
+            columns.append(col)
+        return tuple(columns)
 
     @property
     def children(self) -> tuple[Column, ...]:
@@ -1247,7 +1273,12 @@ class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_bl
             self.obj_ref.table_row.cells[idx] = Text(cell).obj_ref
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: obj_blocks.TableRow, /) -> TableRow:
+    def wrap_obj_ref(cls, obj_ref: obj_core.GenericObject, /) -> TableRow:
+        # `obj_ref` is typed against the covariant upper bound `GenericObject`; the registry guarantees
+        # that `TableRow.wrap_obj_ref` is only ever handed a `TableRow` object.
+        if not isinstance(obj_ref, obj_blocks.TableRow):
+            msg = f'Expected a `TableRow` object, got `{type(obj_ref).__name__}`'
+            raise TypeError(msg)
         row = TableRow(*[Text.wrap_obj_ref(cell) if cell else None for cell in obj_ref.table_row.cells])
         row.obj_ref = obj_ref
         return row
@@ -1336,7 +1367,13 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
     @property
     def rows(self) -> tuple[TableRow, ...]:
         """Return all rows of the table."""
-        return tuple(cast(TableRow, block) for block in super().children)
+        rows: list[TableRow] = []
+        for block in super().children:
+            if not isinstance(block, TableRow):
+                msg = f'Expected a `TableRow` child, got `{type(block).__name__}`.'
+                raise TypeError(msg)
+            rows.append(block)
+        return tuple(rows)
 
     @property
     def children(self) -> tuple[TableRow, ...]:
@@ -1453,7 +1490,11 @@ class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBl
             return self
         elif (synced_from := self.obj_ref.synced_block.synced_from) is not None:
             session = get_active_session()
-            return cast(SyncedBlock, session.get_block(objs.get_uuid(synced_from)))
+            original = session.get_block(objs.get_uuid(synced_from))
+            if not isinstance(original, SyncedBlock):
+                msg = f'Expected original of synced block to be a `SyncedBlock`, got `{type(original).__name__}`.'
+                raise TypeError(msg)
+            return original
         else:
             msg = 'Unknown synced block, neither original nor synced!'
             raise RuntimeError(msg)
@@ -1469,7 +1510,7 @@ class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBl
             raise RuntimeError(msg)
 
         obj = obj_blocks.SyncedBlock.build()
-        obj.synced_block.synced_from = obj_blocks.BlockRef.build(self.obj_ref)
+        obj.synced_block.synced_from = objs.BlockRef.build(self.obj_ref)
         return self.wrap_obj_ref(obj)
 
     def to_markdown(self, *, with_comment: bool = True) -> str:
@@ -1559,8 +1600,8 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
                 case Columns() as cols:
                     col_nodes = [_Node(block=col) for col in cols.columns]
                     node.children.extend(col_nodes)
-                    for col_node in col_nodes:
-                        queue.append((col_node, [_Node(block=child) for child in cast(Column, col_node.block).blocks]))
+                    for col_node, col in zip(col_nodes, cols.columns, strict=True):
+                        queue.append((col_node, [_Node(block=child) for child in col.blocks]))
                 case Table() as table:
                     node.children.extend([_Node(block=row) for row in table.rows])
                 case ParentBlock() as parent_block if parent_block.has_children:
@@ -1577,10 +1618,11 @@ def _build_obj_ref(node: _Node) -> Block:
     if not isinstance(block, Block):
         msg = f'Non-block type {type(block)} not allowed on this level of the hierarchy.'
         raise TypeError(msg)
-    if isinstance(block, ParentBlock) and block.has_children and hasattr(block.obj_ref.value, 'children'):
+    value = block.obj_ref.value
+    if isinstance(block, ParentBlock) and block.has_children and isinstance(value, obj_blocks.WithChildren):
         for child in node.children:
             _build_obj_ref(child)
-        block.obj_ref.value.children = [child.block.obj_ref for child in children]
+        value.children = [child.block.obj_ref for child in children]
     return block
 
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from textwrap import dedent
-from typing import cast
+from uuid import uuid4
 
 import pytest
 
@@ -40,7 +40,7 @@ def test_append_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page.append([h2, h3, h4])
     page.append(h21, after=h2)
 
-    added_children = (h1, h2, h21, h3, h4)
+    added_children: tuple[uno.Block, ...] = (h1, h2, h21, h3, h4)
     assert page.children == added_children
     assert all(pchild is achild for pchild, achild in zip(page.children, added_children, strict=True))
 
@@ -343,8 +343,12 @@ def test_nested_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     p2.append(uno.Paragraph('Nested Paragraph'))
 
     assert len(page.children) == 3
-    assert cast(ChildrenMixin, page.children[1]).children == (p1,)
-    assert len(cast(ChildrenMixin, page.children[2]).children) == 1
+    child1 = page.children[1]
+    assert isinstance(child1, ChildrenMixin)
+    assert child1.children == (p1,)
+    child2 = page.children[2]
+    assert isinstance(child2, ChildrenMixin)
+    assert len(child2.children) == 1
 
 
 @pytest.mark.vcr()
@@ -398,33 +402,41 @@ def test_modify_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
     page.reload()
 
-    child_paragraph = cast(uno.Paragraph, page.children[0])
+    child_paragraph = page.children[0]
+    assert isinstance(child_paragraph, uno.Paragraph)
     assert child_paragraph.color == uno.Color.PINK
     assert child_paragraph.rich_text == 'Pink paragraph'
 
-    child_code = cast(uno.Code, page.children[1])
+    child_code = page.children[1]
+    assert isinstance(child_code, uno.Code)
     assert child_code.language == uno.CodeLang.JAVASCRIPT
     assert child_code.caption == uno.text('JavaScript Code')
     child_code.caption = None
     child_code.reload()
     assert child_code.caption is None
 
-    child_heading = cast(uno.Heading1, page.children[2])
+    child_heading = page.children[2]
+    assert isinstance(child_heading, uno.Heading1)
     assert child_heading.toggleable is False
 
-    child_callout = cast(uno.Callout, page.children[3])
+    child_callout = page.children[3]
+    assert isinstance(child_callout, uno.Callout)
     assert child_callout.icon == '👍'
 
-    child_todo = cast(uno.ToDoItem, page.children[4])
+    child_todo = page.children[4]
+    assert isinstance(child_todo, uno.ToDoItem)
     assert child_todo.checked is False
 
-    child_embed = cast(uno.Embed, page.children[5])
+    child_embed = page.children[5]
+    assert isinstance(child_embed, uno.Embed)
     assert child_embed.caption == 'Notion Homepage'
 
-    child_bookmark = cast(uno.Bookmark, page.children[6])
+    child_bookmark = page.children[6]
+    assert isinstance(child_bookmark, uno.Bookmark)
     assert child_bookmark.url == 'https://notion.so/'
 
-    child_equation = cast(uno.Equation, page.children[7])
+    child_equation = page.children[7]
+    assert isinstance(child_equation, uno.Equation)
     assert child_equation.latex == r'e = mc^2'
 
 
@@ -482,28 +494,31 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     cols[0].delete()
     page.reload()
 
-    cols = cast(uno.Columns, page.children[0])
-    col = cols.columns[0]
-    paragraph = cast(uno.Paragraph, col.children[0])
+    reloaded_cols = page.children[0]
+    assert isinstance(reloaded_cols, uno.Columns)
+    col = reloaded_cols.columns[0]
+    paragraph = col.children[0]
+    assert isinstance(paragraph, uno.Paragraph)
     assert paragraph == right
     assert left.reload().is_deleted
 
     with pytest.raises(IndexError):
-        cols.add_column(index=-1)
+        reloaded_cols.add_column(index=-1)
     with pytest.raises(IndexError):
-        cols.add_column(index=len(cols.children) + 1)
+        reloaded_cols.add_column(index=len(reloaded_cols.children) + 1)
 
-    cols.add_column(index=1)
-    cols[1].append(new_right := uno.Paragraph('New Column 1'))
+    reloaded_cols.add_column(index=1)
+    reloaded_cols[1].append(new_right := uno.Paragraph('New Column 1'))
     page.reload()
 
-    cols = cast(uno.Columns, page.children[0])
-    left_col, right_col = cast(list[uno.Column], cols.children)
+    reloaded_cols = page.children[0]
+    assert isinstance(reloaded_cols, uno.Columns)
+    left_col, right_col = reloaded_cols.children
     assert left_col.children == (right,)
     assert right_col.children == (new_right,)
 
     with pytest.raises(InvalidAPIUsageError):
-        cols.append(uno.Paragraph('This is a paragraph'))
+        reloaded_cols.append(uno.Paragraph('This is a paragraph'))
 
 
 @pytest.mark.vcr()
@@ -554,7 +569,8 @@ def test_modify_table(root_page: uno.Page, notion: uno.Session) -> None:
     assert table[1, 1] == 'Cell 1, 1'
     assert table[1, 2] == 'Cell 1, 2'
     page.reload()
-    reloaded_table = cast(uno.Table, page.children[0])
+    reloaded_table = page.children[0]
+    assert isinstance(reloaded_table, uno.Table)
     assert reloaded_table[0] == ('Cell 0, 0', 'Cell 0, 1', 'Cell 0, 2')
     assert reloaded_table[1, 0] == 'Cell 1, 0'
     assert reloaded_table[1, 1] == 'Cell 1, 1'
@@ -570,7 +586,8 @@ def test_modify_table(root_page: uno.Page, notion: uno.Session) -> None:
     table[2].delete()
     assert table[2] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
     page.reload()
-    reloaded_table = cast(uno.Table, page.children[0])
+    reloaded_table = page.children[0]
+    assert isinstance(reloaded_table, uno.Table)
     assert reloaded_table[2] == ('New Cell 3, 0', 'New Cell 3, 1', 'New Cell 3, 2')
 
     table.has_header_col = True
@@ -637,14 +654,18 @@ def test_nested_bullet_items(root_page: uno.Page, notion: uno.Session) -> None:
 def test_color_code_block(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for color code block')
     code_block = uno.Code('print("Hello, world!")', language='python')
-    assert code_block.obj_ref.code.rich_text[0].annotations.color is Unset  # type: ignore[union-attr]
+    annotations = code_block.obj_ref.code.rich_text[0].annotations
+    assert isinstance(annotations, objs.Annotations)
+    assert annotations.color is Unset
     page.append(code_block)
 
     assert page.children == (code_block,)
     assert code_block.language == 'python'
     # Note that None was replaced with Color.DEFAULT by the API. Sending it directly
     # would have prevented the python code coloring from being applied in the Notion UI.
-    assert code_block.obj_ref.code.rich_text[0].annotations.color is uno.Color.DEFAULT  # type: ignore[union-attr]
+    annotations = code_block.obj_ref.code.rich_text[0].annotations
+    assert isinstance(annotations, objs.Annotations)
+    assert annotations.color is uno.Color.DEFAULT
 
 
 @pytest.mark.vcr()
@@ -689,6 +710,34 @@ def test_rt_default_color() -> None:
     assert para_1.obj_ref.serialize_for_api() == para_2.obj_ref.serialize_for_api()
 
 
+def test_unstyled_mention_equals_default_annotations() -> None:
+    """A mention built with `style=None` must compare equal to the default annotations the API returns.
+
+    Regression test for https://github.com/ultimate-notion/ultimate-notion/issues/174: a mention
+    built without a style has `annotations` set to `Unset`, while the Notion API returns a fully
+    populated `Annotations` object with `color=Color.DEFAULT`. Both represent default styling and
+    must therefore be considered equal.
+    """
+    user_id = uuid4()
+    user_ref = UserRef(id=user_id)
+
+    # Offline mention without any style, as built e.g. internally when no annotations are given.
+    unstyled_mention = objs.MentionUser.build_mention_from(user=user_ref, style=None)
+    unstyled_block = uno.Paragraph(text=Text.wrap_obj_ref(obj_refs=[unstyled_mention]))
+    assert unstyled_mention.annotations is Unset
+
+    # Mention with explicit default annotations, mimicking what the Notion API returns on read.
+    default_mention = objs.MentionUser.build_mention_from(user=user_ref, style=objs.Annotations())
+    default_block = uno.Paragraph(text=Text.wrap_obj_ref(obj_refs=[default_mention]))
+
+    assert unstyled_block == default_block
+
+    # A non-default style must still differ.
+    bold_mention = objs.MentionUser.build_mention_from(user=user_ref, style=objs.Annotations(bold=True))
+    bold_block = uno.Paragraph(text=Text.wrap_obj_ref(obj_refs=[bold_mention]))
+    assert unstyled_block != bold_block
+
+
 @pytest.mark.vcr()
 def test_max_children_length(root_page: uno.Page, notion: uno.Session) -> None:
     n_blocks = int(1.2 * uno_blocks.MAX_BLOCK_CHILDREN)
@@ -710,7 +759,9 @@ def test_max_nesting_level(root_page: uno.Page, notion: uno.Session) -> None:
     # add a 1st level of nesting
     blocks[0].append([uno.BulletedItem(f'Nested Point {i}') for i in range(n_blocks)])
     # add a 2nd level of nesting
-    blocks[0].blocks[0].append([uno.BulletedItem(f'Deeply Nested Point {i}') for i in range(n_blocks)])  # type: ignore[attr-defined]
+    nested = blocks[0].blocks[0]
+    assert isinstance(nested, uno.BulletedItem)
+    nested.append([uno.BulletedItem(f'Deeply Nested Point {i}') for i in range(n_blocks)])
 
     page = notion.create_page(
         parent=root_page, title='Page for testing max nesting level', blocks=[uno.Paragraph('Intro')]
@@ -718,8 +769,12 @@ def test_max_nesting_level(root_page: uno.Page, notion: uno.Session) -> None:
     page.append(blocks)
 
     assert len(page.blocks) == n_blocks + 1
-    assert len(page.blocks[1].blocks) == n_blocks  # type: ignore[attr-defined]
-    assert len(page.blocks[1].blocks[0].blocks) == n_blocks  # type: ignore[attr-defined]
+    first_nested = page.blocks[1]
+    assert isinstance(first_nested, uno.BulletedItem)
+    assert len(first_nested.blocks) == n_blocks
+    second_nested = first_nested.blocks[0]
+    assert isinstance(second_nested, uno.BulletedItem)
+    assert len(second_nested.blocks) == n_blocks
 
 
 @pytest.mark.vcr()

@@ -12,13 +12,19 @@ from tests.conftest import URL
 from ultimate_notion import props
 from ultimate_notion.errors import InvalidAPIUsageError, PropertyError, ReadOnlyPropertyError, SchemaError
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.schema import Property
+from ultimate_notion.schema import Property, Relation
 
 
 @pytest.mark.vcr()
 def test_all_createable_props_schema(
-    notion: uno.Session, root_page: uno.Page, dummy_urls: URL, get_id_prefix: Callable[[str], str]
+    notion: uno.Session,
+    root_page: uno.Page,
+    dummy_urls: URL,
+    get_id_prefix: Callable[[str], str],
+    person: uno.User,
 ) -> None:
+    notion.cache[person.id] = person
+
     class SchemaA(uno.Schema, db_title='Schema A'):
         """Only used to create relations in Schema B"""
 
@@ -72,7 +78,6 @@ def test_all_createable_props_schema(
     with pytest.raises(ReadOnlyPropertyError):
         SchemaB.create(last_edited_time=datetime.now(tz=timezone.utc))
 
-    florian = notion.search_user('Florian Wilhelm').item()
     myself = notion.whoami()
 
     with pytest.raises(ReadOnlyPropertyError):
@@ -97,7 +102,7 @@ def test_all_createable_props_schema(
         'files': props.Files([uno.ExternalFile(name='My File', url=dummy_urls.file)]),
         'multi_select': props.MultiSelect(options[0]),
         'number': props.Number(42),
-        'people': props.Person(florian),
+        'people': props.Person(person),
         'phone_number': props.Phone('+1 234 567 890'),
         'relation': props.Relations([a_item1, a_item2]),
         'relation_twoway': props.Relations([a_item1, a_item2]),
@@ -159,8 +164,12 @@ def test_two_way_prop(notion: uno.Session, root_page: uno.Page) -> None:
     db_a = notion.create_ds(parent=root_page, schema=SchemaA)
     db_b = notion.create_ds(parent=root_page, schema=SchemaB)
 
-    assert db_b.schema.relation_twoway.two_way_prop is SchemaA.relation  # type: ignore
-    assert db_a.schema.relation.two_way_prop is SchemaB.relation_twoway  # type: ignore
+    relation_twoway = db_b.schema.relation_twoway
+    assert isinstance(relation_twoway, Relation)
+    assert relation_twoway.two_way_prop is SchemaA.relation
+    relation = db_a.schema.relation
+    assert isinstance(relation, Relation)
+    assert relation.two_way_prop is SchemaB.relation_twoway
 
 
 @pytest.mark.vcr()
@@ -173,7 +182,9 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
 
     db_a = notion.create_ds(parent=root_page, schema=SchemaA)
 
-    assert db_a.schema.relation.schema is db_a.schema  # type: ignore
+    relation = db_a.schema.relation
+    assert isinstance(relation, Relation)
+    assert relation.schema is db_a.schema
 
 
 # ToDo: Reactivate after the bug on the Notion API side is fixed that adding a two-way relation property
@@ -314,9 +325,13 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
         db.schema['Number'] = uno.PropType.Formula('New Name', formula='prop("Name") + "!"')
 
     db.schema['Number'] = uno.PropType.Formula(formula='prop("Name") + "!"')
-    assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+    formula = db.schema['Number']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith('{{notion:block_property:title:')
     db.reload()
-    assert db.schema['Number'].formula.startswith('{{notion:block_property:title:')  # type: ignore[attr-defined]
+    formula = db.schema['Number']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith('{{notion:block_property:title:')
 
     db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)
     assert db.schema.number.format == uno.NumberFormat.PERCENT
@@ -355,34 +370,47 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     db_b = notion.create_ds(parent=root_page, schema=SchemaB)
     db_c = notion.create_ds(parent=root_page, schema=SchemaC)
 
+    def get_relation(schema: type[uno.Schema], name: str) -> Relation:
+        prop = schema[name]
+        assert isinstance(prop, Relation)
+        return prop
+
+    def two_way_prop_name(schema: type[uno.Schema], name: str) -> str | None:
+        two_way = get_relation(schema, name).two_way_prop
+        return two_way.name if two_way is not None else None
+
     # Set a two-way relation property
-    assert db_c.schema['Relation'].two_way_prop is None  # type: ignore[attr-defined]
+    assert get_relation(db_c.schema, 'Relation').two_way_prop is None
     two_way_prop = 'Back Relation'
-    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    get_relation(db_c.schema, 'Relation').two_way_prop = two_way_prop
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
     db_c.reload()
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
 
     # Try renaming the two-way relation property
     two_way_prop = 'Other Back Relation'
-    db_c.schema['Relation'].two_way_prop = two_way_prop  # type: ignore[attr-defined]
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    get_relation(db_c.schema, 'Relation').two_way_prop = two_way_prop
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
     db_c.reload(rebind_schema=False)  # since we changed something above
-    assert db_a.schema[two_way_prop].two_way_prop.name == 'Relation'  # type: ignore[attr-defined]
+    assert two_way_prop_name(db_a.schema, two_way_prop) == 'Relation'
 
     # Delete the two-way relation property
-    db_c.schema['Relation'].two_way_prop = None  # type: ignore[attr-defined]
+    get_relation(db_c.schema, 'Relation').two_way_prop = None
     assert two_way_prop not in [prop.name for prop in db_a.schema]
     db_a.reload()
     assert two_way_prop not in [prop.name for prop in db_a.schema]
 
     # Change target from SchemaA to SchemaB for one-way and two-way relations
     for rel in ('Relation', 'Relation two-way'):
-        assert db_c.schema[rel].schema == db_a.schema  # type: ignore[attr-defined]
-        db_c.schema[rel].schema = db_b.schema  # type: ignore[attr-defined]
-        assert db_c.schema[rel].schema == db_b.schema  # type: ignore[attr-defined]
+        relation = db_c.schema[rel]
+        assert isinstance(relation, uno.PropType.Relation)
+        assert relation.schema == db_a.schema
+        relation.schema = db_b.schema
+        assert relation.schema == db_b.schema
         db_c.reload()
-        assert db_c.schema[rel].schema == db_b.schema  # type: ignore[attr-defined]
+        relation = db_c.schema[rel]
+        assert isinstance(relation, uno.PropType.Relation)
+        assert relation.schema == db_b.schema
 
     # change the options of the (multi-)select property
     options = [uno.Option(name='Cat1', color=uno.Color.DEFAULT), uno.Option(name='Cat2', color=uno.Color.RED)]
@@ -404,45 +432,59 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
     db = notion.create_ds(parent=root_page, schema=Schema)
 
     # Change the number format of the number property
-    assert db.schema['Number'].format == uno.NumberFormat.DOLLAR  # type: ignore[attr-defined]
-    db.schema['Number'].format = uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
-    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
+    number = db.schema['Number']
+    assert isinstance(number, uno.PropType.Number)
+    assert number.format == uno.NumberFormat.DOLLAR
+    number.format = uno.NumberFormat.PERCENT
+    assert number.format == uno.NumberFormat.PERCENT
     db.reload()
-    assert db.schema['Number'].format == uno.NumberFormat.PERCENT  # type: ignore[attr-defined]
-    db.schema['Number'].format = uno.NumberFormat.EURO.value  # type: ignore[attr-defined]
-    assert db.schema['Number'].format == uno.NumberFormat.EURO  # type: ignore[attr-defined]
+    number = db.schema['Number']
+    assert isinstance(number, uno.PropType.Number)
+    assert number.format == uno.NumberFormat.PERCENT
+    number.format = uno.NumberFormat.EURO.value
+    assert number.format == uno.NumberFormat.EURO
 
     # Change the formula property
-    assert db.schema['Formula'].formula.startswith(block_ref(db.schema['Name']))  # type: ignore[attr-defined]
-    db.schema['Formula'].formula = 'prop("Category")'  # type: ignore[attr-defined]
-    assert db.schema['Formula'].formula == 'prop("Category")'  # type: ignore[attr-defined]
+    formula = db.schema['Formula']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith(block_ref(db.schema['Name']))
+    formula.formula = 'prop("Category")'
+    assert formula.formula == 'prop("Category")'
     db.reload()
-    assert db.schema['Formula'].formula.startswith(block_ref(db.schema['Category']))  # type: ignore[attr-defined]
+    formula = db.schema['Formula']
+    assert isinstance(formula, uno.PropType.Formula)
+    assert formula.formula.startswith(block_ref(db.schema['Category']))
 
     # Change the select options of the select and multi-select properties
     for prop in ('Category', 'Tags'):
-        curr_cats = db.schema[prop].options  # type: ignore[attr-defined]
+        select = db.schema[prop]
+        assert isinstance(select, (uno.PropType.Select, uno.PropType.MultiSelect))
+        curr_cats = select.options
         assert [cat.name for cat in curr_cats] == ['Cat1', 'Cat2']
 
         new_cat = uno.Option(name='Cat3', color=uno.Color.RED)
         # Adding a new category to the select options
-        db.schema[prop].options = [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        select.options = [*curr_cats, new_cat]
 
-        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        assert select.options == [*curr_cats, new_cat]
         db.reload()
-        assert db.schema[prop].options == [*curr_cats, new_cat]  # type: ignore[attr-defined]
+        select = db.schema[prop]
+        assert isinstance(select, (uno.PropType.Select, uno.PropType.MultiSelect))
+        assert select.options == [*curr_cats, new_cat]
 
         # Removing a category from the select options
-        db.schema[prop].options = [new_cat]  # type: ignore[attr-defined]
-        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
+        select.options = [new_cat]
+        assert select.options == [new_cat]
         db.reload()
-        assert db.schema[prop].options == [new_cat]  # type: ignore[attr-defined]
+        select = db.schema[prop]
+        assert isinstance(select, (uno.PropType.Select, uno.PropType.MultiSelect))
+        assert select.options == [new_cat]
 
         # Updating a category in the select options
         with pytest.raises(InvalidAPIUsageError):
             exist_option = uno.Option(name='Cat3', color=uno.Color.GREEN)
             # trying to update the color of an existing option
-            db.schema[prop].options = [exist_option]  # type: ignore[attr-defined]
+            select.options = [exist_option]
 
 
 @pytest.mark.vcr()
@@ -458,8 +500,12 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
 
     # Check the schema properties
     assert isinstance(db.schema.name, uno.PropType.Title)
-    assert db.schema.cat.options == options  # type: ignore[attr-defined]
-    assert db.schema.tags.options == options  # type: ignore[attr-defined]
+    cat = db.schema.cat
+    assert isinstance(cat, uno.PropType.Select)
+    assert cat.options == options
+    tags = db.schema.tags
+    assert isinstance(tags, uno.PropType.MultiSelect)
+    assert tags.options == options
 
     class ConsistentSchema(uno.Schema):
         my_name = uno.PropType.Title('Name')
@@ -470,8 +516,12 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
 
     # Check the schema attribute names
     assert isinstance(db.schema.my_name, uno.PropType.Title)
-    assert db.schema.my_cat.options == options  # type: ignore[attr-defined]
-    assert db.schema.my_tags.options == options  # type: ignore[attr-defined]
+    my_cat = db.schema.my_cat
+    assert isinstance(my_cat, uno.PropType.Select)
+    assert my_cat.options == options
+    my_tags = db.schema.my_tags
+    assert isinstance(my_tags, uno.PropType.MultiSelect)
+    assert my_tags.options == options
     assert not hasattr(db.schema, 'name')
     assert not hasattr(db.schema, 'cat')
     assert not hasattr(db.schema, 'tags')
@@ -560,25 +610,30 @@ def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page, get_id_
 
     db = notion.create_ds(parent=root_page, schema=Schema)
 
-    db.schema.unique_id.prefix = new_id_prefix  # type: ignore[attr-defined]
+    unique_id = db.schema.unique_id
+    assert isinstance(unique_id, uno.PropType.ID)
+
+    unique_id.prefix = new_id_prefix
     db.reload()
-    assert db.schema.unique_id.prefix.startswith(new_id_prefix)  # type: ignore[attr-defined]
+    assert unique_id.prefix.startswith(new_id_prefix)
 
     with pytest.raises(ValueError):
-        db.schema.unique_id.prefix = 'Invalid Prefix!'  # type: ignore[attr-defined]
+        unique_id.prefix = 'Invalid Prefix!'
 
-    db.schema.unique_id.prefix = None  # type: ignore[attr-defined]
-    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+    unique_id.prefix = None
+    assert unique_id.prefix == ''
 
-    db.schema.unique_id.prefix = ''  # type: ignore[attr-defined]
-    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+    unique_id.prefix = ''
+    assert unique_id.prefix == ''
 
     class NoIDPrefixSchema(uno.Schema, db_title='No Prefix ID Test'):
         name = uno.PropType.Title('Name')
         unique_id = uno.PropType.ID('ID')
 
     db = notion.create_ds(parent=root_page, schema=NoIDPrefixSchema)
-    assert db.schema.unique_id.prefix == ''  # type: ignore[attr-defined]
+    unique_id = db.schema.unique_id
+    assert isinstance(unique_id, uno.PropType.ID)
+    assert unique_id.prefix == ''
 
     with pytest.raises(SchemaError):
 

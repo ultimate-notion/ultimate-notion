@@ -7,11 +7,13 @@ More details here: https://github.com/python/mypy/issues/3004
 
 from __future__ import annotations
 
+from urllib.parse import urlparse
+
 import pytest
 
 import ultimate_notion as uno
 from ultimate_notion.errors import SchemaError
-from ultimate_notion.obj_api.query import MAX_PAGE_SIZE
+from ultimate_notion.obj_api.iterator import MAX_PAGE_SIZE
 
 from .conftest import CONTACTS_DB
 
@@ -122,7 +124,7 @@ def test_db_attributes(contacts_db: uno.Database) -> None:
     assert isinstance(contacts_db.icon, str)
     assert contacts_db.icon == '🤝'
     assert contacts_db.cover is None
-    assert contacts_db.url.startswith('https://www.notion.so/d')
+    assert urlparse(contacts_db.url).hostname in {'www.notion.so', 'app.notion.com'}
     assert not contacts_db.is_deleted
     assert not contacts_db.is_inline
 

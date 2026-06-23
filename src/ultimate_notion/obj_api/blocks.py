@@ -17,12 +17,20 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Annotated, Any, cast
+from typing import Annotated, Any, Generic
 
 from pydantic import AfterValidator, Field, SerializeAsAny
 from typing_extensions import TypeVar
 
-from ultimate_notion.obj_api.core import GenericObject, NotionEntity, TypedObject, Unset, UnsetType
+from ultimate_notion.obj_api.core import (
+    GenericObject,
+    NotionEntity,
+    ParentRef,
+    TypedObject,
+    Unset,
+    UnsetType,
+    UserRef,
+)
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
     MAX_TEXT_OBJECT_SIZE,
@@ -37,10 +45,8 @@ from ultimate_notion.obj_api.objects import (
     MentionMixin,
     MentionObject,
     MentionPage,
-    ParentRef,
     RichTextBaseObject,
     TextObject,
-    UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import Property
@@ -53,6 +59,7 @@ class DataObject(NotionEntity, ABC):
 
     in_trash: bool = False  # used to be `archived`
     archived: bool = False  # ToDo: Deprecated but still partially used in Notion. Check to remove in v1.0!
+    is_archived: bool = False  # newer duplicate of `archived` sent by the API
 
     last_edited_by: UserRef | UnsetType = Unset
 
@@ -69,7 +76,7 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, SerializeAsAny[Property]]
+    properties: dict[str, SerializeAsAny[Property]] = Field(default_factory=dict)
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     database_parent: SerializeAsAny[ParentRef] | UnsetType = Unset
 
@@ -104,7 +111,7 @@ class Page(DataObject, MentionMixin, object='page'):
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    properties: dict[str, PropertyValue]
+    properties: dict[str, PropertyValue] = Field(default_factory=dict)
     is_locked: bool | UnsetType = Unset
 
     def _get_title_prop_name(self) -> str:
@@ -120,7 +127,10 @@ class Page(DataObject, MentionMixin, object='page'):
     def title(self) -> list[RichTextBaseObject]:
         """Retrieve the title of the page from page properties."""
         title_prop_name = self._get_title_prop_name()
-        title_prop = cast(Title, self.properties[title_prop_name])
+        title_prop = self.properties[title_prop_name]
+        if not isinstance(title_prop, Title):
+            msg = f'Expected a `Title` property, got `{type(title_prop).__name__}`.'
+            raise TypeError(msg)
         return title_prop.title
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
@@ -146,6 +156,27 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
 
         # ignore meta fields, e.g. id, created_time, etc. for equality, only use content
         return self.type == other.type and self.value == other.value
+
+    def serialize_for_api(self) -> dict[str, Any]:
+        """Serialize the block for sending it to the Notion API."""
+        data = super().serialize_for_api()
+        for key in ('has_children', 'in_trash', 'archived', 'is_archived'):
+            data.pop(key, None)
+        return data
+
+
+# ToDo: Use new syntax when requires-python >= 3.12
+CB = TypeVar('CB', bound=Block, default=Block)  # invariant, as it is used in the mutable `children` list
+
+
+class WithChildren(GenericObject, ABC, Generic[CB]):
+    """Type data mixin for blocks that can hold child blocks.
+
+    Provides a common base so that type data carrying `children` can be detected and narrowed
+    with `isinstance`, e.g. when populating the children cache from the API.
+    """
+
+    children: list[SerializeAsAny[CB]] = Field(default_factory=list)
 
 
 class UnsupportedBlockTypeData(GenericObject):
@@ -183,9 +214,9 @@ def normalize_text_objs(rt_objs: list[RichTextBaseObject]) -> list[RichTextBaseO
 class TextBlockTypeData(GenericObject):
     """Type data for `TextBlock`."""
 
-    rich_text: Annotated[
-        list[SerializeAsAny[RichTextBaseObject]], AfterValidator(normalize_text_objs), Field(default_factory=list)
-    ]
+    rich_text: Annotated[list[SerializeAsAny[RichTextBaseObject]], AfterValidator(normalize_text_objs)] = Field(
+        default_factory=list
+    )
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -210,16 +241,16 @@ class ColoredTextBlock(TextBlock[CTB_co]):
     """A standard abstract text block object in Notion with color."""
 
 
-class ParagraphTypeData(ColoredTextBlockTypeData):
+class ParagraphTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Paragraph` block."""
 
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
 
 
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):
     """A paragraph block in Notion."""
 
-    paragraph: ParagraphTypeData = Field(default_factory=ParagraphTypeData)  # type: ignore[arg-type]
+    paragraph: ParagraphTypeData = Field(default_factory=ParagraphTypeData)
 
 
 class HeadingTypeData(ColoredTextBlockTypeData):
@@ -235,31 +266,29 @@ class Heading(ColoredTextBlock[HeadingTypeData]):
 class Heading1(Heading, type='heading_1'):
     """A heading_1 block in Notion."""
 
-    heading_1: HeadingTypeData = Field(default_factory=HeadingTypeData)  # type: ignore[arg-type]
+    heading_1: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class Heading2(Heading, type='heading_2'):
     """A heading_2 block in Notion."""
 
-    heading_2: HeadingTypeData = Field(default_factory=HeadingTypeData)  # type: ignore[arg-type]
+    heading_2: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
 class Heading3(Heading, type='heading_3'):
     """A heading_3 block in Notion."""
 
-    heading_3: HeadingTypeData = Field(default_factory=HeadingTypeData)  # type: ignore[arg-type]
+    heading_3: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
-class QuoteTypeData(ColoredTextBlockTypeData):
+class QuoteTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Quote` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
     """A quote block in Notion."""
 
-    quote: QuoteTypeData = Field(default_factory=QuoteTypeData)  # type: ignore[arg-type]
+    quote: QuoteTypeData = Field(default_factory=QuoteTypeData)
 
 
 class CaptionMixin(GenericObject, ABC):
@@ -277,14 +306,16 @@ class CodeTypeData(TextBlockTypeData, CaptionMixin):
 class Code(TextBlock[CodeTypeData], type='code'):
     """A code block in Notion."""
 
-    code: CodeTypeData = Field(default_factory=CodeTypeData)  # type: ignore[arg-type]
+    code: CodeTypeData = Field(default_factory=CodeTypeData)
 
 
-class CalloutTypeData(ColoredTextBlockTypeData):
-    """Type data for `Callout` block."""
+class CalloutTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
+    """Type data for `Callout` block.
 
-    # `children` is undocumented and behaves inconsistent. It is used during creation but not filled when retrieved.
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    Note: `children` is undocumented and behaves inconsistently. It is used during creation but not
+    filled when retrieved.
+    """
+
     # `Unset` means the default icon as determined by Notion, and `None` means no icon when retrieved
     #  but is not accepted when sending to Notion.
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
@@ -293,7 +324,7 @@ class CalloutTypeData(ColoredTextBlockTypeData):
 class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
     """A callout block in Notion."""
 
-    callout: CalloutTypeData = Field(default_factory=CalloutTypeData)  # type: ignore[arg-type]
+    callout: CalloutTypeData = Field(default_factory=CalloutTypeData)
 
     # This would work if the Notion API would accept `null` for `icon` to have no icon but does not.
     # def serialize_for_api(self) -> dict[str, Any]:
@@ -305,53 +336,46 @@ class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
     #     return model_data
 
 
-class BulletedListItemTypeData(ColoredTextBlockTypeData):
+class BulletedListItemTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `BulletedListItem` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class BulletedListItem(ColoredTextBlock[BulletedListItemTypeData], type='bulleted_list_item'):
     """A bulleted list item in Notion."""
 
-    bulleted_list_item: BulletedListItemTypeData = Field(default_factory=BulletedListItemTypeData)  # type: ignore[arg-type]
+    bulleted_list_item: BulletedListItemTypeData = Field(default_factory=BulletedListItemTypeData)
 
 
-class NumberedListItemTypeData(ColoredTextBlockTypeData):
+class NumberedListItemTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `NumberedListItem` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class NumberedListItem(ColoredTextBlock[NumberedListItemTypeData], type='numbered_list_item'):
     """A numbered list item in Notion."""
 
-    numbered_list_item: NumberedListItemTypeData = Field(default_factory=NumberedListItemTypeData)  # type: ignore[arg-type]
+    numbered_list_item: NumberedListItemTypeData = Field(default_factory=NumberedListItemTypeData)
 
 
-class ToDoTypeData(ColoredTextBlockTypeData):
+class ToDoTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `ToDo` block."""
 
     checked: bool = False
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class ToDo(ColoredTextBlock[ToDoTypeData], type='to_do'):
     """A todo list item in Notion."""
 
-    to_do: ToDoTypeData = Field(default_factory=ToDoTypeData)  # type: ignore[arg-type]
+    to_do: ToDoTypeData = Field(default_factory=ToDoTypeData)
 
 
-class ToggleTypeData(ColoredTextBlockTypeData):
+class ToggleTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Toggle` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Toggle(ColoredTextBlock[ToggleTypeData], type='toggle'):
     """A toggle list item in Notion."""
 
-    toggle: ToggleTypeData = Field(default_factory=ToggleTypeData)  # type: ignore[arg-type]
+    toggle: ToggleTypeData = Field(default_factory=ToggleTypeData)
 
 
 class DividerTypeData(GenericObject):
@@ -512,12 +536,13 @@ class ChildDataSource(Block[ChildDataSourceTypeData], type='child_data_source'):
     child_data_source: ChildDataSourceTypeData
 
 
-class ColumnTypeData(GenericObject):
-    """Type data for `Column` block."""
+class ColumnTypeData(WithChildren[Block]):
+    """Type data for `Column` block.
 
-    # note that children will not be populated when getting this block
-    # https://developers.notion.com/changelog/column-list-and-column-support
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
+    Note that `children` will not be populated when getting this block.
+    See https://developers.notion.com/changelog/column-list-and-column-support
+    """
+
     width_ratio: float | None = None
 
 
@@ -531,11 +556,13 @@ class Column(Block[ColumnTypeData], type='column'):
         return Column.model_construct(column=ColumnTypeData.model_construct(children=[], width_ratio=width_ratio))
 
 
-class ColumnListTypeData(GenericObject):
-    """Type data for `ColumnList` block."""
+class ColumnListTypeData(WithChildren[Column]):
+    """Type data for `ColumnList` block.
 
-    # note that children will not be populated when getting this block
-    # https://developers.notion.com/changelog/column-list-and-column-support
+    Note that `children` will not be populated when getting this block.
+    See https://developers.notion.com/changelog/column-list-and-column-support
+    """
+
     children: list[Column] = Field(default_factory=list)
 
 
@@ -561,14 +588,16 @@ class TableRow(Block[TableRowTypeData], type='table_row'):
         return TableRow.model_construct(table_row=TableRowTypeData.model_construct(cells=[[] for _ in range(n_cells)]))
 
 
-class TableTypeData(GenericObject):
-    """Type data for `Table` block."""
+class TableTypeData(WithChildren[TableRow]):
+    """Type data for `Table` block.
+
+    Note that `children` will not be populated when getting this block.
+    See https://developers.notion.com/reference/block#table-blocks
+    """
 
     table_width: int = 0
     has_column_header: bool = False
     has_row_header: bool = False
-    # note that children will not be populated when getting this block
-    # https://developers.notion.com/reference/block#table-blocks
     children: list[TableRow] = Field(default_factory=list)
 
 
@@ -584,11 +613,10 @@ class LinkToPage(Block[ParentRef], type='link_to_page'):
     link_to_page: SerializeAsAny[ParentRef]
 
 
-class SyncedBlockTypeData(GenericObject):
+class SyncedBlockTypeData(WithChildren[Block]):
     """Type data for `SyncedBlock` block."""
 
     synced_from: BlockRef | None = None
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
@@ -605,13 +633,11 @@ class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
         return model_data
 
 
-class TemplateTypeData(TextBlockTypeData):
+class TemplateTypeData(TextBlockTypeData, WithChildren[Block]):
     """Type data for `Template` block."""
-
-    children: list[SerializeAsAny[Block]] = Field(default_factory=list)
 
 
 class Template(TextBlock[TemplateTypeData], type='template'):
     """A template block in Notion."""
 
-    template: TemplateTypeData = Field(default_factory=TemplateTypeData)  # type: ignore[arg-type]
+    template: TemplateTypeData = Field(default_factory=TemplateTypeData)

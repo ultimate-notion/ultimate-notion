@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Annotated, Any, TypeAlias, cast, overload
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeVar
 
 import ultimate_notion.obj_api.core as obj_core
 import ultimate_notion.obj_api.schema as obj_schema
@@ -46,12 +46,12 @@ from ultimate_notion.errors import (
     SchemaNotBoundError,
     UnsetError,
 )
-from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset, raise_unset
-from ultimate_notion.obj_api.enums import OptionGroupType
-from ultimate_notion.obj_api.schema import AggFunc, NumberFormat
+from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
+from ultimate_notion.obj_api.enums import AggFunc, NumberFormat, OptionGroupType
+from ultimate_notion.obj_api.objects import SelectGroup
 from ultimate_notion.option import Option, OptionGroup, OptionNS, check_for_updates
 from ultimate_notion.props import PropertyValue
-from ultimate_notion.utils import SList, dict_diff_str, is_notebook
+from ultimate_notion.utils import SList, dict_diff_str, display_html, is_notebook
 
 if TYPE_CHECKING:
     from ultimate_notion.database import DataSource
@@ -73,7 +73,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     allowed_at_creation = True
     """If the Notion API allows to create a new database with a property of this type"""
     _name: str | None = None  # name given by the user, not the Notion API, will match when set
-    _owner: type[Schema] | None = None  # back reference to the schema
+    _owner: SchemaType | None = None  # back reference to the schema
     _attr_name: str | None = None  # name of the attribute within the schema holding the Property
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Property:
@@ -93,8 +93,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
             return NotImplemented
-        other_obj_ref = cast(GO_co, other.obj_ref)
-        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
+        return bool((self.obj_ref.type == other.obj_ref.type) and (self.obj_ref.value == other.obj_ref.value))
 
     def __hash__(self) -> int:
         return hash((self.obj_ref.type, self.obj_ref.value))
@@ -115,18 +114,18 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
         """Determines if the property is ready to be initialized"""
         return True
 
-    def _get_owner(self) -> type[Schema]:
+    def _get_owner(self) -> SchemaType:
         """Get the owner schema of this property."""
         if self._owner is None:
             msg = f'The property {self.name} is not bound to a Schema!'
             raise PropertyError(msg)
         return self._owner
 
-    def _update_prop(self, prop_obj: GO_co) -> GO_co:  # type: ignore[misc] # breaking covariance
+    def _update_prop(self) -> GO_co:
         """Update the attributes of this property from a schema."""
         db = self._get_owner().get_ds()
         session = get_active_session()
-        session.api.data_sources.update(db.obj_ref, schema={self.name: prop_obj})
+        session.api.data_sources.update(db.obj_ref, schema={self.name: self.obj_ref})
         return cast(GO_co, db.obj_ref.properties[self.name])
 
     def _rename_prop(self, new_name: str | None) -> None:
@@ -153,12 +152,10 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
 
         schema._set_obj_refs()
 
-    @classmethod
-    def wrap_obj_ref(cls, obj_ref: GO_co) -> Self:  # type: ignore[misc] # breaking covariance
-        """Wrap the object reference for this property."""
-        obj = super().wrap_obj_ref(obj_ref)
-        obj._attr_name = rich_text.snake_case(obj.name)
-        return obj
+    def _finalize_wrap(self) -> None:
+        """Derive the attribute name from the wrapped property's name."""
+        super()._finalize_wrap()
+        self._attr_name = rich_text.snake_case(self.name)
 
     def delete(self) -> None:
         """Delete this property from the schema."""
@@ -167,7 +164,9 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def id(self) -> str | None:
         """Return identifier of this property."""
-        return raise_unset(self.obj_ref.id)
+        if is_unset(id_ := self.obj_ref.id):
+            raise UnsetError()
+        return id_
 
     @property
     def name(self) -> str:
@@ -206,7 +205,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def prop_value(self) -> type[PropertyValue]:
         """Return the corresponding property value of this property."""
-        return PropertyValue._type_value_map[self.obj_ref.type]
+        return PropertyValue._type_value_map[self.obj_ref._type_name]
 
     @property
     def readonly(self) -> bool:
@@ -239,7 +238,7 @@ class Number(Property[obj_schema.Number], wraps=obj_schema.Number):
         if isinstance(new_format, str):
             new_format = NumberFormat(new_format)
         self.obj_ref.number.format = new_format
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Select(Property[obj_schema.Select], wraps=obj_schema.Select):
@@ -275,7 +274,7 @@ class Select(Property[obj_schema.Select], wraps=obj_schema.Select):
             raise InvalidAPIUsageError(msg)
 
         self.obj_ref.select.options = [option.obj_ref for option in new_options]
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
@@ -312,7 +311,7 @@ class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect
             raise InvalidAPIUsageError(msg)
 
         self.obj_ref.multi_select.options = [option.obj_ref for option in new_options]
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
@@ -364,7 +363,7 @@ class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
         """Return the options of this status property."""
         return [Option.wrap_obj_ref(option) for option in self.obj_ref.status.options]
 
-    def _extract_groups(self) -> list[tuple[obj_schema.SelectGroup, list[Option]]]:
+    def _extract_groups(self) -> list[tuple[SelectGroup, list[Option]]]:
         """Extract options from a group."""
 
         def get_id(option: Option) -> str:
@@ -433,7 +432,7 @@ class Formula(Property[obj_schema.Formula], wraps=obj_schema.Formula):
     def formula(self, formula: str) -> None:
         """Set the formula of this property."""
         self.obj_ref.formula.expression = formula
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
@@ -497,7 +496,11 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         return self._obj_ref
 
     @obj_ref.setter
-    def obj_ref(self, new_obj_ref: obj_schema.Relation) -> None:
+    def obj_ref(self: Wrapper[obj_core.GenericObject], new_obj_ref: obj_core.GenericObject) -> None:
+        # Mirrors `Wrapper.obj_ref`'s setter: the parameter is widened to `GenericObject` (the upper
+        # bound of the covariant type variable) so it stays contravariant with the base, and viewing
+        # `self` as `Wrapper[GenericObject]` keeps the assignment sound. The getter above still
+        # narrows the return type to `obj_schema.Relation`.
         self._obj_ref = new_obj_ref
 
     @property
@@ -521,7 +524,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         else:
             new_rel = obj_schema.SinglePropertyRelation.build_relation(new_schema.get_ds().id)
         self.obj_ref.relation = new_rel.relation
-        self._update_prop(self.obj_ref)
+        self._update_prop()
         self._rel_schema = new_schema
 
     def _rename_two_way_prop(self, new_prop_name: str) -> None:
@@ -530,8 +533,12 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         This is necessary as a two-way relation is created with a default name,
         which is rather a bug in the Notion API itself.
         """
-        two_way_prop_rel = cast(obj_schema.DualPropertyRelation, self.obj_ref.relation)
-        tmp_prop_name = raise_unset(two_way_prop_rel.dual_property.synced_property_name)
+        two_way_prop_rel = self.obj_ref.relation
+        if not isinstance(two_way_prop_rel, obj_schema.DualPropertyRelation):
+            msg = f'Expected a `DualPropertyRelation`, got `{type(two_way_prop_rel).__name__}`.'
+            raise TypeError(msg)
+        if is_unset(tmp_prop_name := two_way_prop_rel.dual_property.synced_property_name):
+            raise UnsetError()
         db = self.schema.get_ds()
         db.reload(rebind_schema=False)
         if (back_ref_prop_type := db.schema[tmp_prop_name]) is not None:
@@ -546,7 +553,8 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
                 self._two_way_prop = self._get_owner().get_prop(self._two_way_prop)
             return self._two_way_prop
         elif self._is_init and isinstance(self.obj_ref.relation, obj_schema.DualPropertyRelation):
-            prop_name = raise_unset(self.obj_ref.relation.dual_property.synced_property_name)
+            if is_unset(prop_name := self.obj_ref.relation.dual_property.synced_property_name):
+                raise UnsetError()
             return self.schema.get_prop(prop_name) if prop_name else None
         else:
             return None
@@ -569,14 +577,14 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
             target_two_way_prop = self.two_way_prop.name
             new_rel = obj_schema.SinglePropertyRelation.build_relation(db.id)
             self.obj_ref.relation = new_rel.relation
-            self.obj_ref = self._update_prop(self.obj_ref)
+            self.obj_ref = self._update_prop()
             # Strangely enough, the two-way property is not removed from the target schema
             # also it is no longer a two-way relation.
             del target_schema[target_two_way_prop]
         else:
             new_rel = obj_schema.DualPropertyRelation.build_relation(db.id)
-            self.obj_ref.relation = cast(obj_schema.DualPropertyRelation, new_rel.relation)
-            self.obj_ref = self._update_prop(self.obj_ref)
+            self.obj_ref.relation = new_rel.relation
+            self.obj_ref = self._update_prop()
             self._rename_two_way_prop(prop_name)
 
         self._rel_schema = None  # Don't rely on the initialization of the schema
@@ -729,7 +737,7 @@ class ID(Property[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
     def prefix(self, prefix: str | None) -> None:
         """Set the prefix of the unique ID."""
         self.obj_ref.unique_id.prefix = self._norm_prefix(prefix)
-        self._update_prop(self.obj_ref)
+        self._update_prop()
 
 
 class Place(Property[obj_schema.Place], wraps=obj_schema.Place):
@@ -782,6 +790,13 @@ class SchemaType(ABCMeta):
     letting it behave like a dictionary for the properties although it is a class, not an instance.
     """
 
+    # The properties live on the schema class itself, so `_props` (and the bound data source in
+    # `_ds`) and the methods operating on them belong on the metaclass. Defining them here
+    # (rather than annotating `cls` as `type[Schema]` on instance-less metaclass methods) lets mypy
+    # resolve them without a `type: ignore`.
+    _props: list[Property]
+    _ds: DataSource | None
+
     # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments
     def __new__(metacls, name: str, bases: tuple[type, ...], namespace: dict[str, object], **kwargs: Any) -> SchemaType:
         # This collects all schema properties under `_props`. Using __prepare__ doesn't work as referencing
@@ -791,7 +806,7 @@ class SchemaType(ABCMeta):
 
         for b in bases:
             for prop in getattr(b, '_props', []):
-                prop = cast(Property, deepcopy(prop))
+                prop = deepcopy(prop)
                 props.append(prop)
 
         for attr, val in list(namespace.items()):
@@ -802,21 +817,93 @@ class SchemaType(ABCMeta):
 
         cls = super().__new__(metacls, name, bases, dict(namespace), **kwargs)
         for prop in props:
-            prop._owner = cast(type[Schema], cls)
+            prop._owner = cls
 
         return cls
 
-    def __str__(cls: type[Schema]) -> str:  # type: ignore[misc]
+    def get_props(cls) -> list[Property]:
+        """Get all properties of this schema."""
+        return cls._props
+
+    def is_bound(cls) -> bool:
+        """Determines if the schema is bound to a data source."""
+        return cls._ds is not None
+
+    def get_ds(cls) -> DataSource:
+        """Get the data source that is bound to this schema."""
+        if cls._ds is not None:  # is_bound() cannot be used here due to type checker
+            return cls._ds
+        else:
+            raise SchemaNotBoundError(cls)
+
+    def _bind_ds(cls, ds: DataSource) -> None:
+        """Bind this schema to the corresponding data source for back-reference without setting it in `ds`."""
+        # Needed to break the recursion when setting a schema in DataSource
+        cls._ds = ds
+        cls._set_obj_refs()
+
+    def to_dict(cls) -> dict[str, Property]:
+        """Convert this schema to a dictionary of property names and corresponding types."""
+        return {prop.name: prop for prop in cls.get_props()}
+
+    def _set_obj_refs(cls) -> None:
+        """Map obj_refs from the properties of the schema to obj_ref.properties of the bound data source."""
+        db_props_dct = cls.get_ds().obj_ref.properties
+        for prop_name, prop_type in cls.to_dict().items():
+            obj_ref = db_props_dct.get(prop_name)
+            if obj_ref:
+                prop_type.obj_ref = obj_ref
+
+    @overload
+    def get_prop(cls, prop_name: str, *, default: UnsetType = ...) -> Property: ...
+    @overload
+    def get_prop(cls, prop_name: str, *, default: T) -> Property | T: ...
+
+    def get_prop(cls, prop_name: str, *, default: object = Unset) -> Property | T:
+        """Get a specific property from this schema assuming that property names are unique."""
+        try:
+            return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
+        except EmptyListError as e:
+            if default is Unset:
+                if cls.is_bound():
+                    msg = f'Property `{prop_name}` not found in schema of `{cls._ds}`.'
+                else:
+                    msg = f'Property `{prop_name}` not found in unbound schema.'
+                raise SchemaError(msg) from e
+            return cast(T, default)
+
+    def as_table(cls, tablefmt: str | None = None) -> str:
+        """Return the schema in a given string table format.
+
+        Some table formats:
+
+        - plain: no pseudographics
+        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
+        - github: GitHub flavored Markdown
+        - simple_grid: uses dashes & pipes to separate cells
+        - html: standard html markup
+
+        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
+        """
+        if tablefmt is None:
+            tablefmt = 'html' if is_notebook() else 'simple'
+
+        headers = ['Name', 'Property', 'Attribute']
+        rows = [(prop.name, prop, prop.attr_name) for prop in cls.get_props()]
+
+        return tabulate(rows, headers=headers, tablefmt=tablefmt)
+
+    def __str__(cls) -> str:
         # We can only overwrite __str__ for a class in a metaclass
         return cls.as_table(tablefmt='simple')
 
-    def __getitem__(cls: type[Schema], prop_name: str) -> Property:  # type: ignore[misc]
+    def __getitem__(cls, prop_name: str) -> Property:
         return cls.get_prop(prop_name)
 
-    def __delitem__(cls: type[Schema], prop_name: str) -> None:  # type: ignore[misc]
+    def __delitem__(cls, prop_name: str) -> None:
         cls.get_prop(prop_name).delete()
 
-    def __setitem__(cls: type[Schema], prop_name: str, prop_type: Property) -> None:  # type: ignore[misc]
+    def __setitem__(cls, prop_name: str, prop_type: Property) -> None:
         if prop_type._name is not None:
             msg = (
                 f'Property `{prop_name}` already has a name and thus the `name` parameter of `{prop_type}` must '
@@ -844,7 +931,7 @@ class SchemaType(ABCMeta):
         if isinstance(prop_type, Relation) and (prop_type._two_way_prop is not None):
             prop_type._rename_two_way_prop(prop if isinstance(prop := prop_type._two_way_prop, str) else prop.name)
 
-    def __getattr__(cls: type[Schema], name: str) -> Property:  # type: ignore[misc]
+    def __getattr__(cls, name: str) -> Property:
         attr_name_props = SList([prop for prop in cls.get_props() if prop._attr_name == name])
         try:
             return attr_name_props.item()
@@ -859,7 +946,7 @@ class SchemaType(ABCMeta):
             msg = f'Schema has no property with attribute name {name}'  # `.` is added by AttributeError automatically
             raise AttributeError(msg) from e
 
-    def __setattr__(cls: type[Schema], name: str, value: Any) -> None:  # type: ignore[misc]
+    def __setattr__(cls, name: str, value: Any) -> None:
         # Overwrite runtime setting of class attributes
         if isinstance(value, Property):
             curr_attr = getattr(cls, name, None)
@@ -878,12 +965,12 @@ class SchemaType(ABCMeta):
                 msg = f'Cannot override non-property `{name}` of type `{type(curr_attr)}`.'
                 raise PropertyError(msg)
         else:
-            super().__setattr__(name, value)  # type: ignore[misc]  # no clue why this results in a type problem
+            super().__setattr__(name, value)
 
-    def __len__(cls: type[Schema]) -> int:  # type: ignore[misc]
+    def __len__(cls) -> int:
         return len(cls.get_props())
 
-    def __iter__(cls: type[Schema]) -> Iterator[Property]:  # type: ignore[misc]
+    def __iter__(cls) -> Iterator[Property]:
         return (prop for prop in cls.get_props())
 
 
@@ -957,32 +1044,6 @@ class Schema(metaclass=SchemaType):
         return cls.get_ds().create_page(**kwargs)
 
     @classmethod
-    def get_props(cls) -> list[Property]:
-        """Get all properties of this schema."""
-        return cls._props
-
-    @overload
-    @classmethod
-    def get_prop(cls, prop_name: str, *, default: UnsetType = ...) -> Property: ...
-    @overload
-    @classmethod
-    def get_prop(cls, prop_name: str, *, default: T) -> Property | T: ...
-
-    @classmethod
-    def get_prop(cls, prop_name: str, *, default: object = Unset) -> Property | T:
-        """Get a specific property from this schema assuming that property names are unique."""
-        try:
-            return SList([prop for prop in cls.get_props() if prop.name == prop_name]).item()
-        except EmptyListError as e:
-            if default is Unset:
-                if cls.is_bound():
-                    msg = f'Property `{prop_name}` not found in schema of `{cls._ds}`.'
-                else:
-                    msg = f'Property `{prop_name}` not found in unbound schema.'
-                raise SchemaError(msg) from e
-            return cast(T, default)
-
-    @classmethod
     def has_prop(cls, prop_name: str) -> bool:
         """Check if a property exists in this schema."""
         return cls.get_prop(prop_name, default=None) is not None
@@ -1046,35 +1107,6 @@ class Schema(metaclass=SchemaType):
         return model
 
     @classmethod
-    def to_dict(cls) -> dict[str, Property]:
-        """Convert this schema to a dictionary of property names and corresponding types."""
-        return {prop.name: prop for prop in cls.get_props()}
-
-    @classmethod
-    def as_table(cls, tablefmt: str | None = None) -> str:
-        """Return the schema in a given string table format.
-
-        Some table formats:
-
-        - plain: no pseudographics
-        - simple: Pandoc's simple table, i.e. only dashes to separate header from content
-        - github: GitHub flavored Markdown
-        - simple_grid: uses dashes & pipes to separate cells
-        - html: standard html markup
-
-        Find more table formats under: https://github.com/astanin/python-tabulate#table-format
-        """
-        if tablefmt is None:
-            tablefmt = 'html' if is_notebook() else 'simple'
-
-        headers = ['Name', 'Property', 'Attribute']
-        rows = []
-        for prop in cls.get_props():
-            rows.append((prop.name, prop, prop.attr_name))
-
-        return tabulate(rows, headers=headers, tablefmt=tablefmt)
-
-    @classmethod
     def show(cls, *, simple: bool | None = None) -> None:
         """Show the schema as html or as simple table."""
         if simple:
@@ -1087,8 +1119,6 @@ class Schema(metaclass=SchemaType):
         table_str = cls.as_table(tablefmt)
 
         if is_notebook() and (tablefmt == 'html'):
-            from IPython.display import display_html  # noqa: PLC0415
-
             display_html(table_str)
         else:
             print(table_str)  # noqa: T201
@@ -1160,21 +1190,6 @@ class Schema(metaclass=SchemaType):
             raise SchemaError(msg)
 
     @classmethod
-    def get_ds(cls) -> DataSource:
-        """Get the data source that is bound to this schema."""
-        if cls._ds is not None:  # is_bound() cannot be used here due to type checker
-            return cls._ds
-        else:
-            raise SchemaNotBoundError(cls)
-
-    @classmethod
-    def _bind_ds(cls, ds: DataSource) -> None:
-        """Bind this schema to the corresponding data source for back-reference without setting it in `ds`."""
-        # Needed to break the recursion when setting a schema in DataSource
-        cls._ds = ds
-        cls._set_obj_refs()
-
-    @classmethod
     def bind_ds(cls, ds: DataSource | None = None) -> None:
         """Bind this schema to the corresponding data source for back-reference and vice versa.
 
@@ -1193,11 +1208,6 @@ class Schema(metaclass=SchemaType):
 
         ds.schema = cls
         cls._bind_ds(ds)
-
-    @classmethod
-    def is_bound(cls) -> bool:
-        """Determines if the schema is bound to a data source."""
-        return cls._ds is not None
 
     @classmethod
     def _get_fwd_rels(cls) -> list[Relation]:
@@ -1254,15 +1264,6 @@ class Schema(metaclass=SchemaType):
         for prop_type in cls.to_dict().values():
             if isinstance(prop_type, Relation) and prop_type.is_two_way:
                 prop_type._update_bwd_rel()
-
-    @classmethod
-    def _set_obj_refs(cls) -> None:
-        """Map obj_refs from the properties of the schema to obj_ref.properties of the bound database."""
-        db_props_dct = cls.get_ds().obj_ref.properties
-        for prop_name, prop_type in cls.to_dict().items():
-            obj_ref = db_props_dct.get(prop_name)
-            if obj_ref:
-                prop_type.obj_ref = obj_ref
 
 
 class DefaultSchema(Schema):

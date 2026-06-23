@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import cast
-
 import pendulum as pnd
 import pytest
 
@@ -402,8 +400,8 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
     db = notion.create_ds(parent=root_page, schema=DB)
 
     page_empty = db.create_page()
-    page_florian = db.create_page(title='Florian', people=[person])
-    page_fan = db.create_page(title='Fan', relation=page_florian)
+    page_person = db.create_page(title='Person', people=[person])
+    page_fan = db.create_page(title='Fan', relation=page_person)
 
     # Test People
     prop_name = 'People'
@@ -411,10 +409,10 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
     assert set(query.execute()) == {page_empty, page_fan}
 
     query = db.query.filter(uno.prop(prop_name).is_not_empty())
-    assert set(query.execute()) == {page_florian}
+    assert set(query.execute()) == {page_person}
 
     query = db.query.filter(uno.prop(prop_name).contains(person))
-    assert set(query.execute()) == {page_florian}
+    assert set(query.execute()) == {page_person}
 
     query = db.query.filter(uno.prop(prop_name).does_not_contain(person))
     assert set(query.execute()) == {page_empty, page_fan}
@@ -422,16 +420,16 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
     # Test Relation
     prop_name = 'Relation'
     query = db.query.filter(uno.prop(prop_name).is_empty())
-    assert set(query.execute()) == {page_empty, page_florian}
+    assert set(query.execute()) == {page_empty, page_person}
 
     query = db.query.filter(uno.prop(prop_name).is_not_empty())
     assert set(query.execute()) == {page_fan}
 
-    query = db.query.filter(uno.prop(prop_name).contains(page_florian))
+    query = db.query.filter(uno.prop(prop_name).contains(page_person))
     assert set(query.execute()) == {page_fan}
 
-    query = db.query.filter(uno.prop(prop_name).does_not_contain(page_florian))
-    assert set(query.execute()) == {page_empty, page_florian}
+    query = db.query.filter(uno.prop(prop_name).does_not_contain(page_person))
+    assert set(query.execute()) == {page_empty, page_person}
 
 
 @pytest.mark.vcr()
@@ -441,7 +439,9 @@ def test_query_new_task_db(new_task_db: uno.DataSource) -> None:
 
     Task = new_task_db.schema  # noqa: N806
     status_col = 'Status'
-    status_options = {option.name: option for option in cast(schema.Select, Task[status_col]).options}
+    status_prop = Task[status_col]
+    assert isinstance(status_prop, schema.Select)
+    status_options = {option.name: option for option in status_prop.options}
 
     task1 = Task.create(task='Task 1', status=status_options['Done'], due_date='2024-01-01')
     task2 = Task.create(task='Task 2', status=status_options['Backlog'], due_date='2024-01-02')

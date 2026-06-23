@@ -322,7 +322,7 @@ class SearchQueryBuilder(QueryBuilder[T]):
         else:  # datasource_only
             value = 'data_source'
 
-        builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
+        builder = type(self)(self.endpoint, text=self.params.get('query'))
         builder.query.filter = SearchFilter(property='object', value=value)
         return builder
 
@@ -330,7 +330,7 @@ class SearchQueryBuilder(QueryBuilder[T]):
         """Add the given sort elements to the query."""
         direction = SortDirection.ASCENDING if ascending else SortDirection.DESCENDING
 
-        builder = SearchQueryBuilder[T](self.endpoint, text=self.params.get('query'))
+        builder = type(self)(self.endpoint, text=self.params.get('query'))
         builder.query.sort = SearchSort(timestamp=TimestampKind.LAST_EDITED_TIME, direction=direction)
         return builder
 

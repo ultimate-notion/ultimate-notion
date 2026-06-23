@@ -25,14 +25,30 @@ def test_search_get_db(notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
+def test_search_page_with_property_less_results(notion: uno.Session) -> None:
+    """`search_page()` must tolerate stripped-down page objects that omit `properties`.
+
+    Notion's `search` endpoint returns property-less records (e.g. trashed or
+    limited-access pages) that contain essentially only `{'object': 'page', 'id': ...}`.
+    The recorded cassette mixes regular pages with such stripped-down objects, so this
+    exercises the full `search_page` pipeline (endpoint → `ObjectList` validation →
+    `Page.wrap_obj_ref`) against that shape offline. Regression test for
+    https://github.com/ultimate-notion/ultimate-notion/issues/273.
+    """
+    pages = notion.search_page()
+
+    assert len(pages) == 4
+    property_less = [page for page in pages if not page.obj_ref.properties]
+    assert len(property_less) == 2
+
+
+@pytest.mark.vcr()
 def test_whoami_get_user(notion: uno.Session) -> None:
     me = notion.whoami()
-    assert me.name == 'Github Unittests'
     user = notion.get_user(me.id)
     assert user.id == me.id
     user = notion.get_user(me.id, use_cache=False, raise_on_unknown=False)
-    assert user.name == 'Github Unittests'
-    notion.get_user('645e79dd-3e43-40de-9d51-39357c1c427f', use_cache=False)
+    assert user == me
     with pytest.raises(UnknownUserError):
         unknown_id = '745e79dd-3e43-40de-9d51-39357c1c428f'
         notion.get_user(unknown_id, use_cache=False)

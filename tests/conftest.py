@@ -32,28 +32,42 @@ from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
 from random import randint
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 from unittest.mock import MagicMock, patch
 
 import pydantic
 import pytest
 from _pytest.fixtures import SubRequest
 from google.auth.exceptions import RefreshError
-from vcr import VCR
+from vcr import VCR  # type: ignore[import-untyped]
 from vcr import mode as vcr_mode
 
 import ultimate_notion as uno
-from ultimate_notion import DataSource, Option, Page, Session, User, schema
+from ultimate_notion import DataSource, NumberFormat, Option, Page, Session, User, schema
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.adapters.google.tasks import GTasksClient
-from ultimate_notion.config import ENV_ULTIMATE_NOTION_CFG, ENV_ULTIMATE_NOTION_DEBUG, get_cfg_file, get_or_create_cfg
+from ultimate_notion.config import (
+    ENV_NOTION_TOKEN,
+    ENV_ULTIMATE_NOTION_CFG,
+    ENV_ULTIMATE_NOTION_DEBUG,
+    get_cfg_file,
+    get_or_create_cfg,
+)
 from ultimate_notion.utils import temp_attr, temp_timezone
 
 if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
 
+# Name of the environment variable that overrides the title of the root test page.
+# This lets a maintainer point the suite at the root page they shared with their own
+# integration without having to name it `Tests`. The default keeps the recorded
+# cassettes (which searched for `Tests`) working unchanged.
+ENV_TEST_ROOT_PAGE = 'UNO_TEST_ROOT_PAGE'
+
 # Manually created DBs and Pages in Notion for testing purposes
-TESTS_PAGE = 'Ultimate Notion Tests'  # root page for all tests with connected Notion integration
+TESTS_PAGE = os.environ.get(
+    ENV_TEST_ROOT_PAGE, 'Ultimate Notion Tests'
+)  # root page for all tests with connected Notion integration
 ALL_PROPS_DB = 'All Properties DB'  # DB with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
@@ -92,8 +106,10 @@ def pytest_addoption(parser: Parser) -> None:
         )
 
 
-def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo, report: pytest.TestReport) -> None:
+def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo[Any], report: pytest.TestReport) -> None:
     """Handle exceptions raised in the tests and provide a bit more output for some exceptions."""
+    if call.excinfo is None:
+        return
     exc_value = call.excinfo.value
 
     if isinstance(exc_value, pydantic.ValidationError):
@@ -139,6 +155,21 @@ def exec_pyfile(file_path: str) -> None:
     """Executes a Python module as a script, as if it was called from the command line."""
     code = compile(Path(file_path).read_text(encoding='utf-8'), file_path, 'exec')
     exec(code, {'__MODULE__': '__main__'})  # noqa: S102
+
+
+@pytest.fixture(scope='session', autouse=True)
+def offline_replay_token(request: SubRequest) -> None:
+    """Provide a dummy Notion token for pure offline replay (`hatch run vcr-only`).
+
+    With `--record-mode=none` the network is blocked and every interaction is
+    replayed from a cassette, so the token is never actually sent. Supplying a
+    placeholder lets contributors run the offline suite with no credentials, as
+    promised in `CONTRIBUTING.md`. Live and (re-)recording runs are untouched: a
+    real token must be provided via `NOTION_TOKEN` for those.
+    """
+    replay_only = request.config.getoption('--record-mode') == 'none'
+    if replay_only and not os.environ.get(ENV_NOTION_TOKEN):
+        os.environ[ENV_NOTION_TOKEN] = 'secret...'  # never sent; the network is blocked during replay
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -245,23 +276,34 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
             yield cfg_path
 
 
-def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
+class _NamedFunc(Protocol):
+    """A callable with a `__name__`, i.e. a plain function (which `Callable` does not model)."""
+
+    __name__: str
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+
+
+def vcr_fixture(
+    scope: Literal['module', 'session'], *, autouse: bool = False, shared: bool = False
+) -> Callable[..., Any]:
     """Return a VCR fixture for module/session-level fixtures"""
     if scope not in {'module', 'session'}:
         msg = f'Use this only for module or session scope, not {scope}!'
         raise ValueError(msg)
 
-    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    def decorator(func: _NamedFunc) -> Callable[..., Any]:
         args = inspect.signature(func).parameters  # to inject the fixtures into the wrapper
         is_generator = inspect.isgeneratorfunction(func)
 
         def setup_vcr(request: SubRequest, vcr_config: dict[str, str]) -> tuple[VCR | MagicMock, str]:
-            if scope == 'module':
+            if scope == 'module' and not shared:
                 cassette_dir = str(Path(request.module.__file__).parent / 'cassettes' / 'fixtures')
                 cassette_name = f'mod_{func.__name__}.yaml'  # same cassette for all modules!
-            else:  # scope == 'session'
-                cassette_dir = str(request.config.rootdir / 'tests' / 'cassettes' / 'fixtures')
-                cassette_name = f'sess_{func.__name__}.yaml'
+            else:
+                cassette_dir = str(request.config.rootpath / 'tests' / 'cassettes' / 'fixtures')
+                prefix = 'mod' if scope == 'module' else 'sess'
+                cassette_name = f'{prefix}_{func.__name__}.yaml'
 
             vcr_config = vcr_config.copy()  # to avoid changing the original config
             vcr_config |= {'cassette_library_dir': cassette_dir}
@@ -318,6 +360,27 @@ def vcr_fixture(scope: str, *, autouse: bool = False) -> Callable[..., Any]:
     return decorator
 
 
+def require_page(notion: Session, title: str) -> Page:
+    """Return the named page, or skip the test if the workspace does not contain it.
+
+    A fresh workspace will not have the manually created test objects, so depending
+    tests skip with a helpful message instead of erroring. See the "Set up a Notion
+    test workspace" section in `CONTRIBUTING.md`.
+    """
+    pages = notion.search_page(title)
+    if not pages:
+        pytest.skip(f'Test workspace has no page titled {title!r}; see CONTRIBUTING.md.')
+    return pages.item()
+
+
+def require_ds(notion: Session, title: str) -> DataSource:
+    """Return the named data source, or skip the test if the workspace does not contain it."""
+    dss = notion.search_ds(title)
+    if not dss:
+        pytest.skip(f'Test workspace has no data source titled {title!r}; see CONTRIBUTING.md.')
+    return dss.item()
+
+
 @pytest.fixture(scope='module')
 def notion_cached() -> Iterator[Session]:
     """Return the notion session used for live testing."""
@@ -332,22 +395,26 @@ def notion(notion_cached: Session) -> Iterator[Session]:
         yield notion_cached
 
 
-@pytest.fixture(scope='module')
+@vcr_fixture(scope='module', shared=True)
 def person(notion_cached: Session) -> User:
-    """Return a user object for testing."""
-    return notion_cached.search_user('Florian Wilhelm').item()
+    """Return a user object for testing.
+
+    Use the first user visible to the integration so the suite is not tied to a
+    specific workspace member.
+    """
+    return notion_cached.all_users()[0]
 
 
 @vcr_fixture(scope='module')
 def contacts_db(notion_cached: Session) -> DataSource:
     """Return a test database."""
-    return notion_cached.search_ds(CONTACTS_DB).item()
+    return require_ds(notion_cached, CONTACTS_DB)
 
 
 @vcr_fixture(scope='module')
 def root_page(notion_cached: Session) -> Page:
     """Return the page reference used as parent page for live testing."""
-    return notion_cached.search_page(TESTS_PAGE).item()
+    return require_page(notion_cached, TESTS_PAGE)
 
 
 @pytest.fixture(scope='function')
@@ -356,7 +423,7 @@ def article_db(notion_cached: Session, root_page: Page) -> Iterator[DataSource]:
 
     class Article(schema.Schema, db_title='Articles'):
         name = schema.Title('Name')
-        cost = schema.Number('Cost', format=schema.NumberFormat.DOLLAR)
+        cost = schema.Number('Cost', format=NumberFormat.DOLLAR)
         desc = schema.Text('Description')
 
     db = notion_cached.create_ds(parent=root_page, schema=Article)
@@ -376,61 +443,61 @@ def page_hierarchy(notion_cached: Session, root_page: Page) -> Iterator[tuple[Pa
 @vcr_fixture(scope='module')
 def intro_page(notion_cached: Session) -> Page:
     """Return the default 'Getting Started' page."""
-    return notion_cached.search_page(GETTING_STARTED_PAGE).item()
+    return require_page(notion_cached, GETTING_STARTED_PAGE)
 
 
 @vcr_fixture(scope='module')
 def all_props_db(notion_cached: Session) -> DataSource:
     """Return manually created database with all properties, also AI properties."""
-    return notion_cached.search_ds(ALL_PROPS_DB).item()
+    return require_ds(notion_cached, ALL_PROPS_DB)
 
 
 @vcr_fixture(scope='module')
 def wiki_db(notion_cached: Session) -> DataSource:
     """Return manually created wiki db."""
-    return notion_cached.search_ds(WIKI_DB).item()
+    return require_ds(notion_cached, WIKI_DB)
 
 
 @vcr_fixture(scope='module')
 def formula_db(notion_cached: Session) -> DataSource:
     """Return manually created formula db."""
-    return notion_cached.search_ds(FORMULA_DB).item()
+    return require_ds(notion_cached, FORMULA_DB)
 
 
 @vcr_fixture(scope='module')
 def md_text_page(notion_cached: Session) -> Page:
     """Return a page with markdown text content."""
-    return notion_cached.search_page(MD_TEXT_TEST_PAGE).item()
+    return require_page(notion_cached, MD_TEXT_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def md_page(notion_cached: Session) -> Page:
     """Return a page with markdown content."""
-    return notion_cached.search_page(MD_PAGE_TEST_PAGE).item()
+    return require_page(notion_cached, MD_PAGE_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def md_subpage(notion_cached: Session) -> Page:
     """Return a page with markdown content."""
-    return notion_cached.search_page(MD_SUBPAGE_TEST_PAGE).item()
+    return require_page(notion_cached, MD_SUBPAGE_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def embed_page(notion_cached: Session) -> Page:
     """Return a page with embed/inline/linked & unfurl content."""
-    return notion_cached.search_page(EMBED_TEST_PAGE).item()
+    return require_page(notion_cached, EMBED_TEST_PAGE)
 
 
 @vcr_fixture(scope='module')
 def comment_page(notion_cached: Session) -> Page:
     """Return a page with comments."""
-    return notion_cached.search_page(COMMENT_PAGE).item()
+    return require_page(notion_cached, COMMENT_PAGE)
 
 
 @vcr_fixture(scope='module')
 def custom_emoji_page(notion_cached: Session) -> Page:
     """Return a page with a custom emoji."""
-    return notion_cached.search_page(CUSTOM_EMOJI_PAGE).item()
+    return require_page(notion_cached, CUSTOM_EMOJI_PAGE)
 
 
 @pytest.fixture(scope='module')
@@ -460,7 +527,7 @@ def static_pages(  # noqa: PLR0917
 @vcr_fixture(scope='module')
 def task_db(notion_cached: Session) -> DataSource:
     """Return manually created wiki db."""
-    return notion_cached.search_ds(TASK_DB).item()
+    return require_ds(notion_cached, TASK_DB)
 
 
 @vcr_fixture(scope='module')
@@ -752,7 +819,9 @@ def get_id_prefix(notion: uno.Session, root_page: uno.Page) -> Callable[[str], s
             state_page.append(state_block)
 
         state_page.reload()  # this saves actually the state in VCR.py
-        id_prefix = cast(uno.Paragraph, state_page.children[0]).rich_text
+        first_child = state_page.children[0]
+        assert isinstance(first_child, uno.Paragraph)
+        id_prefix = first_child.rich_text
         if id_prefix is None:
             msg = 'Could not retrieve ID prefix from state page!'
             raise ValueError(msg)

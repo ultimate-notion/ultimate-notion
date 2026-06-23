@@ -21,6 +21,7 @@ import pendulum as pnd
 import tomli_w
 from numpy.typing import NDArray
 from packaging.version import Version
+from pendulum.tz import local_timezone
 from pydantic import BaseModel
 from typing_extensions import Self
 
@@ -61,17 +62,41 @@ def safe_list_get(lst: Sequence[T], idx: int, *, default: T | None = None) -> T 
 def is_notebook() -> bool:
     """Determine if we are running within a Jupyter notebook."""
     try:
-        from IPython import get_ipython  # noqa: PLC0415
+        from IPython.core.getipython import get_ipython  # noqa: PLC0415
     except ModuleNotFoundError:
         return False  # Probably standard Python interpreter
     else:
-        shell = get_ipython().__class__.__name__
+        shell = get_ipython().__class__.__name__  # type: ignore[no-untyped-call]
         if shell == 'ZMQInteractiveShell':
             return True  # Jupyter notebook or qtconsole
         elif shell == 'TerminalInteractiveShell':
             return False  # Terminal running IPython
         else:
             return False  # Other type (?)
+
+
+def display_html(html: str, *, raw: bool = False) -> None:
+    """Render HTML in the active Jupyter frontend.
+
+    Wraps IPython's untyped ``display_html`` so its missing annotations stay
+    contained at this single boundary instead of leaking to every call site.
+    """
+    from IPython.display import display_html as ipy_display_html  # noqa: PLC0415
+
+    render: Callable[..., None] = ipy_display_html
+    render(html, raw=raw)
+
+
+def display_markdown(markdown: str, *, raw: bool = False) -> None:
+    """Render Markdown in the active Jupyter frontend.
+
+    Wraps IPython's untyped ``display_markdown`` so its missing annotations stay
+    contained at this single boundary instead of leaking to every call site.
+    """
+    from IPython.core.display import display_markdown as ipy_display_markdown  # noqa: PLC0415
+
+    render: Callable[..., None] = ipy_display_markdown
+    render(markdown, raw=raw)
 
 
 class StoredRetvalsFunctor(Generic[P, T]):
@@ -185,7 +210,7 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
     if hasattr(obj, '__deepcopy__'):
         # Do hack to prevent infinite recursion in call to deepcopy
         deepcopy_method = obj.__deepcopy__
-        obj.__deepcopy__ = None
+        obj.__dict__['__deepcopy__'] = None
 
     for attr in shared_attributes:
         del obj.__dict__[attr]
@@ -198,8 +223,8 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
 
     if hasattr(obj, '__deepcopy__'):
         # Undo hack
-        obj.__deepcopy__ = deepcopy_method
-        del clone.__deepcopy__  # type: ignore[attr-defined]
+        obj.__dict__['__deepcopy__'] = deepcopy_method
+        del clone.__dict__['__deepcopy__']
 
     return clone
 
@@ -383,7 +408,7 @@ def temp_timezone(tz: str | pnd.Timezone) -> Iterator[None]:
     if not isinstance(tz, pnd.Timezone):
         tz = pnd.timezone(tz)
 
-    current_tz = pnd.local_timezone()
+    current_tz = local_timezone()
     if not isinstance(current_tz, pnd.Timezone):
         msg = f'Expected a Timezone object but got type {type(current_tz)}.'
         raise RuntimeError(msg)

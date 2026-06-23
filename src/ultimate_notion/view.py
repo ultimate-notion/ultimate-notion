@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import datetime as dt
 from collections.abc import Callable, Iterator, Sequence
 from html import escape as htmlescape
-from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import numpy as np
 from pydantic import BaseModel
@@ -14,12 +15,20 @@ from ultimate_notion import props, schema
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.file import ExternalFile, NotionFile
 from ultimate_notion.obj_api.enums import FormulaType, RollupType
+from ultimate_notion.option import Option
 from ultimate_notion.page import Page
-from ultimate_notion.props import Option
 from ultimate_notion.rich_text import html_img
 from ultimate_notion.schema import Property
 from ultimate_notion.user import User
-from ultimate_notion.utils import SList, deepcopy_with_sharing, find_index, find_indices, is_notebook, rec_apply
+from ultimate_notion.utils import (
+    SList,
+    deepcopy_with_sharing,
+    display_html,
+    find_index,
+    find_indices,
+    is_notebook,
+    rec_apply,
+)
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -88,11 +97,18 @@ class View(Sequence[Page]):
         if isinstance(idx, slice):
             return tuple(pages)
         else:
-            return cast(Page, pages)
+            return self._as_page(pages)
 
     def get_page(self, idx: int, /) -> Page:
         """Retrieve a page by index of the view."""
-        return cast(Page, self._pages[self._row_indices[idx]])
+        return self._as_page(self._pages[self._row_indices[idx]])
+
+    @staticmethod
+    def _as_page(page: Any) -> Page:
+        if not isinstance(page, Page):
+            msg = f'Expected a `Page`, got `{type(page).__name__}`.'
+            raise TypeError(msg)
+        return page
 
     def search_page(self, name: str) -> SList[Page]:
         """Retrieve a page from this view by name"""
@@ -144,7 +160,7 @@ class View(Sequence[Page]):
 
         # remove index as pandas uses its own
         view = self.without_index() if self.has_index else self
-        data = rec_apply(cmplx_to_str, self.to_rows())
+        data = [list(row) for row in rec_apply(cmplx_to_str, self.to_rows())]
 
         return pd.DataFrame(data, columns=view.columns)
 
@@ -189,6 +205,14 @@ class View(Sequence[Page]):
 
         data = rec_apply(cmplx_to_str, self.to_rows())
         schema = self._to_polars_schema()
+        for row in data:
+            for idx, col in enumerate(self.columns):
+                if (
+                    isinstance(schema[col], pl.Datetime)
+                    and isinstance(row[idx], dt.date)
+                    and not isinstance(row[idx], dt.datetime)
+                ):
+                    row[idx] = dt.datetime.combine(row[idx], dt.time())
         return pl.DataFrame(data=data, schema=schema, orient='row')
 
     def _html_for_icon(self, rows: list[Any], cols: list[str]) -> list[Any]:
@@ -243,8 +267,6 @@ class View(Sequence[Page]):
         table_str = self.as_table(tablefmt=tablefmt)
 
         if is_notebook() and (tablefmt == 'html'):
-            from IPython.display import display_html  # noqa: PLC0415
-
             display_html(table_str)
         else:
             print(table_str)  # noqa: T201

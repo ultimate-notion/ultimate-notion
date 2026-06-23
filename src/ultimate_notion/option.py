@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from ultimate_notion.core import Wrapper, get_repr
 from ultimate_notion.errors import UnsetError
+from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
+from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.enums import Color, OptionGroupType
 from ultimate_notion.rich_text import Text
 
@@ -42,7 +43,9 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     @property
     def id(self) -> str:
         """ID of the option."""
-        return raise_unset(self.obj_ref.id)
+        if is_unset(id_ := self.obj_ref.id):
+            raise UnsetError()
+        return id_
 
     @property
     def name(self) -> str:
@@ -52,10 +55,9 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
     @property
     def color(self) -> Color:
         """Color of the option."""
-        try:
-            return raise_unset(self.obj_ref.color)
-        except UnsetError:  # i.e. unset value
+        if is_unset(color := self.obj_ref.color):  # i.e. unset value
             return Color.DEFAULT
+        return color
 
     @property
     def description(self) -> str:
@@ -67,23 +69,25 @@ class Option(Wrapper[objs.SelectOption], wraps=objs.SelectOption):
 
 
 class OptionNSType(type):
-    """Metaclass to implement `len` for type `OptionNS` itself, not an instance of it."""
+    """Metaclass providing class-level operations for `OptionNS` namespaces.
 
-    # ToDo: When mypy is smart enough to understand metaclasses, we can remove the `type: ignore` comments.
+    These operate on the namespace class itself, not on instances of it, so they live on the
+    metaclass. Typing the receiver this way (rather than annotating `cls` as `type[OptionNS]`)
+    lets mypy resolve the methods without a `type: ignore`.
+    """
 
-    def __len__(cls: type[OptionNS]) -> int:  # type: ignore[misc]
+    def to_list(cls) -> list[Option]:
+        """Convert the namespace to a list as needed by the (Multi)Select property types."""
+        return [
+            getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
+        ]
+
+    def __len__(cls) -> int:
         return len(cls.to_list())
 
 
 class OptionNS(metaclass=OptionNSType):
     """Option namespace to simplify working with (Multi-)Select options."""
-
-    @classmethod
-    def to_list(cls) -> list[Option]:
-        """Convert the enum to a list as needed by the (Multi)Select property types."""
-        return [
-            getattr(cls, var) for var in cls.__dict__ if not var.startswith('__') and not callable(getattr(cls, var))
-        ]
 
 
 class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
@@ -118,7 +122,7 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
         super().__init__(name=name, color=color, option_ids=option_ids)
 
     @classmethod
-    def wrap_obj_ref(cls, obj_ref: objs.SelectGroup, /, *, options: list[Option] | None = None) -> OptionGroup:
+    def wrap_obj_ref(cls, obj_ref: obj_core.GenericObject, /, *, options: list[Option] | None = None) -> OptionGroup:
         """Convienence constructor for the group of options."""
         obj = super().wrap_obj_ref(obj_ref)
         obj._options = [] if options is None else options

@@ -6,15 +6,15 @@ import datetime as dt
 import logging
 from abc import ABC
 from enum import Enum
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias
 from uuid import UUID
 
 from typing_extensions import Self, TypeIs, TypeVar
 
-from ultimate_notion.errors import UnknownDatabaseError, UnknownDataSourceError, UnknownPageError
+from ultimate_notion.errors import UnknownDatabaseError, UnknownDataSourceError, UnknownPageError, UnsetError
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset
 
 _logger = logging.getLogger(__name__)
 
@@ -35,9 +35,9 @@ class Wrapper(Generic[GT_co], ABC):
 
     _obj_ref: GT_co
 
-    _obj_api_map: ClassVar[dict[type[GT_co], type[Wrapper]]] = {}
+    _obj_api_map: ClassVar[dict[type[obj_core.GenericObject], type[Wrapper]]] = {}
 
-    def __init_subclass__(cls, wraps: type[GT_co], **kwargs: Any):
+    def __init_subclass__(cls, wraps: type[obj_core.GenericObject], **kwargs: Any):
         super().__init_subclass__(**kwargs)
         cls._obj_api_map[wraps] = cls
 
@@ -45,9 +45,9 @@ class Wrapper(Generic[GT_co], ABC):
         # Needed for wrap_obj_ref and its call to __new__ to work!
         return super().__new__(cls)
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self: Wrapper[obj_core.GenericObject], *args: Any, **kwargs: Any):
         """Default constructor that also builds `obj_ref`."""
-        obj_api_type: type[GT_co] = self._obj_api_map_inv[self.__class__]
+        obj_api_type = self._obj_api_map_inv[self.__class__]
         self._obj_ref = obj_api_type.build(*args, **kwargs)
 
     def __pydantic_serializer__(self) -> SchemaSerializer:  # noqa: PLW3201
@@ -64,27 +64,53 @@ class Wrapper(Generic[GT_co], ABC):
         return self._obj_ref
 
     @obj_ref.setter
-    def obj_ref(self, value: GT_co) -> None:  # type: ignore[misc] # breaking covariance
-        """Set the low-level Notion-API object reference."""
+    def obj_ref(self: Wrapper[obj_core.GenericObject], value: obj_core.GenericObject) -> None:
+        """Set the low-level Notion-API object reference.
+
+        Both `self` and `value` are typed against `GenericObject` (the upper bound of the covariant
+        `GT_co`) rather than `GT_co` itself: a covariant type variable may not appear in an input
+        position. Viewing `self` as `Wrapper[GenericObject]` is sound precisely because `Wrapper` is
+        covariant, and it makes the assignment to `_obj_ref` type-check without breaking covariance.
+        The getter still narrows the return type to `GT_co`.
+        """
         self._obj_ref = value
 
     @classmethod
-    def wrap_obj_ref(cls: type[Self], obj_ref: GT_co, /) -> Self:  # type: ignore[misc] # breaking covariance
-        """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion."""
+    def wrap_obj_ref(cls: type[Self], obj_ref: obj_core.GenericObject, /) -> Self:
+        """Wraps low-level `obj_ref` from Notion API into a high-level (hl) object of Ultimate Notion.
+
+        `obj_ref` is typed against `GenericObject` (the upper bound of the covariant `GT_co`) rather
+        than `GT_co` itself, since a covariant type variable may not appear in an input position. The
+        concrete high-level class is resolved at runtime from the registry keyed on `type(obj_ref)`.
+        """
         hl_cls = cls._obj_api_map[type(obj_ref)]
-        # To allow for `Block.wrap_obj_ref` to work call a specific 'wrap_obj_ref' if it exists,
-        # e.g. `RichText.wrap_obj_ref` we need to break a potential recursion in the MRO.
-        if cls.wrap_obj_ref.__func__ is hl_cls.wrap_obj_ref.__func__:  # type: ignore[attr-defined]
-            # ToDo: remove type ignore when https://github.com/python/mypy/issues/14123 is fixed
-            # break recursion
+        # Resolving `obj_ref` may yield a more specific high-level class than `cls`, e.g. calling
+        # `Block.wrap_obj_ref` on a paragraph object resolves `hl_cls` to `Paragraph`. In that case we
+        # hand off to that class' `wrap_obj_ref` so its specialised wrapping (e.g. children handling) runs.
+        # Once `cls` already is the resolved class we build the object directly to break the recursion.
+        if cls is hl_cls:
             hl_obj = hl_cls.__new__(hl_cls)
             hl_obj._obj_ref = obj_ref
-            return cast(Self, hl_obj)
+            hl_obj._finalize_wrap()
         else:
-            return cast(Self, hl_cls.wrap_obj_ref(obj_ref))
+            hl_obj = hl_cls.wrap_obj_ref(obj_ref)
+        # `cls is hl_cls` makes `hl_obj` an instance of `cls`, while the recursive branch resolves a
+        # more specific subclass of `cls`; either way the guard narrows `hl_obj` to `Self` for mypy.
+        if not isinstance(hl_obj, cls):
+            msg = f'Resolved high-level class `{type(hl_obj).__name__}` is not a `{cls.__name__}`.'
+            raise TypeError(msg)
+        return hl_obj
+
+    def _finalize_wrap(self) -> None:
+        """Run subclass-specific initialisation after `wrap_obj_ref` has set `_obj_ref`.
+
+        Subclasses override this to derive state from `obj_ref` (e.g. an attribute name or child
+        blocks). It is an instance method rather than a parameter of `wrap_obj_ref` so that it does
+        not take the covariant type variable in an input position, which would break covariance.
+        """
 
     @property
-    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[GT_co]]:
+    def _obj_api_map_inv(self) -> dict[type[Wrapper], type[obj_core.GenericObject]]:
         return {v: k for k, v in self._obj_api_map.items()}
 
 
@@ -98,7 +124,9 @@ class NotionObject(Wrapper[NO_co], ABC, wraps=obj_core.NotionObject):
     @property
     def id(self) -> UUID | str:
         """Return the ID of the block."""
-        return raise_unset(self.obj_ref.id)
+        if is_unset(id_ := self.obj_ref.id):
+            raise UnsetError()
+        return id_
 
     @property
     def in_notion(self) -> bool:
@@ -170,29 +198,39 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def id(self) -> UUID:
         """Return the ID of the entity."""
-        return raise_unset(self.obj_ref.id)
+        if is_unset(id_ := self.obj_ref.id):
+            raise UnsetError()
+        return id_
 
     @property
     def created_time(self) -> dt.datetime:
         """Return the time when the block was created."""
-        return raise_unset(self.obj_ref.created_time)
+        if is_unset(created_time := self.obj_ref.created_time):
+            raise UnsetError()
+        return created_time
 
     @property
     def created_by(self) -> User:
         """Return the user who created the block."""
         session = get_active_session()
-        created_by = raise_unset(self.obj_ref.created_by)
-        return session.get_user(raise_unset(created_by.id), raise_on_unknown=False)
+        if is_unset(created_by := self.obj_ref.created_by):
+            raise UnsetError()
+        if is_unset(created_by_id := created_by.id):
+            raise UnsetError()
+        return session.get_user(created_by_id, raise_on_unknown=False)
 
     @property
     def last_edited_time(self) -> dt.datetime:
         """Return the time when the block was last edited."""
-        return raise_unset(self.obj_ref.last_edited_time)
+        if is_unset(last_edited_time := self.obj_ref.last_edited_time):
+            raise UnsetError()
+        return last_edited_time
 
     @property
     def parent(self) -> NotionEntity | WorkspaceType | None:
         """Return the parent Notion entity, Workspace if the workspace is the parent, or None if not accessible."""
-        parent = raise_unset(self.obj_ref.parent)
+        if is_unset(parent := self.obj_ref.parent):
+            raise UnsetError()
         return resolve_ref(parent)
 
     @property

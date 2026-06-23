@@ -18,7 +18,7 @@ import logging
 import re
 from abc import ABC
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, cast, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, cast
 from uuid import UUID
 
 from pydantic import (
@@ -33,7 +33,6 @@ from pydantic import (
 )
 from typing_extensions import Self, TypeIs, TypeVar
 
-from ultimate_notion.errors import UnsetError
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.utils import is_stable_release, pydantic_apply
 
@@ -117,18 +116,6 @@ def is_unset(v: Any) -> TypeIs[UnsetType]:
     return False
 
 
-@overload
-def raise_unset(obj: UnsetType) -> NoReturn: ...
-@overload
-def raise_unset(obj: T) -> T: ...
-def raise_unset(obj: T | UnsetType) -> T:
-    """Raise an error if the object is unset."""
-    if is_unset(obj):
-        msg = 'Parameter is unset and was not yet initialized by the Notion API.'
-        raise UnsetError(msg)
-    return obj
-
-
 def extract_id(text: str) -> str | None:
     """Examine the given text to find a valid Notion object ID."""
 
@@ -154,7 +141,6 @@ def extract_id(text: str) -> str | None:
 class GenericObject(BaseModel):
     """The base for all API objects."""
 
-    __hash__: ClassVar[None] = None  # type: ignore[assignment]
     _frozen: bool = False  # for computing hash and equality
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
@@ -179,14 +165,22 @@ class GenericObject(BaseModel):
             name: the named attribute in the class
             default: the new default value for the named field
         """
-        # Rebuild model to avoid UserWarning about shadowing an attribute in parent.
-        # More details here: https://github.com/pydantic/pydantic/issues/6966
         field = cls.model_fields.get(name)
         if field is None:
             msg = f'No field of name {name} in {cls.__name__} found!'
             raise ValueError(msg)
         field.default = default
         field.validate_default = False
+        # Also set the default as a class attribute so pydantic treats it as a *declared*
+        # default. Since pydantic 2.13, mutating only `FieldInfo.default` no longer propagates
+        # through generic parameterizations (e.g. `Person(User[PersonTypeData])` losing the
+        # `object='user'` default inherited from `User`), whereas declared defaults do.
+        # See: https://github.com/ultimate-notion/ultimate-notion/issues/189
+        # Note: on pydantic <=2.6 this surfaces a benign "Field name shadows an attribute in
+        # parent" UserWarning (silenced in pydantic 2.7+); it has no functional impact.
+        setattr(cls, name, default)
+        # Rebuild model to avoid UserWarning about shadowing an attribute in parent.
+        # More details here: https://github.com/pydantic/pydantic/issues/6966
         cls.model_rebuild(force=True)
 
     # https://github.com/pydantic/pydantic/discussions/3139
@@ -256,6 +250,13 @@ def _normalize_model(obj: T) -> T:
                     setattr(obj_copy, field_name, Unset)
                 elif field_name == 'color' and is_unset(field_value):
                     setattr(obj_copy, field_name, _normalize_color(field_value))
+                elif field_name == 'annotations' and is_unset(field_value):
+                    # An `Unset` annotation means default styling, which the Notion API returns as a
+                    # fully populated `Annotations` object. Normalize so that offline-built objects
+                    # (e.g. mentions built with `style=None`) compare equal to their online counterparts.
+                    from ultimate_notion.obj_api.objects import Annotations  # noqa: PLC0415  # Avoid circular import.
+
+                    setattr(obj_copy, field_name, _recurse(Annotations()))
                 elif isinstance(obj, TypedObject) and obj.type == 'mention' and field_name in {'plain_text', 'href'}:
                     # allows comparing offline-built mentions to online ones, e.g. UserRef
                     setattr(obj_copy, field_name, Unset)
@@ -292,7 +293,7 @@ class NotionObject(UniqueObject):
     defines the general object type, e.g. `page`, `database`, `user`, `block`, ...
     """
 
-    object: str = Field(default=None)  # type: ignore # avoids mypy plugin errors as this is set in __init_subclass__
+    object: str | None = Field(default=None)
     """`object` is a string that identifies the general object type, e.g. `page`, `database`, `user`, `block`, ..."""
 
     request_id: UUID | None = None
@@ -405,7 +406,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
         }
     """
 
-    type: str = Field(default=None)  # type: ignore  # avoids mypy errors as this is set in __pydantic_init_subclass__
+    type: str | None = Field(default=None)
     """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
     _typemap: ClassVar[dict[str, builtins.type[TypedObject]]]
@@ -503,17 +504,27 @@ class TypedObject(GenericObject, Generic[TO_co]):
         return cls(*args, **kwargs)
 
     @property
+    def _type_name(self) -> str:
+        """Return the registered `type` name, which is always a string on concrete subclasses."""
+        if self.type is None:
+            msg = f"'type' is not set on {type(self).__name__}; it is only set on concrete subclasses"
+            raise ValueError(msg)
+        return self.type
+
+    @property
     def value(self) -> TO_co:
         """Return the nested object."""
-        return cast(TO_co, getattr(self, self.type))
+        return cast(TO_co, getattr(self, self._type_name))
 
     @value.setter
-    def value(self, val: TO_co) -> None:  # type: ignore[misc]  # breaking covariance
-        """Set the nested object."""
-        # we are breaking covariance here but going down the Protocol way didn't work out
-        # either due to many limititations, e.g. @runtime_checkable not working with inheritance, etc.
-        # This is still the most programmatic way it seems without adding too much complexity.
-        setattr(self, self.type, val)
+    def value(self, val: object) -> None:
+        """Set the nested object.
+
+        The setter accepts ``object`` rather than the covariant ``TO_co``: a covariant type
+        variable may not appear in an input position, and ``TO_co`` is unbounded so ``object``
+        is its upper bound. The getter still narrows the return type to ``TO_co``.
+        """
+        setattr(self, self._type_name, val)
 
 
 class ParentRef(TypedObject[T], ABC, polymorphic_base=True):

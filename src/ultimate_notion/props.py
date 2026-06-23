@@ -7,19 +7,22 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import pendulum as pnd
 from typing_extensions import Self, TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt
-from ultimate_notion.core import Wrapper, get_active_session, get_repr, raise_unset
+from ultimate_notion.core import Wrapper, get_active_session, get_repr
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.file import AnyFile
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
-from ultimate_notion.obj_api.objects import DateRange, DateTimeOrRange
+from ultimate_notion.obj_api.objects import DateRange
 from ultimate_notion.option import Option
 from ultimate_notion.user import User
+from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
     from ultimate_notion.page import Page
@@ -42,10 +45,6 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
         type_name = wraps.model_fields['type'].get_default()
         cls._type_value_map[type_name] = cls
 
-    @property
-    def _obj_api_type(self) -> type[obj_props.PropertyValue]:
-        return self._obj_api_map_inv[self.__class__]
-
     def __init__(self, values: Any | Sequence[Any]):
         if isinstance(values, Sequence) and not isinstance(values, str | bytes):
             values = [value.obj_ref if isinstance(value, Wrapper) else value for value in values]
@@ -57,8 +56,7 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PropertyValue):
             return NotImplemented
-        other_obj_ref = cast(PV_co, other.obj_ref)
-        return (self.obj_ref.type == other_obj_ref.type) and (self.obj_ref.value == other_obj_ref.value)
+        return bool((self.obj_ref.type == other.obj_ref.type) and (self.obj_ref.value == other.obj_ref.value))
 
     @property
     @abstractmethod
@@ -67,7 +65,9 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
 
     @property
     def id(self) -> str:
-        return raise_unset(self.obj_ref.id)
+        if is_unset(id_ := self.obj_ref.id):
+            raise UnsetError()
+        return id_
 
     def __repr__(self) -> str:
         return get_repr(self)
@@ -310,7 +310,7 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
     @property
     def value_type(self) -> FormulaType | None:
         """Return the type of the formula result."""
-        return FormulaType(self.obj_ref.formula.type) if self.obj_ref.formula else None
+        return FormulaType(self.obj_ref.formula._type_name) if self.obj_ref.formula else None
 
 
 class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):

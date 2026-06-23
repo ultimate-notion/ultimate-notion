@@ -6,6 +6,19 @@ import ultimate_notion as uno
 from ultimate_notion.blocks import TextBlock
 
 
+def _neutralize_mention(md: str) -> str:
+    """Replace a `[@<name>]()` person mention with a workspace-neutral `[@USER]()`.
+
+    Keeps the test portable across maintainers re-recording the cassette, who will have a
+    different user name in the mention (cf. `test_rich_text.py`).
+    """
+    before, mention, rest = md.partition('[@')
+    if not mention:
+        return md
+    _name, end, after = rest.partition(']()')
+    return f'{before}[@USER](){after}' if end else md
+
+
 @pytest.mark.vcr()
 def test_rich_text_md(md_text_page: uno.Page) -> None:
     """These markdowns were tested with https://stackedit.io/app#"""
@@ -17,7 +30,7 @@ def test_rich_text_md(md_text_page: uno.Page) -> None:
         'here is one more with a *strange **style*** **combination**',
         'here is one with an inline **~~equa-*tion*~~ *$E=mc^2$ and*** no block equation',
         (
-            'and here is one with ~~***person** mention [@Florian Wilhelm]()*~~ and **page mention '
+            'and here is one with ~~***person** mention [@USER]()*~~ and **page mention '
             '↗[Markdown Text Test](https://www.notion.so/0c8ea7f1c7ca4abb8890085c0fac383b)** '
         ),
         'here is one **stretching over *many\n~~many~~*\n~~lines~~**',
@@ -31,5 +44,5 @@ def test_rich_text_md(md_text_page: uno.Page) -> None:
     ]
     for idx, block in enumerate(md_text_page.children):
         assert isinstance(block, TextBlock)
-        our_md = block.to_markdown()
+        our_md = _neutralize_mention(block.to_markdown())
         assert our_md == correct_mds[idx]

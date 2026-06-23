@@ -93,31 +93,74 @@ This often provides additional considerations and avoids unnecessary work.
    ```
    These settings will also be respected by [pytest] using [pytest-dotenv].
 
-### Setup the unit tests
+### Set up the unit tests
 
-Ultimate Notion has two ways to deal with unit tests. Most unit tests are recorded on cassettes
-using [VCR.py], which allows to record unit tests that need internet connection and replay them
-without the need of being online, also way faster. So to run existing unit tests, you can just
-use `hatch run vcr-only` and everything should work. For new unit tests, you need to have
-copy the *Ultimate Notion Tests* template into your workspace and set your unit tests up
-so that they can access them.
+Ultimate Notion deals with unit tests in two ways. Most tests are recorded as
+cassettes using [VCR.py], which captures the HTTP interactions a test makes the
+first time it runs against the Notion API and replays them on subsequent runs.
+This lets the suite run offline and much faster, with no Notion account needed:
 
-1. Open the [Ultimate Notion Tests] website and click `Duplicate` on the upper left corner.
-2. Login to Notion and select to which workspace you want to add the template.
-3. In Notion, the `Ultimate Notion Tests` page should show up in your sidebar.
-   Hover over it and click the menu <kbd>⋯</kbd>, then select `Copy link` to extract the
-   *page id* for the step below.
-4. Set up a Notion integration for testing with all permissions as described in the [Getting started] docs.
-   Copy the *Internal integration secret* for the step below.
-5. Create a file `.vscode/.env` within your cloned repository with the following content:
-   ```cfg
-   NOTION_TOKEN=YOUR_INTERNAL_INTEGRATION_SECRET
-   ULTIMATE_NOTION_CONFIG=/PATH/TO/YOUR/CONFIG/.ultimate-notion/config.toml
-   ROOT_PAGE_ID=PAGE_ID_AS_EXTRACTED_ABOVE.
+```console
+hatch run vcr-only
+```
+
+You only need your own Notion workspace and integration token if you want to
+**run the tests live** against the Notion API, or to **add a new test** or
+**re-record an existing cassette**:
+
+```console
+hatch run vcr-rewrite          # re-record all cassettes
+hatch run test -k NEW_TEST     # run/record a specific test live
+```
+
+Running tests live requires a configured test workspace, described next.
+
+### Set up a Notion test workspace
+
+You only need this section to run the tests live or to re-record cassettes.
+
+1. **Create an internal integration.** Open [My integrations] and click
+   *New integration*. Choose **Internal**, associate it with the workspace you
+   want to use for testing, and give it a name.
+
+2. **Enable the required capabilities.** On the integration's *Capabilities* tab
+   enable:
+   - **Read**, **Update** and **Insert** content, because the tests create, modify and
+     delete pages and databases.
+   - A **Read user information** option (with or without email addresses is fine).
+     This is **required**: several tests call `Session.all_users()`, which Notion
+     rejects with `403 "Personal access tokens cannot list users."` for tokens
+     that lack this capability. For the same reason you must use an **internal
+     integration token**, not a personal access token. The latter can never list
+     users.
+
+3. **Copy the token.** From the integration's *Configuration* page copy the
+   *Internal Integration Secret*. It looks like `ntn_…`.
+
+4. **Create and share a root page.** In your test workspace create a page that
+   acts as the parent for all test content, then connect your integration to it
+   via the page's ••• menu → *Connections*. Sharing the parent grants the
+   integration access to everything created beneath it. By default the suite
+   looks for a page titled `Tests`; set the `UNO_TEST_ROOT_PAGE` environment
+   variable to point it at a page with a different title.
+
+5. **Point the configuration at the token.** Set `NOTION_TOKEN` to the secret
+   from step 3 (see the `.vscode/.env` example above); the Ultimate Notion config
+   resolves the token from this environment variable by default.
+
+6. **Bootstrap the API-creatable objects.** Run:
+
+   ```console
+   UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
    ```
-   where you replace the values accordingly.
 
-This should allow you to record new unit tests with `hatch run test -k NEW_TEST`.
+   The command is idempotent and leaves existing objects unchanged.
+
+!!! note
+    Three objects (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use
+    features the API cannot create and must be built by hand. See
+    [`tests/TEST_WORKSPACE.md`](https://github.com/ultimate-notion/ultimate-notion/blob/main/tests/TEST_WORKSPACE.md)
+    for exact instructions.
 
 ### Implement your changes
 
@@ -195,6 +238,5 @@ This should allow you to record new unit tests with `hatch run test -k NEW_TEST`
 [VS Code]: https://code.visualstudio.com/
 [GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files
 [mkdocs]: https://www.mkdocs.org/
-[Ultimate Notion Tests]: https://north-tile-42e.notion.site/Ultimate-Notion-Tests-2d8289fbc2b58168bc9ac92273808b70
 [VCR.py]: https://vcrpy.readthedocs.io/
-[Getting started]: https://ultimate-notion.com/latest/usage/getting_started/#creating-an-integration
+[My integrations]: https://www.notion.so/my-integrations

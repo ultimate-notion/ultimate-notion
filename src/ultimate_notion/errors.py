@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ultimate_notion.schema import Schema
+    from ultimate_notion.schema import SchemaType
 
 
 class UltimateNotionError(Exception):
@@ -14,6 +14,9 @@ class UltimateNotionError(Exception):
 
 class UnsetError(UltimateNotionError):
     """Raised when an unset value is accessed before being initialized by the Notion API."""
+
+    def __init__(self, msg: str = 'Parameter is unset and was not yet initialized by the Notion API.') -> None:
+        super().__init__(msg)
 
 
 class SessionError(UltimateNotionError):
@@ -67,7 +70,7 @@ class SchemaError(UltimateNotionError):
 class SchemaNotBoundError(SchemaError):
     """Raised when the schema is not bound to a data source."""
 
-    def __init__(self, schema: type[Schema]):
+    def __init__(self, schema: SchemaType):
         self.schema = schema
         msg = f'Schema {schema.__name__} is not bound to any data source'
         super().__init__(msg)

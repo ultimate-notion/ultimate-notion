@@ -10,13 +10,22 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, BinaryIO, cast
+from typing import TYPE_CHECKING, Any, BinaryIO
 from uuid import UUID
 
 from pydantic import SerializeAsAny, TypeAdapter
 
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.obj_api.blocks import Block, Database, DataSource, FileBase, Page
-from ultimate_notion.obj_api.core import Unset, UnsetType, raise_unset
+from ultimate_notion.obj_api.core import (
+    GenericObject,
+    ObjectRef,
+    ParentRef,
+    Unset,
+    UnsetType,
+    UserRef,
+    is_unset,
+)
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
@@ -28,13 +37,9 @@ from ultimate_notion.obj_api.objects import (
     EmojiObject,
     FileObject,
     FileUpload,
-    GenericObject,
-    ObjectRef,
     PageRef,
-    ParentRef,
     RichTextBaseObject,
     User,
-    UserRef,
 )
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DataSourceQueryBuilder, SearchQueryBuilder
@@ -53,6 +58,10 @@ if TYPE_CHECKING:
     from notion_client.api_endpoints import UsersEndpoint as NCUsersEndpoint
 
 _logger = logging.getLogger(__name__)
+
+# The Notion SDK types its responses as `Any | Awaitable[Any]`; validate them into a
+# real `dict[str, Any]` so the result is correctly typed for `**`-unpacking.
+_DictAdapter = TypeAdapter(dict[str, Any])
 
 
 class NotionAPI:
@@ -75,6 +84,16 @@ class Endpoint:
     """Baseclass of the Notion API endpoints."""
 
     api: NotionAPI
+
+    @staticmethod
+    def _as_dict(data: Any) -> dict[str, Any]:
+        """Validate a notion_client response into a `dict[str, Any]`.
+
+        The Notion SDK types its responses as `Any | Awaitable[Any]`, which breaks
+        `**`-unpacking the result. Validating through a `TypeAdapter` both narrows the
+        type and checks at runtime that the response really is a mapping.
+        """
+        return _DictAdapter.validate_python(data)
 
 
 class BlocksEndpoint(Endpoint):
@@ -109,9 +128,9 @@ class BlocksEndpoint(Endpoint):
                     msg = 'Number of appended blocks does not match the number of provided blocks.'
                     raise ValueError(msg)
             else:
-                appended_blocks = list(
-                    block_iter(block_id=parent_id, children=children, after=str(raise_unset(after.id)))
-                )
+                if is_unset(after_id := after.id):
+                    raise UnsetError()
+                appended_blocks = list(block_iter(block_id=parent_id, children=children, after=str(after_id)))
 
             # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
             # blocks after the specified block, where we append the blocks.
@@ -167,18 +186,22 @@ class BlocksEndpoint(Endpoint):
 
         The block info will be updated to the latest version from the server.
         """
-        block_id = cast(UUID, raise_unset(block.id))  # don't get why mypy needs this cast
+        if is_unset(block_id := block.id):
+            raise UnsetError()
+        if not isinstance(block_id, UUID):
+            msg = f'Expected block id to be a `UUID`, got `{type(block_id).__name__}`.'
+            raise TypeError(msg)
         _logger.debug(f'Updating block with id `{block_id}`.')
         params = block.serialize_for_api()
 
         if isinstance(block, FileBase):
             # The Notiopn API does not support setting a new typed FileObject, e.g. `external` or `file`
             # It even must be removed from the params
-            dtype = params[block.type].pop('type')
-            del params[block.type][dtype]
+            block_type = block._type_name
+            dtype = params[block_type].pop('type')
+            del params[block_type][dtype]
 
-        # Typing in notion_client sucks, so we cast
-        data = cast(dict[str, Any], self.raw_api.update(block_id.hex, **params))
+        data = self._as_dict(self.raw_api.update(block_id.hex, **params))
         block.update(**data)
 
 
@@ -272,9 +295,7 @@ class DataSourcesEndpoint(Endpoint):
         _logger.debug(f'Updating info of data source with id `{ds.id}`.')
 
         if request := self._build_request(schema=schema, title=title, description=description, inline=inline):
-            # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
-            # Typing in notion_client sucks, thus we cast
-            data = cast(dict[str, Any], self.raw_api.update(str(ds.id), **request))
+            data = self._as_dict(self.raw_api.update(str(ds.id), **request))
             ds.update(**data)
 
     def delete(self, ds: DataSource) -> DataSource:
@@ -388,9 +409,7 @@ class DatabasesEndpoint(Endpoint):
         _logger.debug(f'Updating info of database with id `{db.id}`.')
 
         if request := self._build_request(title=title, description=description, inline=inline):
-            # https://github.com/ramnes/notion-sdk-py/blob/main/notion_client/api_endpoints.py
-            # Typing in notion_client sucks, thus we cast
-            data = cast(dict[str, Any], self.raw_api.update(str(db.id), **request))
+            data = self._as_dict(self.raw_api.update(str(db.id), **request))
             db.update(**data)
 
 
@@ -513,7 +532,8 @@ class PagesEndpoint(Endpoint):
         in_trash: bool | UnsetType = Unset,
     ) -> None:
         """Update the Page object properties on the server."""
-        page_id = raise_unset(page.id)
+        if is_unset(page_id := page.id):
+            raise UnsetError()
         _logger.debug(f'Updating info on page with id `{page_id}`.')
 
         request: dict[str, Any] = {}
@@ -523,21 +543,21 @@ class PagesEndpoint(Endpoint):
                 name: value.serialize_for_api() if value is not None else None for name, value in properties.items()
             }
 
-        if cover is not Unset:
+        if not is_unset(cover):
             if cover is None:
                 _logger.debug(f'Removing cover from page with id `{page_id}`.')
                 request['cover'] = None
             else:
                 _logger.debug(f'Setting cover on page with id `{page_id}`.')
-                request['cover'] = cover.serialize_for_api()  # type: ignore[union-attr]
+                request['cover'] = cover.serialize_for_api()
 
-        if icon is not Unset:
+        if not is_unset(icon):
             if icon is None:
                 _logger.debug(f'Removing icon from page with id `{page_id}`.')
                 request['icon'] = None
             else:
                 _logger.debug(f'Setting icon on page with id `{page_id}`.')
-                request['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
+                request['icon'] = icon.serialize_for_api()
 
         if in_trash is not Unset:
             if in_trash:
@@ -547,7 +567,7 @@ class PagesEndpoint(Endpoint):
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 request['archived'] = False
 
-        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **request))
+        data = self._as_dict(self.raw_api.update(page_id.hex, **request))
         page.update(**data)
 
     def set_attr(
@@ -567,21 +587,21 @@ class PagesEndpoint(Endpoint):
         page_id = PageRef.build(page).page_id
         props: dict[str, Any] = {}
 
-        if cover is not Unset:
+        if not is_unset(cover):
             if cover is None:
                 _logger.debug(f'Removing cover from page with id `{page_id}`.')
                 props['cover'] = None
             else:
                 _logger.debug(f'Setting cover on page with id `{page_id}`.')
-                props['cover'] = cover.serialize_for_api()  # type: ignore[union-attr]
+                props['cover'] = cover.serialize_for_api()
 
-        if icon is not Unset:
+        if not is_unset(icon):
             if icon is None:
                 _logger.debug(f'Removing icon from page with id `{page_id}`.')
                 props['icon'] = None
             else:
                 _logger.debug(f'Setting icon on page with id `{page_id}`.')
-                props['icon'] = icon.serialize_for_api()  # type: ignore[union-attr]
+                props['icon'] = icon.serialize_for_api()
 
         if in_trash is not Unset:
             if in_trash:
@@ -591,7 +611,7 @@ class PagesEndpoint(Endpoint):
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 props['archived'] = False
 
-        data = cast(dict[str, Any], self.raw_api.update(page_id.hex, **props))
+        data = self._as_dict(self.raw_api.update(page_id.hex, **props))
         page.update(**data)
 
 
@@ -706,14 +726,14 @@ class UploadsEndpoint(Endpoint):
         file_param = (file_upload.filename, file, file_upload.content_type)  # see issue #127 for reasons
         # Notion API doesn't like nulls, so we eliminate them
         kwargs = {k: v for k, v in (('file', file_param), ('part_number', part)) if v is not None}
-        data = cast(dict[str, Any], self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
+        data = self._as_dict(self.raw_api.send(file_upload_id=str(file_upload.id), **kwargs))
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/complete-a-file-upload
     def complete(self, file_upload: FileUpload) -> None:
         """Complete the file upload and update the file_upload object."""
         _logger.debug(f'Completing file upload with id `{file_upload.id}`.')
-        data = cast(dict[str, Any], self.raw_api.complete(file_upload_id=str(file_upload.id)))
+        data = self._as_dict(self.raw_api.complete(file_upload_id=str(file_upload.id)))
         file_upload.update(**data)
 
     # https://developers.notion.com/reference/retrieve-a-file-upload

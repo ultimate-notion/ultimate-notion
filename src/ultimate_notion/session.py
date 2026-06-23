@@ -9,7 +9,7 @@ import time
 from collections.abc import Sequence
 from threading import RLock
 from types import TracebackType
-from typing import Any, BinaryIO, ClassVar, cast
+from typing import Any, BinaryIO, ClassVar, TypeVar, cast
 from uuid import UUID
 
 import httpx
@@ -25,7 +25,6 @@ from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
-from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.objects import get_uuid
@@ -37,6 +36,9 @@ from ultimate_notion.user import Bot, UnknownUser, User
 from ultimate_notion.utils import SList
 
 _logger = logging.getLogger(__name__)
+
+# ToDo: Use new syntax when requires-python >= 3.12
+T_cache = TypeVar('T_cache', bound='DataObject | User')
 
 
 class Session:
@@ -106,9 +108,9 @@ class Session:
 
     def __exit__(
         self,
-        exc_type: type[BaseException],
-        exc_value: BaseException,
-        traceback: TracebackType,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None:
         self.close()
 
@@ -144,12 +146,32 @@ class Session:
             msg = 'Invalid API reponse'
             raise SessionError(msg) from err
 
+    def _cache_add(self, obj: T_cache) -> T_cache:
+        """Cache `obj` keyed by its id, returning the already-cached instance if one exists."""
+        cached = self.cache.setdefault(obj.id, obj)
+        if not isinstance(cached, type(obj)):
+            msg = f'Cached object `{obj.id}` is a `{type(cached).__name__}`, expected `{type(obj).__name__}`.'
+            raise TypeError(msg)
+        return cached
+
+    def _cache_get(self, key: UUID, expected_type: type[T_cache]) -> T_cache:
+        """Return the cached object under `key`, narrowed to `expected_type`."""
+        obj = self.cache[key]
+        if not isinstance(obj, expected_type):
+            msg = f'Cached object `{key}` is a `{type(obj).__name__}`, expected `{expected_type.__name__}`.'
+            raise TypeError(msg)
+        return obj
+
     def get_block(self, block_ref: UUID | str, *, use_cache: bool = True) -> Block:
         """Retrieve a single block by an object reference."""
         block_uuid = get_uuid(block_ref)
         if use_cache and block_uuid in self.cache:
             _logger.info(f'Retrieving cached block with id `{block_uuid}`.')
-            block = cast(Block, self.cache[block_uuid])
+            cached_obj = self.cache[block_uuid]
+            if not isinstance(cached_obj, Block):
+                msg = f'Cached object `{block_uuid}` is a `{type(cached_obj).__name__}`, expected a `Block`.'
+                raise TypeError(msg)
+            block = cached_obj
         else:
             _logger.info(f'Retrieving block with id `{block_uuid}`.')
             block = Block.wrap_obj_ref(self.api.blocks.retrieve(block_uuid))
@@ -212,10 +234,7 @@ class Session:
         )
         if reverse:
             query.sort(ascending=True)
-        data_sources = [
-            cast(DataSource, self.cache.setdefault(raise_unset(ds.id), DataSource.wrap_obj_ref(ds)))
-            for ds in query.execute()
-        ]
+        data_sources = [self._cache_add(DataSource.wrap_obj_ref(ds)) for ds in query.execute()]
         if exact and name is not None:
             data_sources = [ds for ds in data_sources if ds.title == name]
         if not deleted:
@@ -227,7 +246,7 @@ class Session:
         ds_uuid = get_uuid(ds_ref)
         if use_cache and ds_uuid in self.cache:
             _logger.info(f'Retrieving cached data source with id `{ds_uuid}`.')
-            ds = cast(DataSource, self.cache[ds_uuid])
+            ds = self._cache_get(ds_uuid, DataSource)
         else:
             _logger.info(f'Retrieving data source with id `{ds_uuid}`.')
             try:
@@ -263,13 +282,10 @@ class Session:
             reverse: search in the reverse order, i.e. the least recently edited results first
         """
         _logger.info(f'Searching for page with title `{title}`.')
-        query = cast(obj_query.SearchQueryBuilder[obj_blocks.Page], self.api.search(title).filter(page_only=True))
+        query = self.api.search(title).filter(page_only=True)
         if reverse:
             query.sort(ascending=True)
-        pages = [
-            cast(Page, self.cache.setdefault(raise_unset(page_obj.id), Page.wrap_obj_ref(page_obj)))
-            for page_obj in query.execute()
-        ]
+        pages = [self._cache_add(Page.wrap_obj_ref(page_obj)) for page_obj in query.execute()]
         if exact and title is not None:
             pages = [page for page in pages if page.title == title]
         return SList(pages)
@@ -279,7 +295,7 @@ class Session:
         page_uuid = get_uuid(page_ref)
         if use_cache and page_uuid in self.cache:
             _logger.info(f'Retrieving cached page with id `{page_uuid}`.')
-            page = cast(Page, self.cache[page_uuid])
+            page = self._cache_get(page_uuid, Page)
         else:
             _logger.info(f'Retrieving page with id `{page_uuid}`.')
             try:
@@ -357,7 +373,7 @@ class Session:
 
         if use_cache and user_uuid in self.cache:
             _logger.info(f'Retrieving cached user with id `{user_uuid}`.')
-            user = cast(User, self.cache[user_uuid])
+            user = self._cache_get(user_uuid, User)
         else:
             _logger.info(f'Retrieving user with id `{user_uuid}`.')
             try:
@@ -383,7 +399,7 @@ class Session:
     def all_users(self) -> list[User]:
         """Retrieve all users of this workspace."""
         _logger.info('Retrieving all users.')
-        return [cast(User, self.cache.setdefault(user.id, User.wrap_obj_ref(user))) for user in self.api.users.list()]
+        return [self._cache_add(User.wrap_obj_ref(user)) for user in self.api.users.list()]
 
     def whoami(self) -> Bot:
         """Return the integration as bot object."""
@@ -391,9 +407,9 @@ class Session:
         if self._own_bot_id is None:
             user = self.api.users.me()
             self._own_bot_id = user.id
-            return cast(Bot, self.cache.setdefault(user.id, Bot.wrap_obj_ref(user)))
+            return self._cache_add(Bot.wrap_obj_ref(user))
         else:
-            return cast(Bot, self.cache[self._own_bot_id])
+            return self._cache_get(self._own_bot_id, Bot)
 
     def upload(self, file: BinaryIO, *, file_name: str | None = None, mime_type: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""

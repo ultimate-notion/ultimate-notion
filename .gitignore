@@ -21,6 +21,7 @@ __pycache__/*
 .settings
 .idea
 .vscode/.env
+.env
 tags
 
 # Package files
@@ -28,6 +29,8 @@ tags
 *.eggs/
 .installed.cfg
 *.egg-info
+# Hatch uses the committed locks/*.lock files.
+uv.lock
 
 # Unittest and coverage
 htmlcov/*

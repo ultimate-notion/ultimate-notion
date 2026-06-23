@@ -5,6 +5,16 @@
 - New: Better logging of model validation errors, issue #152.
 - New: Implement the new data source Notion API version 2025-09-03, issue #118.
 
+## Version 0.9.8, 2026-06-22
+
+- Fix: Tolerate page/database objects that omit `properties`, which the `search` endpoint returns for stripped-down records (e.g. trashed or limited-access pages) and which previously broke `search_page()`/`search_db()`, issue #273.
+
+## Version 0.9.7, 2026-06-22
+
+- Fix: Add support for `pydantic` 2.13, which previously broke parsing of Notion user objects (e.g. people properties), issue #189.
+- Fix: Accept the new `is_archived` field the Notion API sends on pages and databases, which previously broke `search_page()`/`search_db()` in development mode, issue #202.
+- Fix: Accept the nullable `icon` field returned for paragraph blocks and omit read-only archive fields when creating blocks.
+
 ## Version 0.9.6, 2025-11-23
 
 - New: Add the new `Place` database/source property.
@@ -25,6 +35,7 @@
 - Chg: Return `FileUploadStatus` in `UploadedFile.file_import_result` for easier usage.
 - Fix: All objects are no longer `hash`able as they are mutable and thus the former behaviour was semantically incorrect.
 - Fix: Comparison of off-/online `MentionObject`s works, also when `UserRef` or an `ObjectRef` to a page is used, issue #170.
+- Fix: An `Unset` `annotations` (e.g. a mention built with `style=None`) now compares equal to the default `Annotations` returned by the Notion API, issue #174.
 
 ## Version 0.9.5, 2025-10-24
 

@@ -17,9 +17,9 @@ from typing_extensions import Self, TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.core import Wrapper, get_active_session, get_repr
-from ultimate_notion.errors import InvalidAPIUsageError
+from ultimate_notion.errors import InvalidAPIUsageError, UnsetError
 from ultimate_notion.obj_api import objects as objs
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.enums import FileUploadStatus
 from ultimate_notion.rich_text import Text, html_img
 
@@ -149,7 +149,9 @@ class UploadedFile(AnyFile[objs.UploadedFile], wraps=objs.UploadedFile):
     @property
     def id(self) -> UUID:
         """Return the ID of the uploaded file."""
-        return raise_unset(self.obj_file_upload.id)
+        if is_unset(id_ := self.obj_file_upload.id):
+            raise UnsetError()
+        return id_
 
     @classmethod
     def from_file_upload(cls, file_upload: objs.FileUpload) -> Self:

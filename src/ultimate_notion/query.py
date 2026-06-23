@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydantic import BaseModel, Field
 from typing_extensions import Self
@@ -14,7 +14,6 @@ from ultimate_notion import props, schema
 from ultimate_notion.core import get_active_session
 from ultimate_notion.errors import EmptyDataSourceError, FilterQueryError
 from ultimate_notion.obj_api import query as obj_query
-from ultimate_notion.obj_api.core import raise_unset
 from ultimate_notion.obj_api.enums import ArrayQuantifier, FormulaType, RollupType, SortDirection
 from ultimate_notion.option import Option
 from ultimate_notion.page import Page
@@ -213,8 +212,7 @@ class PropertyCondition(Condition, ABC):
             except StopIteration as e:
                 msg = f'The data source {ds} is empty.'
                 raise EmptyDataSourceError(msg) from e
-            page_obj_id = raise_unset(page_obj.id)
-            self._probe_page = cast(Page, session.cache.setdefault(page_obj_id, Page.wrap_obj_ref(page_obj)))
+            self._probe_page = session._cache_add(Page.wrap_obj_ref(page_obj))
 
         return self._probe_page
 
@@ -441,8 +439,8 @@ class EqualsNot(Equals):
 
 
 class InEquality(PropertyCondition, ABC):
-    _num_condition_kw: str
-    _date_condition_kw: str
+    _num_condition_kw: ClassVar[str]
+    _date_condition_kw: ClassVar[str]
 
     def _create_obj_ref_kwargs(self, ds: DataSource, prop_type: Property) -> dict[str, obj_query.Condition]:
         kwargs: dict[str, obj_query.Condition] = {}
@@ -679,7 +677,7 @@ class EndsWith(StartsWith):
 
 
 class DateCondition(PropertyCondition, ABC):
-    _condition_kw: str
+    _condition_kw: ClassVar[str]
     is_method: bool = True
 
     def _create_obj_ref_kwargs(self, ds: DataSource, prop_type: Property) -> dict[str, obj_query.Condition]:
@@ -831,10 +829,7 @@ class Query:
         if sort_objs := self._sorts_obj_ref():
             query_obj = query_obj.sort(sort_objs)
 
-        pages = [
-            cast(Page, session.cache.setdefault(raise_unset(page.id), Page.wrap_obj_ref(page)))
-            for page in query_obj.execute()
-        ]
+        pages = [session._cache_add(Page.wrap_obj_ref(page)) for page in query_obj.execute()]
         return View(ds=self.ds, pages=pages, query=self)
 
     def filter(self, expr: Condition) -> Query:

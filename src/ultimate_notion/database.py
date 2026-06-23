@@ -15,10 +15,10 @@ from typing_extensions import Self, TypeVar
 from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr, resolve_ref
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError, SListError
+from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError, SListError, UnsetError
 from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api import blocks as obj_blocks
-from ultimate_notion.obj_api.core import raise_unset
+from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
 from ultimate_notion.rich_text import Text, camel_case
@@ -37,7 +37,9 @@ class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
     def title(self) -> str | Text | None:
         """Return the title of this data source as rich text."""
         # `str` added as return value but always RichText returned, which inherits from str.
-        if title := raise_unset(self.obj_ref.title):
+        if is_unset(title := self.obj_ref.title):
+            raise UnsetError()
+        if title:
             return Text.wrap_obj_ref(title)
         return None
 
@@ -54,7 +56,9 @@ class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
     @property
     def description(self) -> Text | None:
         """Return the description of this data source as rich text."""
-        if desc := raise_unset(self.obj_ref.description):
+        if is_unset(desc := self.obj_ref.description):
+            raise UnsetError()
+        if desc:
             return Text.wrap_obj_ref(desc)
         return None
 
@@ -192,7 +196,8 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
     @property
     def db_parent(self) -> NotionEntity | WorkspaceType | None:
         """Return the parent of the database of this data source, if any."""
-        db_parent = raise_unset(self.obj_ref.database_parent)
+        if is_unset(db_parent := self.obj_ref.database_parent):
+            raise UnsetError()
         return resolve_ref(db_parent)
 
     def __bool__(self) -> bool:
@@ -262,7 +267,9 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def url(self) -> str:
         """Return the public URL of this database."""
-        return raise_unset(self.obj_ref.url)
+        if is_unset(url := self.obj_ref.url):
+            raise UnsetError()
+        return url
 
     @property
     def public_url(self) -> str | None:
