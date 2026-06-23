@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: Omit the read-only `is_archived` field from nested block children when appending a block hierarchy, which previously leaked into the children and was rejected by the Notion API, issue #291.
 - Chg: Validate polymorphic `TypedObject` sub-types and user references on construction, and wrap any resulting Pydantic `ValidationError` with contextual information about the failing type, issue #152.
 
 ## Version 0.9.8, 2026-06-22
