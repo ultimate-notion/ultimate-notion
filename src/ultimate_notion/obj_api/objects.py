@@ -597,6 +597,23 @@ class CustomEmojiObject(MentionBase[CustomEmojiObjectTypeData], MentionMixin, ty
         return self.__class__.build_mention_from(self, style=style)
 
 
+class BuiltInIconTypeData(GenericObject):
+    """Type data for a `BuiltInIconObject`."""
+
+    name: str
+    color: str
+
+
+class BuiltInIconObject(TypedObject[GenericObject], type='icon'):
+    """A Notion built-in icon object.
+
+    These are icons picked from Notion's icon gallery (rather than emojis or
+    custom images) and are identified by a `name` and a `color`.
+    """
+
+    icon: BuiltInIconTypeData
+
+
 class FileObject(TypedObject[GO_co], polymorphic_base=True):
     """A Notion file object.
 

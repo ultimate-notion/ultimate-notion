@@ -36,6 +36,7 @@ from ultimate_notion.obj_api.objects import (
     MAX_TEXT_OBJECT_SIZE,
     Annotations,
     BlockRef,
+    BuiltInIconObject,
     CustomEmojiObject,
     EmojiObject,
     FileObject,
@@ -68,7 +69,7 @@ class Database(DataObject, MentionMixin, object='database'):
     title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     url: str | UnsetType = Unset
     public_url: str | None = None
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, SerializeAsAny[Property]] = Field(default_factory=dict)
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
@@ -83,7 +84,7 @@ class Page(DataObject, MentionMixin, object='page'):
 
     url: str | UnsetType = Unset
     public_url: str | None = None
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyValue] = Field(default_factory=dict)
     is_locked: bool | UnsetType = Unset
@@ -239,7 +240,7 @@ class ColoredTextBlock(TextBlock[CTB_co]):
 class ParagraphTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Paragraph` block."""
 
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset
 
 
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):
@@ -313,7 +314,7 @@ class CalloutTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
 
     # `Unset` means the default icon as determined by Notion, and `None` means no icon when retrieved
     #  but is not accepted when sending to Notion.
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset
 
 
 class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):

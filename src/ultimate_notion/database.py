@@ -9,7 +9,7 @@ from typing_extensions import Self
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import get_active_session, get_repr
-from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError, UnsetError
 from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -87,7 +87,7 @@ class Database(DataObject[obj_blocks.Database], wraps=obj_blocks.Database):
         session.api.databases.update(self.obj_ref, description=text.obj_ref)
 
     @property
-    def icon(self) -> AnyFile | Emoji | CustomEmoji | None:
+    def icon(self) -> AnyFile | Emoji | CustomEmoji | BuiltInIcon | None:
         """Return the icon of this database as file or emoji."""
         if (icon := self.obj_ref.icon) is None:
             return None

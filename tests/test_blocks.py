@@ -8,7 +8,8 @@ import pytest
 import ultimate_notion as uno
 from tests.conftest import URL, all_blocks
 from ultimate_notion import blocks as uno_blocks
-from ultimate_notion.blocks import ChildrenMixin
+from ultimate_notion.blocks import ChildrenMixin, wrap_icon
+from ultimate_notion.emoji import BuiltInIcon
 from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.blocks import Block as ObjBlock
@@ -1028,3 +1029,30 @@ def test_local_remote_mention_block_cmp(
     assert len(page.children) == 1
     assert page.children[0] == block_child
     assert page.children[0] == another_block_child
+
+
+def test_built_in_icon_wrapper() -> None:
+    """A built-in (icon gallery) icon wraps and renders like an emoji code, see issue #295."""
+    icon_obj = objs.BuiltInIconObject.model_validate({'type': 'icon', 'icon': {'name': 'snake', 'color': 'purple'}})
+
+    icon = wrap_icon(icon_obj)
+    assert isinstance(icon, BuiltInIcon)
+    assert icon.name == 'snake'
+    assert icon.color == 'purple'
+    assert str(icon) == ':snake:'
+    assert icon.to_code == ':snake:'
+
+    # built-in icons cannot be constructed by the user, only retrieved from Notion
+    with pytest.raises(InvalidAPIUsageError):
+        BuiltInIcon()
+
+
+def test_callout_with_built_in_icon_markdown() -> None:
+    """A callout carrying a built-in icon renders its name as an emoji code, see issue #295."""
+    callout = uno_blocks.Callout('Built-in icon callout')
+    callout.obj_ref.value.icon = objs.BuiltInIconObject.model_validate(
+        {'type': 'icon', 'icon': {'name': 'snake', 'color': 'purple'}}
+    )
+
+    assert isinstance(callout.icon, BuiltInIcon)
+    assert callout.to_markdown().strip() == ':snake: Built-in icon callout'

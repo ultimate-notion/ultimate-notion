@@ -10,7 +10,7 @@ from typing_extensions import Self, TypeIs
 from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject, wrap_icon
 from ultimate_notion.comment import Discussion
 from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr
-from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import render_md
@@ -220,7 +220,7 @@ class Page(
         session.api.pages.update(self.obj_ref, properties={title_prop_name: title.obj_ref})
 
     @property
-    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | None:
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon | None:
         """Icon of the page, i.e. emojis, Notion's icons, or custom images."""
         if (icon := self.obj_ref.icon) is None:
             return None
@@ -228,7 +228,7 @@ class Page(
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: AnyFile | Emoji | CustomEmoji | str | None) -> None:
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None) -> None:
         """Set the icon of this page."""
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
             icon = Emoji(icon)

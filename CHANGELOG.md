@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: Accept Notion's built-in (icon gallery) icons, which use the `icon` sub-type with a `name` and `color` and previously broke loading any page/database (and cascaded into `search`/list endpoints) that used one, issue #295.
 - Chg: Validate polymorphic `TypedObject` sub-types and user references on construction, and wrap any resulting Pydantic `ValidationError` with contextual information about the failing type, issue #152.
 
 ## Version 0.9.8, 2026-06-22
