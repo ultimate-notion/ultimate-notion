@@ -122,7 +122,7 @@ def match_search_body(r1: Any, r2: Any) -> bool:
     """
     if not (r1.path == NOTION_SEARCH_PATH and r2.path == NOTION_SEARCH_PATH):
         return True
-    return _request_json_body(r1) == _request_json_body(r2)
+    return bool(_request_json_body(r1) == _request_json_body(r2))
 
 
 def register_notion_matchers(vcr: VCR) -> None:
