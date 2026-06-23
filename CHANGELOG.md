@@ -5,6 +5,13 @@
 - New: Better logging of model validation errors, issue #152.
 - New: Implement the new data source Notion API version 2025-09-03, issue #118.
 
+## Version 0.9.9, 2026-06-23
+
+- Fix: Accept Notion's built-in (icon gallery) icons, which use the `icon` sub-type with a `name` and `color` and previously broke loading any page/database (and cascaded into `search`/list endpoints) that used one, issue #295.
+- Fix: Omit the read-only `is_archived` field from nested block children when appending a block hierarchy, which previously leaked into the children and was rejected by the Notion API, issue #291.
+- Chg: Validate polymorphic `TypedObject` sub-types and user references on construction, and wrap any resulting Pydantic `ValidationError` with contextual information about the failing type, issue #152.
+- Fix: Accept the undocumented `in_trash` field the Notion API sends on `file_upload` objects, which previously broke every file upload in development mode, issue #299.
+
 ## Version 0.9.8, 2026-06-22
 
 - Fix: Tolerate page/database objects that omit `properties`, which the `search` endpoint returns for stripped-down records (e.g. trashed or limited-access pages) and which previously broke `search_page()`/`search_db()`, issue #273.

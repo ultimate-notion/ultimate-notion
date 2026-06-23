@@ -95,3 +95,27 @@ class CustomEmoji(EmojiBase[objs.CustomEmojiObject], wraps=objs.CustomEmojiObjec
 
     def __str__(self) -> str:
         return f':{self.name}:'
+
+
+class BuiltInIcon(EmojiBase[objs.BuiltInIconObject], wraps=objs.BuiltInIconObject):
+    """Built-in icon from Notion's icon gallery, identified by a name and color."""
+
+    def __init__(self) -> None:
+        msg = 'To use a built-in icon, pick one from the icon gallery in Notion.'
+        raise InvalidAPIUsageError(msg)
+
+    @property
+    def name(self) -> str:
+        """Return the name of this built-in icon."""
+        return self.obj_ref.icon.name
+
+    @property
+    def color(self) -> str:
+        """Return the color of this built-in icon."""
+        return self.obj_ref.icon.color
+
+    def __repr__(self) -> str:
+        return get_repr(self, desc=self.name)
+
+    def __str__(self) -> str:
+        return f':{self.name}:'

@@ -144,6 +144,7 @@ Workspace: Final = _Workspace.ROOT
 WorkspaceType: TypeAlias = Literal[_Workspace.ROOT]
 """This represents the type of the root workspace in Notion for type hinting."""
 
+
 # ToDo: Use new syntax when requires-python >= 3.12
 NE_co = TypeVar('NE_co', bound=obj_core.NotionEntity, default=obj_core.NotionEntity, covariant=True)
 

@@ -37,7 +37,7 @@ from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
-from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import InvalidAPIUsageError, UnknownDataSourceError, UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
@@ -75,8 +75,8 @@ DO_co = TypeVar('DO_co', bound=obj_blocks.DataObject, default=obj_blocks.DataObj
 
 
 def wrap_icon(
-    icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject,
-) -> NotionFile | ExternalFile | CustomEmoji | Emoji:
+    icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject | objs.BuiltInIconObject,
+) -> NotionFile | ExternalFile | CustomEmoji | Emoji | BuiltInIcon:
     """Wrap the icon object into the corresponding class."""
     match icon_obj:
         case objs.ExternalFile():
@@ -87,6 +87,8 @@ def wrap_icon(
             return Emoji.wrap_obj_ref(icon_obj)
         case objs.CustomEmojiObject():
             return CustomEmoji.wrap_obj_ref(icon_obj)
+        case objs.BuiltInIconObject():
+            return BuiltInIcon.wrap_obj_ref(icon_obj)
         case _:
             msg = f'unknown icon object of {type(icon_obj)}'
             raise RuntimeError(msg)
@@ -660,7 +662,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
-        icon: AnyFile | str | Emoji | CustomEmoji = '💡',
+        icon: AnyFile | str | Emoji | CustomEmoji | BuiltInIcon = '💡',
     ) -> None:
         super().__init__(text, color=color)
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
@@ -677,7 +679,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         return Emoji('💡')
 
     @property
-    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon:
         if is_unset(icon := self.obj_ref.value.icon):
             raise UnsetError()
         if icon is None:
@@ -686,7 +688,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: AnyFile | Emoji | CustomEmoji) -> None:
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon) -> None:
         self.obj_ref.value.icon = icon.obj_ref
         self._update_in_notion()
 
@@ -694,7 +696,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         match self.icon:
             case Emoji():
                 return f'{self.icon} {super().to_markdown()}\n'
-            case CustomEmoji():
+            case CustomEmoji() | BuiltInIcon():
                 return f':{self.icon.name}: {super().to_markdown()}\n'
             case AnyFile():
                 return f'![icon]({self.icon.url}) {super().to_markdown()}\n'

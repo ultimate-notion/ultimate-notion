@@ -230,13 +230,13 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
         ```
         Tests / Markdown Test
 
-        [📄 **<u>Markdown SubPage Test</u>**](https://www.notion.so/Markdown-SubPage-Test-67ad5240b1b944679b073ef3ebbbc755)
+        [📄 **<u>Markdown SubPage Test</u>**](https://www.notion.so/Markdown-SubPage-Test-00000000000040008000000000000005)
 
         <!--- original block -->
         This is the original Paragraph on Page
         <!--- synced block -->
         This is the original Paragraph on SubPage
-        [**↗️ <u>Markdown SubPage Test</u>**](https://www.notion.so/Markdown-SubPage-Test-67ad5240b1b944679b073ef3ebbbc755)
+        [**↗️ <u>Markdown SubPage Test</u>**](https://www.notion.so/Markdown-SubPage-Test-00000000000040008000000000000005)
 
         <kbd>Unsupported block</kbd>
 

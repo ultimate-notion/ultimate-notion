@@ -276,19 +276,41 @@ class Bootstrap:
 
     def ensure_formula_db(self) -> None:
         database, _ = self.get_or_create_database('Formula DB', Formulas)
-        if not database.is_empty:
+        if database.is_empty:
+            for title, tags in (
+                ('Item 1', [FormulaTag.done, FormulaTag.in_progress]),
+                ('Item 2', [FormulaTag.in_progress]),
+            ):
+                database.create_page(
+                    name=title,
+                    tags=tags,
+                    date_source='2024-11-25T14:08:00.000+00:00',
+                )
+            typer.echo('seeded Formula DB: 2 rows')
+        else:
             typer.echo('Formula DB already has rows')
-            return
-        for title, tags in (
-            ('Item 1', [FormulaTag.done, FormulaTag.in_progress]),
-            ('Item 2', [FormulaTag.in_progress]),
-        ):
-            database.create_page(
-                name=title,
-                tags=tags,
-                date_source='2024-11-25T14:08:00.000+00:00',
+        self.check_formula_filterable(database)
+
+    @staticmethod
+    def check_formula_filterable(database: uno.Database) -> None:
+        """Report whether the Formula DB's formulas can be filtered on.
+
+        Notion rejects query filters on formula properties created via the public API
+        ("Unable to filter based on a formula of unknown type", see issue #297), so the
+        formula columns must be (re)created in the Notion UI before `test_query_formula`
+        can record. This probe surfaces that as a manual step instead of a cryptic 400
+        during cassette recording.
+        """
+        try:
+            database.query.filter(uno.prop('String').is_not_empty()).execute()
+        except HTTPResponseError as exc:
+            typer.echo(
+                f'Formula DB: manual setup required - formula filters fail ({exc}). '
+                'Recreate the formula columns in the Notion UI so Notion assigns them a '
+                'filterable result type (see issue #297), then re-run.'
             )
-        typer.echo('seeded Formula DB: 2 rows')
+        else:
+            typer.echo('Formula DB: formula filters OK')
 
     def ensure_static_pages(self) -> None:
         self.create_page(

@@ -36,6 +36,7 @@ from ultimate_notion.obj_api.objects import (
     MAX_TEXT_OBJECT_SIZE,
     Annotations,
     BlockRef,
+    BuiltInIconObject,
     CustomEmojiObject,
     DataSourceRef,
     EmojiObject,
@@ -74,7 +75,7 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
     title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     url: str | UnsetType = Unset
     public_url: str | None = None
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, SerializeAsAny[Property]] = Field(default_factory=dict)
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
@@ -109,7 +110,7 @@ class Page(DataObject, MentionMixin, object='page'):
 
     url: str | UnsetType = Unset
     public_url: str | None = None
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, PropertyValue] = Field(default_factory=dict)
     is_locked: bool | UnsetType = Unset
@@ -160,9 +161,30 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
     def serialize_for_api(self) -> dict[str, Any]:
         """Serialize the block for sending it to the Notion API."""
         data = super().serialize_for_api()
-        for key in ('has_children', 'in_trash', 'archived', 'is_archived'):
-            data.pop(key, None)
+        _strip_block_meta_fields(data)
         return data
+
+
+# Read-only meta fields the Notion API rejects on create/append payloads. `is_archived`
+# is in particular rejected outright (issue #291), so it must not leak into nested children.
+_API_EXCLUDED_BLOCK_FIELDS = ('has_children', 'in_trash', 'archived', 'is_archived')
+
+
+def _strip_block_meta_fields(data: Any) -> None:
+    """Recursively remove read-only block meta fields from a serialized block tree.
+
+    Nested children are serialized via pydantic's recursive `model_dump` rather than by
+    calling each child's `serialize_for_api`, so the top-level strip never reaches them.
+    Walking the serialized tree here ensures every nested child block is cleaned too.
+    """
+    if isinstance(data, dict):
+        for key in _API_EXCLUDED_BLOCK_FIELDS:
+            data.pop(key, None)
+        for value in data.values():
+            _strip_block_meta_fields(value)
+    elif isinstance(data, list):
+        for item in data:
+            _strip_block_meta_fields(item)
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -244,7 +266,7 @@ class ColoredTextBlock(TextBlock[CTB_co]):
 class ParagraphTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Paragraph` block."""
 
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset
 
 
 class Paragraph(ColoredTextBlock[ParagraphTypeData], type='paragraph'):
@@ -318,7 +340,7 @@ class CalloutTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
 
     # `Unset` means the default icon as determined by Notion, and `None` means no icon when retrieved
     #  but is not accepted when sending to Notion.
-    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | UnsetType | None = Unset
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset
 
 
 class Callout(ColoredTextBlock[CalloutTypeData], type='callout'):
