@@ -158,7 +158,10 @@ You only need this section to run the tests live or to re-record cassettes.
 
 !!! note
     Three objects (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use
-    features the API cannot create and must be built by hand. See
+    features the API cannot create and must be built by hand. A fourth, `Formula DB`,
+    is created by the script but its formula columns must be recreated in the UI,
+    because Notion cannot filter on formula properties created via the API (issue #297);
+    the script reports this. See
     [`tests/TEST_WORKSPACE.md`](https://github.com/ultimate-notion/ultimate-notion/blob/main/tests/TEST_WORKSPACE.md)
     for exact instructions.
 
