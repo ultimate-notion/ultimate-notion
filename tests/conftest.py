@@ -20,6 +20,7 @@ Common pitfalls:
 
 from __future__ import annotations
 
+import contextlib
 import inspect
 import json
 import logging
@@ -135,6 +136,169 @@ def pytest_recording_configure(config: pytest.Config, vcr: VCR) -> None:
     register_notion_matchers(vcr)
 
 
+# --- Workspace-portable cassettes: shared-id normalization (issue #296) --------------------------
+# Matching searches by body (#292/#294) makes the *common* live test portable, but the shared
+# workspace objects still carry ids that differ between workspaces: the root page, the seeded static
+# pages/databases, the integration bot, the workspace members and the workspace itself. A test that
+# asserts identity against such a fixture (`page.parent == root_page`, compared by id) or that puts a
+# shared object's id in a request *path* (`GET /v1/blocks/{root_id}/children`) therefore cannot be
+# recorded against one workspace and replayed against cassettes recorded in another.
+#
+# We normalise those ids to stable placeholders. Shared objects are recognised by their (stable)
+# title, the integration bot and the workspace by the bot's own user object, and human members by the
+# order in which they are first seen; every occurrence of their ids -- in request paths/bodies and in
+# response bodies, in both dashed and dash-less form -- is rewritten to a fixed placeholder. Because
+# VCR runs `before_record_request` over the outgoing request *before matching* as well as before
+# recording (see `Cassette.play_response`), the very same normalisation is applied when matching, so
+# recordings from different workspaces are interchangeable.
+#
+# VCR also runs `before_record_response` on playback, not only on recording. The committed cassettes
+# were migrated to these placeholders once, so on replay the hooks re-see only placeholder ids: the
+# registry never learns them again (it is idempotent -- see `PLACEHOLDER_IDS`), the request hook is an
+# identity, and response normalisation is byte-preserving (it must not reflow JSON or desync
+# `Content-Length`). See the "Add a new live (VCR) test" section in `CONTRIBUTING.md`.
+
+# Placeholder ids are valid-shaped but obviously synthetic version-4 UUIDs. The all-zero id
+# `00000000-0000-0000-0000-000000000000` (Ultimate Notion's "unset" sentinel) has a `0` version
+# nibble, so these `...-4000-8000-...` placeholders never collide with it.
+PLACEHOLDER_WORKSPACE = '00000000-0000-4000-8000-0000000000f0'
+PLACEHOLDER_BOT = '00000000-0000-4000-8000-0000000000f1'
+# Human members, assigned in first-seen order. Four is comfortably more than any test workspace uses.
+PLACEHOLDER_PERSONS = (
+    '00000000-0000-4000-8000-0000000000fa',
+    '00000000-0000-4000-8000-0000000000fb',
+    '00000000-0000-4000-8000-0000000000fc',
+    '00000000-0000-4000-8000-0000000000fd',
+)
+# Shared pages/databases, keyed by their stable title (the root page uses the configured title so a
+# workspace whose root is not named `Tests` still maps). Order/value is irrelevant as long as it is
+# fixed: the migration of the committed cassettes used exactly this mapping.
+SHARED_OBJECT_PLACEHOLDERS: dict[str, str] = {
+    TESTS_PAGE: '00000000-0000-4000-8000-000000000001',
+    GETTING_STARTED_PAGE: '00000000-0000-4000-8000-000000000002',
+    MD_TEXT_TEST_PAGE: '00000000-0000-4000-8000-000000000003',
+    MD_PAGE_TEST_PAGE: '00000000-0000-4000-8000-000000000004',
+    MD_SUBPAGE_TEST_PAGE: '00000000-0000-4000-8000-000000000005',
+    EMBED_TEST_PAGE: '00000000-0000-4000-8000-000000000006',
+    COMMENT_PAGE: '00000000-0000-4000-8000-000000000007',
+    CUSTOM_EMOJI_PAGE: '00000000-0000-4000-8000-000000000008',
+    ALL_PROPS_DB: '00000000-0000-4000-8000-000000000009',
+    WIKI_DB: '00000000-0000-4000-8000-00000000000a',
+    CONTACTS_DB: '00000000-0000-4000-8000-00000000000b',
+    TASK_DB: '00000000-0000-4000-8000-00000000000c',
+    FORMULA_DB: '00000000-0000-4000-8000-00000000000d',
+}
+# The set of every placeholder value. `before_record_response` runs on playback too, so the registry
+# re-learns from already-placeholder responses; ids that are already placeholders must never be learnt
+# again (especially persons, assigned by first-seen order, which would otherwise be remapped onto a
+# different placeholder and corrupt the replay). Learning is therefore idempotent.
+PLACEHOLDER_IDS: frozenset[str] = frozenset(
+    {PLACEHOLDER_WORKSPACE, PLACEHOLDER_BOT, *PLACEHOLDER_PERSONS, *SHARED_OBJECT_PLACEHOLDERS.values()}
+)
+
+
+def _undash(notion_id: str) -> str:
+    """Return a Notion id without its dashes, as it appears in `notion.so/...` URLs."""
+    return notion_id.replace('-', '')
+
+
+def _object_title(obj: dict[str, Any]) -> str | None:
+    """Return the plain-text title of a Notion page/database object, or `None` if it has none."""
+    if obj.get('object') == 'database':
+        title_rich_text = obj.get('title', [])
+    elif obj.get('object') == 'page':
+        title_prop = next((p for p in obj.get('properties', {}).values() if p.get('type') == 'title'), None)
+        title_rich_text = title_prop.get('title', []) if title_prop else []
+    else:
+        return None
+    title = ''.join(part.get('plain_text', '') for part in title_rich_text)
+    return title or None
+
+
+class _SharedIdRegistry:
+    """Collects the recording workspace's shared-object ids and maps them to stable placeholders.
+
+    Populated from recorded responses (`learn_from_response`) and consulted to rewrite every recorded
+    request and response (`scrub`). One module-level instance is shared across the whole pytest session
+    so an id discovered while recording one cassette is normalised in every later cassette too.
+    """
+
+    def __init__(self) -> None:
+        # real (dashed) id -> placeholder (dashed)
+        self._placeholders: dict[str, str] = {}
+        self._persons_seen = 0
+
+    def _add(self, real_id: str, placeholder: str) -> None:
+        self._placeholders.setdefault(real_id, placeholder)
+
+    def learn_from_response(self, body: Any) -> None:
+        """Walk a parsed JSON response body and register any shared-object ids it reveals."""
+        if isinstance(body, dict):
+            obj_type = body.get('object')
+            obj_id = body.get('id')
+            # Ids that are already placeholders (e.g. when re-learning from a replayed cassette) must
+            # not be learnt again, so normalisation is idempotent.
+            if isinstance(obj_id, str) and obj_id not in PLACEHOLDER_IDS:
+                if obj_type in {'page', 'database'}:
+                    placeholder = SHARED_OBJECT_PLACEHOLDERS.get(_object_title(body) or '')
+                    if placeholder is not None:
+                        self._add(obj_id, placeholder)
+                elif obj_type == 'user':
+                    self._learn_user(body)
+            for value in body.values():
+                self.learn_from_response(value)
+        elif isinstance(body, list):
+            for value in body:
+                self.learn_from_response(value)
+
+    def _learn_user(self, user: dict[str, Any]) -> None:
+        """Register the integration bot (and its workspace) or a human member from a full user object."""
+        if user.get('type') == 'bot':
+            self._add(user['id'], PLACEHOLDER_BOT)
+            owner = user.get('bot', {}).get('owner', {})
+            workspace_id = user.get('bot', {}).get('workspace_id') or owner.get('workspace_id')
+            if isinstance(workspace_id, str) and workspace_id not in PLACEHOLDER_IDS:
+                self._add(workspace_id, PLACEHOLDER_WORKSPACE)
+        elif user.get('type') == 'person' and user['id'] not in self._placeholders:
+            if self._persons_seen < len(PLACEHOLDER_PERSONS):
+                self._add(user['id'], PLACEHOLDER_PERSONS[self._persons_seen])
+                self._persons_seen += 1
+
+    def scrub(self, text: str) -> str:
+        """Replace every registered shared id (dashed and dash-less) with its placeholder."""
+        for real_id, placeholder in self._placeholders.items():
+            text = text.replace(real_id, placeholder).replace(_undash(real_id), _undash(placeholder))
+        return text
+
+
+# One registry for the whole session. During offline replay it only ever sees already-placeholder ids,
+# which it refuses to learn, so it stays empty and the scrubbing is a no-op.
+_shared_ids = _SharedIdRegistry()
+
+
+def _scrub_request_body(body: Any) -> Any:
+    """Return a request body with shared ids normalised, preserving its `str`/`bytes`/`None` type."""
+    if isinstance(body, bytes):
+        try:
+            return _shared_ids.scrub(body.decode('utf-8')).encode('utf-8')
+        except UnicodeDecodeError:
+            return body
+    if isinstance(body, str):
+        return _shared_ids.scrub(body)
+    return body
+
+
+def normalize_shared_ids_request(request: Any) -> Any:
+    """`before_record_request` hook: normalise shared ids in the request URI and body.
+
+    Applied both when recording and (by VCR) over the outgoing request before matching, so cassettes
+    recorded against different workspaces match each other.
+    """
+    request.uri = _shared_ids.scrub(request.uri)
+    request.body = _scrub_request_body(request.body)
+    return request
+
+
 def pytest_addoption(parser: Parser) -> None:
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
     parser.addoption(
@@ -226,53 +390,90 @@ def activate_debug_mode(request: SubRequest) -> None:
         os.environ[ENV_ULTIMATE_NOTION_DEBUG] = '1'
 
 
+# Header/body fields that must never be committed to a cassette.
+SECRET_PARAMS = [
+    'client_id',
+    'client_secret',
+    'access_token',
+    'refresh_token',
+    'code',
+    'cookie',
+    'authorization',
+    'CF-RAY',
+    'Date',
+    'ETag',
+    'X-Notion-Request-Id',
+    'user-agent',
+]
+
+
+def _redact_google_oauth_body(body: Any) -> Any:
+    """Redact OAuth secrets carried in a Google API response body (the `body.string` back end)."""
+    if not isinstance(body, str):
+        return body
+    try:
+        dct = json.loads(body)
+        for secret in SECRET_PARAMS:
+            if secret in dct:
+                dct[secret] = 'secret...'
+        return json.dumps(dct)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return body
+
+
+def _normalize_ids_in_body(body: Any) -> Any:
+    """Learn and normalise shared-object ids in a Notion response body (the `content` back end).
+
+    VCR applies `before_record_response` on playback as well as on recording, so this must be
+    *byte-preserving* for an already-normalised body: it only parses to learn ids and rewrites
+    ids/titles by plain string replacement (a no-op once they are placeholders). It deliberately does
+    NOT redact OAuth secrets or re-serialise -- Notion bodies carry no OAuth secrets, and `code` is a
+    Notion *error code* (e.g. `object_not_found`), not a secret. Re-serialising would reflow the JSON,
+    desync `Content-Length`, and corrupt the replay.
+    """
+    if not isinstance(body, str):
+        return body
+    with contextlib.suppress(json.JSONDecodeError, UnicodeDecodeError):
+        _shared_ids.learn_from_response(json.loads(body))
+    # Normalise a non-default root page title back to the canonical `Tests` so a recording made
+    # against a differently named root (via `UNO_TEST_ROOT_PAGE`) replays against the committed
+    # cassettes. A no-op for the default `Tests`, so existing cassettes are untouched.
+    if TESTS_PAGE != 'Tests':
+        body = body.replace(TESTS_PAGE, 'Tests')
+    return _shared_ids.scrub(body)
+
+
+def normalize_response(response: dict[str, Any]) -> dict[str, Any]:
+    """`before_record_response` hook: drop secret headers and normalise the response body.
+
+    Google (urllib) responses keep the body at `body.string`; Notion (httpx) responses keep it at
+    `content`. Both back ends are handled so shared ids are normalised whichever one a cassette uses.
+    """
+    for secret in SECRET_PARAMS:
+        response['headers'].pop(secret, None)
+    if isinstance(response.get('body'), dict) and 'string' in response['body']:
+        response['body']['string'] = _normalize_ids_in_body(_redact_google_oauth_body(response['body']['string']))
+    elif 'content' in response:
+        response['content'] = _normalize_ids_in_body(response['content'])
+    return response
+
+
+def build_vcr_config() -> dict[str, Any]:
+    """Build the pytest-recording config (also reused when recording from module-level fixtures)."""
+    return {
+        'match_on': [*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER],
+        'filter_headers': [(param, 'secret...') for param in SECRET_PARAMS],
+        'filter_query_parameters': SECRET_PARAMS,
+        'filter_post_data_parameters': SECRET_PARAMS,
+        'before_record_request': normalize_shared_ids_request,
+        'before_record_response': normalize_response,
+    }
+
+
 @pytest.fixture(scope='session')
 def vcr_config() -> dict[str, Any]:
     """Configure pytest-recording."""
-    secret_params = [
-        'client_id',
-        'client_secret',
-        'access_token',
-        'refresh_token',
-        'code',
-        'cookie',
-        'authorization',
-        'CF-RAY',
-        'Date',
-        'ETag',
-        'X-Notion-Request-Id',
-        'user-agent',
-    ]
-
-    def remove_secrets(response: dict[str, dict[str, str]]) -> dict[str, dict[str, str]]:
-        for secret in secret_params:
-            response['headers'].pop(secret, None)
-        if 'body' in response and 'string' in response['body']:
-            body = response['body']['string']
-            try:
-                # remove secret tokens from body in Google API calls
-                dct = json.loads(body)
-                for secret in secret_params:
-                    if secret in dct:
-                        dct[secret] = 'secret...'
-                body = json.dumps(dct)
-            except (json.JSONDecodeError, UnicodeDecodeError):
-                pass
-            # Normalise a non-default root page title back to the canonical `Tests` so a recording
-            # made against a differently named root (via `UNO_TEST_ROOT_PAGE`) replays against the
-            # committed cassettes. A no-op for the default `Tests`, so existing cassettes are untouched.
-            if TESTS_PAGE != 'Tests' and isinstance(body, str):
-                body = body.replace(TESTS_PAGE, 'Tests')
-            response['body']['string'] = body
-        return response
-
-    return {
-        'match_on': [*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER],
-        'filter_headers': [(param, 'secret...') for param in secret_params],
-        'filter_query_parameters': secret_params,
-        'filter_post_data_parameters': secret_params,
-        'before_record_response': remove_secrets,
-    }
+    return build_vcr_config()
 
 
 @pytest.fixture(scope='session')

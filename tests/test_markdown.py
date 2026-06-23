@@ -31,7 +31,7 @@ def test_rich_text_md(md_text_page: uno.Page) -> None:
         'here is one with an inline **~~equa-*tion*~~ *$E=mc^2$ and*** no block equation',
         (
             'and here is one with ~~***person** mention [@USER]()*~~ and **page mention '
-            '↗[Markdown Text Test](https://www.notion.so/0c8ea7f1c7ca4abb8890085c0fac383b)** '
+            '↗[Markdown Text Test](https://www.notion.so/00000000000040008000000000000003)** '
         ),
         'here is one **stretching over *many\n~~many~~*\n~~lines~~**',
         # ToDo: This is not 100% right as line breaks in code blocks are ignored in Markdown.
