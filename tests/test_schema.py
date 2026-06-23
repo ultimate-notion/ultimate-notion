@@ -585,7 +585,7 @@ def test_bind_db_auto(notion: uno.Session) -> None:
         TaskBase.bind_db()
     assert not TaskBase.is_bound()
 
-    class TaskWithDbId(TaskBase, db_id='b0cb6b70e740496d9c818a298fa2d5e1'):
+    class TaskWithDbId(TaskBase, db_id='0000000000004000800000000000000c'):
         """Schema with a reference to a database by ID"""
 
     TaskWithDbId.bind_db()

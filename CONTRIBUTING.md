@@ -188,14 +188,23 @@ hatch run vcr-only -k your_new_test
 ```
 
 This works because cassettes are matched by request path and (for `POST /v1/search`)
-by request body, while request *bodies* are otherwise ignored — so a test that creates
-content under `root_page` and asserts on that content replays cleanly regardless of the
-root page's actual id. If your test instead asserts identity against a shared fixture
-(e.g. `page.parent == root_page`) or puts a shared object's id in a request *path*,
-normalise those ids to the canonical committed ones in your new cassette, otherwise it
-will not replay against the committed fixtures. To support recording against a root page
-that cannot be named `Tests`, the non-default title configured via `UNO_TEST_ROOT_PAGE`
-is scrubbed back to `Tests` when cassettes are written (see `tests/conftest.py`).
+by request body, and because the ids of the **shared** workspace objects are normalised
+to stable placeholders when cassettes are written. The root page, the seeded static
+pages/databases, the integration bot, the workspace members and the workspace itself are
+recognised during recording and every occurrence of their ids — in request paths/bodies
+and in response bodies — is rewritten to a fixed placeholder (see the shared-id
+normalisation in `tests/conftest.py`). The same normalisation is applied when matching, so
+a test that asserts identity against a shared fixture (e.g. `page.parent == root_page`) or
+puts a shared object's id in a request *path* (e.g. `GET /v1/blocks/{root_id}/children`)
+replays against the committed fixtures even though it was recorded against *your*
+workspace's ids. Content you create under `root_page` keeps its own (non-shared) ids,
+which are internally consistent within the recording and so replay cleanly.
+
+To support recording against a root page that cannot be named `Tests`, the non-default
+title configured via `UNO_TEST_ROOT_PAGE` is also scrubbed back to `Tests` when cassettes
+are written. Property, option and block ids *inside* the manually created databases are
+workspace-specific and are **not** normalised, so a brand-new test that asserts on those
+(e.g. a formula's internal property reference) may still need a hand edit.
 
 ### Implement your changes
 
