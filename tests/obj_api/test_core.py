@@ -4,9 +4,9 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from ultimate_notion.obj_api.blocks import Paragraph
+from ultimate_notion.obj_api.blocks import Page, Paragraph
 from ultimate_notion.obj_api.core import extract_id
-from ultimate_notion.obj_api.objects import Bot, Person, User
+from ultimate_notion.obj_api.objects import Bot, BuiltInIconObject, Person, User
 
 
 @pytest.fixture(autouse=True)
@@ -71,6 +71,33 @@ def test_paragraph_accepts_null_icon() -> None:
     )
 
     assert paragraph.paragraph.icon is None
+
+
+def test_page_accepts_built_in_icon() -> None:
+    """A page with a built-in (icon gallery) icon must round-trip, see issue #295.
+
+    The Notion API returns these as `{'type': 'icon', 'icon': {'name': ..., 'color': ...}}`,
+    which previously failed validation and cascaded into search/list endpoints.
+    """
+    page = Page.model_validate(
+        {
+            'object': 'page',
+            'id': '00000000-0000-0000-0000-000000000000',
+            'created_time': '2024-01-01T00:00:00.000Z',
+            'last_edited_time': '2024-01-01T00:00:00.000Z',
+            'archived': False,
+            'in_trash': False,
+            'icon': {'type': 'icon', 'icon': {'name': 'snake', 'color': 'purple'}},
+            'cover': None,
+            'parent': {'type': 'workspace', 'workspace': True},
+            'url': 'https://www.notion.so/00000000000000000000000000000000',
+            'properties': {},
+        }
+    )
+
+    assert isinstance(page.icon, BuiltInIconObject)
+    assert page.icon.icon.name == 'snake'
+    assert page.icon.icon.color == 'purple'
 
 
 def test_block_serialization_omits_read_only_archive_flags() -> None:
