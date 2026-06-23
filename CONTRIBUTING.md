@@ -162,6 +162,38 @@ You only need this section to run the tests live or to re-record cassettes.
     [`tests/TEST_WORKSPACE.md`](https://github.com/ultimate-notion/ultimate-notion/blob/main/tests/TEST_WORKSPACE.md)
     for exact instructions.
 
+### Add a new live (VCR) test
+
+The committed cassettes are one coherent recording of a single workspace, so you
+**cannot** simply `vcr-rewrite` a new test against your own workspace and commit the
+result: `vcr-rewrite` replays the shared fixture cassettes in
+`tests/cassettes/fixtures/` (the `Tests` root page, the seeded databases, …) with
+*your* workspace's ids, which then diverge from the rest of the suite. Record a new
+test like this instead:
+
+```console
+# 1. Bootstrap your workspace (root page named `Tests`, or set UNO_TEST_ROOT_PAGE).
+# 2. Delete the shared fixture cassettes so they record fresh against your workspace
+#    (vcr-rewrite otherwise downgrades them to `new_episodes` and replays committed ids).
+rm tests/cassettes/fixtures/mod_*.yaml
+# 3. Record only your new test.
+NOTION_TOKEN=ntn_… hatch run vcr-rewrite -k your_new_test
+# 4. Keep ONLY your new test's cassette; restore the shared fixtures unchanged.
+git checkout -- tests/cassettes/fixtures
+# 5. Verify it replays offline against the committed fixtures.
+hatch run vcr-only -k your_new_test
+```
+
+This works because cassettes are matched by request path and (for `POST /v1/search`)
+by request body, while request *bodies* are otherwise ignored — so a test that creates
+content under `root_page` and asserts on that content replays cleanly regardless of the
+root page's actual id. If your test instead asserts identity against a shared fixture
+(e.g. `page.parent == root_page`) or puts a shared object's id in a request *path*,
+normalise those ids to the canonical committed ones in your new cassette, otherwise it
+will not replay against the committed fixtures. To support recording against a root page
+that cannot be named `Tests`, the non-default title configured via `UNO_TEST_ROOT_PAGE`
+is scrubbed back to `Tests` when cassettes are written (see `tests/conftest.py`).
+
 ### Implement your changes
 
 1. Create a branch to hold your changes:

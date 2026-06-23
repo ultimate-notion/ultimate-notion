@@ -85,6 +85,55 @@ TEST_CFG_FILE = get_cfg_file()
 # Mutually exclusive pytest markers, that are not run by default and enabled via command line flags
 PYTEST_MARKERS = ['check_latest_release', 'file_upload']
 
+# --- Workspace-portable cassettes (issue #292) --------------------------------------------------
+# The default VCR matchers ignore request bodies, so every `POST /v1/search` matches by path alone
+# and a cassette with several searches only replays them in the order they were recorded. That makes
+# the shared fixtures fragile and ties a recording to the workspace it was made in. We add a matcher
+# that *additionally* compares the JSON body of `/v1/search` requests (a no-op for every other
+# endpoint), so each search is matched by what it actually queries. We also scrub a non-default root
+# page title back to the canonical `Tests` on record, so a maintainer who cannot name their shared
+# root page `Tests` (via `UNO_TEST_ROOT_PAGE`) still produces cassettes that replay against the
+# committed set. See the "Set up a Notion test workspace" section in `CONTRIBUTING.md`.
+
+NOTION_SEARCH_PATH = '/v1/search'
+VCR_DEFAULT_MATCHERS = ['method', 'scheme', 'host', 'port', 'path', 'query']
+VCR_SEARCH_MATCHER = 'notion_search_body'
+
+
+def _request_json_body(request: Any) -> Any:
+    """Return the parsed JSON body of a VCR request, or the raw body if it is not JSON."""
+    body = request.body
+    if isinstance(body, bytes):
+        try:
+            body = body.decode('utf-8')
+        except UnicodeDecodeError:
+            return body
+    try:
+        return json.loads(body)
+    except (json.JSONDecodeError, TypeError):
+        return body
+
+
+def match_search_body(r1: Any, r2: Any) -> bool:
+    """Match `POST /v1/search` requests by their JSON body; match everything else unconditionally.
+
+    Combined with the default `path` matcher this adds body matching *only* for the search endpoint,
+    leaving all other endpoints matched exactly as before.
+    """
+    if not (r1.path == NOTION_SEARCH_PATH and r2.path == NOTION_SEARCH_PATH):
+        return True
+    return _request_json_body(r1) == _request_json_body(r2)
+
+
+def register_notion_matchers(vcr: VCR) -> None:
+    """Register Ultimate Notion's custom VCR matchers on a freshly built VCR instance."""
+    vcr.register_matcher(VCR_SEARCH_MATCHER, match_search_body)
+
+
+def pytest_recording_configure(config: pytest.Config, vcr: VCR) -> None:
+    """Register custom matchers on the VCR instance built by pytest-recording (`@pytest.mark.vcr`)."""
+    register_notion_matchers(vcr)
+
 
 def pytest_addoption(parser: Parser) -> None:
     """Add flag to the pytest command line so that we can overwrite fixtures but not always!"""
@@ -199,18 +248,26 @@ def vcr_config() -> dict[str, Any]:
         for secret in secret_params:
             response['headers'].pop(secret, None)
         if 'body' in response and 'string' in response['body']:
+            body = response['body']['string']
             try:
                 # remove secret tokens from body in Google API calls
-                dct = json.loads(response['body']['string'])
+                dct = json.loads(body)
                 for secret in secret_params:
                     if secret in dct:
                         dct[secret] = 'secret...'
-                response['body']['string'] = json.dumps(dct)
+                body = json.dumps(dct)
             except (json.JSONDecodeError, UnicodeDecodeError):
                 pass
+            # Normalise a non-default root page title back to the canonical `Tests` so a recording
+            # made against a differently named root (via `UNO_TEST_ROOT_PAGE`) replays against the
+            # committed cassettes. A no-op for the default `Tests`, so existing cassettes are untouched.
+            if TESTS_PAGE != 'Tests' and isinstance(body, str):
+                body = body.replace(TESTS_PAGE, 'Tests')
+            response['body']['string'] = body
         return response
 
     return {
+        'match_on': [*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER],
         'filter_headers': [(param, 'secret...') for param in secret_params],
         'filter_query_parameters': secret_params,
         'filter_post_data_parameters': secret_params,
@@ -317,6 +374,7 @@ def vcr_fixture(
                 elif mode is None:
                     mode = 'none'
                 vcr = VCR(record_mode=vcr_mode(mode), **vcr_config)
+                register_notion_matchers(vcr)
 
             return vcr, cassette_name
 
