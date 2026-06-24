@@ -100,11 +100,7 @@ class Bot(User[objs.Bot], wraps=objs.Bot):
 
     @property
     def workspace_info(self) -> WorkSpaceInfo:
-        """Return the workspace info of this bot.
-
-        Notion only populates the workspace name and id for the integration's own bot, so this is
-        unavailable for other bot users.
-        """
+        """Return the workspace info of this bot, if available."""
         workspace_id = self.obj_ref.bot.workspace_id
         workspace_name = self.obj_ref.bot.workspace_name
         if workspace_id is None or workspace_name is None:
