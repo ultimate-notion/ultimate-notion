@@ -362,8 +362,6 @@ def parse_dt_str(dt_str: str) -> DateTimeOrRange:
             return set_tz(dt_spec)
         case pnd.Date():
             return dt_spec
-        # `pnd.DateTime` is a subclass of `pnd.Date`, so a `Date` sub-pattern captures both and, unlike a
-        # bare `pnd.Interval()`, gives the bound start/end a concrete type instead of `object`.
         case pnd.Interval(start=pnd.Date() as raw_start, end=pnd.Date() as raw_end):
             # We extend the interval to the full day if only a date is given
             start, end = set_tz(raw_start), set_tz(raw_end)

@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Chg: Replace `hasattr`-based checks in `obj_api.core` with type-safe alternatives (a structural pattern match on `UniqueObject` in `ObjectRef.build`, a typed `ClassVar` sentinel for the `UnsetType` singleton, and a `None`-defaulted `ClassVar` sentinel for the `TypedObject._typemap` registry).
+- Chg: Replace the `hasattr`-based `Property._is_init` check with a `None`-defaulted sentinel for `Wrapper._obj_ref`, so initialization is an explicit `is not None` check that the type checker understands.
 
 ## Version 0.9.10, 2026-06-24
 
