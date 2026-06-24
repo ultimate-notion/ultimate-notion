@@ -55,7 +55,7 @@ class PropertyValue(TypedObject[Any], polymorphic_base=True):
     _is_retrieved: bool = False  # fetched separately as property item from the server
 
     @classmethod
-    def build(cls, value: Any) -> Self:
+    def build(cls, value: Any, /) -> Self:
         """Build the property value from given value, e.g. native Python or nested type.
 
         In practice, this is like calling __init__ with the corresponding keyword.
@@ -103,7 +103,7 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, dt_spec: str | DateTimeOrRange) -> Self:  # ty: ignore[invalid-method-override]
+    def build(cls, dt_spec: str | DateTimeOrRange, /) -> Self:
         """Create a new Date from the native values."""
         obj = cls.model_construct(date=DateRange.build(dt_spec))
         if not isinstance(obj, cls):
@@ -210,7 +210,7 @@ class Relation(PropertyValue, type='relation'):
     has_more: bool = False
 
     @classmethod
-    def build(cls, pages: Sequence[Page]) -> Self:  # ty: ignore[invalid-method-override]
+    def build(cls, pages: Sequence[Page], /) -> Self:
         """Return a `Relation` property with the specified pages."""
         obj = cls.model_construct(relation=[ObjectRef.build(page) for page in pages])
         if not isinstance(obj, cls):
@@ -350,7 +350,7 @@ class Place(PropertyValue, type='place'):
     place: TypeData | None = None
 
     @classmethod
-    def build(cls, place: PlaceDict | None) -> Self:  # ty: ignore[invalid-method-override]
+    def build(cls, place: PlaceDict | None, /) -> Self:
         place_obj = cls.TypeData(**place) if place is not None else None
         obj = cls.model_construct(place=place_obj)
         if not isinstance(obj, cls):
