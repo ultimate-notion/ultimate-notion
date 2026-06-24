@@ -145,6 +145,13 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         return True
 
     @property
+    def url(self) -> str:
+        """Return the public URL of this data source's database."""
+        if is_unset(url := self.obj_ref.url):
+            raise UnsetError()
+        return url
+
+    @property
     def is_inline(self) -> bool:
         """Return whether the data source's database is displayed inline on its parent page."""
         if is_unset(inline := self.obj_ref.is_inline):
