@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, TypeGuard
 from urllib.parse import urlparse
 
 import pendulum as pnd
-from typing_extensions import Self, TypeVar
+from typing_extensions import Self, TypeIs, TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.core import Wrapper
@@ -106,6 +106,11 @@ def math(
     return Text.wrap_obj_ref([math.obj_ref])
 
 
+def _is_date_or_range(value: object) -> TypeIs[DateTimeOrRange]:
+    """Narrow a mention target to a date/datetime/range."""
+    return isinstance(value, dt.datetime | dt.date | pnd.Interval)
+
+
 class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
     """A Mention object.
 
@@ -128,7 +133,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
         annotations = objs.Annotations(
             bold=bold, italic=italic, strikethrough=strikethrough, code=code, underline=underline, color=color
         )
-        if isinstance(target, dt.datetime | dt.date | pnd.Interval):
+        if _is_date_or_range(target):
             self.obj_ref = objs.DateRange.build(target).build_mention(style=annotations)
         else:
             self.obj_ref = target.obj_ref.build_mention(style=annotations)

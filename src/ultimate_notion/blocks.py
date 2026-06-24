@@ -368,20 +368,19 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
 
     def replace(self, blocks: Block | Sequence[Block]) -> None:
         """Replace this block with another block or blocks."""
-        if not isinstance(blocks, Sequence):
-            blocks = [blocks]
+        block_seq: Sequence[Block] = [blocks] if isinstance(blocks, Block) else blocks
 
         if self.is_deleted:
             msg = 'Cannot replace a deleted block.'
             raise InvalidAPIUsageError(msg)
 
-        for block in blocks:  # do complete sanity check first
+        for block in block_seq:  # do complete sanity check first
             if block.in_notion:
                 msg = f'Cannot replace with a block {block} that is already in Notion.'
                 raise InvalidAPIUsageError(msg)
 
         if self.parent is not None and isinstance(self.parent, ChildrenMixin):
-            for block in reversed(blocks):
+            for block in reversed(block_seq):
                 self.parent.append(block, after=self)
         else:
             msg = 'Cannot replace a block that has no parent.'
@@ -391,20 +390,19 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
 
     def insert_after(self, blocks: Block | Sequence[Block]) -> None:
         """Insert a block or several blocks after this block."""
-        if not isinstance(blocks, Sequence):
-            blocks = [blocks]
+        block_seq: Sequence[Block] = [blocks] if isinstance(blocks, Block) else blocks
 
         if self.is_deleted:
             msg = 'Cannot insert a block after a deleted block.'
             raise InvalidAPIUsageError(msg)
 
-        for block in blocks:  # do complete sanity check first
+        for block in block_seq:  # do complete sanity check first
             if block.in_notion:
                 msg = f'Cannot insert block {block} that is already in Notion.'
                 raise InvalidAPIUsageError(msg)
 
         if self.parent is not None and isinstance(self.parent, ChildrenMixin):
-            self.parent.append(blocks, after=self)
+            self.parent.append(block_seq, after=self)
         else:
             msg = 'Cannot insert a block that has no parent.'
             raise InvalidAPIUsageError(msg)
@@ -440,8 +438,12 @@ class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     def _finalize_wrap(self) -> None:
         super()._finalize_wrap()
         value = self.obj_ref.value
-        if self.obj_ref.has_children and isinstance(value, obj_blocks.WithChildren) and value.children:
+        # Children may be carried in `value.children` even when `has_children` is `False`, e.g. when a block tree
+        # is reconstructed via `wrap_obj_ref` from serialized JSON. Pull them into the `_children` cache regardless
+        # so the chunking machinery (which gates on `has_children`/`blocks`) splits deeply-nested trees correctly.
+        if isinstance(value, obj_blocks.WithChildren) and value.children:
             self._children = [Block.wrap_obj_ref(child) for child in value.children]
+            self.obj_ref.has_children = True
             value.children = []  # clear children to avoid confusion during comparison
 
 
