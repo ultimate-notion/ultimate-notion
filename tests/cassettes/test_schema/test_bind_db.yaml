@@ -3,11 +3,12 @@ interactions:
     body: '{"parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
       "title": [{"type": "text", "plain_text": "Bind DB Test", "annotations": {"bold":
       false, "italic": false, "strikethrough": false, "underline": false, "code":
-      false}, "text": {"content": "Bind DB Test"}}], "properties": {"Name": {"type":
-      "title", "title": {}}, "Category": {"type": "select", "select": {"options":
-      [{"name": "Cat1", "color": "default"}, {"name": "Cat2", "color": "red"}]}},
-      "Tags": {"type": "multi_select", "multi_select": {"options": [{"name": "Cat1",
-      "color": "default"}, {"name": "Cat2", "color": "red"}]}}}, "is_inline": false}'
+      false}, "text": {"content": "Bind DB Test"}}], "is_inline": false, "initial_data_source":
+      {"properties": {"Name": {"type": "title", "title": {}}, "Category": {"type":
+      "select", "select": {"options": [{"name": "Cat1", "color": "default"}, {"name":
+      "Cat2", "color": "red"}]}}, "Tags": {"type": "multi_select", "multi_select":
+      {"options": [{"name": "Cat1", "color": "default"}, {"name": "Cat2", "color":
+      "red"}]}}}}}'
     headers:
       accept:
       - '*/*'
@@ -18,7 +19,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '571'
+      - '595'
       content-type:
       - application/json
       cookie:
@@ -26,20 +27,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"29c974f3-b388-8170-826e-d5c2444a168b","cover":null,"icon":null,"created_time":"2025-10-30T15:51:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2025-10-30T15:51:00.000Z","title":[{"type":"text","text":{"content":"Bind
+    content: '{"object":"database","id":"00c98e4e-5fc5-476e-b813-9719206c502f","title":[{"type":"text","text":{"content":"Bind
       DB Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Bind
-      DB Test","href":null}],"description":[],"is_inline":false,"properties":{"Category":{"id":"p%3EYD","name":"Category","description":null,"type":"select","select":{"options":[{"id":"58677002-ed4b-4838-bca5-e03aac8731a4","name":"Cat1","color":"default","description":null},{"id":"696bc6f4-9dba-4e8f-b55b-f760e7beabf2","name":"Cat2","color":"red","description":null}]}},"Tags":{"id":"pwo%7B","name":"Tags","description":null,"type":"multi_select","multi_select":{"options":[{"id":"8cc2e53a-f8c5-4c76-a569-b5fd488df04d","name":"Cat1","color":"default","description":null},{"id":"6b2f9320-f8fb-4863-a36c-c9112912478d","name":"Cat2","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/29c974f3b3888170826ed5c2444a168b","public_url":null,"archived":false,"in_trash":false,"request_id":"6a13bcf1-8f67-4ddd-8e96-e90852760ea5"}'
+      DB Test","href":null}],"description":[],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-24T16:14:40.927+00:00","last_edited_time":"2026-06-24T16:14:40.927+00:00","data_sources":[{"id":"6f4c4e51-9fcb-427a-a062-be4b089fef7b","name":"Bind
+      DB Test"}],"icon":null,"cover":null,"url":"https://app.notion.com/p/00c98e4e5fc5476eb8139719206c502f","public_url":null,"archived":false,"request_id":"3c38a438-06bb-450e-a9c7-464e79d9dca3"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c12902cc416da-FRA
+      - a10d06e09e83edbd-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -69,7 +71,73 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 6a13bcf1-8f67-4ddd-8e96-e90852760ea5
+      - 3c38a438-06bb-450e-a9c7-464e79d9dca3
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2025-09-03'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/data_sources/6f4c4e51-9fcb-427a-a062-be4b089fef7b
+  response:
+    content: '{"object":"data_source","id":"6f4c4e51-9fcb-427a-a062-be4b089fef7b","cover":null,"icon":null,"created_time":"2026-06-24T16:14:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-24T16:14:00.000Z","title":[{"type":"text","text":{"content":"Bind
+      DB Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Bind
+      DB Test","href":null}],"description":[],"is_inline":false,"properties":{"Category":{"id":"C%5DEW","name":"Category","description":null,"type":"select","select":{"options":[{"id":"871c616d-eb27-4a42-9bfa-bcaaea03fc0f","name":"Cat1","color":"default","description":null},{"id":"735a260d-47ba-46ae-b40d-360a03c3b161","name":"Cat2","color":"red","description":null}]}},"Tags":{"id":"qc%3En","name":"Tags","description":null,"type":"multi_select","multi_select":{"options":[{"id":"6d777953-1b56-430a-ab63-3b1bec6dd5da","name":"Cat1","color":"default","description":null},{"id":"a9f62c1a-b35f-4f90-a347-593b71a61636","name":"Cat2","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"00c98e4e-5fc5-476e-b813-9719206c502f"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://app.notion.com/p/00c98e4e5fc5476eb8139719206c502f","public_url":null,"in_trash":false,"archived":false,"request_id":"357c0cd8-4dfc-4e52-abd1-304dc287193f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a10d06e55d34edbd-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 357c0cd8-4dfc-4e52-abd1-304dc287193f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
