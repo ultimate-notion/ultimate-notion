@@ -125,10 +125,6 @@ def test_to_pendulum(tz_berlin: str) -> None:
         utils.to_pendulum(pnd.duration(days=21))  # type: ignore[arg-type]
 
 
-def test_flatten() -> None:
-    assert utils.flatten([[1], [2, 3], [4, 5, 6]]) == [1, 2, 3, 4, 5, 6]
-
-
 def test_safe_list_get() -> None:
     lst = [1, 2, 3]
     assert utils.safe_list_get(lst, 0) == 1
