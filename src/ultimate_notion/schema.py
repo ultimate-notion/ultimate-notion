@@ -107,7 +107,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def _is_init(self) -> bool:
         """Determines if the property is already initialized"""
-        return hasattr(self, '_obj_ref')
+        return self._obj_ref is not None
 
     @property
     def _is_init_ready(self) -> bool:
@@ -490,7 +490,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     @property
     def obj_ref(self) -> obj_schema.Relation:
         """Initialize the low-level object references for this relation."""
-        if not self._is_init:
+        if self._obj_ref is None:
             # Delayed construction of obj_ref to assure that a self-reference is resolved.
             self._obj_ref = self._make_obj_ref()
         return self._obj_ref
