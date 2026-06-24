@@ -188,8 +188,8 @@ def test_parent_subdbs(notion: uno.Session, root_page: uno.Page) -> None:
 
     assert db1.parent == parent
     assert db2.parent == parent
-    assert parent.subdbs == [db1, db2]
-    assert all(isinstance(db, uno.Database) for db in parent.subdbs)
+    assert parent.sub_dss == [db1, db2]
+    assert all(isinstance(db, uno.DataSource) for db in parent.sub_dss)
     assert db1.ancestors == (root_page, parent)
 
 

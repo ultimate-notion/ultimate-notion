@@ -236,11 +236,22 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         return len(self) == 0
 
     @property
-    def db_parent(self) -> NotionEntity | WorkspaceType | None:
-        """Return the parent of the database of this data source, if any."""
+    def parent(self) -> NotionEntity | WorkspaceType | None:
+        """Return the parent of this data source.
+
+        The 2025-09-03 API nests every data source inside a database container. That container is
+        transparent in the high-level API: a data source presents as a child of the page (or
+        workspace) that holds its database. The parent is therefore resolved from `database_parent`
+        (the database's parent) rather than the immediate `parent` ref (the container database).
+        """
         if is_unset(db_parent := self.obj_ref.database_parent):
             raise UnsetError()
         return resolve_ref(db_parent)
+
+    @property
+    def db_parent(self) -> NotionEntity | WorkspaceType | None:
+        """Alias of `parent`: the parent of this data source's (transparent) database container."""
+        return self.parent
 
     def __bool__(self) -> bool:
         """Overwrite default behaviour."""

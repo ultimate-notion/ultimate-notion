@@ -1126,9 +1126,14 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
 
     @property
     def ds(self) -> DataSource:
-        """Return the actual DataSource object."""
+        """Return the actual DataSource object.
+
+        A `child_database` block's id is the id of the database *container*; resolve that database
+        and return its data source. The container is transparent in the high-level API, so a child
+        database surfaces as the data source it holds.
+        """
         sess = get_active_session()
-        return sess.get_ds(self.id)
+        return sess.get_db(self.id).data_sources.item()
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return the child database as Markdown."""
