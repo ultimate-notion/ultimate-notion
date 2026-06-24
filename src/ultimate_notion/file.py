@@ -267,8 +267,10 @@ def get_mime_type(file: BinaryIO | str | Path) -> str:
 
     if isinstance(file, str):
         mime_type = _get_mime_type(file)
-    elif hasattr(file, 'name') and file.name:  # BinaryIO and Path have 'name' attribute
+    elif isinstance(file, Path):
         mime_type = _get_mime_type(file.name)
+    elif file_name := getattr(file, 'name', None):  # BinaryIO has a 'name' unless it is e.g. a BytesIO
+        mime_type = _get_mime_type(file_name)
     else:
         msg = 'Cannot determine MIME type without filename or file.name attribute.'
         raise ValueError(msg)
