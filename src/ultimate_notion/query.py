@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydantic import BaseModel, Field
 from typing_extensions import Self
@@ -26,18 +26,6 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__name__)
-
-_M = TypeVar('_M', bound=BaseModel)
-
-
-def _build(model: type[_M], /, **kwargs: Any) -> _M:
-    """Construct an `obj_query` model from dynamically-computed keyword arguments.
-
-    The condition/filter keys are determined at runtime (e.g. from `_condition_kw` or a
-    Notion alias such as `and`/`or`), which static type checkers cannot verify. This helper
-    localizes that dynamic construction so individual call sites stay clean.
-    """
-    return model(**kwargs)
 
 
 class PageProperty(BaseModel):
@@ -272,36 +260,38 @@ class IsEmpty(PropertyCondition):
 
         match prop_type:
             case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
-                kwargs['rich_text'] = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                kwargs['rich_text'] = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
             case schema.Number():
-                kwargs['number'] = _build(obj_query.NumberCondition, **{self._condition_kw: self.value})
+                kwargs['number'] = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
             case schema.Select():
-                kwargs['select'] = _build(obj_query.SelectCondition, **{self._condition_kw: str(self.value)})
+                kwargs['select'] = obj_query.SelectCondition.model_validate({self._condition_kw: str(self.value)})
             case schema.MultiSelect():
-                kwargs['multi_select'] = _build(obj_query.MultiSelectCondition, **{self._condition_kw: str(self.value)})
+                kwargs['multi_select'] = obj_query.MultiSelectCondition.model_validate(
+                    {self._condition_kw: str(self.value)}
+                )
             case schema.Date():
-                kwargs['date'] = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                kwargs['date'] = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
             case schema.Person():
-                kwargs['people'] = _build(obj_query.PeopleCondition, **{self._condition_kw: self.value})
+                kwargs['people'] = obj_query.PeopleCondition.model_validate({self._condition_kw: self.value})
             case schema.Files():
-                kwargs['files'] = _build(obj_query.FilesCondition, **{self._condition_kw: self.value})
+                kwargs['files'] = obj_query.FilesCondition.model_validate({self._condition_kw: self.value})
             case schema.Relation():
-                kwargs['relation'] = _build(obj_query.RelationCondition, **{self._condition_kw: self.value})
+                kwargs['relation'] = obj_query.RelationCondition.model_validate({self._condition_kw: self.value})
             case schema.Formula():
                 condition: obj_query.Condition
 
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.STRING:
-                        condition = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
                     case FormulaType.NUMBER:
-                        condition = _build(obj_query.NumberCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
                     case FormulaType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = _build(obj_query.FormulaCondition, **{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition.model_validate({formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -313,10 +303,10 @@ class IsEmpty(PropertyCondition):
 
         match prop_type:
             case schema.CreatedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                 return obj_query.CreatedTimeFilter(created_time=date_condition)
             case schema.LastEditedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                 return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
             case schema.Rollup():
                 condition: obj_query.Condition
@@ -331,23 +321,23 @@ class IsEmpty(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = _build(obj_query.RollupArrayCondition, **kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
-                        condition = _build(obj_query.NumberCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
                         rollup_kwarg = rollup_type.value
                     case RollupType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                         rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': _build(obj_query.RollupCondition, **{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition.model_validate({rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return _build(obj_query.PropertyFilter, property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter.model_validate({'property': self.prop.name, **kwargs})
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}()'
@@ -366,31 +356,31 @@ class Equals(PropertyCondition):
 
         match prop_type:
             case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
-                kwargs['rich_text'] = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                kwargs['rich_text'] = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
             case schema.ID():
-                kwargs['unique_id'] = _build(obj_query.IdCondition, **{self._condition_kw: self.value})
+                kwargs['unique_id'] = obj_query.IdCondition.model_validate({self._condition_kw: self.value})
             case schema.Number():
-                kwargs['number'] = _build(obj_query.NumberCondition, **{self._condition_kw: self.value})
+                kwargs['number'] = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
             case schema.Checkbox():
-                kwargs['checkbox'] = _build(obj_query.CheckboxCondition, **{self._condition_kw: bool(self.value)})
+                kwargs['checkbox'] = obj_query.CheckboxCondition.model_validate({self._condition_kw: bool(self.value)})
             case schema.Select():
-                kwargs['select'] = _build(obj_query.SelectCondition, **{self._condition_kw: str(self.value)})
+                kwargs['select'] = obj_query.SelectCondition.model_validate({self._condition_kw: str(self.value)})
             case schema.Date() if self._condition_kw == 'equals':  # date has no `does_not_equal` condition
-                kwargs['date'] = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                kwargs['date'] = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
             case schema.Formula():
                 condition: obj_query.Condition
 
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.STRING:
-                        condition = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
                     case FormulaType.NUMBER:
-                        condition = _build(obj_query.NumberCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
                     case FormulaType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                     case FormulaType.BOOLEAN:
-                        condition = _build(obj_query.CheckboxCondition, **{self._condition_kw: bool(self.value)})
+                        condition = obj_query.CheckboxCondition.model_validate({self._condition_kw: bool(self.value)})
 
-                kwargs['formula'] = _build(obj_query.FormulaCondition, **{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition.model_validate({formula_type.formula_kwarg: condition})
 
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
@@ -403,10 +393,10 @@ class Equals(PropertyCondition):
 
         match prop_type:
             case schema.CreatedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                 return obj_query.CreatedTimeFilter(created_time=date_condition)
             case schema.LastEditedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                 return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
             case schema.Rollup():
                 condition: obj_query.Condition
@@ -421,23 +411,23 @@ class Equals(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = _build(obj_query.RollupArrayCondition, **kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
-                        condition = _build(obj_query.NumberCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
                         rollup_kwarg = rollup_type.value
                     case RollupType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                         rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': _build(obj_query.RollupCondition, **{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition.model_validate({rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return _build(obj_query.PropertyFilter, property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter.model_validate({'property': self.prop.name, **kwargs})
 
     def __repr__(self) -> str:
         return f'{self.prop} == {self._value_str}'
@@ -459,24 +449,24 @@ class InEquality(PropertyCondition, ABC):
 
         match prop_type:
             case schema.Number():
-                kwargs['number'] = _build(obj_query.NumberCondition, **{self._num_condition_kw: self.value})
+                kwargs['number'] = obj_query.NumberCondition.model_validate({self._num_condition_kw: self.value})
             case schema.ID():
-                kwargs['unique_id'] = _build(obj_query.IdCondition, **{self._num_condition_kw: self.value})
+                kwargs['unique_id'] = obj_query.IdCondition.model_validate({self._num_condition_kw: self.value})
             case schema.Date():
-                kwargs['date'] = _build(obj_query.DateCondition, **{self._date_condition_kw: self.value})
+                kwargs['date'] = obj_query.DateCondition.model_validate({self._date_condition_kw: self.value})
             case schema.Formula():
                 condition: obj_query.Condition
 
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.NUMBER:
-                        condition = _build(obj_query.NumberCondition, **{self._num_condition_kw: self.value})
+                        condition = obj_query.NumberCondition.model_validate({self._num_condition_kw: self.value})
                     case FormulaType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._date_condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._date_condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = _build(obj_query.FormulaCondition, **{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition.model_validate({formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -488,10 +478,10 @@ class InEquality(PropertyCondition, ABC):
 
         match prop_type:
             case schema.CreatedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._date_condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._date_condition_kw: self.value})
                 return obj_query.CreatedTimeFilter(created_time=date_condition)
             case schema.LastEditedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._date_condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._date_condition_kw: self.value})
                 return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
             case schema.Rollup():
                 condition: obj_query.Condition
@@ -506,23 +496,23 @@ class InEquality(PropertyCondition, ABC):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = _build(obj_query.RollupArrayCondition, **kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
-                        condition = _build(obj_query.NumberCondition, **{self._num_condition_kw: self.value})
+                        condition = obj_query.NumberCondition.model_validate({self._num_condition_kw: self.value})
                         rollup_kwarg = rollup_type.value
                     case RollupType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._date_condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._date_condition_kw: self.value})
                         rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': _build(obj_query.RollupCondition, **{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition.model_validate({rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return _build(obj_query.PropertyFilter, property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter.model_validate({'property': self.prop.name, **kwargs})
 
     @abstractmethod
     def __repr__(self) -> str: ...
@@ -569,24 +559,26 @@ class Contains(PropertyCondition):
 
         match prop_type:
             case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
-                kwargs['rich_text'] = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                kwargs['rich_text'] = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
             case schema.MultiSelect():
-                kwargs['multi_select'] = _build(obj_query.MultiSelectCondition, **{self._condition_kw: str(self.value)})
+                kwargs['multi_select'] = obj_query.MultiSelectCondition.model_validate(
+                    {self._condition_kw: str(self.value)}
+                )
             case schema.Person() if isinstance(self.value, User):
-                kwargs['people'] = _build(obj_query.PeopleCondition, **{self._condition_kw: self.value.id})
+                kwargs['people'] = obj_query.PeopleCondition.model_validate({self._condition_kw: self.value.id})
             case schema.Relation() if isinstance(self.value, Page):
-                kwargs['relation'] = _build(obj_query.RelationCondition, **{self._condition_kw: self.value.id})
+                kwargs['relation'] = obj_query.RelationCondition.model_validate({self._condition_kw: self.value.id})
             case schema.Formula():
                 condition: obj_query.Condition
 
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.STRING:
-                        condition = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = _build(obj_query.FormulaCondition, **{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition.model_validate({formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -608,16 +600,16 @@ class Contains(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = _build(obj_query.RollupArrayCondition, **kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': _build(obj_query.RollupCondition, **{self.prop.quantifier.value: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition.model_validate({self.prop.quantifier.value: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return _build(obj_query.PropertyFilter, property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter.model_validate({'property': self.prop.name, **kwargs})
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}({self._value_str})'
@@ -637,16 +629,16 @@ class StartsWith(PropertyCondition):
 
         match prop_type:
             case schema.Text() | schema.Title() | schema.Phone() | schema.Email() | schema.URL():
-                kwargs['rich_text'] = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                kwargs['rich_text'] = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
             case schema.Formula():
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.STRING:
-                        condition = _build(obj_query.TextCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = _build(obj_query.FormulaCondition, **{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition.model_validate({formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -668,16 +660,16 @@ class StartsWith(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = _build(obj_query.RollupArrayCondition, **kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': _build(obj_query.RollupCondition, **{self.prop.quantifier.value: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition.model_validate({self.prop.quantifier.value: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return _build(obj_query.PropertyFilter, property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter.model_validate({'property': self.prop.name, **kwargs})
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}({self._value_str})'
@@ -697,16 +689,16 @@ class DateCondition(PropertyCondition, ABC):
 
         match prop_type:
             case schema.Date():
-                kwargs['date'] = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                kwargs['date'] = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
             case schema.Formula():
                 match formula_type := self._get_formula_type(db):
                     case FormulaType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                     case _:
                         msg = f'Invalid formula type `{formula_type.value}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs['formula'] = _build(obj_query.FormulaCondition, **{formula_type.formula_kwarg: condition})
+                kwargs['formula'] = obj_query.FormulaCondition.model_validate({formula_type.formula_kwarg: condition})
             case _:
                 msg = f'Invalid property type `{prop_type}` for condition {self}.'
                 raise FilterQueryError(msg)
@@ -718,10 +710,10 @@ class DateCondition(PropertyCondition, ABC):
 
         match prop_type:
             case schema.CreatedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                 return obj_query.CreatedTimeFilter(created_time=date_condition)
             case schema.LastEditedTime():
-                date_condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                date_condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                 return obj_query.LastEditedTimeFilter(last_edited_time=date_condition)
             case schema.Rollup():
                 condition: obj_query.Condition
@@ -736,20 +728,20 @@ class DateCondition(PropertyCondition, ABC):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = _build(obj_query.RollupArrayCondition, **kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.DATE:
-                        condition = _build(obj_query.DateCondition, **{self._condition_kw: self.value})
+                        condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
                         rollup_kwarg = rollup_type.value
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
 
-                kwargs = {'rollup': _build(obj_query.RollupCondition, **{rollup_kwarg: condition})}
+                kwargs = {'rollup': obj_query.RollupCondition.model_validate({rollup_kwarg: condition})}
             case _:
                 kwargs = self._create_obj_ref_kwargs(db, prop_type)
 
-        return _build(obj_query.PropertyFilter, property=self.prop.name, **kwargs)
+        return obj_query.PropertyFilter.model_validate({'property': self.prop.name, **kwargs})
 
     def __repr__(self) -> str:
         return f'{self.prop}.{self._condition_kw}()'
@@ -787,7 +779,7 @@ class And(Condition):
     terms: list[Condition]
 
     def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
-        return _build(obj_query.CompoundFilter, and_=[term.create_obj_ref(db) for term in self.terms])
+        return obj_query.CompoundFilter.model_validate({'and_': [term.create_obj_ref(db) for term in self.terms]})
 
     def __repr__(self) -> str:
         terms = [f'({term})' if not term.is_method else str(term) for term in self.terms]
@@ -798,7 +790,7 @@ class Or(Condition):
     terms: list[Condition]
 
     def create_obj_ref(self, db: Database) -> obj_query.QueryFilter:
-        return _build(obj_query.CompoundFilter, or_=[term.create_obj_ref(db) for term in self.terms])
+        return obj_query.CompoundFilter.model_validate({'or_': [term.create_obj_ref(db) for term in self.terms]})
 
     def __repr__(self) -> str:
         terms = [f'({term})' if not term.is_method else str(term) for term in self.terms]
