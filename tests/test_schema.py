@@ -272,35 +272,35 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_db(parent=root_page, schema=Schema)
 
     # Delete properties from the schema
-    assert hasattr(db.schema, 'formula')
+    assert 'formula' in [prop.attr_name for prop in db.schema]
     del db.schema['Formula']
     assert 'Formula' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'formula')
+    assert 'formula' not in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Formula' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'formula')
+    assert 'formula' not in [prop.attr_name for prop in db.schema]
 
     db.schema.tags.delete()
     assert 'Tags' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'tags')
+    assert 'tags' not in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Tags' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'tags')
+    assert 'tags' not in [prop.attr_name for prop in db.schema]
 
     # Add properties to the schema
     db.schema['Number'] = uno.PropType.Number(format=uno.NumberFormat.DOLLAR)
     assert 'Number' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'number')
+    assert 'number' in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Number' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'number')
+    assert 'number' in [prop.attr_name for prop in db.schema]
 
     db.schema.date = uno.PropType.Date('Date')
     assert 'Date' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'date')
+    assert 'date' in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Date' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'date')
+    assert 'date' in [prop.attr_name for prop in db.schema]
 
     class TargetSchema(uno.Schema, db_title='Add/Del/Update Prop-Test'):
         """Target schema as self-reference relations lead to a Notion Internal Server Error 500"""
@@ -312,13 +312,13 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     db.schema['Relation'] = uno.PropType.Relation(schema=TargetSchema, two_way_prop='Back Relation')
     assert 'Relation' in [prop.name for prop in db.schema]
     assert 'Back Relation' in [prop.name for prop in target_db.schema]
-    assert hasattr(db.schema, 'relation')
-    assert hasattr(target_db.schema, 'back_relation')
+    assert 'relation' in [prop.attr_name for prop in db.schema]
+    assert 'back_relation' in [prop.attr_name for prop in target_db.schema]
     db.reload()
     assert 'Relation' in [prop.name for prop in db.schema]
     assert 'Back Relation' in [prop.name for prop in target_db.schema]
-    assert hasattr(db.schema, 'relation')
-    assert hasattr(target_db.schema, 'back_relation')
+    assert 'relation' in [prop.attr_name for prop in db.schema]
+    assert 'back_relation' in [prop.attr_name for prop in target_db.schema]
 
     # Update properties in the schema
     with pytest.raises(PropertyError):
@@ -522,9 +522,9 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
     my_tags = db.schema.my_tags
     assert isinstance(my_tags, uno.PropType.MultiSelect)
     assert my_tags.options == options
-    assert not hasattr(db.schema, 'name')
-    assert not hasattr(db.schema, 'cat')
-    assert not hasattr(db.schema, 'tags')
+    assert 'name' not in [prop.attr_name for prop in db.schema]
+    assert 'cat' not in [prop.attr_name for prop in db.schema]
+    assert 'tags' not in [prop.attr_name for prop in db.schema]
 
 
 @pytest.mark.vcr()
