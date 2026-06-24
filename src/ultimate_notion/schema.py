@@ -615,7 +615,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
         two_way_prop_name = self.two_way_prop.name if self.two_way_prop else None
 
-        if obj_synced_property_name != two_way_prop_name:
+        if two_way_prop_name is not None and obj_synced_property_name != two_way_prop_name:
             session = get_active_session()
 
             # change the old default name in the target schema to what was passed during initialization
@@ -625,7 +625,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
                 msg = 'No synced property ID found in the relation object'
                 raise SchemaError(msg)
 
-            schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_prop_name)}  # ty: ignore[invalid-argument-type]
+            schema_dct = {prop_id: obj_schema.RenameProp(name=two_way_prop_name)}
             session.api.databases.update(db=other_db.obj_ref, schema=schema_dct)
             other_db.schema._set_obj_refs()
 
