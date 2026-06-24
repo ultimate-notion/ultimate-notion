@@ -10,7 +10,7 @@ from pydantic import ConfigDict, Field, ValidationError
 from pydantic.functional_validators import BeforeValidator
 
 from ultimate_notion.config import get_cfg
-from ultimate_notion.obj_api.blocks import Block, Database, Page
+from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.objects import Comment, FileUpload, User
 from ultimate_notion.obj_api.props import PropertyItem
@@ -22,7 +22,7 @@ _logger = logging.getLogger(__name__)
 
 def convert_to_notion_obj(
     data: dict[str, Any],
-) -> Block | Page | Database | PropertyItem | User | GenericObject | FileUpload:
+) -> Block | Page | Database | DataSource | PropertyItem | User | GenericObject | FileUpload:
     """Convert a dictionary to the corresponding subtype of Notion Object.
 
     Used in the ObjectList below to convert the results from the Notion API.
@@ -33,7 +33,16 @@ def convert_to_notion_obj(
         msg = 'Unknown object in results'
         raise ValueError(msg)
 
-    models: tuple[type[NotionObject], ...] = (Block, Page, Database, PropertyItem, User, Comment, FileUpload)
+    models: tuple[type[NotionObject], ...] = (
+        Block,
+        Page,
+        Database,
+        DataSource,
+        PropertyItem,
+        User,
+        Comment,
+        FileUpload,
+    )
     model_mapping = {model.model_fields[obj_field].default: model for model in models}
     model_class = model_mapping.get(data[obj_field], GenericObject)
     return model_class.model_validate(data)
