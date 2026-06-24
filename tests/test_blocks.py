@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from textwrap import dedent
+from typing import Any
 from uuid import uuid4
 
 import pytest
@@ -917,6 +918,59 @@ def test_deserialized_block_children(root_page: uno.Page, notion: uno.Session) -
 
     # This hits an assertion error
     assert page.children[0] == another_block_child
+
+
+def test_chunk_deeply_nested_wrapped_blocks() -> None:
+    """A tree reconstructed via `wrap_obj_ref` from JSON must still be chunked one level per request.
+
+    Regression test for https://github.com/ultimate-notion/ultimate-notion/issues/305: when a block
+    tree is built via `wrap_obj_ref` from serialized JSON, its children live in `obj_ref.value.children`
+    while `obj_ref.has_children` is `False`. The chunker gates on `has_children`, so without pulling those
+    children into the `_children` cache the whole tree was sent in a single request, and Notion rejects
+    anything nested more than `MAX_NESTING_LEVEL` deep with a 400.
+    """
+
+    def serialize(block: uno.Block) -> dict[str, Any]:
+        data = block.obj_ref.serialize_for_api()
+        block_type = block.obj_ref.type
+        assert block_type is not None
+        if isinstance(block, ChildrenMixin) and block.has_children:
+            data[block_type]['children'] = [serialize(child) for child in block.blocks]
+        return data
+
+    def depth(block_dict: dict[str, Any]) -> int:
+        type_data = block_dict.get(block_dict['type'], {})
+        children = type_data.get('children', []) if isinstance(type_data, dict) else []
+        return 1 + max((depth(child) for child in children), default=0)
+
+    # Callouts nested 4 levels deep: main > [code, output > [note > [body]]]
+    note = uno.Callout('note')
+    note.append(uno.Callout('body'))
+    output = uno.Callout('Output')
+    output.append(note)
+    main = uno.Callout('Example')
+    main.append([uno.Callout('Code'), output])
+
+    # The whole tree starts out 4 levels deep, which Notion rejects in a single request.
+    assert depth(serialize(main)) == 4
+
+    reloaded = uno.Block.wrap_obj_ref(ObjBlock.model_validate(obj=serialize(main)))
+
+    # The children are pulled into the cache and `has_children` is made consistent with them, even though
+    # the serialized JSON reports `has_children == False` on every node.
+    assert reloaded.has_children
+    assert isinstance(reloaded, ChildrenMixin)
+    assert len(reloaded.blocks) == 2
+
+    parent = uno.Callout('Parent')
+    request_depths = []
+    for batch in uno_blocks._chunk_blocks_for_api(parent, [reloaded]):
+        payload = [uno_blocks._build_obj_ref(child) for child in batch.children]
+        request_depths.append([depth(block.obj_ref.serialize_for_api()) for block in payload])
+
+    # No single request nests deeper than the Notion limit of `MAX_NESTING_LEVEL`.
+    assert all(d <= uno_blocks.MAX_NESTING_LEVEL for depths in request_depths for d in depths)
+    assert request_depths == [[1], [1, 1], [1], [1]]
 
 
 @pytest.mark.vcr()
