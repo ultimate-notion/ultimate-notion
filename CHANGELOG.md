@@ -6,6 +6,7 @@
 - Fix: Raise a clear `UnsetError` from `Bot.workspace_info` when the workspace name or id is unavailable (i.e. for any bot other than the integration's own), instead of an opaque pydantic `ValidationError`, issue #326.
 - Chg: Replace `hasattr`-based checks in `obj_api.core` with type-safe alternatives (a structural pattern match on `UniqueObject` in `ObjectRef.build`, a typed `ClassVar` sentinel for the `UnsetType` singleton, and a `None`-defaulted `ClassVar` sentinel for the `TypedObject._typemap` registry).
 - Chg: Replace the `hasattr`-based `Property._is_init` check with a `None`-defaulted sentinel for `Wrapper._obj_ref`, so initialization is an explicit `is not None` check that the type checker understands.
+- Chg: Make `_Node` generic in its wrapped type and pin `children` to `list[_Node[Block]]`, encoding the invariant that only a root node wraps a `Page` while every child wraps a `Block`, so building child obj_refs no longer needs to launder the element type, issue #339.
 
 ## Version 0.9.10, 2026-06-24
 

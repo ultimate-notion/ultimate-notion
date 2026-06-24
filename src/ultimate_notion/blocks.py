@@ -28,7 +28,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, TypeGuard, overload
+from typing import TYPE_CHECKING, Any, Generic, TypeGuard, overload
 
 import numpy as np
 from tabulate import tabulate
@@ -1561,13 +1561,19 @@ class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.Unsupport
         return '<kbd>Unsupported block</kbd>\n'
 
 
-@dataclass
-class _Node:
-    """Tree of nodes used to chunk blocks for the Notion API."""
+NB_co = TypeVar('NB_co', bound='Block | Page', default='Block | Page', covariant=True)
 
-    block: Block | Page
+
+@dataclass(frozen=True)
+class _Node(Generic[NB_co]):
+    """Tree of nodes used to chunk blocks for the Notion API.
+
+    Only a root node wraps a `Page`; every node held in `children` wraps a `Block`.
+    """
+
+    block: NB_co
     is_root: bool = False
-    children: list[_Node] = field(default_factory=list)
+    children: list[_Node[Block]] = field(default_factory=list)
 
 
 def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iterator[_Node]:
@@ -1615,13 +1621,10 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
         yield batch
 
 
-def _build_obj_ref(node: _Node) -> Block:
+def _build_obj_ref(node: _Node[Block]) -> Block:
     """Recursively build the obj_ref of a block and its children."""
     block = node.block
     children = node.children
-    if not isinstance(block, Block):
-        msg = f'Non-block type {type(block)} not allowed on this level of the hierarchy.'
-        raise TypeError(msg)
     value = block.obj_ref.value
     if isinstance(block, ParentBlock) and block.has_children and isinstance(value, obj_blocks.WithChildren):
         for child in node.children:
