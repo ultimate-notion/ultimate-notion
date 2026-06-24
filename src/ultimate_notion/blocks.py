@@ -585,7 +585,7 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.P
 HT = TypeVar('HT', bound=obj_blocks.Heading)
 
 
-class Heading(ColoredTextBlock[HT], ParentBlock[obj_blocks.Heading], wraps=obj_blocks.Heading):  # ty: ignore[invalid-generic-class]
+class Heading(ColoredTextBlock[HT], ParentBlock[HT], wraps=obj_blocks.Heading):
     """Abstract Heading block.
 
     Parent class of all heading block types.
