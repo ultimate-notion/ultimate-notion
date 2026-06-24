@@ -9,7 +9,6 @@ import textwrap
 import types
 from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
 from contextlib import contextmanager
-from copy import deepcopy
 from functools import update_wrapper
 from hashlib import sha256
 from itertools import chain
@@ -166,66 +165,6 @@ def find_index(elem: Any, lst: list[Any]) -> int | None:
         return lst.index(elem)
     except ValueError:
         return None
-
-
-def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[int, Any] | None = None) -> T:
-    """Like `deepcopy` but specified attributes are shared.
-
-    Deepcopy an object, except for a given list of attributes, which should
-    be shared between the original object and its copy.
-
-    Args:
-        obj: some object to copy
-        shared_attributes: A list of strings identifying the attributes that should be shared instead of copied.
-        memo: dictionary passed into __deepcopy__. Ignore this argument if not calling from within __deepcopy__.
-
-    Example:
-        ```python
-        class A(object):
-            def __init__(self):
-                self.copy_me = []
-                self.share_me = []
-
-            def __deepcopy__(self, memo):
-                return deepcopy_with_sharing(
-                    self, shared_attribute_names=['share_me'], memo=memo
-                )
-
-
-        a = A()
-        b = deepcopy(a)
-        assert a.copy_me is not b.copy_me
-        assert a.share_me is b.share_me
-
-        c = deepcopy(b)
-        assert c.copy_me is not b.copy_me
-        assert c.share_me is b.share_me
-        ```
-
-    Original from https://stackoverflow.com/a/24621200
-    """
-    shared_attrs = {k: getattr(obj, k) for k in shared_attributes}
-
-    if hasattr(obj, '__deepcopy__'):
-        # Do hack to prevent infinite recursion in call to deepcopy
-        deepcopy_method = obj.__deepcopy__
-        obj.__dict__['__deepcopy__'] = None
-
-    for attr in shared_attributes:
-        del obj.__dict__[attr]
-
-    clone = deepcopy(obj, memo)
-
-    for attr, val in shared_attrs.items():
-        setattr(obj, attr, val)
-        setattr(clone, attr, val)
-
-    if hasattr(obj, '__deepcopy__'):
-        # Undo hack
-        obj.__dict__['__deepcopy__'] = deepcopy_method
-        del clone.__dict__['__deepcopy__']
-
-    return clone
 
 
 KT = TypeVar('KT')  # ToDo: Use new syntax when requires-python >= 3.12
