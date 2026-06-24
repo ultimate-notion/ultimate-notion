@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## Version 0.9.10, 2026-06-24
+
 - Fix: Split deeply-nested block trees reconstructed via `Block.wrap_obj_ref()` from serialized JSON into Notion-compliant requests on `append()`. Children carried in `obj_ref.value.children` (where `has_children` is `False`) were previously left untouched by the chunker and sent in a single over-nested request, which Notion rejected with a 400, issue #305.
 
 ## Version 0.9.9, 2026-06-23
