@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: Split deeply-nested block trees reconstructed via `Block.wrap_obj_ref()` from serialized JSON into Notion-compliant requests on `append()`. Children carried in `obj_ref.value.children` (where `has_children` is `False`) were previously left untouched by the chunker and sent in a single over-nested request, which Notion rejected with a 400, issue #305.
+
 ## Version 0.9.9, 2026-06-23
 
 - Fix: Accept Notion's built-in (icon gallery) icons, which use the `icon` sub-type with a `name` and `color` and previously broke loading any page/database (and cascaded into `search`/list endpoints) that used one, issue #295.

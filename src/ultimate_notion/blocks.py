@@ -440,8 +440,12 @@ class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     def _finalize_wrap(self) -> None:
         super()._finalize_wrap()
         value = self.obj_ref.value
-        if self.obj_ref.has_children and isinstance(value, obj_blocks.WithChildren) and value.children:
+        # Children may be carried in `value.children` even when `has_children` is `False`, e.g. when a block tree
+        # is reconstructed via `wrap_obj_ref` from serialized JSON. Pull them into the `_children` cache regardless
+        # so the chunking machinery (which gates on `has_children`/`blocks`) splits deeply-nested trees correctly.
+        if isinstance(value, obj_blocks.WithChildren) and value.children:
             self._children = [Block.wrap_obj_ref(child) for child in value.children]
+            self.obj_ref.has_children = True
             value.children = []  # clear children to avoid confusion during comparison
 
 
