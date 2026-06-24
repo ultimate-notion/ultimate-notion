@@ -77,12 +77,12 @@ def test_bot_type_data(person: uno.User) -> None:
     user_mention = objs.MentionUser(user=person.obj_ref).model_dump()
 
     for owner in (workspace, user_mention):
-        kwargs = {
+        raw_bot_data = {
             'workspace_id': '12345678-1234-1234-1234-1234567890ab',
             'owner': owner,
             'workspace_name': 'Test Bot Workspace',
             # no workspace_limit for this test
         }
-        bot_data = objs.BotTypeData.model_validate(kwargs)
+        bot_data = objs.BotTypeData.model_validate(raw_bot_data)
         assert bot_data.owner is not None
         assert bot_data.owner.model_dump() == owner
