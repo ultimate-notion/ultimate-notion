@@ -25,7 +25,7 @@ from collections import Counter
 from collections.abc import Iterator
 from copy import deepcopy
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Any, TypeAlias, cast, overload
+from typing import TYPE_CHECKING, Any, TypeAlias, cast, overload
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
@@ -1069,8 +1069,7 @@ class Schema(metaclass=SchemaType):
             return py_type if isinstance(py_type, PropertyValue) else prop_value(py_type)
 
         kwargs: dict[str, Any] = {
-            prop.attr_name: Annotated[prop.prop_value, Field(default=None, alias=prop.name)]
-            for prop in cls.get_rw_props()
+            prop.attr_name: (prop.prop_value, Field(default=None, alias=prop.name)) for prop in cls.get_rw_props()
         }
         validators: dict[str, Any] = {
             f'{prop.attr_name}_validator': field_validator(prop.attr_name, mode='before')(
@@ -1080,9 +1079,7 @@ class Schema(metaclass=SchemaType):
         }
 
         if with_ro_props:
-            kwargs |= {
-                prop.attr_name: Annotated[prop.prop_value, Field(alias=prop.name)] for prop in cls.get_ro_props()
-            }
+            kwargs |= {prop.attr_name: (prop.prop_value, Field(alias=prop.name)) for prop in cls.get_ro_props()}
             validators |= {
                 f'{prop.attr_name}_validator': field_validator(prop.attr_name, mode='before')(
                     partial(pytype_to_prop_value, prop_value=prop.prop_value)
