@@ -101,11 +101,7 @@ class GObject(BaseModel):
 
     @model_validator(mode='after')
     def _bind_resource(self, info: ValidationInfo) -> Self:
-        """Bind the Tasks service resource passed via `model_validate(..., context={'resource': ...})`.
-
-        The resource is a runtime dependency rather than part of the API payload, so it travels
-        through the validation context instead of the validated data.
-        """
+        """Bind the Tasks service `resource` passed through the validation context."""
         resource = (info.context or {}).get('resource')
         if resource is not None:
             self._resource = resource
