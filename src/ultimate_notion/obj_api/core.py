@@ -88,9 +88,11 @@ class UnsetType(BaseModel):
 
     __slots__ = ()
 
+    _instance: ClassVar[UnsetType | None] = None
+
     def __new__(cls, *args: Any, **kwargs: Any) -> UnsetType:
         # Ensure only one instance is created, allowing `is` to work correctly
-        if not hasattr(cls, '_instance'):
+        if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
@@ -349,9 +351,9 @@ class ObjectRef(GenericObject):
             case ParentRef() if isinstance(ref.value, UUID):
                 # ParentRefs are typed objects with a nested UUID
                 return cls.model_construct(id=ref.value)
-            case GenericObject() if hasattr(ref, 'id'):
+            case UniqueObject(id=(UUID() | str()) as obj_id):
                 # Re-compose the ObjectReference from the internal ID
-                return cls.build(ref.id)
+                return cls.build(obj_id)
             case UUID():
                 return cls.model_construct(id=ref)
             case str() if (id_str := extract_id(ref)) is not None:
