@@ -7,6 +7,7 @@ from uuid import UUID
 from typing_extensions import TypeVar
 
 from ultimate_notion.core import Wrapper, get_repr
+from ultimate_notion.errors import UnsetError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import UserRef
 
@@ -99,10 +100,18 @@ class Bot(User[objs.Bot], wraps=objs.Bot):
 
     @property
     def workspace_info(self) -> WorkSpaceInfo:
-        """Return the workspace info of this bot, if available."""
+        """Return the workspace info of this bot.
+
+        Notion only populates the workspace name and id for the integration's own bot, so this is
+        unavailable for other bot users.
+        """
         workspace_id = self.obj_ref.bot.workspace_id
+        workspace_name = self.obj_ref.bot.workspace_name
+        if workspace_id is None or workspace_name is None:
+            msg = "Workspace info is only available for the integration's own bot."
+            raise UnsetError(msg)
         kwargs = self.obj_ref.bot.workspace_limits.model_dump()
-        return WorkSpaceInfo(name=self.obj_ref.bot.workspace_name, workspace_id=workspace_id, **kwargs)  # ty: ignore[invalid-argument-type]
+        return WorkSpaceInfo(name=workspace_name, workspace_id=workspace_id, **kwargs)
 
 
 class UnknownUser(User[objs.User], wraps=UserRef):
