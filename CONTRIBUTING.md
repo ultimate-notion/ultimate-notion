@@ -93,12 +93,31 @@ This often provides additional considerations and avoids unnecessary work.
    ```
    These settings will also be respected by [pytest] using [pytest-dotenv].
 
+### Set up the unit tests
+
+Ultimate Notion deals with unit tests in two ways. Most tests are recorded as
+cassettes using [VCR.py], which captures the HTTP interactions a test makes the
+first time it runs against the Notion API and replays them on subsequent runs.
+This lets the suite run offline and much faster, with no Notion account needed:
+
+```console
+hatch run vcr-only
+```
+
+You only need your own Notion workspace and integration token if you want to
+**run the tests live** against the Notion API, or to **add a new test** or
+**re-record an existing cassette**:
+
+```console
+hatch run vcr-rewrite          # re-record all cassettes
+hatch run test -k NEW_TEST     # run/record a specific test live
+```
+
+Running tests live requires a configured test workspace, described next.
+
 ### Set up a Notion test workspace
 
-Most tests replay recorded HTTP interactions (VCR cassettes) and need no network
-access; run them with `hatch run vcr-only`. You only need your own Notion
-workspace and integration token if you want to **run the tests live** against the
-Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
+You only need this section to run the tests live or to re-record cassettes.
 
 1. **Create an internal integration.** Open [My integrations] and click
    *New integration*. Choose **Internal**, associate it with the workspace you
@@ -139,9 +158,53 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 
 !!! note
     Three objects (`All Properties DB`, `Wiki DB` and the `Custom Emoji Page`) use
-    features the API cannot create and must be built by hand. See
+    features the API cannot create and must be built by hand. A fourth, `Formula DB`,
+    is created by the script but its formula columns must be recreated in the UI,
+    because Notion cannot filter on formula properties created via the API (issue #297);
+    the script reports this. See
     [`tests/TEST_WORKSPACE.md`](https://github.com/ultimate-notion/ultimate-notion/blob/main/tests/TEST_WORKSPACE.md)
     for exact instructions.
+
+### Add a new live (VCR) test
+
+The committed cassettes are one coherent recording of a single workspace, so you
+**cannot** simply `vcr-rewrite` a new test against your own workspace and commit the
+result: `vcr-rewrite` replays the shared fixture cassettes in
+`tests/cassettes/fixtures/` (the `Tests` root page, the seeded databases, …) with
+*your* workspace's ids, which then diverge from the rest of the suite. Record a new
+test like this instead:
+
+```console
+# 1. Bootstrap your workspace (root page named `Tests`, or set UNO_TEST_ROOT_PAGE).
+# 2. Delete the shared fixture cassettes so they record fresh against your workspace
+#    (vcr-rewrite otherwise downgrades them to `new_episodes` and replays committed ids).
+rm tests/cassettes/fixtures/mod_*.yaml
+# 3. Record only your new test.
+NOTION_TOKEN=ntn_… hatch run vcr-rewrite -k your_new_test
+# 4. Keep ONLY your new test's cassette; restore the shared fixtures unchanged.
+git checkout -- tests/cassettes/fixtures
+# 5. Verify it replays offline against the committed fixtures.
+hatch run vcr-only -k your_new_test
+```
+
+This works because cassettes are matched by request path and (for `POST /v1/search`)
+by request body, and because the ids of the **shared** workspace objects are normalised
+to stable placeholders when cassettes are written. The root page, the seeded static
+pages/databases, the integration bot, the workspace members and the workspace itself are
+recognised during recording and every occurrence of their ids — in request paths/bodies
+and in response bodies — is rewritten to a fixed placeholder (see the shared-id
+normalisation in `tests/conftest.py`). The same normalisation is applied when matching, so
+a test that asserts identity against a shared fixture (e.g. `page.parent == root_page`) or
+puts a shared object's id in a request *path* (e.g. `GET /v1/blocks/{root_id}/children`)
+replays against the committed fixtures even though it was recorded against *your*
+workspace's ids. Content you create under `root_page` keeps its own (non-shared) ids,
+which are internally consistent within the recording and so replay cleanly.
+
+To support recording against a root page that cannot be named `Tests`, the non-default
+title configured via `UNO_TEST_ROOT_PAGE` is also scrubbed back to `Tests` when cassettes
+are written. Property, option and block ids *inside* the manually created databases are
+workspace-specific and are **not** normalised, so a brand-new test that asserts on those
+(e.g. a formula's internal property reference) may still need a hand edit.
 
 ### Implement your changes
 
@@ -219,4 +282,5 @@ Notion API or **re-record the cassettes** with `hatch run vcr-rewrite`.
 [VS Code]: https://code.visualstudio.com/
 [GitHub's code editor]: https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files
 [mkdocs]: https://www.mkdocs.org/
+[VCR.py]: https://vcrpy.readthedocs.io/
 [My integrations]: https://www.notion.so/my-integrations

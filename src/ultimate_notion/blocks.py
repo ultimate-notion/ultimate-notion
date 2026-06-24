@@ -37,7 +37,7 @@ from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_db, is_page
-from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError, UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
@@ -75,8 +75,8 @@ DO_co = TypeVar('DO_co', bound=obj_blocks.DataObject, default=obj_blocks.DataObj
 
 
 def wrap_icon(
-    icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject,
-) -> NotionFile | ExternalFile | CustomEmoji | Emoji:
+    icon_obj: objs.FileObject | objs.EmojiObject | objs.CustomEmojiObject | objs.BuiltInIconObject,
+) -> NotionFile | ExternalFile | CustomEmoji | Emoji | BuiltInIcon:
     """Wrap the icon object into the corresponding class."""
     match icon_obj:
         case objs.ExternalFile():
@@ -87,6 +87,8 @@ def wrap_icon(
             return Emoji.wrap_obj_ref(icon_obj)
         case objs.CustomEmojiObject():
             return CustomEmoji.wrap_obj_ref(icon_obj)
+        case objs.BuiltInIconObject():
+            return BuiltInIcon.wrap_obj_ref(icon_obj)
         case _:
             msg = f'unknown icon object of {type(icon_obj)}'
             raise RuntimeError(msg)
@@ -436,8 +438,12 @@ class ParentBlock(Block[B_co], ChildrenMixin[B_co], wraps=obj_blocks.Block):
     def _finalize_wrap(self) -> None:
         super()._finalize_wrap()
         value = self.obj_ref.value
-        if self.obj_ref.has_children and isinstance(value, obj_blocks.WithChildren) and value.children:
+        # Children may be carried in `value.children` even when `has_children` is `False`, e.g. when a block tree
+        # is reconstructed via `wrap_obj_ref` from serialized JSON. Pull them into the `_children` cache regardless
+        # so the chunking machinery (which gates on `has_children`/`blocks`) splits deeply-nested trees correctly.
+        if isinstance(value, obj_blocks.WithChildren) and value.children:
             self._children = [Block.wrap_obj_ref(child) for child in value.children]
+            self.obj_ref.has_children = True
             value.children = []  # clear children to avoid confusion during comparison
 
 
@@ -534,7 +540,7 @@ class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_
     def to_markdown(self) -> str:
         """Return the code content of this block as Markdown."""
         lang = self.obj_ref.value.language
-        return f'```{lang}\n{super().to_markdown()}\n```'
+        return f'```{lang.value}\n{super().to_markdown()}\n```'
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -658,7 +664,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         text: str,
         *,
         color: Color | BGColor = Color.DEFAULT,
-        icon: AnyFile | str | Emoji | CustomEmoji = '💡',
+        icon: AnyFile | str | Emoji | CustomEmoji | BuiltInIcon = '💡',
     ) -> None:
         super().__init__(text, color=color)
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
@@ -675,7 +681,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         return Emoji('💡')
 
     @property
-    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji:
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon:
         if is_unset(icon := self.obj_ref.value.icon):
             raise UnsetError()
         if icon is None:
@@ -684,7 +690,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
             return wrap_icon(icon)
 
     @icon.setter
-    def icon(self, icon: AnyFile | Emoji | CustomEmoji) -> None:
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon) -> None:
         self.obj_ref.value.icon = icon.obj_ref
         self._update_in_notion()
 
@@ -692,7 +698,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         match self.icon:
             case Emoji():
                 return f'{self.icon} {super().to_markdown()}\n'
-            case CustomEmoji():
+            case CustomEmoji() | BuiltInIcon():
                 return f':{self.icon.name}: {super().to_markdown()}\n'
             case AnyFile():
                 return f'![icon]({self.icon.url}) {super().to_markdown()}\n'

@@ -25,6 +25,24 @@ def test_search_get_db(notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
+def test_search_page_with_property_less_results(notion: uno.Session) -> None:
+    """`search_page()` must tolerate stripped-down page objects that omit `properties`.
+
+    Notion's `search` endpoint returns property-less records (e.g. trashed or
+    limited-access pages) that contain essentially only `{'object': 'page', 'id': ...}`.
+    The recorded cassette mixes regular pages with such stripped-down objects, so this
+    exercises the full `search_page` pipeline (endpoint → `ObjectList` validation →
+    `Page.wrap_obj_ref`) against that shape offline. Regression test for
+    https://github.com/ultimate-notion/ultimate-notion/issues/273.
+    """
+    pages = notion.search_page()
+
+    assert len(pages) == 4
+    property_less = [page for page in pages if not page.obj_ref.properties]
+    assert len(property_less) == 2
+
+
+@pytest.mark.vcr()
 def test_whoami_get_user(notion: uno.Session) -> None:
     me = notion.whoami()
     user = notion.get_user(me.id)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from textwrap import dedent
+from typing import Any
 from uuid import uuid4
 
 import pytest
@@ -8,7 +9,8 @@ import pytest
 import ultimate_notion as uno
 from tests.conftest import URL, all_blocks
 from ultimate_notion import blocks as uno_blocks
-from ultimate_notion.blocks import ChildrenMixin
+from ultimate_notion.blocks import ChildrenMixin, wrap_icon
+from ultimate_notion.emoji import BuiltInIcon
 from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.blocks import Block as ObjBlock
@@ -701,6 +703,63 @@ def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> Non
     heading.append(uno.Paragraph('This is a child paragraph.'))
 
 
+def test_serialize_strips_meta_from_nested_children() -> None:
+    """Read-only block meta fields must not leak into nested children when serializing.
+
+    Regression test for https://github.com/ultimate-notion/ultimate-notion/issues/291: nested
+    children are serialized via pydantic's recursive `model_dump`, not each child's
+    `serialize_for_api`, so the meta strip has to walk the whole tree. `is_archived` in particular
+    is rejected by Notion's append-children endpoint, turning a latent leak into a hard `400`.
+    """
+    top = uno.Callout('top')
+    mid = uno.Callout('mid')
+    inner = uno.Callout('inner')
+    top.obj_ref.value.children = [mid.obj_ref]
+    mid.obj_ref.value.children = [inner.obj_ref]
+
+    data = top.obj_ref.serialize_for_api()
+    meta_fields = ('has_children', 'in_trash', 'archived', 'is_archived')
+
+    child = data['callout']['children'][0]
+    grandchild = child['callout']['children'][0]
+    for level in (data, child, grandchild):
+        assert not any(field in level for field in meta_fields)
+
+
+@pytest.mark.vcr()
+def test_append_nested_children_single_call(root_page: uno.Page, notion: uno.Session) -> None:
+    """Appending a block that already carries nested children must succeed in a single API call.
+
+    Live counterpart to `test_serialize_strips_meta_from_nested_children`. Regression test for
+    https://github.com/ultimate-notion/ultimate-notion/issues/291: read-only meta fields (notably
+    `is_archived`) leaking into nested children made Notion's append-children endpoint reject the
+    whole request with a hard 400. The tree is assembled offline and appended in one
+    `page.append(top)` call, so the entire nesting goes to the append endpoint at once.
+    """
+    page = notion.create_page(parent=root_page, title='Page for appending nested children')
+    top = uno.Callout('top')
+    mid = uno.Callout('mid')
+    inner = uno.Callout('inner')
+    top.append(mid)
+    mid.append(inner)
+
+    page.append(top)
+
+    assert page.children == (top,)
+    assert top.children == (mid,)
+    assert mid.children == (inner,)
+
+    page.reload()
+
+    assert len(page.children) == 1
+    reloaded_top = page.children[0]
+    assert isinstance(reloaded_top, ChildrenMixin)
+    assert len(reloaded_top.children) == 1
+    reloaded_mid = reloaded_top.children[0]
+    assert isinstance(reloaded_mid, ChildrenMixin)
+    assert len(reloaded_mid.children) == 1
+
+
 def test_rt_default_color() -> None:
     para_1 = uno.Paragraph(text='Hello')
     para_2 = uno.Paragraph(text='')
@@ -861,6 +920,59 @@ def test_deserialized_block_children(root_page: uno.Page, notion: uno.Session) -
     assert page.children[0] == another_block_child
 
 
+def test_chunk_deeply_nested_wrapped_blocks() -> None:
+    """A tree reconstructed via `wrap_obj_ref` from JSON must still be chunked one level per request.
+
+    Regression test for https://github.com/ultimate-notion/ultimate-notion/issues/305: when a block
+    tree is built via `wrap_obj_ref` from serialized JSON, its children live in `obj_ref.value.children`
+    while `obj_ref.has_children` is `False`. The chunker gates on `has_children`, so without pulling those
+    children into the `_children` cache the whole tree was sent in a single request, and Notion rejects
+    anything nested more than `MAX_NESTING_LEVEL` deep with a 400.
+    """
+
+    def serialize(block: uno.Block) -> dict[str, Any]:
+        data = block.obj_ref.serialize_for_api()
+        block_type = block.obj_ref.type
+        assert block_type is not None
+        if isinstance(block, ChildrenMixin) and block.has_children:
+            data[block_type]['children'] = [serialize(child) for child in block.blocks]
+        return data
+
+    def depth(block_dict: dict[str, Any]) -> int:
+        type_data = block_dict.get(block_dict['type'], {})
+        children = type_data.get('children', []) if isinstance(type_data, dict) else []
+        return 1 + max((depth(child) for child in children), default=0)
+
+    # Callouts nested 4 levels deep: main > [code, output > [note > [body]]]
+    note = uno.Callout('note')
+    note.append(uno.Callout('body'))
+    output = uno.Callout('Output')
+    output.append(note)
+    main = uno.Callout('Example')
+    main.append([uno.Callout('Code'), output])
+
+    # The whole tree starts out 4 levels deep, which Notion rejects in a single request.
+    assert depth(serialize(main)) == 4
+
+    reloaded = uno.Block.wrap_obj_ref(ObjBlock.model_validate(obj=serialize(main)))
+
+    # The children are pulled into the cache and `has_children` is made consistent with them, even though
+    # the serialized JSON reports `has_children == False` on every node.
+    assert reloaded.has_children
+    assert isinstance(reloaded, ChildrenMixin)
+    assert len(reloaded.blocks) == 2
+
+    parent = uno.Callout('Parent')
+    request_depths = []
+    for batch in uno_blocks._chunk_blocks_for_api(parent, [reloaded]):
+        payload = [uno_blocks._build_obj_ref(child) for child in batch.children]
+        request_depths.append([depth(block.obj_ref.serialize_for_api()) for block in payload])
+
+    # No single request nests deeper than the Notion limit of `MAX_NESTING_LEVEL`.
+    assert all(d <= uno_blocks.MAX_NESTING_LEVEL for depths in request_depths for d in depths)
+    assert request_depths == [[1], [1, 1], [1], [1]]
+
+
 @pytest.mark.vcr()
 def test_long_code_block(notion: uno.Session, root_page: uno.Page) -> None:
     """Test that a long code block is handled correctly."""
@@ -971,3 +1083,30 @@ def test_local_remote_mention_block_cmp(
     assert len(page.children) == 1
     assert page.children[0] == block_child
     assert page.children[0] == another_block_child
+
+
+def test_built_in_icon_wrapper() -> None:
+    """A built-in (icon gallery) icon wraps and renders like an emoji code, see issue #295."""
+    icon_obj = objs.BuiltInIconObject.model_validate({'type': 'icon', 'icon': {'name': 'snake', 'color': 'purple'}})
+
+    icon = wrap_icon(icon_obj)
+    assert isinstance(icon, BuiltInIcon)
+    assert icon.name == 'snake'
+    assert icon.color == 'purple'
+    assert str(icon) == ':snake:'
+    assert icon.to_code == ':snake:'
+
+    # built-in icons cannot be constructed by the user, only retrieved from Notion
+    with pytest.raises(InvalidAPIUsageError):
+        BuiltInIcon()
+
+
+def test_callout_with_built_in_icon_markdown() -> None:
+    """A callout carrying a built-in icon renders its name as an emoji code, see issue #295."""
+    callout = uno_blocks.Callout('Built-in icon callout')
+    callout.obj_ref.value.icon = objs.BuiltInIconObject.model_validate(
+        {'type': 'icon', 'icon': {'name': 'snake', 'color': 'purple'}}
+    )
+
+    assert isinstance(callout.icon, BuiltInIcon)
+    assert callout.to_markdown().strip() == ':snake: Built-in icon callout'

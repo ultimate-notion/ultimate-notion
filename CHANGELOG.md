@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## Version 0.9.10, 2026-06-24
+
+- Fix: Split deeply-nested block trees reconstructed via `Block.wrap_obj_ref()` from serialized JSON into Notion-compliant requests on `append()`. Children carried in `obj_ref.value.children` (where `has_children` is `False`) were previously left untouched by the chunker and sent in a single over-nested request, which Notion rejected with a 400, issue #305.
+
+## Version 0.9.9, 2026-06-23
+
+- Fix: Accept Notion's built-in (icon gallery) icons, which use the `icon` sub-type with a `name` and `color` and previously broke loading any page/database (and cascaded into `search`/list endpoints) that used one, issue #295.
+- Fix: Omit the read-only `is_archived` field from nested block children when appending a block hierarchy, which previously leaked into the children and was rejected by the Notion API, issue #291.
+- Chg: Validate polymorphic `TypedObject` sub-types and user references on construction, and wrap any resulting Pydantic `ValidationError` with contextual information about the failing type, issue #152.
+- Fix: Accept the undocumented `in_trash` field the Notion API sends on `file_upload` objects, which previously broke every file upload in development mode, issue #299.
+
+## Version 0.9.8, 2026-06-22
+
+- Fix: Tolerate page/database objects that omit `properties`, which the `search` endpoint returns for stripped-down records (e.g. trashed or limited-access pages) and which previously broke `search_page()`/`search_db()`, issue #273.
+
+## Version 0.9.7, 2026-06-22
+
 - Fix: Add support for `pydantic` 2.13, which previously broke parsing of Notion user objects (e.g. people properties), issue #189.
 - Fix: Accept the new `is_archived` field the Notion API sends on pages and databases, which previously broke `search_page()`/`search_db()` in development mode, issue #202.
 - Fix: Accept the nullable `icon` field returned for paragraph blocks and omit read-only archive fields when creating blocks.

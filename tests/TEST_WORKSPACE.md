@@ -15,6 +15,10 @@ Create all three **inside the root page** you shared with your integration (see 
 "Set up a Notion test workspace" section in `CONTRIBUTING.md`). Titles must match
 exactly, because the fixtures look them up by name.
 
+A fourth object, `Formula DB`, is created by the bootstrap script but needs a manual
+follow-up: Notion cannot filter on formula columns created through the API, so its
+formula columns must be (re)created in the Notion UI. See [§4](#4-formula-db) below.
+
 ---
 
 ## 1. `All Properties DB`
@@ -107,6 +111,32 @@ only by the wiki conversion. So:
    - A **callout block** with the text `Callout block without an emoji` and its
      **default 💡 icon** (do not change the callout icon).
 
+## 4. `Formula DB`
+
+The bootstrap script creates `Formula DB`, its `Name` / `Tags` / `Date Source` columns,
+the four formula columns and two seed rows. But **Notion rejects query filters on any
+formula property created through the public API**, returning
+`400 "Unable to filter based on a formula of unknown type"` — reproduced across every
+API version (`2022-06-28` … `2026-03-11`) and both the `databases` and `data_sources`
+query endpoints, even for a constant formula. An API-created formula carries no
+filterable result type in its schema (see issue #297). So `test_query_formula` cannot
+record until the formula columns are recreated in the UI:
+
+1. Open `Formula DB` and delete the four formula columns (`String`, `Number`,
+   `Checkbox`, `Date`).
+2. Re-add them in the UI with the same names, types and expressions:
+
+   | Property name | Type | Expression |
+   | --- | --- | --- |
+   | `String` | Formula | `format(prop("Name"))` |
+   | `Number` | Formula | `prop("Tags").length()` |
+   | `Checkbox` | Formula | `prop("Tags").includes("Done")` |
+   | `Date` | Formula | `prop("Date Source")` |
+
+The bootstrap script verifies this automatically: after seeding it runs a formula filter
+and prints either `Formula DB: formula filters OK` or `Formula DB: manual setup
+required …`. A green line confirms the manual step worked.
+
 ---
 
 ## After building the three objects
@@ -123,6 +153,20 @@ NOTION_TOKEN=ntn_... UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-
 The script is idempotent and leaves existing objects unchanged. Some content-sensitive
 tests still require the richer recorded fixture content; the bootstrap creates the
 minimum useful structure and seed rows needed to inspect and extend a fresh workspace.
+
+After creating objects, the script runs an **audit**: it lists every page and database
+the integration can see, reports any **missing** expected object, and lists **stray**
+objects that are not part of the expected set (`EXPECTED_PAGE_TITLES` /
+`EXPECTED_DATABASE_TITLES` in `scripts/bootstrap_test_workspace.py`, kept in sync with
+the title constants in `tests/conftest.py`). Stray records — trashed, orphaned or
+limited-access leftovers, including property-less objects — are what silently break
+`search_page()`/`search_db()` (issue #273), so a clean audit means a search returns a
+known, stable result set. The audit is **report-only** by default; pass `--prune` to
+move accessible stray pages to trash:
+
+```console
+NOTION_TOKEN=ntn_... hatch run bootstrap-test-workspace --prune
+```
 
 Once every named object exists under your shared root page, re-record with
 `hatch run vcr-rewrite`.
