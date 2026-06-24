@@ -479,11 +479,19 @@ class MentionDatabase(MentionBase[ObjectRef], type='database'):
 
     @classmethod
     def build_mention_from(
-        cls, db: Database | DatabaseRef | ObjectRef, *, style: Annotations | None = None
+        cls,
+        db: Database | DatabaseRef | ObjectRef,
+        *,
+        style: Annotations | None = None,
+        title: list[RichTextBaseObject] | UnsetType | None = None,
     ) -> MentionObject:
         db_ref = ObjectRef.build(db) if not isinstance(db, ObjectRef) else db
         mention = cls.model_construct(database=db_ref)
-        if not (isinstance(db, DatabaseRef | ObjectRef) or is_unset(db.title)):
+        # `title` lets a caller (e.g. a data source mentioning its container database) override the
+        # display text, since a bare `DatabaseRef`/`ObjectRef` carries no title of its own.
+        if title is not None and not is_unset(title):
+            db_title = rich_text_to_str(title)
+        elif not (isinstance(db, DatabaseRef | ObjectRef) or is_unset(db.title)):
             db_title = rich_text_to_str(db.title)
         else:
             db_title = f'Database {db_ref.id}'

@@ -42,7 +42,6 @@ from ultimate_notion.obj_api.objects import (
     EmojiObject,
     FileObject,
     MentionDatabase,
-    MentionDataSource,
     MentionMixin,
     MentionObject,
     MentionPage,
@@ -83,7 +82,9 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
     is_inline: bool = False  # the 2025-09-03 API still returns this on data-source objects
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
-        return MentionDataSource.build_mention_from(self, style=style)
+        # Notion 2025-09-03 has no `data_source` mention type, only `database`. Mention the
+        # containing database (the data source's parent) while keeping this data source's title.
+        return MentionDatabase.build_mention_from(self.parent, style=style, title=self.title)
 
 
 class DataSourceRefInfo(GenericObject):
