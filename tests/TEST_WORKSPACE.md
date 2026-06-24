@@ -19,6 +19,15 @@ A fourth object, `Formula DB`, is created by the bootstrap script but needs a ma
 follow-up: Notion cannot filter on formula columns created through the API, so its
 formula columns must be (re)created in the Notion UI. See [§4](#4-formula-db) below.
 
+Finally, three **content pages** are created as shells by the bootstrap script but must
+have their content finished by hand, because each needs a block the API cannot create:
+
+| Page | Manual content needed |
+| --- | --- |
+| `Markdown Test` | Ends with two **unsupported blocks** (a Button and an AI block) the API cannot create. See [§5](#5-markdown-test-page). |
+| `Embed/Inline/Linked & Unfurl` | Must end with a real **linked-database view**, which the API cannot create. See [§6](#6-embed-page-linked-database). |
+| `Comments` | Needs an **inline comment** on its heading; the API cannot *start* inline discussions. See [§7](#7-comments-page-inline-comment). |
+
 ---
 
 ## 1. `All Properties DB`
@@ -139,12 +148,57 @@ required …`. A green line confirms the manual step worked.
 
 ---
 
-## After building the three objects
+## 5. `Markdown Test` page
 
-These three are only the objects the API **cannot** create. A full live run / cassette
-re-record also needs the remaining named objects (`Contacts DB`, `Task DB`, `Formula DB`,
-the `Getting Started` / markdown / embed / comment pages, etc.) to exist under the same
-root page. Create any missing API-creatable objects with:
+The bootstrap creates this page with a single `Headline 1` block as a shell. It is a
+content fixture for `tests/test_page.py::test_page_to_markdown`, which asserts the page
+renders to **exactly** the markdown in that test's `exp_output` (compared line-by-line
+with `strict=True`). The expected markdown is the spec — build the page so its blocks
+render to it, in order. Most blocks are ordinary (headings, a divider, **toggle**
+headings, bulleted / to-do / numbered lists, a quote, a 💡 callout, a 3×2 table, a
+paragraph, a block equation, a python code block, an image with a caption, a second
+image, a file, an audio embed, a heading, a two-column block, a table of contents, a
+breadcrumb, a child subpage `Markdown SubPage Test`, a synced block and a link to the
+subpage).
+
+The page **cannot be finished through the API**, because its last two blocks render as
+`<kbd>Unsupported block</kbd>`:
+
+1. Add a **Button** block (`/button`) near the end.
+2. Add an **AI block** (e.g. `/ai` summary) as the final block.
+
+Both are returned by the API as `Unsupported` blocks but cannot be *created* by it (see
+`ultimate_notion.blocks.Unsupported`), so they must be added in the UI. The exact text
+of the other blocks is given verbatim by `exp_output`; match it line for line.
+
+## 6. `Embed/Inline/Linked & Unfurl` page
+
+The bootstrap creates this page with an embed, a bookmark and an inline-link paragraph.
+`test_embed_blocks` additionally requires the **last** block to be a real **linked
+database** view (it asserts the final rendered line is
+`<kbd>↗️ Linked database (unsupported)</kbd>`). The API cannot create a linked-database
+view, so add one by hand at the end of the page: type `/linked`, choose **Create linked
+database**, and point it at any existing database (e.g. `Task DB`).
+
+## 7. `Comments` page inline comment
+
+The bootstrap creates this page with a single `Comments` heading. The doc snippet test
+`tests/test_docs_py_snippets.py::test_page_advanced` reads an **inline discussion** on
+that heading (`page.children[0].discussions[0]`). The Notion API can append to an
+existing discussion and start *page* discussions, but it cannot **start an inline
+discussion**, so this must be done in the UI: open the `Comments` page, hover the
+`Comments` heading, and add an inline comment (any text).
+
+---
+
+## After building the manual objects
+
+The sections above cover the parts the API **cannot** create: the three fully-manual
+objects (§1–§3), the `Formula DB` formula columns (§4) and the manual content on the
+`Markdown Test` / embed / `Comments` pages (§5–§7). A full live run / cassette re-record
+also needs the remaining API-creatable objects (`Contacts DB`, `Task DB`, `Formula DB`,
+the `Getting Started` / markdown / embed / comment page shells, etc.) to exist under the
+same root page. Create any missing API-creatable objects with:
 
 ```console
 NOTION_TOKEN=ntn_... UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
