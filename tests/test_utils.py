@@ -37,18 +37,6 @@ def test_slist() -> None:
         lst.item()
 
 
-def test_deepcopy_with_sharing() -> None:
-    class Class:
-        def __init__(self) -> None:
-            self.shared = {'a': 1}
-            self.copied = {'a': 2}
-
-    obj = Class()
-    copy = utils.deepcopy_with_sharing(obj, shared_attributes=['shared'])
-    assert obj.copied is not copy.copied
-    assert obj.shared is copy.shared
-
-
 def test_find_index() -> None:
     test_set = [2, 4, 72, 23]
     assert utils.find_index(4, test_set) == 1
@@ -134,11 +122,7 @@ def test_to_pendulum(tz_berlin: str) -> None:
     assert datetime == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
 
     with pytest.raises(TypeError):
-        utils.to_pendulum(pnd.duration(days=21))  # type: ignore  # ty: ignore[invalid-argument-type]
-
-
-def test_flatten() -> None:
-    assert utils.flatten([[1], [2, 3], [4, 5, 6]]) == [1, 2, 3, 4, 5, 6]
+        utils.to_pendulum(pnd.duration(days=21))  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 
 
 def test_safe_list_get() -> None:

@@ -172,11 +172,6 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
 
     _children: list[Block | Page | Database] | None = None
 
-    @property
-    def _has_children_field(self) -> bool:
-        """Return whether the object has a `children` field."""
-        return isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren)
-
     def _gen_children_cache(self) -> list[Block | Page | Database]:
         """Generate the children cache."""
         if self.is_deleted:
@@ -1561,9 +1556,6 @@ class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.Unsupport
         return '<kbd>Unsupported block</kbd>\n'
 
 
-# ToDo: Use new syntax when requires-python >= 3.12
-# Covariant so a child node (`_Node[Block]`) is usable where a root node (`_Node[Block | Page]`) is
-# expected; sound because `_Node` is frozen and `block` is therefore read-only.
 NB_co = TypeVar('NB_co', bound='Block | Page', default='Block | Page', covariant=True)
 
 
@@ -1624,13 +1616,10 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
         yield batch
 
 
-def _build_obj_ref(node: _Node) -> Block:
+def _build_obj_ref(node: _Node[Block]) -> Block:
     """Recursively build the obj_ref of a block and its children."""
     block = node.block
     children = node.children
-    if not isinstance(block, Block):
-        msg = f'Non-block type {type(block)} not allowed on this level of the hierarchy.'
-        raise TypeError(msg)
     value = block.obj_ref.value
     if isinstance(block, ParentBlock) and block.has_children and isinstance(value, obj_blocks.WithChildren):
         for child in node.children:
