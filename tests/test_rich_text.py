@@ -51,13 +51,6 @@ def test_is_url() -> None:
     assert not is_url('www.example.com')
 
 
-@pytest.mark.xfail(
-    reason='Workspace-portable cassettes do not normalise the container-database id inside a mention '
-    'href (only the data source parent ref), so the recorded link keeps a real id that no longer '
-    'matches the placeholder-based expectation. The behaviour is correct live; needs a conftest '
-    'normalisation fix to also scrub mention hrefs.',
-    strict=False,
-)
 @pytest.mark.vcr()
 def test_mention(
     person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.DataSource, notion: uno.Session

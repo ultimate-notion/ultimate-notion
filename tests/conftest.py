@@ -205,8 +205,8 @@ def _undash(notion_id: str) -> str:
 
 
 def _object_title(obj: dict[str, Any]) -> str | None:
-    """Return the plain-text title of a Notion page/database object, or `None` if it has none."""
-    if obj.get('object') == 'database':
+    """Return the plain-text title of a Notion page/database/data-source object, or `None`."""
+    if obj.get('object') in {'database', 'data_source'}:
         title_rich_text = obj.get('title', [])
     elif obj.get('object') == 'page':
         title_prop = next((p for p in obj.get('properties', {}).values() if p.get('type') == 'title'), None)
@@ -245,6 +245,8 @@ class _SharedIdRegistry:
                     placeholder = SHARED_OBJECT_PLACEHOLDERS.get(_object_title(body) or '')
                     if placeholder is not None:
                         self._add(obj_id, placeholder)
+                elif obj_type == 'data_source':
+                    self._learn_data_source(body)
                 elif obj_type == 'user':
                     self._learn_user(body)
             for value in body.values():
@@ -252,6 +254,28 @@ class _SharedIdRegistry:
         elif isinstance(body, list):
             for value in body:
                 self.learn_from_response(value)
+
+    def _learn_data_source(self, data_source: dict[str, Any]) -> None:
+        """Register a shared data source's *container database* id from its `parent` ref.
+
+        Notion stores each data source under a container `database`; the container's id appears in
+        the data source's `parent` and in any mention of the data source. Most endpoints never return
+        the full container `database` object, so learning the container id only from `database` objects
+        (above) normalises it in some cassettes but leaves it raw in others -- e.g. a recorded mention
+        href keeps the real container id while the data source's parent ref already shows the
+        placeholder, desyncing the two on replay. Learning it here, keyed by the data source's stable
+        title, normalises the container id in every cassette that returns the data source, independent
+        of recording order. The container shares the data source's title-based placeholder, matching
+        what the `database`-object branch records.
+        """
+        placeholder = SHARED_OBJECT_PLACEHOLDERS.get(_object_title(data_source) or '')
+        if placeholder is None:
+            return
+        parent = data_source.get('parent')
+        if isinstance(parent, dict):
+            container_id = parent.get('database_id')
+            if isinstance(container_id, str) and container_id not in PLACEHOLDER_IDS:
+                self._add(container_id, placeholder)
 
     def _learn_user(self, user: dict[str, Any]) -> None:
         """Register the integration bot (and its workspace) or a human member from a full user object."""
