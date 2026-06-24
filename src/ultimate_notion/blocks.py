@@ -1624,7 +1624,8 @@ def _build_obj_ref(node: _Node) -> Block:
         raise TypeError(msg)
     value = block.obj_ref.value
     if isinstance(block, ParentBlock) and block.has_children and isinstance(value, obj_blocks.WithChildren):
-        value.children = [_build_obj_ref(child).obj_ref for child in children]
+        child_blocks = [_build_obj_ref(child) for child in children]
+        value.children = [child_block.obj_ref for child_block in child_blocks]
     return block
 
 
