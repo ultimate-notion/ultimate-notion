@@ -33,7 +33,8 @@ if TYPE_CHECKING:
 class Wrapper(Generic[GT_co], ABC):
     """Convert objects from the obj-based API to the high-level API and vice versa."""
 
-    _obj_ref: GT_co
+    _obj_ref: GT_co | None = None
+    """Low-level object reference, ``None`` until built by a constructor or `wrap_obj_ref`."""
 
     _obj_api_map: ClassVar[dict[type[obj_core.GenericObject], type[Wrapper]]] = {}
 
@@ -53,7 +54,7 @@ class Wrapper(Generic[GT_co], ABC):
     def __pydantic_serializer__(self) -> SchemaSerializer:  # noqa: PLW3201
         """Return the Pydantic serializers for this object."""
         # This is used only when creating a pydantic model from a schema.
-        return self._obj_ref.__pydantic_serializer__
+        return self.obj_ref.__pydantic_serializer__
 
     @property
     def obj_ref(self) -> GT_co:
@@ -61,6 +62,9 @@ class Wrapper(Generic[GT_co], ABC):
 
         This is just the answer of the Notion API as a Pydantic model.
         """
+        if self._obj_ref is None:
+            msg = f'The low-level object reference of {type(self).__name__} is not yet initialized.'
+            raise UnsetError(msg)
         return self._obj_ref
 
     @obj_ref.setter

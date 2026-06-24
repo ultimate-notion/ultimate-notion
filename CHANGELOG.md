@@ -5,6 +5,12 @@
 - New: Better logging of model validation errors, issue #152.
 - New: Implement the new data source Notion API version 2025-09-03, issue #118.
 
+- Fix: Skip the two-way relation backward rename in `Relation._update_bwd_rel` when no backward name is defined, instead of attempting `RenameProp(name=None)` and raising a pydantic `ValidationError`, issue #325.
+- Fix: Raise a clear `UnsetError` from `Bot.workspace_info` when the workspace name or id is unavailable (i.e. for any bot other than the integration's own), instead of an opaque pydantic `ValidationError`, issue #326.
+- Chg: Replace `hasattr`-based checks in `obj_api.core` with type-safe alternatives (a structural pattern match on `UniqueObject` in `ObjectRef.build`, a typed `ClassVar` sentinel for the `UnsetType` singleton, and a `None`-defaulted `ClassVar` sentinel for the `TypedObject._typemap` registry).
+- Chg: Replace the `hasattr`-based `Property._is_init` check with a `None`-defaulted sentinel for `Wrapper._obj_ref`, so initialization is an explicit `is not None` check that the type checker understands.
+- Chg: Make `_Node` generic in its wrapped type and pin `children` to `list[_Node[Block]]`, encoding the invariant that only a root node wraps a `Page` while every child wraps a `Block`, so building child obj_refs no longer needs to launder the element type, issue #339.
+
 ## Version 0.9.10, 2026-06-24
 
 - Fix: Split deeply-nested block trees reconstructed via `Block.wrap_obj_ref()` from serialized JSON into Notion-compliant requests on `append()`. Children carried in `obj_ref.value.children` (where `has_children` is `False`) were previously left untouched by the chunker and sent in a single over-nested request, which Notion rejected with a 400, issue #305.

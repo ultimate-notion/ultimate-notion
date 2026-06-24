@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from collections.abc import Callable, Iterator, Sequence
+from copy import deepcopy
 from html import escape as htmlescape
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
@@ -22,7 +23,6 @@ from ultimate_notion.schema import Property
 from ultimate_notion.user import User
 from ultimate_notion.utils import (
     SList,
-    deepcopy_with_sharing,
     display_html,
     find_index,
     find_indices,
@@ -65,8 +65,9 @@ class View(Sequence[Page]):
         return self
 
     def clone(self) -> View:
-        """Clone the current view."""
-        return deepcopy_with_sharing(self, shared_attributes=['ds', '_pages', '_query'])
+        """Clone the current view, sharing the data source, pages and query with the copy."""
+        memo = {id(obj): obj for obj in (self.ds, self._pages, self._query)}
+        return deepcopy(self, memo)
 
     def _get_columns(self, title_col: str) -> NDArray[Any]:
         """Make sure title column is the first columns."""

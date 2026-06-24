@@ -25,7 +25,7 @@ from collections import Counter
 from collections.abc import Iterator
 from copy import deepcopy
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Any, TypeAlias, cast, overload
+from typing import TYPE_CHECKING, Any, TypeAlias, cast, overload
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, create_model, field_validator
 from tabulate import tabulate
@@ -107,7 +107,7 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     @property
     def _is_init(self) -> bool:
         """Determines if the property is already initialized"""
-        return hasattr(self, '_obj_ref')
+        return self._obj_ref is not None
 
     @property
     def _is_init_ready(self) -> bool:
@@ -490,7 +490,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
     @property
     def obj_ref(self) -> obj_schema.Relation:
         """Initialize the low-level object references for this relation."""
-        if not self._is_init:
+        if self._obj_ref is None:
             # Delayed construction of obj_ref to assure that a self-reference is resolved.
             self._obj_ref = self._make_obj_ref()
         return self._obj_ref
@@ -615,7 +615,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         obj_synced_property_name = self.obj_ref.relation.dual_property.synced_property_name
         two_way_prop_name = self.two_way_prop.name if self.two_way_prop else None
 
-        if obj_synced_property_name != two_way_prop_name:
+        if two_way_prop_name is not None and obj_synced_property_name != two_way_prop_name:
             session = get_active_session()
 
             # change the old default name in the target schema to what was passed during initialization
@@ -1075,8 +1075,7 @@ class Schema(metaclass=SchemaType):
             return py_type if isinstance(py_type, PropertyValue) else prop_value(py_type)
 
         kwargs: dict[str, Any] = {
-            prop.attr_name: Annotated[prop.prop_value, Field(default=None, alias=prop.name)]
-            for prop in cls.get_rw_props()
+            prop.attr_name: (prop.prop_value, Field(default=None, alias=prop.name)) for prop in cls.get_rw_props()
         }
         validators: dict[str, Any] = {
             f'{prop.attr_name}_validator': field_validator(prop.attr_name, mode='before')(
@@ -1086,9 +1085,7 @@ class Schema(metaclass=SchemaType):
         }
 
         if with_ro_props:
-            kwargs |= {
-                prop.attr_name: Annotated[prop.prop_value, Field(alias=prop.name)] for prop in cls.get_ro_props()
-            }
+            kwargs |= {prop.attr_name: (prop.prop_value, Field(alias=prop.name)) for prop in cls.get_ro_props()}
             validators |= {
                 f'{prop.attr_name}_validator': field_validator(prop.attr_name, mode='before')(
                     partial(pytype_to_prop_value, prop_value=prop.prop_value)
@@ -1208,14 +1205,6 @@ class Schema(metaclass=SchemaType):
 
         ds.schema = cls
         cls._bind_ds(ds)
-
-    @classmethod
-    def _get_fwd_rels(cls) -> list[Relation]:
-        return [
-            prop
-            for prop in cls.get_props()
-            if isinstance(prop, Relation) and not (prop._is_two_way_target or prop.is_self_ref)
-        ]
 
     @classmethod
     def _get_self_refs(cls) -> list[Relation]:

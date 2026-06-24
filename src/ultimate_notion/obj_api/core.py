@@ -88,9 +88,11 @@ class UnsetType(BaseModel):
 
     __slots__ = ()
 
+    _instance: ClassVar[UnsetType | None] = None
+
     def __new__(cls, *args: Any, **kwargs: Any) -> UnsetType:
         # Ensure only one instance is created, allowing `is` to work correctly
-        if not hasattr(cls, '_instance'):
+        if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
@@ -349,9 +351,9 @@ class ObjectRef(GenericObject):
             case ParentRef() if isinstance(ref.value, UUID):
                 # ParentRefs are typed objects with a nested UUID
                 return cls.model_construct(id=ref.value)
-            case GenericObject() if hasattr(ref, 'id'):
+            case UniqueObject(id=(UUID() | str()) as obj_id):
                 # Re-compose the ObjectReference from the internal ID
-                return cls.build(ref.id)
+                return cls.build(obj_id)
             case UUID():
                 return cls.model_construct(id=ref)
             case str() if (id_str := extract_id(ref)) is not None:
@@ -409,7 +411,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
     type: str | None = Field(default=None)
     """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
-    _typemap: ClassVar[dict[str, builtins.type[TypedObject]]]
+    _typemap: ClassVar[dict[str, builtins.type[TypedObject]] | None] = None
 
     def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs: Any) -> None:  # noqa: A002
         super().__init_subclass__(**kwargs)
@@ -438,7 +440,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
         # but point to a different object (e.g. the 'date' type may have
         # different implementations depending where it is used in the API)
 
-        if not hasattr(cls, '_typemap'):
+        if cls._typemap is None:
             cls._typemap = {}
 
         if name in cls._typemap:
@@ -467,7 +469,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
             msg = "Invalid 'data' object"
             raise ValueError(msg)
 
-        if not hasattr(cls, '_typemap'):
+        if cls._typemap is None:
             msg = f"Missing '_typemap' in {cls}"
             raise ValueError(msg)
 

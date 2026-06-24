@@ -249,7 +249,7 @@ def test_to_pydantic_model() -> None:
     rw_props_model = Schema.to_pydantic_model(with_ro_props=False)
     rw_props_item = rw_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2']})
     assert len(rw_props_item.__class__.model_fields) == 2
-    assert isinstance(rw_props_item.name, PropertyValue)  # type: ignore[attr-defined]
+    assert isinstance(rw_props_item.name, PropertyValue)  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
     all_props_model = Schema.to_pydantic_model(with_ro_props=True)
     created_on = props.CreatedTime(pnd.parse('2021-01-01T12:00:00Z'))
@@ -272,35 +272,37 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_ds(parent=root_page, schema=Schema)
 
     # Delete properties from the schema
-    assert hasattr(db.schema, 'formula')
+    assert 'formula' in [prop.attr_name for prop in db.schema]
     del db.schema['Formula']
     assert 'Formula' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'formula')
+    assert 'formula' not in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Formula' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'formula')
+    assert 'formula' not in [prop.attr_name for prop in db.schema]
 
     db.schema.tags.delete()
     assert 'Tags' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'tags')
+    assert 'tags' not in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Tags' not in [prop.name for prop in db.schema]
-    assert not hasattr(db.schema, 'tags')
+    assert 'tags' not in [prop.attr_name for prop in db.schema]
 
     # Add properties to the schema
     db.schema['Number'] = uno.PropType.Number(format=uno.NumberFormat.DOLLAR)
     assert 'Number' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'number')
+    assert 'number' in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Number' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'number')
+    assert 'number' in [prop.attr_name for prop in db.schema]
 
-    db.schema.date = uno.PropType.Date('Date')
+    # ty does not resolve class-attribute writes through the schema metaclass `__setattr__`.
+    # See https://github.com/astral-sh/ty/issues/3845
+    db.schema.date = uno.PropType.Date('Date')  # ty: ignore[unresolved-attribute]
     assert 'Date' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'date')
+    assert 'date' in [prop.attr_name for prop in db.schema]
     db.reload()
     assert 'Date' in [prop.name for prop in db.schema]
-    assert hasattr(db.schema, 'date')
+    assert 'date' in [prop.attr_name for prop in db.schema]
 
     class TargetSchema(uno.Schema, db_title='Add/Del/Update Prop-Test'):
         """Target schema as self-reference relations lead to a Notion Internal Server Error 500"""
@@ -312,13 +314,13 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     db.schema['Relation'] = uno.PropType.Relation(schema=TargetSchema, two_way_prop='Back Relation')
     assert 'Relation' in [prop.name for prop in db.schema]
     assert 'Back Relation' in [prop.name for prop in target_db.schema]
-    assert hasattr(db.schema, 'relation')
-    assert hasattr(target_db.schema, 'back_relation')
+    assert 'relation' in [prop.attr_name for prop in db.schema]
+    assert 'back_relation' in [prop.attr_name for prop in target_db.schema]
     db.reload()
     assert 'Relation' in [prop.name for prop in db.schema]
     assert 'Back Relation' in [prop.name for prop in target_db.schema]
-    assert hasattr(db.schema, 'relation')
-    assert hasattr(target_db.schema, 'back_relation')
+    assert 'relation' in [prop.attr_name for prop in db.schema]
+    assert 'back_relation' in [prop.attr_name for prop in target_db.schema]
 
     # Update properties in the schema
     with pytest.raises(PropertyError):
@@ -333,10 +335,16 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert isinstance(formula, uno.PropType.Formula)
     assert formula.formula.startswith('{{notion:block_property:title:')
 
-    db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)
-    assert db.schema.number.format == uno.NumberFormat.PERCENT
+    # ty does not resolve class-attribute writes through the schema metaclass `__setattr__`.
+    # See https://github.com/astral-sh/ty/issues/3845
+    db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)  # ty: ignore[unresolved-attribute]
+    number = db.schema['Number']
+    assert isinstance(number, uno.PropType.Number)
+    assert number.format == uno.NumberFormat.PERCENT
     db.reload()
-    assert db.schema.number.format == uno.NumberFormat.PERCENT
+    number = db.schema['Number']
+    assert isinstance(number, uno.PropType.Number)
+    assert number.format == uno.NumberFormat.PERCENT
 
 
 @pytest.mark.vcr()
@@ -522,9 +530,9 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
     my_tags = db.schema.my_tags
     assert isinstance(my_tags, uno.PropType.MultiSelect)
     assert my_tags.options == options
-    assert not hasattr(db.schema, 'name')
-    assert not hasattr(db.schema, 'cat')
-    assert not hasattr(db.schema, 'tags')
+    assert 'name' not in [prop.attr_name for prop in db.schema]
+    assert 'cat' not in [prop.attr_name for prop in db.schema]
+    assert 'tags' not in [prop.attr_name for prop in db.schema]
 
 
 @pytest.mark.vcr()

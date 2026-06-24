@@ -103,9 +103,9 @@ class Date(PropertyValue, type='date'):
     date: DateRange | None = None
 
     @classmethod
-    def build(cls, dt_spec: str | DateTimeOrRange) -> Self:
+    def build(cls, value: str | DateTimeOrRange) -> Self:
         """Create a new Date from the native values."""
-        obj = cls.model_construct(date=DateRange.build(dt_spec))
+        obj = cls.model_construct(date=DateRange.build(value))
         if not isinstance(obj, cls):
             msg = f'Expected {cls.__name__}, got {type(obj).__name__}'
             raise TypeError(msg)
@@ -210,9 +210,9 @@ class Relation(PropertyValue, type='relation'):
     has_more: bool = False
 
     @classmethod
-    def build(cls, pages: Sequence[Page]) -> Self:
+    def build(cls, value: Sequence[Page]) -> Self:
         """Return a `Relation` property with the specified pages."""
-        obj = cls.model_construct(relation=[ObjectRef.build(page) for page in pages])
+        obj = cls.model_construct(relation=[ObjectRef.build(page) for page in value])
         if not isinstance(obj, cls):
             msg = f'Expected {cls.__name__}, got {type(obj).__name__}'
             raise TypeError(msg)
@@ -350,8 +350,8 @@ class Place(PropertyValue, type='place'):
     place: TypeData | None = None
 
     @classmethod
-    def build(cls, place: PlaceDict | None) -> Self:
-        place_obj = cls.TypeData(**place) if place is not None else None
+    def build(cls, value: PlaceDict | None) -> Self:
+        place_obj = cls.TypeData(**value) if value is not None else None
         obj = cls.model_construct(place=place_obj)
         if not isinstance(obj, cls):
             msg = f'Expected {cls.__name__}, got {type(obj).__name__}'

@@ -25,7 +25,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow  # type: ignore[import-untyped]
 from googleapiclient.discovery import build
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, PrivateAttr, ValidationInfo, model_validator
+from typing_extensions import Self
 
 from ultimate_notion.config import Config, get_or_create_cfg
 from ultimate_notion.utils import SList, is_stable_release
@@ -96,11 +97,15 @@ class GObject(BaseModel):
     etag: str
     updated: datetime
     self_link: HttpUrl = Field(..., alias='selfLink')
-    _resource: TasksServiceResource
+    _resource: TasksServiceResource = PrivateAttr()
 
-    def __init__(self, resource: TasksServiceResource, **data: Any) -> None:
-        super().__init__(**data)
-        self._resource = resource
+    @model_validator(mode='after')
+    def _bind_resource(self, info: ValidationInfo) -> Self:
+        """Bind the Tasks service `resource` passed through the validation context."""
+        resource = (info.context or {}).get('resource')
+        if resource is not None:
+            self._resource = resource
+        return self
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, GObject):
@@ -113,8 +118,7 @@ class GObject(BaseModel):
 
     def _update(self, resp: Task | TaskList) -> None:
         """Updates this object with the given response from the API."""
-        new_obj_dct = dict(resp, resource=self._resource)
-        new_obj = self.model_validate(new_obj_dct)
+        new_obj = self.model_validate(resp, context={'resource': self._resource})
 
         for k in new_obj.model_dump(by_alias=False):
             setattr(self, k, getattr(new_obj, k))
@@ -240,7 +244,7 @@ class GTask(GObject):
             return None
         resource = self._resource.tasks()
         resp = resource.get(tasklist=self.tasklist_id, task=self.parent_id).execute()
-        return GTask(resource=self._resource, **resp)
+        return GTask.model_validate(resp, context={'resource': self._resource})
 
     @parent.setter
     def parent(self, parent: GTask | None) -> None:
@@ -282,7 +286,7 @@ class GTaskList:
     """
 
     def __init__(self, resource: TasksServiceResource, **data: Any) -> None:
-        self._data = _GTaskListData(resource=resource, **data)
+        self._data = _GTaskListData.model_validate(data, context={'resource': resource})
 
     @property
     def _resource(self) -> TasksServiceResource:
@@ -337,7 +341,7 @@ class GTaskList:
                 **_drop_none(pageToken=page_token),
             ).execute()
             items = results.get('items', [])
-            tasks.extend([GTask(resource=self._resource, **item) for item in items])
+            tasks.extend([GTask.model_validate(item, context={'resource': self._resource}) for item in items])
 
             page_token = results.get('nextPageToken')
             if page_token is None:
@@ -367,7 +371,7 @@ class GTaskList:
         """Returns the task with the given ID."""
         resource = self._resource.tasks()
         task = resource.get(tasklist=self.id, task=task_id).execute()
-        return GTask(resource=self._resource, **task)
+        return GTask.model_validate(task, context={'resource': self._resource})
 
     def create_task(self, title: str, due: date | datetime | None = None) -> GTask:
         """Creates a new task."""
@@ -377,7 +381,7 @@ class GTaskList:
         if due is not None:
             body['due'] = due.isoformat()
         task = resource.insert(tasklist=self.id, body=body).execute()
-        return GTask(resource=self._resource, **task)
+        return GTask.model_validate(task, context={'resource': self._resource})
 
     @property
     def is_default(self) -> bool:
