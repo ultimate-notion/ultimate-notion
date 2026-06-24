@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Chg: Replace `hasattr`-based checks in `obj_api.core` with type-safe alternatives (a structural pattern match on `UniqueObject` in `ObjectRef.build` and a typed `ClassVar` sentinel for the `UnsetType` singleton).
+- Chg: Replace `hasattr`-based checks in `obj_api.core` with type-safe alternatives (a structural pattern match on `UniqueObject` in `ObjectRef.build`, a typed `ClassVar` sentinel for the `UnsetType` singleton, and a `None`-defaulted `ClassVar` sentinel for the `TypedObject._typemap` registry).
 
 ## Version 0.9.10, 2026-06-24
 
