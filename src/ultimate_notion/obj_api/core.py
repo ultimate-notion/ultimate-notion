@@ -411,7 +411,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
     type: str | None = Field(default=None)
     """`type` is a string that identifies the specific object type, e.g. `heading_1`, `paragraph`, `equation`, ..."""
     _polymorphic_base: ClassVar[bool] = False
-    _typemap: ClassVar[dict[str, builtins.type[TypedObject]]]
+    _typemap: ClassVar[dict[str, builtins.type[TypedObject]] | None] = None
 
     def __init_subclass__(cls, *, type: str | None = None, polymorphic_base: bool = False, **kwargs: Any) -> None:  # noqa: A002
         super().__init_subclass__(**kwargs)
@@ -440,7 +440,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
         # but point to a different object (e.g. the 'date' type may have
         # different implementations depending where it is used in the API)
 
-        if not hasattr(cls, '_typemap'):
+        if cls._typemap is None:
             cls._typemap = {}
 
         if name in cls._typemap:
@@ -469,7 +469,7 @@ class TypedObject(GenericObject, Generic[TO_co]):
             msg = "Invalid 'data' object"
             raise ValueError(msg)
 
-        if not hasattr(cls, '_typemap'):
+        if cls._typemap is None:
             msg = f"Missing '_typemap' in {cls}"
             raise ValueError(msg)
 
