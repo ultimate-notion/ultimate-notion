@@ -152,11 +152,10 @@ def find_indices(
     elements: NDArray[np.int_] | Sequence[Any], total_set: NDArray[np.int_] | Sequence[Any]
 ) -> NDArray[np.int_]:
     """Finds the indices of the elements in the total set."""
-    if not isinstance(total_set, np.ndarray):
-        total_set = np.array(total_set)
-    mask = np.isin(total_set, elements)
+    total_arr = np.asarray(total_set)
+    mask = np.isin(total_arr, elements)
     indices = np.where(mask)[0]
-    lookup = dict(zip(total_set[mask], indices, strict=True))  # ty: ignore[invalid-argument-type]
+    lookup = dict(zip(total_arr[mask], indices, strict=True))
     result = np.array([lookup.get(x) for x in elements])
     return result
 
