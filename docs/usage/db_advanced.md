@@ -36,7 +36,7 @@ class Item(uno.Schema, db_title='Item DB'):
 ```
 
 The `db_title` parameter in the schema definition is optional but highly recommended. When provided,
-it sets the default title for the database when calling `create_db()` without an explicit `title`
+it sets the default title for the database when calling `create_ds()` without an explicit `title`
 argument. Also it allows you to relate your schema to an existing database.
 
 Alternatively, you can specify a `db_id` parameter to bind the schema to an existing database:
@@ -59,7 +59,7 @@ this page and create the database with the page as parent:
 
 ```python
 root_page = notion.search_page('Tests', exact=True).item()
-item_db = notion.create_db(parent=root_page, schema=Item)
+item_db = notion.create_ds(parent=root_page, schema=Item)
 ```
 
 Now we create a database for our customers and define a one-way [Relation] to the items:
@@ -70,7 +70,7 @@ class Customer(uno.Schema, db_title='Customer DB'):
     name = uno.PropType.Title('Name')
     purchases = uno.PropType.Relation('Items Purchased', schema=Item)
 
-customer_db = notion.create_db(parent=root_page, schema=Customer)
+customer_db = notion.create_ds(parent=root_page, schema=Customer)
 ```
 
 !!! warning
@@ -90,7 +90,7 @@ more classical *programmatic* approach. The main difference is that we first cre
 a database with a default schema and then start adding new properties (i.e., columns) to it.
 
 ```python
-employee_db = notion.create_db(parent=root_page)
+employee_db = notion.create_ds(parent=root_page)
 employee_db.title = 'Employee DB'
 employee_db.description = 'Database holding all our employees'
 
@@ -235,8 +235,8 @@ Let's delete the old databases and recreate them with our updated schemas and a 
 ```python
 item_db.delete(), customer_db.delete()
 
-item_db = notion.create_db(parent=root_page, schema=Item)
-customer_db = notion.create_db(parent=root_page, schema=Customer)
+item_db = notion.create_ds(parent=root_page, schema=Item)
+customer_db = notion.create_ds(parent=root_page, schema=Customer)
 
 t_shirt = item_db.create_page(name='T-shirt', size=Size.L, price=17)
 lovelace = Customer.create(name='Ada Lovelace', purchases=[t_shirt])
@@ -257,7 +257,7 @@ class Task(uno.Schema, db_title='Task List'):
     due_by = uno.PropType.Date('Due by')
     parent = uno.PropType.Relation('Parent Task', schema=uno.SelfRef)
 
-task_db = notion.create_db(parent=root_page, schema=Task)
+task_db = notion.create_ds(parent=root_page, schema=Task)
 
 from datetime import datetime, timedelta
 

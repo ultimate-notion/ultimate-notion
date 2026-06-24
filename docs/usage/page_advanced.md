@@ -345,7 +345,7 @@ Let's see how we can mention a person, page, database or even a date.
 from datetime import datetime
 
 person = notion.all_users()[0]  # any user visible to the integration
-dummy_db = notion.create_db(parent=root_page)
+dummy_db = notion.create_ds(parent=root_page)
 dummy_db.title = 'Dummy DB'
 intro_page = notion.search_page('Getting Started').item()
 my_date = datetime(1592, 3, 14)  # or better use the pendulum library

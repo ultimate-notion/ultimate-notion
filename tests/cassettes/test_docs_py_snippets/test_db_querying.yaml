@@ -20,34 +20,24 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/search
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"00000000-0000-4000-8000-000000000001","created_time":"2022-08-22T15:47:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-00000000000040008000000000000001","public_url":null},{"object":"page","id":"29c974f3-b388-8151-b371-ef6dae596a9a","created_time":"2025-10-30T15:37:00.000Z","last_edited_time":"2025-10-30T15:37:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Test
-      Long Code Block","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Test
-      Long Code Block","href":null}]}},"url":"https://www.notion.so/Test-Long-Code-Block-29c974f3b3888151b371ef6dae596a9a","public_url":null},{"object":"page","id":"29c974f3-b388-81b5-a39d-f1ab6343879d","created_time":"2025-10-30T15:36:00.000Z","last_edited_time":"2025-10-30T15:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Test
-      Deserialized Block Children","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Test
-      Deserialized Block Children","href":null}]}},"url":"https://www.notion.so/Test-Deserialized-Block-Children-29c974f3b38881b5a39df1ab6343879d","public_url":null},{"object":"page","id":"29c974f3-b388-810d-95dc-c73ffc532142","created_time":"2025-10-30T15:36:00.000Z","last_edited_time":"2025-10-30T15:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
-      for testing max nesting level","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
-      for testing max nesting level","href":null}]}},"url":"https://www.notion.so/Page-for-testing-max-nesting-level-29c974f3b388810d95dcc73ffc532142","public_url":null},{"object":"page","id":"29c974f3-b388-8183-a2fd-d9f296ae41dc","created_time":"2025-10-30T15:36:00.000Z","last_edited_time":"2025-10-30T15:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
-      for testing max children length","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
-      for testing max children length","href":null}]}},"url":"https://www.notion.so/Page-for-testing-max-children-length-29c974f3b3888183a2fdd9f296ae41dc","public_url":null},{"object":"page","id":"29c974f3-b388-8176-89d3-cd8452d90031","created_time":"2025-10-30T15:36:00.000Z","last_edited_time":"2025-10-30T15:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
-      for testing block equality and hash","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
-      for testing block equality and hash","href":null}]}},"url":"https://www.notion.so/Page-for-testing-block-equality-and-hash-29c974f3b388817689d3cd8452d90031","public_url":null},{"object":"page","id":"00000000-0000-4000-8000-000000000004","created_time":"2024-02-04T10:09:00.000Z","last_edited_time":"2025-10-05T15:19:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Markdown
-      Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Markdown
-      Test","href":null}]}},"url":"https://www.notion.so/Markdown-Test-00000000000040008000000000000004","public_url":null},{"object":"page","id":"00000000-0000-4000-8000-000000000003","created_time":"2024-01-27T16:13:00.000Z","last_edited_time":"2025-06-10T17:27:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Markdown
-      Text Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Markdown
-      Text Test","href":null}]}},"url":"https://www.notion.so/Markdown-Text-Test-00000000000040008000000000000003","public_url":null},{"object":"page","id":"00000000-0000-4000-8000-000000000005","created_time":"2024-02-11T12:54:00.000Z","last_edited_time":"2024-09-28T13:28:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000004"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Markdown
+    content: '{"object":"list","results":[{"object":"page","id":"00000000-0000-4000-8000-000000000001","created_time":"2026-06-18T15:44:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"fc820d21-80ec-4d06-878c-f991bc8070d2"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://app.notion.com/p/Tests-00000000000040008000000000000001","public_url":null,"archived":false},{"object":"page","id":"00000000-0000-4000-8000-000000000005","created_time":"2026-06-18T17:51:00.000Z","last_edited_time":"2026-06-18T17:51:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000004"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Markdown
       SubPage Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Markdown
-      SubPage Test","href":null}]}},"url":"https://www.notion.so/Markdown-SubPage-Test-00000000000040008000000000000005","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"8c2f892b-9908-4cf3-9b2a-ce4a46985293"}'
+      SubPage Test","href":null}]}},"url":"https://app.notion.com/p/Markdown-SubPage-Test-00000000000040008000000000000005","public_url":null,"archived":false},{"object":"page","id":"00000000-0000-4000-8000-000000000004","created_time":"2026-06-18T17:51:00.000Z","last_edited_time":"2026-06-18T17:51:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Markdown
+      Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Markdown
+      Test","href":null}]}},"url":"https://app.notion.com/p/Markdown-Test-00000000000040008000000000000004","public_url":null,"archived":false},{"object":"page","id":"00000000-0000-4000-8000-000000000003","created_time":"2026-06-18T17:51:00.000Z","last_edited_time":"2026-06-18T17:51:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Markdown
+      Text Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Markdown
+      Text Test","href":null}]}},"url":"https://app.notion.com/p/Markdown-Text-Test-00000000000040008000000000000003","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"c44547b3-c4e1-433f-9151-b650fb420a2f"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04c849041dc1-FRA
+      - a10e9eeb8d821ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -77,7 +67,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 8c2f892b-9908-4cf3-9b2a-ce4a46985293
+      - c44547b3-c4e1-433f-9151-b650fb420a2f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -88,11 +78,11 @@ interactions:
     body: '{"parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
       "title": [{"type": "text", "plain_text": "Article DB", "annotations": {"bold":
       false, "italic": false, "strikethrough": false, "underline": false, "code":
-      false}, "text": {"content": "Article DB"}}], "properties": {"Name": {"type":
-      "title", "title": {}}, "Topic": {"type": "select", "select": {"options": [{"name":
-      "Tech", "color": "green"}, {"name": "Politics", "color": "yellow"}, {"name":
-      "Finance", "color": "red"}]}}, "Released": {"type": "date", "date": {}}}, "is_inline":
-      false}'
+      false}, "text": {"content": "Article DB"}}], "is_inline": false, "initial_data_source":
+      {"properties": {"Name": {"type": "title", "title": {}}, "Topic": {"type": "select",
+      "select": {"options": [{"name": "Tech", "color": "green"}, {"name": "Politics",
+      "color": "yellow"}, {"name": "Finance", "color": "red"}]}}, "Released": {"type":
+      "date", "date": {}}}}}'
     headers:
       accept:
       - '*/*'
@@ -103,7 +93,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '515'
+      - '539'
       content-type:
       - application/json
       cookie:
@@ -111,20 +101,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"29c974f3-b388-8115-b204-ee8125420405","cover":null,"icon":null,"created_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2025-10-30T15:41:00.000Z","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"database","id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e","title":[{"type":"text","text":{"content":"Article
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      DB","href":null}],"description":[],"is_inline":false,"properties":{"Topic":{"id":"%3C%3ExF","name":"Topic","description":null,"type":"select","select":{"options":[{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green","description":null},{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow","description":null},{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red","description":null}]}},"Released":{"id":"LWnx","name":"Released","description":null,"type":"date","date":{}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/29c974f3b3888115b204ee8125420405","public_url":null,"archived":false,"in_trash":false,"request_id":"3ce16056-7181-41ee-a777-b81824aa27e6"}'
+      DB","href":null}],"description":[],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-24T20:53:14.687+00:00","last_edited_time":"2026-06-24T20:53:14.687+00:00","data_sources":[{"id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","name":"Article
+      DB"}],"icon":null,"cover":null,"url":"https://app.notion.com/p/803fa91ac89f4efea01a21fcf3d0e38e","public_url":null,"archived":false,"request_id":"87d8634e-8878-41dd-8c1e-712f78a9f08d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04ca4cf51dc1-FRA
+      - a10e9eed9f4c1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -154,7 +145,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 3ce16056-7181-41ee-a777-b81824aa27e6
+      - 87d8634e-8878-41dd-8c1e-712f78a9f08d
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -182,22 +173,23 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/29c974f3-b388-8115-b204-ee8125420405
+    uri: https://api.notion.com/v1/databases/803fa91a-c89f-4efe-a01a-21fcf3d0e38e
   response:
-    content: '{"object":"database","id":"29c974f3-b388-8115-b204-ee8125420405","cover":null,"icon":null,"created_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2025-10-30T15:41:00.000Z","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"database","id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e","title":[{"type":"text","text":{"content":"Article
       DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
       DB","href":null}],"description":[{"type":"text","text":{"content":"Database
       of various articles","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      of various articles","href":null}],"is_inline":false,"properties":{"Topic":{"id":"%3C%3ExF","name":"Topic","description":null,"type":"select","select":{"options":[{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green","description":null},{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow","description":null},{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red","description":null}]}},"Released":{"id":"LWnx","name":"Released","description":null,"type":"date","date":{}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/29c974f3b3888115b204ee8125420405","public_url":null,"archived":false,"in_trash":false,"request_id":"98050920-dd85-4100-809a-b0de2acccfe1"}'
+      of various articles","href":null}],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-24T20:53:14.687+00:00","last_edited_time":"2026-06-24T20:53:14.687+00:00","data_sources":[{"id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","name":"Article
+      DB"}],"icon":null,"cover":null,"url":"https://app.notion.com/p/803fa91ac89f4efea01a21fcf3d0e38e","public_url":null,"archived":false,"request_id":"e4570786-1c41-49fd-9ac0-5639fe8a63a5"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04d0c9d61dc1-FRA
+      - a10e9ef47d5e1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -227,7 +219,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 98050920-dd85-4100-809a-b0de2acccfe1
+      - e4570786-1c41-49fd-9ac0-5639fe8a63a5
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -235,13 +227,81 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2025-09-03'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/data_sources/7011efc9-b90d-4d97-b6ec-6728d3b9482c
+  response:
+    content: '{"object":"data_source","id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","cover":null,"icon":null,"created_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_time":"2026-06-24T20:53:00.000Z","title":[{"type":"text","text":{"content":"Article
+      DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      DB","href":null}],"description":[{"type":"text","text":{"content":"Database
+      of various articles","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
+      of various articles","href":null}],"is_inline":false,"properties":{"Released":{"id":"TWB%3C","name":"Released","description":null,"type":"date","date":{}},"Topic":{"id":"Ve%3Ew","name":"Topic","description":null,"type":"select","select":{"options":[{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green","description":null},{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow","description":null},{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red","description":null}]}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://app.notion.com/p/803fa91ac89f4efea01a21fcf3d0e38e","public_url":null,"in_trash":false,"archived":false,"request_id":"f432f3a9-b0fb-4c02-a8a9-c0349cec79c0"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a10e9ef838751ca6-AMS
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - f432f3a9-b0fb-4c02-a8a9-c0349cec79c0
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 1", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 1"}}]},
       "Topic": {"type": "select", "select": {"name": "Tech", "color": "green"}}, "Released":
-      {"type": "date", "date": {"start": "2025-10-30T16:41:47.647362", "time_zone":
-      "Europe/Berlin"}}}}'
+      {"type": "date", "date": {"start": "2026-06-24T21:53:16.389687", "time_zone":
+      "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -252,7 +312,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '472'
+      - '478'
       content-type:
       - application/json
       cookie:
@@ -260,20 +320,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-8133-9a0f-e8cd064e0c3d","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-81cf-994d-cf06813fdf43","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      1","href":null}]}},"url":"https://www.notion.so/Article-1-29c974f3b38881339a0fe8cd064e0c3d","public_url":null,"request_id":"a1f9646d-ca6e-41a9-a192-b8409ff4156a"}'
+      1","href":null}]}},"url":"https://app.notion.com/p/Article-1-3899ce7b60a481cf994dcf06813fdf43","public_url":null,"archived":false,"request_id":"9c725b5c-1ef4-4261-8255-8141596eba73"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04d58b3f1dc1-FRA
+      - a10e9efa1a121ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -303,7 +363,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a1f9646d-ca6e-41a9-a192-b8409ff4156a
+      - 9c725b5c-1ef4-4261-8255-8141596eba73
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -311,13 +371,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 2", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 2"}}]},
       "Topic": {"type": "select", "select": {"name": "Politics", "color": "yellow"}},
-      "Released": {"type": "date", "date": {"start": "2024-10-30T16:41:48.015788",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2025-06-24T21:53:16.794142",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -328,7 +388,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '477'
+      - '483'
       content-type:
       - application/json
       cookie:
@@ -336,20 +396,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-81e7-aa50-d9afac0f2ad6","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-81d6-aa07-f085fbb1cf1f","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      2","href":null}]}},"url":"https://www.notion.so/Article-2-29c974f3b38881e7aa50d9afac0f2ad6","public_url":null,"request_id":"18c19b63-bc35-46d1-8bb6-9b1cddbcf2ec"}'
+      2","href":null}]}},"url":"https://app.notion.com/p/Article-2-3899ce7b60a481d6aa07f085fbb1cf1f","public_url":null,"archived":false,"request_id":"3714deb2-d0fe-4445-8db7-23b7b6fb96ed"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04d7d83a1dc1-FRA
+      - a10e9efc9c8f1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -379,7 +439,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 18c19b63-bc35-46d1-8bb6-9b1cddbcf2ec
+      - 3714deb2-d0fe-4445-8db7-23b7b6fb96ed
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -387,13 +447,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 3", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 3"}}]},
       "Topic": {"type": "select", "select": {"name": "Finance", "color": "red"}},
-      "Released": {"type": "date", "date": {"start": "2023-10-30T16:41:48.468129",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2024-06-24T21:53:17.178692",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -404,7 +464,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '473'
+      - '479'
       content-type:
       - application/json
       cookie:
@@ -412,20 +472,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-817a-927b-cb073adc408b","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-81c7-a5ee-daddce5ec559","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      3","href":null}]}},"url":"https://www.notion.so/Article-3-29c974f3b388817a927bcb073adc408b","public_url":null,"request_id":"d0d61ab7-8f16-4677-8e76-7f3fd0ab840e"}'
+      3","href":null}]}},"url":"https://app.notion.com/p/Article-3-3899ce7b60a481c7a5eedaddce5ec559","public_url":null,"archived":false,"request_id":"f8e83c10-088d-4c87-9d02-58fdf82e5f04"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04daadad1dc1-FRA
+      - a10e9eff0e981ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -455,7 +515,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d0d61ab7-8f16-4677-8e76-7f3fd0ab840e
+      - f8e83c10-088d-4c87-9d02-58fdf82e5f04
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -463,13 +523,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 4", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 4"}}]},
       "Topic": {"type": "select", "select": {"name": "Tech", "color": "green"}}, "Released":
-      {"type": "date", "date": {"start": "2025-10-30T16:41:49.142358", "time_zone":
-      "Europe/Berlin"}}}}'
+      {"type": "date", "date": {"start": "2026-06-24T21:53:17.565004", "time_zone":
+      "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -480,7 +540,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '472'
+      - '478'
       content-type:
       - application/json
       cookie:
@@ -488,20 +548,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-8124-88ac-cf9c88145747","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8176-92ff-dfb51614c83e","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       4","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      4","href":null}]}},"url":"https://www.notion.so/Article-4-29c974f3b388812488accf9c88145747","public_url":null,"request_id":"889d0a2e-5ea9-4ede-9ffc-cc3705ae96b4"}'
+      4","href":null}]}},"url":"https://app.notion.com/p/Article-4-3899ce7b60a4817692ffdfb51614c83e","public_url":null,"archived":false,"request_id":"c619ac5c-dc27-452a-b6e2-f1ffe3ab6fb4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04dedd2c1dc1-FRA
+      - a10e9f0168d61ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -531,7 +591,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 889d0a2e-5ea9-4ede-9ffc-cc3705ae96b4
+      - c619ac5c-dc27-452a-b6e2-f1ffe3ab6fb4
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -539,13 +599,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 5", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 5"}}]},
       "Topic": {"type": "select", "select": {"name": "Politics", "color": "yellow"}},
-      "Released": {"type": "date", "date": {"start": "2024-10-30T16:41:49.519613",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2025-06-24T21:53:17.922989",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -556,7 +616,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '477'
+      - '483'
       content-type:
       - application/json
       cookie:
@@ -564,20 +624,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-81a5-a7a2-dc3003ff48aa","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8195-91c0-f2ddb3195b79","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       5","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      5","href":null}]}},"url":"https://www.notion.so/Article-5-29c974f3b38881a5a7a2dc3003ff48aa","public_url":null,"request_id":"2f11ba1c-2bf4-4c6a-b88f-0313a50542ff"}'
+      5","href":null}]}},"url":"https://app.notion.com/p/Article-5-3899ce7b60a4819591c0f2ddb3195b79","public_url":null,"archived":false,"request_id":"f0aa93d3-1948-483f-82a0-9c839bba35a5"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04e139e51dc1-FRA
+      - a10e9f03aabd1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -607,7 +667,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 2f11ba1c-2bf4-4c6a-b88f-0313a50542ff
+      - f0aa93d3-1948-483f-82a0-9c839bba35a5
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -615,13 +675,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 6", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 6"}}]},
       "Topic": {"type": "select", "select": {"name": "Finance", "color": "red"}},
-      "Released": {"type": "date", "date": {"start": "2023-10-30T16:41:49.923519",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2024-06-24T21:53:18.293713",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -632,7 +692,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '473'
+      - '479'
       content-type:
       - application/json
       cookie:
@@ -640,20 +700,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-8108-a5f5-f759ee1b639c","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-81d5-93a8-ed53de0f5ffa","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       6","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      6","href":null}]}},"url":"https://www.notion.so/Article-6-29c974f3b3888108a5f5f759ee1b639c","public_url":null,"request_id":"a1fc277f-12aa-4e11-9722-b62be89da7ec"}'
+      6","href":null}]}},"url":"https://app.notion.com/p/Article-6-3899ce7b60a481d593a8ed53de0f5ffa","public_url":null,"archived":false,"request_id":"8e913ab8-29a9-4885-8dae-637ca3702ff9"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04e3cea01dc1-FRA
+      - a10e9f060d951ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -683,7 +743,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a1fc277f-12aa-4e11-9722-b62be89da7ec
+      - 8e913ab8-29a9-4885-8dae-637ca3702ff9
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -691,13 +751,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 7", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 7"}}]},
       "Topic": {"type": "select", "select": {"name": "Tech", "color": "green"}}, "Released":
-      {"type": "date", "date": {"start": "2025-10-30T16:41:51.480807", "time_zone":
-      "Europe/Berlin"}}}}'
+      {"type": "date", "date": {"start": "2026-06-24T21:53:18.689956", "time_zone":
+      "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -708,7 +768,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '472'
+      - '478'
       content-type:
       - application/json
       cookie:
@@ -716,20 +776,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-81ae-b68d-c8bb67b3e842","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-810f-b709-fc287619b754","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       7","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      7","href":null}]}},"url":"https://www.notion.so/Article-7-29c974f3b38881aeb68dc8bb67b3e842","public_url":null,"request_id":"9f3e1789-210f-43fc-ba87-5952c280f610"}'
+      7","href":null}]}},"url":"https://app.notion.com/p/Article-7-3899ce7b60a4810fb709fc287619b754","public_url":null,"archived":false,"request_id":"db8774cb-2be1-41d8-923c-8a670345eabf"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04ed79ad1dc1-FRA
+      - a10e9f087fce1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -759,7 +819,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 9f3e1789-210f-43fc-ba87-5952c280f610
+      - db8774cb-2be1-41d8-923c-8a670345eabf
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -767,13 +827,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 8", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 8"}}]},
       "Topic": {"type": "select", "select": {"name": "Politics", "color": "yellow"}},
-      "Released": {"type": "date", "date": {"start": "2024-10-30T16:41:51.906863",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2025-06-24T21:53:19.060503",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -784,7 +844,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '477'
+      - '483'
       content-type:
       - application/json
       cookie:
@@ -792,20 +852,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-8169-a901-e57ec0e4db57","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8113-99c0-e48724404dad","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       8","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      8","href":null}]}},"url":"https://www.notion.so/Article-8-29c974f3b3888169a901e57ec0e4db57","public_url":null,"request_id":"b3de8cbd-ad34-4653-9197-7639b57f6d55"}'
+      8","href":null}]}},"url":"https://app.notion.com/p/Article-8-3899ce7b60a4811399c0e48724404dad","public_url":null,"archived":false,"request_id":"fb17181c-c1a2-4adf-96a1-66fc17b94900"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04f02f491dc1-FRA
+      - a10e9f0aca041ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -835,7 +895,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b3de8cbd-ad34-4653-9197-7639b57f6d55
+      - fb17181c-c1a2-4adf-96a1-66fc17b94900
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -843,13 +903,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 9", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 9"}}]},
       "Topic": {"type": "select", "select": {"name": "Finance", "color": "red"}},
-      "Released": {"type": "date", "date": {"start": "2023-10-30T16:41:52.372551",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2024-06-24T21:53:19.478003",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -860,7 +920,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '473'
+      - '479'
       content-type:
       - application/json
       cookie:
@@ -868,20 +928,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-81ad-bf57-cf71440be0de","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-81b0-a95f-d187225858df","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       9","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      9","href":null}]}},"url":"https://www.notion.so/Article-9-29c974f3b38881adbf57cf71440be0de","public_url":null,"request_id":"c7a00646-8043-4092-8394-f7096f538acc"}'
+      9","href":null}]}},"url":"https://app.notion.com/p/Article-9-3899ce7b60a481b0a95fd187225858df","public_url":null,"archived":false,"request_id":"94c0b142-b0b4-474b-8c49-39ef7ea2f635"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04f30d261dc1-FRA
+      - a10e9f0d6d0c1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -911,7 +971,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - c7a00646-8043-4092-8394-f7096f538acc
+      - 94c0b142-b0b4-474b-8c49-39ef7ea2f635
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -919,13 +979,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 10", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 10"}}]},
       "Topic": {"type": "select", "select": {"name": "Tech", "color": "green"}}, "Released":
-      {"type": "date", "date": {"start": "2025-10-30T16:41:52.955620", "time_zone":
-      "Europe/Berlin"}}}}'
+      {"type": "date", "date": {"start": "2026-06-24T21:53:20.470643", "time_zone":
+      "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -936,7 +996,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '474'
+      - '480'
       content-type:
       - application/json
       cookie:
@@ -944,20 +1004,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-813e-9226-cbd98f6a32f0","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8182-b281-f1778ae71f37","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       10","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      10","href":null}]}},"url":"https://www.notion.so/Article-10-29c974f3b388813e9226cbd98f6a32f0","public_url":null,"request_id":"274a736d-65ef-4d12-811d-c47766db09dd"}'
+      10","href":null}]}},"url":"https://app.notion.com/p/Article-10-3899ce7b60a48182b281f1778ae71f37","public_url":null,"archived":false,"request_id":"f8b4845a-7ca0-4a6d-897d-3d8124c6a005"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04f6bc321dc1-FRA
+      - a10e9f139afc1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -987,7 +1047,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 274a736d-65ef-4d12-811d-c47766db09dd
+      - f8b4845a-7ca0-4a6d-897d-3d8124c6a005
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -995,13 +1055,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 11", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 11"}}]},
       "Topic": {"type": "select", "select": {"name": "Politics", "color": "yellow"}},
-      "Released": {"type": "date", "date": {"start": "2024-10-30T16:41:53.357914",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2025-06-24T21:53:20.887693",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1012,7 +1072,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '479'
+      - '485'
       content-type:
       - application/json
       cookie:
@@ -1020,20 +1080,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-812a-8c8c-f42024cc72a4","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8120-b871-e1973464061e","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       11","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      11","href":null}]}},"url":"https://www.notion.so/Article-11-29c974f3b388812a8c8cf42024cc72a4","public_url":null,"request_id":"3c1ab9a0-6101-46eb-9941-fcaedd2572a6"}'
+      11","href":null}]}},"url":"https://app.notion.com/p/Article-11-3899ce7b60a48120b871e1973464061e","public_url":null,"archived":false,"request_id":"b7ecd35f-d10b-4af6-aaab-daff6487955c"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04f938d71dc1-FRA
+      - a10e9f163d351ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1063,7 +1123,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 3c1ab9a0-6101-46eb-9941-fcaedd2572a6
+      - b7ecd35f-d10b-4af6-aaab-daff6487955c
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1071,13 +1131,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 12", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 12"}}]},
       "Topic": {"type": "select", "select": {"name": "Finance", "color": "red"}},
-      "Released": {"type": "date", "date": {"start": "2023-10-30T16:41:53.853312",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2024-06-24T21:53:21.310739",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1088,7 +1148,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '475'
+      - '481'
       content-type:
       - application/json
       cookie:
@@ -1096,20 +1156,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-81e1-a695-ea12353549ef","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8131-9ce9-f897aeed052f","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       12","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      12","href":null}]}},"url":"https://www.notion.so/Article-12-29c974f3b38881e1a695ea12353549ef","public_url":null,"request_id":"bce0c475-7621-4804-8fe7-1352b4d9e746"}'
+      12","href":null}]}},"url":"https://app.notion.com/p/Article-12-3899ce7b60a481319ce9f897aeed052f","public_url":null,"archived":false,"request_id":"e6a3cc4f-f72d-4f5a-8fe6-10ca12bf47db"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04fc4e7f1dc1-FRA
+      - a10e9f18dfb21ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1139,7 +1199,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - bce0c475-7621-4804-8fe7-1352b4d9e746
+      - e6a3cc4f-f72d-4f5a-8fe6-10ca12bf47db
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1147,13 +1207,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 13", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 13"}}]},
       "Topic": {"type": "select", "select": {"name": "Tech", "color": "green"}}, "Released":
-      {"type": "date", "date": {"start": "2025-10-30T16:41:54.239978", "time_zone":
-      "Europe/Berlin"}}}}'
+      {"type": "date", "date": {"start": "2026-06-24T21:53:21.698916", "time_zone":
+      "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1164,7 +1224,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '474'
+      - '480'
       content-type:
       - application/json
       cookie:
@@ -1172,20 +1232,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-8113-bfe1-eddb559e4644","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8197-b1ae-e7606dffdbb7","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       13","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      13","href":null}]}},"url":"https://www.notion.so/Article-13-29c974f3b3888113bfe1eddb559e4644","public_url":null,"request_id":"125e2111-888d-4ea3-b93e-642c67874f99"}'
+      13","href":null}]}},"url":"https://app.notion.com/p/Article-13-3899ce7b60a48197b1aee7606dffdbb7","public_url":null,"archived":false,"request_id":"0d332e2a-648b-4fa0-9917-cc3c1056f7d4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c04febae81dc1-FRA
+      - a10e9f1b49fc1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1215,7 +1275,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 125e2111-888d-4ea3-b93e-642c67874f99
+      - 0d332e2a-648b-4fa0-9917-cc3c1056f7d4
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1223,13 +1283,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 14", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 14"}}]},
       "Topic": {"type": "select", "select": {"name": "Politics", "color": "yellow"}},
-      "Released": {"type": "date", "date": {"start": "2024-10-30T16:41:54.762876",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2025-06-24T21:53:22.131272",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1240,7 +1300,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '479'
+      - '485'
       content-type:
       - application/json
       cookie:
@@ -1248,20 +1308,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-8196-9b25-d6527c1164ed","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8154-a7d2-e346840b5441","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       14","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      14","href":null}]}},"url":"https://www.notion.so/Article-14-29c974f3b38881969b25d6527c1164ed","public_url":null,"request_id":"11477f2e-f4d0-4bbb-9327-99b11003aa2d"}'
+      14","href":null}]}},"url":"https://app.notion.com/p/Article-14-3899ce7b60a48154a7d2e346840b5441","public_url":null,"archived":false,"request_id":"c3b64d16-70aa-4d9b-9643-4f915b139373"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c050208da1dc1-FRA
+      - a10e9f1dfc7e1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1291,7 +1351,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 11477f2e-f4d0-4bbb-9327-99b11003aa2d
+      - c3b64d16-70aa-4d9b-9643-4f915b139373
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1299,13 +1359,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 15", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 15"}}]},
       "Topic": {"type": "select", "select": {"name": "Finance", "color": "red"}},
-      "Released": {"type": "date", "date": {"start": "2023-10-30T16:41:55.153935",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2024-06-24T21:53:22.512188",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1316,7 +1376,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '475'
+      - '481'
       content-type:
       - application/json
       cookie:
@@ -1324,20 +1384,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-81de-8bf9-d94f31f31370","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-811b-ab90-d431a60aa6a8","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       15","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      15","href":null}]}},"url":"https://www.notion.so/Article-15-29c974f3b38881de8bf9d94f31f31370","public_url":null,"request_id":"ba31423f-c3e0-4dcb-b536-55c95eb5bffb"}'
+      15","href":null}]}},"url":"https://app.notion.com/p/Article-15-3899ce7b60a4811bab90d431a60aa6a8","public_url":null,"archived":false,"request_id":"def3c963-8ffb-4bb4-8fea-a2a437155020"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c05047da11dc1-FRA
+      - a10e9f206f2c1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1367,7 +1427,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - ba31423f-c3e0-4dcb-b536-55c95eb5bffb
+      - def3c963-8ffb-4bb4-8fea-a2a437155020
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1375,13 +1435,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 16", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 16"}}]},
       "Topic": {"type": "select", "select": {"name": "Tech", "color": "green"}}, "Released":
-      {"type": "date", "date": {"start": "2025-10-30T16:41:55.527844", "time_zone":
-      "Europe/Berlin"}}}}'
+      {"type": "date", "date": {"start": "2026-06-24T21:53:22.909194", "time_zone":
+      "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1392,7 +1452,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '474'
+      - '480'
       content-type:
       - application/json
       cookie:
@@ -1400,20 +1460,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-81df-9fd7-e344fc7b803e","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8132-b86f-edde96177ea8","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       16","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      16","href":null}]}},"url":"https://www.notion.so/Article-16-29c974f3b38881df9fd7e344fc7b803e","public_url":null,"request_id":"a937e97f-79bb-4201-ad99-cc310347f0fd"}'
+      16","href":null}]}},"url":"https://app.notion.com/p/Article-16-3899ce7b60a48132b86fedde96177ea8","public_url":null,"archived":false,"request_id":"df2d80ac-56de-44ac-8e6a-303e50f34652"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c0506ca701dc1-FRA
+      - a10e9f22d9841ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1443,7 +1503,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a937e97f-79bb-4201-ad99-cc310347f0fd
+      - df2d80ac-56de-44ac-8e6a-303e50f34652
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1451,13 +1511,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 17", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 17"}}]},
       "Topic": {"type": "select", "select": {"name": "Politics", "color": "yellow"}},
-      "Released": {"type": "date", "date": {"start": "2024-10-30T16:41:55.908024",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2025-06-24T21:53:23.274594",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1468,7 +1528,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '479'
+      - '485'
       content-type:
       - application/json
       cookie:
@@ -1476,20 +1536,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-815c-b1a1-f09e7779437e","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-81b1-a56f-d79833757857","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       17","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      17","href":null}]}},"url":"https://www.notion.so/Article-17-29c974f3b388815cb1a1f09e7779437e","public_url":null,"request_id":"678ecfa6-045d-409e-aec9-bdbb1baea79b"}'
+      17","href":null}]}},"url":"https://app.notion.com/p/Article-17-3899ce7b60a481b1a56fd79833757857","public_url":null,"archived":false,"request_id":"a85852dc-35d4-4346-aef4-09b9be44340d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c05095f581dc1-FRA
+      - a10e9f251bd51ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1519,7 +1579,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 678ecfa6-045d-409e-aec9-bdbb1baea79b
+      - a85852dc-35d4-4346-aef4-09b9be44340d
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1527,13 +1587,13 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "29c974f3-b388-8115-b204-ee8125420405"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "7011efc9-b90d-4d97-b6ec-6728d3b9482c"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Article 18", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Article 18"}}]},
       "Topic": {"type": "select", "select": {"name": "Finance", "color": "red"}},
-      "Released": {"type": "date", "date": {"start": "2023-10-30T16:41:56.419729",
-      "time_zone": "Europe/Berlin"}}}}'
+      "Released": {"type": "date", "date": {"start": "2024-06-24T21:53:23.667744",
+      "time_zone": "Europe/London"}}}}'
     headers:
       accept:
       - '*/*'
@@ -1544,7 +1604,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '475'
+      - '481'
       content-type:
       - application/json
       cookie:
@@ -1552,20 +1612,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-813c-b533-f57336ff1a0b","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"page","id":"3899ce7b-60a4-8188-a9e7-d2d4e6640c36","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       18","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      18","href":null}]}},"url":"https://www.notion.so/Article-18-29c974f3b388813cb533f57336ff1a0b","public_url":null,"request_id":"57589477-1caa-4d8e-a71c-c9f31c2d750c"}'
+      18","href":null}]}},"url":"https://app.notion.com/p/Article-18-3899ce7b60a48188a9e7d2d4e6640c36","public_url":null,"archived":false,"request_id":"d993330d-178e-496d-8cfc-752f3ed5b6a4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c050c5d1b1dc1-FRA
+      - a10e9f279e471ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1595,7 +1655,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 57589477-1caa-4d8e-a71c-c9f31c2d750c
+      - d993330d-178e-496d-8cfc-752f3ed5b6a4
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1622,54 +1682,54 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/29c974f3-b388-8115-b204-ee8125420405/query
+    uri: https://api.notion.com/v1/data_sources/7011efc9-b90d-4d97-b6ec-6728d3b9482c/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"29c974f3-b388-8108-a5f5-f759ee1b639c","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      6","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      6","href":null}]}},"url":"https://www.notion.so/Article-6-29c974f3b3888108a5f5f759ee1b639c","public_url":null},{"object":"page","id":"29c974f3-b388-8113-bfe1-eddb559e4644","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      13","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      13","href":null}]}},"url":"https://www.notion.so/Article-13-29c974f3b3888113bfe1eddb559e4644","public_url":null},{"object":"page","id":"29c974f3-b388-8124-88ac-cf9c88145747","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      4","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      4","href":null}]}},"url":"https://www.notion.so/Article-4-29c974f3b388812488accf9c88145747","public_url":null},{"object":"page","id":"29c974f3-b388-812a-8c8c-f42024cc72a4","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      11","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      11","href":null}]}},"url":"https://www.notion.so/Article-11-29c974f3b388812a8c8cf42024cc72a4","public_url":null},{"object":"page","id":"29c974f3-b388-8133-9a0f-e8cd064e0c3d","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      1","href":null}]}},"url":"https://www.notion.so/Article-1-29c974f3b38881339a0fe8cd064e0c3d","public_url":null},{"object":"page","id":"29c974f3-b388-813c-b533-f57336ff1a0b","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"list","results":[{"object":"page","id":"3899ce7b-60a4-8188-a9e7-d2d4e6640c36","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       18","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      18","href":null}]}},"url":"https://www.notion.so/Article-18-29c974f3b388813cb533f57336ff1a0b","public_url":null},{"object":"page","id":"29c974f3-b388-813e-9226-cbd98f6a32f0","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      10","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      10","href":null}]}},"url":"https://www.notion.so/Article-10-29c974f3b388813e9226cbd98f6a32f0","public_url":null},{"object":"page","id":"29c974f3-b388-815c-b1a1-f09e7779437e","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      18","href":null}]}},"url":"https://app.notion.com/p/Article-18-3899ce7b60a48188a9e7d2d4e6640c36","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-81b1-a56f-d79833757857","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       17","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      17","href":null}]}},"url":"https://www.notion.so/Article-17-29c974f3b388815cb1a1f09e7779437e","public_url":null},{"object":"page","id":"29c974f3-b388-8169-a901-e57ec0e4db57","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      8","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      8","href":null}]}},"url":"https://www.notion.so/Article-8-29c974f3b3888169a901e57ec0e4db57","public_url":null},{"object":"page","id":"29c974f3-b388-817a-927b-cb073adc408b","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      3","href":null}]}},"url":"https://www.notion.so/Article-3-29c974f3b388817a927bcb073adc408b","public_url":null},{"object":"page","id":"29c974f3-b388-8196-9b25-d6527c1164ed","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      14","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      14","href":null}]}},"url":"https://www.notion.so/Article-14-29c974f3b38881969b25d6527c1164ed","public_url":null},{"object":"page","id":"29c974f3-b388-81a5-a7a2-dc3003ff48aa","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      5","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      5","href":null}]}},"url":"https://www.notion.so/Article-5-29c974f3b38881a5a7a2dc3003ff48aa","public_url":null},{"object":"page","id":"29c974f3-b388-81ad-bf57-cf71440be0de","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      9","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      9","href":null}]}},"url":"https://www.notion.so/Article-9-29c974f3b38881adbf57cf71440be0de","public_url":null},{"object":"page","id":"29c974f3-b388-81ae-b68d-c8bb67b3e842","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      7","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      7","href":null}]}},"url":"https://www.notion.so/Article-7-29c974f3b38881aeb68dc8bb67b3e842","public_url":null},{"object":"page","id":"29c974f3-b388-81de-8bf9-d94f31f31370","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
-      15","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      15","href":null}]}},"url":"https://www.notion.so/Article-15-29c974f3b38881de8bf9d94f31f31370","public_url":null},{"object":"page","id":"29c974f3-b388-81df-9fd7-e344fc7b803e","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      17","href":null}]}},"url":"https://app.notion.com/p/Article-17-3899ce7b60a481b1a56fd79833757857","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8132-b86f-edde96177ea8","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       16","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      16","href":null}]}},"url":"https://www.notion.so/Article-16-29c974f3b38881df9fd7e344fc7b803e","public_url":null},{"object":"page","id":"29c974f3-b388-81e1-a695-ea12353549ef","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"6c33eef0-3187-42bb-83fb-2db913836559","name":"Finance","color":"red"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2023-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      16","href":null}]}},"url":"https://app.notion.com/p/Article-16-3899ce7b60a48132b86fedde96177ea8","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-811b-ab90-d431a60aa6a8","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      15","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      15","href":null}]}},"url":"https://app.notion.com/p/Article-15-3899ce7b60a4811bab90d431a60aa6a8","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8154-a7d2-e346840b5441","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      14","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      14","href":null}]}},"url":"https://app.notion.com/p/Article-14-3899ce7b60a48154a7d2e346840b5441","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8197-b1ae-e7606dffdbb7","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      13","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      13","href":null}]}},"url":"https://app.notion.com/p/Article-13-3899ce7b60a48197b1aee7606dffdbb7","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8131-9ce9-f897aeed052f","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       12","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      12","href":null}]}},"url":"https://www.notion.so/Article-12-29c974f3b38881e1a695ea12353549ef","public_url":null},{"object":"page","id":"29c974f3-b388-81e7-aa50-d9afac0f2ad6","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"a4c4890e-4caf-43fd-8c22-42924570c529","name":"Politics","color":"yellow"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2024-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      12","href":null}]}},"url":"https://app.notion.com/p/Article-12-3899ce7b60a481319ce9f897aeed052f","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8120-b871-e1973464061e","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      11","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      11","href":null}]}},"url":"https://app.notion.com/p/Article-11-3899ce7b60a48120b871e1973464061e","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8182-b281-f1778ae71f37","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      10","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      10","href":null}]}},"url":"https://app.notion.com/p/Article-10-3899ce7b60a48182b281f1778ae71f37","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-81b0-a95f-d187225858df","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      9","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      9","href":null}]}},"url":"https://app.notion.com/p/Article-9-3899ce7b60a481b0a95fd187225858df","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8113-99c0-e48724404dad","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      8","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      8","href":null}]}},"url":"https://app.notion.com/p/Article-8-3899ce7b60a4811399c0e48724404dad","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-810f-b709-fc287619b754","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      7","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      7","href":null}]}},"url":"https://app.notion.com/p/Article-7-3899ce7b60a4810fb709fc287619b754","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-81d5-93a8-ed53de0f5ffa","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      6","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      6","href":null}]}},"url":"https://app.notion.com/p/Article-6-3899ce7b60a481d593a8ed53de0f5ffa","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8195-91c0-f2ddb3195b79","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      5","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      5","href":null}]}},"url":"https://app.notion.com/p/Article-5-3899ce7b60a4819591c0f2ddb3195b79","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8176-92ff-dfb51614c83e","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      4","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      4","href":null}]}},"url":"https://app.notion.com/p/Article-4-3899ce7b60a4817692ffdfb51614c83e","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-81c7-a5ee-daddce5ec559","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2024-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"840ec54b-f22b-4b70-8efd-bc82e03ccc62","name":"Finance","color":"red"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      3","href":null}]}},"url":"https://app.notion.com/p/Article-3-3899ce7b60a481c7a5eedaddce5ec559","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-81d6-aa07-f085fbb1cf1f","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2025-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"195f9b71-482d-4870-a796-109bf8799864","name":"Politics","color":"yellow"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      2","href":null}]}},"url":"https://www.notion.so/Article-2-29c974f3b38881e7aa50d9afac0f2ad6","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"f1b94bc7-5fd6-4762-bf1c-5764c5c39b0b"}'
+      2","href":null}]}},"url":"https://app.notion.com/p/Article-2-3899ce7b60a481d6aa07f085fbb1cf1f","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-81cf-994d-cf06813fdf43","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
+      1","href":null}]}},"url":"https://app.notion.com/p/Article-1-3899ce7b60a481cf994dcf06813fdf43","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"75ad6618-07dd-4323-b2c3-defe49a8f3aa"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c050f1aca1dc1-FRA
+      - a10e9f29f88d1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1699,7 +1759,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - f1b94bc7-5fd6-4762-bf1c-5764c5c39b0b
+      - 75ad6618-07dd-4323-b2c3-defe49a8f3aa
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1707,9 +1767,9 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"filter": {"and": [{"select": {"equals": "Tech"}, "property": "Topic"},
-      {"date": {"this_week": {}}, "property": "Released"}]}, "sorts": [{"property":
-      "Released", "direction": "descending"}, {"property": "Name", "direction": "ascending"}],
+    body: '{"sorts": [{"property": "Released", "direction": "descending"}, {"property":
+      "Name", "direction": "ascending"}], "filter": {"and": [{"select": {"equals":
+      "Tech"}, "property": "Topic"}, {"date": {"this_week": {}}, "property": "Released"}]},
       "page_size": 100}'
     headers:
       accept:
@@ -1729,30 +1789,30 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/29c974f3-b388-8115-b204-ee8125420405/query
+    uri: https://api.notion.com/v1/data_sources/7011efc9-b90d-4d97-b6ec-6728d3b9482c/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"29c974f3-b388-8133-9a0f-e8cd064e0c3d","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+    content: '{"object":"list","results":[{"object":"page","id":"3899ce7b-60a4-81cf-994d-cf06813fdf43","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      1","href":null}]}},"url":"https://www.notion.so/Article-1-29c974f3b38881339a0fe8cd064e0c3d","public_url":null},{"object":"page","id":"29c974f3-b388-8124-88ac-cf9c88145747","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      1","href":null}]}},"url":"https://app.notion.com/p/Article-1-3899ce7b60a481cf994dcf06813fdf43","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8176-92ff-dfb51614c83e","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       4","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      4","href":null}]}},"url":"https://www.notion.so/Article-4-29c974f3b388812488accf9c88145747","public_url":null},{"object":"page","id":"29c974f3-b388-81ae-b68d-c8bb67b3e842","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      4","href":null}]}},"url":"https://app.notion.com/p/Article-4-3899ce7b60a4817692ffdfb51614c83e","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-810f-b709-fc287619b754","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       7","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      7","href":null}]}},"url":"https://www.notion.so/Article-7-29c974f3b38881aeb68dc8bb67b3e842","public_url":null},{"object":"page","id":"29c974f3-b388-813e-9226-cbd98f6a32f0","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      7","href":null}]}},"url":"https://app.notion.com/p/Article-7-3899ce7b60a4810fb709fc287619b754","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8182-b281-f1778ae71f37","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       10","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      10","href":null}]}},"url":"https://www.notion.so/Article-10-29c974f3b388813e9226cbd98f6a32f0","public_url":null},{"object":"page","id":"29c974f3-b388-8113-bfe1-eddb559e4644","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      10","href":null}]}},"url":"https://app.notion.com/p/Article-10-3899ce7b60a48182b281f1778ae71f37","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8197-b1ae-e7606dffdbb7","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       13","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      13","href":null}]}},"url":"https://www.notion.so/Article-13-29c974f3b3888113bfe1eddb559e4644","public_url":null},{"object":"page","id":"29c974f3-b388-81df-9fd7-e344fc7b803e","created_time":"2025-10-30T15:41:00.000Z","last_edited_time":"2025-10-30T15:41:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"29c974f3-b388-8115-b204-ee8125420405"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"Topic":{"id":"%3C%3ExF","type":"select","select":{"id":"d8d991e5-1173-409d-9007-0b12f4f9d6f7","name":"Tech","color":"green"}},"Released":{"id":"LWnx","type":"date","date":{"start":"2025-10-30T16:41:00.000+01:00","end":null,"time_zone":null}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
+      13","href":null}]}},"url":"https://app.notion.com/p/Article-13-3899ce7b60a48197b1aee7606dffdbb7","public_url":null,"archived":false},{"object":"page","id":"3899ce7b-60a4-8132-b86f-edde96177ea8","created_time":"2026-06-24T20:53:00.000Z","last_edited_time":"2026-06-24T20:53:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"7011efc9-b90d-4d97-b6ec-6728d3b9482c","database_id":"803fa91a-c89f-4efe-a01a-21fcf3d0e38e"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Released":{"id":"TWB%3C","type":"date","date":{"start":"2026-06-24T21:53:00.000+01:00","end":null,"time_zone":null}},"Topic":{"id":"Ve%3Ew","type":"select","select":{"id":"f1f98a9a-00ce-4c4a-9a32-50a62ee725fd","name":"Tech","color":"green"}},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Article
       16","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Article
-      16","href":null}]}},"url":"https://www.notion.so/Article-16-29c974f3b38881df9fd7e344fc7b803e","public_url":null}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"9c5a5c74-06a3-4255-8d0c-1439439650e1"}'
+      16","href":null}]}},"url":"https://app.notion.com/p/Article-16-3899ce7b60a48132b86fedde96177ea8","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"171ffc50-562f-4466-a434-1bd2cff589d8"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c051a98d71dc1-FRA
+      - a10e9f2c3b1a1ca6-AMS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1782,7 +1842,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 9c5a5c74-06a3-4255-8d0c-1439439650e1
+      - 171ffc50-562f-4466-a434-1bd2cff589d8
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:

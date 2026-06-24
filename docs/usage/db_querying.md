@@ -38,7 +38,7 @@ class Article(uno.Schema, db_title='Article DB'):
     topic = uno.PropType.Select('Topic', options=Topic)
     released = uno.PropType.Date('Released')
 
-article_db = notion.create_db(parent=root_page, schema=Article)
+article_db = notion.create_ds(parent=root_page, schema=Article)
 
 num_of_articles = 18
 for i in range(num_of_articles):

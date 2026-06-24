@@ -15,21 +15,21 @@ import ultimate_notion as uno
 
 notion = uno.Session.get_or_create()  # if NOTION_TOKEN is set in environment
 
-contacts_dbs = notion.search_db('Contacts DB')
+contacts_dbs = notion.search_ds('Contacts DB')
 
 assert [db.title for db in contacts_dbs] == ['Contacts DB']
 ```
 
-The method `search_db` will always return a list, as Notion gives no guarantees that the
+The method `search_ds` will always return a list, as Notion gives no guarantees that the
 title of a database is unique. Practically though, most users give databases unique
 names, and to accommodate this, the returned list provides a method `.item()`, which
 will return the item of a single-item list or raise an error otherwise. Another possibility
 is to retrieve the database by its unique ID.
 
 ```python
-contacts_db = notion.search_db('Contacts DB').item()
+contacts_db = notion.search_ds('Contacts DB').item()
 # or in case the unique ID of the database is known
-contacts_db = notion.get_db(contacts_db.id)
+contacts_db = notion.get_ds(contacts_db.id)
 ```
 
 The [Database object] provides access to many attributes like [title], [icon], [description], etc.
@@ -41,12 +41,12 @@ assert contacts_db.description == 'Database of all my contacts!'
 ## Creating a database and adding pages
 
 A simple database with the default columns `Name` for the title of pages and the Multi-select column `Tags`
-can be created using [create_db]. To tell Notion where to put the database, we have to provide an existing page.
+can be created using [create_ds]. To tell Notion where to put the database, we have to provide an existing page.
 Let's assume we have a page called `Tests` that is shared with our integration:
 
 ```python
 root_page = notion.search_page('Tests').item()
-my_db = notion.create_db(parent=root_page)
+my_db = notion.create_ds(parent=root_page)
 ```
 
 Using the `my_db` object, we can now set its attributes, e.g.:
@@ -108,7 +108,7 @@ To access the tasks, i.e., the pages within this database, we can use the [get_a
 generate a [View]. It's as simple as:
 
 ```python
-task_db = notion.search_db('Task DB').item()
+task_db = notion.search_ds('Task DB').item()
 task_view = task_db.get_all_pages()
 ```
 
@@ -188,6 +188,6 @@ keep in mind that some methods are just stubs.
 [head]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.head
 [limit]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.limit
 [tail]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.tail
-[create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
+[create_ds]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_ds
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema

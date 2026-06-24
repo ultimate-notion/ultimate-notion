@@ -43,7 +43,7 @@ Assume we have a page acting like a task in a database similar to the [Task List
 We search for `Task DB`, retrieve all pages in a [View], and select the `Run first Marathon` page:
 
 ```python
-task_view = notion.search_db('Task DB').item().get_all_pages()
+task_view = notion.search_ds('Task DB').item().get_all_pages()
 task = task_view.search_page('Run first Marathon').item()
 ```
 
@@ -69,7 +69,7 @@ The actual property names like `status` and `due_date` can be easily found out b
 holding our page, with:
 
 ```python
-task.parent_db.schema.show()
+task.parent_ds.schema.show()
 ```
 
 returning the actual column name, the property type and the Python attribute name within `props`:
@@ -120,7 +120,7 @@ Here is an example of how to change the task status, which is a select property.
 get the list of all options by accessing the corresponding property types with:
 
 ```python
-options = {opt.name: opt for opt in task.parent_db.schema.status.options}
+options = {opt.name: opt for opt in task.parent_ds.schema.status.options}
 ```
 
 This generates a dictionary of [Option] objects:
