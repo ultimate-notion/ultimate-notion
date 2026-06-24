@@ -213,12 +213,9 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
     # to `obj.__deepcopy__` and recursing forever.
     memo[id(obj)] = clone
 
-    for attr, value in vars(obj).items():
-        if attr in shared:
-            setattr(clone, attr, value)  # share by reference
-        else:
-            setattr(clone, attr, deepcopy(value, memo))
-
+    clone.__dict__.update(
+        {attr: value if attr in shared else deepcopy(value, memo) for attr, value in vars(obj).items()}
+    )
     return clone
 
 
