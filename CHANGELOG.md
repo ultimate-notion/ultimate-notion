@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- New: Export the user-facing icon subtypes `BuiltInIcon` and `CustomEmoji` from the top-level package, alongside the already-exported `Emoji`, so icons returned by `Page.icon`/`DataSource.icon`/`Database.icon` can be narrowed with `isinstance` without reaching into `ultimate_notion.emoji`, issue #353.
 - Fix: Skip the two-way relation backward rename in `Relation._update_bwd_rel` when no backward name is defined, instead of attempting `RenameProp(name=None)` and raising a pydantic `ValidationError`, issue #325.
 - Fix: Raise a clear `UnsetError` from `Bot.workspace_info` when the workspace name or id is unavailable (i.e. for any bot other than the integration's own), instead of an opaque pydantic `ValidationError`, issue #326.
 - Chg: Replace `hasattr`-based checks in `obj_api.core` with type-safe alternatives (a structural pattern match on `UniqueObject` in `ObjectRef.build`, a typed `ClassVar` sentinel for the `UnsetType` singleton, and a `None`-defaulted `ClassVar` sentinel for the `TypedObject._typemap` registry).

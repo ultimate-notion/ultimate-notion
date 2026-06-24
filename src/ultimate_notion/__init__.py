@@ -48,7 +48,7 @@ from ultimate_notion.blocks import (
 )
 from ultimate_notion.core import Workspace, WorkspaceType, get_active_session
 from ultimate_notion.database import Database
-from ultimate_notion.emoji import Emoji
+from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, url
 from ultimate_notion.obj_api.enums import (
     AggFunc,
@@ -79,6 +79,7 @@ __all__ = [
     'Block',  # for type hinting only
     'Bookmark',
     'Breadcrumb',
+    'BuiltInIcon',
     'BulletedItem',
     'Callout',
     'Code',
@@ -87,6 +88,7 @@ __all__ = [
     'Column',
     'Columns',
     'Condition',  # for type hinting only
+    'CustomEmoji',
     'Database',
     'DateTimeOrRange',  # for type hinting only
     'Divider',
