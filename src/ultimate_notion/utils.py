@@ -206,9 +206,9 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
     """
     shared_attrs = {k: getattr(obj, k) for k in shared_attributes}
 
-    if hasattr(obj, '__deepcopy__'):
+    deepcopy_method = getattr(obj, '__deepcopy__', None)
+    if deepcopy_method is not None:
         # Do hack to prevent infinite recursion in call to deepcopy
-        deepcopy_method = obj.__deepcopy__
         obj.__dict__['__deepcopy__'] = None
 
     for attr in shared_attributes:
@@ -220,7 +220,7 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
         setattr(obj, attr, val)
         setattr(clone, attr, val)
 
-    if hasattr(obj, '__deepcopy__'):
+    if deepcopy_method is not None:
         # Undo hack
         obj.__dict__['__deepcopy__'] = deepcopy_method
         del clone.__dict__['__deepcopy__']
@@ -446,7 +446,7 @@ def set_attr_none(
                 raise AttributeError(msg)
 
         last_attr = attrs[-1]
-        if hasattr(curr_obj, last_attr):
+        if isinstance(curr_obj, BaseModel) and last_attr in type(curr_obj).model_fields:
             setattr(curr_obj, last_attr, None)
         elif not missing_ok:
             msg = f'{last_attr} does not exist in {".".join(attrs[:-2]) if len(attrs) > 1 else "the object"}.'
