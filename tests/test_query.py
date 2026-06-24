@@ -447,7 +447,7 @@ def test_query_new_task_db(new_task_db: uno.DataSource) -> None:
     task2 = Task.create(task='Task 2', status=status_options['Backlog'], due_date='2024-01-02')
     task3 = Task.create(task='Task 3', status=status_options['In Progress'], due_date='2024-01-01')
 
-    assert str(new_task_db.query) == "Query(database='My Tasks', sort=(), filter=None)"
+    assert str(new_task_db.query) == "Query(ds='My Tasks', sort=(), filter=None)"
 
     query = new_task_db.query.sort(uno.prop('Due Date').asc(), uno.prop('Task').asc())
     assert set(query.execute()) == {task1, task3, task2}
