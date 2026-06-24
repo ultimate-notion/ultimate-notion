@@ -5,15 +5,10 @@ from __future__ import annotations
 import datetime as dt
 import json
 import re
-import textwrap
-import types
 from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
 from contextlib import contextmanager
-from functools import update_wrapper
 from hashlib import sha256
-from itertools import chain
-from pathlib import Path
-from typing import Any, Generic, ParamSpec, TypeAlias, TypeVar
+from typing import Any, TypeAlias, TypeVar
 
 import numpy as np
 import pendulum as pnd
@@ -22,13 +17,11 @@ from numpy.typing import NDArray
 from packaging.version import Version
 from pendulum.tz import local_timezone
 from pydantic import BaseModel
-from typing_extensions import Self
 
 from ultimate_notion import __version__
 from ultimate_notion.errors import EmptyListError, MultipleItemsError
 
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
-P = ParamSpec('P')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
 class SList(list[T]):
@@ -43,11 +36,6 @@ class SList(list[T]):
         else:
             msg = 'list has multiple items'
             raise MultipleItemsError(msg)
-
-
-def flatten(nested_list: Sequence[Sequence[T]], /) -> list[T]:
-    """Flatten a nested list."""
-    return list(chain.from_iterable(nested_list))
 
 
 def safe_list_get(lst: Sequence[T], idx: int, *, default: T | None = None) -> T | None:
@@ -98,55 +86,6 @@ def display_markdown(markdown: str, *, raw: bool = False) -> None:
     render(markdown, raw=raw)
 
 
-class StoredRetvalsFunctor(Generic[P, T]):
-    """A decorator that stores the return values of a function for later use."""
-
-    def __init__(self, func: Callable[P, T]) -> None:
-        # Kopiert __name__, __doc__, __module__, __annotations__, __wrapped__
-        update_wrapper(self, func)
-        self._func = func
-        self.retvals: list[T] = []
-
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> T:
-        rv = self._func(*args, **kwargs)
-        self.retvals.append(rv)
-        return rv
-
-    # Ensures that the decorator also binds correctly to methods (self/cls)
-    def __get__(self, obj: Any, objtype: type | None = None) -> Self | types.MethodType:
-        if obj is None:
-            return self
-        return types.MethodType(self, obj)  # bind 'obj' as first argument
-
-
-def store_retvals(func: Callable[P, T]) -> StoredRetvalsFunctor[P, T]:
-    """Decorator storing the return values as function attribute for later cleanups.
-
-    This can be used for instance in a generator like this:
-    ```
-    @pytest.fixture
-    def create_blank_db(notion, test_area):
-        @store_retvals
-        def nested_func(db_name):
-            db = notion.databases.create(
-                parent=test_area,
-                title=db_name,
-                schema={
-                    'Name': schema.Title(),
-                },
-            )
-            return db
-
-        yield nested_func
-
-        # clean up by deleting the db of each prior call
-        for db in nested_func.retvals:
-            notion.databases.delete(db)
-    ```
-    """
-    return StoredRetvalsFunctor(func)
-
-
 def find_indices(
     elements: NDArray[np.int_] | Sequence[Any], total_set: NDArray[np.int_] | Sequence[Any]
 ) -> NDArray[np.int_]:
@@ -187,53 +126,6 @@ def dict_diff_str(dct1: Mapping[KT, VT], dct2: Mapping[KT, VT]) -> tuple[list[st
     keys_removed_str = [str(k) for k in keys_removed]
     keys_changed_str = [f'{k}: {v[0]} -> {v[1]}' for k, v in values_changed.items()]
     return keys_added_str, keys_removed_str, keys_changed_str
-
-
-def convert_md_to_py(path: Path | str, *, target_path: Path | str | None = None) -> None:
-    """Converts a Markdown file to a py file by extracting all python codeblocks
-
-    Args:
-        path: Path to the Markdown file to convert
-        target_path: Path to save the new Python file. If not provided, the new file will be the same file with .py
-
-    !!! warning
-
-        If a file with the same name already exists, it will be overwritten.
-    """
-    if isinstance(path, str):
-        path = Path(path)
-    if not path.is_file():
-        msg = f'{path} is no file!'
-        raise RuntimeError(msg)
-
-    if target_path is None:
-        target_path = path.with_suffix('.py')
-    elif isinstance(target_path, str):
-        target_path = Path(target_path)
-
-    md_str = path.read_text()
-
-    def check_codeblock(block: str) -> str:
-        first_line = block.split('\n', maxsplit=1)[0]
-        if first_line[3:] != 'python':
-            return ''
-        return '\n'.join(block.split('\n')[1:])
-
-    docstring = textwrap.dedent(md_str)
-    in_block = False
-    block = ''
-    codeblocks = []
-    for line in docstring.split('\n'):
-        if line.startswith('```'):
-            if in_block:
-                codeblocks.append(check_codeblock(block))
-                block = ''
-            in_block = not in_block
-        if in_block:
-            block += line + '\n'
-    py_str = '\n'.join([c for c in codeblocks if c != ''])
-
-    target_path.with_suffix('.py').write_text(py_str)
 
 
 def str_hash(*args: str, n_chars: int = 16) -> str:
@@ -311,15 +203,6 @@ def parse_dt_str(dt_str: str) -> DateTimeOrRange:
         case _:
             msg = f'Unexpected parsing result of type {type(dt_spec)} for {dt_str}'
             raise TypeError(msg)
-
-
-def is_dt_str(dt_str: str) -> bool:
-    """Check if the given string is a valid datetime string."""
-    try:
-        parse_dt_str(dt_str)
-        return True
-    except (ValueError, TypeError):
-        return False
 
 
 def to_pendulum(dt_spec: str | DateTimeOrRange) -> DateTimeOrRange:
