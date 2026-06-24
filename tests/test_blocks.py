@@ -527,7 +527,7 @@ def test_modify_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 def test_modify_column_blocks_width_ratios(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for modifying column blocks with width ratios')
     with pytest.raises(TypeError):
-        uno.Columns((0.5, 'a', 0.5))  # type: ignore[arg-type]
+        uno.Columns((0.5, 'a', 0.5))  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 
     with pytest.raises(ValueError):
         uno.Columns((1, -2, 3))
@@ -550,7 +550,7 @@ def test_modify_column_blocks_width_ratios(root_page: uno.Page, notion: uno.Sess
         cols.width_ratios = (1, 2, 3, 4)
 
     with pytest.raises(TypeError):
-        cols.width_ratios = (1, 'a', 3)
+        cols.width_ratios = (1, 'a', 3)  # ty: ignore[invalid-assignment]
 
     with pytest.raises(ValueError):
         cols.width_ratios = (-1, 2, 3)

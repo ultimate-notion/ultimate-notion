@@ -44,10 +44,10 @@ class PageProperty(BaseModel):
     def __hash__(self) -> int:
         return hash((self.name, self.sort))
 
-    def __eq__(self, other: Any) -> Condition:  # type: ignore[override]
+    def __eq__(self, other: Any) -> Condition:  # type: ignore[override]  # ty: ignore[invalid-method-override]
         return Equals(prop=self, value=other)
 
-    def __ne__(self, other: Any) -> Condition:  # type: ignore[override]
+    def __ne__(self, other: Any) -> Condition:  # type: ignore[override]  # ty: ignore[invalid-method-override]
         return EqualsNot(prop=self, value=other)
 
     def __gt__(self, value: Any) -> Condition:
@@ -321,7 +321,7 @@ class IsEmpty(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
@@ -411,7 +411,7 @@ class Equals(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
@@ -496,7 +496,7 @@ class InEquality(PropertyCondition, ABC):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.NUMBER:
                         condition = obj_query.NumberCondition.model_validate({self._num_condition_kw: self.value})
@@ -600,7 +600,7 @@ class Contains(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
@@ -660,7 +660,7 @@ class StartsWith(PropertyCondition):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                     case _:
                         msg = f'Invalid rollup type `{rollup_type}` for condition {self}.'
                         raise FilterQueryError(msg)
@@ -728,7 +728,7 @@ class DateCondition(PropertyCondition, ABC):
                             raise FilterQueryError(msg)
 
                         kwargs = self._create_obj_ref_kwargs(db, prop_type.rollup_prop)
-                        condition = obj_query.RollupArrayCondition(**kwargs)
+                        condition = obj_query.RollupArrayCondition.model_validate(kwargs)
                         rollup_kwarg = self.prop.quantifier.value
                     case RollupType.DATE:
                         condition = obj_query.DateCondition.model_validate({self._condition_kw: self.value})

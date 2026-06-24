@@ -112,6 +112,14 @@ show_column_numbers = true
 pretty = true
 strict = true
 
+# ty configuration
+
+[tool.ty.src]
+include = ["src/ultimate_notion", "tests", "examples"]
+
+[tool.ty.analysis]
+respect-type-ignore-comments = false
+
 # Pytest configuration
 
 [tool.pytest.ini_options]
@@ -360,6 +368,7 @@ build-check = [
 dependencies = [
     "mypy==1.18.2",
     "ruff==0.14.5", # make sure this is consistent with .pre-commit-config.yaml, thus pinned!
+    "ty==0.0.51",
     "pyright~=1.1", # no automatic testing, just additionally to mypy
     "types-tabulate", # stubs for tabulate, otherwise mypy needs --install-types
     "pandas-stubs", # stubs for pandas
@@ -374,7 +383,9 @@ dependencies = [
 [tool.hatch.envs.lint.scripts]
 typing = [
     "echo \"VERSION: `mypy --version`\"",
-    "mypy --install-types --non-interactive {args}"
+    "mypy --install-types --non-interactive {args}",
+    "echo \"VERSION: `ty --version`\"",
+    "ty check {args}"
 ]
 style = [
     "echo \"VERSION: `ruff --version`\"",
