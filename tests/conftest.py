@@ -572,10 +572,10 @@ def vcr_fixture(
             else:
                 mode = request.config.getoption('--record-mode')
                 if mode == 'rewrite':
-                    # Re-record fixture cassettes live (real ids) on every module. Replaying an
-                    # already-normalised fixture cassette mid-record would feed placeholder ids back
-                    # to the code, which then 404s on live calls. Deterministic fixtures (e.g. the
-                    # `Tests` search) re-record identically, so the shared cassettes stay consistent.
+                    # Re-record the shared fixture cassettes live (with real ids) on every rewrite.
+                    # Replaying them (e.g. via `new_episodes`) would feed back the workspace-portable
+                    # placeholder ids written by the normalisation, 404ing later modules in a full-suite
+                    # re-record. Deterministic fixtures (e.g. `search('Tests')`) re-record identically.
                     mode = 'all'
                 elif mode is None:
                     mode = 'none'
