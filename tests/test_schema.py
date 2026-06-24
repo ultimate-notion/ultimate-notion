@@ -512,7 +512,7 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
         my_cat = uno.PropType.Select('Category', options=options)
         my_tags = uno.PropType.MultiSelect('Tags', options=options)
 
-    ConsistentSchema.bind_db(db)
+    ConsistentSchema.bind_ds(db)
 
     # Check the schema attribute names
     assert isinstance(db.schema.my_name, uno.PropType.Title)
@@ -582,20 +582,20 @@ def test_bind_db_auto(notion: uno.Session) -> None:
         urgency = uno.PropType.Formula('Urgency', formula=formula)
 
     with pytest.raises(InvalidAPIUsageError):
-        TaskBase.bind_db()
+        TaskBase.bind_ds()
     assert not TaskBase.is_bound()
 
     class TaskWithDbId(TaskBase, db_id='0000000000004000800000000000000c'):
         """Schema with a reference to a database by ID"""
 
-    TaskWithDbId.bind_db()
+    TaskWithDbId.bind_ds()
     assert TaskWithDbId.is_bound()
     assert not TaskBase.is_bound()
 
     class TaskWithDbTitle(TaskBase, db_title='Task DB'):
         """Schema with a reference to a database by title"""
 
-    TaskWithDbTitle.bind_db()
+    TaskWithDbTitle.bind_ds()
     assert TaskWithDbTitle.is_bound()
 
 
