@@ -55,7 +55,6 @@ from ultimate_notion.utils import SList, dict_diff_str, display_html, is_noteboo
 
 if TYPE_CHECKING:
     from ultimate_notion.database import Database
-    from ultimate_notion.obj_api.core import UnsetType
     from ultimate_notion.page import Page
 
 T = TypeVar('T')
@@ -1206,14 +1205,6 @@ class Schema(metaclass=SchemaType):
 
         db.schema = cls
         cls._bind_db(db)
-
-    @classmethod
-    def _get_fwd_rels(cls) -> list[Relation]:
-        return [
-            prop
-            for prop in cls.get_props()
-            if isinstance(prop, Relation) and not (prop._is_two_way_target or prop.is_self_ref)
-        ]
 
     @classmethod
     def _get_self_refs(cls) -> list[Relation]:

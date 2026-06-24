@@ -172,11 +172,6 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
 
     _children: list[Block | Page | Database] | None = None
 
-    @property
-    def _has_children_field(self) -> bool:
-        """Return whether the object has a `children` field."""
-        return isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren)
-
     def _gen_children_cache(self) -> list[Block | Page | Database]:
         """Generate the children cache."""
         if self.is_deleted:
