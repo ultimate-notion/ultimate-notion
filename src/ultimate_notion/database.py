@@ -15,9 +15,10 @@ from typing_extensions import Self, TypeVar
 from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr, resolve_ref
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
-from ultimate_notion.errors import ReadOnlyPropertyError, SchemaError, SListError, UnsetError
+from ultimate_notion.errors import InvalidAPIUsageError, ReadOnlyPropertyError, SchemaError, SListError, UnsetError
 from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api import blocks as obj_blocks
+from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.page import Page
 from ultimate_notion.query import Query
@@ -149,6 +150,40 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         if is_unset(inline := self.obj_ref.is_inline):
             raise UnsetError()
         return inline
+
+    @is_inline.setter
+    def is_inline(self, inline: bool) -> None:
+        """Set whether the data source's database is displayed inline on its parent page."""
+        self._update_container_db(inline=inline)
+
+    # `description` and `is_inline` live on the containing database, not the data source. The API
+    # mirrors them onto the data-source response (read-only), so writing them requires updating the
+    # database; we then refresh `obj_ref` so the local getters reflect the change.
+    @property
+    def description(self) -> Text | None:
+        """Return the description of this data source as rich text."""
+        if is_unset(desc := self.obj_ref.description):
+            raise UnsetError()
+        return Text.wrap_obj_ref(desc) if desc else None
+
+    @description.setter
+    def description(self, text: str | Text | None) -> None:
+        """Set the description of this data source (stored on its containing database)."""
+        if text is None:
+            text = ''
+        if not isinstance(text, Text):
+            text = Text.from_plain_text(text)
+        self._update_container_db(description=text.obj_ref)
+
+    def _update_container_db(self, **fields: Any) -> None:
+        """Update the containing database (where `description`/`is_inline` live) and refresh self."""
+        session = get_active_session()
+        if not isinstance(parent := self.obj_ref.parent, objs.DatabaseRef):
+            msg = f'Data source `{self.id}` has no database parent (got `{type(parent).__name__}`).'
+            raise InvalidAPIUsageError(msg)
+        db_ref = obj_blocks.Database.model_construct(id=parent.database_id)
+        session.api.databases.update(db_ref, **fields)
+        self.obj_ref = session.api.data_sources.retrieve(self.id)
 
     def delete(self) -> Self:
         """Delete this data source."""

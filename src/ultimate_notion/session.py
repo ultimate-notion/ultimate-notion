@@ -215,13 +215,15 @@ class Session:
         schema_dct = {prop.name: prop.obj_ref for prop in ds_schema.get_props() if prop._is_init_ready}
         # The Create Database endpoint creates the container and its initial data source in one call.
         db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct, title=title_obj, inline=inline)
+        # `description` lives on the database container; set it before retrieving the data source so the
+        # data-source response (which mirrors the database's description) reflects it.
+        if schema and schema._db_desc:
+            self.api.databases.update(db_obj, description=schema._db_desc.obj_ref)
         ds_obj = self.api.data_sources.retrieve(db_obj.data_sources[0].id)
 
         ds: DataSource = DataSource.wrap_obj_ref(ds_obj)
 
         if schema:
-            if schema._db_desc:
-                self.api.data_sources.update(ds_obj, description=schema._db_desc.obj_ref)
             ds._set_schema(schema, during_init=True)  # schema is thus bound to the data source
             schema._init_self_refs()
             schema._init_self_ref_rollups()
