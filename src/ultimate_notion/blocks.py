@@ -28,7 +28,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, TypeGuard, overload
+from typing import TYPE_CHECKING, Any, Generic, TypeGuard, overload
 
 import numpy as np
 from tabulate import tabulate
@@ -1561,13 +1561,22 @@ class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.Unsupport
         return '<kbd>Unsupported block</kbd>\n'
 
 
-@dataclass
-class _Node:
-    """Tree of nodes used to chunk blocks for the Notion API."""
+# ToDo: Use new syntax when requires-python >= 3.12
+# Covariant so a child node (`_Node[Block]`) is usable where a root node (`_Node[Block | Page]`) is
+# expected; sound because `_Node` is frozen and `block` is therefore read-only.
+NB_co = TypeVar('NB_co', bound='Block | Page', default='Block | Page', covariant=True)
 
-    block: Block | Page
+
+@dataclass(frozen=True)
+class _Node(Generic[NB_co]):
+    """Tree of nodes used to chunk blocks for the Notion API.
+
+    Only a root node wraps a `Page`; every node held in `children` wraps a `Block`.
+    """
+
+    block: NB_co
     is_root: bool = False
-    children: list[_Node] = field(default_factory=list)
+    children: list[_Node[Block]] = field(default_factory=list)
 
 
 def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iterator[_Node]:
@@ -1624,8 +1633,9 @@ def _build_obj_ref(node: _Node) -> Block:
         raise TypeError(msg)
     value = block.obj_ref.value
     if isinstance(block, ParentBlock) and block.has_children and isinstance(value, obj_blocks.WithChildren):
-        child_blocks = [_build_obj_ref(child) for child in children]
-        value.children = [child_block.obj_ref for child_block in child_blocks]
+        for child in node.children:
+            _build_obj_ref(child)
+        value.children = [child.block.obj_ref for child in children]
     return block
 
 
