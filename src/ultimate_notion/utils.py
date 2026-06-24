@@ -201,29 +201,23 @@ def deepcopy_with_sharing(obj: T, shared_attributes: Sequence[str], memo: dict[i
         assert c.copy_me is not b.copy_me
         assert c.share_me is b.share_me
         ```
-
-    Original from https://stackoverflow.com/a/24621200
     """
-    shared_attrs = {k: getattr(obj, k) for k in shared_attributes}
+    if memo is None:
+        memo = {}
 
-    deepcopy_method = getattr(obj, '__deepcopy__', None)
-    if deepcopy_method is not None:
-        # Do hack to prevent infinite recursion in call to deepcopy
-        obj.__dict__['__deepcopy__'] = None
+    shared = set(shared_attributes)
+    cls = type(obj)
+    clone = cls.__new__(cls)
+    # Register the clone before recursing so cyclic references (including `obj`
+    # referring back to itself) resolve to the clone instead of re-dispatching
+    # to `obj.__deepcopy__` and recursing forever.
+    memo[id(obj)] = clone
 
-    for attr in shared_attributes:
-        del obj.__dict__[attr]
-
-    clone = deepcopy(obj, memo)
-
-    for attr, val in shared_attrs.items():
-        setattr(obj, attr, val)
-        setattr(clone, attr, val)
-
-    if deepcopy_method is not None:
-        # Undo hack
-        obj.__dict__['__deepcopy__'] = deepcopy_method
-        del clone.__dict__['__deepcopy__']
+    for attr, value in vars(obj).items():
+        if attr in shared:
+            setattr(clone, attr, value)  # share by reference
+        else:
+            setattr(clone, attr, deepcopy(value, memo))
 
     return clone
 
