@@ -153,8 +153,8 @@ WorkspaceType: TypeAlias = Literal[_Workspace.ROOT]
 NE_co = TypeVar('NE_co', bound=obj_core.NotionEntity, default=obj_core.NotionEntity, covariant=True)
 
 
-def resolve_ref(obj_ref: obj_core.NotionEntity) -> NotionEntity | WorkspaceType | None:
-    """Resolve a low-level NotionEntity reference to a high-level NotionEntity object."""
+def resolve_ref(obj_ref: obj_core.ParentRef) -> NotionEntity | WorkspaceType | None:
+    """Resolve a low-level parent reference to the high-level NotionEntity it points to."""
     session = get_active_session()
     match obj_ref:
         case objs.WorkspaceRef():

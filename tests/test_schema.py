@@ -135,13 +135,13 @@ def test_all_createable_props_schema(
 
 
 @pytest.mark.vcr()
-def test_all_props_schema(all_props_db: uno.Database) -> None:
+def test_all_props_schema(all_props_db: uno.DataSource) -> None:
     schema_dct = all_props_db.schema.to_dict()
     assert len(schema_dct) == 27
 
 
 @pytest.mark.vcr()
-def test_wiki_db_schema(wiki_db: uno.Database) -> None:
+def test_wiki_db_schema(wiki_db: uno.DataSource) -> None:
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
     wiki_db.get_all_pages()

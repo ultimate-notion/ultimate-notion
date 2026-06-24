@@ -8,7 +8,7 @@ from ultimate_notion.props import Title
 
 
 @pytest.mark.vcr()
-def test_retrieve_property(notion: uno.Session, all_props_db: uno.Database) -> None:
+def test_retrieve_property(notion: uno.Session, all_props_db: uno.DataSource) -> None:
     page = all_props_db.get_all_pages().to_pages()[0]
     page_obj = page.obj_ref
     page_props = page.props._obj_prop_vals

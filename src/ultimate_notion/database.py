@@ -46,13 +46,16 @@ class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
 
     @title.setter
     def title(self, text: str | Text | None) -> None:
-        """Set the title of this data source."""
+        """Set the title of this data source or database."""
         if text is None:
             text = ''
         if not isinstance(text, Text):
             text = Text.from_plain_text(text)
         session = get_active_session()
-        session.api.data_sources.update(self.obj_ref, title=text.obj_ref)
+        if isinstance(obj_ref := self.obj_ref, obj_blocks.Database):
+            session.api.databases.update(obj_ref, title=text.obj_ref)
+        else:
+            session.api.data_sources.update(obj_ref, title=text.obj_ref)
 
     @property
     def description(self) -> Text | None:
@@ -65,13 +68,16 @@ class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
 
     @description.setter
     def description(self, text: str | Text | None) -> None:
-        """Set the description of this data source."""
+        """Set the description of this data source or database."""
         if text is None:
             text = ''
         if not isinstance(text, Text):
             text = Text.from_plain_text(text)
         session = get_active_session()
-        session.api.data_sources.update(self.obj_ref, description=text.obj_ref)
+        if isinstance(obj_ref := self.obj_ref, obj_blocks.Database):
+            session.api.databases.update(obj_ref, description=text.obj_ref)
+        else:
+            session.api.data_sources.update(obj_ref, description=text.obj_ref)
 
     @property
     def icon(self) -> AnyFile | Emoji | CustomEmoji | BuiltInIcon | None:

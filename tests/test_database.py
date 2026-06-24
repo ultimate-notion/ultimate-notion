@@ -19,7 +19,7 @@ from .conftest import CONTACTS_DB
 
 
 @pytest.mark.vcr()
-def test_schema(article_db: uno.Database) -> None:
+def test_schema(article_db: uno.DataSource) -> None:
     ref_schema = article_db.schema
     assert article_db.title == 'Articles'
 
@@ -118,7 +118,7 @@ def test_db_with_docstring(notion: uno.Session, root_page: uno.Page) -> None:
 
 
 @pytest.mark.vcr()
-def test_db_attributes(contacts_db: uno.Database) -> None:
+def test_db_attributes(contacts_db: uno.DataSource) -> None:
     assert contacts_db.title == CONTACTS_DB
     assert contacts_db.description == 'Database of all my contacts!'
     assert isinstance(contacts_db.icon, str)
@@ -130,7 +130,7 @@ def test_db_attributes(contacts_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_title_setter(notion: uno.Session, article_db: uno.Database) -> None:
+def test_title_setter(notion: uno.Session, article_db: uno.DataSource) -> None:
     old_title = 'Articles'
     assert article_db.title == old_title
     new_title = 'My most favorite articles'
@@ -147,7 +147,7 @@ def test_title_setter(notion: uno.Session, article_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_description_setter(notion: uno.Session, article_db: uno.Database) -> None:
+def test_description_setter(notion: uno.Session, article_db: uno.DataSource) -> None:
     assert article_db.description is None
 
     new_description = 'My most favorite articles'
@@ -207,7 +207,7 @@ def test_more_than_max_page_size_pages(notion: uno.Session, root_page: uno.Page)
 
 
 @pytest.mark.vcr()
-def test_property_description(contacts_db: uno.Database) -> None:
+def test_property_description(contacts_db: uno.DataSource) -> None:
     assert contacts_db.schema['Title'].description == 'Title within the company'
 
 
@@ -270,6 +270,6 @@ def test_get_or_create_db(notion: uno.Session, root_page: uno.Page) -> None:  # 
 
 
 @pytest.mark.vcr()
-def test_new_task_db(new_task_db: uno.Database) -> None:
+def test_new_task_db(new_task_db: uno.DataSource) -> None:
     # ToDo: Implement a proper test
     pass

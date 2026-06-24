@@ -469,7 +469,7 @@ def test_query_new_task_db(new_task_db: uno.DataSource) -> None:
 
 
 @pytest.mark.vcr()
-def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.Database) -> None:
+def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.DataSource) -> None:
     item_1, item_2 = formula_db.get_all_pages()
     query = formula_db.query.filter(uno.prop('String') == 'Item 1')
     assert set(query.execute()) == {item_1}
@@ -639,7 +639,7 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_id_prop(all_props_db: uno.Database) -> None:
+def test_id_prop(all_props_db: uno.DataSource) -> None:
     all_pages = all_props_db.get_all_pages()
 
     query = all_props_db.query.filter(uno.prop('ID') != 42)

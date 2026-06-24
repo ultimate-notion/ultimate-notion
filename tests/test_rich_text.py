@@ -55,7 +55,7 @@ def test_is_url() -> None:
 def test_mention(
     person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.DataSource, notion: uno.Session
 ) -> None:
-    def mention_url(obj: uno.Page | uno.Database) -> str:
+    def mention_url(obj: uno.Page | uno.DataSource) -> str:
         parsed = urlparse(obj.url)
         prefix = '/p' if parsed.hostname == 'app.notion.com' else ''
         return f'{parsed.scheme}://{parsed.netloc}{prefix}/{obj.id.hex}'

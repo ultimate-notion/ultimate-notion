@@ -31,6 +31,7 @@ from ultimate_notion.obj_api.core import (
     Unset,
     UnsetType,
     UserRef,
+    is_unset,
 )
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
@@ -39,6 +40,7 @@ from ultimate_notion.obj_api.objects import (
     BlockRef,
     BuiltInIconObject,
     CustomEmojiObject,
+    DatabaseRef,
     EmojiObject,
     FileObject,
     MentionDatabase,
@@ -84,7 +86,10 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         # Notion 2025-09-03 has no `data_source` mention type, only `database`. Mention the
         # containing database (the data source's parent) while keeping this data source's title.
-        return MentionDatabase.build_mention_from(self.parent, style=style, title=self.title)
+        if is_unset(parent := self.parent) or not isinstance(parent, DatabaseRef):
+            msg = f'Cannot build a mention for data source `{self.id}` without a database parent.'
+            raise RuntimeError(msg)
+        return MentionDatabase.build_mention_from(parent, style=style, title=self.title)
 
 
 class DataSourceRefInfo(GenericObject):

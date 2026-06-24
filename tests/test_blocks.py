@@ -1033,7 +1033,7 @@ def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) ->
 
 @pytest.mark.vcr()
 def test_local_remote_mention_block_cmp(
-    root_page: uno.Page, notion: uno.Session, person: uno.User, task_db: uno.Database
+    root_page: uno.Page, notion: uno.Session, person: uno.User, task_db: uno.DataSource
 ) -> None:
     # Test user mention
     page = notion.create_page(parent=root_page, title='Test Local Remote User Mention Block CMP')

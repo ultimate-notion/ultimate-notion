@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
-from ultimate_notion import Database, Page, Property
+from ultimate_notion import DataSource, Page, Property
 from ultimate_notion.adapters.google.tasks.client import GTask, GTaskList
 from ultimate_notion.adapters.sync import ID, ConflictMode, SyncTask
 from ultimate_notion.core import get_active_session
@@ -19,7 +19,7 @@ class SyncGTasks(SyncTask):
     def __init__(
         self,
         *,
-        notion_db: Database,
+        notion_db: DataSource,
         tasklist: GTaskList,
         completed_col: Property | str,
         completed_val: Any,
