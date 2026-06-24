@@ -298,21 +298,34 @@ class DataSourcesEndpoint(Endpoint):
             data = self._as_dict(self.raw_api.update(str(ds.id), **request))
             ds.update(**data)
 
+    @staticmethod
+    def _container_db_id(ds: DataSource) -> UUID:
+        """Return the id of the database that contains this data source.
+
+        The 2025-09-03 API has no endpoint to delete/restore an individual data source; instead
+        the containing database (which is the block on the page) is archived/restored. A data
+        source's `parent` is always the `DatabaseRef` of its container.
+        """
+        if not isinstance(parent := ds.parent, DatabaseRef):
+            msg = f'Data source `{ds.id}` has no database parent (got `{type(parent).__name__}`), cannot delete/restore'
+            raise RuntimeError(msg)
+        return parent.database_id
+
     def delete(self, ds: DataSource) -> DataSource:
-        """Delete (archive) the specified DataSource."""
-        ds_id = DataSourceRef.build(ds).data_source_id
-        _logger.debug(f'Deleting data source with id `{ds_id}`.')
-        block_obj = self.api.blocks.delete(str(ds_id))
+        """Delete (archive) the database containing the specified DataSource."""
+        db_id = self._container_db_id(ds)
+        _logger.debug(f'Deleting database `{db_id}` containing data source `{ds.id}`.')
+        block_obj = self.api.blocks.delete(str(db_id))
         # block.update(**data) is not possible as the API returns a block, not a data source
         ds.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
         ds.in_trash = block_obj.in_trash
         return ds
 
     def restore(self, ds: DataSource) -> DataSource:
-        """Restore (unarchive) the specified DataSource."""
-        ds_id = DataSourceRef.build(ds).data_source_id
-        _logger.debug(f'Restoring data source with id `{ds_id}`.')
-        block_obj = self.api.blocks.restore(str(ds_id))
+        """Restore (unarchive) the database containing the specified DataSource."""
+        db_id = self._container_db_id(ds)
+        _logger.debug(f'Restoring database `{db_id}` containing data source `{ds.id}`.')
+        block_obj = self.api.blocks.restore(str(db_id))
         # block.update(**data) is not possible as the API returns a block, not a data source
         ds.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
         ds.in_trash = block_obj.in_trash
@@ -374,13 +387,24 @@ class DatabasesEndpoint(Endpoint):
         self,
         parent: Page,
         *,
+        schema: Mapping[str, Property] | None = None,
         title: list[RichTextBaseObject] | None = None,
         inline: bool = False,
     ) -> Database:
-        """Create a new database container in the given Page parent."""
+        """Create a new database container in the given Page parent.
+
+        In API version 2025-09-03+ a database is created together with its first data source,
+        whose schema (properties) is passed via the `initial_data_source` payload. This is the
+        only supported way to create a data source under a page; the `data_sources` endpoint
+        only adds further data sources to an existing database.
+        """
         parent_ref = PageRef.build(parent)
         _logger.debug(f'Creating new database below page with id `{parent_ref.page_id}`.')
         request = self._build_request(parent=parent_ref, title=title, inline=inline)
+        if schema is not None:
+            request['initial_data_source'] = {
+                'properties': {name: value.serialize_for_api() for name, value in schema.items()}
+            }
         data = self.raw_api.create(**request)
         return Database.model_validate(data)
 

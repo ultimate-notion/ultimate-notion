@@ -185,8 +185,14 @@ class Session:
         _logger.info(f'Retrieved `{type(block)}` block.')
         return block
 
-    def create_ds(self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None) -> DataSource:
+    def create_ds(
+        self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
+    ) -> DataSource:
         """Create a new data source within a page.
+
+        In API version 2025-09-03+ a data source under a page is created via the Create Database
+        endpoint, which creates the database container together with its initial data source. This
+        method returns that data source. Pass `inline=True` to display the database inline on the page.
 
         In case a title and a schema are provided, title overrides the schema's `db_title` attribute if it exists.
         """
@@ -207,7 +213,9 @@ class Session:
 
         title_obj = title.obj_ref if title is not None else None
         schema_dct = {prop.name: prop.obj_ref for prop in ds_schema.get_props() if prop._is_init_ready}
-        ds_obj = self.api.data_sources.create(parent=parent.obj_ref, title=title_obj, schema=schema_dct)
+        # The Create Database endpoint creates the container and its initial data source in one call.
+        db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct, title=title_obj, inline=inline)
+        ds_obj = self.api.data_sources.retrieve(db_obj.data_sources[0].id)
 
         ds: DataSource = DataSource.wrap_obj_ref(ds_obj)
 

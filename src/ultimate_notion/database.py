@@ -143,6 +143,13 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         """Return whether the object is a data source."""
         return True
 
+    @property
+    def is_inline(self) -> bool:
+        """Return whether the data source's database is displayed inline on its parent page."""
+        if is_unset(inline := self.obj_ref.is_inline):
+            raise UnsetError()
+        return inline
+
     def delete(self) -> Self:
         """Delete this data source."""
         if not self.is_deleted:
