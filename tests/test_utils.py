@@ -134,7 +134,7 @@ def test_to_pendulum(tz_berlin: str) -> None:
     assert datetime == pnd.datetime(2021, 1, 1, 10, 0, 0, tz='UTC')
 
     with pytest.raises(TypeError):
-        utils.to_pendulum(pnd.duration(days=21))  # type: ignore
+        utils.to_pendulum(pnd.duration(days=21))  # type: ignore[arg-type]
 
 
 def test_flatten() -> None:
