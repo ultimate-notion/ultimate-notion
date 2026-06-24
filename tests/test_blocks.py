@@ -1069,9 +1069,9 @@ def test_local_remote_mention_block_cmp(
     assert page.children[0] == block_child
     assert page.children[0] == another_block_child
 
-    # Test database mention
+    # Test database mention (mentions reference the container database, not the data source)
     page = notion.create_page(parent=root_page, title='Test Local Remote Database Mention Block CMP')
-    db_obj_ref = ObjectRef(id=task_db.id)
+    db_obj_ref = ObjectRef(id=task_db.database_id)
     mention_obj = objs.MentionDatabase.build_mention_from(db=db_obj_ref, style=objs.Annotations())
     mention_text = Text.wrap_obj_ref(obj_refs=[mention_obj])
 

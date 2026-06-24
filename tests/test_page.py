@@ -89,13 +89,16 @@ def test_icon_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.get_page(new_page.id)
     assert new_page.icon == uno.Emoji(emoji_icon)
 
+    # A `notion.so/icons/...` gallery URL is recognised by Notion as a built-in icon, so it round-trips
+    # as a `BuiltInIcon` (with a name and colour) rather than an external file.
     notion_icon_url = 'https://www.notion.so/icons/snake_purple.svg'
     new_page.icon = uno.url(notion_icon_url)
-    assert isinstance(new_page.icon, uno.AnyFile)
-    assert new_page.icon == uno.ExternalFile(url=notion_icon_url)
+    assert isinstance(new_page.icon, uno.BuiltInIcon)
+    assert str(new_page.icon) == ':snake:'
 
     new_page.reload()
-    assert new_page.icon == uno.ExternalFile(url=notion_icon_url)
+    assert isinstance(new_page.icon, uno.BuiltInIcon)
+    assert str(new_page.icon) == ':snake:'
 
     new_page.icon = None
     new_page.reload()

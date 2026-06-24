@@ -593,15 +593,20 @@ def test_bind_db_auto(notion: uno.Session) -> None:
         TaskBase.bind_ds()
     assert not TaskBase.is_bound()
 
-    class TaskWithDbId(TaskBase, db_id='0000000000004000800000000000000c'):
-        """Schema with a reference to a database by ID"""
+    # Bind by id, using the real Task DB data source id so the interaction can be recorded live
+    # (a hardcoded id is not resolvable on record). The workspace-portable normalisation rewrites it
+    # to a stable placeholder in the cassette, so the recording stays reproducible across workspaces.
+    task_ds = notion.search_ds('Task DB').item()
+
+    class TaskWithDbId(TaskBase, db_id=str(task_ds.id)):
+        """Schema with a reference to a data source by ID"""
 
     TaskWithDbId.bind_ds()
     assert TaskWithDbId.is_bound()
     assert not TaskBase.is_bound()
 
     class TaskWithDbTitle(TaskBase, db_title='Task DB'):
-        """Schema with a reference to a database by title"""
+        """Schema with a reference to a data source by title"""
 
     TaskWithDbTitle.bind_ds()
     assert TaskWithDbTitle.is_bound()

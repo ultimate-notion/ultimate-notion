@@ -8,6 +8,7 @@ In API version 2025-09-03+:
 from __future__ import annotations
 
 from typing import Any
+from uuid import UUID
 
 from pydantic import ValidationError
 from typing_extensions import Self, TypeVar
@@ -265,6 +266,19 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
     def db_parent(self) -> NotionEntity | WorkspaceType | None:
         """Alias of `parent`: the parent of this data source's (transparent) database container."""
         return self.parent
+
+    @property
+    def database_id(self) -> UUID:
+        """Return the id of the database container that holds this data source.
+
+        The container is transparent in the hierarchy (`parent`/`ancestors` skip it), but it is what a
+        mention or the public URL of this data source actually points to, so its id is exposed here.
+        Use `session.get_db(ds.database_id)` to retrieve the container `Database` object itself.
+        """
+        if not isinstance(parent := self.obj_ref.parent, objs.DatabaseRef):
+            msg = f'Data source `{self.id}` has no database parent (got `{type(parent).__name__}`).'
+            raise RuntimeError(msg)
+        return parent.database_id
 
     def __bool__(self) -> bool:
         """Overwrite default behaviour."""
