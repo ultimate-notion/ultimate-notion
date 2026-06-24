@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from abc import ABC
 from typing import Annotated, Any, Generic
+from uuid import UUID
 
 from pydantic import AfterValidator, Field, SerializeAsAny
 from typing_extensions import TypeVar
@@ -38,7 +39,6 @@ from ultimate_notion.obj_api.objects import (
     BlockRef,
     BuiltInIconObject,
     CustomEmojiObject,
-    DataSourceRef,
     EmojiObject,
     FileObject,
     MentionDatabase,
@@ -86,6 +86,17 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
         return MentionDataSource.build_mention_from(self, style=style)
 
 
+class DataSourceRefInfo(GenericObject):
+    """A lightweight `{id, name}` reference to a data source as listed inside a `Database`.
+
+    The `data_sources` field of a database response carries these slim entries, not full
+    data-source objects; use `Session.get_ds(id)` to resolve one to a full `DataSource`.
+    """
+
+    id: UUID
+    name: str
+
+
 class Database(DataObject, MentionMixin, object='database'):
     """A database container that can hold multiple data sources (new in API 2025-09-03+).
 
@@ -100,7 +111,8 @@ class Database(DataObject, MentionMixin, object='database'):
     cover: SerializeAsAny[FileObject] | None = None
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
-    data_sources: list[DataSourceRef] = Field(default_factory=list)
+    is_locked: bool | UnsetType = Unset
+    data_sources: list[DataSourceRefInfo] = Field(default_factory=list)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionDatabase.build_mention_from(self, style=style)

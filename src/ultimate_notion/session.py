@@ -18,9 +18,15 @@ from notion_client.errors import APIResponseError
 
 from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
-from ultimate_notion.database import DataSource
+from ultimate_notion.database import Database, DataSource
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import SessionError, UnknownDataSourceError, UnknownPageError, UnknownUserError
+from ultimate_notion.errors import (
+    SessionError,
+    UnknownDatabaseError,
+    UnknownDataSourceError,
+    UnknownPageError,
+    UnknownUserError,
+)
 from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_size, get_mime_type
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
@@ -258,6 +264,24 @@ class Session:
             self.cache[ds.id] = ds
         _logger.info(f'Retrieved data source `{ds.title}`.')
         return ds
+
+    def get_db(self, db_ref: UUID | str, *, use_cache: bool = True) -> Database:
+        """Retrieve a Notion database (a container of data sources) by uuid."""
+        db_uuid = get_uuid(db_ref)
+        if use_cache and db_uuid in self.cache:
+            _logger.info(f'Retrieving cached database with id `{db_uuid}`.')
+            db = self._cache_get(db_uuid, Database)
+        else:
+            _logger.info(f'Retrieving database with id `{db_uuid}`.')
+            try:
+                db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
+            except APIResponseError as e:
+                msg = f'Database with id `{db_uuid}` does not exist or is not accessible!'
+                _logger.warning(msg)
+                raise UnknownDatabaseError(msg) from e
+            self.cache[db.id] = db
+        _logger.info(f'Retrieved database `{db.title}`.')
+        return db
 
     def get_or_create_ds(self, parent: Page, schema: type[Schema]) -> DataSource:
         """Get or create the data source."""

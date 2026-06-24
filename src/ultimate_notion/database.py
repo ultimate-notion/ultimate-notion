@@ -297,7 +297,8 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
     @property
     def data_sources(self) -> SList[DataSource]:
         """Return all data sources in this database."""
-        return SList(DataSource.wrap_obj_ref(ds) for ds in self.obj_ref.data_sources)
+        session = get_active_session()
+        return SList(session.get_ds(ds.id) for ds in self.obj_ref.data_sources)
 
     @property
     def query(self) -> Query:
@@ -318,3 +319,11 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
         """Return whether the database is a wiki."""
         # ToDo: Implement using the verification property
         raise NotImplementedError
+
+    def to_markdown(self) -> str:
+        """Return the reference to this database as Markdown."""
+        return self._to_markdown()
+
+    def _to_markdown(self) -> str:
+        """Return the reference to this database as Markdown."""
+        return f'[**📚 {self.title}**]({self.block_url})\n'
