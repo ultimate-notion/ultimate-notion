@@ -83,6 +83,10 @@ jobs:
       run: hatch run ci
 
     - name: Coveralls Parallel
+      # Coverage reporting must never fail the build. In particular, the
+      # macOS runner's Homebrew refuses to load the coveralls formula from an
+      # untrusted tap, which would otherwise cancel the whole matrix. See #358.
+      continue-on-error: true
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.github_token }}
