@@ -82,11 +82,17 @@ jobs:
     - name: Run tests and track code coverage
       run: hatch run ci
 
+    # The macOS runner's Homebrew refuses to load the coveralls formula from
+    # the untrusted coverallsapp/coveralls tap, which the Coveralls action
+    # installs from. Trust the tap up front so the install succeeds. See #358.
+    - name: Trust Coveralls Homebrew tap (macOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew tap coverallsapp/coveralls
+        brew trust coverallsapp/coveralls
+
     - name: Coveralls Parallel
-      # Coverage reporting must never fail the build. In particular, the
-      # macOS runner's Homebrew refuses to load the coveralls formula from an
-      # untrusted tap, which would otherwise cancel the whole matrix. See #358.
-      continue-on-error: true
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.github_token }}
