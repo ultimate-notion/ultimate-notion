@@ -15,6 +15,9 @@ from notion_client import Client
 from notion_client.errors import HTTPResponseError
 
 import ultimate_notion as uno
+from ultimate_notion.rich_text import math as rt_math
+from ultimate_notion.rich_text import mention as rt_mention
+from ultimate_notion.rich_text import text as rt_text
 
 DEFAULT_ROOT_TITLE = 'Tests'
 MAX_REQUEST_ATTEMPTS = 5
@@ -83,6 +86,99 @@ def json_object(value: Any) -> dict[str, Any]:
 
 def rich_text(text: str) -> list[dict[str, Any]]:
     return [{'type': 'text', 'text': {'content': text}}]
+
+
+# The 12 intricately-styled paragraphs that `tests/test_markdown.py::test_rich_text_md`
+# expects on the `Markdown Text Test` page. Contrary to earlier belief, this rich text *is*
+# reproducible through the API (nested bold/italic/strikethrough/underline, inline code and
+# equations, a person and a self page-mention, mid-word links), so the bootstrap builds it
+# rather than leaving it as a manual UI step. The target markdown is the `correct_mds` list
+# in that test; `markdown_text_paragraphs` reproduces it segment by segment.
+_G = 'https://google.de/'
+_A = 'https://amazon.com/'
+
+# The first paragraph rendered to markdown -- used to detect an already-built page so the
+# bootstrap stays idempotent (a placeholder page renders to plain, unstyled text).
+MARKDOWN_TEXT_FIRST_MD = 'here is something **very** *simpel* and <u>underlined</u> as well as `code`'
+
+
+def markdown_text_paragraphs(notion: uno.Session, page: uno.Page) -> list[uno.Paragraph]:
+    """Return the 12 styled paragraphs for the `Markdown Text Test` page.
+
+    `page` is the page itself, needed for the self page-mention in paragraph 7; a workspace
+    member is used for that paragraph's person mention (the test neutralises the name).
+    """
+    t, m = rt_text, rt_math
+    users = notion.all_users()
+    person = next((u for u in users if getattr(u, 'is_person', False)), users[0])
+    parts = [
+        t('here is something ')
+        + t('very', bold=True)
+        + t(' ')
+        + t('simpel', italic=True)
+        + t(' and ')
+        + t('underlined', underline=True)
+        + t(' as well as ')
+        + t('code', code=True),
+        t('here is a sentence that was bolded ', bold=True)
+        + t('then', bold=True, italic=True)
+        + t(' typed.', bold=True),
+        t('here is a test sentence with ')
+        + t('many ', strikethrough=True)
+        + t('different ', strikethrough=True, bold=True)
+        + t('styles', strikethrough=True, bold=True, italic=True)
+        + t('.', strikethrough=True, bold=True),
+        t('here is another test with ')
+        + t('many ', strikethrough=True)
+        + t('different ', strikethrough=True, italic=True)
+        + t('styles', strikethrough=True, italic=True, bold=True)
+        + t('.', strikethrough=True, italic=True),
+        t('here is one more with a ')
+        + t('strange ', italic=True)
+        + t('style', italic=True, bold=True)
+        + t(' ')
+        + t('combination', bold=True),
+        t('here is one with an inline ')
+        + t('equa-', bold=True, strikethrough=True)
+        + t('tion', bold=True, strikethrough=True, italic=True)
+        + t(' ', bold=True)
+        + m('E=mc^2', bold=True, italic=True)
+        + t(' and', bold=True, italic=True)
+        + t(' no block equation'),
+        t('and here is one with ')
+        + t('person', bold=True, italic=True, strikethrough=True)
+        + t(' mention ', italic=True, strikethrough=True)
+        + rt_mention(person, italic=True, strikethrough=True)
+        + t(' and ')
+        + t('page mention ', bold=True)
+        + rt_mention(page, bold=True)
+        + t(' '),
+        t('here is one ')
+        + t('stretching over ', bold=True)
+        + t('many\n', bold=True, italic=True)
+        + t('many', bold=True, italic=True, strikethrough=True)
+        + t('\n', bold=True)
+        + t('lines', bold=True, strikethrough=True),
+        t('This is code, e.g. ')
+        + t('python', bold=True, code=True)
+        + t(' code\nnow stretching ', bold=True)
+        + t('over\nmany lines', bold=True, code=True),
+        t('This is a ')
+        + t('li', href=_G)
+        + t('n', bold=True, href=_G)
+        + t('k', href=_G)
+        + t(' and a ')
+        + t('first', strikethrough=True)
+        + t(' an')
+        + t('d ', strikethrough=True)
+        + t('second', strikethrough=True, underline=True)
+        + t(' stroke', strikethrough=True)
+        + t(' through')
+        + t(' word.', underline=True),
+        t('Half a ') + t('lin', href=_G) + t('k', href=_A) + t(' for two destinations'),
+        t('✨Magic ✨'),
+    ]
+    return [uno.Paragraph(part) for part in parts]
 
 
 class ContactRole(uno.OptionNS):
@@ -320,10 +416,7 @@ class Bootstrap:
                 uno.Paragraph('Welcome to the Ultimate Notion test workspace.'),
             ],
         )
-        self.create_page(
-            'Markdown Text Test',
-            blocks=[uno.Paragraph('Markdown rich-text fixture.')],
-        )
+        self.ensure_markdown_text_page()
         markdown_page = self.create_page(
             'Markdown Test',
             blocks=[uno.Heading1('Headline 1')],
@@ -346,6 +439,22 @@ class Bootstrap:
             'Comments',
             blocks=[uno.Heading1('Comments')],
         )
+
+    def ensure_markdown_text_page(self) -> None:
+        """Create the `Markdown Text Test` page and build its 12 styled rich-text paragraphs.
+
+        Idempotent: if the page already renders the expected first paragraph it is left
+        unchanged; otherwise its body is rebuilt (a freshly-created or placeholder page).
+        """
+        page = self.create_page('Markdown Text Test')
+        children = list(page.children)
+        if children and children[0].to_markdown() == MARKDOWN_TEXT_FIRST_MD:
+            typer.echo('Markdown Text Test: rich text already built')
+            return
+        for child in children:
+            child.delete()
+        page.append(markdown_text_paragraphs(self.notion, page))
+        typer.echo('Markdown Text Test: built 12 rich-text paragraphs')
 
     def audit_manual_objects(self) -> None:
         for title, kind in (
