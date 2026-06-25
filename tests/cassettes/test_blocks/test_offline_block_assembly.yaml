@@ -29,14 +29,14 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"29c974f3-b388-815f-8340-e8cc2ab9d7f9","created_time":"2025-10-30T15:35:00.000Z","last_edited_time":"2025-10-30T15:35:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
+    content: '{"object":"page","id":"38a9ce7b-60a4-8186-b3b3-e0ee30207208","created_time":"2026-06-25T14:36:00.000Z","last_edited_time":"2026-06-25T14:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
       for offline assembly","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
-      for offline assembly","href":null}]}},"url":"https://www.notion.so/Page-for-offline-assembly-29c974f3b388815f8340e8cc2ab9d7f9","public_url":null,"request_id":"658cf2b7-5297-4393-b422-14e025d9de36"}'
+      for offline assembly","href":null}]}},"url":"https://www.notion.so/Page-for-offline-assembly-38a9ce7b60a48186b3b3e0ee30207208","public_url":null,"archived":false,"request_id":"05d693c6-ff8a-4ca0-8e65-50d058113b25"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfc13eb1d9766-FRA
+      - a114b4d5590df40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -66,7 +66,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 658cf2b7-5297-4393-b422-14e025d9de36
+      - 05d693c6-ff8a-4ca0-8e65-50d058113b25
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -95,12 +95,12 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/pages/00000000-0000-4000-8000-000000000001
   response:
-    content: '{"object":"page","id":"00000000-0000-4000-8000-000000000001","created_time":"2022-08-22T15:47:00.000Z","last_edited_time":"2025-10-30T15:35:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-00000000000040008000000000000001","public_url":null,"request_id":"8a0b69aa-1250-472e-a04e-af444d1b0d57"}'
+    content: '{"object":"page","id":"00000000-0000-4000-8000-000000000001","created_time":"2026-06-18T15:44:00.000Z","last_edited_time":"2026-06-25T14:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-00000000000040008000000000000001","public_url":null,"archived":false,"request_id":"23de716d-8faf-4cd0-9aa7-d108a7634930"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfc170d629766-FRA
+      - a114b4d75eb1f40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -130,7 +130,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 8a0b69aa-1250-472e-a04e-af444d1b0d57
+      - 23de716d-8faf-4cd0-9aa7-d108a7634930
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -138,15 +138,15 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: "{\"children\":[{\"object\":\"block\",\"has_children\":true,\"in_trash\":false,\"archived\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
+    body: "{\"children\":[{\"object\":\"block\",\"type\":\"paragraph\",\"paragraph\":{\"children\":[],\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
       is the first block.\",\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false},\"text\":{\"content\":\"This
-      is the first block.\"}}],\"color\":\"default\",\"children\":[]}},{\"object\":\"block\",\"has_children\":true,\"in_trash\":false,\"archived\":false,\"type\":\"quote\",\"quote\":{\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
+      is the first block.\"}}],\"color\":\"default\"}},{\"object\":\"block\",\"type\":\"quote\",\"quote\":{\"children\":[],\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
       is a quote.\",\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false},\"text\":{\"content\":\"This
-      is a quote.\"}}],\"color\":\"default\",\"children\":[]}},{\"object\":\"block\",\"has_children\":true,\"in_trash\":false,\"archived\":false,\"type\":\"bulleted_list_item\",\"bulleted_list_item\":{\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
+      is a quote.\"}}],\"color\":\"default\"}},{\"object\":\"block\",\"type\":\"bulleted_list_item\",\"bulleted_list_item\":{\"children\":[],\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
       is a bullet point.\",\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false},\"text\":{\"content\":\"This
-      is a bullet point.\"}}],\"color\":\"default\",\"children\":[]}},{\"object\":\"block\",\"has_children\":true,\"in_trash\":false,\"archived\":false,\"type\":\"callout\",\"callout\":{\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
+      is a bullet point.\"}}],\"color\":\"default\"}},{\"object\":\"block\",\"type\":\"callout\",\"callout\":{\"children\":[],\"rich_text\":[{\"type\":\"text\",\"plain_text\":\"This
       is a callout.\",\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false},\"text\":{\"content\":\"This
-      is a callout.\"}}],\"color\":\"default\",\"children\":[],\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F4A1\"}}}]}"
+      is a callout.\"}}],\"color\":\"default\",\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F4A1\"}}}]}"
     headers:
       accept:
       - '*/*'
@@ -157,7 +157,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '1433'
+      - '1217'
       content-type:
       - application/json
       cookie:
@@ -169,22 +169,22 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/blocks/29c974f3-b388-815f-8340-e8cc2ab9d7f9/children
+    uri: https://api.notion.com/v1/blocks/38a9ce7b-60a4-8186-b3b3-e0ee30207208/children
   response:
-    content: "{\"object\":\"list\",\"results\":[{\"object\":\"block\",\"id\":\"29c974f3-b388-81e1-b77d-e55b699b31a0\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"archived\":false,\"in_trash\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-8169-b5fd-d109a3384054\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"in_trash\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is the first block.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is the first block.\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"29c974f3-b388-815a-b8b8-fdce237576d8\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"archived\":false,\"in_trash\":false,\"type\":\"quote\",\"quote\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is the first block.\",\"href\":null}],\"icon\":null,\"color\":\"default\"},\"archived\":false},{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-81e3-8431-c69724b8d2df\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"in_trash\":false,\"type\":\"quote\",\"quote\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is a quote.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is a quote.\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"29c974f3-b388-817f-a70b-f7646f7dfcb6\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"archived\":false,\"in_trash\":false,\"type\":\"bulleted_list_item\",\"bulleted_list_item\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is a quote.\",\"href\":null}],\"color\":\"default\"},\"archived\":false},{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-81cc-8c78-c8ab6538cc0c\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"in_trash\":false,\"type\":\"bulleted_list_item\",\"bulleted_list_item\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is a bullet point.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is a bullet point.\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"29c974f3-b388-812f-9d00-eccecb6c0494\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"archived\":false,\"in_trash\":false,\"type\":\"callout\",\"callout\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is a bullet point.\",\"href\":null}],\"color\":\"default\"},\"archived\":false},{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-8189-9022-c75bf3583414\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":false,\"in_trash\":false,\"type\":\"callout\",\"callout\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is a callout.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is a callout.\",\"href\":null}],\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F4A1\"},\"color\":\"default\"}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"block\",\"block\":{},\"request_id\":\"555401c5-b3bf-4e47-ae25-5c52798fd26a\"}"
+      is a callout.\",\"href\":null}],\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F4A1\"},\"color\":\"default\"},\"archived\":false}],\"next_cursor\":null,\"has_more\":false,\"type\":\"block\",\"block\":{},\"request_id\":\"01a54bd5-94fb-4cc6-907d-ef5f03846ebf\"}"
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfc1b88cc9766-FRA
+      - a114b4d8aabaf40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -214,7 +214,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 555401c5-b3bf-4e47-ae25-5c52798fd26a
+      - 01a54bd5-94fb-4cc6-907d-ef5f03846ebf
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -222,9 +222,9 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"children":[{"object":"block","has_children":false,"in_trash":false,"archived":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","plain_text":"This
+    body: '{"children":[{"object":"block","type":"paragraph","paragraph":{"children":[],"rich_text":[{"type":"text","plain_text":"This
       is a child paragraph.","annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false},"text":{"content":"This
-      is a child paragraph."}}],"color":"default","children":[]}}]}'
+      is a child paragraph."}}],"color":"default"}}]}'
     headers:
       accept:
       - '*/*'
@@ -235,7 +235,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '370'
+      - '315'
       content-type:
       - application/json
       cookie:
@@ -247,16 +247,16 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/blocks/29c974f3-b388-81e1-b77d-e55b699b31a0/children
+    uri: https://api.notion.com/v1/blocks/38a9ce7b-60a4-8169-b5fd-d109a3384054/children
   response:
-    content: '{"object":"list","results":[{"object":"block","id":"29c974f3-b388-815e-9660-e2bd0e50be3c","parent":{"type":"block_id","block_id":"29c974f3-b388-81e1-b77d-e55b699b31a0"},"created_time":"2025-10-30T15:35:00.000Z","last_edited_time":"2025-10-30T15:35:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"archived":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
+    content: '{"object":"list","results":[{"object":"block","id":"38a9ce7b-60a4-8147-8669-fd680b35e59b","parent":{"type":"block_id","block_id":"38a9ce7b-60a4-8169-b5fd-d109a3384054"},"created_time":"2026-06-25T14:36:00.000Z","last_edited_time":"2026-06-25T14:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
       is a child paragraph.","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"This
-      is a child paragraph.","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"4f791136-ba67-49d1-b83e-65a62a4885f6"}'
+      is a child paragraph.","href":null}],"icon":null,"color":"default"},"archived":false}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"923c8c4c-ce0e-4d27-b489-72bb2f4c99fd"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfc1f1b1c9766-FRA
+      - a114b4dc8de4f40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -286,7 +286,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 4f791136-ba67-49d1-b83e-65a62a4885f6
+      - 923c8c4c-ce0e-4d27-b489-72bb2f4c99fd
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -294,9 +294,9 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"children":[{"object":"block","has_children":false,"in_trash":false,"archived":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","plain_text":"This
+    body: '{"children":[{"object":"block","type":"paragraph","paragraph":{"children":[],"rich_text":[{"type":"text","plain_text":"This
       is a child paragraph of the quote.","annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false},"text":{"content":"This
-      is a child paragraph of the quote."}}],"color":"default","children":[]}}]}'
+      is a child paragraph of the quote."}}],"color":"default"}}]}'
     headers:
       accept:
       - '*/*'
@@ -307,7 +307,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '396'
+      - '341'
       content-type:
       - application/json
       cookie:
@@ -319,16 +319,16 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/blocks/29c974f3-b388-815a-b8b8-fdce237576d8/children
+    uri: https://api.notion.com/v1/blocks/38a9ce7b-60a4-81e3-8431-c69724b8d2df/children
   response:
-    content: '{"object":"list","results":[{"object":"block","id":"29c974f3-b388-8186-a4ab-d3ea556bb978","parent":{"type":"block_id","block_id":"29c974f3-b388-815a-b8b8-fdce237576d8"},"created_time":"2025-10-30T15:35:00.000Z","last_edited_time":"2025-10-30T15:35:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"archived":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
+    content: '{"object":"list","results":[{"object":"block","id":"38a9ce7b-60a4-8191-a3de-e6b4044b01ec","parent":{"type":"block_id","block_id":"38a9ce7b-60a4-81e3-8431-c69724b8d2df"},"created_time":"2026-06-25T14:36:00.000Z","last_edited_time":"2026-06-25T14:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
       is a child paragraph of the quote.","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"This
-      is a child paragraph of the quote.","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"b2bfec43-0916-4f83-b0bb-3eca88914027"}'
+      is a child paragraph of the quote.","href":null}],"icon":null,"color":"default"},"archived":false}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"1ee3cfa7-e900-4219-90d3-dc7b27269fb3"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfc22bdee9766-FRA
+      - a114b4e1adc0f40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -358,7 +358,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b2bfec43-0916-4f83-b0bb-3eca88914027
+      - 1ee3cfa7-e900-4219-90d3-dc7b27269fb3
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -366,9 +366,9 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"children":[{"object":"block","has_children":false,"in_trash":false,"archived":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","plain_text":"This
+    body: '{"children":[{"object":"block","type":"paragraph","paragraph":{"children":[],"rich_text":[{"type":"text","plain_text":"This
       is a child paragraph of the bullet point.","annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false},"text":{"content":"This
-      is a child paragraph of the bullet point."}}],"color":"default","children":[]}}]}'
+      is a child paragraph of the bullet point."}}],"color":"default"}}]}'
     headers:
       accept:
       - '*/*'
@@ -379,7 +379,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '410'
+      - '355'
       content-type:
       - application/json
       cookie:
@@ -391,16 +391,16 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/blocks/29c974f3-b388-817f-a70b-f7646f7dfcb6/children
+    uri: https://api.notion.com/v1/blocks/38a9ce7b-60a4-81cc-8c78-c8ab6538cc0c/children
   response:
-    content: '{"object":"list","results":[{"object":"block","id":"29c974f3-b388-815c-b92c-f4bf8544cd32","parent":{"type":"block_id","block_id":"29c974f3-b388-817f-a70b-f7646f7dfcb6"},"created_time":"2025-10-30T15:35:00.000Z","last_edited_time":"2025-10-30T15:35:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"archived":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
+    content: '{"object":"list","results":[{"object":"block","id":"38a9ce7b-60a4-81e4-990b-d8af84667484","parent":{"type":"block_id","block_id":"38a9ce7b-60a4-81cc-8c78-c8ab6538cc0c"},"created_time":"2026-06-25T14:36:00.000Z","last_edited_time":"2026-06-25T14:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
       is a child paragraph of the bullet point.","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"This
-      is a child paragraph of the bullet point.","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"601c403c-20e9-4816-8448-4dc4ba6fe9c2"}'
+      is a child paragraph of the bullet point.","href":null}],"icon":null,"color":"default"},"archived":false}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"0fc761a8-b5ee-4200-9391-8a289b586eed"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfc282a669766-FRA
+      - a114b4e76e99f40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -430,7 +430,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 601c403c-20e9-4816-8448-4dc4ba6fe9c2
+      - 0fc761a8-b5ee-4200-9391-8a289b586eed
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -438,9 +438,9 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"children":[{"object":"block","has_children":false,"in_trash":false,"archived":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","plain_text":"This
+    body: '{"children":[{"object":"block","type":"paragraph","paragraph":{"children":[],"rich_text":[{"type":"text","plain_text":"This
       is a child paragraph of the callout.","annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false},"text":{"content":"This
-      is a child paragraph of the callout."}}],"color":"default","children":[]}}]}'
+      is a child paragraph of the callout."}}],"color":"default"}}]}'
     headers:
       accept:
       - '*/*'
@@ -451,7 +451,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '400'
+      - '345'
       content-type:
       - application/json
       cookie:
@@ -463,16 +463,16 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/blocks/29c974f3-b388-812f-9d00-eccecb6c0494/children
+    uri: https://api.notion.com/v1/blocks/38a9ce7b-60a4-8189-9022-c75bf3583414/children
   response:
-    content: '{"object":"list","results":[{"object":"block","id":"29c974f3-b388-8164-859e-e3a5517602f6","parent":{"type":"block_id","block_id":"29c974f3-b388-812f-9d00-eccecb6c0494"},"created_time":"2025-10-30T15:35:00.000Z","last_edited_time":"2025-10-30T15:35:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"archived":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
+    content: '{"object":"list","results":[{"object":"block","id":"38a9ce7b-60a4-8170-ae2d-f42af57c299a","parent":{"type":"block_id","block_id":"38a9ce7b-60a4-8189-9022-c75bf3583414"},"created_time":"2026-06-25T14:36:00.000Z","last_edited_time":"2026-06-25T14:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"in_trash":false,"type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This
       is a child paragraph of the callout.","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"This
-      is a child paragraph of the callout.","href":null}],"color":"default"}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"2c2d684c-ee9c-4e36-83e9-62c4f5344d58"}'
+      is a child paragraph of the callout.","href":null}],"icon":null,"color":"default"},"archived":false}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"8c1d4892-0eeb-4477-af80-f06c3b83157c"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfc2cadca9766-FRA
+      - a114b4eaaf01f40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -502,7 +502,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 2c2d684c-ee9c-4e36-83e9-62c4f5344d58
+      - 8c1d4892-0eeb-4477-af80-f06c3b83157c
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -529,16 +529,16 @@ interactions:
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/pages/29c974f3-b388-815f-8340-e8cc2ab9d7f9
+    uri: https://api.notion.com/v1/pages/38a9ce7b-60a4-8186-b3b3-e0ee30207208
   response:
-    content: '{"object":"page","id":"29c974f3-b388-815f-8340-e8cc2ab9d7f9","created_time":"2025-10-30T15:35:00.000Z","last_edited_time":"2025-10-30T15:35:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"archived":false,"in_trash":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
+    content: '{"object":"page","id":"38a9ce7b-60a4-8186-b3b3-e0ee30207208","created_time":"2026-06-25T14:36:00.000Z","last_edited_time":"2026-06-25T14:36:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Page
       for offline assembly","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Page
-      for offline assembly","href":null}]}},"url":"https://www.notion.so/Page-for-offline-assembly-29c974f3b388815f8340e8cc2ab9d7f9","public_url":null,"request_id":"fa6c1294-99af-4750-8e3d-2fba04cfbfb9"}'
+      for offline assembly","href":null}]}},"url":"https://www.notion.so/Page-for-offline-assembly-38a9ce7b60a48186b3b3e0ee30207208","public_url":null,"archived":false,"request_id":"680a1988-1321-41ca-83a8-fb9b17c54684"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfcacef369766-FRA
+      - a114b4ef9c20f40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -568,7 +568,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - fa6c1294-99af-4750-8e3d-2fba04cfbfb9
+      - 680a1988-1321-41ca-83a8-fb9b17c54684
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -595,22 +595,22 @@ interactions:
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/blocks/29c974f3-b388-815f-8340-e8cc2ab9d7f9/children?page_size=100
+    uri: https://api.notion.com/v1/blocks/38a9ce7b-60a4-8186-b3b3-e0ee30207208/children?page_size=100
   response:
-    content: "{\"object\":\"list\",\"results\":[{\"object\":\"block\",\"id\":\"29c974f3-b388-81e1-b77d-e55b699b31a0\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"archived\":false,\"in_trash\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-8169-b5fd-d109a3384054\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"in_trash\":false,\"type\":\"paragraph\",\"paragraph\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is the first block.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is the first block.\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"29c974f3-b388-815a-b8b8-fdce237576d8\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"archived\":false,\"in_trash\":false,\"type\":\"quote\",\"quote\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is the first block.\",\"href\":null}],\"icon\":null,\"color\":\"default\"},\"archived\":false},{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-81e3-8431-c69724b8d2df\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"in_trash\":false,\"type\":\"quote\",\"quote\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is a quote.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is a quote.\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"29c974f3-b388-817f-a70b-f7646f7dfcb6\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"archived\":false,\"in_trash\":false,\"type\":\"bulleted_list_item\",\"bulleted_list_item\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is a quote.\",\"href\":null}],\"color\":\"default\"},\"archived\":false},{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-81cc-8c78-c8ab6538cc0c\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"in_trash\":false,\"type\":\"bulleted_list_item\",\"bulleted_list_item\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is a bullet point.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is a bullet point.\",\"href\":null}],\"color\":\"default\"}},{\"object\":\"block\",\"id\":\"29c974f3-b388-812f-9d00-eccecb6c0494\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"29c974f3-b388-815f-8340-e8cc2ab9d7f9\"},\"created_time\":\"2025-10-30T15:35:00.000Z\",\"last_edited_time\":\"2025-10-30T15:35:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"archived\":false,\"in_trash\":false,\"type\":\"callout\",\"callout\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
+      is a bullet point.\",\"href\":null}],\"color\":\"default\"},\"archived\":false},{\"object\":\"block\",\"id\":\"38a9ce7b-60a4-8189-9022-c75bf3583414\",\"parent\":{\"type\":\"page_id\",\"page_id\":\"38a9ce7b-60a4-8186-b3b3-e0ee30207208\"},\"created_time\":\"2026-06-25T14:36:00.000Z\",\"last_edited_time\":\"2026-06-25T14:36:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"has_children\":true,\"in_trash\":false,\"type\":\"callout\",\"callout\":{\"rich_text\":[{\"type\":\"text\",\"text\":{\"content\":\"This
       is a callout.\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"This
-      is a callout.\",\"href\":null}],\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F4A1\"},\"color\":\"default\"}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"block\",\"block\":{},\"request_id\":\"7c9a3847-1914-4208-a595-b68353a722b8\"}"
+      is a callout.\",\"href\":null}],\"icon\":{\"type\":\"emoji\",\"emoji\":\"\U0001F4A1\"},\"color\":\"default\"},\"archived\":false}],\"next_cursor\":null,\"has_more\":false,\"type\":\"block\",\"block\":{},\"request_id\":\"45fb84e7-e9aa-4c3e-9fd5-d17ca59cf1a6\"}"
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bfcae68559766-FRA
+      - a114b4f0f87af40e-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -640,7 +640,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 7c9a3847-1914-4208-a595-b68353a722b8
+      - 45fb84e7-e9aa-4c3e-9fd5-d17ca59cf1a6
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:

@@ -1,15 +1,342 @@
 interactions:
 - request:
     body: ''
-    headers: {}
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
     method: GET
     uri: https://api.notion.com/v1/users?page_size=100
   response:
-    content: '{"object":"list","results":[{"object":"user","id":"00000000-0000-4000-8000-0000000000fa","name":"Florian
-      Wilhelm","avatar_url":null,"type":"person","person":{"email":"florian.wilhelm@gmail.com"}}],"next_cursor":null,"has_more":false,"type":"user","user":{},"request_id":"15bf0e55-027a-4d35-8358-e0083a1a028b"}'
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000fa\",\"name\":\"Adam
+      Dangoor\",\"avatar_url\":null,\"type\":\"person\",\"person\":{\"email\":\"adamdangoor@gmail.com\"}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Publish
+      Interview Questions\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Ultimate
+      Notion Tests\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{\"owner\":{\"type\":\"workspace\",\"workspace\":true},\"workspace_name\":\"Adam
+      Dangoor\u2019s Notion\",\"workspace_id\":\"00000000-0000-4000-8000-0000000000f0\",\"workspace_limits\":{\"max_file_upload_size_in_bytes\":5242880}}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"user\",\"user\":{},\"request_id\":\"6baa8472-39f5-43a7-b38d-b0abe97c7be8\"}"
     headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a114a1becfae8a25-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
       Content-Type:
       - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 6baa8472-39f5-43a7-b38d-b0abe97c7be8
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/users?page_size=100
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000fa\",\"name\":\"Adam
+      Dangoor\",\"avatar_url\":null,\"type\":\"person\",\"person\":{\"email\":\"adamdangoor@gmail.com\"}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Publish
+      Interview Questions\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Ultimate
+      Notion Tests\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{\"owner\":{\"type\":\"workspace\",\"workspace\":true},\"workspace_name\":\"Adam
+      Dangoor\u2019s Notion\",\"workspace_id\":\"00000000-0000-4000-8000-0000000000f0\",\"workspace_limits\":{\"max_file_upload_size_in_bytes\":5242880}}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"user\",\"user\":{},\"request_id\":\"0b9fbf2f-d5f5-4f9b-881a-b2952ccc7cfd\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a114a718de3d8c31-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 0b9fbf2f-d5f5-4f9b-881a-b2952ccc7cfd
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/users?page_size=100
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000fa\",\"name\":\"Adam
+      Dangoor\",\"avatar_url\":null,\"type\":\"person\",\"person\":{\"email\":\"adamdangoor@gmail.com\"}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Publish
+      Interview Questions\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Ultimate
+      Notion Tests\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{\"owner\":{\"type\":\"workspace\",\"workspace\":true},\"workspace_name\":\"Adam
+      Dangoor\u2019s Notion\",\"workspace_id\":\"00000000-0000-4000-8000-0000000000f0\",\"workspace_limits\":{\"max_file_upload_size_in_bytes\":5242880}}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"user\",\"user\":{},\"request_id\":\"bf89808a-8433-4d82-b16c-388d6f36e7ad\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a114ace83bb49517-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - bf89808a-8433-4d82-b16c-388d6f36e7ad
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/users?page_size=100
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000fa\",\"name\":\"Adam
+      Dangoor\",\"avatar_url\":null,\"type\":\"person\",\"person\":{\"email\":\"adamdangoor@gmail.com\"}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Publish
+      Interview Questions\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Ultimate
+      Notion Tests\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{\"owner\":{\"type\":\"workspace\",\"workspace\":true},\"workspace_name\":\"Adam
+      Dangoor\u2019s Notion\",\"workspace_id\":\"00000000-0000-4000-8000-0000000000f0\",\"workspace_limits\":{\"max_file_upload_size_in_bytes\":5242880}}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"user\",\"user\":{},\"request_id\":\"86e16384-73a0-44f3-bf38-e7de54bef478\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a114b0663fd1ef55-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 86e16384-73a0-44f3-bf38-e7de54bef478
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/users?page_size=100
+  response:
+    content: "{\"object\":\"list\",\"results\":[{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000fa\",\"name\":\"Adam
+      Dangoor\",\"avatar_url\":null,\"type\":\"person\",\"person\":{\"email\":\"adamdangoor@gmail.com\"}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Publish
+      Interview Questions\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{}},{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\",\"name\":\"Ultimate
+      Notion Tests\",\"avatar_url\":null,\"type\":\"bot\",\"bot\":{\"owner\":{\"type\":\"workspace\",\"workspace\":true},\"workspace_name\":\"Adam
+      Dangoor\u2019s Notion\",\"workspace_id\":\"00000000-0000-4000-8000-0000000000f0\",\"workspace_limits\":{\"max_file_upload_size_in_bytes\":5242880}}}],\"next_cursor\":null,\"has_more\":false,\"type\":\"user\",\"user\":{},\"request_id\":\"197df037-dc09-4314-be81-2b8e62897f0c\"}"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a114b5d4ac21f40e-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 197df037-dc09-4314-be81-2b8e62897f0c
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
     http_version: HTTP/1.1
     status_code: 200
 version: 1
