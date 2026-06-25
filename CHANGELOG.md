@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: Capture the read-only `block_type` field Notion sends on unsupported blocks (e.g. button or AI blocks), which previously raised a pydantic `ValidationError` on dev/CI installs (`extra='forbid'`) and made the whole children list — including sibling blocks after the unsupported one — inaccessible, issue #356.
+
 ## Version 0.9.11, 2026-06-24
 
 - New: Export the user-facing icon subtypes `BuiltInIcon` and `CustomEmoji` from the top-level package, alongside the already-exported `Emoji`, so icons returned by `Page.icon`/`DataSource.icon`/`Database.icon` can be narrowed with `isinstance` without reaching into `ultimate_notion.emoji`, issue #353.

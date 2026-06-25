@@ -178,6 +178,8 @@ class WithChildren(GenericObject, ABC, Generic[CB]):
 class UnsupportedBlockTypeData(GenericObject):
     """Type data for `UnsupportedBlock`."""
 
+    block_type: str | None = None
+
 
 class UnsupportedBlock(Block[UnsupportedBlockTypeData], type='unsupported'):
     """A placeholder for unsupported blocks in the API."""
