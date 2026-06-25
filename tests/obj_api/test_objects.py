@@ -86,3 +86,17 @@ def test_bot_type_data(person: uno.User) -> None:
         bot_data = objs.BotTypeData.model_validate(raw_bot_data)
         assert bot_data.owner is not None
         assert bot_data.owner.model_dump() == owner
+
+
+def test_unsupported_block() -> None:
+    # Notion returns unsupported blocks (e.g. button or AI blocks) with a
+    # read-only `block_type` field. This must validate even with extra='forbid'
+    # on dev/CI installs, otherwise the whole children list fails to parse.
+    raw_block = {
+        'object': 'block',
+        'type': 'unsupported',
+        'unsupported': {'block_type': 'button'},
+        'has_children': False,
+    }
+    block = obj_blocks.UnsupportedBlock.model_validate(raw_block)
+    assert block.unsupported.block_type == 'button'
