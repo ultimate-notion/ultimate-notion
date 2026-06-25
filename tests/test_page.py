@@ -8,7 +8,7 @@ import pytest
 
 import ultimate_notion as uno
 from tests.conftest import assert_eventually
-from ultimate_notion.blocks import Block
+from ultimate_notion.blocks import Block, Unsupported
 from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.page import Page
@@ -252,6 +252,23 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
 
     for exp, act in zip(exp_output.strip().split('\n'), markdown, strict=True):
         assert exp == act
+
+
+@pytest.mark.vcr()
+def test_page_with_unsupported_blocks(md_page: Page) -> None:
+    """Regression test for issue #356.
+
+    Notion returns blocks it cannot expose via the API (e.g. button or AI blocks)
+    as `{"type": "unsupported", "unsupported": {"block_type": ...}}`. Reading the
+    children of a page that contains such a block previously raised a pydantic
+    `ValidationError` on dev/CI installs (`extra='forbid'`), which also made every
+    sibling block after the unsupported one inaccessible. Accessing the children
+    must succeed, capture the read-only `block_type`, and render a placeholder.
+    """
+    unsupported = [block for block in md_page.children if isinstance(block, Unsupported)]
+    assert {block.obj_ref.unsupported.block_type for block in unsupported} == {'button', 'ai_block'}
+    for block in unsupported:
+        assert block.to_markdown() == '<kbd>Unsupported block</kbd>\n'
 
 
 @pytest.mark.vcr()

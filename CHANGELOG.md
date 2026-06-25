@@ -5,6 +5,10 @@
 - New: Better logging of model validation errors, issue #152.
 - New: Implement the new data source Notion API version 2025-09-03, issue #118.
 
+- Fix: Capture the read-only `block_type` field Notion sends on unsupported blocks (e.g. button or AI blocks), which previously raised a pydantic `ValidationError` on dev/CI installs (`extra='forbid'`) and made the whole children list — including sibling blocks after the unsupported one — inaccessible, issue #356.
+
+## Version 0.9.11, 2026-06-24
+
 - New: Export the user-facing icon subtypes `BuiltInIcon` and `CustomEmoji` from the top-level package, alongside the already-exported `Emoji`, so icons returned by `Page.icon`/`DataSource.icon`/`Database.icon` can be narrowed with `isinstance` without reaching into `ultimate_notion.emoji`, issue #353.
 - Fix: Skip the two-way relation backward rename in `Relation._update_bwd_rel` when no backward name is defined, instead of attempting `RenameProp(name=None)` and raising a pydantic `ValidationError`, issue #325.
 - Fix: Raise a clear `UnsetError` from `Bot.workspace_info` when the workspace name or id is unavailable (i.e. for any bot other than the integration's own), instead of an opaque pydantic `ValidationError`, issue #326.
