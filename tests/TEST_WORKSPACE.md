@@ -150,26 +150,26 @@ required …`. A green line confirms the manual step worked.
 
 ## 5. `Markdown Test` page
 
-The bootstrap creates this page with a single `Headline 1` block as a shell. It is a
-content fixture for `tests/test_page.py::test_page_to_markdown`, which asserts the page
-renders to **exactly** the markdown in that test's `exp_output` (compared line-by-line
-with `strict=True`). The expected markdown is the spec — build the page so its blocks
-render to it, in order. Most blocks are ordinary (headings, a divider, **toggle**
-headings, bulleted / to-do / numbered lists, a quote, a 💡 callout, a 3×2 table, a
-paragraph, a block equation, a python code block, an image with a caption, a second
-image, a file, an audio embed, a heading, a two-column block, a table of contents, a
-breadcrumb, a child subpage `Markdown SubPage Test`, a synced block and a link to the
-subpage).
+This is a content fixture for `tests/test_page.py::test_page_to_markdown`, which asserts
+the page renders to **exactly** the markdown in that test's `exp_output` (compared
+line-by-line with `strict=True`).
 
-The page **cannot be finished through the API**, because its last two blocks render as
-`<kbd>Unsupported block</kbd>`:
+**The bootstrap builds the entire body automatically** — headings, a divider, toggle
+headings, bulleted / to-do / numbered lists, a quote, a callout, a 3×2 table, a block
+equation, a python code block, an embed, an (uploaded) image, a file, an audio embed, a
+two-column block, a table of contents, a breadcrumb, the child subpage
+`Markdown SubPage Test`, both synced blocks and the link to the subpage. It (re)builds
+whenever the page is missing or incomplete, and leaves a complete page untouched.
 
-1. Add a **Button** block (`/button`) near the end.
+Only the **last two blocks must be added by hand**, because the API cannot create them —
+they render as `<kbd>Unsupported block</kbd>`:
+
+1. Add a **Button** block (`/button`).
 2. Add an **AI block** (e.g. `/ai` summary) as the final block.
 
-Both are returned by the API as `Unsupported` blocks but cannot be *created* by it (see
-`ultimate_notion.blocks.Unsupported`), so they must be added in the UI. The exact text
-of the other blocks is given verbatim by `exp_output`; match it line for line.
+Both come back from the API as `Unsupported` blocks but cannot be *created* by it (see
+`ultimate_notion.blocks.Unsupported`). Add them at the very end, after the link to the
+subpage, then the page is complete.
 
 ## 6. `Embed/Inline/Linked & Unfurl` page
 

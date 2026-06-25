@@ -5,6 +5,8 @@ Set NOTION_TOKEN and share the root page with the integration before running it.
 """
 
 import argparse
+import base64
+import io
 import os
 import time
 from collections.abc import Callable
@@ -15,9 +17,22 @@ from notion_client import Client
 from notion_client.errors import HTTPResponseError
 
 import ultimate_notion as uno
+from ultimate_notion.errors import SchemaError
 
 DEFAULT_ROOT_TITLE = 'Tests'
 MAX_REQUEST_ATTEMPTS = 5
+
+# A minimal valid 1x1 JPEG. The `test_page_to_markdown` fixture renders its second image as
+# `![1004-300x300.jpg](https://...)`, where the alt text is the *uploaded* file name and the URL is a
+# Notion-hosted (`prod-files-secure`) link -- an external URL cannot reproduce it. So we upload a file
+# named `1004-300x300.jpg`; the pixels are irrelevant, only the name and that it is Notion-hosted matter.
+TINY_JPEG = base64.b64decode(
+    '/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB'
+    'AQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB'
+    'AQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACv/EABQQAQAA'
+    'AAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMR'
+    'AD8AvwA//9k='
+)
 
 # The exact set of objects the live test suite expects to find in the workspace.
 # Keep these in sync with the title constants in `tests/conftest.py`. The audit step
@@ -197,7 +212,16 @@ class Bootstrap:
     def get_or_create_ds(self, title: str, schema: type[uno.Schema]) -> tuple[uno.DataSource, bool]:
         data_source = self.find_ds(title)
         if data_source is not None:
-            data_source.schema = schema
+            # Bind the script schema only to seed an empty data source. An existing, hand-maintained one
+            # may legitimately diverge -- e.g. Formula DB after its formula columns are recreated in the UI,
+            # which Notion then types by result (Text/Number/...) rather than as generic formulas (#297).
+            # Forcing the schema would reject that, so we keep whatever is already there.
+            if data_source.is_empty:
+                try:
+                    data_source.schema = schema
+                except SchemaError:
+                    typer.echo(f'data source exists: {title} (schema differs from the script; keeping its own)')
+                    return data_source, False
             typer.echo(f'data source exists: {title}')
             return data_source, False
         data_source = self.notion.create_ds(parent=self.root, schema=schema)
@@ -310,20 +334,7 @@ class Bootstrap:
             'Markdown Text Test',
             blocks=[uno.Paragraph('Markdown rich-text fixture.')],
         )
-        markdown_page = self.create_page(
-            'Markdown Test',
-            blocks=[uno.Heading1('Headline 1')],
-        )
-        self.create_page(
-            'Markdown SubPage Test',
-            parent=markdown_page,
-            blocks=[uno.Paragraph('This is the original Paragraph on SubPage')],
-        )
-        # The Markdown Test page is a content-sensitive fixture whose expected markdown
-        # (`tests/test_page.py::test_page_to_markdown`) ends with two `<kbd>Unsupported block</kbd>`
-        # lines. Those come from blocks the API cannot create (a button and an AI block); the test
-        # zips expected-vs-actual with `strict=True`, so the page must be finished by hand.
-        typer.echo('manual step: finish the Markdown Test page by hand (see tests/TEST_WORKSPACE.md §5)')
+        self.ensure_markdown_test_page()
 
         self.create_page(
             'Embed/Inline/Linked & Unfurl',
@@ -345,6 +356,88 @@ class Bootstrap:
         # can append to existing discussions and start page discussions, but cannot *start* an inline
         # discussion, so the comment must be added by hand.
         typer.echo('manual step: add an inline comment to the Comments heading (see tests/TEST_WORKSPACE.md §7)')
+
+    def ensure_markdown_test_page(self) -> None:
+        """Build the `Markdown Test` content fixture for `test_page_to_markdown`.
+
+        Every block except the final two -- a Button and an AI block, which the Notion API cannot
+        create -- is built here to match the test's `exp_output` line for line. Idempotent: a page that
+        already contains the body (detected by a `Divider`) is left untouched; an empty or stub page is
+        (re)built from scratch. The two unsupported blocks must still be added by hand
+        (see tests/TEST_WORKSPACE.md §5).
+        """
+        page = self.find_page('Markdown Test')
+        # Use a late, distinctive block as the "fully built" marker: a `Breadcrumb` appears near the end of
+        # the body and is unlikely in a partial hand-build, so a stub or half-finished page is rebuilt while
+        # a complete one (plus the hand-added unsupported blocks) is left intact on re-runs.
+        if page is not None and any(isinstance(block, uno.Breadcrumb) for block in page.children):
+            typer.echo('Markdown Test: body already built')
+        else:
+            if page is not None:
+                page.delete()  # trash the stub/partial page and rebuild fresh (it is looked up by title)
+            page = self.notion.create_page(parent=self.root, title='Markdown Test')
+            self.build_markdown_test_body(page)
+            typer.echo('built Markdown Test body')
+        typer.echo('manual step: add a Button and an AI block at the end of Markdown Test (see TEST_WORKSPACE.md §5)')
+
+    def build_markdown_test_body(self, page: uno.Page) -> None:
+        """Append every API-creatable block of the Markdown Test fixture, in order."""
+        add = page.append
+        add([uno.Heading1('Headline 1'), uno.Heading2('Headline 2'), uno.Heading3('Headline 3'), uno.Divider()])
+        # Toggle headings are siblings (not nested): nesting hides the inner headings from the rendered
+        # markdown, which the test expects to see flattened.
+        add(
+            [
+                uno.Heading1('Toggle Headline 1', toggleable=True),
+                uno.Heading2('Toggle Headline 2', toggleable=True),
+                uno.Heading3('Toggle Headline 3', toggleable=True),
+            ]
+        )
+        add([uno.BulletedItem('Item 1'), uno.BulletedItem('Item 2\nwith a new line'), uno.BulletedItem('Item 3')])
+        add(
+            [uno.ToDoItem('ToDo1'), uno.ToDoItem('ToDo2\nwith a new line'), uno.ToDoItem('Checked ToDo3', checked=True)]
+        )
+        add(
+            [
+                uno.NumberedItem('First item'),
+                uno.NumberedItem('Second item\nwith a new line'),
+                uno.NumberedItem('Third item'),
+            ]
+        )
+        add(uno.Quote('This is a quote\nwith a new line'))
+        add(uno.Callout('Callout!'))
+        table = uno.Table(3, 2)
+        add(table)
+        for row in range(3):
+            table[row] = (f'Cell {row + 1}, 1', f'Cell {row + 1}, 2')
+        add(uno.Paragraph('This is an emoji! \U0001f600\U0001f600'))
+        add(uno.Equation(r'|x|=\begin{cases}x, &\quad x \geq 0\\-x, &\quad x < 0\end{cases}'))
+        add(uno.Code('# Python Code\nimport ultimate_notion', language=uno.CodeLang.PYTHON))
+        add(uno.Embed('https://picsum.photos/300/300', caption='Caption'))
+        # The second image must be Notion-hosted (see TINY_JPEG), so upload it rather than link externally.
+        uploaded = self.notion.upload(io.BytesIO(TINY_JPEG), file_name='1004-300x300.jpg', mime_type='image/jpeg')
+        add(uno.Image(uploaded))
+        add(
+            uno.File(
+                uno.ExternalFile(url='https://ultimate-notion.com/latest/assets/images/logo_with_text.svg'),
+                name='logo_with_text.svg',
+            )
+        )
+        add(uno.Audio(uno.ExternalFile(url='https://samplelib.com/lib/preview/mp3/sample-3s.mp3')))
+        add(uno.Heading2('Unsupported Stuff in Markdown'))
+        columns = uno.Columns(2)
+        add(columns)
+        columns[0].append(uno.Paragraph('Column 1'))
+        columns[1].append(uno.Paragraph('Column'))
+        add(uno.TableOfContents())
+        add(uno.Breadcrumb())
+        # The subpage is created here so its child-page block lands right after the breadcrumb.
+        subpage = self.notion.create_page(parent=page, title='Markdown SubPage Test')
+        subpage_synced = uno.SyncedBlock(uno.Paragraph('This is the original Paragraph on SubPage'))
+        subpage.append(subpage_synced)
+        add(uno.SyncedBlock(uno.Paragraph('This is the original Paragraph on Page')))
+        add(subpage_synced.create_synced())  # a synced copy on this page of the block that lives on the subpage
+        add(uno.LinkToPage(subpage))
 
     def audit_manual_objects(self) -> None:
         for title, kind in (
