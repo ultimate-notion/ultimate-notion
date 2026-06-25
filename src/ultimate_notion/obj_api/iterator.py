@@ -75,6 +75,18 @@ class PageOrDataSourceList(ObjectList, type='page_or_data_source'):
     page_or_data_source: TypeData
 
 
+class PageOrDatabaseList(ObjectList, type='page_or_database'):
+    """A list of Page or Database objects returned by the Notion API.
+
+    Notion still tags some `search` list responses with the legacy `page_or_database`
+    discriminator (alongside the newer `page_or_data_source`), so both must validate.
+    """
+
+    class TypeData(GenericObject): ...
+
+    page_or_database: TypeData
+
+
 class UserList(ObjectList, type='user'):
     """A list of User objects returned by the Notion API."""
 
