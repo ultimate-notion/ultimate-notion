@@ -466,6 +466,12 @@ def _normalize_ids_in_body(body: Any) -> Any:
     # cassettes. A no-op for the default `Tests`, so existing cassettes are untouched.
     if TESTS_PAGE != 'Tests':
         body = body.replace(TESTS_PAGE, 'Tests')
+    # Notion returns object URLs under either `www.notion.so/<id>` or `app.notion.com/p/<id>` depending
+    # on the workspace/account. Canonicalise to `www.notion.so/` so a cassette recorded against an
+    # app.notion.com workspace replays against the placeholder-based, notion.so expectations. The two
+    # forms differ in length, but `Content-Length` is not stored in the cassettes, and on replay the body
+    # already carries `www.notion.so`, so the replacement is then a no-op.
+    body = body.replace('app.notion.com/p/', 'www.notion.so/')
     return _shared_ids.scrub(body)
 
 
