@@ -38,7 +38,7 @@ from url_normalize import url_normalize
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
-from ultimate_notion.errors import InvalidAPIUsageError, UnknownDataSourceError, UnsetError
+from ultimate_notion.errors import EmptyListError, InvalidAPIUsageError, UnknownDataSourceError, UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -198,13 +198,19 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 ref_block: Block | DataSource
                 try:
                     ref_block = child_block.ds
-                except UnknownDataSourceError:
-                    # linked data source that cannot be retrieved via API. Check the docs:
+                except (UnknownDataSourceError, EmptyListError):
+                    # A linked database (a linked view of another database) cannot be resolved to a data
+                    # source via the API: its container either is not retrievable (`UnknownDataSourceError`)
+                    # or exposes no data sources (`EmptyListError`). Fall back to the block itself, which
+                    # renders as an unsupported linked database. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
                     ref_block = child_block
                 child_blocks[idx] = ref_block
 
-        return [session._cache_add(block) for block in child_blocks]
+        # A `ChildDatabase` still present here is an unresolved linked database (resolved ones became
+        # `DataSource` above). Its id is the container database's id, already cached as a `Database` while
+        # resolving it, so re-caching it as a `ChildDatabase` would collide -- leave it uncached.
+        return [block if isinstance(block, ChildDatabase) else session._cache_add(block) for block in child_blocks]
 
     @property
     def children(self) -> tuple[Block | Page | DataSource, ...]:
@@ -1137,7 +1143,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return the child database as Markdown."""
-        return '<kbd>↗️ Linked data source (unsupported)</kbd>'
+        return '<kbd>↗️ Linked database (unsupported)</kbd>'
 
 
 class Column(ParentBlock[obj_blocks.Column], wraps=obj_blocks.Column):
