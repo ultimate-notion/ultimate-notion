@@ -303,24 +303,32 @@ class Bootstrap:
 
     @staticmethod
     def check_formula_filterable(database: uno.DataSource) -> None:
-        """Report whether the Formula DB's formulas can be filtered on.
+        """Verify the Formula DB's formula columns are real, computing formulas (`test_query_formula`).
 
-        Notion rejects query filters on formula properties created via the public API
-        ("Unable to filter based on a formula of unknown type", see issue #297), so the
-        formula columns must be (re)created in the Notion UI before `test_query_formula`
-        can record. This probe surfaces that as a manual step instead of a cryptic 400
-        during cassette recording.
+        Notion rejects query filters on formula properties created via the public API ("Unable to filter
+        based on a formula of unknown type", #297), so the columns must be recreated in the UI. They must
+        be recreated as **Formula** columns, though: recreating them as plain Text/Number/Checkbox/Date
+        columns (the formulas' result types) also clears the 400 but leaves them empty. So we check the
+        actual computed value -- `String` (= `format(prop("Name"))`) must read `Item 1` for row `Item 1` --
+        rather than merely that a filter does not error.
         """
+        manual_hint = (
+            'Formula DB: manual setup required - recreate String / Number / Checkbox / Date as '
+            '**Formula** columns in the UI (not plain Text/Number/Checkbox/Date), with expressions '
+            'String=format(prop("Name")), Number=prop("Tags").length(), '
+            'Checkbox=prop("Tags").includes("Done"), Date=prop("Date Source"). See issue #297 / §4.'
+        )
         try:
-            database.query.filter(uno.prop('String').is_not_empty()).execute()
-        except HTTPResponseError as exc:
-            typer.echo(
-                f'Formula DB: manual setup required - formula filters fail ({exc}). '
-                'Recreate the formula columns in the Notion UI so Notion assigns them a '
-                'filterable result type (see issue #297), then re-run.'
-            )
+            rows = {page.props.name: page for page in database.get_all_pages()}
+            item_1 = rows.get('Item 1')
+            computed = None if item_1 is None else item_1.props.string
+        except (HTTPResponseError, AttributeError) as exc:
+            typer.echo(f'{manual_hint} ({exc})')
+            return
+        if computed == 'Item 1':
+            typer.echo('Formula DB: formula columns OK')
         else:
-            typer.echo('Formula DB: formula filters OK')
+            typer.echo(f'{manual_hint} (String for row "Item 1" reads {computed!r}, expected "Item 1")')
 
     def ensure_static_pages(self) -> None:
         self.create_page(
@@ -334,6 +342,11 @@ class Bootstrap:
             'Markdown Text Test',
             blocks=[uno.Paragraph('Markdown rich-text fixture.')],
         )
+        # `test_rich_text_md` expects 12 paragraphs of intricately-styled rich text (nested bold/italic/
+        # strikethrough/underline, inline code & equations, mentions, mid-word links). This is a
+        # hand-crafted fixture; match `correct_mds` in tests/test_markdown.py (see TEST_WORKSPACE.md §8).
+        typer.echo('manual step: add the rich-text paragraphs to Markdown Text Test (see TEST_WORKSPACE.md §8)')
+
         self.ensure_markdown_test_page()
 
         self.create_page(
@@ -348,14 +361,33 @@ class Bootstrap:
         # cannot create. (A placeholder paragraph would only render the wrong markdown, so we omit it.)
         typer.echo('manual step: add a linked-database view to the Embed page (see tests/TEST_WORKSPACE.md §6)')
 
-        self.create_page(
-            'Comments',
-            blocks=[uno.Heading1('Comments')],
-        )
-        # `test_page_advanced` reads an inline discussion on the Comments page's heading. The Notion API
-        # can append to existing discussions and start page discussions, but cannot *start* an inline
-        # discussion, so the comment must be added by hand.
-        typer.echo('manual step: add an inline comment to the Comments heading (see tests/TEST_WORKSPACE.md §7)')
+        self.ensure_comments_page()
+
+    def ensure_comments_page(self) -> None:
+        """Create the `Comments` page and seed its 5 page-level comments (`test_list_comments`).
+
+        Page comments are API-creatable and cannot be deleted via the API, so we only add them when the
+        page has none, appending in order with the 5th reading `Another comment` (what the test checks).
+        The heading's *inline* discussions (`test_append_block_comments`) cannot be started through the
+        API and remain a manual step.
+        """
+        page = self.create_page('Comments', blocks=[uno.Heading1('Comments')])
+        wanted = ['Comment 1', 'Comment 2', 'Comment 3', 'Comment 4', 'Another comment']
+        existing = len(page.comments)
+        if existing == 0:
+            for text in wanted:
+                page.comments.append(text)
+            typer.echo(f'seeded Comments: {len(wanted)} page comments')
+        elif existing == len(wanted):
+            typer.echo('Comments: page comments already present')
+        else:
+            typer.echo(
+                f'Comments: has {existing} page comment(s); test_list_comments expects {len(wanted)} '
+                "with the 5th reading 'Another comment' -- comments cannot be deleted via the API, "
+                'so adjust by hand if needed'
+            )
+        # Inline discussions on the heading cannot be created via the API.
+        typer.echo('manual step: add 2 inline discussions to the Comments heading (see TEST_WORKSPACE.md §7)')
 
     def ensure_markdown_test_page(self) -> None:
         """Build the `Markdown Test` content fixture for `test_page_to_markdown`.

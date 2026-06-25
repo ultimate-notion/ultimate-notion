@@ -19,14 +19,15 @@ A fourth object, `Formula DB`, is created by the bootstrap script but needs a ma
 follow-up: Notion cannot filter on formula columns created through the API, so its
 formula columns must be (re)created in the Notion UI. See [§4](#4-formula-db) below.
 
-Finally, three **content pages** are created as shells by the bootstrap script but must
-have their content finished by hand, because each needs a block the API cannot create:
+Finally, several **content pages** are mostly built by the bootstrap script but need some
+content finished by hand, because each needs something the API cannot create:
 
 | Page | Manual content needed |
 | --- | --- |
-| `Markdown Test` | Ends with two **unsupported blocks** (a Button and an AI block) the API cannot create. See [§5](#5-markdown-test-page). |
+| `Markdown Test` | Body is built automatically; add the final two **unsupported blocks** (a Button and an AI block) the API cannot create. See [§5](#5-markdown-test-page). |
 | `Embed/Inline/Linked & Unfurl` | Must end with a real **linked-database view**, which the API cannot create. See [§6](#6-embed-page-linked-database). |
-| `Comments` | Needs an **inline comment** on its heading; the API cannot *start* inline discussions. See [§7](#7-comments-page-inline-comment). |
+| `Comments` | Page comments are seeded; add **2 inline discussions** to the heading (first = `Infinite discussion!`). The API cannot *start* inline discussions. See [§7](#7-comments-page-inline-discussions). |
+| `Markdown Text Test` | Needs 12 paragraphs of intricately-styled **rich text** (a hand-crafted fixture). See [§8](#8-markdown-text-test-page-rich-text). |
 
 ---
 
@@ -142,9 +143,15 @@ record until the formula columns are recreated in the UI:
    | `Checkbox` | Formula | `prop("Tags").includes("Done")` |
    | `Date` | Formula | `prop("Date Source")` |
 
-The bootstrap script verifies this automatically: after seeding it runs a formula filter
-and prints either `Formula DB: formula filters OK` or `Formula DB: manual setup
-required …`. A green line confirms the manual step worked.
+   **They must be `Formula` columns.** It is tempting to add them as plain
+   `Text` / `Number` / `Checkbox` / `Date` columns (matching each formula's *result* type) —
+   that also clears the 400, but the columns are then empty and `test_query_formula` fails
+   on `set() != {...}`. Pick **Formula** as the property type and paste the expression.
+
+The bootstrap script verifies this automatically: after seeding it reads the `String`
+formula of row `Item 1` and prints either `Formula DB: formula columns OK` or
+`Formula DB: manual setup required …`. The latter (`String … reads None`) is exactly the
+symptom of the plain-column mistake above. A green line confirms the manual step worked.
 
 ---
 
@@ -180,14 +187,31 @@ database** view (it asserts the final rendered line is
 view, so add one by hand at the end of the page: type `/linked`, choose **Create linked
 database**, and point it at any existing database (e.g. `Task DB`).
 
-## 7. `Comments` page inline comment
+## 7. `Comments` page inline discussions
 
-The bootstrap creates this page with a single `Comments` heading. The doc snippet test
-`tests/test_docs_py_snippets.py::test_page_advanced` reads an **inline discussion** on
-that heading (`page.children[0].discussions[0]`). The Notion API can append to an
-existing discussion and start *page* discussions, but it cannot **start an inline
-discussion**, so this must be done in the UI: open the `Comments` page, hover the
-`Comments` heading, and add an inline comment (any text).
+The bootstrap creates the page, its `Comments` heading and **5 page-level comments** (for
+`test_list_comments`; the 5th reads `Another comment`). What remains manual are the
+heading's **inline discussions** — the Notion API can append to an existing discussion and
+start *page* discussions, but it cannot **start an inline discussion**.
+
+`tests/test_comment.py::test_append_block_comments` requires the `Comments` heading to have
+**exactly two inline discussions**, and the first one's first comment to read
+`Infinite discussion!`. (`tests/test_docs_py_snippets.py::test_page_advanced` only needs
+`discussions[0]` to exist, so the same setup satisfies both.) In the UI:
+
+1. Hover the `Comments` heading → add an inline comment with the text `Infinite discussion!`.
+2. Hover the heading again → add a **second, separate** inline comment (any text) to start a
+   second discussion thread.
+
+## 8. `Markdown Text Test` page rich text
+
+The bootstrap creates this page with a placeholder paragraph.
+`tests/test_markdown.py::test_rich_text_md` expects **12 paragraphs** of intricately-styled
+rich text — nested bold/italic/strikethrough/underline, inline `code` and `$equations$`,
+a person and a self page-mention, and mid-word links. The exact target for each paragraph is
+the `correct_mds` list in `tests/test_markdown.py`; build the 12 paragraphs (e.g. in
+StackEdit, then paste) so each renders to its corresponding entry. This is a hand-crafted
+fixture: the styling combinations are not reliably reproducible through the API.
 
 ---
 
