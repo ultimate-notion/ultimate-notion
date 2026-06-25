@@ -223,6 +223,10 @@ class WithChildren(GenericObject, ABC, Generic[CB]):
 class UnsupportedBlockTypeData(GenericObject):
     """Type data for `UnsupportedBlock`."""
 
+    # Notion reports the underlying block kind (e.g. `button`, an AI block) here. It is read-only;
+    # unsupported blocks cannot be created or modified through the API.
+    block_type: str | None = None
+
 
 class UnsupportedBlock(Block[UnsupportedBlockTypeData], type='unsupported'):
     """A placeholder for unsupported blocks in the API."""
