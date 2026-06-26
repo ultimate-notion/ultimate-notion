@@ -25,27 +25,25 @@ def test_search_get_db(notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-@pytest.mark.replay_only
-def test_search_page_with_property_less_results(notion: uno.Session) -> None:
-    """`search_page()` must tolerate stripped-down page objects that omit `properties`.
+def test_search_page(notion: uno.Session, intro_page: uno.Page) -> None:
+    """`search_page()` wraps the live `search` endpoint results as `Page` objects.
 
-    Notion's `search` endpoint returns property-less records (e.g. trashed or
-    limited-access pages) that contain essentially only `{'object': 'page', 'id': ...}`.
-    The recorded cassette mixes regular pages with such stripped-down objects, so this
-    exercises the full `search_page` pipeline (endpoint → `ObjectList` validation →
-    `Page.wrap_obj_ref`) against that shape offline. Regression test for
-    https://github.com/ultimate-notion/ultimate-notion/issues/273.
+    Exercises the real pipeline (endpoint → `ObjectList` validation → `Page.wrap_obj_ref`)
+    against whatever the workspace returns, so it re-records like any other live test. The
+    assertions are workspace-invariant (a non-empty list of `Page`s, plus an exact
+    by-title lookup) rather than a fixed count.
 
-    Replay-only by design: the committed cassette is hand-crafted to a fixed result set
-    (4 pages, 2 property-less), which a live workspace with many more pages cannot
-    reproduce. The `replay_only` marker keeps `hatch run vcr-rewrite` from overwriting it
-    (issue #374, part of #361).
+    The stripped-down, property-less records that Notion's `search` returns for trashed or
+    limited-access pages (issue #273) are exercised without the network in
+    `tests/obj_api/test_iterator.py::test_object_list_tolerates_pages_without_properties`,
+    which builds that `ObjectList` shape directly.
     """
     pages = notion.search_page()
+    assert len(pages) > 0
+    assert all(isinstance(page, uno.Page) for page in pages)
 
-    assert len(pages) == 4
-    property_less = [page for page in pages if not page.obj_ref.properties]
-    assert len(property_less) == 2
+    found = notion.search_page(intro_page.title).item()
+    assert found == intro_page
 
 
 @pytest.mark.vcr()
