@@ -536,7 +536,14 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
 
 
 @pytest.mark.vcr()
-def test_bind_db_auto(notion: uno.Session) -> None:
+def test_bind_db_auto(notion: uno.Session, task_db: uno.Database) -> None:
+    """Bind a schema to a database by id and by title.
+
+    The by-id case binds to the real `Task DB` (via the `task_db` fixture) rather than a hardcoded
+    placeholder id, so it records live and replays portably: the shared-id normalization maps the real
+    Task DB id to its `…000c` placeholder in both the request URI and the response. See issue #373.
+    """
+
     class StatusOption(uno.OptionNS):
         backlog = uno.Option('Backlog', color=uno.Color.GRAY)
         in_progress = uno.Option('In Progress', color=uno.Color.BLUE)
@@ -593,7 +600,7 @@ def test_bind_db_auto(notion: uno.Session) -> None:
         TaskBase.bind_db()
     assert not TaskBase.is_bound()
 
-    class TaskWithDbId(TaskBase, db_id='0000000000004000800000000000000c'):
+    class TaskWithDbId(TaskBase, db_id=str(task_db.id)):
         """Schema with a reference to a database by ID"""
 
     TaskWithDbId.bind_db()
