@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: Coerce the plain-string `description` Notion returns on select/multi-select/status options into the rich-text list the `SelectOption.description` field is typed as (mapping the empty string to `None`), instead of raising a pydantic `ValidationError`. The error previously cascaded through `search_db()`/`db` listings and made every database containing an option with a description inaccessible.
 - Fix: Capture the read-only `block_type` field Notion sends on unsupported blocks (e.g. button or AI blocks), which previously raised a pydantic `ValidationError` on dev/CI installs (`extra='forbid'`) and made the whole children list — including sibling blocks after the unsupported one — inaccessible, issue #356.
 
 ## Version 0.9.11, 2026-06-24

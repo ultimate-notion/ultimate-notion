@@ -100,3 +100,21 @@ def test_unsupported_block() -> None:
     }
     block = obj_blocks.UnsupportedBlock.model_validate(raw_block)
     assert block.unsupported.block_type == 'button'
+
+
+def test_select_option_string_description() -> None:
+    # Notion returns the select-option description as a plain string (or an
+    # empty string when unset), not the rich-text list the field is typed as.
+    # Both must validate instead of raising a ValidationError.
+    unset = objs.SelectOption.model_validate({'name': 'A', 'description': ''})
+    assert unset.description is None
+
+    described = objs.SelectOption.model_validate({'name': 'B', 'description': 'A short summary.'})
+    assert described.description is not None
+    assert described.description[0].plain_text == 'A short summary.'
+
+    # An already-correct rich-text list still passes through unchanged.
+    rich = {'type': 'text', 'text': {'content': 'hi'}, 'plain_text': 'hi'}
+    passthrough = objs.SelectOption.model_validate({'name': 'C', 'description': [rich]})
+    assert passthrough.description is not None
+    assert passthrough.description[0].plain_text == 'hi'

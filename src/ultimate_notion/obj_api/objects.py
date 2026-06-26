@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 import pendulum as pnd
-from pydantic import Field, SerializeAsAny
+from pydantic import Field, SerializeAsAny, field_validator
 from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import (
@@ -58,6 +58,23 @@ class SelectOption(GenericObject):
     id: str | UnsetType = Unset  # According to docs: "These are sometimes, but not always, UUIDs."
     color: Color | UnsetType = Unset  # Leave this as Unset when overwriting an option as colors can't be changed
     description: list[RichTextBaseObject] | None = None  # ToDo: Undocumented in the Notion API
+
+    @field_validator('description', mode='before')
+    @classmethod
+    def _coerce_str_description(cls, value: object) -> object:
+        """Coerce a plain-string description into the expected rich-text list.
+
+        The Notion API returns the select-option description as a plain string
+        (or an empty string when unset), not the rich-text list this field is
+        typed as, so deserialising a real option raised a `ValidationError`.
+        Map the empty string to `None` and wrap a non-empty string in a single
+        text rich-text object. Existing list values pass through unchanged.
+        """
+        if value == '':
+            return None
+        if isinstance(value, str):
+            return [{'type': 'text', 'text': {'content': value}, 'plain_text': value}]
+        return value
 
     @classmethod
     def build(cls, name: str, color: Color = Color.DEFAULT) -> SelectOption:
