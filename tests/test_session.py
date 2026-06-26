@@ -25,6 +25,7 @@ def test_search_get_db(notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
+@pytest.mark.replay_only
 def test_search_page_with_property_less_results(notion: uno.Session) -> None:
     """`search_page()` must tolerate stripped-down page objects that omit `properties`.
 
@@ -34,6 +35,11 @@ def test_search_page_with_property_less_results(notion: uno.Session) -> None:
     exercises the full `search_page` pipeline (endpoint → `ObjectList` validation →
     `Page.wrap_obj_ref`) against that shape offline. Regression test for
     https://github.com/ultimate-notion/ultimate-notion/issues/273.
+
+    Replay-only by design: the committed cassette is hand-crafted to a fixed result set
+    (4 pages, 2 property-less), which a live workspace with many more pages cannot
+    reproduce. The `replay_only` marker keeps `hatch run vcr-rewrite` from overwriting it
+    (issue #374, part of #361).
     """
     pages = notion.search_page()
 

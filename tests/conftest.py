@@ -366,6 +366,19 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         else:
             return None
 
+    # Replay-only tests assert against a hand-crafted cassette that a live workspace cannot
+    # reproduce (e.g. the fixed `search_page()` result set in issue #273). A live re-record
+    # (`hatch run vcr-rewrite`, `--record-mode=rewrite`) would overwrite the crafted cassette
+    # with real workspace data and break the test, so skip them in that mode. Every other mode
+    # (`none`, `once`, `new_episodes`) replays the committed cassette and is safe.
+    if config.getoption('--record-mode') == 'rewrite':
+        skip_replay_only = pytest.mark.skip(
+            reason='replay-only: crafted cassette must not be overwritten by a live re-record'
+        )
+        for item in items:
+            if 'replay_only' in item.keywords:
+                item.add_marker(skip_replay_only)
+
     marker = get_marker_option()
     if marker is None:
         for item in items:

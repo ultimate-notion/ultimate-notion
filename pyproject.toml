@@ -130,7 +130,8 @@ testpaths = [
 ]
 markers = [
     "check_latest_release: tests that check the latest release on PyPI",
-    "file_upload: tests that upload files to Notion"
+    "file_upload: tests that upload files to Notion",
+    "replay_only: tests whose hand-crafted cassette must never be overwritten by a live re-record"
 ]
 env_files = [
     ".vscode/.env"

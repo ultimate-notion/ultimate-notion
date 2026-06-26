@@ -175,3 +175,18 @@ NOTION_TOKEN=ntn_... hatch run bootstrap-test-workspace --prune
 
 Once every named object exists under your shared root page, re-record with
 `hatch run vcr-rewrite`.
+
+## Replay-only cassettes (not re-recorded)
+
+A few cassettes are **hand-crafted** to a fixed shape that a live workspace cannot
+reproduce, so they must survive a re-record untouched. These tests carry the
+`@pytest.mark.replay_only` marker, and `pytest_collection_modifyitems` skips them whenever
+`--record-mode=rewrite` is in effect — so `hatch run vcr-rewrite` leaves their committed
+cassettes in place. They still run (and must pass) under `hatch run vcr-only`.
+
+| Test | Why it is replay-only |
+| --- | --- |
+| `test_session.py::test_search_page_with_property_less_results` | The cassette mixes regular pages with stripped-down, property-less `search` records to a fixed result set (4 pages, 2 property-less) for issue #273; a live workspace has many more pages. See issue #374. |
+
+If you craft another replay-only cassette, add `@pytest.mark.replay_only` to its test and a
+row here so the next re-record preserves it.
