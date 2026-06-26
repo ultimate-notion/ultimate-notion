@@ -746,8 +746,17 @@ def wiki_db(notion_cached: Session) -> Database:
 
 @vcr_fixture(scope='module')
 def formula_db(notion_cached: Session) -> Database:
-    """Return manually created formula db."""
-    return require_db(notion_cached, FORMULA_DB)
+    """Return manually created formula db.
+
+    Notion's eventually-consistent `/search` index intermittently reports the formula
+    columns by their underlying storage type (e.g. `String` as `rich_text`), so reload
+    from the authoritative database-retrieve endpoint to bind the true formula schema
+    regardless of `/search` lag. `reload()`'s default `rebind_schema=True` would raise a
+    `SchemaError` here, so `rebind_schema=False` is required.
+    """
+    db = require_db(notion_cached, FORMULA_DB)
+    db.reload(rebind_schema=False)
+    return db
 
 
 @vcr_fixture(scope='module')
