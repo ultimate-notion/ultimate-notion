@@ -78,7 +78,10 @@ def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
         _logger.debug(msg)
 
     user_agent = kwargs.pop('user_agent', _get_default_user_agent())
-    httpx_client = httpx.Client(event_hooks={'request': [log_request], 'response': [log_response]})
+    # Retry transient connection failures (e.g. ephemeral-port exhaustion under heavy use). This applies only to
+    # establishing the connection, not to requests that already reached the server, so it cannot cause duplicate writes.
+    transport = httpx.HTTPTransport(retries=3)
+    httpx_client = httpx.Client(transport=transport, event_hooks={'request': [log_request], 'response': [log_response]})
     client = notion_client.Client(auth=auth, client=httpx_client, **kwargs)
     # we need to set the user agent manually, because notion_client ovewrites it during initialization
     httpx_client.headers['User-Agent'] = user_agent
