@@ -470,7 +470,9 @@ def test_query_new_task_db(new_task_db: uno.Database) -> None:
 
 @pytest.mark.vcr()
 def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.Database) -> None:
-    item_1, item_2 = formula_db.get_all_pages()
+    # Sort by title so the test does not depend on Notion's (workspace-specific) default row
+    # order, which `get_all_pages()` returns unsorted -- see issue #364.
+    item_1, item_2 = sorted(formula_db.get_all_pages(), key=lambda page: str(page.title))
     query = formula_db.query.filter(uno.prop('String') == 'Item 1')
     assert set(query.execute()) == {item_1}
 
