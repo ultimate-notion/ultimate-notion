@@ -387,6 +387,32 @@ class Bootstrap:
             typer.echo('Formula DB already has rows')
         self.check_formula_filterable(database)
 
+    def ensure_all_props_db_rows(self) -> None:
+        """Seed rows into the manually-created `All Properties DB`.
+
+        The database itself cannot be created through the API (it has AI Autofill and
+        Button properties, see `tests/TEST_WORKSPACE.md`) so it must be built by hand,
+        but its *rows* can be created through the API. `test_retrieve_property` reads the
+        first row, so the database must be non-empty for a live re-record (see issue #371).
+        Only writable properties are set; read-only ones (formula, rollup, AI, button,
+        timestamps, ...) are populated by Notion.
+        """
+        database = self.find_database('All Properties DB')
+        if database is None:
+            typer.echo('All Properties DB: not found; build it by hand first (see tests/TEST_WORKSPACE.md)')
+            return
+        if not database.is_empty:
+            typer.echo('All Properties DB already has rows')
+            return
+        for idx in (1, 2):
+            database.create_page(
+                title=f'Item {idx}',
+                text=f'Text {idx}',
+                number=idx,
+                checkbox=idx % 2 == 0,
+            )
+        typer.echo('seeded All Properties DB: 2 rows')
+
     @staticmethod
     def check_formula_filterable(database: uno.Database) -> None:
         """Report whether the Formula DB's formulas can be filtered on.
@@ -584,6 +610,7 @@ class Bootstrap:
         self.ensure_contacts_db()
         self.ensure_task_db()
         self.ensure_formula_db()
+        self.ensure_all_props_db_rows()
         self.ensure_static_pages()
         self.audit_manual_objects()
         self.audit_workspace_objects()
