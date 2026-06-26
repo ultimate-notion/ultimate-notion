@@ -91,14 +91,22 @@ PYTEST_MARKERS = ['check_latest_release', 'file_upload']
 # and a cassette with several searches only replays them in the order they were recorded. That makes
 # the shared fixtures fragile and ties a recording to the workspace it was made in. We add a matcher
 # that *additionally* compares the JSON body of `/v1/search` requests (a no-op for every other
-# endpoint), so each search is matched by what it actually queries. We also scrub a non-default root
+# endpoint), so each search is matched by what it actually queries. The same problem affects
+# database/datasource `/query` requests, whose filter/sort criteria also live in the body (issue
+# #367); a parallel matcher compares those by body too. We also scrub a non-default root
 # page title back to the canonical `Tests` on record, so a maintainer who cannot name their shared
 # root page `Tests` (via `UNO_TEST_ROOT_PAGE`) still produces cassettes that replay against the
 # committed set. See the "Set up a Notion test workspace" section in `CONTRIBUTING.md`.
 
 NOTION_SEARCH_PATH = '/v1/search'
+# Database/datasource queries (`POST /v1/databases/{id}/query`, `POST /v1/data_sources/{id}/query`)
+# carry their filter and sort criteria in the request body, which the default matchers ignore. We
+# recognise them by the `/query` path suffix (the id in the path is already distinguished by the
+# default `path` matcher). See issue #367.
+NOTION_QUERY_PATH_SUFFIX = '/query'
 VCR_DEFAULT_MATCHERS = ['method', 'scheme', 'host', 'port', 'path', 'query']
 VCR_SEARCH_MATCHER = 'notion_search_body'
+VCR_QUERY_MATCHER = 'notion_query_body'
 
 
 def _request_json_body(request: Any) -> Any:
@@ -126,9 +134,21 @@ def match_search_body(r1: Any, r2: Any) -> bool:
     return bool(_request_json_body(r1) == _request_json_body(r2))
 
 
+def match_query_body(r1: Any, r2: Any) -> bool:
+    """Match `POST .../query` requests by their JSON body; match everything else unconditionally.
+
+    Combined with the default `path` matcher this adds body matching *only* for the database/datasource
+    query endpoint, leaving all other endpoints matched exactly as before.
+    """
+    if not (r1.path.endswith(NOTION_QUERY_PATH_SUFFIX) and r2.path.endswith(NOTION_QUERY_PATH_SUFFIX)):
+        return True
+    return bool(_request_json_body(r1) == _request_json_body(r2))
+
+
 def register_notion_matchers(vcr: VCR) -> None:
     """Register Ultimate Notion's custom VCR matchers on a freshly built VCR instance."""
     vcr.register_matcher(VCR_SEARCH_MATCHER, match_search_body)
+    vcr.register_matcher(VCR_QUERY_MATCHER, match_query_body)
 
 
 def pytest_recording_configure(config: pytest.Config, vcr: VCR) -> None:
@@ -467,7 +487,7 @@ def normalize_response(response: dict[str, Any]) -> dict[str, Any]:
 def build_vcr_config() -> dict[str, Any]:
     """Build the pytest-recording config (also reused when recording from module-level fixtures)."""
     return {
-        'match_on': [*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER],
+        'match_on': [*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER, VCR_QUERY_MATCHER],
         'filter_headers': [(param, 'secret...') for param in SECRET_PARAMS],
         'filter_query_parameters': SECRET_PARAMS,
         'filter_post_data_parameters': SECRET_PARAMS,

@@ -22,6 +22,7 @@ from tests.conftest import (
     TESTS_PAGE,
     _SharedIdRegistry,
     _undash,
+    match_query_body,
     match_search_body,
     normalize_response,
     normalize_shared_ids_request,
@@ -170,6 +171,20 @@ def test_matcher_passes_non_search_requests() -> None:
     a = _FakeRequest('https://api.notion.com/v1/pages', json.dumps({'query': 'A'}), path='/v1/pages')
     b = _FakeRequest('https://api.notion.com/v1/pages', json.dumps({'query': 'B'}), path='/v1/pages')
     assert match_search_body(a, b)
+
+
+def test_matcher_compares_query_requests_by_body() -> None:
+    path = f'/v1/databases/{ROOT_ID}/query'
+    a = _FakeRequest('https://api.notion.com' + path, json.dumps({'filter': 'A'}), path=path)
+    b = _FakeRequest('https://api.notion.com' + path, json.dumps({'filter': 'B'}), path=path)
+    assert match_query_body(a, a)
+    assert not match_query_body(a, b)
+
+
+def test_query_matcher_passes_non_query_requests() -> None:
+    a = _FakeRequest('https://api.notion.com/v1/pages', json.dumps({'filter': 'A'}), path='/v1/pages')
+    b = _FakeRequest('https://api.notion.com/v1/pages', json.dumps({'filter': 'B'}), path='/v1/pages')
+    assert match_query_body(a, b)
 
 
 @pytest.fixture
