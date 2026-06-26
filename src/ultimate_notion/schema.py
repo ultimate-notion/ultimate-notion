@@ -999,13 +999,22 @@ class Schema(metaclass=SchemaType):
     _db_desc: rich_text.Text | None
     _database: Database | None = None
     _props: list[Property]
+    _partial: bool = False
 
-    def __init_subclass__(cls, db_title: str | None = None, db_id: str | None = None, **kwargs: Any):
+    def __init_subclass__(
+        cls,
+        db_title: str | None = None,
+        db_id: str | None = None,
+        *,
+        partial: bool = False,
+        **kwargs: Any,
+    ):
         if db_title is not None:
             db_title = rich_text.Text(db_title)
         cls._db_title = db_title
         cls._db_id = db_id
         cls._db_desc = rich_text.Text(cls.__doc__) if cls.__doc__ is not None else None
+        cls._partial = partial
         cls._validate()
         super().__init_subclass__(**kwargs)
 
@@ -1124,8 +1133,19 @@ class Schema(metaclass=SchemaType):
         return SList(prop for prop in cls.get_props() if isinstance(prop, Title)).item()
 
     @classmethod
-    def assert_consistency_with(cls, other_schema: type[Schema], *, during_init: bool = False) -> None:
-        """Assert that this schema is consistent with another schema."""
+    def assert_consistency_with(
+        cls,
+        other_schema: type[Schema],
+        *,
+        during_init: bool = False,
+        partial: bool = False,
+    ) -> None:
+        """Assert that this schema is consistent with another schema.
+
+        When `partial` is True, properties present in `cls` (the DB-reflected schema) but missing
+        from `other_schema` (the user-supplied schema) are tolerated. Extra properties in
+        `other_schema` and type mismatches still raise.
+        """
         own_schema_dct = cls.to_dict()
         other_schema_dct = other_schema.to_dict()
 
@@ -1170,14 +1190,18 @@ class Schema(metaclass=SchemaType):
 
         if other_schema_dct != own_schema_dct:
             props_added, props_removed, props_changed = dict_diff_str(own_schema_dct, other_schema_dct)
-            msg = 'Provided schema is not consistent with the current schema of the database:\n'
-            if props_added:
-                msg += f'- added: {", ".join(props_added)}\n'
-            if props_removed:
-                msg += f'- removed: {", ".join(props_removed)}\n'
-            if props_changed:
-                msg += f'- changed: {", ".join(props_changed)}\n'
-            raise SchemaError(msg)
+            if partial:
+                # Props in own (DB) but missing from other (user) are allowed in partial mode.
+                props_removed = []
+            if props_added or props_removed or props_changed:
+                msg = 'Provided schema is not consistent with the current schema of the database:\n'
+                if props_added:
+                    msg += f'- added: {", ".join(props_added)}\n'
+                if props_removed:
+                    msg += f'- removed: {", ".join(props_removed)}\n'
+                if props_changed:
+                    msg += f'- changed: {", ".join(props_changed)}\n'
+                raise SchemaError(msg)
 
     @classmethod
     def _bind_db(cls, db: Database) -> None:

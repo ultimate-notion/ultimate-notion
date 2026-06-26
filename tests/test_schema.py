@@ -240,6 +240,42 @@ def test_property_name_is_set() -> None:
             tags = uno.PropType.Number()
 
 
+def test_partial_schema_consistency() -> None:
+    """`partial=True` lets a Schema be a subset of the DB schema; extras and type mismatches still error."""
+
+    class Full(uno.Schema, db_title='Full'):
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
+        desc = uno.PropType.Text('Description')
+
+    class StrictSubset(uno.Schema, db_title='Strict Subset'):
+        name = uno.PropType.Title('Name')
+
+    assert StrictSubset._partial is False
+    with pytest.raises(SchemaError):
+        Full.assert_consistency_with(StrictSubset)
+
+    class PartialSubset(uno.Schema, db_title='Partial Subset', partial=True):
+        name = uno.PropType.Title('Name')
+
+    assert PartialSubset._partial is True
+    Full.assert_consistency_with(PartialSubset, partial=True)  # must not raise
+
+    class ExtraPartial(uno.Schema, db_title='Extra Partial', partial=True):
+        name = uno.PropType.Title('Name')
+        bogus = uno.PropType.Text('Bogus')
+
+    with pytest.raises(SchemaError):
+        Full.assert_consistency_with(ExtraPartial, partial=True)
+
+    class WrongTypePartial(uno.Schema, db_title='Wrong Type Partial', partial=True):
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Text('Cost')
+
+    with pytest.raises(SchemaError):
+        Full.assert_consistency_with(WrongTypePartial, partial=True)
+
+
 def test_to_pydantic_model() -> None:
     class Schema(uno.Schema, db_title='Schema'):
         name = uno.PropType.Title('Name')
