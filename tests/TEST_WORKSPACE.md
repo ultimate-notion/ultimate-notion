@@ -57,6 +57,10 @@ recorded cassette `tests/cassettes/fixtures/mod_all_props_db.yaml`).
 | `AI key info` | AI Autofill (Text output) | **API cannot create.** |
 | `AI custom` | AI Autofill (Text output) | **API cannot create.** |
 
+Once the database exists, the bootstrap script seeds a couple of rows into it through
+the API (only the writable properties are set). `test_retrieve_property` reads the first
+row, so the database must be non-empty for a live re-record (see issue #371).
+
 Notes:
 - **Names are matched exactly (and are case-sensitive).** Notion gives new properties
   default names that differ from the table. For example, the title is `Name`, and you get
