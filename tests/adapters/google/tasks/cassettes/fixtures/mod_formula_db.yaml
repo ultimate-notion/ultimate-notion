@@ -289,4 +289,91 @@ interactions:
       - '0'
     http_version: HTTP/1.1
     status_code: 200
+- request:
+    body: null
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2022-06-28'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/databases/00000000-0000-4000-8000-00000000000d
+  response:
+    content: '{"object": "database", "id": "00000000-0000-4000-8000-00000000000d",
+      "cover": null, "icon": null, "created_time": "2024-11-18T14:08:00.000Z", "created_by":
+      {"object": "user", "id": "00000000-0000-4000-8000-0000000000fa"}, "last_edited_by":
+      {"object": "user", "id": "00000000-0000-4000-8000-0000000000fa"}, "last_edited_time":
+      "2025-06-10T17:41:00.000Z", "title": [{"type": "text", "text": {"content": "Formula
+      DB", "link": null}, "annotations": {"bold": false, "italic": false, "strikethrough":
+      false, "underline": false, "code": false, "color": "default"}, "plain_text":
+      "Formula DB", "href": null}], "description": [], "is_inline": false, "properties":
+      {"String": {"id": "PbR%3B", "name": "String", "description": null, "type": "formula",
+      "formula": {"expression": "{{notion:block_property:title:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.style(\"u\",
+      \"pink\")"}}, "Date": {"id": "aK_F", "name": "Date", "description": null, "type":
+      "formula", "formula": {"expression": "{{notion:block_property:created_time}}.dateAdd(1,
+      \"weeks\")"}}, "Checkbox": {"id": "f%3EhC", "name": "Checkbox", "description":
+      null, "type": "formula", "formula": {"expression": "{{notion:block_property:fjsB:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.includes(\"Done\")"}},
+      "Tags": {"id": "fjsB", "name": "Tags", "description": null, "type": "multi_select",
+      "multi_select": {"options": [{"id": "73212b86-d2fb-47f6-8c57-e9791c3a6a09",
+      "name": "In Progress", "color": "pink", "description": null}, {"id": "427db6b8-1ec9-4374-b721-6ab4572b185b",
+      "name": "Done", "color": "gray", "description": null}]}}, "Number": {"id": "voBT",
+      "name": "Number", "description": null, "type": "formula", "formula": {"expression":
+      "{{notion:block_property:fjsB:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.length()"}},
+      "Name": {"id": "title", "name": "Name", "description": null, "type": "title",
+      "title": {}}}, "parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
+      "url": "https://www.notion.so/0000000000004000800000000000000d", "public_url":
+      null, "archived": false, "in_trash": false}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 996bf2aefdda65da-FRA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - b2fbabfe-90de-4b84-a2c2-406859827bc5
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
 version: 1
