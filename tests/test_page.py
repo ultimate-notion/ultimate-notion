@@ -76,7 +76,7 @@ def test_parent_children(intro_page: uno.Page) -> None:
 # re-recorded live. `record_mode='none'` makes pytest-recording always replay the committed cassette
 # (recorded before Notion changed this) -- it overrides the CLI record mode and, crucially, is applied
 # before the `rewrite` branch that would delete the cassette -- so a full `vcr-rewrite` preserves it.
-# Remove once built-in-icon-type support lands (it models the new shape). See #372 (part of #361).
+# Remove once built-in-icon-type support lands (it models the new shape); see #376. See #372 (part of #361).
 @pytest.mark.vcr(record_mode='none')
 def test_icon_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.create_page(parent=root_page, title='My new page with icon')
