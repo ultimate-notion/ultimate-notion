@@ -600,6 +600,12 @@ def vcr_fixture(
                     # Replaying them (e.g. via `new_episodes`) would feed back the workspace-portable
                     # placeholder ids written by the normalisation, 404ing later modules in a full-suite
                     # re-record. Deterministic fixtures (e.g. `search('Tests')`) re-record identically.
+                    #
+                    # `all` mode never replays, but vcrpy *loads* an existing cassette and *appends*
+                    # live interactions to it rather than replacing them; the stale entries survive and
+                    # win on later replay (first match wins). Delete the file first so the rewrite is a
+                    # true overwrite and the fixture cannot carry old schema/data forward (see #383).
+                    Path(cassette_dir, cassette_name).unlink(missing_ok=True)
                     mode = 'all'
                 elif mode is None:
                     mode = 'none'

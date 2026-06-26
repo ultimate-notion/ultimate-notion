@@ -169,21 +169,19 @@ You only need this section to run the tests live or to re-record cassettes.
 
 The committed cassettes are one coherent recording of a single workspace, so you
 **cannot** simply `vcr-rewrite` a new test against your own workspace and commit the
-result: `vcr-rewrite` replays the shared fixture cassettes in
-`tests/cassettes/fixtures/` (the `Tests` root page, the seeded databases, …) with
-*your* workspace's ids, which then diverge from the rest of the suite. Record a new
+result: `vcr-rewrite` re-records the shared fixture cassettes in
+`tests/cassettes/fixtures/` (the `Tests` root page, the seeded databases, …) against
+*your* workspace, whose ids then diverge from the rest of the suite. Record a new
 test like this instead:
 
 ```console
 # 1. Bootstrap your workspace (root page named `Tests`, or set UNO_TEST_ROOT_PAGE).
-# 2. Delete the shared fixture cassettes so they record fresh against your workspace
-#    (vcr-rewrite otherwise downgrades them to `new_episodes` and replays committed ids).
-rm tests/cassettes/fixtures/mod_*.yaml
-# 3. Record only your new test.
+# 2. Record only your new test. vcr-rewrite re-records the shared fixtures it touches
+#    against your workspace too (it deletes and re-fetches them live, see #383).
 NOTION_TOKEN=ntn_… hatch run vcr-rewrite -k your_new_test
-# 4. Keep ONLY your new test's cassette; restore the shared fixtures unchanged.
+# 3. Keep ONLY your new test's cassette; restore the shared fixtures unchanged.
 git checkout -- tests/cassettes/fixtures
-# 5. Verify it replays offline against the committed fixtures.
+# 4. Verify it replays offline against the committed fixtures.
 hatch run vcr-only -k your_new_test
 ```
 
