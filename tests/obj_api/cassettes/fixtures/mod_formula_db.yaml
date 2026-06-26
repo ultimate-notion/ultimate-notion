@@ -206,10 +206,10 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: null
+    body: ''
     headers:
       accept:
-      - application/json
+      - '*/*'
       accept-encoding:
       - gzip, deflate
       authorization:
@@ -227,35 +227,17 @@ interactions:
     method: GET
     uri: https://api.notion.com/v1/databases/00000000-0000-4000-8000-00000000000d
   response:
-    content: '{"object": "database", "id": "00000000-0000-4000-8000-00000000000d",
-      "cover": null, "icon": null, "created_time": "2024-11-18T14:08:00.000Z", "created_by":
-      {"object": "user", "id": "00000000-0000-4000-8000-0000000000fa"}, "last_edited_by":
-      {"object": "user", "id": "00000000-0000-4000-8000-0000000000fa"}, "last_edited_time":
-      "2025-06-10T17:41:00.000Z", "title": [{"type": "text", "text": {"content": "Formula
-      DB", "link": null}, "annotations": {"bold": false, "italic": false, "strikethrough":
-      false, "underline": false, "code": false, "color": "default"}, "plain_text":
-      "Formula DB", "href": null}], "description": [], "is_inline": false, "properties":
-      {"String": {"id": "PbR%3B", "name": "String", "description": null, "type": "formula",
-      "formula": {"expression": "{{notion:block_property:title:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.style(\"u\",
-      \"pink\")"}}, "Date": {"id": "aK_F", "name": "Date", "description": null, "type":
-      "formula", "formula": {"expression": "{{notion:block_property:created_time}}.dateAdd(1,
-      \"weeks\")"}}, "Checkbox": {"id": "f%3EhC", "name": "Checkbox", "description":
-      null, "type": "formula", "formula": {"expression": "{{notion:block_property:fjsB:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.includes(\"Done\")"}},
-      "Tags": {"id": "fjsB", "name": "Tags", "description": null, "type": "multi_select",
-      "multi_select": {"options": [{"id": "73212b86-d2fb-47f6-8c57-e9791c3a6a09",
-      "name": "In Progress", "color": "pink", "description": null}, {"id": "427db6b8-1ec9-4374-b721-6ab4572b185b",
-      "name": "Done", "color": "gray", "description": null}]}}, "Number": {"id": "voBT",
-      "name": "Number", "description": null, "type": "formula", "formula": {"expression":
-      "{{notion:block_property:fjsB:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.length()"}},
-      "Name": {"id": "title", "name": "Name", "description": null, "type": "title",
-      "title": {}}}, "parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
-      "url": "https://www.notion.so/0000000000004000800000000000000d", "public_url":
-      null, "archived": false, "in_trash": false}'
+    content: '{"object":"database","id":"00000000-0000-4000-8000-00000000000d","cover":null,"icon":null,"created_time":"2024-11-18T14:08:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa"},"last_edited_time":"2025-06-10T17:41:00.000Z","title":[{"type":"text","text":{"content":"Formula
+      DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Formula
+      DB","href":null}],"description":[],"is_inline":false,"properties":{"String":{"id":"PbR%3B","name":"String","description":null,"type":"formula","formula":{"expression":"{{notion:block_property:title:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.style(\"u\",
+      \"pink\")"}},"Date":{"id":"aK_F","name":"Date","description":null,"type":"formula","formula":{"expression":"{{notion:block_property:created_time}}.dateAdd(1,
+      \"weeks\")"}},"Checkbox":{"id":"f%3EhC","name":"Checkbox","description":null,"type":"formula","formula":{"expression":"{{notion:block_property:fjsB:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.includes(\"Done\")"}},"Tags":{"id":"fjsB","name":"Tags","description":null,"type":"multi_select","multi_select":{"options":[{"id":"73212b86-d2fb-47f6-8c57-e9791c3a6a09","name":"In
+      Progress","color":"pink","description":null},{"id":"427db6b8-1ec9-4374-b721-6ab4572b185b","name":"Done","color":"gray","description":null}]}},"Number":{"id":"voBT","name":"Number","description":null,"type":"formula","formula":{"expression":"{{notion:block_property:fjsB:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}.length()"}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/0000000000004000800000000000000d","public_url":null,"archived":false,"in_trash":false,"request_id":"f5cc7f83-69db-41b3-abf7-fedc071e9c01"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996bf66f2c219ba1-FRA
+      - 996c0da239e071d6-FRA
       Connection:
       - keep-alive
       Content-Encoding:
@@ -285,7 +267,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a7f3d263-f9ac-4cc5-bab8-2d368900d1fc
+      - f5cc7f83-69db-41b3-abf7-fedc071e9c01
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
