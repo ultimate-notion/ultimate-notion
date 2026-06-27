@@ -269,11 +269,15 @@ def get_mime_type(file: BinaryIO | str | Path) -> str:
         mime_type = _get_mime_type(file)
     elif isinstance(file, Path):
         mime_type = _get_mime_type(file.name)
-    elif file_name := getattr(file, 'name', None):  # BinaryIO has a 'name' unless it is e.g. a BytesIO
-        mime_type = _get_mime_type(file_name)
     else:
-        msg = 'Cannot determine MIME type without filename or file.name attribute.'
-        raise ValueError(msg)
+        try:
+            file_name = file.name  # BinaryIO has a 'name' unless it is e.g. a BytesIO
+        except AttributeError:
+            file_name = ''
+        if not file_name:
+            msg = 'Cannot determine MIME type without filename or file.name attribute.'
+            raise ValueError(msg)
+        mime_type = _get_mime_type(file_name)
 
     # correct some MIME types to match Notion's expectations
     mime_type_map = {
