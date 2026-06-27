@@ -649,6 +649,13 @@ class Heading3(Heading[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
         return f'#### {super().to_markdown()}'
 
 
+class Heading4(Heading[obj_blocks.Heading4], wraps=obj_blocks.Heading4):
+    """Heading 4 block."""
+
+    def to_markdown(self) -> str:
+        return f'##### {super().to_markdown()}'
+
+
 class Quote(ColoredTextBlock[obj_blocks.Quote], ParentBlock[obj_blocks.Quote], wraps=obj_blocks.Quote):
     """Quote block."""
 
