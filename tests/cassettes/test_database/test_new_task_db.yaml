@@ -95,190 +95,190 @@ interactions:
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: "{\"object\":\"database\",\"id\":\"29c974f3-b388-815f-b961-d53c19db47db\",\"cover\":null,\"icon\":null,\"created_time\":\"2025-10-30T15:40:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_time\":\"2025-10-30T15:40:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+    content: "{\"object\":\"database\",\"id\":\"38c9ce7b-60a4-8179-a3db-f4ac9708fd0c\",\"cover\":null,\"icon\":null,\"created_time\":\"2026-06-27T04:53:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_time\":\"2026-06-27T04:53:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
       Tasks\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
-      Tasks\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"URL\":{\"id\":\"%3CldL\",\"name\":\"URL\",\"description\":null,\"type\":\"url\",\"url\":{}},\"Priority\":{\"id\":\"AjWs\",\"name\":\"Priority\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"7b3c7cfe-e1bc-4937-a2f9-c8e59a3e2248\",\"name\":\"\u2739
-      High\",\"color\":\"red\",\"description\":null},{\"id\":\"db281f1d-d9df-49a6-bfc6-c548bd377298\",\"name\":\"\u2737
-      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"c9a318fa-6ed8-4a06-a3a4-bb95c8a58c74\",\"name\":\"\u2736
-      Low\",\"color\":\"gray\",\"description\":null}]}},\"Urgency\":{\"id\":\"BbC_\",\"name\":\"Urgency\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:%5E%60WX:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"\\\", if(now() > if(or({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      Tasks\",\"href\":null}],\"description\":[],\"is_inline\":false,\"properties\":{\"Done\":{\"id\":\"%3FGR~\",\"name\":\"Done\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:EeLx:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Done\\\"\"}},\"Status\":{\"id\":\"EeLx\",\"name\":\"Status\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"1270b701-62e1-45eb-acda-d6569d0d873a\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"a152d1d1-1f01-478a-8091-5fab6bc95129\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"4ea3dec7-180f-4feb-bcac-1ffca77e8753\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"354213f8-5820-4d93-968d-f29231a1ad81\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"7e9aaf8f-0442-4a29-9730-dac235eba565\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"Due
+      by\":{\"id\":\"FAQk\",\"name\":\"Due by\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
       >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
-      {{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), empty({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
+      {{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      1, \\\"months\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Repeats\":{\"id\":\"Ixp%5C\",\"name\":\"Repeats\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"87ecbc9c-bfbb-4142-8b32-0a2d8813df9b\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"1f958911-0166-43ca-9c54-662936508d8e\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"30f9c869-1b19-4423-b2f0-05738bab0695\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"cac08a01-0193-4aea-9294-d71cfdd4040a\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"f9c82966-00fa-4c72-a686-5881beab6565\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"c9495466-e118-4530-bd05-94082dc1ee4a\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"6c4dbf87-4292-444b-8047-a0aff907b2e6\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Urgency\":{\"id\":\"PnKA\",\"name\":\"Urgency\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:EeLx:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"\\\", if(now() > if(or({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
+      \\\"minutes\\\"), empty({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
+      {{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
+      \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
+      1, \\\"months\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\")))))))))), \\\"\U0001F525
-      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"Done\":{\"id\":\"RTqD\",\"name\":\"Done\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:%5E%60WX:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Done\\\"\"}},\"Repeats\":{\"id\":\"%5COFG\",\"name\":\"Repeats\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"515ef408-8cfc-421a-97dc-3d772705530e\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"982bd7d5-887b-40a1-aecf-988435ba5c90\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"3aae1ae9-4afe-4c4f-8f0c-e4de55f965a3\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"c3d2e67c-54cb-4a4d-833a-9e7eb1f63d85\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"48b55e99-0946-45ce-a74a-4b1b57e9548c\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"d68be2f1-345f-4bbe-9baa-6e3bf2e4357b\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"91445a3c-356b-4627-ab38-666556007b8b\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Status\":{\"id\":\"%5E%60WX\",\"name\":\"Status\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"9bc0c1c2-9601-446a-aea8-30b4eb586497\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"5178871a-cfc8-4737-a65a-f5ee29094da6\",\"name\":\"In
-      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"3f92927e-75c7-4fca-9c52-7189a485bbf6\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"8669a311-903a-4dd6-9891-dbaa12c7fe25\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"9a0f9e82-d839-4e40-aefc-7496094b742d\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"Due
-      by\":{\"id\":\"%60%7BCd\",\"name\":\"Due by\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
-      {{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Started\":{\"id\":\"q%3C%3B%3E\",\"name\":\"Started\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Due
-      Date\":{\"id\":\"sMSo\",\"name\":\"Due Date\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"description\":null,\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"00000000-0000-4000-8000-000000000001\"},\"url\":\"https://www.notion.so/29c974f3b388815fb961d53c19db47db\",\"public_url\":null,\"archived\":false,\"in_trash\":false,\"request_id\":\"e5a6ea64-4e55-486d-9ef7-0c7a0350424f\"}"
+      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"Started\":{\"id\":\"XbA%3C\",\"name\":\"Started\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"Xm%3CA\",\"name\":\"Priority\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"e77a33bc-b3d9-4323-930b-4f825f961136\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"80afaa7c-e6a8-4420-be29-75921243b7e6\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"d8813f5e-4f93-4dc2-b554-fecc4b8e205d\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"URL\":{\"id\":\"ibu%5D\",\"name\":\"URL\",\"description\":null,\"type\":\"url\",\"url\":{}},\"Due
+      Date\":{\"id\":\"yf%5Bd\",\"name\":\"Due Date\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"description\":null,\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"00000000-0000-4000-8000-000000000001\"},\"url\":\"https://www.notion.so/38c9ce7b60a48179a3dbf4ac9708fd0c\",\"public_url\":null,\"in_trash\":false,\"archived\":false,\"request_id\":\"93aa9083-a55b-40db-90b7-95a9f33d0e19\"}"
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c033b9c099241-FRA
+      - a121d97b0f4c653b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -308,7 +308,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e5a6ea64-4e55-486d-9ef7-0c7a0350424f
+      - 93aa9083-a55b-40db-90b7-95a9f33d0e19
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -340,194 +340,194 @@ interactions:
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/29c974f3-b388-815f-b961-d53c19db47db
+    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8179-a3db-f4ac9708fd0c
   response:
-    content: "{\"object\":\"database\",\"id\":\"29c974f3-b388-815f-b961-d53c19db47db\",\"cover\":null,\"icon\":null,\"created_time\":\"2025-10-30T15:40:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_time\":\"2025-10-30T15:40:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
+    content: "{\"object\":\"database\",\"id\":\"38c9ce7b-60a4-8179-a3db-f4ac9708fd0c\",\"cover\":null,\"icon\":null,\"created_time\":\"2026-06-27T04:53:00.000Z\",\"created_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_by\":{\"object\":\"user\",\"id\":\"00000000-0000-4000-8000-0000000000f1\"},\"last_edited_time\":\"2026-06-27T04:53:00.000Z\",\"title\":[{\"type\":\"text\",\"text\":{\"content\":\"My
       Tasks\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
       Tasks\",\"href\":null}],\"description\":[{\"type\":\"text\",\"text\":{\"content\":\"My
       personal task list\",\"link\":null},\"annotations\":{\"bold\":false,\"italic\":false,\"strikethrough\":false,\"underline\":false,\"code\":false,\"color\":\"default\"},\"plain_text\":\"My
-      personal task list\",\"href\":null}],\"is_inline\":false,\"properties\":{\"URL\":{\"id\":\"%3CldL\",\"name\":\"URL\",\"description\":null,\"type\":\"url\",\"url\":{}},\"Priority\":{\"id\":\"AjWs\",\"name\":\"Priority\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"7b3c7cfe-e1bc-4937-a2f9-c8e59a3e2248\",\"name\":\"\u2739
-      High\",\"color\":\"red\",\"description\":null},{\"id\":\"db281f1d-d9df-49a6-bfc6-c548bd377298\",\"name\":\"\u2737
-      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"c9a318fa-6ed8-4a06-a3a4-bb95c8a58c74\",\"name\":\"\u2736
-      Low\",\"color\":\"gray\",\"description\":null}]}},\"Urgency\":{\"id\":\"BbC_\",\"name\":\"Urgency\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:%5E%60WX:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"\\\", if(now() > if(or({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      personal task list\",\"href\":null}],\"is_inline\":false,\"properties\":{\"Done\":{\"id\":\"%3FGR~\",\"name\":\"Done\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:EeLx:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Done\\\"\"}},\"Status\":{\"id\":\"EeLx\",\"name\":\"Status\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"1270b701-62e1-45eb-acda-d6569d0d873a\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"a152d1d1-1f01-478a-8091-5fab6bc95129\",\"name\":\"In
+      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"4ea3dec7-180f-4feb-bcac-1ffca77e8753\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"354213f8-5820-4d93-968d-f29231a1ad81\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"7e9aaf8f-0442-4a29-9730-dac235eba565\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"Due
+      by\":{\"id\":\"FAQk\",\"name\":\"Due by\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
       >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
-      {{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), empty({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
+      {{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      1, \\\"months\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Repeats\":{\"id\":\"Ixp%5C\",\"name\":\"Repeats\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"87ecbc9c-bfbb-4142-8b32-0a2d8813df9b\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"1f958911-0166-43ca-9c54-662936508d8e\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"30f9c869-1b19-4423-b2f0-05738bab0695\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"cac08a01-0193-4aea-9294-d71cfdd4040a\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"f9c82966-00fa-4c72-a686-5881beab6565\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"c9495466-e118-4530-bd05-94082dc1ee4a\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"6c4dbf87-4292-444b-8047-a0aff907b2e6\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Urgency\":{\"id\":\"PnKA\",\"name\":\"Urgency\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if({{notion:block_property:EeLx:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Done\\\", \\\"\u2705 Done\\\", if(empty({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"\\\", if(now() > if(or({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
+      \\\"minutes\\\"), empty({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
+      {{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
+      \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
+      1, \\\"days\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
+      1, \\\"months\\\"), hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:Ixp%5C:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
+      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
+      hour({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
+      \\\"hours\\\"), minute({{notion:block_property:yf%5Bd:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
       \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\")))))))))), \\\"\U0001F525
-      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"Done\":{\"id\":\"RTqD\",\"name\":\"Done\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"{{notion:block_property:%5E%60WX:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Done\\\"\"}},\"Repeats\":{\"id\":\"%5COFG\",\"name\":\"Repeats\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"515ef408-8cfc-421a-97dc-3d772705530e\",\"name\":\"Daily\",\"color\":\"gray\",\"description\":null},{\"id\":\"982bd7d5-887b-40a1-aecf-988435ba5c90\",\"name\":\"Weekly\",\"color\":\"pink\",\"description\":null},{\"id\":\"3aae1ae9-4afe-4c4f-8f0c-e4de55f965a3\",\"name\":\"Bi-weekly\",\"color\":\"brown\",\"description\":null},{\"id\":\"c3d2e67c-54cb-4a4d-833a-9e7eb1f63d85\",\"name\":\"Monthly\",\"color\":\"orange\",\"description\":null},{\"id\":\"48b55e99-0946-45ce-a74a-4b1b57e9548c\",\"name\":\"Quarterly\",\"color\":\"blue\",\"description\":null},{\"id\":\"d68be2f1-345f-4bbe-9baa-6e3bf2e4357b\",\"name\":\"Bi-annually\",\"color\":\"purple\",\"description\":null},{\"id\":\"91445a3c-356b-4627-ab38-666556007b8b\",\"name\":\"Yearly\",\"color\":\"red\",\"description\":null}]}},\"Status\":{\"id\":\"%5E%60WX\",\"name\":\"Status\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"9bc0c1c2-9601-446a-aea8-30b4eb586497\",\"name\":\"Backlog\",\"color\":\"gray\",\"description\":null},{\"id\":\"5178871a-cfc8-4737-a65a-f5ee29094da6\",\"name\":\"In
-      Progress\",\"color\":\"blue\",\"description\":null},{\"id\":\"3f92927e-75c7-4fca-9c52-7189a485bbf6\",\"name\":\"Blocked\",\"color\":\"red\",\"description\":null},{\"id\":\"8669a311-903a-4dd6-9891-dbaa12c7fe25\",\"name\":\"Done\",\"color\":\"green\",\"description\":null},{\"id\":\"9a0f9e82-d839-4e40-aefc-7496094b742d\",\"name\":\"Rejected\",\"color\":\"brown\",\"description\":null}]}},\"Due
-      by\":{\"id\":\"%60%7BCd\",\"name\":\"Due by\",\"description\":null,\"type\":\"formula\",\"formula\":{\"expression\":\"if(or({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      >= dateSubtract(dateSubtract(now(), hour(now()), \\\"hours\\\"), minute(now()),
-      \\\"minutes\\\"), empty({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}})),
-      {{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Daily\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"days\\\") + 1, \\\"days\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") + 1, \\\"weeks\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-weekly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"weeks\\\") % 2)) + 2, \\\"weeks\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Monthly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") + 1, \\\"months\\\"), 1,
-      \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Quarterly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 4)) + 4, \\\"months\\\"),
-      1, \\\"days\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Bi-annually\\\", dateSubtract(dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") - (dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"months\\\") % 6)) + 6, \\\"months\\\"),
-      1, \\\"months\\\"), hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), if({{notion:block_property:%5COFG:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}
-      == \\\"Yearly\\\", dateAdd(dateAdd(dateSubtract(dateAdd(dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), dateBetween(now(), dateAdd(dateSubtract(dateSubtract({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}},
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), 1, \\\"days\\\"), \\\"years\\\") + 1, \\\"years\\\"), 1, \\\"days\\\"),
-      hour({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"hours\\\"), minute({{notion:block_property:sMSo:00000000-0000-0000-0000-000000000000:00000000-0000-4000-8000-0000000000f0}}),
-      \\\"minutes\\\"), fromTimestamp(toNumber(\\\"\\\"))))))))))\"}},\"Started\":{\"id\":\"q%3C%3B%3E\",\"name\":\"Started\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Due
-      Date\":{\"id\":\"sMSo\",\"name\":\"Due Date\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"description\":null,\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"00000000-0000-4000-8000-000000000001\"},\"url\":\"https://www.notion.so/29c974f3b388815fb961d53c19db47db\",\"public_url\":null,\"archived\":false,\"in_trash\":false,\"request_id\":\"cb70fecc-f329-4207-8c1f-887509098549\"}"
+      Overdue\\\", \\\"\U0001F550 Upcoming\\\")))\"}},\"Started\":{\"id\":\"XbA%3C\",\"name\":\"Started\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Priority\":{\"id\":\"Xm%3CA\",\"name\":\"Priority\",\"description\":null,\"type\":\"select\",\"select\":{\"options\":[{\"id\":\"e77a33bc-b3d9-4323-930b-4f825f961136\",\"name\":\"\u2739
+      High\",\"color\":\"red\",\"description\":null},{\"id\":\"80afaa7c-e6a8-4420-be29-75921243b7e6\",\"name\":\"\u2737
+      Medium\",\"color\":\"yellow\",\"description\":null},{\"id\":\"d8813f5e-4f93-4dc2-b554-fecc4b8e205d\",\"name\":\"\u2736
+      Low\",\"color\":\"gray\",\"description\":null}]}},\"URL\":{\"id\":\"ibu%5D\",\"name\":\"URL\",\"description\":null,\"type\":\"url\",\"url\":{}},\"Due
+      Date\":{\"id\":\"yf%5Bd\",\"name\":\"Due Date\",\"description\":null,\"type\":\"date\",\"date\":{}},\"Task\":{\"id\":\"title\",\"name\":\"Task\",\"description\":null,\"type\":\"title\",\"title\":{}}},\"parent\":{\"type\":\"page_id\",\"page_id\":\"00000000-0000-4000-8000-000000000001\"},\"url\":\"https://www.notion.so/38c9ce7b60a48179a3dbf4ac9708fd0c\",\"public_url\":null,\"in_trash\":false,\"archived\":false,\"request_id\":\"83f54b2b-06a6-4c7c-85b0-6b2d82219303\"}"
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c0347fb629241-FRA
+      - a121d9812984653b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -557,7 +557,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - cb70fecc-f329-4207-8c1f-887509098549
+      - 83f54b2b-06a6-4c7c-85b0-6b2d82219303
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -584,15 +584,15 @@ interactions:
       user-agent:
       - secret...
     method: DELETE
-    uri: https://api.notion.com/v1/blocks/29c974f3-b388-815f-b961-d53c19db47db
+    uri: https://api.notion.com/v1/blocks/38c9ce7b-60a4-8179-a3db-f4ac9708fd0c
   response:
-    content: '{"object":"block","id":"29c974f3-b388-815f-b961-d53c19db47db","parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"created_time":"2025-10-30T15:40:00.000Z","last_edited_time":"2025-10-30T15:40:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"archived":true,"in_trash":true,"type":"child_database","child_database":{"title":"My
-      Tasks"},"request_id":"a125dde6-7c83-44ce-ab13-fc34b2cc1bf9"}'
+    content: '{"object":"block","id":"38c9ce7b-60a4-8179-a3db-f4ac9708fd0c","parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"created_time":"2026-06-27T04:53:00.000Z","last_edited_time":"2026-06-27T04:53:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"has_children":false,"in_trash":true,"type":"child_database","child_database":{"title":"My
+      Tasks"},"archived":true,"request_id":"213e8d44-5bb1-45ae-b570-7dbd16bd308a"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - 996c034e4f2f9241-FRA
+      - a121d985fafe653b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -622,7 +622,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a125dde6-7c83-44ce-ab13-fc34b2cc1bf9
+      - 213e8d44-5bb1-45ae-b570-7dbd16bd308a
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
