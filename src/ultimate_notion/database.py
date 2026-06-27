@@ -417,9 +417,75 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def data_sources(self) -> SList[DataSource]:
-        """Return all data sources in this database."""
+        """Return all data sources in this database.
+
+        Trashed data sources are excluded: Notion keeps them in the container's raw list even after
+        they are moved to the trash, so they are filtered out here (use `restore_ds()` to bring one
+        back).
+        """
         session = get_active_session()
-        return SList(session.get_ds(ds.id) for ds in self.obj_ref.data_sources)
+        return SList(ds for ds in (session.get_ds(ds.id) for ds in self.obj_ref.data_sources) if not ds.is_deleted)
+
+    def create_ds(self, *, schema: type[Schema] | None = None, title: str | None = None) -> DataSource:
+        """Add a new data source to this database.
+
+        In case a title and a schema are provided, the title overrides the schema's `db_title`. If no
+        schema is given, a default single-title schema is used. Use `delete_ds()` to remove one again.
+        """
+        session = get_active_session()
+        title_obj, schema_dct, _ = session._build_ds_create_args(schema, title)
+        ds_obj = session.api.data_sources.create(parent=self.obj_ref, schema=schema_dct, title=title_obj)
+        ds = session._bind_new_ds(ds_obj, schema)
+        self.obj_ref = session.api.databases.retrieve(self.id)  # refresh the `data_sources` list
+        return ds
+
+    def delete_ds(self, ds: DataSource) -> DataSource:
+        """Remove (move to trash) a single data source from this database.
+
+        The data source's siblings and the database container itself are left untouched. To delete the
+        whole database (and all its data sources), use `delete()`. Restore a removed data source with
+        `restore_ds()`.
+        """
+        session = get_active_session()
+        if ds.database_id != self.id:
+            msg = f'Data source `{ds.id}` does not belong to database `{self.id}`.'
+            raise InvalidAPIUsageError(msg)
+        session.api.data_sources.update(ds.obj_ref, in_trash=True)
+        return ds
+
+    def restore_ds(self, ds: DataSource) -> DataSource:
+        """Restore a data source previously removed from this database with `delete_ds()`."""
+        session = get_active_session()
+        if ds.database_id != self.id:
+            msg = f'Data source `{ds.id}` does not belong to database `{self.id}`.'
+            raise InvalidAPIUsageError(msg)
+        session.api.data_sources.update(ds.obj_ref, in_trash=False)
+        return ds
+
+    def reload(self) -> Self:
+        """Reload this database from Notion, refreshing its data sources and metadata."""
+        session = get_active_session()
+        self.obj_ref = session.api.databases.retrieve(self.id)
+        return self
+
+    def delete(self) -> Self:
+        """Delete (move to trash) this database and all of its data sources."""
+        if not self.is_deleted:
+            session = get_active_session()
+            block_obj = session.api.blocks.delete(self.id)
+            self.obj_ref.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
+            self.obj_ref.in_trash = block_obj.in_trash
+            self._delete_me_from_parent()
+        return self
+
+    def restore(self) -> Self:
+        """Restore this database from trash."""
+        if self.is_deleted:
+            session = get_active_session()
+            block_obj = session.api.blocks.restore(self.id)
+            self.obj_ref.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
+            self.obj_ref.in_trash = block_obj.in_trash
+        return self
 
     @property
     def query(self) -> Query:

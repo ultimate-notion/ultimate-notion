@@ -323,3 +323,61 @@ def test_get_or_create_db(notion: uno.Session, root_page: uno.Page) -> None:  # 
 def test_new_task_db(new_task_db: uno.DataSource) -> None:
     # ToDo: Implement a proper test
     pass
+
+
+@pytest.mark.vcr()
+def test_create_db(notion: uno.Session, root_page: uno.Page) -> None:
+    """`create_db` creates a database container with a single initial data source."""
+
+    class Article(uno.Schema, db_title='My Articles'):
+        name = uno.PropType.Title('Name')
+        cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
+
+    db = notion.create_db(parent=root_page, schema=Article)
+    assert isinstance(db, uno.Database)
+    assert db.is_db
+    assert db.title == 'My Articles'
+
+    ds = db.data_sources.item()
+    assert isinstance(ds, uno.DataSource)
+    # The container is transparent: the data source presents as a child of the page, while its
+    # `database_id` points back to the container we just created.
+    assert ds.parent == root_page
+    assert ds.database_id == db.id
+    assert notion.get_db(ds.database_id).id == db.id
+
+    db.delete()
+    assert db.is_deleted
+    db.restore()
+    assert not db.is_deleted
+    db.delete()
+
+
+@pytest.mark.vcr()
+def test_db_add_remove_data_source(notion: uno.Session, root_page: uno.Page) -> None:
+    """A database can hold multiple data sources that can be added and removed individually."""
+
+    class Items(uno.Schema, db_title='Items'):
+        name = uno.PropType.Title('Name')
+
+    class People(uno.Schema, db_title='People'):
+        name = uno.PropType.Title('Name')
+
+    db = notion.create_db(parent=root_page, schema=Items)
+    assert len(db.data_sources) == 1
+
+    people_ds = db.create_ds(schema=People)
+    assert people_ds.database_id == db.id
+    assert len(db.data_sources) == 2
+    assert {ds.title for ds in db.data_sources} == {'Items', 'People'}
+
+    db.delete_ds(people_ds)
+    assert people_ds.is_deleted
+    assert len(db.data_sources) == 1
+    assert db.data_sources.item().title == 'Items'
+
+    db.restore_ds(people_ds)
+    assert not people_ds.is_deleted
+    assert len(db.data_sources) == 2
+
+    db.delete()

@@ -231,6 +231,7 @@ class DataSourcesEndpoint(Endpoint):
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
+        in_trash: bool | None = None,
     ) -> dict[str, Any]:
         """Build a request payload from the given items.
 
@@ -256,21 +257,29 @@ class DataSourcesEndpoint(Endpoint):
         if inline is not None:
             request['is_inline'] = inline
 
+        if in_trash is not None:
+            request['in_trash'] = in_trash
+
         return request
 
     # https://developers.notion.com/reference/create-a-data-source
     def create(
         self,
-        parent: Page,
+        parent: Database,
         schema: Mapping[str, Property],
         *,
         title: list[RichTextBaseObject] | None = None,
-        inline: bool = False,
     ) -> DataSource:
-        """Add a data source to the given Page parent."""
-        parent_ref = PageRef.build(parent)
-        _logger.debug(f'Creating new data source below page with id `{parent_ref.page_id}`.')
-        request = self._build_request(parent=parent_ref, schema=schema, title=title, inline=inline)
+        """Add an additional data source to an existing database container.
+
+        In API version 2025-09-03+ a data source's parent is always a database. To create the
+        *first* data source under a page, create the database via `DatabasesEndpoint.create`
+        (which seeds it with an initial data source); this endpoint only adds further data
+        sources to a database that already exists.
+        """
+        parent_ref = DatabaseRef.build(parent)
+        _logger.debug(f'Creating new data source in database with id `{parent_ref.database_id}`.')
+        request = self._build_request(parent=parent_ref, schema=schema, title=title)
         data = self.raw_api.create(**request)
         return DataSource.model_validate(data)
 
@@ -291,18 +300,21 @@ class DataSourcesEndpoint(Endpoint):
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
         schema: Mapping[str, Property | RenameProp | None] | None = None,
+        in_trash: bool | None = None,
     ) -> None:
         """Update the DataSource object on the server.
 
         The data source info will be updated to the latest version from the server. Passing a
-        `parent` (a `DatabaseRef`) reassigns the data source to a different parent database.
+        `parent` (a `DatabaseRef`) reassigns the data source to a different parent database. Pass
+        `in_trash=True`/`False` to trash or restore an individual data source (the data source's
+        containing database is left untouched).
 
         API reference: https://developers.notion.com/reference/update-a-data-source
         """
         _logger.debug(f'Updating info of data source with id `{ds.id}`.')
 
         if request := self._build_request(
-            parent=parent, schema=schema, title=title, description=description, inline=inline
+            parent=parent, schema=schema, title=title, description=description, inline=inline, in_trash=in_trash
         ):
             data = self._as_dict(self.raw_api.update(str(ds.id), **request))
             ds.update(**data)
