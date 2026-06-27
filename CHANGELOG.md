@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.10, 2026-
+## Unreleased
+
+## Version 0.10, 2026-06-27
 
 - New: Support tab blocks via the new `Tabs` block, which groups content into labeled tabs. Each tab is a `Paragraph` whose text is the tab label and whose children hold the tab content. Create tabs up front with `Tabs([...labels])` or add them later with `Tabs.add_tab()`, issue #188.
 - New: Support icons on tab labels (and paragraphs): read or write a paragraph's icon via the new `Paragraph.icon` property (mirroring `Page.icon`), pass an optional `icon` to `Tabs.add_tab()`, and render it in `Tabs.to_markdown()`, issue #421.
