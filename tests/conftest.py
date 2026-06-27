@@ -68,9 +68,11 @@ if TYPE_CHECKING:
 ENV_TEST_ROOT_PAGE = 'UNO_TEST_ROOT_PAGE'
 
 # Manually created DBs and Pages in Notion for testing purposes
-TESTS_PAGE = os.environ.get(
-    ENV_TEST_ROOT_PAGE, 'Ultimate Notion Tests'
-)  # root page for all tests with connected Notion integration
+# The default is the canonical `Tests` that the committed cassettes are normalised to (see the
+# workspace-portable cassette machinery below); offline replay (`hatch run vcr-only`, CI) relies on it.
+# A maintainer whose live root page is named differently points the suite at it via `UNO_TEST_ROOT_PAGE`,
+# and the request/response scrubbing maps that title back to `Tests` when (re-)recording.
+TESTS_PAGE = os.environ.get(ENV_TEST_ROOT_PAGE, 'Tests')  # root page for all tests with connected Notion integration
 ALL_PROPS_DB = 'All Properties DB'  # DB with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
@@ -377,6 +379,18 @@ def pytest_addoption(parser: Parser) -> None:
             default=False,
             help=f'Use flag `{flag}` to run tests marked with `{marker}`.',
         )
+
+
+# Set in `pytest_configure` from `--record-mode`. In pure-replay mode (CI's `vcr-only`) a missing test
+# object means a missing or non-matching cassette, not a fresh workspace, so `require_*` must fail rather
+# than skip -- otherwise a new VCR test without its own cassette goes green. See `pytest_configure`.
+# A mutable holder (rather than a rebound module global) keeps `pytest_configure` free of `global`.
+_replay_state = {'only': False}
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Record whether this run is pure offline replay (`--record-mode=none`, i.e. CI's `vcr-only`)."""
+    _replay_state['only'] = config.getoption('--record-mode') == 'none'
 
 
 def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo[Any], report: pytest.TestReport) -> None:
@@ -741,10 +755,13 @@ def require_page(notion: Session, title: str) -> Page:
 
     A fresh workspace will not have the manually created test objects, so depending
     tests skip with a helpful message instead of erroring. See the "Set up a Notion
-    test workspace" section in `CONTRIBUTING.md`.
+    test workspace" section in `CONTRIBUTING.md`. In pure-replay mode (CI), a missing
+    page means a missing/non-matching cassette and is a hard failure, not a skip.
     """
     pages = notion.search_page(title)
     if not pages:
+        if _replay_state['only']:
+            pytest.fail(f'No cassette data for page {title!r}; record a cassette for this test.')
         pytest.skip(f'Test workspace has no page titled {title!r}; see CONTRIBUTING.md.')
     return pages.item()
 
@@ -753,6 +770,8 @@ def require_ds(notion: Session, title: str) -> DataSource:
     """Return the named data source, or skip the test if the workspace does not contain it."""
     dss = notion.search_ds(title)
     if not dss:
+        if _replay_state['only']:
+            pytest.fail(f'No cassette data for data source {title!r}; record a cassette for this test.')
         pytest.skip(f'Test workspace has no data source titled {title!r}; see CONTRIBUTING.md.')
     return dss.item()
 
