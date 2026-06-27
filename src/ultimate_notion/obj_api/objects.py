@@ -446,7 +446,7 @@ class Bot(User[BotTypeData], type='bot'):
     """Represents a Bot in Notion."""
 
     # Even if stated otherwise in the docs, `bot` type data is optional and for instance
-    # not present when a new page is created by a bot within a database with a `CreatedBy` Property.
+    # not present when a new page is created by a bot within a data source with a `CreatedBy` Property.
     # For ease of use, we include a default instance of the bot type data.
     bot: BotTypeData = Field(default_factory=BotTypeData)
 

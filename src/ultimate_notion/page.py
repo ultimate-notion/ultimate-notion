@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 
 
 class PagePropertiesNS(Mapping[str, Any]):
-    """Namespace of the properties of a page as defined in the schema of the database.
+    """Namespace of the properties of a page as defined in the schema of the data source.
 
     This defines the `.props` namespace of a page `page` and updates the content
     on the Notion server side in case of an assignment.
@@ -73,11 +73,11 @@ class PagePropertiesNS(Mapping[str, Any]):
         return self._get_property(prop_name).value
 
     def __setitem__(self, prop_name: str, value: Any) -> None:
-        # Todo: use the schema of the database to see which properties are writeable at all.
+        # Todo: use the schema of the data source to see which properties are writeable at all.
         db = self._page.parent_ds
 
         if db is None:
-            msg = f'Trying to set a property but page {self._page} is not bound to any database'
+            msg = f'Trying to set a property but page {self._page} is not bound to any data source'
             raise RuntimeError(msg)
 
         if not isinstance(value, PropertyValue):
@@ -137,7 +137,7 @@ class Page(
         self.props = self._create_page_props_ns()
 
     def _create_page_props_ns(self) -> PagePropertiesNS:
-        """Create a namespace for the properties of this page defind by the database."""
+        """Create a namespace for the properties of this page defind by the data source."""
         schema = None if self.parent_ds is None else self.parent_ds.schema
         return PagePropertiesNS(page=self, schema=schema)
 
@@ -172,7 +172,7 @@ class Page(
 
     @property
     def public_url(self) -> str | None:
-        """Return the public URL of this database."""
+        """Return the public URL of this page."""
         return self.obj_ref.public_url
 
     @property
@@ -330,7 +330,7 @@ class Page(
 
         !!! Warning
 
-            Deleting a page will also delete all child pages and child databases recursively.
+            Deleting a page will also delete all child pages and child data sources recursively.
             If these objects are already cached in the session, they will not be updated.
             Use `session.cache.clear()` to clear the cache or call `reload()` on them.
         """
@@ -362,7 +362,7 @@ class Page(
         db = self.parent_ds
 
         if db is None:
-            msg = f'Trying to set properties but page {self} is not bound to any database'
+            msg = f'Trying to set properties but page {self} is not bound to any data source'
             raise RuntimeError(msg)
 
         props = {}

@@ -68,7 +68,7 @@ def _wait_for_consistency(predicate: Callable[[], bool], description: str) -> No
 class Session:
     """A session for the Notion API.
 
-    The session keeps tracks of all objects, e.g. pages, databases, etc.
+    The session keeps tracks of all objects, e.g. pages, data sources, etc.
     in an object store to avoid unnecessary calls to the API.
     """
 

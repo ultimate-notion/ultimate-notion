@@ -136,7 +136,7 @@ class Page(DataObject, MentionMixin, object='page'):
 
     def _get_title_prop_name(self) -> str:
         """Get the name of the title property."""
-        # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
+        # As the 'title' property might be renamed in case of pages in data sources, we look for the `id`.
         for name, prop in self.properties.items():
             if prop.id == 'title':
                 return name

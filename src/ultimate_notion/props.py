@@ -1,5 +1,5 @@
 """
-Page property values especially for pages within databases.
+Page property values especially for pages within data sources.
 The names of the properties reflect the name in the Notion UI.
 """
 
@@ -399,7 +399,7 @@ class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
 
 
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
-    """Verification property value of pages in wiki databases."""
+    """Verification property value of pages in wiki data sources."""
 
     # ToDo: Write a unit test for this!
     readonly = True
@@ -431,7 +431,7 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
 class Button(PropertyValue[obj_props.Button], wraps=obj_props.Button):
     """Button property value.
 
-    This is a read-only property that represents a button in a database.
+    This is a read-only property that represents a button in a data source.
     """
 
     readonly = True

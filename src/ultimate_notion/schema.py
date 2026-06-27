@@ -1,8 +1,8 @@
-"""Functionality around defining a database schema.
+"""Functionality around defining a data source schema.
 
-Currently only normal databases, no wiki databases, can be created [1].
-Neither the `Unique ID` nor `Status` nor the `Verfication` page property can be set as a database property
-in a custom Schema when creating the database.
+Currently only normal data sources, no wiki data sources, can be created [1].
+Neither the `Unique ID` nor `Status` nor the `Verfication` page property can be set as a data source property
+in a custom Schema when creating the data source.
 
 [1] https://developers.notion.com/docs/working-with-databases#wiki-databases
 
@@ -14,8 +14,8 @@ property, e.g. `Text`, `Number`.
 
 The source of truth is always the `obj_ref` and a `Property` holds only auxilliary
 information if actually needed. Since the object references `obj_ref` must always point
-to the actual `obj_api.blocks.Database.properties` value if the schema is bound to a database,
-the method `_set_obj_refs` rewires this when a schema is used to create a database.
+to the actual `obj_api.blocks.Database.properties` value if the schema is bound to a data source,
+the method `_set_obj_refs` rewires this when a schema is used to create a data source.
 """
 
 from __future__ import annotations
@@ -66,12 +66,12 @@ GO_co = TypeVar('GO_co', bound=PropertyGO, default=PropertyGO, covariant=True)
 class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
     """Base class for Notion property objects.
 
-    A property defines the name and type of a property in a database, e.g. number, date, text, etc.
+    A property defines the name and type of a property in a data source, e.g. number, date, text, etc.
     """
 
     """Reference to the low-level object representation of this property"""
     allowed_at_creation = True
-    """If the Notion API allows to create a new database with a property of this type"""
+    """If the Notion API allows to create a new data source with a property of this type"""
     _name: str | None = None  # name given by the user, not the Notion API, will match when set
     _owner: SchemaType | None = None  # back reference to the schema
     _attr_name: str | None = None  # name of the attribute within the schema holding the Property
@@ -211,15 +211,15 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
 
 
 class Title(Property[obj_schema.Title], wraps=obj_schema.Title):
-    """Defines the mandatory title property in a database."""
+    """Defines the mandatory title property in a data source."""
 
 
 class Text(Property[obj_schema.RichText], wraps=obj_schema.RichText):
-    """Defines a text property in a database."""
+    """Defines a text property in a data source."""
 
 
 class Number(Property[obj_schema.Number], wraps=obj_schema.Number):
-    """Defines a number property in a database."""
+    """Defines a number property in a data source."""
 
     def __init__(self, name: str | None = None, *, format: NumberFormat | str = NumberFormat.NUMBER):  # noqa: A002
         super().__init__(name, format=NumberFormat(format))
@@ -239,7 +239,7 @@ class Number(Property[obj_schema.Number], wraps=obj_schema.Number):
 
 
 class Select(Property[obj_schema.Select], wraps=obj_schema.Select):
-    """Defines a select property in a database."""
+    """Defines a select property in a data source."""
 
     def __init__(self, name: str | None = None, *, options: list[Option] | type[OptionNS]):
         if isinstance(options, type) and issubclass(options, OptionNS):
@@ -275,7 +275,7 @@ class Select(Property[obj_schema.Select], wraps=obj_schema.Select):
 
 
 class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect):
-    """Defines a multi-select property in a database."""
+    """Defines a multi-select property in a data source."""
 
     def __init__(self, name: str | None = None, *, options: list[Option] | type[OptionNS]):
         if isinstance(options, type) and issubclass(options, OptionNS):
@@ -312,12 +312,12 @@ class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect
 
 
 class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
-    """Defines a status property in a database.
+    """Defines a status property in a data source.
 
     The Notion API doesn't allow to create a property of this type.
     Sending it to the API with options and option groups defined results in an error
     about the existence of the keys `options` and `groups` and removing them
-    creates a database with the property missing... ignorance is bliss.
+    creates a data source with the property missing... ignorance is bliss.
 
     Also the Status configuration is not mentioned as a
     [Property Schema Object])https://developers.notion.com/reference/property-schema-object).
@@ -386,35 +386,35 @@ class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
 
 
 class Date(Property[obj_schema.Date], wraps=obj_schema.Date):
-    """Defines a date property in a database."""
+    """Defines a date property in a data source."""
 
 
 class Person(Property[obj_schema.People], wraps=obj_schema.People):
-    """Defines a person/people property in a database."""
+    """Defines a person/people property in a data source."""
 
 
 class Files(Property[obj_schema.Files], wraps=obj_schema.Files):
-    """Defines a files property in a database."""
+    """Defines a files property in a data source."""
 
 
 class Checkbox(Property[obj_schema.Checkbox], wraps=obj_schema.Checkbox):
-    """Defines a checkbox property in database."""
+    """Defines a checkbox property in data source."""
 
 
 class Email(Property[obj_schema.Email], wraps=obj_schema.Email):
-    """Defines an e-mail property in a database."""
+    """Defines an e-mail property in a data source."""
 
 
 class URL(Property[obj_schema.URL], wraps=obj_schema.URL):
-    """Defines a URL property in a database."""
+    """Defines a URL property in a data source."""
 
 
 class Phone(Property[obj_schema.PhoneNumber], wraps=obj_schema.PhoneNumber):
-    """Defines a phone number property in a database."""
+    """Defines a phone number property in a data source."""
 
 
 class Formula(Property[obj_schema.Formula], wraps=obj_schema.Formula):
-    """Defines a formula property in a database.
+    """Defines a formula property in a data source.
 
     Currently the formula expression cannot reference other formula properties, e.g. `prop("other formula")`
     This is a limitation of the Notion API.
@@ -433,10 +433,10 @@ class Formula(Property[obj_schema.Formula], wraps=obj_schema.Formula):
 
 
 class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
-    """Relation to another database."""
+    """Relation to another data source."""
 
-    _rel_schema: type[Schema] | None = None  # other schema, i.e. of the target database
-    _two_way_prop: Property | str | None = None  # other property, i.e. of the target database
+    _rel_schema: type[Schema] | None = None  # other schema, i.e. of the target data source
+    _two_way_prop: Property | str | None = None  # other property, i.e. of the target data source
 
     def __init__(
         self, name: str | None = None, *, schema: type[Schema] | None = None, two_way_prop: Relation | str | None = None
@@ -475,7 +475,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         try:
             db = self.schema.get_ds()
         except SchemaNotBoundError as e:
-            msg = f"A database with schema '{self.schema.__name__}' needs to be created first!"
+            msg = f"A data source with schema '{self.schema.__name__}' needs to be created first!"
             raise RelationError(msg) from e
 
         if self._two_way_prop:
@@ -502,7 +502,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
 
     @property
     def schema(self) -> type[Schema]:
-        """Schema of the relation database."""
+        """Schema of the relation data source."""
         if self._rel_schema is None and self._get_owner().is_bound():
             session = get_active_session()
             self._rel_schema = session.get_ds(self.obj_ref.relation.data_source_id).schema
@@ -515,7 +515,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
 
     @schema.setter
     def schema(self, new_schema: type[Schema]) -> None:
-        """Set the schema of the relation database."""
+        """Set the schema of the relation data source."""
         if self.is_two_way:
             new_rel = obj_schema.DualPropertyRelation.build_relation(new_schema.get_ds().id)
         else:
@@ -564,7 +564,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
         """
 
         if (db := self.schema.get_ds()) is None:
-            msg = 'The target schema of the relation is not bound to a database'
+            msg = 'The target schema of the relation is not bound to a data source'
             raise RelationError(msg)
 
         if prop_name is None:  # delete the two-way property
@@ -632,7 +632,7 @@ class Relation(Property[obj_schema.Relation], wraps=obj_schema.Relation):
 
 
 class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
-    """Defines the rollup property in a database.
+    """Defines the rollup property in a data source.
 
     If the relation propery is a self-referencing relation, i.e. `uno.PropType.Relation(uno.SelfRef)` in the schema,
     then the `property` must be a `str` of the corresponding property name.
@@ -648,7 +648,7 @@ class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
     ):
         calculate = AggFunc.from_alias(calculate) if not isinstance(calculate, AggFunc) else calculate
 
-        # ToDo: One could check here if property really is a property in the database where relation points to
+        # ToDo: One could check here if property really is a property in the data source where relation points to
         super().__init__(name, relation=relation.name, property=rollup.name, function=calculate)
 
     @property
@@ -656,7 +656,7 @@ class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
         """Determines if the relation of the rollup is ready to be initialized."""
         try:
             return self.relation_prop._is_init_ready
-        except SchemaError:  # DB is not bound yet
+        except SchemaError:  # data source is not bound yet
             return False
 
     @property
@@ -686,23 +686,23 @@ class Rollup(Property[obj_schema.Rollup], wraps=obj_schema.Rollup):
 
 
 class CreatedTime(Property[obj_schema.CreatedTime], wraps=obj_schema.CreatedTime):
-    """Defines the created-time property in a database."""
+    """Defines the created-time property in a data source."""
 
 
 class CreatedBy(Property[obj_schema.CreatedBy], wraps=obj_schema.CreatedBy):
-    """Defines the created-by property in a database."""
+    """Defines the created-by property in a data source."""
 
 
 class LastEditedBy(Property[obj_schema.LastEditedBy], wraps=obj_schema.LastEditedBy):
-    """Defines the last-edited-by property in a database."""
+    """Defines the last-edited-by property in a data source."""
 
 
 class LastEditedTime(Property[obj_schema.LastEditedTime], wraps=obj_schema.LastEditedTime):
-    """Defines the last-edited-time property in a database."""
+    """Defines the last-edited-time property in a data source."""
 
 
 class ID(Property[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
-    """Defines a unique ID property in a database.
+    """Defines a unique ID property in a data source.
 
     !!! note
         The prefix of the ID will be capitalized by Notion automatically.
@@ -738,23 +738,23 @@ class ID(Property[obj_schema.UniqueID], wraps=obj_schema.UniqueID):
 
 
 class Place(Property[obj_schema.Place], wraps=obj_schema.Place):
-    """Defines a place property in a database."""
+    """Defines a place property in a data source."""
 
 
 class Verification(Property[obj_schema.Verification], wraps=obj_schema.Verification):
-    """Defines a unique ID property in a database."""
+    """Defines a unique ID property in a data source."""
 
     allowed_at_creation = False
 
 
 class Button(Property[obj_schema.Button], wraps=obj_schema.Button):
-    """Defines a button property in a database."""
+    """Defines a button property in a data source."""
 
     allowed_at_creation = False
 
 
 class PropType:
-    """Namespace class of all creatable property types of a database for easier access."""
+    """Namespace class of all creatable property types of a data source for easier access."""
 
     Title = Title
     Text = Text
@@ -781,7 +781,7 @@ class PropType:
 
 
 class SchemaType(ABCMeta):
-    """Metaclass for the schema of a database.
+    """Metaclass for the schema of a data source.
 
     This makes the schema class itself more user-friendly by providing a `__magic__` methods, e.g.
     letting it behave like a dictionary for the properties although it is a class, not an instance.
@@ -973,7 +973,7 @@ class SchemaType(ABCMeta):
 
 
 class SchemaModel(BaseModel):
-    """Base Pydantic model for schemas to validate pages within a database."""
+    """Base Pydantic model for schemas to validate pages within a data source."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra='forbid')
     _db_title: str | None = PrivateAttr(default=None)
@@ -997,7 +997,7 @@ class SchemaModel(BaseModel):
 
 
 class Schema(metaclass=SchemaType):
-    """Base class for the schema of a database."""
+    """Base class for the schema of a data source."""
 
     _db_title: rich_text.Text | None
     _db_id: str | None
@@ -1016,7 +1016,7 @@ class Schema(metaclass=SchemaType):
 
     @classmethod
     def _validate(cls) -> None:
-        """Validate the schema before creating a database."""
+        """Validate the schema before creating a data source."""
         try:
             cls.get_title_prop()
         except EmptyListError as e:
@@ -1175,7 +1175,7 @@ class Schema(metaclass=SchemaType):
 
         if other_schema_dct != own_schema_dct:
             props_added, props_removed, props_changed = dict_diff_str(own_schema_dct, other_schema_dct)
-            msg = 'Provided schema is not consistent with the current schema of the database:\n'
+            msg = 'Provided schema is not consistent with the current schema of the data source:\n'
             if props_added:
                 msg += f'- added: {", ".join(props_added)}\n'
             if props_removed:
@@ -1254,15 +1254,15 @@ class Schema(metaclass=SchemaType):
 
 
 class DefaultSchema(Schema):
-    # Default database schema of Notion.
+    # Default data source schema of Notion.
     #
-    # As inferred by just creating an empty database in the Notion UI.
-    # NOTE: Use no docstring here, otherwise it will be used as the database description.
+    # As inferred by just creating an empty data source in the Notion UI.
+    # NOTE: Use no docstring here, otherwise it will be used as the data source description.
 
     name = Title('Name')
 
 
 class SelfRef(Schema):
-    """Target schema for self-referencing database relations."""
+    """Target schema for self-referencing data source relations."""
 
     _ = Title('title')  # mandatory title property, used for nothing.

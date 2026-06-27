@@ -177,7 +177,7 @@ class QueryFilter(GenericObject):
 
 
 class PropertyFilter(QueryFilter, RollupArrayCondition):
-    """Represents a database property filter in Notion."""
+    """Represents a data source property filter in Notion."""
 
     property: str
     rollup: RollupCondition | None = None
