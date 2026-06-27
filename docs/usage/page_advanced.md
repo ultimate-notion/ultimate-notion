@@ -284,12 +284,11 @@ tabs[0].append(uno.Paragraph('Overview content'))
 tabs[1].append(uno.Paragraph('Details content'))
 ```
 
-To add another tab later, use `add_tab`. It returns the new tab so that we can append content to it
-right away:
+To add another tab later, use `add_tab` and then index into the block to append content to it:
 
 ```python
-more = tabs.add_tab('More')
-more.append(uno.Paragraph('Even more content'))
+tabs.add_tab('More')
+tabs[-1].append(uno.Paragraph('Even more content'))
 ```
 
 ## Advanced blocks

@@ -569,6 +569,13 @@ def _build_tabs_obj_ref() -> uno.Tabs:
 
 
 def test_tabs_offline() -> None:
+    with pytest.raises(ValueError):
+        uno.Tabs([])
+    with pytest.raises(TypeError):
+        uno.Tabs('Overview')  # a bare string is not a sequence of label strings
+    with pytest.raises(TypeError):
+        uno.Tabs(['Overview', 1])  # ty: ignore[invalid-argument-type]
+
     tabs = uno.Tabs(['Overview', 'Details'])
     # Like `Columns`, tabs are embedded in the obj_ref and only surfaced once the block is in Notion.
     assert tabs.tabs == ()

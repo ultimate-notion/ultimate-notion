@@ -58,6 +58,8 @@ if TYPE_CHECKING:
 
 MIN_COLS = 2
 """Minimum number of columns when creating a column block to structure a page."""
+MIN_TABS = 1
+"""Minimum number of tabs when creating a tabs block to structure a page."""
 MAX_BLOCK_CHILDREN = 100
 """"The maximum number of block children that can be appended in one API call.
 
@@ -1290,9 +1292,15 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
     See https://developers.notion.com/changelog/tab-block-support
     """
 
-    def __init__(self, tabs: Sequence[str] = ()) -> None:
+    def __init__(self, tabs: Sequence[str]) -> None:
         """Create a new `Tabs` block with an initially empty tab for each given label."""
         super().__init__()
+        if isinstance(tabs, str) or not isinstance(tabs, Sequence) or not all(isinstance(label, str) for label in tabs):
+            msg = 'Tabs must be initialized with a sequence of label strings.'
+            raise TypeError(msg)
+        if len(tabs) < MIN_TABS:
+            msg = f'Number of tabs must be at least {MIN_TABS}.'
+            raise ValueError(msg)
         self.obj_ref.tab.children = [Paragraph(label).obj_ref for label in tabs]
 
     def __getitem__(self, index: int) -> Paragraph:
@@ -1318,20 +1326,23 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
         """Return all tabs of this block. Alias for `tabs`."""
         return self.tabs
 
-    def add_tab(self, label: str, *, index: int | None = None) -> Paragraph:
-        """Add a new tab with the given label to this block.
+    def add_tab(self, label: str, index: int | None = None) -> Self:
+        """Add a new tab with the given label to this block at the given index.
 
-        The index must be between 0 and the number of tabs (inclusive). If no index is given, the
-        new tab is added at the end. Returns the created tab so that content can be appended to it.
+        The index must be between 0 and the number of tabs (inclusive).
+        If no index is given, the new tab is added at the end.
+
+        Append content to the new tab by indexing into the block, e.g. `tabs[-1].append(...)`.
         """
         if index is None:
             index = len(self.tabs)
-        if not 0 <= index <= len(self.tabs):
+        if 0 <= index <= len(self.tabs):
+            new_tab = Paragraph(label)
+            super().append(new_tab, after=self.tabs[index - 1] if index > 0 else None)
+            return self
+        else:
             msg = f'Tab index must be between 0 and {len(self.tabs)} (inclusive).'
             raise IndexError(msg)
-        tab = Paragraph(label)
-        super().append(tab, after=self.tabs[index - 1] if index > 0 else None)
-        return tab
 
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:  # noqa: PLR6301
         """Append a block or a sequence of blocks to the content of this block."""
