@@ -410,7 +410,11 @@ class Session:
 
     def upload(self, file: BinaryIO, *, file_name: str | None = None, mime_type: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
-        file_name = file_name if file_name is not None else os.path.basename(getattr(file, 'name', 'unknown_file'))
+        if file_name is None:
+            try:
+                file_name = os.path.basename(file.name)  # BinaryIO has a 'name' unless it is e.g. a BytesIO
+            except AttributeError:
+                file_name = 'unknown_file'
         mime_type = mime_type if mime_type is not None else get_mime_type(file)
         file_size = get_file_size(file)
         if mime_type == 'application/octet-stream':
