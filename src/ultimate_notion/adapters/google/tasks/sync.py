@@ -1,4 +1,4 @@
-"""Syncs a Notion database with a Google Tasks task list."""
+"""Syncs a Notion data source with a Google Tasks task list."""
 # ruff: noqa: PLR6301
 
 from __future__ import annotations
@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
-from ultimate_notion import Database, Page, Property
+from ultimate_notion import DataSource, Page, Property
 from ultimate_notion.adapters.google.tasks.client import GTask, GTaskList
 from ultimate_notion.adapters.sync import ID, ConflictMode, SyncTask
 from ultimate_notion.core import get_active_session
@@ -14,12 +14,12 @@ from ultimate_notion.utils import str_hash
 
 
 class SyncGTasks(SyncTask):
-    """Syncs a Notion database with a Google Tasks task list."""
+    """Syncs a Notion data source with a Google Tasks task list."""
 
     def __init__(
         self,
         *,
-        notion_db: Database,
+        notion_db: DataSource,
         tasklist: GTaskList,
         completed_col: Property | str,
         completed_val: Any,
@@ -49,11 +49,11 @@ class SyncGTasks(SyncTask):
         super().__init__(name=name, attr_map=attr_map, conflict_mode=conflict_mode)
 
     def get_notion_objects(self) -> list[Page]:
-        """Get all pages from database."""
-        # We remove all cached pages from the database to make sure we get the latest version
+        """Get all pages from data source."""
+        # We remove all cached pages from the data source to make sure we get the latest version
         cache = get_active_session().cache
         cached_pages = [
-            obj_id for obj_id, obj in cache.items() if isinstance(obj, Page) and obj.parent_db == self.notion_db
+            obj_id for obj_id, obj in cache.items() if isinstance(obj, Page) and obj.parent_ds == self.notion_db
         ]
         for page_id in cached_pages:
             del cache[page_id]

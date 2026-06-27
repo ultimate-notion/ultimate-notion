@@ -3,10 +3,11 @@ interactions:
     body: '{"parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
       "title": [{"type": "text", "plain_text": "Text Query DB Test", "annotations":
       {"bold": false, "italic": false, "strikethrough": false, "underline": false,
-      "code": false}, "text": {"content": "Text Query DB Test"}}], "properties": {"Title":
-      {"type": "title", "title": {}}, "Name": {"type": "rich_text", "rich_text": {}},
-      "Phone": {"type": "phone_number", "phone_number": {}}, "Email": {"type": "email",
-      "email": {}}, "URL": {"type": "url", "url": {}}}, "is_inline": false}'
+      "code": false}, "text": {"content": "Text Query DB Test"}}], "is_inline": false,
+      "initial_data_source": {"properties": {"Title": {"type": "title", "title": {}},
+      "Name": {"type": "rich_text", "rich_text": {}}, "Phone": {"type": "phone_number",
+      "phone_number": {}}, "Email": {"type": "email", "email": {}}, "URL": {"type":
+      "url", "url": {}}}}}'
     headers:
       accept:
       - '*/*'
@@ -17,7 +18,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '503'
+      - '527'
       content-type:
       - application/json
       cookie:
@@ -25,20 +26,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-8103-9bef-de00483e281d","cover":null,"icon":null,"created_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:57:00.000Z","title":[{"type":"text","text":{"content":"Text
+    content: '{"object":"database","id":"b11f1ebd-717f-4572-9040-6f9198b898fc","title":[{"type":"text","text":{"content":"Text
       Query DB Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Text
-      Query DB Test","href":null}],"description":[],"is_inline":false,"properties":{"URL":{"id":"KMqN","name":"URL","description":null,"type":"url","url":{}},"Phone":{"id":"Lsxr","name":"Phone","description":null,"type":"phone_number","phone_number":{}},"Email":{"id":"SO%5Ca","name":"Email","description":null,"type":"email","email":{}},"Name":{"id":"qK%5Cq","name":"Name","description":null,"type":"rich_text","rich_text":{}},"Title":{"id":"title","name":"Title","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a481039befde00483e281d","public_url":null,"in_trash":false,"archived":false,"request_id":"637c538f-9ab7-4efc-b10b-ed0825c05679"}'
+      Query DB Test","href":null}],"description":[],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-27T05:58:06.419+00:00","last_edited_time":"2026-06-27T05:58:06.419+00:00","data_sources":[{"id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","name":"Text
+      Query DB Test"}],"icon":null,"cover":null,"url":"https://www.notion.so/b11f1ebd717f457290406f9198b898fc","public_url":null,"archived":false,"request_id":"7662d44a-9caa-4921-b5d8-288c4b41f33b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df6ca9479b16-LHR
+      - a12237d0beb4fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -68,7 +70,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 637c538f-9ab7-4efc-b10b-ed0825c05679
+      - 7662d44a-9caa-4921-b5d8-288c4b41f33b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -76,7 +78,73 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-8103-9bef-de00483e281d"},
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2025-09-03'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483
+  response:
+    content: '{"object":"data_source","id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","cover":null,"icon":null,"created_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T05:58:00.000Z","title":[{"type":"text","text":{"content":"Text
+      Query DB Test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Text
+      Query DB Test","href":null}],"description":[],"is_inline":false,"properties":{"URL":{"id":"SzS%5C","name":"URL","description":null,"type":"url","url":{}},"Name":{"id":"c%7D~G","name":"Name","description":null,"type":"rich_text","rich_text":{}},"Email":{"id":"hB%3Ek","name":"Email","description":null,"type":"email","email":{}},"Phone":{"id":"tCeD","name":"Phone","description":null,"type":"phone_number","phone_number":{}},"Title":{"id":"title","name":"Title","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/b11f1ebd717f457290406f9198b898fc","public_url":null,"in_trash":false,"archived":false,"request_id":"bb964490-af99-4b8f-a7bc-4d729932377c"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a12237d72896fc2b-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - bb964490-af99-4b8f-a7bc-4d729932377c
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "6a6fddb0-5eef-4baa-b8c6-69e02f5f5483"},
       "properties": {}}'
     headers:
       accept:
@@ -88,7 +156,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '102'
+      - '108'
       content-type:
       - application/json
       cookie:
@@ -96,18 +164,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false,"request_id":"1d7d21fe-dc0e-4d3c-9bfe-cc35b080870e"}'
+    content: '{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false,"request_id":"283dc7eb-fa5f-4977-b398-36d46c3d29ed"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df701dfc9b16-LHR
+      - a12237d8bafcfc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -137,7 +205,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 1d7d21fe-dc0e-4d3c-9bfe-cc35b080870e
+      - 283dc7eb-fa5f-4977-b398-36d46c3d29ed
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -145,7 +213,7 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-8103-9bef-de00483e281d"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "6a6fddb0-5eef-4baa-b8c6-69e02f5f5483"},
       "properties": {"Title": {"type": "title", "title": [{"type": "text", "plain_text":
       "John", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "John"}}]}, "Name":
@@ -164,7 +232,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '670'
+      - '676'
       content-type:
       - application/json
       cookie:
@@ -172,20 +240,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+    content: '{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false,"request_id":"9ba9aedb-a116-4ec8-bc0e-10e33a09e65b"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false,"request_id":"5e7b9b93-89aa-4fc3-b75d-907d2cbbeb69"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df7268ed9b16-LHR
+      - a12237daee7dfc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -215,7 +283,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 9ba9aedb-a116-4ec8-bc0e-10e33a09e65b
+      - 5e7b9b93-89aa-4fc3-b75d-907d2cbbeb69
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -223,7 +291,7 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-8103-9bef-de00483e281d"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "6a6fddb0-5eef-4baa-b8c6-69e02f5f5483"},
       "properties": {"Title": {"type": "title", "title": [{"type": "text", "plain_text":
       "Jane", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Jane"}}]}, "Name":
@@ -242,7 +310,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '669'
+      - '675'
       content-type:
       - application/json
       cookie:
@@ -250,20 +318,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false,"request_id":"e30d1c80-571c-4aab-9564-d932bb3374a7"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false,"request_id":"4f628dca-744d-41ad-a676-78f3a00bf637"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df74cbee9b16-LHR
+      - a12237dd2997fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -293,7 +361,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e30d1c80-571c-4aab-9564-d932bb3374a7
+      - 4f628dca-744d-41ad-a676-78f3a00bf637
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -321,18 +389,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"0a83261d-bf86-4692-990a-05b972ba131b"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"c0b28e5c-ebaf-4289-82ef-c582277b5f60"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df76ce449b16-LHR
+      - a12237df6cf9fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -362,7 +430,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 0a83261d-bf86-4692-990a-05b972ba131b
+      - c0b28e5c-ebaf-4289-82ef-c582277b5f60
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -390,22 +458,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"d7759fc8-7413-4bb7-b944-eadccc6d651e"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"c2d55cb6-052a-4638-a436-958783c57c15"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df78a8929b16-LHR
+      - a12237e15f98fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -435,7 +503,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d7759fc8-7413-4bb7-b944-eadccc6d651e
+      - c2d55cb6-052a-4638-a436-958783c57c15
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -463,18 +531,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"09df3cb1-e594-435d-b99f-76c82f5b3522"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"f8b751a5-008e-461b-b59b-ec1c2878bada"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df7a7b579b16-LHR
+      - a12237e34a82fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -504,7 +572,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 09df3cb1-e594-435d-b99f-76c82f5b3522
+      - f8b751a5-008e-461b-b59b-ec1c2878bada
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -532,22 +600,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"113853de-4195-4dfc-90b3-b47bf2d568af"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"f4459553-414b-496a-ae71-4b687941386d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df7c5dd99b16-LHR
+      - a12237e53d2cfc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -577,7 +645,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 113853de-4195-4dfc-90b3-b47bf2d568af
+      - f4459553-414b-496a-ae71-4b687941386d
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -605,18 +673,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"bbe82640-0bc3-466e-b80f-4e43f254590b"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"e99d7890-3122-4f82-a3ca-68d6fb6e6456"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df7e68649b16-LHR
+      - a12237e6f842fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -646,7 +714,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - bbe82640-0bc3-466e-b80f-4e43f254590b
+      - e99d7890-3122-4f82-a3ca-68d6fb6e6456
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -674,22 +742,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"b00a294c-8bce-48d4-ab68-9836fded909a"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"25072491-e0df-4888-8332-25f50a73d973"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df805af49b16-LHR
+      - a12237e8caf4fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -719,7 +787,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b00a294c-8bce-48d4-ab68-9836fded909a
+      - 25072491-e0df-4888-8332-25f50a73d973
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -747,20 +815,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"63a90650-69b1-49bb-afec-e3ccdea87702"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"b3cdbdc5-aa21-438e-a6d9-21db9bda7f5d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df8a88969b16-LHR
+      - a12237eade1efc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -790,7 +858,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 63a90650-69b1-49bb-afec-e3ccdea87702
+      - b3cdbdc5-aa21-438e-a6d9-21db9bda7f5d
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -818,18 +886,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"3ceaeb56-1af9-4537-834f-62e7d5bdf17f"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"28b96ab2-b5bb-4c07-948c-92d11e928ac9"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df8cab1e9b16-LHR
+      - a12237ecc935fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -859,7 +927,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 3ceaeb56-1af9-4537-834f-62e7d5bdf17f
+      - 28b96ab2-b5bb-4c07-948c-92d11e928ac9
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -887,18 +955,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"0e0b9581-6826-4615-9d8a-e3ead107641a"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"12f9912d-6658-4469-9566-77205d174389"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df8e6d779b16-LHR
+      - a12237eeac44fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -928,7 +996,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 0e0b9581-6826-4615-9d8a-e3ead107641a
+      - 12f9912d-6658-4469-9566-77205d174389
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -956,22 +1024,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"315a8b56-31ca-4b59-a2c7-78a01cfdfc16"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"b9c7b8b8-0a64-4000-891d-722c81e2e136"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df905fd99b16-LHR
+      - a12237f08e84fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1001,7 +1069,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 315a8b56-31ca-4b59-a2c7-78a01cfdfc16
+      - b9c7b8b8-0a64-4000-891d-722c81e2e136
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1029,20 +1097,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"26e488dc-eeec-43b7-9e1e-dc9f5d4fd298"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"87d2e62b-510e-4695-a52e-88ce4fa540e8"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df925aa19b16-LHR
+      - a12237f2594efc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1072,7 +1140,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 26e488dc-eeec-43b7-9e1e-dc9f5d4fd298
+      - 87d2e62b-510e-4695-a52e-88ce4fa540e8
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1100,20 +1168,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"b27c6027-0c3b-4bfb-8b6a-b0e03dbdc386"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"facf9ed0-414a-4759-bc23-7456727c0508"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df946d4a9b16-LHR
+      - a12237f45c13fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1143,7 +1211,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b27c6027-0c3b-4bfb-8b6a-b0e03dbdc386
+      - facf9ed0-414a-4759-bc23-7456727c0508
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1171,22 +1239,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"efb5e1c4-f1be-4a1c-b15b-04499a9b6760"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"f8459b87-757a-42e0-b38c-c917389c7510"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df967fdd9b16-LHR
+      - a12237f63e89fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1216,7 +1284,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - efb5e1c4-f1be-4a1c-b15b-04499a9b6760
+      - f8459b87-757a-42e0-b38c-c917389c7510
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1244,18 +1312,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"a15dee41-712c-4117-bbb1-f5200e58bfc8"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"6546dfc3-1a79-4bbe-8868-21d944cff873"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df986a549b16-LHR
+      - a12237f80905fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1285,7 +1353,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a15dee41-712c-4117-bbb1-f5200e58bfc8
+      - 6546dfc3-1a79-4bbe-8868-21d944cff873
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1313,20 +1381,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"380d0b9b-619e-4b8a-8e8b-f4a85b2fc276"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"f183f72e-d016-435a-bb37-b63b3dd81a41"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df9d68bc9b16-LHR
+      - a12237fa0bcdfc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1356,7 +1424,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 380d0b9b-619e-4b8a-8e8b-f4a85b2fc276
+      - f183f72e-d016-435a-bb37-b63b3dd81a41
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1384,22 +1452,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"d3f8c1ad-f2fe-4e7f-9063-a50ca2690e67"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"b8eb361f-eeb8-4203-81cb-050d9e124f1a"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121df9f7b329b16-LHR
+      - a12237fbff0cfc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1429,7 +1497,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d3f8c1ad-f2fe-4e7f-9063-a50ca2690e67
+      - b8eb361f-eeb8-4203-81cb-050d9e124f1a
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1457,18 +1525,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"266e3d49-3a54-4a1b-a3af-213e0c043353"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"66a1d269-e5fd-41dd-8c79-623bbef4f5ff"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfa14d4d9b16-LHR
+      - a12237fdf9dffc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1498,7 +1566,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 266e3d49-3a54-4a1b-a3af-213e0c043353
+      - 66a1d269-e5fd-41dd-8c79-623bbef4f5ff
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1526,22 +1594,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"627053e7-1ede-4e16-8e86-f8a30359c7f3"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"e49d2847-fe72-4754-a912-2b1183f9a90b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfa31f789b16-LHR
+      - a12238011e53fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1571,7 +1639,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 627053e7-1ede-4e16-8e86-f8a30359c7f3
+      - e49d2847-fe72-4754-a912-2b1183f9a90b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1599,18 +1667,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"b67fc08e-8475-4466-972f-2135ba10599b"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"500c49dc-d764-454a-be5f-09512ea785e9"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfa52a279b16-LHR
+      - a1223802f8fcfc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1640,7 +1708,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b67fc08e-8475-4466-972f-2135ba10599b
+      - 500c49dc-d764-454a-be5f-09512ea785e9
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1668,22 +1736,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"5dc8d145-547a-41bc-824e-04da43b56fe8"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"f24647a1-4bb1-45c1-915c-36d1892f7785"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfa6ec649b16-LHR
+      - a1223804bb77fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1713,7 +1781,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 5dc8d145-547a-41bc-824e-04da43b56fe8
+      - f24647a1-4bb1-45c1-915c-36d1892f7785
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1741,18 +1809,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"f96cc404-e180-406e-b01a-257f895cabdc"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"9cd61781-23f3-4203-a0c4-b72bcf63c242"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfa8eee89b16-LHR
+      - a1223806ce6afc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1782,7 +1850,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - f96cc404-e180-406e-b01a-257f895cabdc
+      - 9cd61781-23f3-4203-a0c4-b72bcf63c242
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1810,22 +1878,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"7b34424c-3f0a-4c80-9918-779b3dd975c7"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"9c55502b-a66e-4fe6-9078-d750a4f79edf"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfaac9529b16-LHR
+      - a1223808993ffc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1855,7 +1923,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 7b34424c-3f0a-4c80-9918-779b3dd975c7
+      - 9c55502b-a66e-4fe6-9078-d750a4f79edf
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1883,18 +1951,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"13c71861-e8a5-49d5-9b7a-98ad024e2d32"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"6de32d35-c3ae-48b7-a849-83425d4b3e65"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfacdbe69b16-LHR
+      - a122380a8c33fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1924,7 +1992,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 13c71861-e8a5-49d5-9b7a-98ad024e2d32
+      - 6de32d35-c3ae-48b7-a849-83425d4b3e65
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1952,18 +2020,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"02f1b42f-199b-41bf-b129-69cc6ebf932d"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"a0fd07ad-ba4c-4764-878f-a619d54b3fd2"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfaeae6a9b16-LHR
+      - a122380c6ed1fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1993,7 +2061,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 02f1b42f-199b-41bf-b129-69cc6ebf932d
+      - a0fd07ad-ba4c-4764-878f-a619d54b3fd2
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2021,18 +2089,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"fa23ef98-cc6a-435f-8ce9-6d6d3e25fa6d"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"ea71c068-0b5c-4483-9178-d1d03a7826ef"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfb0788e9b16-LHR
+      - a122380e2965fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2062,7 +2130,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - fa23ef98-cc6a-435f-8ce9-6d6d3e25fa6d
+      - ea71c068-0b5c-4483-9178-d1d03a7826ef
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2090,22 +2158,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"d5341c99-0ae1-450a-929e-1e3b81abf1d0"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"02c181b0-2179-4390-84c3-2bda199d4cb6"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfb28afc9b16-LHR
+      - a12238101c28fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2135,7 +2203,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d5341c99-0ae1-450a-929e-1e3b81abf1d0
+      - 02c181b0-2179-4390-84c3-2bda199d4cb6
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2163,18 +2231,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"675506a3-11af-43d7-a392-3e0fad7dd7ec"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"363c3cce-8ea3-4e12-806c-fdb99c505122"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfb47d0f9b16-LHR
+      - a1223811fee5fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2204,7 +2272,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 675506a3-11af-43d7-a392-3e0fad7dd7ec
+      - 363c3cce-8ea3-4e12-806c-fdb99c505122
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2232,22 +2300,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"b4df9166-c4e3-4e8c-87ed-dc2f06ec14e8"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"99778d30-c4b4-4477-b048-9e9b37a54083"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfb67f6a9b16-LHR
+      - a1223813c987fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2277,7 +2345,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b4df9166-c4e3-4e8c-87ed-dc2f06ec14e8
+      - 99778d30-c4b4-4477-b048-9e9b37a54083
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2305,22 +2373,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"0f3597e1-5c8d-415d-a59f-fc2128deb261"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"1e824c73-c4c9-4944-8bde-174e94ac2082"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfb8499a9b16-LHR
+      - a1223815bc75fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2350,7 +2418,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 0f3597e1-5c8d-415d-a59f-fc2128deb261
+      - 1e824c73-c4c9-4944-8bde-174e94ac2082
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2378,18 +2446,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"c59c3967-542c-4622-9ae6-f16a96625ce2"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"7208ce29-d18e-4348-aead-a30355b5b498"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfba3bf69b16-LHR
+      - a12238179f56fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2419,7 +2487,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - c59c3967-542c-4622-9ae6-f16a96625ce2
+      - 7208ce29-d18e-4348-aead-a30355b5b498
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2447,20 +2515,20 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"4274b1b5-d87b-4d10-a6b9-0add778e2777"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"e90dbee3-379b-4341-98d2-3de7b555c92d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfbc5e7b9b16-LHR
+      - a122381989f4fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2490,7 +2558,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 4274b1b5-d87b-4d10-a6b9-0add778e2777
+      - e90dbee3-379b-4341-98d2-3de7b555c92d
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2518,18 +2586,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"a8832034-00f8-4415-b620-cd54f246818d"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"603c25a3-ebeb-4ebc-8d70-c53bd5ec815f"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfbe28be9b16-LHR
+      - a122381b6cc0fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2559,7 +2627,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a8832034-00f8-4415-b620-cd54f246818d
+      - 603c25a3-ebeb-4ebc-8d70-c53bd5ec815f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2587,18 +2655,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"f7171187-a0e6-422a-9673-5b3f8790e965"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"4e182621-c0cc-464e-b86e-3db52416ea70"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfc00b5e9b16-LHR
+      - a122381d781ffc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2628,7 +2696,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - f7171187-a0e6-422a-9673-5b3f8790e965
+      - 4e182621-c0cc-464e-b86e-3db52416ea70
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2656,22 +2724,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"c71563ac-684b-4d86-a640-9afd0e72e167"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"75f4a70d-aceb-4c34-be8a-9f9872dd65fd"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfc1fd9e9b16-LHR
+      - a122381f7b73fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2701,7 +2769,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - c71563ac-684b-4d86-a640-9afd0e72e167
+      - 75f4a70d-aceb-4c34-be8a-9f9872dd65fd
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2729,18 +2797,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"d2cba970-ff1d-4ecd-a714-e35035c59d77"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"4784e488-1782-4667-aea9-c787622476f8"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfc4083e9b16-LHR
+      - a12238216e8dfc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2770,7 +2838,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d2cba970-ff1d-4ecd-a714-e35035c59d77
+      - 4784e488-1782-4667-aea9-c787622476f8
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2798,22 +2866,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"85dcd5b2-19bd-4513-8e8f-bd4b2024fc73"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"1e8400f3-9033-414c-9295-d2b951b367ed"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfc5da629b16-LHR
+      - a12238233911fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2843,7 +2911,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 85dcd5b2-19bd-4513-8e8f-bd4b2024fc73
+      - 1e8400f3-9033-414c-9295-d2b951b367ed
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2871,22 +2939,22 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-818b-a7f4-e34a25b78746","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://jane.doe.de"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"jane.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81e2-9ff3-ea605a0e81ef","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://jane.doe.de"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Jane
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a4818ba7f4e34a25b78746","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-81dd-b0a2-dd2929abe6d2","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":"https://john.doe.com"},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":"123-456-7890"},"Email":{"id":"SO%5Ca","type":"email","email":"john.doe@gmail.com"},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"jane.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Jane","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Jane","href":null}]}},"url":"https://www.notion.so/Jane-38c9ce7b60a481e29ff3ea605a0e81ef","public_url":null,"archived":false},{"object":"page","id":"38c9ce7b-60a4-8124-91cd-cfc609d48ff6","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":"https://john.doe.com"},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[{"type":"text","text":{"content":"John
       Doe","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John
-      Doe","href":null}]},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a481ddb0a2dd2929abe6d2","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"79525460-3e66-48e2-95e1-49199e072aa6"}'
+      Doe","href":null}]},"Email":{"id":"hB%3Ek","type":"email","email":"john.doe@gmail.com"},"Phone":{"id":"tCeD","type":"phone_number","phone_number":"123-456-7890"},"Title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"John","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"John","href":null}]}},"url":"https://www.notion.so/John-38c9ce7b60a4812491cdcfc609d48ff6","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"35a58665-560d-420c-aa6a-cc9240c6ac05"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfc7dd4f9b16-LHR
+      - a12238254bf2fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2916,7 +2984,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 79525460-3e66-48e2-95e1-49199e072aa6
+      - 35a58665-560d-420c-aa6a-cc9240c6ac05
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2944,18 +3012,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-8123-93c7-eaec5056b07c","created_time":"2026-06-27T04:57:00.000Z","last_edited_time":"2026-06-27T04:57:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8103-9bef-de00483e281d"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"KMqN","type":"url","url":null},"Phone":{"id":"Lsxr","type":"phone_number","phone_number":null},"Email":{"id":"SO%5Ca","type":"email","email":null},"Name":{"id":"qK%5Cq","type":"rich_text","rich_text":[]},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a4812393c7eaec5056b07c","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"d99b0282-da90-47bd-8739-67bd8625506b"}'
+    content: '{"object":"list","results":[{"object":"page","id":"38c9ce7b-60a4-81ce-bdec-cfe34857fc91","created_time":"2026-06-27T05:58:00.000Z","last_edited_time":"2026-06-27T05:58:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"6a6fddb0-5eef-4baa-b8c6-69e02f5f5483","database_id":"b11f1ebd-717f-4572-9040-6f9198b898fc"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"URL":{"id":"SzS%5C","type":"url","url":null},"Name":{"id":"c%7D~G","type":"rich_text","rich_text":[]},"Email":{"id":"hB%3Ek","type":"email","email":null},"Phone":{"id":"tCeD","type":"phone_number","phone_number":null},"Title":{"id":"title","type":"title","title":[]}},"url":"https://www.notion.so/38c9ce7b60a481cebdeccfe34857fc91","public_url":null,"archived":false}],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"ea6ab712-a4ea-4acc-bc4f-4804227724a7"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfc9efe59b16-LHR
+      - a12238272ec7fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2985,7 +3053,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d99b0282-da90-47bd-8739-67bd8625506b
+      - ea6ab712-a4ea-4acc-bc4f-4804227724a7
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -3013,18 +3081,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"53e96242-576a-4cd1-afde-7d8e6955d6f7"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"989efd40-31eb-4544-863b-93f4c01252dc"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfcbea929b16-LHR
+      - a122382939c9fc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -3054,7 +3122,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 53e96242-576a-4cd1-afde-7d8e6955d6f7
+      - 989efd40-31eb-4544-863b-93f4c01252dc
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -3082,18 +3150,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8103-9bef-de00483e281d/query
+    uri: https://api.notion.com/v1/data_sources/6a6fddb0-5eef-4baa-b8c6-69e02f5f5483/query
   response:
-    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_database","page_or_database":{},"request_id":"cad3daec-0460-460a-9d82-9479ab9ebf6d"}'
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"page_or_data_source","page_or_data_source":{},"request_id":"0c00b35d-f89c-4a58-b97d-a786f9644acd"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dfcddcc09b16-LHR
+      - a122382b3cbefc2b-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -3123,7 +3191,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - cad3daec-0460-460a-9d82-9479ab9ebf6d
+      - 0c00b35d-f89c-4a58-b97d-a786f9644acd
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:

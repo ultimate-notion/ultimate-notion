@@ -169,7 +169,7 @@ class Files(PropertyValue, type='files'):
 class FormulaResult(TypedObject, ABC, polymorphic_base=True):
     """A Notion formula result.
 
-    This object contains the result of the expression in the database properties.
+    This object contains the result of the expression in the data source properties.
     """
 
 

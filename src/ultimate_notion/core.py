@@ -11,7 +11,7 @@ from uuid import UUID
 
 from typing_extensions import Self, TypeIs, TypeVar
 
-from ultimate_notion.errors import UnknownDatabaseError, UnknownPageError, UnsetError
+from ultimate_notion.errors import UnknownDatabaseError, UnknownDataSourceError, UnknownPageError, UnsetError
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import is_unset
@@ -24,7 +24,7 @@ GT_co = TypeVar('GT_co', bound=obj_core.GenericObject, default=obj_core.GenericO
 if TYPE_CHECKING:
     from pydantic_core import SchemaSerializer
 
-    from ultimate_notion.database import Database
+    from ultimate_notion.database import DataSource
     from ultimate_notion.page import Page
     from ultimate_notion.session import Session
     from ultimate_notion.user import User
@@ -149,16 +149,14 @@ WorkspaceType: TypeAlias = Literal[_Workspace.ROOT]
 """This represents the type of the root workspace in Notion for type hinting."""
 
 
-def resolve_ref(obj_ref: obj_core.NotionEntity) -> NotionEntity | WorkspaceType | None:
-    """Resolve a low-level NotionEntity reference to a high-level NotionEntity object.
+# ToDo: Use new syntax when requires-python >= 3.12
+NE_co = TypeVar('NE_co', bound=obj_core.NotionEntity, default=obj_core.NotionEntity, covariant=True)
 
-    Returns the parent Notion entity, Workspace if the workspace is the parent, or None if not accessible.
-    """
+
+def resolve_ref(obj_ref: obj_core.ParentRef) -> NotionEntity | WorkspaceType | None:
+    """Resolve a low-level parent reference to the high-level NotionEntity it points to."""
     session = get_active_session()
-    if is_unset(parent := obj_ref.parent):
-        raise UnsetError()
-
-    match parent:
+    match obj_ref:
         case objs.WorkspaceRef():
             return Workspace
         case objs.PageRef(page_id=page_id):
@@ -175,15 +173,18 @@ def resolve_ref(obj_ref: obj_core.NotionEntity) -> NotionEntity | WorkspaceType 
                 msg = f'No access to parent database with id `{database_id}`: {e}'
                 _logger.info(msg)
                 return None
+        case objs.DataSourceRef(data_source_id=data_source_id):
+            try:
+                return session.get_ds(ds_ref=data_source_id)
+            except UnknownDataSourceError as e:
+                msg = f'No access to parent data source with id `{data_source_id}`: {e}'
+                _logger.info(msg)
+                return None
         case objs.BlockRef(block_id=block_id):
             return session.get_block(block_ref=block_id)
         case _:
-            msg = f'Unknown parent reference {type(parent)}'
+            msg = f'Unknown object reference {type(obj_ref)}'
             raise RuntimeError(msg)
-
-
-# ToDo: Use new syntax when requires-python >= 3.12
-NE_co = TypeVar('NE_co', bound=obj_core.NotionEntity, default=obj_core.NotionEntity, covariant=True)
 
 
 class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
@@ -233,7 +234,9 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def parent(self) -> NotionEntity | WorkspaceType | None:
         """Return the parent Notion entity, Workspace if the workspace is the parent, or None if not accessible."""
-        return resolve_ref(self.obj_ref)
+        if is_unset(parent := self.obj_ref.parent):
+            raise UnsetError()
+        return resolve_ref(parent)
 
     @property
     def ancestors(self) -> tuple[NotionEntity, ...]:
@@ -251,6 +254,11 @@ class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
     @property
     def is_db(self) -> bool:
         """Return whether the object is a database."""
+        return False
+
+    @property
+    def is_ds(self) -> bool:
+        """Return whether the object is a data source."""
         return False
 
 
@@ -278,9 +286,9 @@ def get_repr(obj: Any, /, *, name: Any = None, desc: Any = None) -> str:
     return f"<{type_str}: '{desc_str}' at {hex(id(obj))}>"
 
 
-def is_db(obj: NotionEntity | None) -> TypeIs[Database]:
-    """Return whether the object is a database as type guard."""
-    return obj is not None and obj.is_db
+def is_ds(obj: NotionEntity | None) -> TypeIs[DataSource]:
+    """Return whether the object is a data source as type guard."""
+    return obj is not None and obj.is_ds
 
 
 def is_page(obj: NotionEntity | None) -> TypeIs[Page]:

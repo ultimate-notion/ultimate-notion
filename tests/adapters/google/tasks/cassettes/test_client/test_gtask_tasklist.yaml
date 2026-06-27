@@ -15,148 +15,43 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: POST
     uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/4WQwU7DMAyG730Kq+etBcRpt2pUYpchQXdCHLLESsPSuCTpYEx9d5K0EhNC2in6
-        7S+WP58zgBytJZuv4BxCiJwEhnR/c7uYCh06x2Ss5c/4MaDz0DIByhyZVgLY4Fs0XnHmFRngFkWM
-        TLsC6q8euUcBT1Wg4A4Y52EaeDqgWYAmqcIPooNCIAsUJlm4MraAF0Rove/dqiwFHlFTj9YVkkhq
-        LDh1pUqsP5VOSbNUpvzEfUQ5GUcal72l97BYkc+K6QQuGL6mDPMt/upvZuX1r+M8IZGCOqZMBKWm
-        PdOXPYvMUepFsTqd/KKtafKMQDwVWfU9Ff6BmlOf1mmRCbT5DIzpfZuNnGd+iEb5blvtmsd622zW
-        VVM/RHzMxuwH1VrBt/sBAAA=
+        H4sIAAAAAAAC/3WPSwuCQBSF9/6KYdqm8xCMXLUJDHQRiFC4EZ108Il3dMrov8cotGtzN9/HOee+
+        LYRwLbsC+wirDGrYmRtKUHhvmFzJlT+TgkVLxI9zkgxLEUTLrdwMobLSOCmugnxh5/gyVnmKN6ik
+        aoSh0Qt1QiMT3vzCp6HIlFgbOOWeTT2bH2J68Knru9ThlN03EUTzCGVXG7NSagCfEK21U/Z92Yhs
+        kODkfUvWB8jMyARiBHJqBTFlQP7stz7WF4MIvu8BAQAA
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:30 GMT
+      etag:
+      - '"hHcz1ETIrhc"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      WWW-Authenticate:
-      - Bearer realm="https://accounts.google.com/", error="invalid_token"
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
-    status:
-      code: 401
-      message: Unauthorized
-- request:
-    body: grant_type=refresh_token&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ftasks
-    headers:
-      accept-encoding:
-      - gzip, deflate
-      content-type:
-      - application/x-www-form-urlencoded
-      user-agent:
-      - secret...
-      x-goog-api-client:
-      - gl-python/3.10.9 auth/2.40.3 cred-type/u
-    method: POST
-    uri: https://oauth2.googleapis.com/token
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAC/1XQzXKCMBQF4L1P4biuilFA3IEiKqIDiIqbTArhxyBREkyx03dv1VW398w9Z+b7
-        brXbHRRFmDHIKcFlZ9LuNAhoPSTpu1yxwX0r6wIDzcxuazteHUaU1LpblnShapfIKQhCJLTHG7M0
-        akk0Wh3GZ5U89lvJfWy6YjbHPq0sM3Gb/WoIjXVhrfMjWpZ8MUjUtInrfdYVABY2hwkcMms+4Gg/
-        H0fr2JONKvUDK/FHNHCiZQgbu3s+3fJ4gGYyVvQEV+JuZUWAVSVyvZW38E/lsmsCMlXvm+zyWPoP
-        NUBomoa2vkt93XP8ubuwjsDJhwYhUAWDYBZ/0nDmbc3TwRESkNTOx9MEf13zCjOYP0WGsqa9riyi
-        V/wkyji/skm/L4TopZSmBUbXnPUieumjmmd9jhhh76YXK+TN+9HAqMLVO6lw8jeRveHhv0WgjCUA
-        Wj+/EOoyhaABAAA=
-    headers:
-      Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Cache-Control:
-      - no-cache, no-store, max-age=0, must-revalidate
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=utf-8
-      Expires:
-      - Mon, 01 Jan 1990 00:00:00 GMT
-      Pragma:
-      - no-cache
-      Server:
-      - scaffolding on HTTPServer2
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Origin
-      - X-Origin
-      - Referer
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-XSS-Protection:
+      x-xss-protection:
       - '0'
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"title": "My new tasklist"}'
-    headers:
-      accept:
-      - application/json
-      accept-encoding:
-      - gzip, deflate
-      authorization:
-      - secret...
-      content-length:
-      - '28'
-      content-type:
-      - application/json
-      user-agent:
-      - secret...
-      x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
-    method: POST
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists?alt=json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAC/3WPwQqCQBRF937FMG3L0UwoV4ERLqxNZiVCmL500lR6U1NE/x6j0K7N25zDvfe9
-        NUJoyeuMOoSKBEscqOtzFHSoGO8IBOHltG1l5BVetH26qRe6e9kbIJJcOTE9bpa7xdoNJv4hpj0U
-        XFSg6OpFapBEhVe/8HubJQK6hrExtkemMbKMwLQdy3SsmW5MplEvIlRnn9elMgshWnQYk1LqedPk
-        FSQtRz1trqx7gD1Mdke4IZtfgakyZH/2ax/tC1hipIQBAQAA
-    headers:
-      Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Origin
-      - X-Origin
-      - Referer
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
-      x-l2-request-path:
-      - l2-managed-14
     status:
       code: 200
       message: OK
@@ -176,41 +71,45 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: POST
-    uri: https://tasks.googleapis.com/tasks/v1/lists/eTVjbUpwZHhHZUxCcHVCXw/tasks?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/lists/Q2xVd1MzM29vVVpzdHMzYg/tasks?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/32PXUvDMBSG7/srSrx1TT/oxILIHJNubJOVrkidF1kTu6xtGkzW+IH/XZMWBRFz
-        cSDnfc457/tu2TaoKMMgsoFEohJnuoJz3aemmzbh3Yblc9wkKmGLZNXweT7pCSJRqZkdIO5suXhL
-        mzSZ7UAvSiprotXVq82Isn8WnzhGkpjtvuuHI88dBW7qhVHgRcGl440v8h4UpH5aUlZp8iAlFxGE
-        SimnbNuyJohT4RRtA41x2HmwpkIKSNLsuN9ylceHON++TIs4m96rgfovDm8FlbRl+pz7xxtMSSRP
-        QjOMECwmhRkxUv3lVSsPj+aryD6jRP1OYIwMGb79wzVb33Rxh/nt88Y/xvhaoKsxsD6sT16+Djqk
-        AQAA
+        H4sIAAAAAAAC/32PUU+DMBSF3/kVpL4KLZCxSWLMoolkkamTYJzzoYwOKrUQW9aJ8b9rC9HEGPtw
+        k97z3XvPebdsG9SUFyCygcSiFke6gmPdp6abs0W3rlev2bnXLO/b4PpykSbzgSASl5rZgBu8j5WM
+        Z9USbcAgSioZ0WryZnOi7J/FXVtgScx2H/mhg0LHn6ZoGqEgCpA7CcP1AArCdleU15qspGxFBKFS
+        yi2bpmQEt1S42+YFGuNw70FGhRTw1j9khZf0iX+yz7K2L+KkfyhH6r84bSOopA3X59AfbzQlseyE
+        ZjghhZhvzYiR2JdXrTw+ma8ieUaJ+p3AGBkzfPuHfMV3F3XqVJNnNcvv0JnApyGwPqxPWP1LzaQB
+        AAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:30 GMT
+      etag:
+      - '"PavHwtH8hN0"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -228,41 +127,45 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/lists/eTVjbUpwZHhHZUxCcHVCXw/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
+    uri: https://tasks.googleapis.com/tasks/v1/lists/Q2xVd1MzM29vVVpzdHMzYg/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/4WRX2vCMBTF3/0UIXudplXqWGEMFUcV/2CpZXTKiG2msW0STGy2id99bSa6DWF5
-        uJD8Tu65JznUAIApZQl0AVRYpvLGVHhbAaLwugILSHnBO6/TLt7FC/gNqSK5LOlLuQHgYOrVZkZu
-        GDUkyJ3pjEWDJPe1z4b+OBeDqHNRXVyJ1R8NP4M88PsnVyNQVGWkUow/ACMa/DbZiwQrYpyaVtOp
-        21a9ZQW247Zst3XfsNt30UUsSfY2oiyt1BulhHQR0lo31pyvM4IFlY2Y58iEQYWNMiqVRCQIt6u5
-        0JG38aL5ey/2wt6zPqn+iye4pIpyVllaV9aP4RRW++qJISMkkZ3YXDvjrJzbfMDyfKTJKqRE/01k
-        BjtlOudBEzbpFl6RiKfdrLn1kkeJH9rQtDqWdVk71r4A+JJiaB8CAAA=
+        H4sIAAAAAAAC/4WRUU/CMBSF3/kVTX11tBth4BJjiCYuxA1FMiPCQ2Fl1I1usZdVIPx3t0pADYl9
+        uEn7nd5zT7trIIRTIWPsIQxMperCVHxZAw4sqcEED8LSHchNQiM1wd9QAF+pir5VG4R2pp5tZuSG
+        CUNmWX89Tocf0a2dhy9Fa3DfHwW9k+rk+shKX4PfXYb04GoEICDjtSLYIMk1+m2yLmIG3Dg51HEt
+        6lpOZ0Q7Hm15Ldpsu+74JFY8WzwImdbqJUChPEK01s0kz5OMs0Ko5jxfEROGlDbJhAJFnpzPKLaD
+        beBclVFUbGM/2L4mB9V/8YpcCRC5rC3pmfVjOGCwrp8YS85j1Zuba0ecVXObD5gejzSfRYLrv4nM
+        YIdMxzxEDuXiLh1Zy/a77s6e6Y1i1y42rfZVnTb2jS+p6w7LHwIAAA==
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:30 GMT
+      etag:
+      - '"ONv6Onyg0Vs"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -282,41 +185,43 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: PATCH
-    uri: https://tasks.googleapis.com/tasks/v1/lists/eTVjbUpwZHhHZUxCcHVCXw/tasks/Tm5OQnZIdmRwRnJRMmpIZA?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/lists/Q2xVd1MzM29vVVpzdHMzYg/tasks/blJuZkRrVC1oNWp3OGJTMA?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/32PX0+DMBTF3/kUpL66lT9jRhJjlIQw4+ZGgEycD2xU6CilsR3VGL+7KxCXGLUP
-        Te49J+ee34em66DCNAeuDkTGK36mfnCu9rjbRrXzsKLpLK9DGdK7cF6zWXrTO5DICuXZgPUy9h/L
-        xL/wjA3oRYEFQUqdv+sUSf0UfGB5JlCXbhmWMzKNkW1EpuPapmtfjifONO2NHJGXe0wr5SyFYNyF
-        UEo5LpqmIChjmI93TQ274rA1IcFccIiiZL+NmUyDMkjjN28XJN5aDq7/cFjDscANVeeMX95QSmTi
-        wJXneJsRpEg64TT+BTaxBzByhFIRT8/dKNE2wUj+RO0aD7DfoHBBF7dt0ObMf11Z+yC/5tnVFGif
-        2hfId96TzQEAAA==
+        H4sIAAAAAAAC/32PUUvDMBSF3/srSny1TZtqqwURmTAZdrKtVJwTSW3WxcY2mHTRiv/dJS0ORM1D
+        4N5zOPd8H5Ztg4rWBYhtILGoxIH+waHeU7PN2aRdVvPXbOQ301se3IwnaXLRO4jEpfaswHT2iMdk
+        FC7KZAV6UVLJiFaTd7smyt4Ht7zAkph05KHQ8UIHRakXxV4QB74bHIXL3igIW1/TutLOjZRcxBAq
+        pdyyaUpGMKfCfWpeoCkOtz5kVEgBZ+gtK/ykS9DpNst4V1wl3V05uP7D4Y2gkja1Puf98oZSEstW
+        aM/uNmdEkxhhP/4B5kdoAGM7KB1x/2BGRfKMEvUT1TQeYL9BYT2v15dV6myOn9VJvvDOBT4LgfVp
+        fQHIM7ohzQEAAA==
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:31 GMT
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -334,9 +239,9 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: DELETE
-    uri: https://tasks.googleapis.com/tasks/v1/lists/eTVjbUpwZHhHZUxCcHVCXw/tasks/Tm5OQnZIdmRwRnJRMmpIZA
+    uri: https://tasks.googleapis.com/tasks/v1/lists/Q2xVd1MzM29vVVpzdHMzYg/tasks/blJuZkRrVC1oNWp3OGJTMA
   response:
     body:
       string: ''
@@ -345,22 +250,24 @@ interactions:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Content-Length:
       - '0'
-      Content-Type:
+      content-type:
       - application/json; charset=UTF-8
-      Server:
+      date:
+      - Sat, 27 Jun 2026 07:03:31 GMT
+      server:
       - ESF
-      Vary:
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 204
       message: No Content
@@ -378,41 +285,45 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/lists/eTVjbUpwZHhHZUxCcHVCXw/tasks/Tm5OQnZIdmRwRnJRMmpIZA?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/lists/Q2xVd1MzM29vVVpzdHMzYg/tasks/blJuZkRrVC1oNWp3OGJTMA?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/32PXUvDMBSG7/srSrx1S78y14KIDrQTO1nZhtSJdEvcsrZpWNJlIv53l6w6EDQX
-        gfOeh3PO82HZNigowyCygcxFIc70D851Tk06qdDjmGVDXKUqZfdpUvFhdn0kiMxXmpmD1ybIwiEb
-        4LtkDo5NSWVJdDd5txlR9mlww3EuiZnuOR7quE7HdyYuinw38sMuClF2BAUp3x4oKzS5lpKLCEKl
-        VHdV16uS5JyK7rKuoDkc7lxYUiEFJJPZZjHlKovXcTbdD5bxbPCkWuo/HV4LKmnN9DonNK/v+X23
-        5144DkK99iiZy0Zo5rCbl0SbmMap/EMsCPxWDJNvUG4bYqLy4KmnPr+YUpHFjBL1295ItP4/7nDE
-        Rje7eIf57XbsbWJ8JfLLHrA+rS8Nf9w44AEAAA==
+        H4sIAAAAAAAC/32PXU/CMBSG7/kVS70Vunawr8QYo4lKmCjijIgXmyujrnYN7ahi/O/SMiUx0V40
+        Oe95cs55PjqOAyrKCxA7QGWykgfmB4cmpzbN2bCZVZNVeorqq3vhjc+H0+RkRxCVlYaZg8nqMr3z
+        Obke9edg11RUMWK6ybvDiXb2gxtRZIrY6djFftf1uziYukHserGHekEUzXagJGwxorwy5FIpIWMI
+        tda9sq5LRjJBZe+5foX2cLhGkFGpJLzBb2mBkk2Co3Waik1xkWweypb6T0fUkipac7POjewLMQr6
+        Ax+FYYiD9iiVqUYaZrtbMGJMbGNf/iGGAtyKFeQbVKuG2IhtPc3UxydbapKnlOjf9lai9f9xh3zC
+        F2fVtLscvOgwv3WPZXbkg85n5wsWBs+f4AEAAA==
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:31 GMT
+      etag:
+      - '"RrIVU6nePL4"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -430,9 +341,9 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/lists/eTVjbUpwZHhHZUxCcHVCXw/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
+    uri: https://tasks.googleapis.com/tasks/v1/lists/Q2xVd1MzM29vVVpzdHMzYg/tasks?alt=json&maxResults=100&showCompleted=true&showDeleted=false&showHidden=true
   response:
     body:
       string: !!binary |
@@ -441,26 +352,30 @@ interactions:
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:32 GMT
+      etag:
+      - '"4i2g7ETQPtU"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -478,39 +393,43 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/eTVjbUpwZHhHZUxCcHVCXw?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Q2xVd1MzM29vVVpzdHMzYg?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPSwuCQBSF9/6KYdqW46MJchUI4cJaaZQEYXrTySfdqSmi/x6j0K7N3Xwf55z7
-        NgihlWhz6hEqU6xwom8oUNKpZmIgEO2u57hXSVAGSfz0s2Dn79VogEwL7RzpKd4e1gvuH+bFkY5Q
-        ClmDppsXaUERHV7/wu99nkoYGhzL4TPbmrlWZHPPtT13afIlT0YRob6Eoq20WUrZo8eYUsosuq6o
-        Ie0FmlnXsOEB9rDZHeGGbNUA02XI/uw3PsYXLCVwVgEBAAA=
+        H4sIAAAAAAAC/3WPPQ+CMBRFd35FU1ehUBIQJkcHiCExJBqWRmqtfMZXQGr876aQuLm85Zzce9/b
+        QghXsi1xjLBiUMHG3ESCwlvD5EIy+spLL9UpjcY873V5SPVZrAZXTBinwCzT+joPjyPdFXiFSqqa
+        G5rOqOUTMuH1L3zoS6b40kBdGthuYNPw5Iax68e+54RRdFlF4PUtkW1lzLtSPcSETNPkiK4TNWe9
+        BOfaNWR5gIweGYA/gewbTkwZkD/7rY/1BRXtnqIBAQAA
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:32 GMT
+      etag:
+      - '"aQzzcyujO28"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -530,39 +449,41 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: PATCH
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/eTVjbUpwZHhHZUxCcHVCXw?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Q2xVd1MzM29vVVpzdHMzYg?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPzQqCQBRG9z7FMG3TGTUhXAUSWNQuI6TNpDed/KU7NkX07jEK7dp8m3Pg8L0t
-        Qmgl25yGhCqBFc7M7iQqOjdMjgQOx9sl6XUal3GaPKMsPkYnPRmgRGGcMy2GzfNVbodouz7TCSqp
-        ajB0/yJ3aEUDOTGB+hcY+lwoGCse9wLb5bbPD24Q+m644A73lukkItTXnWwrY5ZK9RgyprV2iq4r
-        ahC9RCfrGjaeYA+XDQh3ZKsGmIkh+/PB+lhfnbCDGAUBAAA=
+        H4sIAAAAAAAC/3WPvQrCMBRG9z5FiKtt2ogVOzkoOLSDKAXFJZhrDf3Fe2u14rtLWnBz+ZZz4PC9
+        HcZ4birNI8ZJYY4Tu7FB4lPLzEB28pnqIOkTuXykadPrbdIfs9EAUpl1zpw2+7VyX+uA8jMfIRkq
+        wNLkxe5QqRI0s4HiF2gbrQiGivRl6PqhKxcHfxH5s2gmvVDOT6OIUFxjU+XWvBE1GAnRdZ2X1XVW
+        gGoMepe6FMMJ8QhEi3BHsSpB2BiKPx+cj/MF2eXfnwUBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:32 GMT
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -580,39 +501,43 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: GET
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/eTVjbUpwZHhHZUxCcHVCXw?alt=json
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Q2xVd1MzM29vVVpzdHMzYg?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/3WPzQqCQBRG9z7FMG3TGTUhXAUSWNQuI6TNpDed/KU7NkX07jEK7dp8m3Pg8L0t
-        Qmgl25yGhCqBFc7M7iQqOjdMjgQOx9sl6XUal3GaPKMsPkYnPRmgRGGcMy2GzfNVbodouz7TCSqp
-        ajB0/yJ3aEUDOTGB+hcY+lwoGCse9wLb5bbPD24Q+m644A73lukkItTXnWwrY5ZK9RgyprV2iq4r
-        ahC9RCfrGjaeYA+XDQh3ZKsGmIkh+/PB+lhfnbCDGAUBAAA=
+        H4sIAAAAAAAC/3WPvQrCMBRG9z5FiKtt2ogVOzkoOLSDKAXFJZhrDf3Fe2u14rtLWnBz+ZZz4PC9
+        HcZ4birNI8ZJYY4Tu7FB4lPLzEB28pnqIOkTuXykadPrbdIfs9EAUpl1zpw2+7VyX+uA8jMfIRkq
+        wNLkxe5QqRI0s4HiF2gbrQiGivRl6PqhKxcHfxH5s2gmvVDOT6OIUFxjU+XWvBE1GAnRdZ2X1XVW
+        gGoMepe6FMMJ8QhEi3BHsSpB2BiKPx+cj/MF2eXfnwUBAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:32 GMT
+      etag:
+      - '"tESDa-yD1tk"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK
@@ -630,9 +555,9 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: DELETE
-    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/eTVjbUpwZHhHZUxCcHVCXw
+    uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/Q2xVd1MzM29vVVpzdHMzYg
   response:
     body:
       string: ''
@@ -641,22 +566,24 @@ interactions:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Content-Length:
       - '0'
-      Content-Type:
+      content-type:
       - application/json; charset=UTF-8
-      Server:
+      date:
+      - Sat, 27 Jun 2026 07:03:33 GMT
+      server:
       - ESF
-      Vary:
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 204
       message: No Content
@@ -674,39 +601,43 @@ interactions:
       user-agent:
       - secret...
       x-goog-api-client:
-      - gdcl/2.179.0 gl-python/3.10.9 cred-type/u
+      - gdcl/2.187.0 gl-python/3.13.9 cred-type/u
     method: GET
     uri: https://tasks.googleapis.com/tasks/v1/users/@me/lists/%40default?alt=json
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAC/4WPyw6CMBBF93wFqVuhUBUCK01gYbQ+EjYaNg1WrDzjVKsY/10LH+BmkplzMjf3
-        bZgmKkR9QqGJJIMCRnquBUg01kz0hEaxS7slode423T7yTYqnjRZ/PaDR6NGDS6XLNd2ikhUBbvs
-        qlYsS9EApZAl73+9zEQHDed7e2KS9yHEIVPLcS3iJK4XEj+cBbbv+8dBBF6e16IutHmRsoUQY6WU
-        nTdNXnLWCrCzpsJ9B/xw8R34DfC84rj8lQH8t4LxMb7ne/U1DgEAAA==
+        H4sIAAAAAAAC/4WPyw6CMBBF93wFqVuhj/iClcS6UnADC40bIhUaihCn2qjx36XwAW5mkjknc3M/
+        juuiWt4KFLpI51DDxM69BI2mlsmBxDxjMd+yhJf9zmjyzkjyPpqYR4uYt2Z0hc5La5/RwaOwqaJd
+        pC5nNEIttRLDr5eb2qDx/OiKXIshhBFGPLL02DKlQUiCkM79FZ2dRhGEuu7lrbZmpXUHIcbGGL9s
+        21KJvJPgX9oGDx3wk+IHiDvgdSOw6ssA/lvB+To/w9DomQ4BAAA=
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=UTF-8
-      Server:
-      - ESF
       Transfer-Encoding:
       - chunked
-      Vary:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sat, 27 Jun 2026 07:03:33 GMT
+      etag:
+      - '"O-1sChAKAlc"'
+      server:
+      - ESF
+      vary:
       - Origin
       - X-Origin
       - Referer
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
-      - '0'
       x-l2-request-path:
       - l2-managed-14
+      x-xss-protection:
+      - '0'
     status:
       code: 200
       message: OK

@@ -53,12 +53,18 @@ def test_is_url() -> None:
 
 @pytest.mark.vcr()
 def test_mention(
-    person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.Database, notion: uno.Session
+    person: uno.User, root_page: uno.Page, md_text_page: uno.Page, all_props_db: uno.DataSource, notion: uno.Session
 ) -> None:
-    def mention_url(obj: uno.Page | uno.Database) -> str:
+    def mention_url(obj: uno.Page | uno.DataSource) -> str:
         parsed = urlparse(obj.url)
         prefix = '/p' if parsed.hostname == 'app.notion.com' else ''
         return f'{parsed.scheme}://{parsed.netloc}{prefix}/{obj.id.hex}'
+
+    def db_mention_url(ds: uno.DataSource) -> str:
+        # A data-source mention links to its container database, so the URL carries the container's id.
+        parsed = urlparse(ds.url)
+        prefix = '/p' if parsed.hostname == 'app.notion.com' else ''
+        return f'{parsed.scheme}://{parsed.netloc}{prefix}/{ds.database_id.hex}'
 
     user_mention = uno.mention(person)
     page_mention = uno.mention(md_text_page)
@@ -70,7 +76,7 @@ def test_mention(
     page.append(paragraph)
     exp_text = (
         f'[@USER]() : ↗[Markdown Text Test]({mention_url(md_text_page)})'
-        f' : ↗[All Properties DB]({mention_url(all_props_db)})'
+        f' : ↗[All Properties DB]({db_mention_url(all_props_db)})'
         ' : [2022-01-01T00:00:00.000+00:00]()'
     )
     actual = re.sub(r'^\[@[^\]]+\]\(\)', '[@USER]()', page.children[0].to_markdown())

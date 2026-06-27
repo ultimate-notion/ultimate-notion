@@ -17,7 +17,7 @@ from uuid import UUID
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.errors import UnsetError
-from ultimate_notion.obj_api.blocks import Block, Database, FileBase, Page
+from ultimate_notion.obj_api.blocks import Block, Database, DataSource, FileBase, Page
 from ultimate_notion.obj_api.core import (
     GenericObject,
     ObjectRef,
@@ -34,6 +34,7 @@ from ultimate_notion.obj_api.objects import (
     Comment,
     CustomEmojiObject,
     DatabaseRef,
+    DataSourceRef,
     EmojiObject,
     FileObject,
     FileUpload,
@@ -42,7 +43,7 @@ from ultimate_notion.obj_api.objects import (
     User,
 )
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
-from ultimate_notion.obj_api.query import DBQueryBuilder, SearchQueryBuilder
+from ultimate_notion.obj_api.query import DataSourceQueryBuilder, SearchQueryBuilder
 from ultimate_notion.obj_api.schema import Property, RenameProp
 
 if TYPE_CHECKING:
@@ -51,6 +52,7 @@ if TYPE_CHECKING:
     from notion_client.api_endpoints import BlocksEndpoint as NCBlocksEndpoint
     from notion_client.api_endpoints import CommentsEndpoint as NCCommentsEndpoint
     from notion_client.api_endpoints import DatabasesEndpoint as NCDatabasesEndpoint
+    from notion_client.api_endpoints import DataSourcesEndpoint as NCDataSourcesEndpoint
     from notion_client.api_endpoints import FileUploadsEndpoint as NCFileUploadsEndpoint
     from notion_client.api_endpoints import PagesEndpoint as NCPagesEndpoint
     from notion_client.api_endpoints import PagesPropertiesEndpoint as NCPagesPropertiesEndpoint
@@ -69,6 +71,7 @@ class NotionAPI:
     def __init__(self, client: NCClient):
         self.client = client
         self.blocks = BlocksEndpoint(self)
+        self.data_sources = DataSourcesEndpoint(self)
         self.databases = DatabasesEndpoint(self)
         self.pages = PagesEndpoint(self)
         self.search = SearchEndpoint(self)
@@ -207,13 +210,18 @@ class BlocksEndpoint(Endpoint):
         block.update(**data)
 
 
-class DatabasesEndpoint(Endpoint):
-    """Interface to the 'databases' endpoint of the Notion API."""
+class DataSourcesEndpoint(Endpoint):
+    """Interface to the 'data_sources' endpoint of the Notion API (new in API 2025-09-03).
+
+    Data sources contain the schema (properties) and pages. In API version 2025-09-03+,
+    databases are containers that can hold multiple data sources, while data sources
+    hold the actual data.
+    """
 
     @property
-    def raw_api(self) -> NCDatabasesEndpoint:
+    def raw_api(self) -> NCDataSourcesEndpoint:
         """Return the underlying endpoint in the Notion SDK."""
-        return self.api.client.databases
+        return self.api.client.data_sources
 
     @staticmethod
     def _build_request(
@@ -250,7 +258,7 @@ class DatabasesEndpoint(Endpoint):
 
         return request
 
-    # https://developers.notion.com/reference/create-a-database
+    # https://developers.notion.com/reference/create-a-data-source
     def create(
         self,
         parent: Page,
@@ -258,11 +266,150 @@ class DatabasesEndpoint(Endpoint):
         *,
         title: list[RichTextBaseObject] | None = None,
         inline: bool = False,
+    ) -> DataSource:
+        """Add a data source to the given Page parent."""
+        parent_ref = PageRef.build(parent)
+        _logger.debug(f'Creating new data source below page with id `{parent_ref.page_id}`.')
+        request = self._build_request(parent=parent_ref, schema=schema, title=title, inline=inline)
+        data = self.raw_api.create(**request)
+        return DataSource.model_validate(data)
+
+    # https://developers.notion.com/reference/retrieve-a-data-source
+    def retrieve(self, dsref: DataSource | str | UUID) -> DataSource:
+        """Return the DataSource with the given ID."""
+        ds_id = DataSourceRef.build(dsref).data_source_id
+        _logger.debug(f'Retrieving data source with id `{ds_id}`.')
+        data = self.raw_api.retrieve(str(ds_id))
+        return DataSource.model_validate(data)
+
+    def update(
+        self,
+        ds: DataSource,
+        *,
+        title: list[RichTextBaseObject] | None = None,
+        description: list[RichTextBaseObject] | None = None,
+        inline: bool | None = None,
+        schema: Mapping[str, Property | RenameProp | None] | None = None,
+    ) -> None:
+        """Update the DataSource object on the server.
+
+        The data source info will be updated to the latest version from the server.
+
+        API reference: https://developers.notion.com/reference/update-a-data-source
+        """
+        _logger.debug(f'Updating info of data source with id `{ds.id}`.')
+
+        if request := self._build_request(schema=schema, title=title, description=description, inline=inline):
+            data = self._as_dict(self.raw_api.update(str(ds.id), **request))
+            ds.update(**data)
+
+    @staticmethod
+    def _container_db_id(ds: DataSource) -> UUID:
+        """Return the id of the database that contains this data source.
+
+        The 2025-09-03 API has no endpoint to delete/restore an individual data source; instead
+        the containing database (which is the block on the page) is archived/restored. A data
+        source's `parent` is always the `DatabaseRef` of its container.
+        """
+        if not isinstance(parent := ds.parent, DatabaseRef):
+            msg = f'Data source `{ds.id}` has no database parent (got `{type(parent).__name__}`), cannot delete/restore'
+            raise RuntimeError(msg)
+        return parent.database_id
+
+    def delete(self, ds: DataSource) -> DataSource:
+        """Delete (archive) the database containing the specified DataSource."""
+        db_id = self._container_db_id(ds)
+        _logger.debug(f'Deleting database `{db_id}` containing data source `{ds.id}`.')
+        block_obj = self.api.blocks.delete(str(db_id))
+        # block.update(**data) is not possible as the API returns a block, not a data source
+        ds.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
+        ds.in_trash = block_obj.in_trash
+        return ds
+
+    def restore(self, ds: DataSource) -> DataSource:
+        """Restore (unarchive) the database containing the specified DataSource."""
+        db_id = self._container_db_id(ds)
+        _logger.debug(f'Restoring database `{db_id}` containing data source `{ds.id}`.')
+        block_obj = self.api.blocks.restore(str(db_id))
+        # block.update(**data) is not possible as the API returns a block, not a data source
+        ds.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
+        ds.in_trash = block_obj.in_trash
+        return ds
+
+    # https://developers.notion.com/reference/post-data-source-query
+    def query(self, ds: DataSource | UUID | str) -> DataSourceQueryBuilder:
+        """Initialize a new Query object for the data source."""
+        ds_id = DataSourceRef.build(ds).data_source_id
+        _logger.debug(f'Initializing query for data source with id `{ds_id}`.')
+        return DataSourceQueryBuilder(endpoint=self.raw_api.query, data_source_id=str(ds_id))
+
+
+class DatabasesEndpoint(Endpoint):
+    """Interface to the 'databases' endpoint of the Notion API.
+
+    In API version 2025-09-03+, databases are containers that can hold multiple data sources.
+    The actual schema/properties are now on the DataSource objects.
+
+    Note: Query functionality has moved to DataSourcesEndpoint.query().
+    """
+
+    @property
+    def raw_api(self) -> NCDatabasesEndpoint:
+        """Return the underlying endpoint in the Notion SDK."""
+        return self.api.client.databases
+
+    @staticmethod
+    def _build_request(
+        *,
+        parent: SerializeAsAny[ParentRef] | None = None,
+        title: list[RichTextBaseObject] | None = None,
+        description: list[RichTextBaseObject] | None = None,
+        inline: bool | None = None,
+    ) -> dict[str, Any]:
+        """Build a request payload from the given items.
+
+        *NOTE* this method does not anticipate what the request will be used for and as
+        such does not validate the inputs for any particular requests.
+        """
+        request: dict[str, Any] = {}
+
+        if parent is not None:
+            request['parent'] = parent.serialize_for_api()
+
+        if title is not None:
+            request['title'] = [rt_obj.serialize_for_api() for rt_obj in title]
+
+        if description is not None:
+            request['description'] = [rt_obj.serialize_for_api() for rt_obj in description]
+
+        if inline is not None:
+            request['is_inline'] = inline
+
+        return request
+
+    # https://developers.notion.com/reference/create-a-database
+    def create(
+        self,
+        parent: Page,
+        *,
+        schema: Mapping[str, Property] | None = None,
+        title: list[RichTextBaseObject] | None = None,
+        inline: bool = False,
     ) -> Database:
-        """Add a database to the given Page parent."""
+        """Create a new database container in the given Page parent.
+
+        In API version 2025-09-03+ a database is created together with its first data source,
+        whose schema (properties) is passed via the `initial_data_source` payload. This is the
+        only supported way to create a data source under a page; the `data_sources` endpoint
+        only adds further data sources to an existing database.
+        """
         parent_ref = PageRef.build(parent)
         _logger.debug(f'Creating new database below page with id `{parent_ref.page_id}`.')
-        request = self._build_request(parent=parent_ref, schema=schema, title=title, inline=inline)
+        request = self._build_request(parent=parent_ref, title=title, inline=inline)
+        if schema is not None:
+            request['initial_data_source'] = {
+                'properties': {name: value.serialize_for_api() for name, value in schema.items()}
+            }
         data = self.raw_api.create(**request)
         return Database.model_validate(data)
 
@@ -281,7 +428,6 @@ class DatabasesEndpoint(Endpoint):
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
-        schema: Mapping[str, Property | RenameProp | None] | None = None,
     ) -> None:
         """Update the Database object on the server.
 
@@ -291,36 +437,9 @@ class DatabasesEndpoint(Endpoint):
         """
         _logger.debug(f'Updating info of database with id `{db.id}`.')
 
-        if request := self._build_request(schema=schema, title=title, description=description, inline=inline):
+        if request := self._build_request(title=title, description=description, inline=inline):
             data = self._as_dict(self.raw_api.update(str(db.id), **request))
             db.update(**data)
-
-    def delete(self, db: Database) -> Database:
-        """Delete (archive) the specified Database."""
-        db_id = DatabaseRef.build(db).database_id
-        _logger.debug(f'Deleting database with id `{db_id}`.')
-        block_obj = self.api.blocks.delete(str(db_id))
-        # block.update(**data) is not possible as the API returns a block, not a database
-        db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
-        db.in_trash = block_obj.in_trash
-        return db
-
-    def restore(self, db: Database) -> Database:
-        """Restore (unarchive) the specified Database."""
-        db_id = DatabaseRef.build(db).database_id
-        _logger.debug(f'Restoring database with id `{db_id}`.')
-        block_obj = self.api.blocks.restore(str(db_id))
-        # block.update(**data) is not possible as the API returns a block, not a database
-        db.archived = block_obj.archived  # ToDo: Remove when `archived` is completely deprecated
-        db.in_trash = block_obj.in_trash
-        return db
-
-    # https://developers.notion.com/reference/post-database-query
-    def query(self, db: Database | UUID | str) -> DBQueryBuilder:
-        """Initialize a new Query object with the target data class."""
-        db_id = DatabaseRef.build(db).database_id
-        _logger.debug(f'Initializing query for db with id `{db_id}`.')
-        return DBQueryBuilder(endpoint=self.raw_api.query, db_id=str(db_id))
 
 
 class PagesEndpoint(Endpoint):
@@ -359,7 +478,7 @@ class PagesEndpoint(Endpoint):
     # https://developers.notion.com/reference/post-page
     def create(
         self,
-        parent: ParentRef | Page | Database,
+        parent: ParentRef | Page | DataSource,
         *,
         title: Title | None = None,
         properties: dict[str, PropertyValue] | None = None,
@@ -367,7 +486,7 @@ class PagesEndpoint(Endpoint):
         cover: FileObject | None = None,
         icon: FileObject | EmojiObject | CustomEmojiObject | None = None,
     ) -> Page:
-        """Add a page to the given parent (Page or Database)."""
+        """Add a page to the given parent (Page or DataSource)."""
         if parent is None:
             msg = "'parent' must be provided"
             raise ValueError(msg)
@@ -376,9 +495,9 @@ class PagesEndpoint(Endpoint):
             case Page():
                 parent = PageRef.build(parent)
                 parent_id = parent.page_id
-            case Database():
-                parent = DatabaseRef.build(parent)
-                parent_id = parent.database_id
+            case DataSource():
+                parent = DataSourceRef.build(parent)
+                parent_id = parent.data_source_id
             case _:
                 msg = f'Unsupported parent of type {type(parent)}'
                 raise ValueError(msg)

@@ -61,7 +61,7 @@ when reporting [issues]. You can either:
     If no default is provided and the variable is missing, configuration loading fails.
 
 **Google Tasks integration**: The `sync_state_dir` and `[google]` section are only needed for syncing
-Ultimate Notion databases with Google Tasks:
+Ultimate Notion data sources with Google Tasks:
 
 * `sync_state_dir`: Directory for storing sync state files
 * `client_secret_json`: Google OAuth client secret file

@@ -23,7 +23,7 @@ from ultimate_notion.user import User
 from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
-    from ultimate_notion.database import Database
+    from ultimate_notion.database import DataSource
     from ultimate_notion.page import Page
 
 
@@ -121,7 +121,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
     def __init__(
         self,
-        target: User | Page | Database | CustomEmoji | DateTimeOrRange,
+        target: User | Page | DataSource | CustomEmoji | DateTimeOrRange,
         *,
         bold: bool = False,
         italic: bool = False,
@@ -145,7 +145,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
 
 def mention(
-    target: User | Page | Database | CustomEmoji | DateTimeOrRange,
+    target: User | Page | DataSource | CustomEmoji | DateTimeOrRange,
     *,
     bold: bool = False,
     italic: bool = False,

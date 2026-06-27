@@ -41,7 +41,7 @@ def test_sync_google_tasks(custom_config: Path) -> None:
     delete_all_taskslists()
     # Manual cleanup as `notion_cleanups` fixture does not work here
     with uno.Session() as notion, contextlib.suppress(ValueError):
-        notion.search_db('My synced task db').item().delete()
+        notion.search_ds('My synced task db').item().delete()
 
 
 @pytest.mark.file_upload()

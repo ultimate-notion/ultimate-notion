@@ -8,7 +8,7 @@ from ultimate_notion.props import Title
 
 
 @pytest.mark.vcr()
-def test_retrieve_property(notion: uno.Session, all_props_db: uno.Database) -> None:
+def test_retrieve_property(notion: uno.Session, all_props_db: uno.DataSource) -> None:
     page = all_props_db.get_all_pages().to_pages()[0]
     page_obj = page.obj_ref
     page_props = page.props._obj_prop_vals
@@ -23,7 +23,7 @@ def test_create_page(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         role = uno.PropType.Text('Role')
 
-    contacts_db = notion.create_db(
+    contacts_db = notion.create_ds(
         parent=root_page, title='Contacts DB for low-level page creation test', schema=ContactsDB
     )
 
@@ -60,7 +60,7 @@ def test_update_page(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         role = uno.PropType.Text('Role')
 
-    contacts_db = notion.create_db(
+    contacts_db = notion.create_ds(
         parent=root_page, title='Contacts DB for low-level page update test', schema=ContactsDB
     )
 

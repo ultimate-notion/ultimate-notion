@@ -1,14 +1,14 @@
-# Querying databases
+# Querying data sources
 
-Notion provides sophisticated database capabilities similar to traditional relational
+Notion provides sophisticated data source capabilities similar to traditional relational
 databases, which are accessed with the help of the Structured Query Language (SQL).
 
 With the *Relation* property, you can express Foreign Key relationships and Joins, while the
 *Rollup* property allows aggregations like Group By operations in SQL. The two missing basic
 SQL query operations are the Where and Order By clauses, which correspond to *filtering* and
 *sorting* in Notion. These are especially useful in Notion when we want to retrieve
-specific pages from a database given some conditions on properties. Ultimate Notion provides
-a programmatic way, inspired by [PySpark] and [Polars], to query Notion databases.
+specific pages from a data source given some conditions on properties. Ultimate Notion provides
+a programmatic way, inspired by [PySpark] and [Polars], to query Notion data sources.
 
 We first create a Notion session and retrieve a page called `Tests`, which we assume
 to be connected to our Ultimate Notion integration:
@@ -21,8 +21,8 @@ notion = uno.Session.get_or_create()
 root_page = notion.search_page('Tests', exact=True).item()
 ```
 
-We create a database `Article` with properties name, topic, and release date.
-Then we populate the database with some pages:
+We create a data source `Article` with properties name, topic, and release date.
+Then we populate the data source with some pages:
 
 ```python
 class Topic(uno.OptionNS):
@@ -38,7 +38,7 @@ class Article(uno.Schema, db_title='Article DB'):
     topic = uno.PropType.Select('Topic', options=Topic)
     released = uno.PropType.Date('Released')
 
-article_db = notion.create_db(parent=root_page, schema=Article)
+article_db = notion.create_ds(parent=root_page, schema=Article)
 
 num_of_articles = 18
 for i in range(num_of_articles):
@@ -49,7 +49,7 @@ for i in range(num_of_articles):
     )
 ```
 
-To query this database, we can retrieve a [Query][query object] object from the attribute
+To query this data source, we can retrieve a [Query][query object] object from the attribute
 [query][query property] of `article_db`. Calling the method [execute] of the [Query][query object] object
 will retrieve all pages, which is equivalent to calling the method [get_all_pages] of `article_db`
 to get a [View]:
@@ -62,7 +62,7 @@ assert len(view_of_all_pages) == num_of_articles
 ## Filtering & sorting
 
 The concept of filtering is really easy. We use a *boolean condition* to filter for the
-pages in a database that we want to retrieve. A basic term of a condition consists of
+pages in a data source that we want to retrieve. A basic term of a condition consists of
 a property and a boolean operation, e.g., `uno.prop('Name') == 'Article 1'`. We use
 [prop] to create a [Property] object, which we can then use for boolean operations like
 `==`, `contains(...)`, etc. Several conditions can be composed with the boolean operators
@@ -114,7 +114,7 @@ assert str(cond) == "(prop('Topic') == 'Tech') & prop('Released').this_week()"
 Not all conditions work with every property type. For instance, `this_week()` is obviously only
 meaningful if the property is of type [Date]. Whether the conditions and their corresponding
 property types match or not is evaluated when the query is executed, since only then do we have
-access to a database schema. Keep this in mind when constructing
+access to a data source schema. Keep this in mind when constructing
 filter conditions, as a semantically correct condition can turn out to be wrong when
 the corresponding property types are also taken into account.
 
@@ -164,9 +164,9 @@ The following table lists all condition operators and methods as well as their c
 
 Note that the array type works a little bit differently than the others. Imagine you have a rollup with aggregation
 `uno.AggFunc.SHOW_ORIGINAL` defined on a date property. The result of the rollup property will thus be a possibly empty
-array of dates. Imagine a database of readers with a `has_read` relation to our `Article` database in order to reference
+array of dates. Imagine a data source of readers with a `has_read` relation to our `Article` data source in order to reference
 all articles that a reader has already read. We could now define a rollup, named `article dates`, on the `has_read`
-relation for the `released` property of the `Article` database with no aggregation, i.e., just showing the original
+relation for the `released` property of the `Article` data source with no aggregation, i.e., just showing the original
 values as elements of an array. The condition that filters for all readers having read at least one article that was released
 this week looks like this:
 
@@ -180,10 +180,10 @@ elements of the array.
 
 [PySpark]: https://spark.apache.org/docs/latest/api/python/index.html
 [Polars]: https://pola.rs/
-[get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.get_all_pages
+[get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.get_all_pages
 [query object]: ../../reference/ultimate_notion/query/#ultimate_notion.query.Query
 [execute]: ../../reference/ultimate_notion/database/#ultimate_notion.query.Query.execute
-[query property]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.query
+[query property]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.query
 [View]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View
 [prop]: ../../reference/ultimate_notion/query/#ultimate_notion.query.prop
 [Property]: ../../reference/ultimate_notion/query/#ultimate_notion.query.Property

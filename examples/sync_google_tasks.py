@@ -40,7 +40,7 @@ class Task(uno.Schema, db_title='My synced task db'):
 
 with uno.Session() as notion:
     parent = notion.search_page(PARENT_PAGE).item()
-    task_db = notion.get_or_create_db(parent=parent, schema=Task)
+    task_db = notion.get_or_create_ds(parent=parent, schema=Task)
 
     if task_db.is_empty:
         Task.create(
@@ -80,7 +80,7 @@ with GTasksClient() as gtasks:
 
 # Option 1: Using the Notion database declaration from above
 with uno.Session() as notion, GTasksClient(read_only=False) as gtasks:
-    task_db = notion.get_or_create_db(parent=parent, schema=Task)
+    task_db = notion.get_or_create_ds(parent=parent, schema=Task)
     tasklist = gtasks.get_or_create_tasklist('My synced task list')
 
     sync_task = SyncGTasks(
@@ -101,7 +101,7 @@ with uno.Session() as notion, GTasksClient(read_only=False) as gtasks:
 
 # Option 2: Using an existing Notion database that was created manually
 with uno.Session() as notion, GTasksClient(read_only=False) as gtasks:
-    task_db = notion.search_db('My synced task db').item()
+    task_db = notion.search_ds('My synced task db').item()
     status_col = task_db.schema.get_prop('Status')
     due_date_col = task_db.schema.get_prop('Due Date')
     tasklist = gtasks.get_or_create_tasklist('My synced task list')

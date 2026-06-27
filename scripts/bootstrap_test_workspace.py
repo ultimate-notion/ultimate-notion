@@ -5,6 +5,8 @@ Set NOTION_TOKEN and share the root page with the integration before running it.
 """
 
 import argparse
+import base64
+import io
 import os
 import time
 from collections.abc import Callable
@@ -15,12 +17,25 @@ from notion_client import Client
 from notion_client.errors import HTTPResponseError
 
 import ultimate_notion as uno
+from ultimate_notion.errors import SchemaError
 from ultimate_notion.rich_text import math as rt_math
 from ultimate_notion.rich_text import mention as rt_mention
 from ultimate_notion.rich_text import text as rt_text
 
 DEFAULT_ROOT_TITLE = 'Tests'
 MAX_REQUEST_ATTEMPTS = 5
+
+# A minimal valid 1x1 JPEG. The `test_page_to_markdown` fixture renders its second image as
+# `![1004-300x300.jpg](https://...)`, where the alt text is the *uploaded* file name and the URL is a
+# Notion-hosted (`prod-files-secure`) link -- an external URL cannot reproduce it. So we upload a file
+# named `1004-300x300.jpg`; the pixels are irrelevant, only the name and that it is Notion-hosted matter.
+TINY_JPEG = base64.b64decode(
+    '/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB'
+    'AQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB'
+    'AQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACv/EABQQAQAA'
+    'AAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMR'
+    'AD8AvwA//9k='
+)
 
 # The exact set of objects the live test suite expects to find in the workspace.
 # Keep these in sync with the title constants in `tests/conftest.py`. The audit step
@@ -206,6 +221,39 @@ class Contacts(uno.Schema, db_title='Contacts DB'):
     sync_date = uno.PropType.Date('Sync Date')
 
 
+class TaskPriority(uno.OptionNS):
+    high = uno.Option('✹ High', color=uno.Color.RED)
+    medium = uno.Option('✷ Medium', color=uno.Color.YELLOW)
+    low = uno.Option('✶ Low', color=uno.Color.GRAY)
+
+
+class TaskStatusTodo(uno.OptionNS):
+    backlog = uno.Option('Backlog', color=uno.Color.GRAY)
+    blocked = uno.Option('Blocked', color=uno.Color.RED)
+
+
+class TaskStatusInProgress(uno.OptionNS):
+    in_progress = uno.Option('In Progress', color=uno.Color.BLUE)
+
+
+class TaskStatusComplete(uno.OptionNS):
+    done = uno.Option('Done', color=uno.Color.GREEN)
+
+
+class Tasks(uno.Schema, db_title='Task DB'):
+    """My personal task list of all the important stuff I have to do"""
+
+    task = uno.PropType.Title('Task')
+    status = uno.PropType.Status(
+        'Status', to_do=TaskStatusTodo, in_progress=TaskStatusInProgress, complete=TaskStatusComplete
+    )
+    due_date = uno.PropType.Date('Due Date')
+    priority = uno.PropType.Select('Priority', options=TaskPriority)
+    urgency = uno.PropType.Formula(
+        'Urgency', formula='if(prop("Status") == "Done", "✅", if(empty(prop("Due Date")), "", "🕘"))'
+    )
+
+
 class FormulaTag(uno.OptionNS):
     in_progress = uno.Option('In Progress', color=uno.Color.PINK)
     done = uno.Option('Done', color=uno.Color.GRAY)
@@ -243,8 +291,8 @@ class Bootstrap:
     def find_page(self, title: str) -> uno.Page | None:
         return self.one_match(list(self.notion.search_page(title)), title, 'page')
 
-    def find_database(self, title: str) -> uno.Database | None:
-        return self.one_match(list(self.notion.search_db(title)), title, 'database')
+    def find_ds(self, title: str) -> uno.DataSource | None:
+        return self.one_match(list(self.notion.search_ds(title)), title, 'data source')
 
     def create_page(
         self,
@@ -261,28 +309,37 @@ class Bootstrap:
         typer.echo(f'created page: {title}')
         return page
 
-    def get_or_create_database(self, title: str, schema: type[uno.Schema]) -> tuple[uno.Database, bool]:
-        database = self.find_database(title)
-        if database is not None:
-            database.schema = schema
-            typer.echo(f'database exists: {title}')
-            return database, False
-        database = self.notion.create_db(parent=self.root, schema=schema)
-        typer.echo(f'created database: {title}')
-        return database, True
+    def get_or_create_ds(self, title: str, schema: type[uno.Schema]) -> tuple[uno.DataSource, bool]:
+        data_source = self.find_ds(title)
+        if data_source is not None:
+            # Bind the script schema only to seed an empty data source. An existing, hand-maintained one
+            # may legitimately diverge -- e.g. Formula DB after its formula columns are recreated in the UI,
+            # which Notion then types by result (Text/Number/...) rather than as generic formulas (#297).
+            # Forcing the schema would reject that, so we keep whatever is already there.
+            if data_source.is_empty:
+                try:
+                    data_source.schema = schema
+                except SchemaError:
+                    typer.echo(f'data source exists: {title} (schema differs from the script; keeping its own)')
+                    return data_source, False
+            typer.echo(f'data source exists: {title}')
+            return data_source, False
+        data_source = self.notion.create_ds(parent=self.root, schema=schema)
+        typer.echo(f'created data source: {title}')
+        return data_source, True
 
     def ensure_wiki_shell(self) -> None:
-        if self.find_database('Wiki DB') is not None:
+        if self.find_ds('Wiki DB') is not None:
             typer.echo('wiki exists: Wiki DB')
             return
         self.create_page('Wiki DB')
         typer.echo('manual step: open the Wiki DB page and select ... -> Turn into wiki')
 
     def ensure_contacts_db(self) -> None:
-        database, created = self.get_or_create_database('Contacts DB', Contacts)
+        database, created = self.get_or_create_ds('Contacts DB', Contacts)
         if created:
-            # Database icons currently have no high-level setter.
-            self.client.databases.update(database_id=str(database.id), icon={'type': 'emoji', 'emoji': '🤝'})
+            # The icon lives on the container database; data-source icons have no high-level setter.
+            self.client.databases.update(database_id=str(database.database_id), icon={'type': 'emoji', 'emoji': '🤝'})
         if not database.is_empty:
             typer.echo('Contacts DB already has rows')
             return
@@ -309,50 +366,7 @@ class Bootstrap:
         typer.echo('seeded Contacts DB: 10 rows')
 
     def ensure_task_db(self) -> None:
-        database = self.find_database('Task DB')
-        if database is None:
-            # Status properties cannot be created through Ultimate Notion's Schema API.
-            response = json_object(
-                self.client.databases.create(
-                    parent={'page_id': str(self.root.id)},
-                    title=rich_text('Task DB'),
-                    description=rich_text('My personal task list of all the important stuff I have to do'),
-                    properties={
-                        'Task': {'title': {}},
-                        'Status': {
-                            'status': {
-                                'options': [
-                                    {'name': 'Backlog', 'color': 'gray'},
-                                    {'name': 'Blocked', 'color': 'red'},
-                                    {'name': 'In Progress', 'color': 'blue'},
-                                    {'name': 'Done', 'color': 'green'},
-                                ]
-                            }
-                        },
-                        'Due Date': {'date': {}},
-                        'Priority': {
-                            'select': {
-                                'options': [
-                                    {'name': '✹ High', 'color': 'red'},
-                                    {'name': '✷ Medium', 'color': 'yellow'},
-                                    {'name': '✶ Low', 'color': 'gray'},
-                                ]
-                            }
-                        },
-                        'Urgency': {
-                            'formula': {
-                                'expression': (
-                                    'if(prop("Status") == "Done", "✅", if(empty(prop("Due Date")), "", "🕘"))'
-                                )
-                            }
-                        },
-                    },
-                )
-            )
-            database = self.notion.get_db(response['id'])
-            typer.echo('created database: Task DB')
-        else:
-            typer.echo('database exists: Task DB')
+        database, _ = self.get_or_create_ds('Task DB', Tasks)
         if not database.is_empty:
             typer.echo('Task DB already has rows')
             return
@@ -371,7 +385,7 @@ class Bootstrap:
         typer.echo('seeded Task DB: 3 rows')
 
     def ensure_formula_db(self) -> None:
-        database, _ = self.get_or_create_database('Formula DB', Formulas)
+        database, _ = self.get_or_create_ds('Formula DB', Formulas)
         if database.is_empty:
             for title, tags in (
                 ('Item 1', [FormulaTag.done, FormulaTag.in_progress]),
@@ -397,7 +411,7 @@ class Bootstrap:
         Only writable properties are set; read-only ones (formula, rollup, AI, button,
         timestamps, ...) are populated by Notion.
         """
-        database = self.find_database('All Properties DB')
+        database = self.find_ds('All Properties DB')
         if database is None:
             typer.echo('All Properties DB: not found; build it by hand first (see tests/TEST_WORKSPACE.md)')
             return
@@ -414,25 +428,33 @@ class Bootstrap:
         typer.echo('seeded All Properties DB: 2 rows')
 
     @staticmethod
-    def check_formula_filterable(database: uno.Database) -> None:
-        """Report whether the Formula DB's formulas can be filtered on.
+    def check_formula_filterable(database: uno.DataSource) -> None:
+        """Verify the Formula DB's formula columns are real, computing formulas (`test_query_formula`).
 
-        Notion rejects query filters on formula properties created via the public API
-        ("Unable to filter based on a formula of unknown type", see issue #297), so the
-        formula columns must be (re)created in the Notion UI before `test_query_formula`
-        can record. This probe surfaces that as a manual step instead of a cryptic 400
-        during cassette recording.
+        Notion rejects query filters on formula properties created via the public API ("Unable to filter
+        based on a formula of unknown type", #297), so the columns must be recreated in the UI. They must
+        be recreated as **Formula** columns, though: recreating them as plain Text/Number/Checkbox/Date
+        columns (the formulas' result types) also clears the 400 but leaves them empty. So we check the
+        actual computed value -- `String` (= `format(prop("Name"))`) must read `Item 1` for row `Item 1` --
+        rather than merely that a filter does not error.
         """
+        manual_hint = (
+            'Formula DB: manual setup required - recreate String / Number / Checkbox / Date as '
+            '**Formula** columns in the UI (not plain Text/Number/Checkbox/Date), with expressions '
+            'String=format(prop("Name")), Number=prop("Tags").length(), '
+            'Checkbox=prop("Tags").includes("Done"), Date=prop("Date Source"). See issue #297 / §4.'
+        )
         try:
-            database.query.filter(uno.prop('String').is_not_empty()).execute()
-        except HTTPResponseError as exc:
-            typer.echo(
-                f'Formula DB: manual setup required - formula filters fail ({exc}). '
-                'Recreate the formula columns in the Notion UI so Notion assigns them a '
-                'filterable result type (see issue #297), then re-run.'
-            )
+            rows = {page.props.name: page for page in database.get_all_pages()}
+            item_1 = rows.get('Item 1')
+            computed = None if item_1 is None else item_1.props.string
+        except (HTTPResponseError, AttributeError) as exc:
+            typer.echo(f'{manual_hint} ({exc})')
+            return
+        if computed == 'Item 1':
+            typer.echo('Formula DB: formula columns OK')
         else:
-            typer.echo('Formula DB: formula filters OK')
+            typer.echo(f'{manual_hint} (String for row "Item 1" reads {computed!r}, expected "Item 1")')
 
     def ensure_static_pages(self) -> None:
         self.create_page(
@@ -443,28 +465,128 @@ class Bootstrap:
             ],
         )
         self.ensure_markdown_text_page()
-        markdown_page = self.create_page(
-            'Markdown Test',
-            blocks=[uno.Heading1('Headline 1')],
-        )
-        self.create_page(
-            'Markdown SubPage Test',
-            parent=markdown_page,
-            blocks=[uno.Paragraph('This is the original Paragraph on SubPage')],
-        )
+        self.ensure_markdown_test_page()
         self.create_page(
             'Embed/Inline/Linked & Unfurl',
             blocks=[
                 uno.Embed('https://ultimate-notion.com/'),
                 uno.Bookmark('https://ultimate-notion.com/'),
                 uno.Paragraph('Inline link: https://ultimate-notion.com/'),
-                uno.Paragraph('Linked database placeholder'),
             ],
         )
-        self.create_page(
-            'Comments',
-            blocks=[uno.Heading1('Comments')],
+        # `test_embed_blocks` requires the last block to be a real linked-database view, which the API
+        # cannot create. (A placeholder paragraph would only render the wrong markdown, so we omit it.)
+        typer.echo('manual step: add a linked-database view to the Embed page (see tests/TEST_WORKSPACE.md §6)')
+
+        self.ensure_comments_page()
+
+    def ensure_comments_page(self) -> None:
+        """Create the `Comments` page and seed its 5 page-level comments (`test_list_comments`).
+
+        Page comments are API-creatable and cannot be deleted via the API, so we only add them when the
+        page has none, appending in order with the 5th reading `Another comment` (what the test checks).
+        The heading's *inline* discussions (`test_append_block_comments`) cannot be started through the
+        API and remain a manual step.
+        """
+        page = self.create_page('Comments', blocks=[uno.Heading1('Comments')])
+        wanted = ['Comment 1', 'Comment 2', 'Comment 3', 'Comment 4', 'Another comment']
+        existing = len(page.comments)
+        if existing == 0:
+            for text in wanted:
+                page.comments.append(text)
+            typer.echo(f'seeded Comments: {len(wanted)} page comments')
+        elif existing == len(wanted):
+            typer.echo('Comments: page comments already present')
+        else:
+            typer.echo(
+                f'Comments: has {existing} page comment(s); test_list_comments expects {len(wanted)} '
+                "with the 5th reading 'Another comment' -- comments cannot be deleted via the API, "
+                'so adjust by hand if needed'
+            )
+        # Inline discussions on the heading cannot be created via the API.
+        typer.echo('manual step: add 2 inline discussions to the Comments heading (see TEST_WORKSPACE.md §7)')
+
+    def ensure_markdown_test_page(self) -> None:
+        """Build the `Markdown Test` content fixture for `test_page_to_markdown`.
+
+        Every block except the final two -- a Button and an AI block, which the Notion API cannot
+        create -- is built here to match the test's `exp_output` line for line. Idempotent: a page that
+        already contains the body (detected by a `Divider`) is left untouched; an empty or stub page is
+        (re)built from scratch. The two unsupported blocks must still be added by hand
+        (see tests/TEST_WORKSPACE.md §5).
+        """
+        page = self.find_page('Markdown Test')
+        # Use a late, distinctive block as the "fully built" marker: a `Breadcrumb` appears near the end of
+        # the body and is unlikely in a partial hand-build, so a stub or half-finished page is rebuilt while
+        # a complete one (plus the hand-added unsupported blocks) is left intact on re-runs.
+        if page is not None and any(isinstance(block, uno.Breadcrumb) for block in page.children):
+            typer.echo('Markdown Test: body already built')
+        else:
+            if page is not None:
+                page.delete()  # trash the stub/partial page and rebuild fresh (it is looked up by title)
+            page = self.notion.create_page(parent=self.root, title='Markdown Test')
+            self.build_markdown_test_body(page)
+            typer.echo('built Markdown Test body')
+        typer.echo('manual step: add a Button and an AI block at the end of Markdown Test (see TEST_WORKSPACE.md §5)')
+
+    def build_markdown_test_body(self, page: uno.Page) -> None:
+        """Append every API-creatable block of the Markdown Test fixture, in order."""
+        add = page.append
+        add([uno.Heading1('Headline 1'), uno.Heading2('Headline 2'), uno.Heading3('Headline 3'), uno.Divider()])
+        # Toggle headings are siblings (not nested): nesting hides the inner headings from the rendered
+        # markdown, which the test expects to see flattened.
+        add(
+            [
+                uno.Heading1('Toggle Headline 1', toggleable=True),
+                uno.Heading2('Toggle Headline 2', toggleable=True),
+                uno.Heading3('Toggle Headline 3', toggleable=True),
+            ]
         )
+        add([uno.BulletedItem('Item 1'), uno.BulletedItem('Item 2\nwith a new line'), uno.BulletedItem('Item 3')])
+        add(
+            [uno.ToDoItem('ToDo1'), uno.ToDoItem('ToDo2\nwith a new line'), uno.ToDoItem('Checked ToDo3', checked=True)]
+        )
+        add(
+            [
+                uno.NumberedItem('First item'),
+                uno.NumberedItem('Second item\nwith a new line'),
+                uno.NumberedItem('Third item'),
+            ]
+        )
+        add(uno.Quote('This is a quote\nwith a new line'))
+        add(uno.Callout('Callout!'))
+        table = uno.Table(3, 2)
+        add(table)
+        for row in range(3):
+            table[row] = (f'Cell {row + 1}, 1', f'Cell {row + 1}, 2')
+        add(uno.Paragraph('This is an emoji! \U0001f600\U0001f600'))
+        add(uno.Equation(r'|x|=\begin{cases}x, &\quad x \geq 0\\-x, &\quad x < 0\end{cases}'))
+        add(uno.Code('# Python Code\nimport ultimate_notion', language=uno.CodeLang.PYTHON))
+        add(uno.Embed('https://picsum.photos/300/300', caption='Caption'))
+        # The second image must be Notion-hosted (see TINY_JPEG), so upload it rather than link externally.
+        uploaded = self.notion.upload(io.BytesIO(TINY_JPEG), file_name='1004-300x300.jpg', mime_type='image/jpeg')
+        add(uno.Image(uploaded))
+        add(
+            uno.File(
+                uno.ExternalFile(url='https://ultimate-notion.com/latest/assets/images/logo_with_text.svg'),
+                name='logo_with_text.svg',
+            )
+        )
+        add(uno.Audio(uno.ExternalFile(url='https://samplelib.com/lib/preview/mp3/sample-3s.mp3')))
+        add(uno.Heading2('Unsupported Stuff in Markdown'))
+        columns = uno.Columns(2)
+        add(columns)
+        columns[0].append(uno.Paragraph('Column 1'))
+        columns[1].append(uno.Paragraph('Column'))
+        add(uno.TableOfContents())
+        add(uno.Breadcrumb())
+        # The subpage is created here so its child-page block lands right after the breadcrumb.
+        subpage = self.notion.create_page(parent=page, title='Markdown SubPage Test')
+        subpage_synced = uno.SyncedBlock(uno.Paragraph('This is the original Paragraph on SubPage'))
+        subpage.append(subpage_synced)
+        add(uno.SyncedBlock(uno.Paragraph('This is the original Paragraph on Page')))
+        add(subpage_synced.create_synced())  # a synced copy on this page of the block that lives on the subpage
+        add(uno.LinkToPage(subpage))
 
     def ensure_markdown_text_page(self) -> None:
         """Create the `Markdown Text Test` page and build its 12 styled rich-text paragraphs.
@@ -484,11 +606,11 @@ class Bootstrap:
 
     def audit_manual_objects(self) -> None:
         for title, kind in (
-            ('All Properties DB', 'database'),
-            ('Wiki DB', 'database'),
+            ('All Properties DB', 'data source'),
+            ('Wiki DB', 'data source'),
             ('Custom Emoji Page', 'page'),
         ):
-            obj = self.find_database(title) if kind == 'database' else self.find_page(title)
+            obj = self.find_ds(title) if kind == 'data source' else self.find_page(title)
             status = 'ready' if obj is not None else 'manual setup required'
             typer.echo(f'{title}: {status}')
 
@@ -507,7 +629,7 @@ class Bootstrap:
         return self
 
     def iter_visible(self, object_type: str) -> 'list[dict[str, Any]]':
-        """Return every object of `object_type` ('page'/'database') the integration can see."""
+        """Return every object of `object_type` ('page'/'data_source') the integration can see."""
         results: list[dict[str, Any]] = []
         cursor: str | None = None
         while True:
@@ -530,7 +652,7 @@ class Bootstrap:
         Returns None for the stripped-down, property-less objects Notion returns for
         trashed / limited-access records (see issue #273).
         """
-        if obj.get('object') == 'database':
+        if obj.get('object') in {'database', 'data_source'}:
             parts = obj.get('title') or []
         else:
             parts = []
@@ -540,6 +662,17 @@ class Bootstrap:
                     break
         text = ''.join(part.get('plain_text', '') for part in parts if isinstance(part, dict))
         return text or None
+
+    @staticmethod
+    def is_row(obj: dict[str, Any]) -> bool:
+        """True if `obj` is a page that belongs to a data source (i.e. a database row).
+
+        Rows are managed content of their data source, not free-standing pages, so they must
+        not be reported (or pruned) as stray just because their title is not an expected one.
+        """
+        parent = obj.get('parent')
+        parent_type = parent.get('type') if isinstance(parent, dict) else None
+        return parent_type in {'data_source_id', 'database_id'}
 
     def audit_workspace_objects(self) -> None:
         """Report everything the integration can see and flag drift from the expected set.
@@ -551,7 +684,7 @@ class Bootstrap:
         """
         expected_titles = EXPECTED_PAGE_TITLES | EXPECTED_DATABASE_TITLES
         pages = self.iter_visible('page')
-        databases = self.iter_visible('database')
+        databases = self.iter_visible('data_source')
 
         visible_titles: set[str] = set()
         property_less = 0
@@ -562,6 +695,8 @@ class Bootstrap:
                 property_less += 1
             else:
                 visible_titles.add(title)
+            if self.is_row(obj):  # rows of a data source are managed content, never stray
+                continue
             if title not in expected_titles:  # None (property-less) is never expected
                 stray.append(obj)
 

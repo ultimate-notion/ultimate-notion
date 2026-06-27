@@ -1,9 +1,9 @@
-"""Objects representing a database schema.
+"""Objects representing a data source schema.
 
 Properties are used when
 
-1. a database with a specific schema is [created],
-2. a database with a schema is [retrieved].
+1. a data source with a specific schema is [created],
+2. a data source with a schema is [retrieved].
 
 Unfortunately, the way a schema is defined in case of 1. and 2. is not consistent.
 In case 1., the property name is only defined as a key while in case 2. it is additionally
@@ -33,7 +33,7 @@ class Property(TypedObject[GO_co], polymorphic_base=True):
     """Base class for Notion property objects."""
 
     id: str | UnsetType = Unset
-    name: str | UnsetType = Unset  # Unset when creating a database property schema
+    name: str | UnsetType = Unset  # Unset when creating a data source property schema
     description: str | None = None
 
 
@@ -42,7 +42,7 @@ class TitleTypeData(GenericObject):
 
 
 class Title(Property[TitleTypeData], type='title'):
-    """Defines the title configuration for a database property."""
+    """Defines the title configuration for a data source property."""
 
     title: TitleTypeData = Field(default_factory=TitleTypeData)
 
@@ -52,7 +52,7 @@ class RichTextTypeData(GenericObject):
 
 
 class RichText(Property[RichTextTypeData], type='rich_text'):
-    """Defines the rich text configuration for a database property."""
+    """Defines the rich text configuration for a data source property."""
 
     rich_text: RichTextTypeData = Field(default_factory=RichTextTypeData)
 
@@ -71,7 +71,7 @@ class NumberTypeData(GenericObject):
 
 
 class Number(Property[NumberTypeData], type='number'):
-    """Defines the number configuration for a database property."""
+    """Defines the number configuration for a data source property."""
 
     number: NumberTypeData = Field(default_factory=NumberTypeData)
 
@@ -88,7 +88,7 @@ class SelectTypeData(GenericObject):
 
 
 class Select(Property[SelectTypeData], type='select'):
-    """Defines the select configuration for a database property."""
+    """Defines the select configuration for a data source property."""
 
     select: SelectTypeData = Field(default_factory=SelectTypeData)
 
@@ -105,7 +105,7 @@ class MultiSelectTypeData(GenericObject):
 
 
 class MultiSelect(Property[MultiSelectTypeData], type='multi_select'):
-    """Defines the multi-select configuration for a database property."""
+    """Defines the multi-select configuration for a data source property."""
 
     multi_select: MultiSelectTypeData = Field(default_factory=MultiSelectTypeData)
 
@@ -123,7 +123,7 @@ class StatusTypeData(GenericObject):
 
 
 class Status(Property[StatusTypeData], type='status'):
-    """Defines the status configuration for a database property."""
+    """Defines the status configuration for a data source property."""
 
     status: StatusTypeData = Field(default_factory=StatusTypeData)
 
@@ -134,7 +134,7 @@ class Status(Property[StatusTypeData], type='status'):
         !!! warning
 
             While a Status property can be built, it can only be used to
-            check a schema, not to create a database having such a property.
+            check a schema, not to create a data source having such a property.
         """
         return cls.model_construct(status=StatusTypeData(options=options, groups=groups))
 
@@ -144,7 +144,7 @@ class DateTypeData(GenericObject):
 
 
 class Date(Property[DateTypeData], type='date'):
-    """Defines the date configuration for a database property."""
+    """Defines the date configuration for a data source property."""
 
     date: DateTypeData = Field(default_factory=DateTypeData)
 
@@ -154,7 +154,7 @@ class PeopleTypeData(GenericObject):
 
 
 class People(Property[PeopleTypeData], type='people'):
-    """Defines the people configuration for a database property."""
+    """Defines the people configuration for a data source property."""
 
     people: PeopleTypeData = Field(default_factory=PeopleTypeData)
 
@@ -164,7 +164,7 @@ class FilesTypeData(GenericObject):
 
 
 class Files(Property[FilesTypeData], type='files'):
-    """Defines the files configuration for a database property."""
+    """Defines the files configuration for a data source property."""
 
     files: FilesTypeData = Field(default_factory=FilesTypeData)
 
@@ -174,7 +174,7 @@ class CheckboxTypeData(GenericObject):
 
 
 class Checkbox(Property[CheckboxTypeData], type='checkbox'):
-    """Defines the checkbox configuration for a database property."""
+    """Defines the checkbox configuration for a data source property."""
 
     checkbox: CheckboxTypeData = Field(default_factory=CheckboxTypeData)
 
@@ -184,7 +184,7 @@ class EmailTypeData(GenericObject):
 
 
 class Email(Property[EmailTypeData], type='email'):
-    """Defines the email configuration for a database property."""
+    """Defines the email configuration for a data source property."""
 
     email: EmailTypeData = Field(default_factory=EmailTypeData)
 
@@ -194,7 +194,7 @@ class URLTypeData(GenericObject):
 
 
 class URL(Property[URLTypeData], type='url'):
-    """Defines the URL configuration for a database property."""
+    """Defines the URL configuration for a data source property."""
 
     url: URLTypeData = Field(default_factory=URLTypeData)
 
@@ -204,7 +204,7 @@ class PhoneNumberTypeData(GenericObject):
 
 
 class PhoneNumber(Property[PhoneNumberTypeData], type='phone_number'):
-    """Defines the phone number configuration for a database property."""
+    """Defines the phone number configuration for a data source property."""
 
     phone_number: PhoneNumberTypeData = Field(default_factory=PhoneNumberTypeData)
 
@@ -223,7 +223,7 @@ class FormulaTypeData(GenericObject):
 
 
 class Formula(Property[FormulaTypeData], type='formula'):
-    """Defines the formula configuration for a database property."""
+    """Defines the formula configuration for a data source property."""
 
     formula: FormulaTypeData
 
@@ -233,16 +233,19 @@ class Formula(Property[FormulaTypeData], type='formula'):
 
 
 class PropertyRelation(TypedObject[GO_co], polymorphic_base=True):
-    """Defines common configuration for a property relation."""
+    """Defines common configuration for a property relation.
 
-    database_id: UUID
-    data_source_id: str | None = None  # 2025-09-03 update: https://developers.notion.com/docs/upgrade-guide-2025-09-03
+    In API 2025-09-03+, relations primarily use `data_source_id` to reference the target data source.
+    The `database_id` field references the parent database container.
+    """
+
+    data_source_id: UUID  # Primary target reference in API 2025-09-03+
+    database_id: UUID | UnsetType = Unset  # Reference to parent database container
 
     def __eq__(self, other: object) -> bool:
-        # ToDo: Consider data_source_id when Update 2025-09-03 is implemented.
         if not isinstance(other, PropertyRelation):
             return NotImplemented
-        return self.database_id == other.database_id
+        return self.data_source_id == other.data_source_id
 
 
 class SinglePropertyRelationTypeData(GenericObject):
@@ -250,17 +253,17 @@ class SinglePropertyRelationTypeData(GenericObject):
 
 
 class SinglePropertyRelation(PropertyRelation[SinglePropertyRelationTypeData], type='single_property'):
-    """Defines a one-way relation configuration for a database property."""
+    """Defines a one-way relation configuration for a data source property."""
 
     single_property: SinglePropertyRelationTypeData = Field(default_factory=SinglePropertyRelationTypeData)
 
     @classmethod
-    def build_relation(cls, dbref: UUID) -> Relation:
-        """Create a `single_property` relation using the target database reference.
+    def build_relation(cls, dsref: UUID) -> Relation:
+        """Create a `single_property` relation using the target data source reference.
 
-        `dbref` must be either a string or UUID.
+        `dsref` must be either a string or UUID.
         """
-        rel = SinglePropertyRelation.model_construct(database_id=dbref)
+        rel = SinglePropertyRelation.model_construct(data_source_id=dsref)
         return Relation.model_construct(relation=rel)
 
 
@@ -279,7 +282,7 @@ class DualPropertyRelationTypeData(GenericObject):
 
 
 class DualPropertyRelation(PropertyRelation[DualPropertyRelationTypeData], type='dual_property'):
-    """Defines a two-way relation configuration for a database property.
+    """Defines a two-way relation configuration for a data source property.
 
     If a two-way relation property X relates to Y then the two-way relation property Y relates to X.
     """
@@ -287,20 +290,20 @@ class DualPropertyRelation(PropertyRelation[DualPropertyRelationTypeData], type=
     dual_property: DualPropertyRelationTypeData = Field(default_factory=DualPropertyRelationTypeData)
 
     @classmethod
-    def build_relation(cls, dbref: UUID) -> Relation:
-        """Create a `dual_property` relation using the target database reference.
+    def build_relation(cls, dsref: UUID) -> Relation:
+        """Create a `dual_property` relation using the target data source reference.
 
-        `dbref` must be either a string or UUID.
+        `dsref` must be either a string or UUID.
         """
         # No `synced_property_name` is set since it will be ignored by the Notion API.
         # Thus we first get the default two-way relation name, which we gonna change later.
         # See: https://developers.notion.com/reference/property-schema-object#dual-property-relation-configuration
-        rel = DualPropertyRelation.model_construct(database_id=dbref)
+        rel = DualPropertyRelation.model_construct(data_source_id=dsref)
         return Relation.model_construct(relation=rel)
 
 
 class Relation(Property[SinglePropertyRelation | DualPropertyRelation], type='relation'):
-    """Defines the relation configuration for a database property."""
+    """Defines the relation configuration for a data source property."""
 
     relation: SinglePropertyRelation | DualPropertyRelation
 
@@ -335,7 +338,7 @@ class RollupTypeData(GenericObject):
 
 
 class Rollup(Property[RollupTypeData], type='rollup'):
-    """Defines the rollup configuration for a database property."""
+    """Defines the rollup configuration for a data source property."""
 
     rollup: RollupTypeData
 
@@ -351,7 +354,7 @@ class CreatedTimeTypeData(GenericObject):
 
 
 class CreatedTime(Property[CreatedTimeTypeData], type='created_time'):
-    """Defines the created-time configuration for a database property."""
+    """Defines the created-time configuration for a data source property."""
 
     created_time: CreatedTimeTypeData = Field(default_factory=CreatedTimeTypeData)
 
@@ -361,7 +364,7 @@ class CreatedByTypeData(GenericObject):
 
 
 class CreatedBy(Property[CreatedByTypeData], type='created_by'):
-    """Defines the created-by configuration for a database property."""
+    """Defines the created-by configuration for a data source property."""
 
     created_by: CreatedByTypeData = Field(default_factory=CreatedByTypeData)
 
@@ -371,7 +374,7 @@ class LastEditedByTypeData(GenericObject):
 
 
 class LastEditedBy(Property[LastEditedByTypeData], type='last_edited_by'):
-    """Defines the last-edited-by configuration for a database property."""
+    """Defines the last-edited-by configuration for a data source property."""
 
     last_edited_by: LastEditedByTypeData = Field(default_factory=LastEditedByTypeData)
 
@@ -381,7 +384,7 @@ class LastEditedTimeTypeData(GenericObject):
 
 
 class LastEditedTime(Property[LastEditedTimeTypeData], type='last_edited_time'):
-    """Defines the last-edited-time configuration for a database property."""
+    """Defines the last-edited-time configuration for a data source property."""
 
     last_edited_time: LastEditedTimeTypeData = Field(default_factory=LastEditedTimeTypeData)
 
@@ -393,7 +396,7 @@ class UniqueIDTypeData(GenericObject):
 
 
 class UniqueID(Property[UniqueIDTypeData], type='unique_id'):
-    """Unique ID database property."""
+    """Unique ID data source property."""
 
     unique_id: UniqueIDTypeData = Field(default_factory=UniqueIDTypeData)
 
@@ -407,7 +410,7 @@ class VerificationTypeData(GenericObject):
 
 
 class Verification(Property[VerificationTypeData], type='verification'):
-    """Verfication database property of Wiki databases."""
+    """Verfication data source property of Wiki databases."""
 
     verification: VerificationTypeData = Field(default_factory=VerificationTypeData)
 
@@ -417,7 +420,7 @@ class ButtonTypeData(GenericObject):
 
 
 class Button(Property[ButtonTypeData], type='button'):
-    """Button database property."""
+    """Button data source property."""
 
     button: ButtonTypeData = Field(default_factory=ButtonTypeData)
 
@@ -427,12 +430,12 @@ class PlaceTypeData(GenericObject):
 
 
 class Place(Property[GenericObject], type='place'):
-    """Defines the place configuration for a database property."""
+    """Defines the place configuration for a data source property."""
 
     place: PlaceTypeData = Field(default_factory=PlaceTypeData)
 
 
 class RenameProp(GenericObject):
-    """Property to rename a property during a database update."""
+    """Property to rename a property during a data source update."""
 
     name: str

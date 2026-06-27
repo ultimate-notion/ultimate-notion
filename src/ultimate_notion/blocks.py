@@ -36,9 +36,9 @@ from typing_extensions import Self, TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion
-from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_db, is_page
+from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
-from ultimate_notion.errors import InvalidAPIUsageError, UnknownDatabaseError, UnsetError
+from ultimate_notion.errors import EmptyListError, InvalidAPIUsageError, UnknownDataSourceError, UnsetError
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -51,7 +51,7 @@ from ultimate_notion.user import User
 from ultimate_notion.utils import set_attr_none
 
 if TYPE_CHECKING:
-    from ultimate_notion.database import Database
+    from ultimate_notion.database import DataSource
     from ultimate_notion.page import Page
 
 
@@ -95,7 +95,7 @@ def wrap_icon(
 
 
 class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
-    """The base type for all data-related types, i.e, pages, databases and blocks."""
+    """The base type for all data-related types, i.e, pages, databases, data sources and blocks."""
 
     @property
     def block_url(self) -> str:
@@ -170,9 +170,14 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
     as the Notion API often doesn't send the `children` property back in the response.
     """
 
-    _children: list[Block | Page | Database] | None = None
+    _children: list[Block | Page | DataSource] | None = None
 
-    def _gen_children_cache(self) -> list[Block | Page | Database]:
+    @property
+    def _has_children_field(self) -> bool:
+        """Return whether the object has a `children` field."""
+        return isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren)
+
+    def _gen_children_cache(self) -> list[Block | Page | DataSource]:
         """Generate the children cache."""
         if self.is_deleted:
             msg = 'Cannot retrieve children of a deleted block from Notion.'
@@ -184,26 +189,32 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         if isinstance(self.obj_ref, obj_blocks.Block) and isinstance(self.obj_ref.value, obj_blocks.WithChildren):
             self.obj_ref.value.children = child_blocks_objs  # update the children attribute
 
-        child_blocks: list[Block | Page | Database] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
+        child_blocks: list[Block | Page | DataSource] = [Block.wrap_obj_ref(block) for block in child_blocks_objs]
 
         for idx, child_block in enumerate(child_blocks):
             if isinstance(child_block, ChildPage):
                 child_blocks[idx] = child_block.page
             elif isinstance(child_block, ChildDatabase):
-                ref_block: Block | Database
+                ref_block: Block | DataSource
                 try:
-                    ref_block = child_block.db
-                except UnknownDatabaseError:
-                    # linked database that cannot be retrieved via API. Check the docs:
+                    ref_block = child_block.ds
+                except (UnknownDataSourceError, EmptyListError):
+                    # A linked database (a linked view of another database) cannot be resolved to a data
+                    # source via the API: its container either is not retrievable (`UnknownDataSourceError`)
+                    # or exposes no data sources (`EmptyListError`). Fall back to the block itself, which
+                    # renders as an unsupported linked database. Check the docs:
                     # https://developers.notion.com/reference/retrieve-a-database
                     ref_block = child_block
                 child_blocks[idx] = ref_block
 
-        return [session._cache_add(block) for block in child_blocks]
+        # A `ChildDatabase` still present here is an unresolved linked database (resolved ones became
+        # `DataSource` above). Its id is the container database's id, already cached as a `Database` while
+        # resolving it, so re-caching it as a `ChildDatabase` would collide -- leave it uncached.
+        return [block if isinstance(block, ChildDatabase) else session._cache_add(block) for block in child_blocks]
 
     @property
-    def children(self) -> tuple[Block | Page | Database, ...]:
-        """Return the children of this block, which are blocks but might also be pages and databases."""
+    def children(self) -> tuple[Block | Page | DataSource, ...]:
+        """Return the children of this block, which are blocks but might also be pages and data sources."""
         if self.in_notion:
             if self._children is None:
                 self._children = self._gen_children_cache()
@@ -216,8 +227,8 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
 
     @property
     def blocks(self) -> tuple[Block, ...]:
-        """Return all contained blocks within this block (excluding child pages and databases)"""
-        return tuple(block for block in self.children if not is_page(block) and not is_db(block))
+        """Return all contained blocks within this block (excluding child pages and data sources)"""
+        return tuple(block for block in self.children if not is_page(block) and not is_ds(block))
 
     def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
         """Append a block or a sequence of blocks to the content of this block.
@@ -1097,19 +1108,19 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
 class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatabase):
     """Child database block.
 
-    This block is used to represent a database if it is a child of e.g. a page.
-    We try to resolve it via the API to get the actual database object. This does not work
+    This block is used to represent a data source if it is a child of e.g. a page.
+    We try to resolve it via the API to get the actual data source object. This does not work
     if it is a `linked database` as mentioned in the Notion API docs:
     https://developers.notion.com/reference/retrieve-a-database
 
     !!! note
 
-        To create a child database block as an end-user, create a new database with the corresponding parent.
+        To create a child database block as an end-user, create a new data source with the corresponding parent.
         This block is used only internally.
     """
 
     def __init__(self) -> None:
-        msg = 'To create a child database block, create a new database with the corresponding parent.'
+        msg = 'To create a child database block, create a new data source with the corresponding parent.'
         raise InvalidAPIUsageError(msg)
 
     @property
@@ -1120,10 +1131,15 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         return title if title else None
 
     @property
-    def db(self) -> Database:
-        """Return the actual Database object."""
+    def ds(self) -> DataSource:
+        """Return the actual DataSource object.
+
+        A `child_database` block's id is the id of the database *container*; resolve that database
+        and return its data source. The container is transparent in the high-level API, so a child
+        database surfaces as the data source it holds.
+        """
         sess = get_active_session()
-        return sess.get_db(self.id)
+        return sess.get_db(self.id).data_sources.item()
 
     def to_markdown(self) -> str:  # noqa: PLR6301
         """Return the child database as Markdown."""

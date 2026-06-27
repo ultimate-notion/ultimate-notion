@@ -119,7 +119,7 @@ def test_date_query(root_page: uno.Page, notion: uno.Session) -> None:
         created = uno.PropType.CreatedTime('Created')
         last_edited = uno.PropType.LastEditedTime('Last Edited')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     now = pnd.now()
     page_no_date = db.create_page(name='no_date')
     page_tw = db.create_page(name='this week', date=now)
@@ -207,7 +207,7 @@ def test_text_query(root_page: uno.Page, notion: uno.Session) -> None:
         email = uno.PropType.Email('Email')
         url = uno.PropType.URL('URL')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     page_empty = db.create_page()
     page_john_doe = db.create_page(
         title='John', name='John Doe', phone='123-456-7890', email='john.doe@gmail.com', url='https://john.doe.com'
@@ -266,7 +266,7 @@ def test_number_query(root_page: uno.Page, notion: uno.Session) -> None:
         title = uno.PropType.Title('Title')
         number = uno.PropType.Number('Number')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     page_empty = db.create_page()
     page_1 = db.create_page(title='1', number=1)
     page_2 = db.create_page(title='1', number=2)
@@ -311,7 +311,7 @@ def test_select_query(root_page: uno.Page, notion: uno.Session) -> None:
         select = uno.PropType.Select('Select', options=status_options)
         multi_select = uno.PropType.MultiSelect('Multi-Select', options=status_options)
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     page_empty = db.create_page()
     page_1 = db.create_page(title='Done', select=done, multi_select=[done, ongoing])
     page_2 = db.create_page(title='In Progress', select=ongoing, multi_select=[backlog, ongoing])
@@ -365,7 +365,7 @@ def test_files_checkbox_query(root_page: uno.Page, notion: uno.Session) -> None:
         files = uno.PropType.Files('Files')
         check = uno.PropType.Checkbox('Checkbox')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
 
     page_empty = db.create_page()
 
@@ -404,7 +404,7 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
         people = uno.PropType.Person('People')
         relation = uno.PropType.Relation('Relation', schema=uno.SelfRef)
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
 
     page_empty = db.create_page()
     page_person = db.create_page(title='Person', people=[person])
@@ -440,7 +440,7 @@ def test_people_relation_query(root_page: uno.Page, notion: uno.Session, person:
 
 
 @pytest.mark.vcr()
-def test_query_new_task_db(new_task_db: uno.Database) -> None:
+def test_query_new_task_db(new_task_db: uno.DataSource) -> None:
     all_pages = new_task_db.query.execute()
     assert len(all_pages) == 0
 
@@ -454,7 +454,7 @@ def test_query_new_task_db(new_task_db: uno.Database) -> None:
     task2 = Task.create(task='Task 2', status=status_options['Backlog'], due_date='2024-01-02')
     task3 = Task.create(task='Task 3', status=status_options['In Progress'], due_date='2024-01-01')
 
-    assert str(new_task_db.query) == "Query(database='My Tasks', sort=(), filter=None)"
+    assert str(new_task_db.query) == "Query(ds='My Tasks', sort=(), filter=None)"
 
     query = new_task_db.query.sort(uno.prop('Due Date').asc(), uno.prop('Task').asc())
     assert set(query.execute()) == {task1, task3, task2}
@@ -476,7 +476,7 @@ def test_query_new_task_db(new_task_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.Database) -> None:
+def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.DataSource) -> None:
     # Sort by title so the test does not depend on Notion's (workspace-specific) default row
     # order, which `get_all_pages()` returns unsorted -- see issue #364.
     item_1, item_2 = sorted(formula_db.get_all_pages(), key=lambda page: str(page.title))
@@ -532,7 +532,7 @@ def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno
         title = uno.PropType.Title('Title')
         formula = uno.PropType.Formula('Formula', formula='prop("Title")')
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
 
     query = db.query.filter(uno.prop('Formula').is_empty())
     assert set(query.execute()) == set()
@@ -567,7 +567,7 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session) -> None:
             rollup_number_prop_arr, relation=relation, rollup=number, calculate=uno.AggFunc.SHOW_ORIGINAL
         )
 
-    db = notion.create_db(parent=root_page, schema=DB)
+    db = notion.create_ds(parent=root_page, schema=DB)
     item_1 = db.create_page(title='Item 1', number=42, date='2024-11-25 14:08:00+00:00')
     item_2 = db.create_page(title='Item 2', number=72, date='1981-11-23 08:02:00+01:00', relation=item_1)
     item_3 = db.create_page(title='Item 3', number=12, date='2024-11-25 14:08:00+00:00', relation=(item_1, item_2))
@@ -648,7 +648,7 @@ def test_query_rollup(root_page: uno.Page, notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_id_prop(all_props_db: uno.Database) -> None:
+def test_id_prop(all_props_db: uno.DataSource) -> None:
     all_pages = all_props_db.get_all_pages()
 
     query = all_props_db.query.filter(uno.prop('ID') != 42)

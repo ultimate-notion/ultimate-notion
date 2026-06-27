@@ -3,9 +3,9 @@ interactions:
     body: '{"parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
       "title": [{"type": "text", "plain_text": "Item DB for max relation items", "annotations":
       {"bold": false, "italic": false, "strikethrough": false, "underline": false,
-      "code": false}, "text": {"content": "Item DB for max relation items"}}], "properties":
-      {"Name": {"type": "title", "title": {}}, "Price": {"type": "number", "number":
-      {"format": "dollar"}}}, "is_inline": false}'
+      "code": false}, "text": {"content": "Item DB for max relation items"}}], "is_inline":
+      false, "initial_data_source": {"properties": {"Name": {"type": "title", "title":
+      {}}, "Price": {"type": "number", "number": {"format": "dollar"}}}}}'
     headers:
       accept:
       - '*/*'
@@ -16,7 +16,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '422'
+      - '446'
       content-type:
       - application/json
       cookie:
@@ -24,20 +24,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"494d95ef-9be9-41f8-8361-97f035cbd158","title":[{"type":"text","text":{"content":"Item
       DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      DB for max relation items","href":null}],"description":[],"is_inline":false,"properties":{"Price":{"id":"%3FmQ%7D","name":"Price","description":null,"type":"number","number":{"format":"dollar"}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a481c58656ff76fd28e461","public_url":null,"in_trash":false,"archived":false,"request_id":"a08702f2-b2d9-4664-adca-009a0a2e1e35"}'
+      DB for max relation items","href":null}],"description":[],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-27T05:56:25.972+00:00","last_edited_time":"2026-06-27T05:56:25.972+00:00","data_sources":[{"id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","name":"Item
+      DB for max relation items"}],"icon":null,"cover":null,"url":"https://www.notion.so/494d95ef9be941f8836197f035cbd158","public_url":null,"archived":false,"request_id":"b70bdd92-3db5-4a0d-bab8-845135c34d7b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dd8d0984aff9-LHR
+      - a122355d2ee926f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -67,7 +68,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a08702f2-b2d9-4664-adca-009a0a2e1e35
+      - b70bdd92-3db5-4a0d-bab8-845135c34d7b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -95,22 +96,23 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-81c5-8656-ff76fd28e461
+    uri: https://api.notion.com/v1/databases/494d95ef-9be9-41f8-8361-97f035cbd158
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"494d95ef-9be9-41f8-8361-97f035cbd158","title":[{"type":"text","text":{"content":"Item
       DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
       DB for max relation items","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      of all items","href":null}],"is_inline":false,"properties":{"Price":{"id":"%3FmQ%7D","name":"Price","description":null,"type":"number","number":{"format":"dollar"}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a481c58656ff76fd28e461","public_url":null,"in_trash":false,"archived":false,"request_id":"46d8d669-94a3-4618-a19e-e5498700f320"}'
+      of all items","href":null}],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-27T05:56:25.972+00:00","last_edited_time":"2026-06-27T05:56:25.972+00:00","data_sources":[{"id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","name":"Item
+      DB for max relation items"}],"icon":null,"cover":null,"url":"https://www.notion.so/494d95ef9be941f8836197f035cbd158","public_url":null,"archived":false,"request_id":"f50865dc-c3c8-4634-b23a-8ff363383b4e"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dd935b32aff9-LHR
+      - a12235663ab226f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -140,7 +142,75 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 46d8d669-94a3-4618-a19e-e5498700f320
+      - f50865dc-c3c8-4634-b23a-8ff363383b4e
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2025-09-03'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/data_sources/25af4dc6-7a71-4777-91a4-6e6fcabb9395
+  response:
+    content: '{"object":"data_source","id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","cover":null,"icon":null,"created_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T05:56:00.000Z","title":[{"type":"text","text":{"content":"Item
+      DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      DB for max relation items","href":null}],"description":[{"type":"text","text":{"content":"Database
+      of all items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
+      of all items","href":null}],"is_inline":false,"properties":{"Price":{"id":"o%3FIq","name":"Price","description":null,"type":"number","number":{"format":"dollar"}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/494d95ef9be941f8836197f035cbd158","public_url":null,"in_trash":false,"archived":false,"request_id":"ef0281d6-ecef-4b1c-a5aa-92f96f13ceac"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a1223568ff0026f7-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - ef0281d6-ecef-4b1c-a5aa-92f96f13ceac
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -152,9 +222,10 @@ interactions:
       "title": [{"type": "text", "plain_text": "Customer DB for max relation items",
       "annotations": {"bold": false, "italic": false, "strikethrough": false, "underline":
       false, "code": false}, "text": {"content": "Customer DB for max relation items"}}],
-      "properties": {"Name": {"type": "title", "title": {}}, "Items Purchased": {"type":
-      "relation", "relation": {"type": "dual_property", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461",
-      "dual_property": {}}}}, "is_inline": false}'
+      "is_inline": false, "initial_data_source": {"properties": {"Name": {"type":
+      "title", "title": {}}, "Items Purchased": {"type": "relation", "relation": {"type":
+      "dual_property", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395", "dual_property":
+      {}}}}}}'
     headers:
       accept:
       - '*/*'
@@ -165,7 +236,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '521'
+      - '548'
       content-type:
       - application/json
       cookie:
@@ -173,22 +244,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-8122-a4a4-ff0c92ff286b","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"database","id":"6fd3a0ab-3e4d-47b7-a720-dec3ef72427b","title":[{"type":"text","text":{"content":"Customer
       DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
-      DB for max relation items","href":null}],"description":[],"is_inline":false,"properties":{"Items
-      Purchased":{"id":"wNLO","name":"Items Purchased","description":null,"type":"relation","relation":{"database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461","data_source_id":"38c9ce7b-60a4-8163-a994-000b6807a0f0","type":"dual_property","dual_property":{"synced_property_name":"Related
-      to Customer DB for max relation items (Items Purchased)","synced_property_id":"%3EiE%3E"}}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a48122a4a4ff0c92ff286b","public_url":null,"in_trash":false,"archived":false,"request_id":"65b6e77d-d3c4-47cc-9e8d-d8678860ea3f"}'
+      DB for max relation items","href":null}],"description":[],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-27T05:56:28.165+00:00","last_edited_time":"2026-06-27T05:56:28.165+00:00","data_sources":[{"id":"c5201abf-d4c1-4e82-b620-6ee6d2e60a47","name":"Customer
+      DB for max relation items"}],"icon":null,"cover":null,"url":"https://www.notion.so/6fd3a0ab3e4d47b7a720dec3ef72427b","public_url":null,"archived":false,"request_id":"d8b54d00-c5c1-4a1d-b5ae-54fc82523d0d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dd961fe0aff9-LHR
+      - a122356ae97226f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -218,7 +288,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 65b6e77d-d3c4-47cc-9e8d-d8678860ea3f
+      - d8b54d00-c5c1-4a1d-b5ae-54fc82523d0d
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -246,24 +316,23 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8122-a4a4-ff0c92ff286b
+    uri: https://api.notion.com/v1/databases/6fd3a0ab-3e4d-47b7-a720-dec3ef72427b
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-8122-a4a4-ff0c92ff286b","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"database","id":"6fd3a0ab-3e4d-47b7-a720-dec3ef72427b","title":[{"type":"text","text":{"content":"Customer
       DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
       DB for max relation items","href":null}],"description":[{"type":"text","text":{"content":"Database
       for customers","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      for customers","href":null}],"is_inline":false,"properties":{"Items Purchased":{"id":"wNLO","name":"Items
-      Purchased","description":null,"type":"relation","relation":{"database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461","data_source_id":"38c9ce7b-60a4-8163-a994-000b6807a0f0","type":"dual_property","dual_property":{"synced_property_name":"Related
-      to Customer DB for max relation items (Items Purchased)","synced_property_id":"%3EiE%3E"}}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a48122a4a4ff0c92ff286b","public_url":null,"in_trash":false,"archived":false,"request_id":"5b099831-0167-4c42-bccf-452ad2e3eb36"}'
+      for customers","href":null}],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-27T05:56:28.165+00:00","last_edited_time":"2026-06-27T05:56:28.165+00:00","data_sources":[{"id":"c5201abf-d4c1-4e82-b620-6ee6d2e60a47","name":"Customer
+      DB for max relation items"}],"icon":null,"cover":null,"url":"https://www.notion.so/6fd3a0ab3e4d47b7a720dec3ef72427b","public_url":null,"archived":false,"request_id":"c136483e-e257-4835-937c-6acd80ba9e2a"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dd9befbeaff9-LHR
+      - a1223570b9c826f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -293,7 +362,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 5b099831-0167-4c42-bccf-452ad2e3eb36
+      - c136483e-e257-4835-937c-6acd80ba9e2a
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -301,7 +370,77 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"properties":{"%3EiE%3E":{"name":"Bought by"}}}'
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2025-09-03'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/data_sources/c5201abf-d4c1-4e82-b620-6ee6d2e60a47
+  response:
+    content: '{"object":"data_source","id":"c5201abf-d4c1-4e82-b620-6ee6d2e60a47","cover":null,"icon":null,"created_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T05:56:00.000Z","title":[{"type":"text","text":{"content":"Customer
+      DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
+      DB for max relation items","href":null}],"description":[{"type":"text","text":{"content":"Database
+      for customers","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
+      for customers","href":null}],"is_inline":false,"properties":{"Items Purchased":{"id":"%3Djxv","name":"Items
+      Purchased","description":null,"type":"relation","relation":{"database_id":"494d95ef-9be9-41f8-8361-97f035cbd158","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","type":"dual_property","dual_property":{"synced_property_name":"Related
+      to Customer DB for max relation items (Items Purchased)","synced_property_id":"UC%7CA"}}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"6fd3a0ab-3e4d-47b7-a720-dec3ef72427b"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/6fd3a0ab3e4d47b7a720dec3ef72427b","public_url":null,"in_trash":false,"archived":false,"request_id":"0f13f74b-5d0f-45e1-a5ca-91fac9c47258"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a12235738dda26f7-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 0f13f74b-5d0f-45e1-a5ca-91fac9c47258
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"properties":{"UC%7CA":{"name":"Bought by"}}}'
     headers:
       accept:
       - '*/*'
@@ -312,7 +451,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '48'
+      - '46'
       content-type:
       - application/json
       cookie:
@@ -320,24 +459,24 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-81c5-8656-ff76fd28e461
+    uri: https://api.notion.com/v1/data_sources/25af4dc6-7a71-4777-91a4-6e6fcabb9395
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"data_source","id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","cover":null,"icon":null,"created_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T05:56:00.000Z","title":[{"type":"text","text":{"content":"Item
       DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
       DB for max relation items","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      of all items","href":null}],"is_inline":false,"properties":{"Bought by":{"id":"%3EiE%3E","name":"Bought
-      by","description":null,"type":"relation","relation":{"database_id":"38c9ce7b-60a4-8122-a4a4-ff0c92ff286b","data_source_id":"38c9ce7b-60a4-818f-8510-000b125e43e0","type":"dual_property","dual_property":{"synced_property_name":"Items
-      Purchased","synced_property_id":"wNLO"}}},"Price":{"id":"%3FmQ%7D","name":"Price","description":null,"type":"number","number":{"format":"dollar"}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a481c58656ff76fd28e461","public_url":null,"in_trash":false,"archived":false,"request_id":"46ac6de9-557a-4577-b370-728ab20ffbc5"}'
+      of all items","href":null}],"is_inline":false,"properties":{"Bought by":{"id":"UC%7CA","name":"Bought
+      by","description":null,"type":"relation","relation":{"database_id":"6fd3a0ab-3e4d-47b7-a720-dec3ef72427b","data_source_id":"c5201abf-d4c1-4e82-b620-6ee6d2e60a47","type":"dual_property","dual_property":{"synced_property_name":"Items
+      Purchased","synced_property_id":"%3Djxv"}}},"Price":{"id":"o%3FIq","name":"Price","description":null,"type":"number","number":{"format":"dollar"}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/494d95ef9be941f8836197f035cbd158","public_url":null,"in_trash":false,"archived":false,"request_id":"cd9cec23-6bac-41d5-80ea-952b3e4784cc"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dd9e8b52aff9-LHR
+      - a12235770aa326f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -367,7 +506,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 46ac6de9-557a-4577-b370-728ab20ffbc5
+      - cd9cec23-6bac-41d5-80ea-952b3e4784cc
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -394,24 +533,24 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8122-a4a4-ff0c92ff286b
+    uri: https://api.notion.com/v1/data_sources/c5201abf-d4c1-4e82-b620-6ee6d2e60a47
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-8122-a4a4-ff0c92ff286b","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"data_source","id":"c5201abf-d4c1-4e82-b620-6ee6d2e60a47","cover":null,"icon":null,"created_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T05:56:00.000Z","title":[{"type":"text","text":{"content":"Customer
       DB for max relation items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
       DB for max relation items","href":null}],"description":[{"type":"text","text":{"content":"Database
       for customers","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      for customers","href":null}],"is_inline":false,"properties":{"Items Purchased":{"id":"wNLO","name":"Items
-      Purchased","description":null,"type":"relation","relation":{"database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461","data_source_id":"38c9ce7b-60a4-8163-a994-000b6807a0f0","type":"dual_property","dual_property":{"synced_property_name":"Bought
-      by","synced_property_id":"%3EiE%3E"}}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a48122a4a4ff0c92ff286b","public_url":null,"in_trash":false,"archived":false,"request_id":"4a3af763-008f-48fb-8430-b876eff949fb"}'
+      for customers","href":null}],"is_inline":false,"properties":{"Items Purchased":{"id":"%3Djxv","name":"Items
+      Purchased","description":null,"type":"relation","relation":{"database_id":"494d95ef-9be9-41f8-8361-97f035cbd158","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","type":"dual_property","dual_property":{"synced_property_name":"Bought
+      by","synced_property_id":"UC%7CA"}}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"6fd3a0ab-3e4d-47b7-a720-dec3ef72427b"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/6fd3a0ab3e4d47b7a720dec3ef72427b","public_url":null,"in_trash":false,"archived":false,"request_id":"be078139-71ab-4c9e-939b-5fa5ba8f9580"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dda248b2aff9-LHR
+      - a12235814aa126f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -441,7 +580,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 4a3af763-008f-48fb-8430-b876eff949fb
+      - be078139-71ab-4c9e-939b-5fa5ba8f9580
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -449,7 +588,7 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-8122-a4a4-ff0c92ff286b"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "c5201abf-d4c1-4e82-b620-6ee6d2e60a47"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Customer 1", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Customer 1"}}]}}}'
@@ -463,7 +602,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '306'
+      - '312'
       content-type:
       - application/json
       cookie:
@@ -471,21 +610,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8122-a4a4-ff0c92ff286b"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Items
-      Purchased":{"id":"wNLO","type":"relation","relation":[],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"page","id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"c5201abf-d4c1-4e82-b620-6ee6d2e60a47","database_id":"6fd3a0ab-3e4d-47b7-a720-dec3ef72427b"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Items
+      Purchased":{"id":"%3Djxv","type":"relation","relation":[],"has_more":false},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Customer
       1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
-      1","href":null}]}},"url":"https://www.notion.so/Customer-1-38c9ce7b60a481a7ac02da7b686dafc6","public_url":null,"archived":false,"request_id":"dec01e1e-30d1-4396-bd49-a5f3c194f777"}'
+      1","href":null}]}},"url":"https://www.notion.so/Customer-1-38c9ce7b60a481348e39d6d37f1fd214","public_url":null,"archived":false,"request_id":"5df66cfe-a9e7-49f7-82d5-d6aacd81c529"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dda50d6faff9-LHR
+      - a122358cbb4426f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -515,7 +654,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - dec01e1e-30d1-4396-bd49-a5f3c194f777
+      - 5df66cfe-a9e7-49f7-82d5-d6aacd81c529
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -523,12 +662,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 1", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 1"}}]}, "Price":
       {"type": "number", "number": 10}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -539,7 +678,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -547,21 +686,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81b5-8775-d5d1163991e8","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":10},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8138-b1f5-dafa86dfa1cc","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":10},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      1","href":null}]}},"url":"https://www.notion.so/Item-1-38c9ce7b60a481b58775d5d1163991e8","public_url":null,"archived":false,"request_id":"e9a625dd-98ad-4a08-9af7-7c4efb6c1533"}'
+      1","href":null}]}},"url":"https://www.notion.so/Item-1-38c9ce7b60a48138b1f5dafa86dfa1cc","public_url":null,"archived":false,"request_id":"3ace7a2b-b64f-47ea-97b6-58895e4010eb"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dda7f99daff9-LHR
+      - a122358f3eb926f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -591,7 +730,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e9a625dd-98ad-4a08-9af7-7c4efb6c1533
+      - 3ace7a2b-b64f-47ea-97b6-58895e4010eb
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -599,12 +738,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 2", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 2"}}]}, "Price":
       {"type": "number", "number": 20}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -615,7 +754,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -623,21 +762,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81dd-82e9-dc040dd12c99","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":20},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-811f-9ed7-d216b1af35bf","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":20},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       2","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      2","href":null}]}},"url":"https://www.notion.so/Item-2-38c9ce7b60a481dd82e9dc040dd12c99","public_url":null,"archived":false,"request_id":"91e58de7-159f-4c2d-aff5-05d77c1ecdd9"}'
+      2","href":null}]}},"url":"https://www.notion.so/Item-2-38c9ce7b60a4811f9ed7d216b1af35bf","public_url":null,"archived":false,"request_id":"04e8fe01-6b59-47f5-9ba1-726ed87dd1e7"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddaa5e78aff9-LHR
+      - a1223591ba3a26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -667,7 +806,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 91e58de7-159f-4c2d-aff5-05d77c1ecdd9
+      - 04e8fe01-6b59-47f5-9ba1-726ed87dd1e7
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -675,12 +814,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 3", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 3"}}]}, "Price":
       {"type": "number", "number": 30}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -691,7 +830,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -699,21 +838,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81bd-8199-e0f910c0e593","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":30},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8127-be54-ea0da002f73c","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":30},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       3","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      3","href":null}]}},"url":"https://www.notion.so/Item-3-38c9ce7b60a481bd8199e0f910c0e593","public_url":null,"archived":false,"request_id":"e546d219-2a12-496e-95ca-00b1c483cc7d"}'
+      3","href":null}]}},"url":"https://www.notion.so/Item-3-38c9ce7b60a48127be54ea0da002f73c","public_url":null,"archived":false,"request_id":"eb3f8df0-f0c3-4f9c-accc-54b97670ea52"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddacac2caff9-LHR
+      - a1223593ed9726f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -743,7 +882,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e546d219-2a12-496e-95ca-00b1c483cc7d
+      - eb3f8df0-f0c3-4f9c-accc-54b97670ea52
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -751,12 +890,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 4", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 4"}}]}, "Price":
       {"type": "number", "number": 40}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -767,7 +906,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -775,21 +914,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81e9-90fa-d1b7cb10467c","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":40},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8128-aea2-d8573bf5f13d","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":40},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       4","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      4","href":null}]}},"url":"https://www.notion.so/Item-4-38c9ce7b60a481e990fad1b7cb10467c","public_url":null,"archived":false,"request_id":"9c37eb01-2924-4005-a4f6-7ad045c741e1"}'
+      4","href":null}]}},"url":"https://www.notion.so/Item-4-38c9ce7b60a48128aea2d8573bf5f13d","public_url":null,"archived":false,"request_id":"f1c40157-ec2e-4daa-b3af-680bcdcb1075"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddaee8c5aff9-LHR
+      - a122359639ab26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -819,7 +958,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 9c37eb01-2924-4005-a4f6-7ad045c741e1
+      - f1c40157-ec2e-4daa-b3af-680bcdcb1075
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -827,12 +966,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 5", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 5"}}]}, "Price":
       {"type": "number", "number": 50}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -843,7 +982,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -851,21 +990,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-818e-8758-d0e0c943e994","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":50},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81cc-82be-fcd3337acc66","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":50},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       5","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      5","href":null}]}},"url":"https://www.notion.so/Item-5-38c9ce7b60a4818e8758d0e0c943e994","public_url":null,"archived":false,"request_id":"29fbd7e9-dbf4-497a-8500-2b5da762f105"}'
+      5","href":null}]}},"url":"https://www.notion.so/Item-5-38c9ce7b60a481cc82befcd3337acc66","public_url":null,"archived":false,"request_id":"a466ac41-a762-4097-8fa6-b792db25367d"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddb20dd6aff9-LHR
+      - a1223598dd5f26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -895,7 +1034,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 29fbd7e9-dbf4-497a-8500-2b5da762f105
+      - a466ac41-a762-4097-8fa6-b792db25367d
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -903,12 +1042,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 6", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 6"}}]}, "Price":
       {"type": "number", "number": 60}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -919,7 +1058,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -927,21 +1066,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81ce-acc5-d5345f738660","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":60},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8195-be86-c8d79122b173","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":60},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       6","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      6","href":null}]}},"url":"https://www.notion.so/Item-6-38c9ce7b60a481ceacc5d5345f738660","public_url":null,"archived":false,"request_id":"e659ad4a-beff-478a-8a5a-44938ec3228c"}'
+      6","href":null}]}},"url":"https://www.notion.so/Item-6-38c9ce7b60a48195be86c8d79122b173","public_url":null,"archived":false,"request_id":"53fc5321-7806-43c7-af85-a91e46127369"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddb458d3aff9-LHR
+      - a122359ba9a626f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -971,7 +1110,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e659ad4a-beff-478a-8a5a-44938ec3228c
+      - 53fc5321-7806-43c7-af85-a91e46127369
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -979,12 +1118,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 7", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 7"}}]}, "Price":
       {"type": "number", "number": 70}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -995,7 +1134,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -1003,21 +1142,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8144-9c1f-fa9dd2637950","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":70},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81e8-90d8-c044af2a6f3f","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":70},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       7","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      7","href":null}]}},"url":"https://www.notion.so/Item-7-38c9ce7b60a481449c1ffa9dd2637950","public_url":null,"archived":false,"request_id":"8aa84aae-a234-4da1-ac7b-900f331f3105"}'
+      7","href":null}]}},"url":"https://www.notion.so/Item-7-38c9ce7b60a481e890d8c044af2a6f3f","public_url":null,"archived":false,"request_id":"c900fe06-e167-4a8d-b6fd-8c662dbf74eb"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddb68bbaaff9-LHR
+      - a122359f5f3a26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1047,7 +1186,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 8aa84aae-a234-4da1-ac7b-900f331f3105
+      - c900fe06-e167-4a8d-b6fd-8c662dbf74eb
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1055,12 +1194,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 8", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 8"}}]}, "Price":
       {"type": "number", "number": 80}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1071,7 +1210,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -1079,21 +1218,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81a3-9b4a-df69023b1409","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":80},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-819f-bd7b-d3568ea7d1e5","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":80},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       8","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      8","href":null}]}},"url":"https://www.notion.so/Item-8-38c9ce7b60a481a39b4adf69023b1409","public_url":null,"archived":false,"request_id":"b108df24-3efb-41ed-a501-3ccbac8c0fc0"}'
+      8","href":null}]}},"url":"https://www.notion.so/Item-8-38c9ce7b60a4819fbd7bd3568ea7d1e5","public_url":null,"archived":false,"request_id":"f85142d2-3efa-4ca2-a74e-7fcfd4cc0ba6"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddb96863aff9-LHR
+      - a12235c07c0926f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1123,7 +1262,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - b108df24-3efb-41ed-a501-3ccbac8c0fc0
+      - f85142d2-3efa-4ca2-a74e-7fcfd4cc0ba6
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1131,12 +1270,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 9", "annotations": {"bold": false, "italic": false, "strikethrough": false,
       "underline": false, "code": false}, "text": {"content": "Item 9"}}]}, "Price":
       {"type": "number", "number": 90}, "Bought by": {"type": "relation", "relation":
-      [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1147,7 +1286,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '444'
+      - '450'
       content-type:
       - application/json
       cookie:
@@ -1155,21 +1294,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8166-aee0-f2374cc13ef7","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":90},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8132-8a7d-eef2e64e3e23","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":90},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       9","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      9","href":null}]}},"url":"https://www.notion.so/Item-9-38c9ce7b60a48166aee0f2374cc13ef7","public_url":null,"archived":false,"request_id":"d1c4f951-c38d-47a5-a0bc-f22df0fcbd87"}'
+      9","href":null}]}},"url":"https://www.notion.so/Item-9-38c9ce7b60a481328a7deef2e64e3e23","public_url":null,"archived":false,"request_id":"68e9f262-c5fb-435c-9197-77a0ab284110"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddbbaba4aff9-LHR
+      - a12235c2af2526f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1199,7 +1338,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d1c4f951-c38d-47a5-a0bc-f22df0fcbd87
+      - 68e9f262-c5fb-435c-9197-77a0ab284110
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1207,12 +1346,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 10", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 10"}}]},
       "Price": {"type": "number", "number": 100}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1223,7 +1362,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1231,21 +1370,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-813b-9a63-e36db01ba50d","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":100},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8129-aac8-ec5f41d6d178","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":100},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       10","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      10","href":null}]}},"url":"https://www.notion.so/Item-10-38c9ce7b60a4813b9a63e36db01ba50d","public_url":null,"archived":false,"request_id":"0d39652a-4198-4f9e-bf6d-aa565ff578e0"}'
+      10","href":null}]}},"url":"https://www.notion.so/Item-10-38c9ce7b60a48129aac8ec5f41d6d178","public_url":null,"archived":false,"request_id":"b557c7f9-3ee0-47bf-89e2-2fa4f55359cf"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddbdee8daff9-LHR
+      - a12235c57b4c26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1275,7 +1414,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 0d39652a-4198-4f9e-bf6d-aa565ff578e0
+      - b557c7f9-3ee0-47bf-89e2-2fa4f55359cf
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1283,12 +1422,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 11", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 11"}}]},
       "Price": {"type": "number", "number": 110}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1299,7 +1438,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1307,21 +1446,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81a3-8666-f20dc299cc9e","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":110},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-815f-8b1a-d83a8c586332","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":110},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       11","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      11","href":null}]}},"url":"https://www.notion.so/Item-11-38c9ce7b60a481a38666f20dc299cc9e","public_url":null,"archived":false,"request_id":"e5c1e037-90c9-47f9-834b-ea576dc0dc62"}'
+      11","href":null}]}},"url":"https://www.notion.so/Item-11-38c9ce7b60a4815f8b1ad83a8c586332","public_url":null,"archived":false,"request_id":"785b7829-c249-4e06-a3f9-9346a7f54c8b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddc03975aff9-LHR
+      - a12235c81f8626f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1351,7 +1490,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e5c1e037-90c9-47f9-834b-ea576dc0dc62
+      - 785b7829-c249-4e06-a3f9-9346a7f54c8b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1359,12 +1498,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 12", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 12"}}]},
       "Price": {"type": "number", "number": 120}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1375,7 +1514,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1383,21 +1522,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8146-8b6b-f73427adf955","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":120},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8100-9005-d14a13cf3836","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":120},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       12","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      12","href":null}]}},"url":"https://www.notion.so/Item-12-38c9ce7b60a481468b6bf73427adf955","public_url":null,"archived":false,"request_id":"9a82f4b7-ee04-4540-a4ed-d23420322959"}'
+      12","href":null}]}},"url":"https://www.notion.so/Item-12-38c9ce7b60a481009005d14a13cf3836","public_url":null,"archived":false,"request_id":"bf352ffe-b32c-477d-91df-1ffa916cea20"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddc2ccd8aff9-LHR
+      - a12235caed0926f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1427,7 +1566,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 9a82f4b7-ee04-4540-a4ed-d23420322959
+      - bf352ffe-b32c-477d-91df-1ffa916cea20
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1435,12 +1574,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 13", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 13"}}]},
       "Price": {"type": "number", "number": 130}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1451,7 +1590,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1459,21 +1598,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8151-b01d-c49c091695aa","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":130},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81e1-8f5c-e98a7ca616cf","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":130},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       13","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      13","href":null}]}},"url":"https://www.notion.so/Item-13-38c9ce7b60a48151b01dc49c091695aa","public_url":null,"archived":false,"request_id":"d0e96816-44f4-4f83-a46a-3b5f5fbedc1c"}'
+      13","href":null}]}},"url":"https://www.notion.so/Item-13-38c9ce7b60a481e18f5ce98a7ca616cf","public_url":null,"archived":false,"request_id":"687d4681-0c50-4300-ac7a-e80d9834bd51"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddc5381eaff9-LHR
+      - a12235cd88b826f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1503,7 +1642,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d0e96816-44f4-4f83-a46a-3b5f5fbedc1c
+      - 687d4681-0c50-4300-ac7a-e80d9834bd51
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1511,12 +1650,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 14", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 14"}}]},
       "Price": {"type": "number", "number": 140}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1527,7 +1666,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1535,21 +1674,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8198-a15f-ec47c0ca2838","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":140},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81d9-8a05-f205c0d86cbe","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":140},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       14","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      14","href":null}]}},"url":"https://www.notion.so/Item-14-38c9ce7b60a48198a15fec47c0ca2838","public_url":null,"archived":false,"request_id":"721e821e-f324-4839-b4ea-9c4b16930234"}'
+      14","href":null}]}},"url":"https://www.notion.so/Item-14-38c9ce7b60a481d98a05f205c0d86cbe","public_url":null,"archived":false,"request_id":"8b421215-0a72-4e72-98a1-2b08ce15cafa"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddc7ebf9aff9-LHR
+      - a12235cfec7726f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1579,7 +1718,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 721e821e-f324-4839-b4ea-9c4b16930234
+      - 8b421215-0a72-4e72-98a1-2b08ce15cafa
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1587,12 +1726,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 15", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 15"}}]},
       "Price": {"type": "number", "number": 150}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1603,7 +1742,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1611,21 +1750,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81b3-96b4-e3cc04096f47","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":150},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8198-8709-e8301f187495","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":150},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       15","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      15","href":null}]}},"url":"https://www.notion.so/Item-15-38c9ce7b60a481b396b4e3cc04096f47","public_url":null,"archived":false,"request_id":"a37ce7bf-66dc-472c-8b45-9188f93ea769"}'
+      15","href":null}]}},"url":"https://www.notion.so/Item-15-38c9ce7b60a481988709e8301f187495","public_url":null,"archived":false,"request_id":"0f040023-69f7-4886-82a9-dc403167e4c0"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddca4f2faff9-LHR
+      - a12235d2494526f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1655,7 +1794,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a37ce7bf-66dc-472c-8b45-9188f93ea769
+      - 0f040023-69f7-4886-82a9-dc403167e4c0
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1663,12 +1802,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 16", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 16"}}]},
       "Price": {"type": "number", "number": 160}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1679,7 +1818,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1687,21 +1826,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81b9-b466-df3d00dc9598","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":160},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81dd-b53c-c811d1371cae","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":160},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       16","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      16","href":null}]}},"url":"https://www.notion.so/Item-16-38c9ce7b60a481b9b466df3d00dc9598","public_url":null,"archived":false,"request_id":"febdebb0-1b56-424c-82df-08d387c9bb55"}'
+      16","href":null}]}},"url":"https://www.notion.so/Item-16-38c9ce7b60a481ddb53cc811d1371cae","public_url":null,"archived":false,"request_id":"bd761588-aac5-408f-9ebe-ac4ee820477b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddcc8a30aff9-LHR
+      - a12235d4ada726f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1731,7 +1870,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - febdebb0-1b56-424c-82df-08d387c9bb55
+      - bd761588-aac5-408f-9ebe-ac4ee820477b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1739,12 +1878,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 17", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 17"}}]},
       "Price": {"type": "number", "number": 170}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1755,7 +1894,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1763,21 +1902,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8178-b439-d656198957cf","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":170},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81fc-a58d-f0710125bd6e","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":170},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       17","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      17","href":null}]}},"url":"https://www.notion.so/Item-17-38c9ce7b60a48178b439d656198957cf","public_url":null,"archived":false,"request_id":"3512fa78-1325-4b4f-b578-3a5246a5d0f5"}'
+      17","href":null}]}},"url":"https://www.notion.so/Item-17-38c9ce7b60a481fca58df0710125bd6e","public_url":null,"archived":false,"request_id":"085b0002-87ff-4fff-b60c-85e3676abc95"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddceed9caff9-LHR
+      - a12235d6e97726f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1807,7 +1946,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 3512fa78-1325-4b4f-b578-3a5246a5d0f5
+      - 085b0002-87ff-4fff-b60c-85e3676abc95
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1815,12 +1954,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 18", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 18"}}]},
       "Price": {"type": "number", "number": 180}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1831,7 +1970,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1839,21 +1978,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8110-b337-eed9a9408ccb","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":180},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81f0-b374-c4502c21f1fa","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":180},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       18","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      18","href":null}]}},"url":"https://www.notion.so/Item-18-38c9ce7b60a48110b337eed9a9408ccb","public_url":null,"archived":false,"request_id":"58e672ab-d882-471e-b180-9a1807a0f8d4"}'
+      18","href":null}]}},"url":"https://www.notion.so/Item-18-38c9ce7b60a481f0b374c4502c21f1fa","public_url":null,"archived":false,"request_id":"e57b0dff-8ea0-4152-9331-9a5bd3e795a4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddd0f8edaff9-LHR
+      - a12235d96d7c26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1883,7 +2022,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 58e672ab-d882-471e-b180-9a1807a0f8d4
+      - e57b0dff-8ea0-4152-9331-9a5bd3e795a4
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1891,12 +2030,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 19", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 19"}}]},
       "Price": {"type": "number", "number": 190}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1907,7 +2046,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1915,21 +2054,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8147-9428-f6165156efc9","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":190},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-810e-ab30-db7530eeac3d","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":190},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       19","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      19","href":null}]}},"url":"https://www.notion.so/Item-19-38c9ce7b60a481479428f6165156efc9","public_url":null,"archived":false,"request_id":"efb57eb0-db28-4b07-bfcf-1658b18e8a2f"}'
+      19","href":null}]}},"url":"https://www.notion.so/Item-19-38c9ce7b60a4810eab30db7530eeac3d","public_url":null,"archived":false,"request_id":"0eb773c3-c3f1-46c3-bdea-1f0243cee2e1"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddd37ce1aff9-LHR
+      - a12235dba8ee26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1959,7 +2098,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - efb57eb0-db28-4b07-bfcf-1658b18e8a2f
+      - 0eb773c3-c3f1-46c3-bdea-1f0243cee2e1
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1967,12 +2106,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 20", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 20"}}]},
       "Price": {"type": "number", "number": 200}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -1983,7 +2122,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -1991,21 +2130,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-810d-97fa-e47d4b8d3e9f","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":200},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81a1-a2b1-e16a30f99fcc","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":200},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       20","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      20","href":null}]}},"url":"https://www.notion.so/Item-20-38c9ce7b60a4810d97fae47d4b8d3e9f","public_url":null,"archived":false,"request_id":"6f96903e-53dd-47bd-bbe5-bd7657f19cb8"}'
+      20","href":null}]}},"url":"https://www.notion.so/Item-20-38c9ce7b60a481a1a2b1e16a30f99fcc","public_url":null,"archived":false,"request_id":"3a0817b0-3e5b-4f82-a387-92194393f668"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddd59fb4aff9-LHR
+      - a12235de3d2126f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2035,7 +2174,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 6f96903e-53dd-47bd-bbe5-bd7657f19cb8
+      - 3a0817b0-3e5b-4f82-a387-92194393f668
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2043,12 +2182,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 21", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 21"}}]},
       "Price": {"type": "number", "number": 210}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2059,7 +2198,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2067,21 +2206,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8181-817a-ce0ee6bdf099","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":210},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-819b-9bad-ebbb0d9f1011","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":210},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       21","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      21","href":null}]}},"url":"https://www.notion.so/Item-21-38c9ce7b60a48181817ace0ee6bdf099","public_url":null,"archived":false,"request_id":"7e5e645b-2816-4bf1-93cb-57e69dc52632"}'
+      21","href":null}]}},"url":"https://www.notion.so/Item-21-38c9ce7b60a4819b9badebbb0d9f1011","public_url":null,"archived":false,"request_id":"6bfff3a0-f4fa-433c-b928-56d3dd36d203"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddd7dabfaff9-LHR
+      - a12235e27ae226f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2111,7 +2250,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 7e5e645b-2816-4bf1-93cb-57e69dc52632
+      - 6bfff3a0-f4fa-433c-b928-56d3dd36d203
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2119,12 +2258,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 22", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 22"}}]},
       "Price": {"type": "number", "number": 220}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2135,7 +2274,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2143,21 +2282,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81f1-b85e-f7711dc098be","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":220},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8180-a003-e3147221aed3","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":220},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       22","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      22","href":null}]}},"url":"https://www.notion.so/Item-22-38c9ce7b60a481f1b85ef7711dc098be","public_url":null,"archived":false,"request_id":"f44d73f7-8fe1-45a2-94c2-88840ceb28de"}'
+      22","href":null}]}},"url":"https://www.notion.so/Item-22-38c9ce7b60a48180a003e3147221aed3","public_url":null,"archived":false,"request_id":"6990cf25-286c-468d-abec-c95e2c44633b"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddda4e76aff9-LHR
+      - a12235e6683d26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2187,7 +2326,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - f44d73f7-8fe1-45a2-94c2-88840ceb28de
+      - 6990cf25-286c-468d-abec-c95e2c44633b
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2195,12 +2334,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 23", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 23"}}]},
       "Price": {"type": "number", "number": 230}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2211,7 +2350,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2219,21 +2358,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8198-bd5f-f32f5ece2d7b","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":230},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-818e-8688-fc5c270a1036","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":230},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       23","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      23","href":null}]}},"url":"https://www.notion.so/Item-23-38c9ce7b60a48198bd5ff32f5ece2d7b","public_url":null,"archived":false,"request_id":"e78c364f-d6df-4eb1-908d-dff96c6a5328"}'
+      23","href":null}]}},"url":"https://www.notion.so/Item-23-38c9ce7b60a4818e8688fc5c270a1036","public_url":null,"archived":false,"request_id":"91566eaa-02e3-4927-a7a6-b4ed19510fd2"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dddc79a1aff9-LHR
+      - a12235e8eb8a26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2263,7 +2402,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e78c364f-d6df-4eb1-908d-dff96c6a5328
+      - 91566eaa-02e3-4927-a7a6-b4ed19510fd2
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2271,12 +2410,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 24", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 24"}}]},
       "Price": {"type": "number", "number": 240}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2287,7 +2426,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2295,21 +2434,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-814d-8881-d42d16259919","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":240},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8136-bda4-cda9b4a9e49e","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":240},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       24","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      24","href":null}]}},"url":"https://www.notion.so/Item-24-38c9ce7b60a4814d8881d42d16259919","public_url":null,"archived":false,"request_id":"6551d29e-2ac4-4cc9-9138-e0ea52df6bfd"}'
+      24","href":null}]}},"url":"https://www.notion.so/Item-24-38c9ce7b60a48136bda4cda9b4a9e49e","public_url":null,"archived":false,"request_id":"977cdde5-d6ed-47a2-af43-233b6995090e"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dddebcafaff9-LHR
+      - a12235eb6f1a26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2339,7 +2478,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 6551d29e-2ac4-4cc9-9138-e0ea52df6bfd
+      - 977cdde5-d6ed-47a2-af43-233b6995090e
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2347,12 +2486,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 25", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 25"}}]},
       "Price": {"type": "number", "number": 250}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2363,7 +2502,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2371,21 +2510,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-814e-9c73-ce6b086e6acc","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":250},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81c2-946e-cfcf83d756c8","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":250},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       25","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      25","href":null}]}},"url":"https://www.notion.so/Item-25-38c9ce7b60a4814e9c73ce6b086e6acc","public_url":null,"archived":false,"request_id":"a8ec5acf-6df9-456a-a4e9-6b3056ea4985"}'
+      25","href":null}]}},"url":"https://www.notion.so/Item-25-38c9ce7b60a481c2946ecfcf83d756c8","public_url":null,"archived":false,"request_id":"39621cbe-5e86-475a-83f4-385084f66dd4"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dde0efa4aff9-LHR
+      - a12235edea8926f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2415,7 +2554,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - a8ec5acf-6df9-456a-a4e9-6b3056ea4985
+      - 39621cbe-5e86-475a-83f4-385084f66dd4
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2423,12 +2562,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 26", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 26"}}]},
       "Price": {"type": "number", "number": 260}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2439,7 +2578,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2447,21 +2586,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-810a-b771-e06446acb787","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":260},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8165-a306-da4db782f281","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":260},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       26","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      26","href":null}]}},"url":"https://www.notion.so/Item-26-38c9ce7b60a4810ab771e06446acb787","public_url":null,"archived":false,"request_id":"e957639e-3134-4a92-91fa-53d1b6747f1b"}'
+      26","href":null}]}},"url":"https://www.notion.so/Item-26-38c9ce7b60a48165a306da4db782f281","public_url":null,"archived":false,"request_id":"237bc679-665b-4149-b612-22a41134800e"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dde2ea26aff9-LHR
+      - a12235f05dc926f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2491,7 +2630,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - e957639e-3134-4a92-91fa-53d1b6747f1b
+      - 237bc679-665b-4149-b612-22a41134800e
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2499,12 +2638,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 27", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 27"}}]},
       "Price": {"type": "number", "number": 270}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2515,7 +2654,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2523,21 +2662,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81b9-a3eb-cbea610925bb","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":270},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-8131-a1c7-d27db86cf823","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":270},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       27","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      27","href":null}]}},"url":"https://www.notion.so/Item-27-38c9ce7b60a481b9a3ebcbea610925bb","public_url":null,"archived":false,"request_id":"3c3eac2e-531d-4750-b299-8d8065ce4ac9"}'
+      27","href":null}]}},"url":"https://www.notion.so/Item-27-38c9ce7b60a48131a1c7d27db86cf823","public_url":null,"archived":false,"request_id":"7be8e62b-680c-4bf9-8632-0dfd896b3a6f"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dde58dc0aff9-LHR
+      - a12235f278e926f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2567,7 +2706,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 3c3eac2e-531d-4750-b299-8d8065ce4ac9
+      - 7be8e62b-680c-4bf9-8632-0dfd896b3a6f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2575,12 +2714,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 28", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 28"}}]},
       "Price": {"type": "number", "number": 280}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2591,7 +2730,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2599,21 +2738,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8131-b363-deed130d3a7c","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":280},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81ec-b531-c816fcd239f8","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":280},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       28","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      28","href":null}]}},"url":"https://www.notion.so/Item-28-38c9ce7b60a48131b363deed130d3a7c","public_url":null,"archived":false,"request_id":"8b97fd8f-d773-41ef-bbe5-c42f00246264"}'
+      28","href":null}]}},"url":"https://www.notion.so/Item-28-38c9ce7b60a481ecb531c816fcd239f8","public_url":null,"archived":false,"request_id":"7a892fcb-11af-478b-bead-f310b1ade539"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121dde80900aff9-LHR
+      - a12235f50c8c26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2643,7 +2782,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 8b97fd8f-d773-41ef-bbe5-c42f00246264
+      - 7a892fcb-11af-478b-bead-f310b1ade539
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2651,12 +2790,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 29", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 29"}}]},
       "Price": {"type": "number", "number": 290}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2667,7 +2806,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2675,21 +2814,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-8173-855f-dfbc3c0b303c","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":290},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-81d9-bf45-db74940df6eb","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":290},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       29","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      29","href":null}]}},"url":"https://www.notion.so/Item-29-38c9ce7b60a48173855fdfbc3c0b303c","public_url":null,"archived":false,"request_id":"d6e138f9-03b6-4dab-b8d6-358790125fce"}'
+      29","href":null}]}},"url":"https://www.notion.so/Item-29-38c9ce7b60a481d9bf45db74940df6eb","public_url":null,"archived":false,"request_id":"26e2e316-2618-4cc5-8eda-d9ae06329133"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddeb9dbeaff9-LHR
+      - a12235f78fec26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2719,7 +2858,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - d6e138f9-03b6-4dab-b8d6-358790125fce
+      - 26e2e316-2618-4cc5-8eda-d9ae06329133
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2727,12 +2866,12 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-81c5-8656-ff76fd28e461"},
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "25af4dc6-7a71-4777-91a4-6e6fcabb9395"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Item 30", "annotations": {"bold": false, "italic": false, "strikethrough":
       false, "underline": false, "code": false}, "text": {"content": "Item 30"}}]},
       "Price": {"type": "number", "number": 300}, "Bought by": {"type": "relation",
-      "relation": [{"id": "38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}], "has_more": false}}}'
+      "relation": [{"id": "38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}], "has_more": false}}}'
     headers:
       accept:
       - '*/*'
@@ -2743,7 +2882,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '447'
+      - '453'
       content-type:
       - application/json
       cookie:
@@ -2751,21 +2890,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81b4-9d60-ea5736e42888","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-81c5-8656-ff76fd28e461"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
-      by":{"id":"%3EiE%3E","type":"relation","relation":[{"id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6"}],"has_more":false},"Price":{"id":"%3FmQ%7D","type":"number","number":300},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"page","id":"38c9ce7b-60a4-810a-ae05-cdf45c58e87a","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"25af4dc6-7a71-4777-91a4-6e6fcabb9395","database_id":"494d95ef-9be9-41f8-8361-97f035cbd158"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Bought
+      by":{"id":"UC%7CA","type":"relation","relation":[{"id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214"}],"has_more":false},"Price":{"id":"o%3FIq","type":"number","number":300},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Item
       30","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      30","href":null}]}},"url":"https://www.notion.so/Item-30-38c9ce7b60a481b49d60ea5736e42888","public_url":null,"archived":false,"request_id":"72fe6c3e-f43f-4da8-b721-255796b1e6c9"}'
+      30","href":null}]}},"url":"https://www.notion.so/Item-30-38c9ce7b60a4810aae05cdf45c58e87a","public_url":null,"archived":false,"request_id":"5694697e-248d-4952-b3bc-716ac603fd16"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddede9caaff9-LHR
+      - a12235f9eb5226f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2795,7 +2934,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 72fe6c3e-f43f-4da8-b721-255796b1e6c9
+      - 5694697e-248d-4952-b3bc-716ac603fd16
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2818,21 +2957,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/pages/38c9ce7b-60a4-81a7-ac02-da7b686dafc6
+    uri: https://api.notion.com/v1/pages/38c9ce7b-60a4-8134-8e39-d6d37f1fd214
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81a7-ac02-da7b686dafc6","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8122-a4a4-ff0c92ff286b"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Items
-      Purchased":{"id":"wNLO","type":"relation","relation":[{"id":"38c9ce7b-60a4-81b5-8775-d5d1163991e8"},{"id":"38c9ce7b-60a4-81dd-82e9-dc040dd12c99"},{"id":"38c9ce7b-60a4-81bd-8199-e0f910c0e593"},{"id":"38c9ce7b-60a4-81e9-90fa-d1b7cb10467c"},{"id":"38c9ce7b-60a4-818e-8758-d0e0c943e994"},{"id":"38c9ce7b-60a4-81ce-acc5-d5345f738660"},{"id":"38c9ce7b-60a4-81a3-9b4a-df69023b1409"},{"id":"38c9ce7b-60a4-8144-9c1f-fa9dd2637950"},{"id":"38c9ce7b-60a4-8166-aee0-f2374cc13ef7"},{"id":"38c9ce7b-60a4-81a3-8666-f20dc299cc9e"},{"id":"38c9ce7b-60a4-813b-9a63-e36db01ba50d"},{"id":"38c9ce7b-60a4-8146-8b6b-f73427adf955"},{"id":"38c9ce7b-60a4-8151-b01d-c49c091695aa"},{"id":"38c9ce7b-60a4-8198-a15f-ec47c0ca2838"},{"id":"38c9ce7b-60a4-81b3-96b4-e3cc04096f47"},{"id":"38c9ce7b-60a4-8178-b439-d656198957cf"},{"id":"38c9ce7b-60a4-81b9-b466-df3d00dc9598"},{"id":"38c9ce7b-60a4-8147-9428-f6165156efc9"},{"id":"38c9ce7b-60a4-810d-97fa-e47d4b8d3e9f"},{"id":"38c9ce7b-60a4-8181-817a-ce0ee6bdf099"},{"id":"38c9ce7b-60a4-8110-b337-eed9a9408ccb"},{"id":"38c9ce7b-60a4-81f1-b85e-f7711dc098be"},{"id":"38c9ce7b-60a4-8198-bd5f-f32f5ece2d7b"},{"id":"38c9ce7b-60a4-814d-8881-d42d16259919"},{"id":"38c9ce7b-60a4-814e-9c73-ce6b086e6acc"}],"has_more":true},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Customer
+    content: '{"object":"page","id":"38c9ce7b-60a4-8134-8e39-d6d37f1fd214","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"c5201abf-d4c1-4e82-b620-6ee6d2e60a47","database_id":"6fd3a0ab-3e4d-47b7-a720-dec3ef72427b"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Items
+      Purchased":{"id":"%3Djxv","type":"relation","relation":[{"id":"38c9ce7b-60a4-8138-b1f5-dafa86dfa1cc"},{"id":"38c9ce7b-60a4-8127-be54-ea0da002f73c"},{"id":"38c9ce7b-60a4-811f-9ed7-d216b1af35bf"},{"id":"38c9ce7b-60a4-8128-aea2-d8573bf5f13d"},{"id":"38c9ce7b-60a4-81cc-82be-fcd3337acc66"},{"id":"38c9ce7b-60a4-8195-be86-c8d79122b173"},{"id":"38c9ce7b-60a4-81e8-90d8-c044af2a6f3f"},{"id":"38c9ce7b-60a4-819f-bd7b-d3568ea7d1e5"},{"id":"38c9ce7b-60a4-8132-8a7d-eef2e64e3e23"},{"id":"38c9ce7b-60a4-8129-aac8-ec5f41d6d178"},{"id":"38c9ce7b-60a4-815f-8b1a-d83a8c586332"},{"id":"38c9ce7b-60a4-8100-9005-d14a13cf3836"},{"id":"38c9ce7b-60a4-81e1-8f5c-e98a7ca616cf"},{"id":"38c9ce7b-60a4-81d9-8a05-f205c0d86cbe"},{"id":"38c9ce7b-60a4-8198-8709-e8301f187495"},{"id":"38c9ce7b-60a4-81dd-b53c-c811d1371cae"},{"id":"38c9ce7b-60a4-81fc-a58d-f0710125bd6e"},{"id":"38c9ce7b-60a4-81f0-b374-c4502c21f1fa"},{"id":"38c9ce7b-60a4-810e-ab30-db7530eeac3d"},{"id":"38c9ce7b-60a4-81a1-a2b1-e16a30f99fcc"},{"id":"38c9ce7b-60a4-819b-9bad-ebbb0d9f1011"},{"id":"38c9ce7b-60a4-8180-a003-e3147221aed3"},{"id":"38c9ce7b-60a4-818e-8688-fc5c270a1036"},{"id":"38c9ce7b-60a4-8136-bda4-cda9b4a9e49e"},{"id":"38c9ce7b-60a4-81c2-946e-cfcf83d756c8"}],"has_more":true},"Name":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Customer
       1","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Customer
-      1","href":null}]}},"url":"https://www.notion.so/Customer-1-38c9ce7b60a481a7ac02da7b686dafc6","public_url":null,"archived":false,"request_id":"54638b95-ddce-4ef1-8317-0259fb96c2a2"}'
+      1","href":null}]}},"url":"https://www.notion.so/Customer-1-38c9ce7b60a481348e39d6d37f1fd214","public_url":null,"archived":false,"request_id":"fbfd8424-6e0d-4883-a4ef-19fd9bfb4c43"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121ddf00ccfaff9-LHR
+      - a12235fc4ea826f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2862,7 +3001,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 54638b95-ddce-4ef1-8317-0259fb96c2a2
+      - fbfd8424-6e0d-4883-a4ef-19fd9bfb4c43
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -2885,18 +3024,18 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/pages/38c9ce7b-60a4-81a7-ac02-da7b686dafc6/properties/wNLO?page_size=100
+    uri: https://api.notion.com/v1/pages/38c9ce7b-60a4-8134-8e39-d6d37f1fd214/properties/%3Djxv?page_size=100
   response:
-    content: '{"object":"list","results":[{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81b5-8775-d5d1163991e8"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81dd-82e9-dc040dd12c99"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81bd-8199-e0f910c0e593"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81e9-90fa-d1b7cb10467c"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-818e-8758-d0e0c943e994"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81ce-acc5-d5345f738660"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81a3-9b4a-df69023b1409"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8144-9c1f-fa9dd2637950"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8166-aee0-f2374cc13ef7"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81a3-8666-f20dc299cc9e"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-813b-9a63-e36db01ba50d"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8146-8b6b-f73427adf955"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8151-b01d-c49c091695aa"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8198-a15f-ec47c0ca2838"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81b3-96b4-e3cc04096f47"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8178-b439-d656198957cf"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81b9-b466-df3d00dc9598"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8147-9428-f6165156efc9"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-810d-97fa-e47d4b8d3e9f"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8181-817a-ce0ee6bdf099"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8110-b337-eed9a9408ccb"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81f1-b85e-f7711dc098be"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8198-bd5f-f32f5ece2d7b"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-814d-8881-d42d16259919"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-814e-9c73-ce6b086e6acc"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81b9-a3eb-cbea610925bb"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8131-b363-deed130d3a7c"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-810a-b771-e06446acb787"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-8173-855f-dfbc3c0b303c"}},{"object":"property_item","type":"relation","id":"wNLO","relation":{"id":"38c9ce7b-60a4-81b4-9d60-ea5736e42888"}}],"next_cursor":null,"has_more":false,"type":"property_item","property_item":{"id":"wNLO","next_url":null,"type":"relation","relation":{}},"request_id":"952b96c8-fac5-4328-9334-64ffe98fcad5"}'
+    content: '{"object":"list","results":[{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8138-b1f5-dafa86dfa1cc"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8127-be54-ea0da002f73c"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-811f-9ed7-d216b1af35bf"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8128-aea2-d8573bf5f13d"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81cc-82be-fcd3337acc66"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8195-be86-c8d79122b173"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81e8-90d8-c044af2a6f3f"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-819f-bd7b-d3568ea7d1e5"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8132-8a7d-eef2e64e3e23"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8129-aac8-ec5f41d6d178"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-815f-8b1a-d83a8c586332"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8100-9005-d14a13cf3836"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81e1-8f5c-e98a7ca616cf"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81d9-8a05-f205c0d86cbe"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8198-8709-e8301f187495"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81dd-b53c-c811d1371cae"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81fc-a58d-f0710125bd6e"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81f0-b374-c4502c21f1fa"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-810e-ab30-db7530eeac3d"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81a1-a2b1-e16a30f99fcc"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-819b-9bad-ebbb0d9f1011"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8180-a003-e3147221aed3"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-818e-8688-fc5c270a1036"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8136-bda4-cda9b4a9e49e"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81c2-946e-cfcf83d756c8"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8165-a306-da4db782f281"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-8131-a1c7-d27db86cf823"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81ec-b531-c816fcd239f8"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-81d9-bf45-db74940df6eb"}},{"object":"property_item","type":"relation","id":"%3Djxv","relation":{"id":"38c9ce7b-60a4-810a-ae05-cdf45c58e87a"}}],"next_cursor":null,"has_more":false,"type":"property_item","property_item":{"id":"%3Djxv","next_url":null,"type":"relation","relation":{}},"request_id":"5261efa0-be3a-4e50-9645-2fb72b8aa4d8"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121de046af8aff9-LHR
+      - a1223610abdb26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -2926,7 +3065,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 952b96c8-fac5-4328-9334-64ffe98fcad5
+      - 5261efa0-be3a-4e50-9645-2fb72b8aa4d8
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:

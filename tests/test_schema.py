@@ -66,8 +66,8 @@ def test_all_createable_props_schema(
         url = uno.PropType.URL('URL')
         unique_id = uno.PropType.ID('ID', prefix=id_prefix)
 
-    db_a = notion.create_db(parent=root_page, schema=SchemaA)
-    db_b = notion.create_db(parent=root_page, schema=SchemaB)
+    db_a = notion.create_ds(parent=root_page, schema=SchemaA)
+    db_b = notion.create_ds(parent=root_page, schema=SchemaB)
 
     with pytest.raises(SchemaError):
         SchemaB.create(non_existent_attr_name=None)
@@ -135,13 +135,13 @@ def test_all_createable_props_schema(
 
 
 @pytest.mark.vcr()
-def test_all_props_schema(all_props_db: uno.Database) -> None:
+def test_all_props_schema(all_props_db: uno.DataSource) -> None:
     schema_dct = all_props_db.schema.to_dict()
     assert len(schema_dct) == 27
 
 
 @pytest.mark.vcr()
-def test_wiki_db_schema(wiki_db: uno.Database) -> None:
+def test_wiki_db_schema(wiki_db: uno.DataSource) -> None:
     schema_dct = wiki_db.schema.to_dict()
     assert len(schema_dct) == 5  # title, last_edited_time, owner, tags, verification
     wiki_db.get_all_pages()
@@ -161,8 +161,8 @@ def test_two_way_prop(notion: uno.Session, root_page: uno.Page) -> None:
         relation_twoway = uno.PropType.Relation('Relation two-way', schema=SchemaA, two_way_prop=SchemaA.relation)
         title = uno.PropType.Title('Title')
 
-    db_a = notion.create_db(parent=root_page, schema=SchemaA)
-    db_b = notion.create_db(parent=root_page, schema=SchemaB)
+    db_a = notion.create_ds(parent=root_page, schema=SchemaA)
+    db_b = notion.create_ds(parent=root_page, schema=SchemaB)
 
     relation_twoway = db_b.schema.relation_twoway
     assert isinstance(relation_twoway, Relation)
@@ -180,7 +180,7 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         relation = uno.PropType.Relation('Relation', schema=uno.SelfRef)
 
-    db_a = notion.create_db(parent=root_page, schema=SchemaA)
+    db_a = notion.create_ds(parent=root_page, schema=SchemaA)
 
     relation = db_a.schema.relation
     assert isinstance(relation, Relation)
@@ -198,7 +198,7 @@ def test_self_ref_relation(notion: uno.Session, root_page: uno.Page) -> None:
 #         fwd_rel = uno.PropType.Relation('Forward Relation')
 #         bwd_rel = uno.PropType.Relation('Backward Relation', schema=uno.SelfRef, two_way_prop=fwd_rel)
 
-#     db_a = notion.create_db(parent=root_page, schema=SchemaA)
+#     db_a = notion.create_ds(parent=root_page, schema=SchemaA)
 
 #     assert db_a.schema.fwd_rel._schema is db_a._schema  # type: ignore
 #     assert db_a.schema.bwd_rel._schema is db_a._schema  # type: ignore
@@ -269,7 +269,7 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
         tags = uno.PropType.MultiSelect('Tags', options=options)
         formula = uno.PropType.Formula('Formula', formula='prop("Name")')
 
-    db = notion.create_db(parent=root_page, schema=Schema)
+    db = notion.create_ds(parent=root_page, schema=Schema)
 
     # Delete properties from the schema
     assert 'formula' in [prop.attr_name for prop in db.schema]
@@ -309,7 +309,7 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
 
         name = uno.PropType.Title('Name')
 
-    target_db = notion.create_db(parent=root_page, schema=TargetSchema)
+    target_db = notion.create_ds(parent=root_page, schema=TargetSchema)
 
     db.schema['Relation'] = uno.PropType.Relation(schema=TargetSchema, two_way_prop='Back Relation')
     assert 'Relation' in [prop.name for prop in db.schema]
@@ -374,9 +374,9 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
             calculate=uno.AggFunc.COUNT_ALL,
         )
 
-    db_a = notion.create_db(parent=root_page, schema=SchemaA)
-    db_b = notion.create_db(parent=root_page, schema=SchemaB)
-    db_c = notion.create_db(parent=root_page, schema=SchemaC)
+    db_a = notion.create_ds(parent=root_page, schema=SchemaA)
+    db_b = notion.create_ds(parent=root_page, schema=SchemaB)
+    db_c = notion.create_ds(parent=root_page, schema=SchemaC)
 
     def get_relation(schema: type[uno.Schema], name: str) -> Relation:
         prop = schema[name]
@@ -437,7 +437,7 @@ def test_update_prop_type_attrs(notion: uno.Session, root_page: uno.Page) -> Non
         formula = uno.PropType.Formula('Formula', formula='prop("Name")')
         number = uno.PropType.Number('Number', format=uno.NumberFormat.DOLLAR)
 
-    db = notion.create_db(parent=root_page, schema=Schema)
+    db = notion.create_ds(parent=root_page, schema=Schema)
 
     # Change the number format of the number property
     number = db.schema['Number']
@@ -504,7 +504,7 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
         cat = uno.PropType.Select('Category', options=options)
         tags = uno.PropType.MultiSelect('Tags', options=options)
 
-    db = notion.create_db(parent=root_page, schema=OrigSchema)
+    db = notion.create_ds(parent=root_page, schema=OrigSchema)
 
     # Check the schema properties
     assert isinstance(db.schema.name, uno.PropType.Title)
@@ -520,7 +520,7 @@ def test_bind_db(notion: uno.Session, root_page: uno.Page) -> None:
         my_cat = uno.PropType.Select('Category', options=options)
         my_tags = uno.PropType.MultiSelect('Tags', options=options)
 
-    ConsistentSchema.bind_db(db)
+    ConsistentSchema.bind_ds(db)
 
     # Check the schema attribute names
     assert isinstance(db.schema.my_name, uno.PropType.Title)
@@ -597,20 +597,25 @@ def test_bind_db_auto(notion: uno.Session, task_db: uno.Database) -> None:
         urgency = uno.PropType.Formula('Urgency', formula=formula)
 
     with pytest.raises(InvalidAPIUsageError):
-        TaskBase.bind_db()
+        TaskBase.bind_ds()
     assert not TaskBase.is_bound()
 
-    class TaskWithDbId(TaskBase, db_id=str(task_db.id)):
-        """Schema with a reference to a database by ID"""
+    # Bind by id, using the real Task DB data source id so the interaction can be recorded live
+    # (a hardcoded id is not resolvable on record). The workspace-portable normalisation rewrites it
+    # to a stable placeholder in the cassette, so the recording stays reproducible across workspaces.
+    task_ds = notion.search_ds('Task DB').item()
 
-    TaskWithDbId.bind_db()
+    class TaskWithDbId(TaskBase, db_id=str(task_ds.id)):
+        """Schema with a reference to a data source by ID"""
+
+    TaskWithDbId.bind_ds()
     assert TaskWithDbId.is_bound()
     assert not TaskBase.is_bound()
 
     class TaskWithDbTitle(TaskBase, db_title='Task DB'):
-        """Schema with a reference to a database by title"""
+        """Schema with a reference to a data source by title"""
 
-    TaskWithDbTitle.bind_db()
+    TaskWithDbTitle.bind_ds()
     assert TaskWithDbTitle.is_bound()
 
 
@@ -623,7 +628,7 @@ def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page, get_id_
         name = uno.PropType.Title('Name')
         unique_id = uno.PropType.ID('ID', prefix=old_id_prefix)
 
-    db = notion.create_db(parent=root_page, schema=Schema)
+    db = notion.create_ds(parent=root_page, schema=Schema)
 
     unique_id = db.schema.unique_id
     assert isinstance(unique_id, uno.PropType.ID)
@@ -645,7 +650,7 @@ def test_update_unique_id_prop(notion: uno.Session, root_page: uno.Page, get_id_
         name = uno.PropType.Title('Name')
         unique_id = uno.PropType.ID('ID')
 
-    db = notion.create_db(parent=root_page, schema=NoIDPrefixSchema)
+    db = notion.create_ds(parent=root_page, schema=NoIDPrefixSchema)
     unique_id = db.schema.unique_id
     assert isinstance(unique_id, uno.PropType.ID)
     assert unique_id.prefix == ''
@@ -666,7 +671,7 @@ def test_place_property(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         location = uno.PropType.Place('Location')
 
-    db = notion.create_db(parent=root_page, schema=Location)
+    db = notion.create_ds(parent=root_page, schema=Location)
 
     berlin_place_data = uno.PlaceDict(
         lat=52.5200,

@@ -230,7 +230,7 @@ def test_create_file_blocks(root_page: uno.Page, notion: uno.Session, dummy_urls
 def test_create_child_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating child blocks')
     subpage = notion.create_page(parent=page, title='Subpage')
-    subdb = notion.create_db(parent=page)
+    subdb = notion.create_ds(parent=page)
     assert page.children == (subpage, subdb)  # This works as we only compare the IDs
     page.reload()
     assert page.children == (subpage, subdb)
@@ -1033,7 +1033,7 @@ def test_local_remote_text_equality(notion: uno.Session, root_page: uno.Page) ->
 
 @pytest.mark.vcr()
 def test_local_remote_mention_block_cmp(
-    root_page: uno.Page, notion: uno.Session, person: uno.User, task_db: uno.Database
+    root_page: uno.Page, notion: uno.Session, person: uno.User, task_db: uno.DataSource
 ) -> None:
     # Test user mention
     page = notion.create_page(parent=root_page, title='Test Local Remote User Mention Block CMP')
@@ -1069,9 +1069,9 @@ def test_local_remote_mention_block_cmp(
     assert page.children[0] == block_child
     assert page.children[0] == another_block_child
 
-    # Test database mention
+    # Test database mention (mentions reference the container database, not the data source)
     page = notion.create_page(parent=root_page, title='Test Local Remote Database Mention Block CMP')
-    db_obj_ref = ObjectRef(id=task_db.id)
+    db_obj_ref = ObjectRef(id=task_db.database_id)
     mention_obj = objs.MentionDatabase.build_mention_from(db=db_obj_ref, style=objs.Annotations())
     mention_text = Text.wrap_obj_ref(obj_refs=[mention_obj])
 

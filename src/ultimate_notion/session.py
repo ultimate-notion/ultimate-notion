@@ -9,7 +9,7 @@ import time
 from collections.abc import Callable, Sequence
 from threading import RLock
 from types import TracebackType
-from typing import Any, BinaryIO, ClassVar, TypeVar
+from typing import Any, BinaryIO, ClassVar, TypeVar, cast
 from uuid import UUID
 
 import httpx
@@ -18,11 +18,19 @@ from notion_client.errors import APIResponseError
 
 from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
-from ultimate_notion.database import Database
+from ultimate_notion.database import Database, DataSource
 from ultimate_notion.emoji import CustomEmoji, Emoji
-from ultimate_notion.errors import SessionError, UnknownDatabaseError, UnknownPageError, UnknownUserError
+from ultimate_notion.errors import (
+    SessionError,
+    UnknownDatabaseError,
+    UnknownDataSourceError,
+    UnknownPageError,
+    UnknownUserError,
+)
 from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_size, get_mime_type
+from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
+from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.objects import get_uuid
@@ -60,7 +68,7 @@ def _wait_for_consistency(predicate: Callable[[], bool], description: str) -> No
 class Session:
     """A session for the Notion API.
 
-    The session keeps tracks of all objects, e.g. pages, databases, etc.
+    The session keeps tracks of all objects, e.g. pages, data sources, etc.
     in an object store to avoid unnecessary calls to the API.
     """
 
@@ -195,15 +203,19 @@ class Session:
         _logger.info(f'Retrieved `{type(block)}` block.')
         return block
 
-    def create_db(
+    def create_ds(
         self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
-    ) -> Database:
-        """Create a new database within a page.
+    ) -> DataSource:
+        """Create a new data source within a page.
 
-        In case a title and a schema ware provided, title overrides the schema's `db_title` attribute if it exists.
+        In API version 2025-09-03+ a data source under a page is created via the Create Database
+        endpoint, which creates the database container together with its initial data source. This
+        method returns that data source. Pass `inline=True` to display the database inline on the page.
+
+        In case a title and a schema are provided, title overrides the schema's `db_title` attribute if it exists.
         """
         # Implementation:
-        # 1. create the database using a Notion API call and potential external forward relations
+        # 1. create the data source using a Notion API call and potential external forward relations
         # 2. initialize self-referencing forward relations
         # 3. create properties with self-referencing forward relations using an update call
         # 4. update the backward references, i.e. two-way relations, using an update call
@@ -212,52 +224,77 @@ class Session:
         elif schema is not None and schema._db_title is not None:
             title = schema._db_title
         else:
-            title = None  # Anonymous database without a title.
+            title = None  # Anonymous data source without a title.
 
-        db_schema: type[Schema] = DefaultSchema if schema is None else schema
-        _logger.info(f'Creating database `{title or "<NoTitle>"}` in page `{parent.title}` with schema:\n{db_schema}')
+        ds_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
+        _logger.info(f'Creating data source `{title or "<NoTitle>"}` in `{parent.title}` with schema:\n{ds_schema}')
 
         title_obj = title.obj_ref if title is not None else None
-        schema_dct = {prop.name: prop.obj_ref for prop in db_schema.get_props() if prop._is_init_ready}
-        db_obj = self.api.databases.create(parent=parent.obj_ref, title=title_obj, schema=schema_dct, inline=inline)
+        schema_dct = {prop.name: prop.obj_ref for prop in ds_schema.get_props() if prop._is_init_ready}
+        # The Create Database endpoint creates the container and its initial data source in one call.
+        db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct, title=title_obj, inline=inline)
+        # `description` lives on the database container; set it before retrieving the data source so the
+        # data-source response (which mirrors the database's description) reflects it.
+        if schema and schema._db_desc:
+            self.api.databases.update(db_obj, description=schema._db_desc.obj_ref)
+        ds_obj = self.api.data_sources.retrieve(db_obj.data_sources[0].id)
 
-        db: Database = Database.wrap_obj_ref(db_obj)
+        ds: DataSource = DataSource.wrap_obj_ref(ds_obj)
 
         if schema:
-            if schema._db_desc:
-                self.api.databases.update(db_obj, description=schema._db_desc.obj_ref)
-            db._set_schema(schema, during_init=True)  # schema is thus bound to the database
+            ds._set_schema(schema, during_init=True)  # schema is thus bound to the data source
             schema._init_self_refs()
             schema._init_self_ref_rollups()
             schema._update_bwd_rels()
 
-        self.cache[db.id] = db
-        return db
+        self.cache[ds.id] = ds
+        return ds
 
-    def search_db(
-        self, db_name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
-    ) -> SList[Database]:
-        """Search a database by name or return all if `db_name` is None.
+    def search_ds(
+        self, name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
+    ) -> SList[DataSource]:
+        """Search a data source by name or return all if `name` is None.
 
         Args:
-            db_name: name/title of the database, return all if `None`
+            name: name/title of the data source, return all if `None`
             exact: perform an exact search, not only a substring match
             reverse: search in the reverse order, i.e. the least recently edited results first
-            deleted: include deleted databases in search
+            deleted: include deleted data sources in search
         """
-        _logger.info(f'Searching for database with name `{db_name}`.')
-        query = self.api.search(db_name).filter(db_only=True)
+        _logger.info(f'Searching for data source with name `{name}`.')
+        query = cast(
+            obj_query.SearchQueryBuilder[obj_blocks.DataSource],
+            self.api.search(name).filter(datasource_only=True),
+        )
         if reverse:
             query.sort(ascending=True)
-        dbs = [self._cache_add(Database.wrap_obj_ref(db)) for db in query.execute()]
-        if exact and db_name is not None:
-            dbs = [db for db in dbs if db.title == db_name]
+        data_sources = [self._cache_add(DataSource.wrap_obj_ref(ds)) for ds in query.execute()]
+        if exact and name is not None:
+            data_sources = [ds for ds in data_sources if ds.title == name]
         if not deleted:
-            dbs = [db for db in dbs if not db.is_deleted]
-        return SList(dbs)
+            data_sources = [ds for ds in data_sources if not ds.is_deleted]
+        return SList(data_sources)
+
+    def get_ds(self, ds_ref: UUID | str, *, use_cache: bool = True) -> DataSource:
+        """Retrieve Notion data source by uuid."""
+        ds_uuid = get_uuid(ds_ref)
+        if use_cache and ds_uuid in self.cache:
+            _logger.info(f'Retrieving cached data source with id `{ds_uuid}`.')
+            ds = self._cache_get(ds_uuid, DataSource)
+        else:
+            _logger.info(f'Retrieving data source with id `{ds_uuid}`.')
+            try:
+                ds = DataSource.wrap_obj_ref(self.api.data_sources.retrieve(ds_uuid))
+            except APIResponseError as e:
+                msg = f'Data source with id `{ds_uuid}` does not exist or is not accessible!'
+                _logger.warning(msg)
+                raise UnknownDataSourceError(msg) from e
+            self.cache[ds.id] = ds
+        _logger.info(f'Retrieved data source `{ds.title}`.')
+        return ds
 
     def get_db(self, db_ref: UUID | str, *, use_cache: bool = True) -> Database:
-        """Retrieve Notion database by uuid"""
+        """Retrieve a Notion database (a container of data sources) by uuid."""
         db_uuid = get_uuid(db_ref)
         if use_cache and db_uuid in self.cache:
             _logger.info(f'Retrieving cached database with id `{db_uuid}`.')
@@ -274,20 +311,20 @@ class Session:
         _logger.info(f'Retrieved database `{db.title}`.')
         return db
 
-    def get_or_create_db(self, parent: Page, schema: type[Schema]) -> Database:
-        """Get or create the database."""
-        dbs = SList(db for db in self.search_db(schema._db_title) if db.parent == parent)
-        if len(dbs) == 0:
-            db = self.create_db(parent, schema=schema)
+    def get_or_create_ds(self, parent: Page, schema: type[Schema]) -> DataSource:
+        """Get or create the data source."""
+        data_sources = SList(ds for ds in self.search_ds(schema._db_title) if ds.parent == parent)
+        if len(data_sources) == 0:
+            ds = self.create_ds(parent, schema=schema)
             _wait_for_consistency(
-                lambda: bool([db for db in self.search_db(schema._db_title) if db.parent == parent]),
-                f'database `{db.title}`',
+                lambda: bool([ds for ds in self.search_ds(schema._db_title) if ds.parent == parent]),
+                f'data source `{ds.title}`',
             )
-            return db
+            return ds
         else:
-            db = dbs.item()
-            db.schema = schema
-            return db
+            ds = data_sources.item()
+            ds.schema = schema
+            return ds
 
     def search_page(self, title: str | None = None, *, exact: bool = True, reverse: bool = False) -> SList[Page]:
         """Search a page by name. Deleted pages, i.e. in trash, are not included in the search.
@@ -326,14 +363,14 @@ class Session:
 
     def create_page(
         self,
-        parent: Page | Database,
+        parent: Page | DataSource,
         title: Text | str | None = None,
         blocks: Sequence[Block] | None = None,
         *,
         cover: AnyFile | None = None,
         icon: AnyFile | Emoji | CustomEmoji | str | None = None,
     ) -> Page:
-        """Create a new page in a `parent` page or database with a given `title`.
+        """Create a new page in a `parent` page or data source with a given `title`.
 
         The `blocks` are optional and can be used to create a page with content right away.
         Note that some nested blocks may not be supported by the API and must be created separately, i.e.
@@ -360,7 +397,7 @@ class Session:
 
         return page
 
-    def get_or_create_page(self, parent: Page | Database, title: str | None = None) -> Page:
+    def get_or_create_page(self, parent: Page | DataSource, title: str | None = None) -> Page:
         """Get an existing page or create a new one if it doesn't exist."""
         pages = SList(page for page in self.search_page(title) if page.parent == parent)
         if len(pages) == 0:

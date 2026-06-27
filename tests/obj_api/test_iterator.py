@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ultimate_notion.obj_api.blocks import Database, Page
+from ultimate_notion.obj_api.blocks import DataSource, Page
 from ultimate_notion.obj_api.iterator import ObjectList
 
 
@@ -30,24 +30,24 @@ def test_object_list_tolerates_pages_without_properties() -> None:
         assert result.properties == {}
 
 
-def test_object_list_tolerates_databases_without_properties() -> None:
-    """A search result whose database objects omit `properties` must still validate.
+def test_object_list_tolerates_data_sources_without_properties() -> None:
+    """A search result whose data-source objects omit `properties` must still validate.
 
-    Companion to the page case above: `Database.properties` must also default to an
-    empty dict so stripped-down database records do not break `ObjectList` validation.
+    Companion to the page case above: `DataSource.properties` must also default to an
+    empty dict so stripped-down data-source records do not break `ObjectList` validation.
     """
     obj_list = ObjectList.model_validate(
         {
             'object': 'list',
-            'type': 'page_or_database',
-            'page_or_database': {},
+            'type': 'page_or_data_source',
+            'page_or_data_source': {},
             'has_more': False,
             'next_cursor': None,
-            'results': [{'object': 'database', 'id': f'00000000-0000-4713-920b-61d813bf72a{i}'} for i in range(3)],
+            'results': [{'object': 'data_source', 'id': f'00000000-0000-4713-920b-61d813bf72a{i}'} for i in range(3)],
         }
     )
 
     assert len(obj_list.results) == 3
     for result in obj_list.results:
-        assert isinstance(result, Database)
+        assert isinstance(result, DataSource)
         assert result.properties == {}

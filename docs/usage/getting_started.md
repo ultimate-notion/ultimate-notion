@@ -90,29 +90,29 @@ In Notion, everything is either a **page** or a **block**. A page contains block
 If a page is deleted using Ultimate Notion, it is not deleted directly but moved to the trash can, i.e.,
 "🗑️ Trash" in the sidebar, for a period of 30 days before it is deleted.
 
-### Databases
+### Data sources
 
-A **database** is a special block type that can exist:
+A **data source** is a special block type that can exist:
 
-- Within a page (inline database)
-- At the same level as pages (full-page database)
+- Within a page (inline data source)
+- At the same level as pages (full-page data source)
 
-Every database has a **schema** defined by a set of **properties** (columns) with specific types (text, number,
-URL, etc.) that impose structured data on every page within that database. Only pages contained in a database
+Every data source has a **schema** defined by a set of **properties** (columns) with specific types (text, number,
+URL, etc.) that impose structured data on every page within that data source. Only pages contained in a data source
 have properties.
 
-Besides the properties of pages contained in a database, every page has **attributes** such as title, cover,
+Besides the properties of pages contained in a data source, every page has **attributes** such as title, cover,
 icon, or whether it is in the trash. The **title** attribute is special and will always be included as a
-property in the schema if the page is in a database. The property name of the title attribute can be customized.
+property in the schema if the page is in a data source. The property name of the title attribute can be customized.
 Think of the title property as a human-readable identifier, which does not have to be unique! This concept is
-important when **relation** properties are used between different databases, as the title property of a linked
-page will show up in the relation property of the other database.
+important when **relation** properties are used between different data sources, as the title property of a linked
+page will show up in the relation property of the other data source.
 
-A special type of database is a **wiki database** that comes with a pre-defined schema, i.e., title,
+A special type of data source is a **wiki database** that comes with a pre-defined schema, i.e., title,
 last-edited-time, owner, tags, verification.
 
 !!! warning
-    Linked databases (marked with ↗) aren't accessible via the API—always work with the source database.
+    Linked databases (marked with ↗) aren't accessible via the API—always work with the source data source.
 
 ### Page hierarchy and permissions
 
@@ -129,7 +129,7 @@ Integration permissions inherit from parent pages, so granting access to a paren
 Notion assigns a **UUID** (32-character identifier) to every page, block, user, and property. These UUIDs remain
 constant even when titles change.
 
-You can find page/database UUIDs by:
+You can find page/data source UUIDs by:
 
 1. Using <kbd>Copy link</kbd> from the **···** menu
 2. Extracting from the URL: `https://www.notion.so/{TITLE}-{UUID}`

@@ -488,12 +488,11 @@ class TypedObject(GenericObject, Generic[TO_co]):
             msg = f'Unsupported sub-type: {type_name}'
             raise ValueError(msg)
 
-        try:  # we cannot use sub_cls.model_validate here since we use meta class params like `object`/`type`
+        try:  # we cannot use `sub_cls.model_validate` here since we use meta class parameters like `object` and `type`
             typed_obj = sub_cls(**value)
-        except ValidationError as e:
+        except ValidationError as e:  # ValueError would be caught by pydantic and wrapped again
             msg = f'Error constructing {sub_cls} for type {type_name}:\n{e}'
             raise RuntimeError(msg) from e
-
         return typed_obj
 
     @classmethod

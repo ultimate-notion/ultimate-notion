@@ -1,4 +1,4 @@
-"""Comments and discussions for pages, blocks, and databases."""
+"""Comments and discussions for pages, blocks, and data sources."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class Comment(NotionEntity[objs.Comment], wraps=objs.Comment):
-    """A comment on a page, block, or database behaving like a normal string."""
+    """A comment on a page, block, or data source behaving like a normal string."""
 
     @property
     def text(self) -> Text | None:

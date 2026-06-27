@@ -3,9 +3,9 @@ interactions:
     body: '{"parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
       "title": [{"type": "text", "plain_text": "Item DB for max text items", "annotations":
       {"bold": false, "italic": false, "strikethrough": false, "underline": false,
-      "code": false}, "text": {"content": "Item DB for max text items"}}], "properties":
-      {"Name": {"type": "title", "title": {}}, "Description": {"type": "rich_text",
-      "rich_text": {}}}, "is_inline": false}'
+      "code": false}, "text": {"content": "Item DB for max text items"}}], "is_inline":
+      false, "initial_data_source": {"properties": {"Name": {"type": "title", "title":
+      {}}, "Description": {"type": "rich_text", "rich_text": {}}}}}'
     headers:
       accept:
       - '*/*'
@@ -16,7 +16,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '409'
+      - '433'
       content-type:
       - application/json
       cookie:
@@ -24,20 +24,21 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/databases
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-8199-a72a-dcd7d038b6fa","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"d1fde811-4c6e-48ab-a19d-406bca31cb30","title":[{"type":"text","text":{"content":"Item
       DB for max text items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
-      DB for max text items","href":null}],"description":[],"is_inline":false,"properties":{"Description":{"id":"%40Gwb","name":"Description","description":null,"type":"rich_text","rich_text":{}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a48199a72adcd7d038b6fa","public_url":null,"in_trash":false,"archived":false,"request_id":"684420bc-169c-4c35-ad5e-b7cb9fe06133"}'
+      DB for max text items","href":null}],"description":[],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-27T05:56:55.727+00:00","last_edited_time":"2026-06-27T05:56:55.727+00:00","data_sources":[{"id":"296049a8-92aa-46ab-aff2-bd8f0952bd1e","name":"Item
+      DB for max text items"}],"icon":null,"cover":null,"url":"https://www.notion.so/d1fde8114c6e48aba19d406bca31cb30","public_url":null,"archived":false,"request_id":"b6c4442c-3a5a-4b16-89e6-960e92b4e24f"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121de09ead2aff9-LHR
+      - a12236172d6a26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -67,7 +68,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 684420bc-169c-4c35-ad5e-b7cb9fe06133
+      - b6c4442c-3a5a-4b16-89e6-960e92b4e24f
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -95,22 +96,23 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: PATCH
-    uri: https://api.notion.com/v1/databases/38c9ce7b-60a4-8199-a72a-dcd7d038b6fa
+    uri: https://api.notion.com/v1/databases/d1fde811-4c6e-48ab-a19d-406bca31cb30
   response:
-    content: '{"object":"database","id":"38c9ce7b-60a4-8199-a72a-dcd7d038b6fa","cover":null,"icon":null,"created_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T04:56:00.000Z","title":[{"type":"text","text":{"content":"Item
+    content: '{"object":"database","id":"d1fde811-4c6e-48ab-a19d-406bca31cb30","title":[{"type":"text","text":{"content":"Item
       DB for max text items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
       DB for max text items","href":null}],"description":[{"type":"text","text":{"content":"Database
       of all items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
-      of all items","href":null}],"is_inline":false,"properties":{"Description":{"id":"%40Gwb","name":"Description","description":null,"type":"rich_text","rich_text":{}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/38c9ce7b60a48199a72adcd7d038b6fa","public_url":null,"in_trash":false,"archived":false,"request_id":"4c1723f0-bc6c-4e31-8390-0a91f4af07d2"}'
+      of all items","href":null}],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"in_trash":false,"is_locked":false,"created_time":"2026-06-27T05:56:55.727+00:00","last_edited_time":"2026-06-27T05:56:55.727+00:00","data_sources":[{"id":"296049a8-92aa-46ab-aff2-bd8f0952bd1e","name":"Item
+      DB for max text items"}],"icon":null,"cover":null,"url":"https://www.notion.so/d1fde8114c6e48aba19d406bca31cb30","public_url":null,"archived":false,"request_id":"499a171a-b9f6-43b5-8f8a-e93717b93da5"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121de0f2a2aaff9-LHR
+      - a122361bbb6f26f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -140,7 +142,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 4c1723f0-bc6c-4e31-8390-0a91f4af07d2
+      - 499a171a-b9f6-43b5-8f8a-e93717b93da5
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -148,7 +150,75 @@ interactions:
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"parent": {"type": "database_id", "database_id": "38c9ce7b-60a4-8199-a72a-dcd7d038b6fa"},
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2025-09-03'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/data_sources/296049a8-92aa-46ab-aff2-bd8f0952bd1e
+  response:
+    content: '{"object":"data_source","id":"296049a8-92aa-46ab-aff2-bd8f0952bd1e","cover":null,"icon":null,"created_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_time":"2026-06-27T05:56:00.000Z","title":[{"type":"text","text":{"content":"Item
+      DB for max text items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Item
+      DB for max text items","href":null}],"description":[{"type":"text","text":{"content":"Database
+      of all items","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Database
+      of all items","href":null}],"is_inline":false,"properties":{"Description":{"id":"%3AHrq","name":"Description","description":null,"type":"rich_text","rich_text":{}},"Name":{"id":"title","name":"Name","description":null,"type":"title","title":{}}},"parent":{"type":"database_id","database_id":"d1fde811-4c6e-48ab-a19d-406bca31cb30"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/d1fde8114c6e48aba19d406bca31cb30","public_url":null,"in_trash":false,"archived":false,"request_id":"a44452dc-5bb9-46cd-a786-4a23f82b252c"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a122361eaf3d26f7-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - a44452dc-5bb9-46cd-a786-4a23f82b252c
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "296049a8-92aa-46ab-aff2-bd8f0952bd1e"},
       "properties": {"Name": {"type": "title", "title": [{"type": "text", "plain_text":
       "Who is the best programmer? ;-) ", "annotations": {"bold": false, "italic":
       false, "strikethrough": false, "underline": false, "code": false}, "text": {"content":
@@ -712,7 +782,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '41604'
+      - '41610'
       content-type:
       - application/json
       cookie:
@@ -720,13 +790,13 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: POST
     uri: https://api.notion.com/v1/pages
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81f1-9b43-f1f7d4b7cf9c","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8199-a72a-dcd7d038b6fa"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Description":{"id":"%40Gwb","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Who
+    content: '{"object":"page","id":"38c9ce7b-60a4-8106-82d4-d5236cec0bc9","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"296049a8-92aa-46ab-aff2-bd8f0952bd1e","database_id":"d1fde811-4c6e-48ab-a19d-406bca31cb30"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Description":{"id":"%3AHrq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Who
       is the best programmer? ;-) ","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Who
       is the best programmer? ;-) ","href":null},{"type":"mention","mention":{"type":"user","user":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa","name":"Adam
       Dangoor","avatar_url":null,"type":"person","person":{"email":"adamdangoor@gmail.com"}}},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"@Adam
@@ -1028,12 +1098,12 @@ interactions:
       Dangoor","href":null},{"type":"text","text":{"content":", ","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":",
       ","href":null},{"type":"mention","mention":{"type":"user","user":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa","name":"Adam
       Dangoor","avatar_url":null,"type":"person","person":{"email":"adamdangoor@gmail.com"}}},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"@Adam
-      Dangoor","href":null}]}},"url":"https://www.notion.so/Who-is-the-best-programmer-38c9ce7b60a481f19b43f1f7d4b7cf9c","public_url":null,"archived":false,"request_id":"c6c9ace2-bbef-4861-aad1-ab1fb856fd77"}'
+      Dangoor","href":null}]}},"url":"https://www.notion.so/Who-is-the-best-programmer-38c9ce7b60a4810682d4d5236cec0bc9","public_url":null,"archived":false,"request_id":"f4222d28-3a3b-495c-8c86-0539af72ffb9"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121de1a6ba5aff9-LHR
+      - a1223620fa6826f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1063,7 +1133,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - c6c9ace2-bbef-4861-aad1-ab1fb856fd77
+      - f4222d28-3a3b-495c-8c86-0539af72ffb9
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:
@@ -1086,13 +1156,13 @@ interactions:
       host:
       - api.notion.com
       notion-version:
-      - '2022-06-28'
+      - '2025-09-03'
       user-agent:
       - secret...
     method: GET
-    uri: https://api.notion.com/v1/pages/38c9ce7b-60a4-81f1-9b43-f1f7d4b7cf9c
+    uri: https://api.notion.com/v1/pages/38c9ce7b-60a4-8106-82d4-d5236cec0bc9
   response:
-    content: '{"object":"page","id":"38c9ce7b-60a4-81f1-9b43-f1f7d4b7cf9c","created_time":"2026-06-27T04:56:00.000Z","last_edited_time":"2026-06-27T04:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"38c9ce7b-60a4-8199-a72a-dcd7d038b6fa"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Description":{"id":"%40Gwb","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Who
+    content: '{"object":"page","id":"38c9ce7b-60a4-8106-82d4-d5236cec0bc9","created_time":"2026-06-27T05:56:00.000Z","last_edited_time":"2026-06-27T05:56:00.000Z","created_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"last_edited_by":{"object":"user","id":"00000000-0000-4000-8000-0000000000f1"},"cover":null,"icon":null,"parent":{"type":"data_source_id","data_source_id":"296049a8-92aa-46ab-aff2-bd8f0952bd1e","database_id":"d1fde811-4c6e-48ab-a19d-406bca31cb30"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Description":{"id":"%3AHrq","type":"rich_text","rich_text":[{"type":"text","text":{"content":"Who
       is the best programmer? ;-) ","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Who
       is the best programmer? ;-) ","href":null},{"type":"mention","mention":{"type":"user","user":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa","name":"Adam
       Dangoor","avatar_url":null,"type":"person","person":{"email":"adamdangoor@gmail.com"}}},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"@Adam
@@ -1394,12 +1464,12 @@ interactions:
       Dangoor","href":null},{"type":"text","text":{"content":", ","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":",
       ","href":null},{"type":"mention","mention":{"type":"user","user":{"object":"user","id":"00000000-0000-4000-8000-0000000000fa","name":"Adam
       Dangoor","avatar_url":null,"type":"person","person":{"email":"adamdangoor@gmail.com"}}},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"@Adam
-      Dangoor","href":null}]}},"url":"https://www.notion.so/Who-is-the-best-programmer-38c9ce7b60a481f19b43f1f7d4b7cf9c","public_url":null,"archived":false,"request_id":"84947850-8066-4ae9-a955-ce2ba551ab8d"}'
+      Dangoor","href":null}]}},"url":"https://www.notion.so/Who-is-the-best-programmer-38c9ce7b60a4810682d4d5236cec0bc9","public_url":null,"archived":false,"request_id":"7cd45295-bf8b-403d-b8f2-7c956bece8bb"}'
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-Ray:
-      - a121de22f921aff9-LHR
+      - a12236330ac426f7-LHR
       Connection:
       - keep-alive
       Content-Encoding:
@@ -1429,7 +1499,7 @@ interactions:
       x-frame-options:
       - SAMEORIGIN
       x-notion-request-id:
-      - 84947850-8066-4ae9-a955-ce2ba551ab8d
+      - 7cd45295-bf8b-403d-b8f2-7c956bece8bb
       x-permitted-cross-domain-policies:
       - none
       x-xss-protection:

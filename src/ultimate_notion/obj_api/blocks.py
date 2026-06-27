@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from abc import ABC
 from typing import Annotated, Any, Generic
+from uuid import UUID
 
 from pydantic import AfterValidator, Field, SerializeAsAny
 from typing_extensions import TypeVar
@@ -30,6 +31,7 @@ from ultimate_notion.obj_api.core import (
     Unset,
     UnsetType,
     UserRef,
+    is_unset,
 )
 from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
 from ultimate_notion.obj_api.objects import (
@@ -38,6 +40,7 @@ from ultimate_notion.obj_api.objects import (
     BlockRef,
     BuiltInIconObject,
     CustomEmojiObject,
+    DatabaseRef,
     EmojiObject,
     FileObject,
     MentionDatabase,
@@ -63,8 +66,12 @@ class DataObject(NotionEntity, ABC):
     last_edited_by: UserRef | UnsetType = Unset
 
 
-class Database(DataObject, MentionMixin, object='database'):
-    """A database record type."""
+class DataSource(DataObject, MentionMixin, object='data_source'):
+    """A data source record type (formerly 'database' in pre-2025-09-03 API).
+
+    A data source contains the schema (properties) and pages. In API version 2025-09-03+,
+    databases are containers that can hold multiple data sources.
+    """
 
     title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     url: str | UnsetType = Unset
@@ -73,7 +80,45 @@ class Database(DataObject, MentionMixin, object='database'):
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, SerializeAsAny[Property]] = Field(default_factory=dict)
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    database_parent: SerializeAsAny[ParentRef] | UnsetType = Unset
+    is_inline: bool = False  # the 2025-09-03 API still returns this on data-source objects
+
+    def build_mention(self, style: Annotations | None = None) -> MentionObject:
+        # Notion 2025-09-03 has no `data_source` mention type, only `database`. Mention the
+        # containing database (the data source's parent) while keeping this data source's title.
+        if is_unset(parent := self.parent) or not isinstance(parent, DatabaseRef):
+            msg = f'Cannot build a mention for data source `{self.id}` without a database parent.'
+            raise RuntimeError(msg)
+        return MentionDatabase.build_mention_from(parent, style=style, title=self.title)
+
+
+class DataSourceRefInfo(GenericObject):
+    """A lightweight `{id, name}` reference to a data source as listed inside a `Database`.
+
+    The `data_sources` field of a database response carries these slim entries, not full
+    data-source objects; use `Session.get_ds(id)` to resolve one to a full `DataSource`.
+    """
+
+    id: UUID
+    name: str
+
+
+class Database(DataObject, MentionMixin, object='database'):
+    """A database container that can hold multiple data sources (new in API 2025-09-03+).
+
+    In the new API model, databases are containers that group related data sources.
+    The actual schema/properties are now on the DataSource objects.
+    """
+
+    title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    url: str | UnsetType = Unset
+    public_url: str | None = None
+    icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | None = None
+    cover: SerializeAsAny[FileObject] | None = None
+    description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
+    is_locked: bool | UnsetType = Unset
+    data_sources: list[DataSourceRefInfo] = Field(default_factory=list)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
         return MentionDatabase.build_mention_from(self, style=style)
@@ -91,7 +136,7 @@ class Page(DataObject, MentionMixin, object='page'):
 
     def _get_title_prop_name(self) -> str:
         """Get the name of the title property."""
-        # As the 'title' property might be renamed in case of pages in databases, we look for the `id`.
+        # As the 'title' property might be renamed in case of pages in data sources, we look for the `id`.
         for name, prop in self.properties.items():
             if prop.id == 'title':
                 return name
@@ -178,6 +223,8 @@ class WithChildren(GenericObject, ABC, Generic[CB]):
 class UnsupportedBlockTypeData(GenericObject):
     """Type data for `UnsupportedBlock`."""
 
+    # Notion reports the underlying block kind (e.g. `button`, an AI block) here. It is read-only;
+    # unsupported blocks cannot be created or modified through the API.
     block_type: str | None = None
 
 
@@ -517,9 +564,21 @@ class ChildDatabaseTypeData(GenericObject):
 
 
 class ChildDatabase(Block[ChildDatabaseTypeData], type='child_database'):
-    """A child database block in Notion."""
+    """A child database block in Notion (container concept in API 2025-09-03+)."""
 
     child_database: ChildDatabaseTypeData
+
+
+class ChildDataSourceTypeData(GenericObject):
+    """Type data for `ChildDataSource` block."""
+
+    title: str
+
+
+class ChildDataSource(Block[ChildDataSourceTypeData], type='child_data_source'):
+    """A child data source block in Notion (formerly 'child_database' in pre-2025-09-03 API)."""
+
+    child_data_source: ChildDataSourceTypeData
 
 
 class ColumnTypeData(WithChildren[Block]):

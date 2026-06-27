@@ -45,7 +45,7 @@ from vcr import mode as vcr_mode
 from vcr.persisters.filesystem import FilesystemPersister  # type: ignore[import-untyped]
 
 import ultimate_notion as uno
-from ultimate_notion import Database, NumberFormat, Option, Page, Session, User, schema
+from ultimate_notion import DataSource, NumberFormat, Option, Page, Session, User, schema
 from ultimate_notion import blocks as uno_blocks
 from ultimate_notion.adapters.google.tasks import GTasksClient
 from ultimate_notion.config import (
@@ -68,7 +68,9 @@ if TYPE_CHECKING:
 ENV_TEST_ROOT_PAGE = 'UNO_TEST_ROOT_PAGE'
 
 # Manually created DBs and Pages in Notion for testing purposes
-TESTS_PAGE = os.environ.get(ENV_TEST_ROOT_PAGE, 'Tests')  # root page for all tests with connected Notion integration
+TESTS_PAGE = os.environ.get(
+    ENV_TEST_ROOT_PAGE, 'Ultimate Notion Tests'
+)  # root page for all tests with connected Notion integration
 ALL_PROPS_DB = 'All Properties DB'  # DB with all possible properties including AI properties!
 WIKI_DB = 'Wiki DB'
 CONTACTS_DB = 'Contacts DB'
@@ -225,8 +227,8 @@ def _undash(notion_id: str) -> str:
 
 
 def _object_title(obj: dict[str, Any]) -> str | None:
-    """Return the plain-text title of a Notion page/database object, or `None` if it has none."""
-    if obj.get('object') == 'database':
+    """Return the plain-text title of a Notion page/database/data-source object, or `None`."""
+    if obj.get('object') in {'database', 'data_source'}:
         title_rich_text = obj.get('title', [])
     elif obj.get('object') == 'page':
         title_prop = next((p for p in obj.get('properties', {}).values() if p.get('type') == 'title'), None)
@@ -265,6 +267,8 @@ class _SharedIdRegistry:
                     placeholder = SHARED_OBJECT_PLACEHOLDERS.get(_object_title(body) or '')
                     if placeholder is not None:
                         self._add(obj_id, placeholder)
+                elif obj_type == 'data_source':
+                    self._learn_data_source(body)
                 elif obj_type == 'user':
                     self._learn_user(body)
             for value in body.values():
@@ -272,6 +276,28 @@ class _SharedIdRegistry:
         elif isinstance(body, list):
             for value in body:
                 self.learn_from_response(value)
+
+    def _learn_data_source(self, data_source: dict[str, Any]) -> None:
+        """Register a shared data source's *container database* id from its `parent` ref.
+
+        Notion stores each data source under a container `database`; the container's id appears in
+        the data source's `parent` and in any mention of the data source. Most endpoints never return
+        the full container `database` object, so learning the container id only from `database` objects
+        (above) normalises it in some cassettes but leaves it raw in others -- e.g. a recorded mention
+        href keeps the real container id while the data source's parent ref already shows the
+        placeholder, desyncing the two on replay. Learning it here, keyed by the data source's stable
+        title, normalises the container id in every cassette that returns the data source, independent
+        of recording order. The container shares the data source's title-based placeholder, matching
+        what the `database`-object branch records.
+        """
+        placeholder = SHARED_OBJECT_PLACEHOLDERS.get(_object_title(data_source) or '')
+        if placeholder is None:
+            return
+        parent = data_source.get('parent')
+        if isinstance(parent, dict):
+            container_id = parent.get('database_id')
+            if isinstance(container_id, str) and container_id not in PLACEHOLDER_IDS:
+                self._add(container_id, placeholder)
 
     def _learn_user(self, user: dict[str, Any]) -> None:
         """Register the integration bot (and its workspace) or a human member from a full user object."""
@@ -299,14 +325,28 @@ _shared_ids = _SharedIdRegistry()
 
 
 def _scrub_request_body(body: Any) -> Any:
-    """Return a request body with shared ids normalised, preserving its `str`/`bytes`/`None` type."""
+    """Return a request body with the root title and shared ids normalised, preserving its type.
+
+    Mirrors the response-body normalisation so the `/v1/search` (and other) request bodies match the
+    committed cassettes regardless of the recording workspace's root page title.
+    """
+
+    def _norm(text: str) -> str:
+        # Map a non-default root page title (set via `UNO_TEST_ROOT_PAGE`) back to the canonical
+        # `Tests` so a request recorded against a differently named root replays against the committed
+        # cassettes -- in particular so the `/v1/search` body matcher succeeds in CI, which uses the
+        # default title. A no-op for the default `Tests`.
+        if TESTS_PAGE != 'Tests':
+            text = text.replace(TESTS_PAGE, 'Tests')
+        return _shared_ids.scrub(text)
+
     if isinstance(body, bytes):
         try:
-            return _shared_ids.scrub(body.decode('utf-8')).encode('utf-8')
+            return _norm(body.decode('utf-8')).encode('utf-8')
         except UnicodeDecodeError:
             return body
     if isinstance(body, str):
-        return _shared_ids.scrub(body)
+        return _norm(body)
     return body
 
 
@@ -709,12 +749,12 @@ def require_page(notion: Session, title: str) -> Page:
     return pages.item()
 
 
-def require_db(notion: Session, title: str) -> Database:
-    """Return the named database, or skip the test if the workspace does not contain it."""
-    dbs = notion.search_db(title)
-    if not dbs:
-        pytest.skip(f'Test workspace has no database titled {title!r}; see CONTRIBUTING.md.')
-    return dbs.item()
+def require_ds(notion: Session, title: str) -> DataSource:
+    """Return the named data source, or skip the test if the workspace does not contain it."""
+    dss = notion.search_ds(title)
+    if not dss:
+        pytest.skip(f'Test workspace has no data source titled {title!r}; see CONTRIBUTING.md.')
+    return dss.item()
 
 
 @pytest.fixture(scope='module')
@@ -742,9 +782,9 @@ def person(notion_cached: Session) -> User:
 
 
 @vcr_fixture(scope='module')
-def contacts_db(notion_cached: Session) -> Database:
+def contacts_db(notion_cached: Session) -> DataSource:
     """Return a test database."""
-    return require_db(notion_cached, CONTACTS_DB)
+    return require_ds(notion_cached, CONTACTS_DB)
 
 
 @vcr_fixture(scope='module')
@@ -754,7 +794,7 @@ def root_page(notion_cached: Session) -> Page:
 
 
 @pytest.fixture(scope='function')
-def article_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
+def article_db(notion_cached: Session, root_page: Page) -> Iterator[DataSource]:
     """Simple database of articles."""
 
     class Article(schema.Schema, db_title='Articles'):
@@ -762,7 +802,7 @@ def article_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
         cost = schema.Number('Cost', format=NumberFormat.DOLLAR)
         desc = schema.Text('Description')
 
-    db = notion_cached.create_db(parent=root_page, schema=Article)
+    db = notion_cached.create_ds(parent=root_page, schema=Article)
     yield db
     db.delete()
 
@@ -783,30 +823,30 @@ def intro_page(notion_cached: Session) -> Page:
 
 
 @vcr_fixture(scope='module')
-def all_props_db(notion_cached: Session) -> Database:
+def all_props_db(notion_cached: Session) -> DataSource:
     """Return manually created database with all properties, also AI properties."""
-    return require_db(notion_cached, ALL_PROPS_DB)
+    return require_ds(notion_cached, ALL_PROPS_DB)
 
 
 @vcr_fixture(scope='module')
-def wiki_db(notion_cached: Session) -> Database:
+def wiki_db(notion_cached: Session) -> DataSource:
     """Return manually created wiki db."""
-    return require_db(notion_cached, WIKI_DB)
+    return require_ds(notion_cached, WIKI_DB)
 
 
 @vcr_fixture(scope='module')
-def formula_db(notion_cached: Session) -> Database:
+def formula_db(notion_cached: Session) -> DataSource:
     """Return manually created formula db.
 
     Notion's eventually-consistent `/search` index intermittently reports the formula
     columns by their underlying storage type (e.g. `String` as `rich_text`), so reload
-    from the authoritative database-retrieve endpoint to bind the true formula schema
+    from the authoritative data-source-retrieve endpoint to bind the true formula schema
     regardless of `/search` lag. `reload()`'s default `rebind_schema=True` would raise a
     `SchemaError` here, so `rebind_schema=False` is required.
     """
-    db = require_db(notion_cached, FORMULA_DB)
-    db.reload(rebind_schema=False)
-    return db
+    ds = require_ds(notion_cached, FORMULA_DB)
+    ds.reload(rebind_schema=False)
+    return ds
 
 
 @vcr_fixture(scope='module')
@@ -870,21 +910,21 @@ def static_pages(  # noqa: PLR0917
 
 
 @vcr_fixture(scope='module')
-def task_db(notion_cached: Session) -> Database:
+def task_db(notion_cached: Session) -> DataSource:
     """Return manually created wiki db."""
-    return require_db(notion_cached, TASK_DB)
+    return require_ds(notion_cached, TASK_DB)
 
 
 @vcr_fixture(scope='module')
 def static_dbs(
-    all_props_db: Database, wiki_db: Database, contacts_db: Database, task_db: Database, formula_db: Database
-) -> set[Database]:
+    all_props_db: DataSource, wiki_db: DataSource, contacts_db: DataSource, task_db: DataSource, formula_db: DataSource
+) -> set[DataSource]:
     """Return all static pages for the unit tests."""
     return {all_props_db, wiki_db, contacts_db, task_db, formula_db}
 
 
 @pytest.fixture(scope='function')
-def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
+def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[DataSource]:
     status_options = [
         Option('Backlog', color=uno.Color.GRAY),
         Option('In Progress', color=uno.Color.BLUE),
@@ -983,14 +1023,14 @@ def new_task_db(notion_cached: Session, root_page: Page) -> Iterator[Database]:
         # parent = schema.Relation('Parent Task', schema.SelfRef)
         # subs = schema.Relation('Sub-Tasks', schema.SelfRef, two_way_prop=parent)
 
-    db = notion_cached.create_db(parent=root_page, schema=Tasklist)
+    db = notion_cached.create_ds(parent=root_page, schema=Tasklist)
     yield db
     db.delete()
 
 
 @vcr_fixture(scope='module', autouse=True)
 def notion_cleanups(
-    notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[Database]
+    notion_cached: Session, root_page: Page, static_pages: set[Page], static_dbs: set[DataSource]
 ) -> Iterator[None]:
     """Delete all databases and pages in the root_page after we ran except of some special dbs and their content.
 
@@ -999,7 +1039,7 @@ def notion_cleanups(
     """
 
     def clean() -> None:
-        for db in notion_cached.search_db():
+        for db in notion_cached.search_ds():
             if db.ancestors[0] == root_page and db not in static_dbs:
                 db.delete()
         for page in notion_cached.search_page():
@@ -1009,9 +1049,9 @@ def notion_cleanups(
             if (
                 ancestors
                 and ancestors[0] == root_page
-                and page.parent_db not in static_dbs
+                and page.parent_ds not in static_dbs
                 # skip if any ancestor page or database was already deleted
-                and not any(isinstance(p, Page | Database) and p.is_deleted for p in ancestors)
+                and not any(isinstance(p, Page | DataSource) and p.is_deleted for p in ancestors)
             ):
                 page.delete()
 

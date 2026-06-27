@@ -7,7 +7,7 @@ from ultimate_notion.schema import MultiSelect, Select, Status
 
 
 @pytest.mark.vcr()
-def test_status_options_groups(all_props_db: uno.Database) -> None:
+def test_status_options_groups(all_props_db: uno.DataSource) -> None:
     status_prop_type = all_props_db.schema.get_prop('Status')
     assert isinstance(status_prop_type, Status)
     all_options = ['Not started', 'In progress', 'Done']
@@ -21,7 +21,7 @@ def test_status_options_groups(all_props_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_select_options(all_props_db: uno.Database) -> None:
+def test_select_options(all_props_db: uno.DataSource) -> None:
     select_prop_type = all_props_db.schema.get_prop('Select')
     assert isinstance(select_prop_type, Select)
     all_options = ['Option1', 'Option2']
@@ -29,7 +29,7 @@ def test_select_options(all_props_db: uno.Database) -> None:
 
 
 @pytest.mark.vcr()
-def test_multi_select_options(all_props_db: uno.Database) -> None:
+def test_multi_select_options(all_props_db: uno.DataSource) -> None:
     multi_select_prop_type = all_props_db.schema.get_prop('Multi-Select')
     assert isinstance(multi_select_prop_type, MultiSelect)
     all_options = ['MultiOption1', 'MultiOption2']
