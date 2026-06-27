@@ -804,9 +804,10 @@ class SchemaType(ABCMeta):
         props = cast(list[Property], namespace.setdefault('_props', []))
 
         for b in bases:
-            for prop in getattr(b, '_props', []):
-                prop = deepcopy(prop)
-                props.append(prop)
+            if isinstance(b, SchemaType):
+                for prop in b._props:
+                    prop = deepcopy(prop)
+                    props.append(prop)
 
         for attr, val in list(namespace.items()):
             if isinstance(val, Property):
