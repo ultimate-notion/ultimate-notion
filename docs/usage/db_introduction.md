@@ -169,6 +169,49 @@ To reload the view, i.e., re-execute the query that led to the view, use [reload
 Find out more about the functionality of [View] by reading the API references, but
 keep in mind that some methods are just stubs.
 
+## Databases: containers of data sources
+
+Since Notion API version 2025-09-03, a data source always lives inside a *database* container, and a
+single database can hold more than one data source. Ultimate Notion keeps that container transparent,
+so a data source presents as a direct child of its page, but exposes it as a [Database] object
+whenever you need to work with the container itself.
+
+Use [create_db] to create a database together with its first data source:
+
+```python
+class Item(uno.Schema, db_title='Items'):
+    name = uno.PropType.Title('Name')
+
+class Customer(uno.Schema, db_title='Customers'):
+    name = uno.PropType.Title('Name')
+
+shop_db = notion.create_db(parent=root_page, schema=Item)
+assert len(shop_db.data_sources) == 1
+```
+
+Add further data sources with [add_ds] and remove them again with [delete_ds]:
+
+```python
+customers_ds = shop_db.create_ds(schema=Customer)
+assert {ds.title for ds in shop_db.data_sources} == {'Items', 'Customers'}
+
+shop_db.delete_ds(customers_ds)
+assert [ds.title for ds in shop_db.data_sources] == ['Items']
+```
+
+Given a data source, you can always retrieve its container database via its `database_id`:
+
+```python
+items_ds = shop_db.data_sources.item()
+assert notion.get_db(items_ds.database_id) == shop_db
+```
+
+Finally, delete the whole database (and all of its data sources) again:
+
+```python
+shop_db.delete()
+```
+
 [DataSource object]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource
 [get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.get_all_pages
 [title]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataContainer.title
@@ -191,3 +234,7 @@ keep in mind that some methods are just stubs.
 [create_ds]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_ds
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.create_page
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema
+[Database]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
+[create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
+[add_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_ds
+[delete_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.delete_ds
