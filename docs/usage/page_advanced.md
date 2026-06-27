@@ -284,11 +284,11 @@ tabs[0].append(uno.Paragraph('Overview content'))
 tabs[1].append(uno.Paragraph('Details content'))
 ```
 
-To add another tab later, optionally with an icon, use `add_tab`. It returns the new tab so that we can
-append content to it right away:
+To add another tab later, use `add_tab`. It returns the new tab so that we can append content to it
+right away:
 
 ```python
-more = tabs.add_tab('More', icon='📋')
+more = tabs.add_tab('More')
 more.append(uno.Paragraph('Even more content'))
 ```
 

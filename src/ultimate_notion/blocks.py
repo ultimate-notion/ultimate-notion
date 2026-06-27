@@ -587,20 +587,6 @@ class ColoredTextBlock(TextBlock[TB], wraps=obj_blocks.ColoredTextBlock):
 class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph):
     """Paragraph block."""
 
-    @property
-    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon | None:
-        """Icon shown alongside the paragraph, e.g. when the paragraph is used as a tab label."""
-        if is_unset(icon := self.obj_ref.paragraph.icon) or icon is None:
-            return None
-        return wrap_icon(icon)
-
-    @icon.setter
-    def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None) -> None:
-        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
-            icon = Emoji(icon)
-        self.obj_ref.paragraph.icon = icon.obj_ref if icon is not None else None
-        self._update_in_notion(exclude_attrs=['paragraph.children'])
-
 
 # ToDo: Use new syntax when requires-python >= 3.12
 HT = TypeVar('HT', bound=obj_blocks.Heading)
@@ -1332,14 +1318,8 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
         """Return all tabs of this block. Alias for `tabs`."""
         return self.tabs
 
-    def add_tab(
-        self,
-        label: str,
-        *,
-        icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None = None,
-        index: int | None = None,
-    ) -> Paragraph:
-        """Add a new tab with the given label and optional icon to this block.
+    def add_tab(self, label: str, *, index: int | None = None) -> Paragraph:
+        """Add a new tab with the given label to this block.
 
         The index must be between 0 and the number of tabs (inclusive). If no index is given, the
         new tab is added at the end. Returns the created tab so that content can be appended to it.
@@ -1350,8 +1330,6 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
             msg = f'Tab index must be between 0 and {len(self.tabs)} (inclusive).'
             raise IndexError(msg)
         tab = Paragraph(label)
-        if icon is not None:
-            tab.icon = icon
         super().append(tab, after=self.tabs[index - 1] if index > 0 else None)
         return tab
 
