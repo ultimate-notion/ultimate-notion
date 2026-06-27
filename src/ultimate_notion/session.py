@@ -219,18 +219,9 @@ class Session:
         # 2. initialize self-referencing forward relations
         # 3. create properties with self-referencing forward relations using an update call
         # 4. update the backward references, i.e. two-way relations, using an update call
-        if title is not None:
-            title = Text(title)
-        elif schema is not None and schema._db_title is not None:
-            title = schema._db_title
-        else:
-            title = None  # Anonymous data source without a title.
-
-        ds_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
+        title_obj, schema_dct, ds_schema = self._build_ds_create_args(schema, title)
         _logger.info(f'Creating data source `{title or "<NoTitle>"}` in `{parent.title}` with schema:\n{ds_schema}')
 
-        title_obj = title.obj_ref if title is not None else None
-        schema_dct = {prop.name: prop.obj_ref for prop in ds_schema.get_props() if prop._is_init_ready}
         # The Create Database endpoint creates the container and its initial data source in one call.
         db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct, title=title_obj, inline=inline)
         # `description` lives on the database container; set it before retrieving the data source so the
@@ -238,17 +229,54 @@ class Session:
         if schema and schema._db_desc:
             self.api.databases.update(db_obj, description=schema._db_desc.obj_ref)
         ds_obj = self.api.data_sources.retrieve(db_obj.data_sources[0].id)
+        return self._bind_new_ds(ds_obj, schema)
 
+    @staticmethod
+    def _build_ds_create_args(
+        schema: type[Schema] | None, title: str | None
+    ) -> tuple[Any, dict[str, Any], type[Schema]]:
+        """Resolve the serialized title, property schema and effective schema for a data-source create.
+
+        `title` (if given) overrides the schema's `db_title`; otherwise the schema's `db_title` is used,
+        falling back to an anonymous (untitled) data source. When no schema is given, the `DefaultSchema`
+        (a single title property) is used.
+        """
+        title_text: Text | None
+        if title is not None:
+            title_text = Text(title)
+        elif schema is not None and schema._db_title is not None:
+            title_text = schema._db_title
+        else:
+            title_text = None  # Anonymous data source without a title.
+
+        ds_schema: type[Schema] = cast(type[Schema], DefaultSchema) if schema is None else schema
+        title_obj = title_text.obj_ref if title_text is not None else None
+        schema_dct = {prop.name: prop.obj_ref for prop in ds_schema.get_props() if prop._is_init_ready}
+        return title_obj, schema_dct, ds_schema
+
+    def _bind_new_ds(self, ds_obj: obj_blocks.DataSource, schema: type[Schema] | None) -> DataSource:
+        """Wrap a freshly created data-source object, bind its schema and initialize relations."""
         ds: DataSource = DataSource.wrap_obj_ref(ds_obj)
-
         if schema:
             ds._set_schema(schema, during_init=True)  # schema is thus bound to the data source
             schema._init_self_refs()
             schema._init_self_ref_rollups()
             schema._update_bwd_rels()
-
         self.cache[ds.id] = ds
         return ds
+
+    def create_db(
+        self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
+    ) -> Database:
+        """Create a new database (a container of data sources) within a page.
+
+        In API version 2025-09-03+ every data source lives inside a database container. This creates
+        that container together with its first data source (from `schema`, or a default single-title
+        schema) and returns the `Database`. Use `db.create_ds(...)` to add further data sources, and
+        `db.data_sources` to list them. Pass `inline=True` to display the database inline on the page.
+        """
+        ds = self.create_ds(parent, schema=schema, title=title, inline=inline)
+        return self.get_db(ds.database_id)
 
     def search_ds(
         self, name: str | None = None, *, exact: bool = True, reverse: bool = False, deleted: bool = False
