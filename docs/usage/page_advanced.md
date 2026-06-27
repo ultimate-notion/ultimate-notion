@@ -270,6 +270,27 @@ row.delete()
 Tables can be easily modified in various other ways using the `insert_row`, `append_row` methods as well as assigning
 to the `has_header_col` and `has_header_row` properties.
 
+## Tabs
+
+We can group content into labeled tabs using the [Tabs] block. Like [Columns], it behaves like a list,
+but here each tab is a [Paragraph] whose text is the tab label and whose children hold the tab content.
+We provide the tab labels up front and then append content to each tab:
+
+```python
+tabs = uno.Tabs(['Overview', 'Details'])
+page.append(tabs)
+
+tabs[0].append(uno.Paragraph('Overview content'))
+tabs[1].append(uno.Paragraph('Details content'))
+```
+
+To add another tab later, use `add_tab` and then index into the block to append content to it:
+
+```python
+tabs.add_tab('More')
+tabs[-1].append(uno.Paragraph('Even more content'))
+```
+
 ## Advanced blocks
 
 There are some additional more advanced blocks like links to a page and synced blocks. Let's take a look at those.
@@ -410,6 +431,8 @@ discussion.append('My first appended inline comment!')
 [Block]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Block
 [in_notion]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.DataObject.in_notion
 [Columns]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Columns
+[Tabs]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Tabs
+[Paragraph]: ../../reference/ultimate_notion/blocks/#ultimate_notion.blocks.Paragraph
 [Text object]: ../../reference/ultimate_notion/rich_text/#ultimate_notion.rich_text.Text
 [math]: ../../reference/ultimate_notion/rich_text/#ultimate_notion.rich_text.math
 [mention]: ../../reference/ultimate_notion/rich_text/#ultimate_notion.rich_text.mention

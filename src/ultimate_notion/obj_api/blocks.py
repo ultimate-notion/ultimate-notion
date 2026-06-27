@@ -623,6 +623,24 @@ class ColumnList(Block[ColumnListTypeData], type='column_list'):
     column_list: ColumnListTypeData = Field(default_factory=ColumnListTypeData)
 
 
+class TabTypeData(WithChildren[Paragraph]):
+    """Type data for `Tab` block.
+
+    Each tab is a paragraph child: its `rich_text` is the tab label, its optional `icon` is shown
+    alongside the label and its `children` hold the tab content. Note that `children` will not be
+    populated when getting this block.
+    See https://developers.notion.com/changelog/tab-block-support
+    """
+
+    children: list[Paragraph] = Field(default_factory=list)
+
+
+class Tab(Block[TabTypeData], type='tab'):
+    """A tab block in Notion grouping content into labeled tabs (paragraph children)."""
+
+    tab: TabTypeData = Field(default_factory=TabTypeData)
+
+
 class TableRowTypeData(GenericObject):
     """Type data for `TableRow` block."""
 
