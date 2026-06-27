@@ -42,6 +42,7 @@ from _pytest.fixtures import SubRequest
 from google.auth.exceptions import RefreshError
 from vcr import VCR  # type: ignore[import-untyped]
 from vcr import mode as vcr_mode
+from vcr.errors import CannotOverwriteExistingCassetteException  # type: ignore[import-untyped]
 from vcr.persisters.filesystem import FilesystemPersister  # type: ignore[import-untyped]
 
 import ultimate_notion as uno
@@ -403,6 +404,21 @@ def pytest_exception_interact(node: pytest.Item, call: pytest.CallInfo[Any], rep
         input_errors = '\n'.join(str(e['input']) for e in exc_value.errors())
         msg = f'Following erroneous inputs to the pydantic model {exc_value.title}:\n{input_errors}'
         logging.error(msg)
+
+    elif isinstance(exc_value, CannotOverwriteExistingCassetteException):
+        # VCR's own message ("Can't overwrite existing cassette ... in record mode 'none'") is
+        # misleading: in pure-replay mode (CI's `vcr-only`) the usual cause is a *missing* or
+        # non-matching cassette for a new/changed test, not a write attempt. Surface an actionable
+        # hint as a report section (visible in the failure output, unlike a captured log line).
+        # See the "Add a new live (VCR) test" section in `CONTRIBUTING.md`.
+        msg = (
+            f'No matching cassette interaction for `{node.nodeid}` in offline-replay mode.\n'
+            'This usually means the test is new or its requests changed, so its cassette is missing '
+            'or out of date. Record it live against your Notion test workspace with:\n'
+            f'  hatch run vcr-rewrite -k {node.name}\n'
+            'then verify the replay with `hatch run vcr-only` and commit the new cassette(s).'
+        )
+        report.sections.append(('How to fix this VCR failure', msg))
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:

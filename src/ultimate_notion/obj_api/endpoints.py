@@ -295,6 +295,7 @@ class DataSourcesEndpoint(Endpoint):
         self,
         ds: DataSource,
         *,
+        parent: SerializeAsAny[ParentRef] | None = None,
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
@@ -303,7 +304,8 @@ class DataSourcesEndpoint(Endpoint):
     ) -> None:
         """Update the DataSource object on the server.
 
-        The data source info will be updated to the latest version from the server. Pass
+        The data source info will be updated to the latest version from the server. Passing a
+        `parent` (a `DatabaseRef`) reassigns the data source to a different parent database. Pass
         `in_trash=True`/`False` to trash or restore an individual data source (the data source's
         containing database is left untouched).
 
@@ -312,7 +314,7 @@ class DataSourcesEndpoint(Endpoint):
         _logger.debug(f'Updating info of data source with id `{ds.id}`.')
 
         if request := self._build_request(
-            schema=schema, title=title, description=description, inline=inline, in_trash=in_trash
+            parent=parent, schema=schema, title=title, description=description, inline=inline, in_trash=in_trash
         ):
             data = self._as_dict(self.raw_api.update(str(ds.id), **request))
             ds.update(**data)
@@ -379,6 +381,7 @@ class DatabasesEndpoint(Endpoint):
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
+        is_locked: bool | None = None,
     ) -> dict[str, Any]:
         """Build a request payload from the given items.
 
@@ -398,6 +401,9 @@ class DatabasesEndpoint(Endpoint):
 
         if inline is not None:
             request['is_inline'] = inline
+
+        if is_locked is not None:
+            request['is_locked'] = is_locked
 
         return request
 
@@ -442,6 +448,7 @@ class DatabasesEndpoint(Endpoint):
         title: list[RichTextBaseObject] | None = None,
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
+        is_locked: bool | None = None,
     ) -> None:
         """Update the Database object on the server.
 
@@ -451,7 +458,7 @@ class DatabasesEndpoint(Endpoint):
         """
         _logger.debug(f'Updating info of database with id `{db.id}`.')
 
-        if request := self._build_request(title=title, description=description, inline=inline):
+        if request := self._build_request(title=title, description=description, inline=inline, is_locked=is_locked):
             data = self._as_dict(self.raw_api.update(str(db.id), **request))
             db.update(**data)
 
@@ -573,6 +580,7 @@ class PagesEndpoint(Endpoint):
         cover: FileObject | UnsetType | None = Unset,
         icon: FileObject | EmojiObject | CustomEmojiObject | UnsetType | None = Unset,
         in_trash: bool | UnsetType = Unset,
+        is_locked: bool | UnsetType = Unset,
     ) -> None:
         """Update the Page object properties on the server."""
         if is_unset(page_id := page.id):
@@ -610,6 +618,10 @@ class PagesEndpoint(Endpoint):
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 request['archived'] = False
 
+        if not is_unset(is_locked):
+            _logger.debug(f'Setting `is_locked={is_locked}` on page with id `{page_id}`.')
+            request['is_locked'] = is_locked
+
         data = self._as_dict(self.raw_api.update(page_id.hex, **request))
         page.update(**data)
 
@@ -620,6 +632,7 @@ class PagesEndpoint(Endpoint):
         cover: FileObject | UnsetType | None = Unset,
         icon: FileObject | EmojiObject | CustomEmojiObject | UnsetType | None = Unset,
         in_trash: bool | UnsetType = Unset,
+        is_locked: bool | UnsetType = Unset,
     ) -> None:
         """Set specific page attributes (such as cover, icon, etc.) on the server.
 
@@ -653,6 +666,10 @@ class PagesEndpoint(Endpoint):
             else:
                 _logger.debug(f'Restoring page with id `{page_id}`.')
                 props['archived'] = False
+
+        if not is_unset(is_locked):
+            _logger.debug(f'Setting `is_locked={is_locked}` on page with id `{page_id}`.')
+            props['is_locked'] = is_locked
 
         data = self._as_dict(self.raw_api.update(page_id.hex, **props))
         page.update(**data)
