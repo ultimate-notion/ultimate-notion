@@ -45,6 +45,22 @@ def test_delete_restore_page(notion: uno.Session, root_page: uno.Page) -> None:
 
 
 @pytest.mark.vcr()
+def test_lock_unlock_page(notion: uno.Session, root_page: uno.Page) -> None:
+    page = notion.create_page(root_page, title='Lockable page')
+    assert not page.is_locked
+
+    page.is_locked = True
+    assert page.is_locked
+    # clear the cache and retrieve again to be sure it was updated on the server side
+    page = notion.get_page(page.id, use_cache=False)
+    assert page.is_locked
+
+    page.is_locked = False
+    assert not page.is_locked
+    page.delete()
+
+
+@pytest.mark.vcr()
 def test_reload_page(notion: uno.Session, root_page: uno.Page) -> None:
     page = notion.create_page(root_page)
     old_obj_id = id(page.obj_ref)

@@ -163,6 +163,56 @@ def test_description_setter(notion: uno.Session, article_db: uno.DataSource) -> 
 
 
 @pytest.mark.vcr()
+def test_lock_unlock_db(notion: uno.Session, root_page: uno.Page) -> None:
+    ds = notion.create_ds(root_page)
+    db = notion.get_db(ds.database_id)
+    assert not db.is_locked
+
+    db.is_locked = True
+    assert db.is_locked
+    # clear the cache and retrieve again to be sure it was updated on the server side
+    db = notion.get_db(db.id, use_cache=False)
+    assert db.is_locked
+
+    db.is_locked = False
+    assert not db.is_locked
+    ds.delete()
+
+
+@pytest.mark.vcr()
+def test_lock_unlock_ds(notion: uno.Session, root_page: uno.Page) -> None:
+    ds = notion.create_ds(root_page)
+    assert not ds.is_locked
+
+    ds.is_locked = True
+    assert ds.is_locked
+
+    ds.is_locked = False
+    assert not ds.is_locked
+    ds.delete()
+
+
+@pytest.mark.vcr()
+def test_move_ds(notion: uno.Session, root_page: uno.Page) -> None:
+    ds = notion.create_ds(root_page, title='Movable DS')
+    target_ds = notion.create_ds(root_page, title='Target DS')
+    target_db = notion.get_db(target_ds.database_id)
+
+    assert ds.parent == root_page
+    assert ds.database_id != target_db.id
+
+    ds.move(target_db)
+    assert ds.database_id == target_db.id
+    assert ds.parent == root_page
+
+    # the target database now holds both data sources
+    target_db = notion.get_db(target_db.id, use_cache=False)
+    assert {member.id for member in target_db.data_sources} == {ds.id, target_ds.id}
+
+    ds.delete()
+
+
+@pytest.mark.vcr()
 def test_delete_restore_db(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_ds(root_page)
     assert not db.is_deleted

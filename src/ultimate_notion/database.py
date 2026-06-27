@@ -189,6 +189,18 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
             text = Text.from_plain_text(text)
         self._update_container_db(description=text.obj_ref)
 
+    # `is_locked` lives on the containing database, not the data source. The data-source response
+    # does not mirror it, so the getter reads it from the database and the setter writes it there.
+    @property
+    def is_locked(self) -> bool:
+        """Return whether this data source's database is locked for editing."""
+        return get_active_session().get_db(self.database_id, use_cache=False).is_locked
+
+    @is_locked.setter
+    def is_locked(self, locked: bool) -> None:
+        """Lock or unlock this data source's database for editing."""
+        self._update_container_db(is_locked=locked)
+
     def _update_container_db(self, **fields: Any) -> None:
         """Update the containing database (where `description`/`is_inline` live) and refresh self."""
         session = get_active_session()
@@ -198,6 +210,21 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         db_ref = obj_blocks.Database.model_construct(id=parent.database_id)
         session.api.databases.update(db_ref, **fields)
         self.obj_ref = session.api.data_sources.retrieve(self.id)
+
+    def move(self, database: Database) -> Self:
+        """Move this data source to a different parent database.
+
+        Reassigns the data source from its current container database to `database`. Cached
+        children of the old and new parent are invalidated so the hierarchy reflects the move.
+        """
+        session = get_active_session()
+        old_parent = self.parent
+        session.api.data_sources.update(self.obj_ref, parent=objs.DatabaseRef.build(database.id))
+        self.obj_ref = session.api.data_sources.retrieve(self.id)
+        for parent in (old_parent, database.parent):
+            if isinstance(parent, ChildrenMixin):
+                parent._children = None  # forces a new retrieval of children next time
+        return self
 
     def delete(self) -> Self:
         """Delete this data source."""
@@ -368,6 +395,20 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
             session = get_active_session()
             session.api.databases.update(self.obj_ref, inline=inline)
             self.obj_ref.is_inline = inline
+
+    @property
+    def is_locked(self) -> bool:
+        """Return whether the database is locked for editing."""
+        if is_unset(locked := self.obj_ref.is_locked):
+            raise UnsetError()
+        return locked
+
+    @is_locked.setter
+    def is_locked(self, locked: bool) -> None:
+        """Lock or unlock this database for editing."""
+        session = get_active_session()
+        session.api.databases.update(self.obj_ref, is_locked=locked)
+        self.obj_ref.is_locked = locked
 
     @property
     def is_db(self) -> bool:

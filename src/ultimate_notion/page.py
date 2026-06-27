@@ -163,6 +163,12 @@ class Page(
             raise UnsetError()
         return is_locked
 
+    @is_locked.setter
+    def is_locked(self, locked: bool) -> None:
+        """Lock or unlock this page for editing."""
+        session = get_active_session()
+        session.api.pages.set_attr(self.obj_ref, is_locked=locked)
+
     @property
     def url(self) -> str:
         """Return the URL of this page."""
