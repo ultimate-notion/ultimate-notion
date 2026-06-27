@@ -1295,8 +1295,10 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
     def __init__(self, tabs: Sequence[str]) -> None:
         """Create a new `Tabs` block with an initially empty tab for each given label."""
         super().__init__()
-        if isinstance(tabs, str) or not isinstance(tabs, Sequence) or not all(isinstance(label, str) for label in tabs):
-            msg = 'Tabs must be initialized with a sequence of label strings.'
+        # A bare `str` satisfies `Sequence[str]` for the type checker but would create one tab per
+        # character, so guard against it explicitly; other type errors are caught statically.
+        if isinstance(tabs, str):
+            msg = 'Tabs must be initialized with a sequence of label strings, not a single string.'
             raise TypeError(msg)
         if len(tabs) < MIN_TABS:
             msg = f'Number of tabs must be at least {MIN_TABS}.'

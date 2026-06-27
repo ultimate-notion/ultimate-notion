@@ -572,9 +572,7 @@ def test_tabs_offline() -> None:
     with pytest.raises(ValueError):
         uno.Tabs([])
     with pytest.raises(TypeError):
-        uno.Tabs('Overview')  # a bare string is not a sequence of label strings
-    with pytest.raises(TypeError):
-        uno.Tabs(['Overview', 1])  # ty: ignore[invalid-argument-type]
+        uno.Tabs('Overview')  # a bare string satisfies `Sequence[str]` but is not a list of labels
 
     tabs = uno.Tabs(['Overview', 'Details'])
     # Like `Columns`, tabs are embedded in the obj_ref and only surfaced once the block is in Notion.
