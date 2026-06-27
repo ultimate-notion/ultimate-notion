@@ -3,7 +3,11 @@
 ## Version 0.10, 2026-
 
 - New: Better logging of model validation errors, issue #152.
-- New: Implement the new data source Notion API version 2025-09-03, issue #118.
+- Breaking: Adopt the Notion API version 2025-09-03, which splits the former "database" into two concepts: a *data source* (holds the schema and pages) and a *database* (a container of one or more data sources), issue #118. This requires `notion-client~=2.7.0` and renames much of the high-level API. To migrate:
+    - The former `Database` class (schema + pages) is now `DataSource`. The name `Database` now refers to the new container; access its data sources via `Database.data_sources`.
+    - Rename these calls: `Session.search_db()` → `search_ds()`, `Session.create_db()` → `create_ds()`, `Session.get_or_create_db()` → `get_or_create_ds()`, `Schema.bind_db()` → `bind_ds()`, and `Page.parent_db` → `Page.parent_ds`.
+    - `Session.get_db()` still exists but now returns the new `Database` container; use `Session.get_ds()` to get what `get_db()` returned before (a single data source).
+    - The `db_title=` and `db_id=` arguments on `Schema` subclasses are unchanged.
 
 - Fix: Capture the read-only `block_type` field Notion sends on unsupported blocks (e.g. button or AI blocks), which previously raised a pydantic `ValidationError` on dev/CI installs (`extra='forbid'`) and made the whole children list — including sibling blocks after the unsupported one — inaccessible, issue #356.
 
