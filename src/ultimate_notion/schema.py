@@ -82,9 +82,6 @@ class Property(Wrapper[GO_co], ABC, wraps=PropertyGO):
         return super().__new__(cls)
 
     def __init__(self, name: str | None = None, **kwargs: Any) -> None:
-        if name is not None and not isinstance(name, str):
-            msg = f'The name of the property must be a string, not {type(name).__name__}'
-            raise PropertyError(msg)
         self._name = name
         obj_api_type = self._obj_api_map_inv[self.__class__]
         self.obj_ref = obj_api_type.build(**kwargs)
