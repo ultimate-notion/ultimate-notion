@@ -50,7 +50,7 @@
 
 <span class=k>with</span> <span class=n>uno</span><span class=o>.</span><span class=n>Session</span><span class=p>()</span> <span class=k>as</span> <span class=n>notion</span><span class=p>:</span>
     <span class=n>parent</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>search_page</span><span class=p>(</span><span class=n>PARENT_PAGE</span><span class=p>)</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
-    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>get_or_create_db</span><span class=p>(</span><span class=n>parent</span><span class=o>=</span><span class=n>parent</span><span class=p>,</span> <span class=n>schema</span><span class=o>=</span><span class=n>Task</span><span class=p>)</span>
+    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>get_or_create_ds</span><span class=p>(</span><span class=n>parent</span><span class=o>=</span><span class=n>parent</span><span class=p>,</span> <span class=n>schema</span><span class=o>=</span><span class=n>Task</span><span class=p>)</span>
 
     <span class=k>if</span> <span class=n>task_db</span><span class=o>.</span><span class=n>is_empty</span><span class=p>:</span>
         <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
@@ -90,7 +90,7 @@
 
 <span class=c1># Option 1: Using the Notion database declaration from above</span>
 <span class=k>with</span> <span class=n>uno</span><span class=o>.</span><span class=n>Session</span><span class=p>()</span> <span class=k>as</span> <span class=n>notion</span><span class=p>,</span> <span class=n>GTasksClient</span><span class=p>(</span><span class=n>read_only</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span> <span class=k>as</span> <span class=n>gtasks</span><span class=p>:</span>
-    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>get_or_create_db</span><span class=p>(</span><span class=n>parent</span><span class=o>=</span><span class=n>parent</span><span class=p>,</span> <span class=n>schema</span><span class=o>=</span><span class=n>Task</span><span class=p>)</span>
+    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>get_or_create_ds</span><span class=p>(</span><span class=n>parent</span><span class=o>=</span><span class=n>parent</span><span class=p>,</span> <span class=n>schema</span><span class=o>=</span><span class=n>Task</span><span class=p>)</span>
     <span class=n>tasklist</span> <span class=o>=</span> <span class=n>gtasks</span><span class=o>.</span><span class=n>get_or_create_tasklist</span><span class=p>(</span><span class=s1>'My synced task list'</span><span class=p>)</span>
 
     <span class=n>sync_task</span> <span class=o>=</span> <span class=n>SyncGTasks</span><span class=p>(</span>
@@ -111,7 +111,7 @@
 
 <span class=c1># Option 2: Using an existing Notion database that was created manually</span>
 <span class=k>with</span> <span class=n>uno</span><span class=o>.</span><span class=n>Session</span><span class=p>()</span> <span class=k>as</span> <span class=n>notion</span><span class=p>,</span> <span class=n>GTasksClient</span><span class=p>(</span><span class=n>read_only</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span> <span class=k>as</span> <span class=n>gtasks</span><span class=p>:</span>
-    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>search_db</span><span class=p>(</span><span class=s1>'My synced task db'</span><span class=p>)</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
+    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>search_ds</span><span class=p>(</span><span class=s1>'My synced task db'</span><span class=p>)</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
     <span class=n>status_col</span> <span class=o>=</span> <span class=n>task_db</span><span class=o>.</span><span class=n>schema</span><span class=o>.</span><span class=n>get_prop</span><span class=p>(</span><span class=s1>'Status'</span><span class=p>)</span>
     <span class=n>due_date_col</span> <span class=o>=</span> <span class=n>task_db</span><span class=o>.</span><span class=n>schema</span><span class=o>.</span><span class=n>get_prop</span><span class=p>(</span><span class=s1>'Due Date'</span><span class=p>)</span>
     <span class=n>tasklist</span> <span class=o>=</span> <span class=n>gtasks</span><span class=o>.</span><span class=n>get_or_create_tasklist</span><span class=p>(</span><span class=s1>'My synced task list'</span><span class=p>)</span>

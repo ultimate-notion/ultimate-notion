@@ -63,7 +63,7 @@
 
 <span class=k>with</span> <span class=n>uno</span><span class=o>.</span><span class=n>Session</span><span class=p>()</span> <span class=k>as</span> <span class=n>notion</span><span class=p>:</span>
     <span class=n>parent</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>search_page</span><span class=p>(</span><span class=n>PARENT_PAGE</span><span class=p>)</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
-    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>create_db</span><span class=p>(</span><span class=n>parent</span><span class=o>=</span><span class=n>parent</span><span class=p>,</span> <span class=n>schema</span><span class=o>=</span><span class=n>Task</span><span class=p>)</span>
+    <span class=n>task_db</span> <span class=o>=</span> <span class=n>notion</span><span class=o>.</span><span class=n>create_ds</span><span class=p>(</span><span class=n>parent</span><span class=o>=</span><span class=n>parent</span><span class=p>,</span> <span class=n>schema</span><span class=o>=</span><span class=n>Task</span><span class=p>)</span>
 
     <span class=c1># just create 10 random tasks for demonstration</span>
     <span class=n>Task</span><span class=o>.</span><span class=n>create</span><span class=p>(</span>
