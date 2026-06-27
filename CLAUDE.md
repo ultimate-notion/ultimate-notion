@@ -17,7 +17,7 @@ with Notion's API, allowing users to manage pages, databases (data sources), blo
 
 - **Python**: 3.10+ with full type hints
 - **Pydantic**: For data validation and object modeling
-- **notion-client**: Official Notion SDK (currently 2.7.0 for API 2025-09-03)
+- **notion-client**: Official Notion SDK (currently 3.1 for API 2026-03-11)
 - **VCR.py**: For recording and replaying HTTP interactions in tests
 
 ### Code Conventions

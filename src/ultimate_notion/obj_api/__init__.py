@@ -31,6 +31,10 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+# The Notion API version this library targets. notion-client 3.1 still defaults to the older
+# `2025-09-03`, so we pin the version explicitly here.
+NOTION_API_VERSION = '2026-03-11'
+
 
 def _get_default_user_agent() -> str:
     """Return the default user agent string for the Notion client."""
@@ -59,6 +63,7 @@ def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
     # Set same sane defaults as notion_client defines its own logger
     kwargs.setdefault('logger', logging.getLogger('notion_client'))
     kwargs.setdefault('log_level', logging.NOTSET)
+    kwargs.setdefault('notion_version', NOTION_API_VERSION)
 
     def log_request(request: httpx.Request) -> None:
         msg = f'Request: {request.method} {request.url}'
