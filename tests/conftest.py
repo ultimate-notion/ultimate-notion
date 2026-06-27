@@ -1048,13 +1048,19 @@ def tz_berlin() -> Iterator[str]:
         yield tz
 
 
-def assert_eventually(assertion_func: Callable[..., Any], retries: int = 5, delay: int = 3) -> None:
+def assert_eventually(
+    assertion_func: Callable[..., Any], retries: int = 5, delay: float = 0.2, max_delay: float = 3.0
+) -> None:
     """Retry the provided assertion function for a given number of attempts with a delay.
+
+    The delay starts short and grows exponentially (capped at `max_delay`) so the common case where
+    the assertion passes quickly returns fast, while slow eventual-consistency cases still get time.
 
     Args:
         assertion_func: The lambda containing the assertion logic without parameters.
         retries: Number of retries before failing.
-        delay: Delay in seconds between retries.
+        delay: Initial delay in seconds between retries.
+        max_delay: Maximum delay in seconds between retries.
     """
     for attempt in range(retries):
         try:
@@ -1062,7 +1068,7 @@ def assert_eventually(assertion_func: Callable[..., Any], retries: int = 5, dela
             return
         except AssertionError:
             if attempt < retries - 1:
-                time.sleep(delay)
+                time.sleep(min(delay * 2**attempt, max_delay))
     assertion_func()
 
 
