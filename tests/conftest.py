@@ -42,6 +42,7 @@ from _pytest.fixtures import SubRequest
 from google.auth.exceptions import RefreshError
 from vcr import VCR  # type: ignore[import-untyped]
 from vcr import mode as vcr_mode
+from vcr.persisters.filesystem import FilesystemPersister  # type: ignore[import-untyped]
 
 import ultimate_notion as uno
 from ultimate_notion import Database, NumberFormat, Option, Page, Session, User, schema
@@ -485,6 +486,34 @@ def normalize_response(response: dict[str, Any]) -> dict[str, Any]:
     return response
 
 
+class DedupFilesystemPersister(FilesystemPersister):  # type: ignore[misc]  # vcr is untyped
+    """Collapse byte-identical interactions to one before writing the cassette (#388).
+
+    The shared module-fixture cassettes (`mod_*.yaml`) are a single cassette opened in `all`
+    mode once per test module that resolves the fixture. `all` mode loads the existing cassette
+    and *appends* the new recording rather than replacing it, so a full re-record accumulates one
+    identical copy of the same normalised request per module (~20x bloat). Replay is first-match-wins,
+    so every copy past the first is dead weight. Dropping exact `(request, response)` duplicates is
+    behaviour-preserving — a single interaction already serves every module on offline replay — and
+    keeps the re-record diff small and reviewable. Non-identical interactions (e.g. distinct requests,
+    or the same request with paginated/differing responses) keep separate signatures and are retained.
+    """
+
+    @staticmethod
+    def save_cassette(cassette_path: Any, cassette_dict: dict[str, Any], serializer: Any) -> None:
+        seen: set[str] = set()
+        requests, responses = [], []
+        for request, response in zip(cassette_dict['requests'], cassette_dict['responses'], strict=True):
+            signature = json.dumps([request._to_dict(), response], sort_keys=True, default=str)
+            if signature in seen:
+                continue
+            seen.add(signature)
+            requests.append(request)
+            responses.append(response)
+        deduped = {**cassette_dict, 'requests': requests, 'responses': responses}
+        FilesystemPersister.save_cassette(cassette_path, deduped, serializer)
+
+
 def build_vcr_config() -> dict[str, Any]:
     """Build the pytest-recording config (also reused when recording from module-level fixtures)."""
     return {
@@ -623,6 +652,9 @@ def vcr_fixture(
                     mode = 'none'
                 vcr = VCR(record_mode=vcr_mode(mode), **vcr_config)
                 register_notion_matchers(vcr)
+                # Dedup identical interactions on save so `all`-mode re-records of the shared
+                # module-fixture cassettes don't accumulate one redundant copy per module (#388).
+                vcr.register_persister(DedupFilesystemPersister)
 
             return vcr, cassette_name
 
