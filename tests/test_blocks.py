@@ -830,6 +830,14 @@ def test_serialize_strips_meta_from_nested_children() -> None:
         assert not any(field in level for field in meta_fields)
 
 
+def test_heading_markdown() -> None:
+    """Headings render with increasing markdown levels (page titles take `#`)."""
+    assert uno.Heading1('H1').to_markdown() == '## H1'
+    assert uno.Heading2('H2').to_markdown() == '### H2'
+    assert uno.Heading3('H3').to_markdown() == '#### H3'
+    assert uno.Heading4('H4').to_markdown() == '##### H4'
+
+
 @pytest.mark.vcr()
 def test_append_nested_children_single_call(root_page: uno.Page, notion: uno.Session) -> None:
     """Appending a block that already carries nested children must succeed in a single API call.
