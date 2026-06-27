@@ -561,6 +561,7 @@ def _build_tabs_obj_ref() -> uno.Tabs:
     """Reconstruct a `Tabs` block as the API would return it after creation, for offline tests."""
     tab_obj = ObjTab()
     overview = uno.Paragraph('Overview')
+    overview.obj_ref.paragraph.icon = uno.Emoji('📋').obj_ref
     overview.obj_ref.paragraph.children = [uno.Paragraph('Welcome!').obj_ref]
     details = uno.Paragraph('Details')
     details.obj_ref.paragraph.children = [uno.Paragraph('Fine print').obj_ref]
@@ -593,14 +594,33 @@ def test_tabs_add_tab_index_validation() -> None:
         tabs.add_tab('Out of range', index=len(tabs.tabs) + 1)
 
 
+def test_paragraph_icon() -> None:
+    paragraph = uno.Paragraph('Labelled')
+    assert paragraph.icon is None
+    paragraph.obj_ref.paragraph.icon = uno.Emoji('📋').obj_ref
+    assert isinstance(paragraph.icon, uno.Emoji)
+    assert str(paragraph.icon) == '📋'
+    paragraph.obj_ref.paragraph.icon = None
+    assert paragraph.icon is None
+
+
+def test_tabs_add_tab_icon() -> None:
+    tabs = _build_tabs_obj_ref()
+    # Insert at the front so the offline block can be appended without an `after` anchor.
+    tabs.add_tab('More', index=0, icon='📋')
+    assert isinstance(tabs.tabs[0].icon, uno.Emoji)
+    assert str(tabs.tabs[0].icon) == '📋'
+
+
 def test_tabs_to_markdown() -> None:
     tabs = _build_tabs_obj_ref()
     assert [str(tab) for tab in tabs.tabs] == ['Overview', 'Details']
+    assert str(tabs.tabs[0].icon) == '📋'
     assert str(tabs[1]) == 'Details'
 
     output = tabs.to_markdown()
     exp_output = dedent("""
-        <!--- tab: Overview -->
+        <!--- tab: 📋 Overview -->
         Welcome!
         <!--- tab: Details -->
         Fine print""")
@@ -640,13 +660,14 @@ def test_modify_tab_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     tabs = uno.Tabs(['Overview'])
     page.append(tabs)
 
-    tabs.add_tab('Details')
+    tabs.add_tab('Details', icon='📋')
     tabs[1].append(uno.Paragraph('Details content'))
     page.reload()
 
     reloaded_tabs = page.children[0]
     assert isinstance(reloaded_tabs, uno.Tabs)
     assert [str(tab) for tab in reloaded_tabs.tabs] == ['Overview', 'Details']
+    assert str(reloaded_tabs.tabs[1].icon) == '📋'
 
     with pytest.raises(InvalidAPIUsageError):
         reloaded_tabs.append(uno.Paragraph('Use add_tab instead'))
