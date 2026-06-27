@@ -595,12 +595,15 @@ def test_tabs_add_tab_index_validation() -> None:
 
 
 def test_paragraph_icon() -> None:
+    # The `.icon` setter is a no-op against Notion until the block is in Notion, so this exercises
+    # the local round-trip offline. Live, Notion only allows an icon on a tab-label paragraph and
+    # rejects it on any other paragraph; that constraint is covered by `test_modify_tab_blocks`.
     paragraph = uno.Paragraph('Labelled')
     assert paragraph.icon is None
-    paragraph.obj_ref.paragraph.icon = uno.Emoji('📋').obj_ref
+    paragraph.icon = '📋'
     assert isinstance(paragraph.icon, uno.Emoji)
     assert str(paragraph.icon) == '📋'
-    paragraph.obj_ref.paragraph.icon = None
+    paragraph.icon = None
     assert paragraph.icon is None
 
 

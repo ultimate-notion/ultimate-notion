@@ -591,7 +591,19 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.P
 
     @property
     def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon | None:
-        """Icon shown alongside the paragraph, e.g. when the paragraph is used as a tab label."""
+        """Icon shown alongside the paragraph when it is used as a tab label.
+
+        Notion only allows an icon on a paragraph that is a direct child of a `Tabs` block, i.e. a
+        tab label. A plain body paragraph never shows an icon, so reading this returns `None` for
+        any non-tab paragraph.
+
+        !!! warning
+
+            Setting an icon only works on a tab-label paragraph. Notion rejects it on any other
+            paragraph with `Cannot set icon on a paragraph block that is not a direct child of a tab
+            block.`. Use `Tabs.add_tab(label, icon=...)`, or set `.icon` on a paragraph already
+            returned from a `Tabs` block (e.g. `tabs[0].icon = '📋'`).
+        """
         if is_unset(icon := self.obj_ref.paragraph.icon) or icon is None:
             return None
         return wrap_icon(icon)
@@ -601,6 +613,9 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.P
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
             icon = Emoji(icon)
         self.obj_ref.paragraph.icon = icon.obj_ref if icon is not None else None
+        # `_update_in_notion` pushes this to Notion, which raises if the paragraph is not a tab
+        # label (see the property docstring). We deliberately don't pre-validate here: a paragraph
+        # has no reliable local handle to its parent block, so we let Notion be the source of truth.
         self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
@@ -1354,6 +1369,10 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
         The index must be between 0 and the number of tabs (inclusive).
         If no index is given, the new tab is added at the end.
 
+        The optional `icon` is shown alongside the label. Notion only allows an icon on a tab-label
+        paragraph, which is exactly what a tab is, so it is always valid here (unlike a plain
+        `Paragraph.icon`, which Notion rejects outside a tab).
+
         Append content to the new tab by indexing into the block, e.g. `tabs[-1].append(...)`.
         """
         if index is None:
@@ -1363,6 +1382,10 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
             if icon is not None:
                 if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
                     icon = Emoji(icon)
+                # Bake the icon into the obj_ref so it is sent as part of the tab's creation under
+                # the `Tabs` block. We must NOT use `Paragraph.icon` here: its setter eagerly calls
+                # the API, and at this point `new_tab` is not yet a tab child, so Notion would reject
+                # it. Appending it below carries the icon along in the same valid request.
                 new_tab.obj_ref.paragraph.icon = icon.obj_ref
             super().append(new_tab, after=self.tabs[index - 1] if index > 0 else None)
             return self

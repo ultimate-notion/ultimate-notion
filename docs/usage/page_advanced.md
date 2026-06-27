@@ -295,6 +295,12 @@ tabs[-1].append(uno.Paragraph('Even more content'))
 assert str(tabs[-1].icon) == '📋'
 ```
 
+!!! note
+
+    Notion only allows an icon on a paragraph that is a tab label. Setting `icon` on any other
+    [Paragraph] is rejected by Notion, so the `Paragraph.icon` property is only useful for the tabs
+    returned by a [Tabs] block.
+
 ## Advanced blocks
 
 There are some additional more advanced blocks like links to a page and synced blocks. Let's take a look at those.
