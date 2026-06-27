@@ -2,6 +2,7 @@
 
 ## Version 0.10, 2026-
 
+- New: Support the `Heading4` block introduced by the Notion API (March 30, 2026 changelog), mirroring `Heading1`/`Heading2`/`Heading3` and rendering as a level-5 markdown heading, issue #405.
 - New: Lock or unlock pages, data sources, and databases for editing via the writable `Page.is_locked`, `DataSource.is_locked`, and `Database.is_locked` properties, and move a data source to a different parent database with `DataSource.move()`. Enabled by the Notion API version 2025-09-03, issue #402.
 - New: Better logging of model validation errors, issue #152.
 - Breaking: Adopt the Notion API version 2025-09-03, which splits the former "database" into two concepts: a *data source* (holds the schema and pages) and a *database* (a container of one or more data sources), issue #118. This requires `notion-client~=2.7.0` and renames much of the high-level API. To migrate:

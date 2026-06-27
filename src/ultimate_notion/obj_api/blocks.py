@@ -326,6 +326,12 @@ class Heading3(Heading, type='heading_3'):
     heading_3: HeadingTypeData = Field(default_factory=HeadingTypeData)
 
 
+class Heading4(Heading, type='heading_4'):
+    """A heading_4 block in Notion."""
+
+    heading_4: HeadingTypeData = Field(default_factory=HeadingTypeData)
+
+
 class QuoteTypeData(ColoredTextBlockTypeData, WithChildren[Block]):
     """Type data for `Quote` block."""
 
