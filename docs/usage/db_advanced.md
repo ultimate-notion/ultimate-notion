@@ -1,7 +1,7 @@
 # Data models & schemas
 
-We'll create two simple databases with a relation quite similar to those described
-in the [Notion docs]. We'll have a database for customers and one for items,
+We'll create two simple data sources with a relation quite similar to those described
+in the [Notion docs]. We'll have a data source for customers and one for items,
 which customers can purchase.
 
 Let's first initialize a Notion session:
@@ -36,10 +36,10 @@ class Item(uno.Schema, db_title='Item DB'):
 ```
 
 The `db_title` parameter in the schema definition is optional but highly recommended. When provided,
-it sets the default title for the database when calling `create_ds()` without an explicit `title`
-argument. Also it allows you to relate your schema to an existing database.
+it sets the default title for the data source when calling `create_ds()` without an explicit `title`
+argument. Also it allows you to relate your schema to an existing data source.
 
-Alternatively, you can specify a `db_id` parameter to bind the schema to an existing database:
+Alternatively, you can specify a `db_id` parameter to bind the schema to an existing data source:
 
 ```python
 class Item(uno.Schema, db_id='550e8400-e29b-41d4-a716-446655440000'):
@@ -49,20 +49,20 @@ class Item(uno.Schema, db_id='550e8400-e29b-41d4-a716-446655440000'):
     price = uno.PropType.Number('Price', format=uno.NumberFormat.DOLLAR)
 ```
 
-When `db_id` is provided, you can easily bind the schema to the existing database using `bind_db()`
+When `db_id` is provided, you can easily bind the schema to the existing data source using `bind_ds()`
 without having to manually search for it.If neither `db_id` nor `db_title` is provided, you'll need
-to pass a database object explicitly to `bind_db()` or provide a title when creating the database.
+to pass a data source object explicitly to `bind_ds()` or provide a title when creating the data source.
 
-Since a database needs to be a block within a page, we assume there is a page called
+Since a data source needs to be a block within a page, we assume there is a page called
 `Tests` that is connected with this integration. We retrieve the object of
-this page and create the database with the page as parent:
+this page and create the data source with the page as parent:
 
 ```python
 root_page = notion.search_page('Tests', exact=True).item()
 item_db = notion.create_ds(parent=root_page, schema=Item)
 ```
 
-Now we create a database for our customers and define a one-way [Relation] to the items:
+Now we create a data source for our customers and define a one-way [Relation] to the items:
 
 ```python
 class Customer(uno.Schema, db_title='Customer DB'):
@@ -74,20 +74,20 @@ customer_db = notion.create_ds(parent=root_page, schema=Customer)
 ```
 
 !!! warning
-    To create a database that has a relation to another database, the target
-    database must already exist. Thus, the order of creating databases from schemas
+    To create a data source that has a relation to another data source, the target
+    data source must already exist. Thus, the order of creating data sources from schemas
     is important.
 
-All available database property types are provided by [PropType], which is a namespace
+All available data source property types are provided by [PropType], which is a namespace
 for the various property types defined in [schema]. Property types with the class
 variable `allowed_at_creation` set to `False` are currently not supported by the Notion API
-when creating a new database.
+when creating a new data source.
 
 ## Programmatic way of defining a schema
 
 Besides the recommended *declarative* approach to define a schema, you can also choose a
 more classical *programmatic* approach. The main difference is that we first create
-a database with a default schema and then start adding new properties (i.e., columns) to it.
+a data source with a default schema and then start adding new properties (i.e., columns) to it.
 
 ```python
 employee_db = notion.create_ds(parent=root_page)
@@ -142,10 +142,10 @@ employee_db.schema.hiring_date_as_str.delete()
 
 Again using both the dictionary and the property approach.
 
-## New database entries
+## New data source entries
 
-Now that we have created those two databases, we can start filling them with entries
-either using the [create_page] method of the database object:
+Now that we have created those two data sources, we can start filling them with entries
+either using the [create_page] method of the data source object:
 
 ```python
 t_shirt = item_db.create_page(name='T-shirt', size=Size.L, price=17)
@@ -154,7 +154,7 @@ tank_top = item_db.create_page(name='Tank top', size=Size.S, price=15)
 ```
 
 or we can also directly use the [create] method of the schema if the schema is already bound
-(e.g., by using [bind_db]) to a database:
+(e.g., by using [bind_ds]) to a data source:
 
 ```python
 lovelace = Customer.create(name='Ada Lovelace', purchases=[tank_top])
@@ -165,18 +165,18 @@ engelbart = Customer.create(name='Doug Engelbart', purchases=[khaki_pants, t_shi
 !!! info
     The keyword arguments are exactly the class variables from the page schemas `Item` and `Customer` above.
 
-This is how our two databases `item_db` and `customer_db` look in the Notion UI right now:
+This is how our two data sources `item_db` and `customer_db` look in the Notion UI right now:
 
 ![Notion item database](../assets/images/notion-item-db.png){:style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
 
 ![Notion customer database](../assets/images/notion-customer-db.png){:style="width:800px; display:block; margin-left:auto; margin-right:auto;"}
 
 !!! note
-    The description of the databases corresponds to the docstring of the schema classes `Item` and `Customer`.
+    The description of the data sources corresponds to the docstring of the schema classes `Item` and `Customer`.
 
 ## Fast access to page properties
 
-The properties of a page, defined by the properties of the database the page resides in, can be easily accessed using
+The properties of a page, defined by the properties of the data source the page resides in, can be easily accessed using
 the `.props` namespace:
 
 ```python
@@ -230,7 +230,7 @@ What happens here is that we first create a *target* relation property `bought_b
 specifying any other schema. Then in `Customer`, we define a two-way property by specifying not only
 the schema `Item` but also the property we want to synchronize with using the `two_way_prop` keyword.
 
-Let's delete the old databases and recreate them with our updated schemas and a few items:
+Let's delete the old data sources and recreate them with our updated schemas and a few items:
 
 ```python
 item_db.delete(), customer_db.delete()
@@ -284,9 +284,9 @@ tidyup_kitchen = Task.create(
     Creating a two-way relation leads to the creation of a one-way relation. We check for that and fail.
 
 [Notion docs]: https://www.notion.so/help/relations-and-rollups#create-a-relation
-[create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
+[create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.create_page
 [create]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema.create
 [Relation]:  ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Relation
 [PropType]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.PropType
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema
-[bind_db]: ../../reference/ultimate_notion/#ultimate_notion.Schema.bind_db
+[bind_ds]: ../../reference/ultimate_notion/#ultimate_notion.Schema.bind_ds

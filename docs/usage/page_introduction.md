@@ -3,7 +3,7 @@
 Pages are one of the most essential building blocks of Notion.
 A page has certain *attributes* such as a title, cover, icon, and whether it is deleted, i.e.,
 in the trash, or not.
-Items within a database, or rows if you will, are just pages, and the schema of the database,
+Items within a data source, or rows if you will, are just pages, and the schema of the data source,
 that is the set of columns and their types, imposes *properties* on each contained page.
 
 Besides attributes and properties, a page also has *content*, consisting of *blocks* for text
@@ -36,7 +36,7 @@ In a Jupyter notebook, you would see
 ## Properties of a page
 
 The properties of a page can be accessed with the `props` attribute of each page object.
-Assume we have a page acting like a task in a database similar to the [Task List example] like this:
+Assume we have a page acting like a task in a data source similar to the [Task List example] like this:
 
 ![Notion task database](../assets/images/notion-task-db.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
@@ -65,7 +65,7 @@ to get the output:
 Task "Run first Marathon" was Done on 2023-11-24 17:10:00+01:00
 ```
 
-The actual property names like `status` and `due_date` can be easily found out by looking at the schema of the database
+The actual property names like `status` and `due_date` can be easily found out by looking at the schema of the data source
 holding our page, with:
 
 ```python

@@ -1,14 +1,14 @@
-# Introduction to databases
+# Introduction to data sources
 
-Databases are one of the most versatile and powerful features of Notion.
-Working programmatically with your databases extends Notion's functionality infinitely,
+Data sources are one of the most versatile and powerful features of Notion.
+Working programmatically with your data sources extends Notion's functionality infinitely,
 as you can use Python for all kinds of transformations, external data services, and much more.
-Ultimate Notion unleashes the full power of Python for use with Notion's databases.
+Ultimate Notion unleashes the full power of Python for use with Notion's data sources.
 So let's see what we can do.
 
-## Searching for a database
+## Searching for a data source
 
-Assume we have a database called *Contacts DB*.
+Assume we have a data source called *Contacts DB*.
 
 ```python
 import ultimate_notion as uno
@@ -21,27 +21,27 @@ assert [db.title for db in contacts_dbs] == ['Contacts DB']
 ```
 
 The method `search_ds` will always return a list, as Notion gives no guarantees that the
-title of a database is unique. Practically though, most users give databases unique
+title of a data source is unique. Practically though, most users give data sources unique
 names, and to accommodate this, the returned list provides a method `.item()`, which
 will return the item of a single-item list or raise an error otherwise. Another possibility
-is to retrieve the database by its unique ID.
+is to retrieve the data source by its unique ID.
 
 ```python
 contacts_db = notion.search_ds('Contacts DB').item()
-# or in case the unique ID of the database is known
+# or in case the unique ID of the data source is known
 contacts_db = notion.get_ds(contacts_db.id)
 ```
 
-The [Database object] provides access to many attributes like [title], [icon], [description], etc.
+The [DataSource object] provides access to many attributes like [title], [icon], [description], etc.
 
 ```python
 assert contacts_db.description == 'Database of all my contacts!'
 ```
 
-## Creating a database and adding pages
+## Creating a data source and adding pages
 
-A simple database with the default columns `Name` for the title of pages and the Multi-select column `Tags`
-can be created using [create_ds]. To tell Notion where to put the database, we have to provide an existing page.
+A simple data source with the default columns `Name` for the title of pages and the Multi-select column `Tags`
+can be created using [create_ds]. To tell Notion where to put the data source, we have to provide an existing page.
 Let's assume we have a page called `Tests` that is shared with our integration:
 
 ```python
@@ -53,13 +53,13 @@ Using the `my_db` object, we can now set its attributes, e.g.:
 
 ```python
 my_db.title = 'My DB'
-my_db.description = 'This is my database for cool Python libraries!'
+my_db.description = 'This is my data source for cool Python libraries!'
 ```
 
 !!! info
-    Unfortunately, the Notion API does not support setting the *icon* or the *cover* of a database.
+    Unfortunately, the Notion API does not support setting the *icon* or the *cover* of a data source.
 
-We can now simply add a new page to this database and set some attributes:
+We can now simply add a new page to this data source and set some attributes:
 
 ```python
 new_page = my_db.create_page(name='Ultimate Notion')
@@ -73,7 +73,7 @@ This is how *My DB* looks right now.
 ![Notion My DB](../assets/images/notion-my-db.png){:style="width:500px; display:block; margin-left:auto; margin-right:auto;"}
 
 But how can I figure out which keyword arguments to pass to [create_page]? For this, we can take a look at the [schema]
-of the database, which also allows us to create new pages in a neat way. As our database holds *tools*, we can express
+of the data source, which also allows us to create new pages in a neat way. As our data source holds *tools*, we can express
 this by naming the variable for the schema accordingly. An example illustrates this:
 
 ```python
@@ -81,7 +81,7 @@ Tool = my_db.schema
 Tool.show()
 ```
 
-This shows us that our database has two columns, `Name` and `Tags`, as well as the name of the arguments for [create_page].
+This shows us that our data source has two columns, `Name` and `Tags`, as well as the name of the arguments for [create_page].
 
 ```console
 Name    Property     Attribute
@@ -98,13 +98,13 @@ new_tool = Tool.create(name='Ultimate Notion')
 
 This is basically just an alias for [create_page] but can make your code much more expressive.
 
-## Viewing the pages of a database
+## Viewing the pages of a data source
 
-Assume we have a simple database listing tasks like this:
+Assume we have a simple data source listing tasks like this:
 
 ![Notion task database](../assets/images/notion-task-db.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
-To access the tasks, i.e., the pages within this database, we can use the [get_all_pages] method to
+To access the tasks, i.e., the pages within this data source, we can use the [get_all_pages] method to
 generate a [View]. It's as simple as:
 
 ```python
@@ -169,11 +169,11 @@ To reload the view, i.e., re-execute the query that led to the view, use [reload
 Find out more about the functionality of [View] by reading the API references, but
 keep in mind that some methods are just stubs.
 
-[Database object]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
-[get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.get_all_pages
-[title]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.title
-[icon]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.icon
-[description]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.description
+[DataSource object]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource
+[get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.get_all_pages
+[title]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataContainer.title
+[icon]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataContainer.icon
+[description]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.description
 [View]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View
 [show]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.show
 [with_index]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.with_index
@@ -189,5 +189,5 @@ keep in mind that some methods are just stubs.
 [limit]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.limit
 [tail]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View.tail
 [create_ds]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_ds
-[create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_page
+[create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.create_page
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema

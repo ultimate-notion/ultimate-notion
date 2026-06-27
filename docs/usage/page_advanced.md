@@ -339,7 +339,7 @@ to compose the formatting we want.
     would not work as we would first concatenate a `str` with a `Text` before we append it to a `Text`.
     A `str` object would ignore the additional formatting information in the `Text` object while concatenating.
 
-Let's see how we can mention a person, page, database or even a date.
+Let's see how we can mention a person, page, data source or even a date.
 
 ```python
 from datetime import datetime
