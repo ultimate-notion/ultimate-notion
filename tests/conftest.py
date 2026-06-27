@@ -51,6 +51,7 @@ from ultimate_notion.config import (
     ENV_NOTION_TOKEN,
     ENV_ULTIMATE_NOTION_CFG,
     ENV_ULTIMATE_NOTION_DEBUG,
+    get_cfg,
     get_cfg_file,
     get_or_create_cfg,
 )
@@ -555,6 +556,17 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
     else:  # vcr-off and vcr-rewrite
         cfg_path = get_cfg_file()
         with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
+            # Skip (rather than poison real state and the cassette) when the optional Google
+            # OAuth creds are absent during a live re-record. The test body below would otherwise
+            # `rmtree` the sync state, `delete_all_taskslists()` and make live Notion calls before
+            # failing deep inside the Google client. See CONTRIBUTING.md for setting up creds.
+            google = get_cfg().google
+            creds = (google.client_secret_json, google.token_json) if google is not None else (None, None)
+            if any(path is None or not path.exists() for path in creds):
+                pytest.skip(
+                    'Google OAuth credentials (client_secret.json + token.json from the [google] '
+                    'config section) are required to record this test live; see CONTRIBUTING.md.'
+                )
             yield cfg_path
 
 
