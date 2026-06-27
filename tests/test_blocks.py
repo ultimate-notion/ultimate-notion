@@ -247,6 +247,23 @@ def test_create_child_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     assert page.children == ()
 
 
+def test_columns_offline() -> None:
+    with pytest.raises(ValueError):
+        uno.Columns(1)
+    with pytest.raises(TypeError):
+        uno.Columns((0.5, 'a', 0.5))  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+
+    # Columns are populated and surfaced offline, before the block is pushed to Notion.
+    cols = uno.Columns(2)
+    assert cols.has_children
+    assert len(cols.columns) == 2
+    assert all(isinstance(col, uno.Column) for col in cols.columns)
+
+    ratio_cols = uno.Columns((1, 3))
+    assert ratio_cols.has_children
+    assert ratio_cols.width_ratios == (0.25, 0.75)
+
+
 @pytest.mark.vcr()
 def test_create_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating column blocks')
@@ -576,10 +593,9 @@ def test_tabs_offline() -> None:
         uno.Tabs('Overview')  # a bare string satisfies `Sequence[str]` but is not a list of labels
 
     tabs = uno.Tabs(['Overview', 'Details'])
-    # Like `Columns`, tabs are embedded in the obj_ref and only surfaced once the block is in Notion.
-    assert tabs.tabs == ()
-    labels = [child.paragraph.rich_text[0].plain_text for child in tabs.obj_ref.tab.children]
-    assert labels == ['Overview', 'Details']
+    # Tabs are populated and surfaced offline, before the block is pushed to Notion.
+    assert tabs.has_children
+    assert [str(tab) for tab in tabs.tabs] == ['Overview', 'Details']
 
     with pytest.raises(InvalidAPIUsageError):
         tabs.append(uno.Paragraph('Not allowed, use add_tab'))

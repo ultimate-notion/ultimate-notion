@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: Populate the high-level children cache when constructing `Tabs` or `Columns` directly, so an offline-built block exposes its tabs/columns (`.tabs`/`.columns`, `has_children`) and uploads its children instead of an empty container when pushed to Notion. Previously only the low-level `obj_ref` was filled, contradicting the documented offline build-then-push workflow, issue #424.
+
 ## Version 0.10, 2026-06-27
 
 - New: Support tab blocks via the new `Tabs` block, which groups content into labeled tabs. Each tab is a `Paragraph` whose text is the tab label and whose children hold the tab content. Create tabs up front with `Tabs([...labels])` or add them later with `Tabs.add_tab()`, issue #188.
