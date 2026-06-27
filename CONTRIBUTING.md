@@ -165,6 +165,40 @@ You only need this section to run the tests live or to re-record cassettes.
     [`tests/TEST_WORKSPACE.md`](https://github.com/ultimate-notion/ultimate-notion/blob/main/tests/TEST_WORKSPACE.md)
     for exact instructions.
 
+### Set up Google Tasks credentials (optional)
+
+One live test, `test_sync_google_tasks`, exercises the Google Tasks sync adapter and
+therefore needs Google OAuth credentials in addition to your Notion workspace. You only
+need this to **record that one test live**; it **auto-skips when the credentials are
+absent**, so a full `hatch run vcr-rewrite` of the rest of the suite needs no Google
+setup.
+
+**Where the files go.** The `[google]` paths (`client_secret_json` and `token_json`) are
+relative to the directory holding your `config.toml`. The suite uses
+`~/.ultimate-notion/config.toml` by default, so place the files at:
+
+- `~/.ultimate-notion/client_secret.json`
+- `~/.ultimate-notion/token.json`
+
+**How to get `client_secret.json`.** In the [Google Cloud Console]:
+
+1. Create or select a project.
+2. Enable the **Google Tasks API** for it.
+3. Go to **Credentials** → **Create credentials** → **OAuth 2.0 Client ID** and choose
+   application type **Desktop app**.
+4. Download the client JSON and save it as `~/.ultimate-notion/client_secret.json`.
+
+**How `token.json` is produced.** You do not create it by hand. On the first live run the
+adapter's `InstalledAppFlow` opens a browser; sign in with the Google account that holds
+the test task lists and grant the `tasks` scope. The adapter then writes `token.json` next
+to your config. Subsequent runs reuse (and refresh) it.
+
+!!! warning
+    `client_secret.json` and `token.json` are **real secrets**. Keep them only in
+    `~/.ultimate-notion/` and never commit them. The cassette scrubber already redacts the
+    Google `client_secret`, `token` and `refresh_token` values from recordings, but the
+    files themselves must stay out of the repo.
+
 ### Add a new live (VCR) test
 
 The committed cassettes are one coherent recording of a single workspace, so you
@@ -282,3 +316,4 @@ workspace-specific and are **not** normalised, so a brand-new test that asserts 
 [mkdocs]: https://www.mkdocs.org/
 [VCR.py]: https://vcrpy.readthedocs.io/
 [My integrations]: https://www.notion.so/my-integrations
+[Google Cloud Console]: https://console.cloud.google.com/
