@@ -135,7 +135,10 @@ class BlocksEndpoint(Endpoint):
             else:
                 if is_unset(after_id := after.id):
                     raise UnsetError()
-                appended_blocks = list(block_iter(block_id=parent_id, children=children, after=str(after_id)))
+                # API 2026-03-11 replaced the `after` parameter with a typed `position` object:
+                # `{"type": "after_block", "after_block": {"id": <block-id>}}`.
+                position = {'type': 'after_block', 'after_block': {'id': str(after_id)}}
+                appended_blocks = list(block_iter(block_id=parent_id, children=children, position=position))
 
             # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
             # blocks after the specified block, where we append the blocks.
@@ -174,7 +177,7 @@ class BlocksEndpoint(Endpoint):
         """Restore (unarchive) the specified Block."""
         block_id = str(ObjectRef.build(block).id)
         _logger.debug(f'Restoring block with id `{block_id}`.')
-        data = self.raw_api.update(block_id, archived=False)
+        data = self.raw_api.update(block_id, in_trash=False)
         return Block.model_validate(data)
 
     # https://developers.notion.com/reference/retrieve-a-block
@@ -613,10 +616,10 @@ class PagesEndpoint(Endpoint):
         if in_trash is not Unset:
             if in_trash:
                 _logger.debug(f'Deleting page with id `{page_id}`.')
-                request['archived'] = True
+                request['in_trash'] = True
             else:
                 _logger.debug(f'Restoring page with id `{page_id}`.')
-                request['archived'] = False
+                request['in_trash'] = False
 
         if not is_unset(is_locked):
             _logger.debug(f'Setting `is_locked={is_locked}` on page with id `{page_id}`.')
@@ -662,10 +665,10 @@ class PagesEndpoint(Endpoint):
         if in_trash is not Unset:
             if in_trash:
                 _logger.debug(f'Deleting page with id `{page_id}`.')
-                props['archived'] = True
+                props['in_trash'] = True
             else:
                 _logger.debug(f'Restoring page with id `{page_id}`.')
-                props['archived'] = False
+                props['in_trash'] = False
 
         if not is_unset(is_locked):
             _logger.debug(f'Setting `is_locked={is_locked}` on page with id `{page_id}`.')
