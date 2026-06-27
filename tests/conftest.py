@@ -42,6 +42,7 @@ from _pytest.fixtures import SubRequest
 from google.auth.exceptions import RefreshError
 from vcr import VCR  # type: ignore[import-untyped]
 from vcr import mode as vcr_mode
+from vcr.persisters.filesystem import FilesystemPersister  # type: ignore[import-untyped]
 
 import ultimate_notion as uno
 from ultimate_notion import DataSource, NumberFormat, Option, Page, Session, User, schema
@@ -51,6 +52,7 @@ from ultimate_notion.config import (
     ENV_NOTION_TOKEN,
     ENV_ULTIMATE_NOTION_CFG,
     ENV_ULTIMATE_NOTION_DEBUG,
+    get_cfg,
     get_cfg_file,
     get_or_create_cfg,
 )
@@ -93,14 +95,22 @@ PYTEST_MARKERS = ['check_latest_release', 'file_upload']
 # and a cassette with several searches only replays them in the order they were recorded. That makes
 # the shared fixtures fragile and ties a recording to the workspace it was made in. We add a matcher
 # that *additionally* compares the JSON body of `/v1/search` requests (a no-op for every other
-# endpoint), so each search is matched by what it actually queries. We also scrub a non-default root
+# endpoint), so each search is matched by what it actually queries. The same problem affects
+# database/datasource `/query` requests, whose filter/sort criteria also live in the body (issue
+# #367); a parallel matcher compares those by body too. We also scrub a non-default root
 # page title back to the canonical `Tests` on record, so a maintainer who cannot name their shared
 # root page `Tests` (via `UNO_TEST_ROOT_PAGE`) still produces cassettes that replay against the
 # committed set. See the "Set up a Notion test workspace" section in `CONTRIBUTING.md`.
 
 NOTION_SEARCH_PATH = '/v1/search'
+# Database/datasource queries (`POST /v1/databases/{id}/query`, `POST /v1/data_sources/{id}/query`)
+# carry their filter and sort criteria in the request body, which the default matchers ignore. We
+# recognise them by the `/query` path suffix (the id in the path is already distinguished by the
+# default `path` matcher). See issue #367.
+NOTION_QUERY_PATH_SUFFIX = '/query'
 VCR_DEFAULT_MATCHERS = ['method', 'scheme', 'host', 'port', 'path', 'query']
 VCR_SEARCH_MATCHER = 'notion_search_body'
+VCR_QUERY_MATCHER = 'notion_query_body'
 
 
 def _request_json_body(request: Any) -> Any:
@@ -128,9 +138,21 @@ def match_search_body(r1: Any, r2: Any) -> bool:
     return bool(_request_json_body(r1) == _request_json_body(r2))
 
 
+def match_query_body(r1: Any, r2: Any) -> bool:
+    """Match `POST .../query` requests by their JSON body; match everything else unconditionally.
+
+    Combined with the default `path` matcher this adds body matching *only* for the database/datasource
+    query endpoint, leaving all other endpoints matched exactly as before.
+    """
+    if not (r1.path.endswith(NOTION_QUERY_PATH_SUFFIX) and r2.path.endswith(NOTION_QUERY_PATH_SUFFIX)):
+        return True
+    return bool(_request_json_body(r1) == _request_json_body(r2))
+
+
 def register_notion_matchers(vcr: VCR) -> None:
     """Register Ultimate Notion's custom VCR matchers on a freshly built VCR instance."""
     vcr.register_matcher(VCR_SEARCH_MATCHER, match_search_body)
+    vcr.register_matcher(VCR_QUERY_MATCHER, match_query_body)
 
 
 def pytest_recording_configure(config: pytest.Config, vcr: VCR) -> None:
@@ -490,10 +512,38 @@ def normalize_response(response: dict[str, Any]) -> dict[str, Any]:
     return response
 
 
+class DedupFilesystemPersister(FilesystemPersister):  # type: ignore[misc]  # vcr is untyped
+    """Collapse byte-identical interactions to one before writing the cassette (#388).
+
+    The shared module-fixture cassettes (`mod_*.yaml`) are a single cassette opened in `all`
+    mode once per test module that resolves the fixture. `all` mode loads the existing cassette
+    and *appends* the new recording rather than replacing it, so a full re-record accumulates one
+    identical copy of the same normalised request per module (~20x bloat). Replay is first-match-wins,
+    so every copy past the first is dead weight. Dropping exact `(request, response)` duplicates is
+    behaviour-preserving — a single interaction already serves every module on offline replay — and
+    keeps the re-record diff small and reviewable. Non-identical interactions (e.g. distinct requests,
+    or the same request with paginated/differing responses) keep separate signatures and are retained.
+    """
+
+    @staticmethod
+    def save_cassette(cassette_path: Any, cassette_dict: dict[str, Any], serializer: Any) -> None:
+        seen: set[str] = set()
+        requests, responses = [], []
+        for request, response in zip(cassette_dict['requests'], cassette_dict['responses'], strict=True):
+            signature = json.dumps([request._to_dict(), response], sort_keys=True, default=str)
+            if signature in seen:
+                continue
+            seen.add(signature)
+            requests.append(request)
+            responses.append(response)
+        deduped = {**cassette_dict, 'requests': requests, 'responses': responses}
+        FilesystemPersister.save_cassette(cassette_path, deduped, serializer)
+
+
 def build_vcr_config() -> dict[str, Any]:
     """Build the pytest-recording config (also reused when recording from module-level fixtures)."""
     return {
-        'match_on': [*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER],
+        'match_on': [*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER, VCR_QUERY_MATCHER],
         'filter_headers': [(param, 'secret...') for param in SECRET_PARAMS],
         'filter_query_parameters': SECRET_PARAMS,
         'filter_post_data_parameters': SECRET_PARAMS,
@@ -561,6 +611,17 @@ def custom_config(request: SubRequest) -> Iterator[Path]:
     else:  # vcr-off and vcr-rewrite
         cfg_path = get_cfg_file()
         with patch.dict(os.environ, {ENV_ULTIMATE_NOTION_CFG: str(cfg_path)}):
+            # Skip (rather than poison real state and the cassette) when the optional Google
+            # OAuth creds are absent during a live re-record. The test body below would otherwise
+            # `rmtree` the sync state, `delete_all_taskslists()` and make live Notion calls before
+            # failing deep inside the Google client. See CONTRIBUTING.md for setting up creds.
+            google = get_cfg().google
+            creds = (google.client_secret_json, google.token_json) if google is not None else (None, None)
+            if any(path is None or not path.exists() for path in creds):
+                pytest.skip(
+                    'Google OAuth credentials (client_secret.json + token.json from the [google] '
+                    'config section) are required to record this test live; see CONTRIBUTING.md.'
+                )
             yield cfg_path
 
 
@@ -606,11 +667,20 @@ def vcr_fixture(
                     # Replaying them (e.g. via `new_episodes`) would feed back the workspace-portable
                     # placeholder ids written by the normalisation, 404ing later modules in a full-suite
                     # re-record. Deterministic fixtures (e.g. `search('Tests')`) re-record identically.
+                    #
+                    # `all` mode never replays, but vcrpy *loads* an existing cassette and *appends*
+                    # live interactions to it rather than replacing them; the stale entries survive and
+                    # win on later replay (first match wins). Delete the file first so the rewrite is a
+                    # true overwrite and the fixture cannot carry old schema/data forward (see #383).
+                    Path(cassette_dir, cassette_name).unlink(missing_ok=True)
                     mode = 'all'
                 elif mode is None:
                     mode = 'none'
                 vcr = VCR(record_mode=vcr_mode(mode), **vcr_config)
                 register_notion_matchers(vcr)
+                # Dedup identical interactions on save so `all`-mode re-records of the shared
+                # module-fixture cassettes don't accumulate one redundant copy per module (#388).
+                vcr.register_persister(DedupFilesystemPersister)
 
             return vcr, cassette_name
 
@@ -752,8 +822,17 @@ def wiki_db(notion_cached: Session) -> DataSource:
 
 @vcr_fixture(scope='module')
 def formula_db(notion_cached: Session) -> DataSource:
-    """Return manually created formula db."""
-    return require_ds(notion_cached, FORMULA_DB)
+    """Return manually created formula db.
+
+    Notion's eventually-consistent `/search` index intermittently reports the formula
+    columns by their underlying storage type (e.g. `String` as `rich_text`), so reload
+    from the authoritative data-source-retrieve endpoint to bind the true formula schema
+    regardless of `/search` lag. `reload()`'s default `rebind_schema=True` would raise a
+    `SchemaError` here, so `rebind_schema=False` is required.
+    """
+    ds = require_ds(notion_cached, FORMULA_DB)
+    ds.reload(rebind_schema=False)
+    return ds
 
 
 @vcr_fixture(scope='module')
@@ -995,13 +1074,19 @@ def tz_berlin() -> Iterator[str]:
         yield tz
 
 
-def assert_eventually(assertion_func: Callable[..., Any], retries: int = 5, delay: int = 3) -> None:
+def assert_eventually(
+    assertion_func: Callable[..., Any], retries: int = 5, delay: float = 0.2, max_delay: float = 3.0
+) -> None:
     """Retry the provided assertion function for a given number of attempts with a delay.
+
+    The delay starts short and grows exponentially (capped at `max_delay`) so the common case where
+    the assertion passes quickly returns fast, while slow eventual-consistency cases still get time.
 
     Args:
         assertion_func: The lambda containing the assertion logic without parameters.
         retries: Number of retries before failing.
-        delay: Delay in seconds between retries.
+        delay: Initial delay in seconds between retries.
+        max_delay: Maximum delay in seconds between retries.
     """
     for attempt in range(retries):
         try:
@@ -1009,7 +1094,7 @@ def assert_eventually(assertion_func: Callable[..., Any], retries: int = 5, dela
             return
         except AssertionError:
             if attempt < retries - 1:
-                time.sleep(delay)
+                time.sleep(min(delay * 2**attempt, max_delay))
     assertion_func()
 
 

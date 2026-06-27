@@ -419,8 +419,7 @@ def join(texts: Sequence[str], *, delim: str = ' ') -> Text:
     if len(texts) == 0:
         return Text.wrap_obj_ref([])
 
-    if isinstance(delim, str):
-        delim_objs = Text(delim).obj_ref
+    delim_objs = Text(delim).obj_ref
 
     all_objs = Text(texts[0]).obj_ref
     for text in texts[1:]:

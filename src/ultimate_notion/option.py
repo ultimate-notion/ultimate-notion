@@ -168,7 +168,12 @@ def check_for_updates(old: list[Option], new: list[Option]) -> dict[str, list[st
         old_opt = old_by_name[name]
         new_opt = new_by_name[name]
 
-        for attr in ('name', 'color', 'description'):
-            if getattr(old_opt, attr) != getattr(new_opt, attr):
+        changed_attrs = {
+            'name': old_opt.name != new_opt.name,
+            'color': old_opt.color != new_opt.color,
+            'description': old_opt.description != new_opt.description,
+        }
+        for attr, changed in changed_attrs.items():
+            if changed:
                 updates.setdefault(name, []).append(attr)
     return updates

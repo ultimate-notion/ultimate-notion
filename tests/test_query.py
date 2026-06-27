@@ -4,6 +4,7 @@ import pendulum as pnd
 import pytest
 
 import ultimate_notion as uno
+from tests.conftest import VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER
 from ultimate_notion import schema
 from ultimate_notion.errors import FilterQueryError
 from ultimate_notion.utils import parse_dt_str
@@ -104,7 +105,13 @@ def test_property() -> None:
     assert str(prop.every != 'John') == "prop('Name').every != 'John'"
 
 
-@pytest.mark.vcr()
+# This test filters on `pnd.now()`, which must stay a real timestamp: the relative-window conditions
+# (`this_week`, `past_week`, ...) are evaluated by Notion against its own clock at *record* time, so the
+# created page dates have to be relative to the real now. That makes the absolute-comparison query bodies
+# (`== now`, `< now`, ...) record-time-specific, so they cannot be matched by body on replay. We therefore
+# opt this one test out of the `/query` body matcher (issue #367) and fall back to ordered path matching --
+# exactly how every query test matched before that matcher existed.
+@pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCHERS, VCR_SEARCH_MATCHER])
 def test_date_query(root_page: uno.Page, notion: uno.Session) -> None:
     class DB(uno.Schema, db_title='Date Query DB Test'):
         name = uno.PropType.Title('Name')
@@ -470,7 +477,9 @@ def test_query_new_task_db(new_task_db: uno.DataSource) -> None:
 
 @pytest.mark.vcr()
 def test_query_formula(root_page: uno.Page, notion: uno.Session, formula_db: uno.DataSource) -> None:
-    item_1, item_2 = formula_db.get_all_pages()
+    # Sort by title so the test does not depend on Notion's (workspace-specific) default row
+    # order, which `get_all_pages()` returns unsorted -- see issue #364.
+    item_1, item_2 = sorted(formula_db.get_all_pages(), key=lambda page: str(page.title))
     query = formula_db.query.filter(uno.prop('String') == 'Item 1')
     assert set(query.execute()) == {item_1}
 

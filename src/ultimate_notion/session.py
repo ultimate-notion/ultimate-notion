@@ -6,7 +6,7 @@ import io
 import logging
 import os
 import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from threading import RLock
 from types import TracebackType
 from typing import Any, BinaryIO, ClassVar, TypeVar, cast
@@ -45,6 +45,24 @@ _logger = logging.getLogger(__name__)
 
 # ToDo: Use new syntax when requires-python >= 3.12
 T_cache = TypeVar('T_cache', bound='DataObject | User')
+
+# Notion's search index is eventually consistent after a create. We poll with a short initial
+# interval and exponential backoff so the common (fast) case returns quickly, while the cap keeps
+# the worst case bounded without over-waiting.
+_CONSISTENCY_POLL_INITIAL_DELAY = 0.2
+_CONSISTENCY_POLL_MAX_DELAY = 2.0
+
+
+def _wait_for_consistency(predicate: Callable[[], bool], description: str) -> None:
+    """Poll `predicate` with exponential backoff until it returns `True`.
+
+    Used to wait for Notion's eventually-consistent search index to reflect a freshly created object.
+    """
+    delay = _CONSISTENCY_POLL_INITIAL_DELAY
+    while not predicate():
+        _logger.info(f'Waiting for {description} to be fully created.')
+        time.sleep(delay)
+        delay = min(delay * 2, _CONSISTENCY_POLL_MAX_DELAY)
 
 
 class Session:
@@ -298,9 +316,10 @@ class Session:
         data_sources = SList(ds for ds in self.search_ds(schema._db_title) if ds.parent == parent)
         if len(data_sources) == 0:
             ds = self.create_ds(parent, schema=schema)
-            while not [ds for ds in self.search_ds(schema._db_title) if ds.parent == parent]:
-                _logger.info(f'Waiting for data source `{ds.title}` to be fully created.')
-                time.sleep(1)
+            _wait_for_consistency(
+                lambda: bool([ds for ds in self.search_ds(schema._db_title) if ds.parent == parent]),
+                f'data source `{ds.title}`',
+            )
             return ds
         else:
             ds = data_sources.item()
@@ -383,9 +402,10 @@ class Session:
         pages = SList(page for page in self.search_page(title) if page.parent == parent)
         if len(pages) == 0:
             page = self.create_page(parent, title=title)
-            while not [page for page in self.search_page(title) if page.parent == parent]:
-                _logger.info(f'Waiting for page `{page.title}` to be fully created.')
-                time.sleep(1)
+            _wait_for_consistency(
+                lambda: bool([page for page in self.search_page(title) if page.parent == parent]),
+                f'page `{page.title}`',
+            )
             return page
         else:
             return pages.item()
@@ -447,7 +467,11 @@ class Session:
 
     def upload(self, file: BinaryIO, *, file_name: str | None = None, mime_type: str | None = None) -> UploadedFile:
         """Upload a file to Notion."""
-        file_name = file_name if file_name is not None else os.path.basename(getattr(file, 'name', 'unknown_file'))
+        if file_name is None:
+            try:
+                file_name = os.path.basename(file.name)  # BinaryIO has a 'name' unless it is e.g. a BytesIO
+            except AttributeError:
+                file_name = 'unknown_file'
         mime_type = mime_type if mime_type is not None else get_mime_type(file)
         file_size = get_file_size(file)
         if mime_type == 'application/octet-stream':

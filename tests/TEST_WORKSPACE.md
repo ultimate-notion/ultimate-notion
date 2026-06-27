@@ -67,6 +67,10 @@ recorded cassette `tests/cassettes/fixtures/mod_all_props_db.yaml`).
 | `AI key info` | AI Autofill (Text output) | **API cannot create.** |
 | `AI custom` | AI Autofill (Text output) | **API cannot create.** |
 
+Once the database exists, the bootstrap script seeds a couple of rows into it through
+the API (only the writable properties are set). `test_retrieve_property` reads the first
+row, so the database must be non-empty for a live re-record (see issue #371).
+
 Notes:
 - **Names are matched exactly (and are case-sensitive).** Notion gives new properties
   default names that differ from the table. For example, the title is `Name`, and you get
@@ -228,9 +232,14 @@ same root page. Create any missing API-creatable objects with:
 NOTION_TOKEN=ntn_... UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
 ```
 
-The script is idempotent and leaves existing objects unchanged. Some content-sensitive
-tests still require the richer recorded fixture content; the bootstrap creates the
-minimum useful structure and seed rows needed to inspect and extend a fresh workspace.
+The script is idempotent and leaves existing objects unchanged. It also builds the
+intricately-styled rich text on the `Markdown Text Test` page that
+`tests/test_markdown.py::test_rich_text_md` expects (nested bold/italic/strikethrough/
+underline, inline code and equations, a person and a self page-mention, mid-word links).
+This rich text *is* reproducible through the API, so it is no longer a manual step. A few
+content-sensitive tests still require manual workspace content the API cannot create —
+notably the `Comments` page's **inline discussions** (the API cannot start an inline
+discussion) and the `Formula DB` formula columns (§4).
 
 After creating objects, the script runs an **audit**: it lists every page and database
 the integration can see, reports any **missing** expected object, and lists **stray**

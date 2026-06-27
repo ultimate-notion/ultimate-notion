@@ -268,7 +268,7 @@ def set_attr_none(
                 raise AttributeError(msg)
 
         last_attr = attrs[-1]
-        if hasattr(curr_obj, last_attr):
+        if isinstance(curr_obj, BaseModel) and last_attr in type(curr_obj).model_fields:
             setattr(curr_obj, last_attr, None)
         elif not missing_ok:
             msg = f'{last_attr} does not exist in {".".join(attrs[:-2]) if len(attrs) > 1 else "the object"}.'
