@@ -22,7 +22,7 @@ with Notion's API, allowing users to manage pages, databases (data sources), blo
 
 ### Code Conventions
 
-- **Type Safety**: Full mypy type checking required
+- **Type Safety**: Full static type checking required (mypy and ty, via `hatch run lint:typing`)
 - **Code Style**: Ruff for linting and formatting
 - **Naming Conventions**:
   - `ds` = data source (what was previously called "database")
@@ -194,12 +194,12 @@ hatch run vcr-only
 hatch env create
 
 # Run linting
-hatch run lint:all        # Run all linters
-hatch run lint:style      # Ruff style check
-hatch run lint:typing     # Mypy type check
+hatch run lint:all        # Run all linters (style + typing)
+hatch run lint:style      # Ruff check + format check
+hatch run lint:typing     # Type check (mypy + ty)
 
 # Format code
-hatch run lint:fmt        # Auto-format with ruff
+hatch run lint:fix        # Auto-format (ruff format) and apply ruff fixes
 
 # Run tests
 hatch run test            # All tests with VCR
