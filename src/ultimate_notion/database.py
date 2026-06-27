@@ -376,9 +376,14 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
 
     @property
     def data_sources(self) -> SList[DataSource]:
-        """Return all data sources in this database."""
+        """Return all data sources in this database.
+
+        Trashed data sources are excluded: Notion keeps them in the container's raw list even after
+        they are moved to the trash, so they are filtered out here (use `restore_ds()` to bring one
+        back).
+        """
         session = get_active_session()
-        return SList(session.get_ds(ds.id) for ds in self.obj_ref.data_sources)
+        return SList(ds for ds in (session.get_ds(ds.id) for ds in self.obj_ref.data_sources) if not ds.is_deleted)
 
     def create_ds(self, *, schema: type[Schema] | None = None, title: str | None = None) -> DataSource:
         """Add a new data source to this database.
@@ -405,7 +410,6 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
             msg = f'Data source `{ds.id}` does not belong to database `{self.id}`.'
             raise InvalidAPIUsageError(msg)
         session.api.data_sources.update(ds.obj_ref, in_trash=True)
-        self.obj_ref = session.api.databases.retrieve(self.id)  # refresh the `data_sources` list
         return ds
 
     def restore_ds(self, ds: DataSource) -> DataSource:
@@ -415,7 +419,6 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
             msg = f'Data source `{ds.id}` does not belong to database `{self.id}`.'
             raise InvalidAPIUsageError(msg)
         session.api.data_sources.update(ds.obj_ref, in_trash=False)
-        self.obj_ref = session.api.databases.retrieve(self.id)  # refresh the `data_sources` list
         return ds
 
     def reload(self) -> Self:

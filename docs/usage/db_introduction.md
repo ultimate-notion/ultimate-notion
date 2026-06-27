@@ -172,8 +172,8 @@ keep in mind that some methods are just stubs.
 ## Databases: containers of data sources
 
 Since Notion API version 2025-09-03, a data source always lives inside a *database* container, and a
-single database can hold more than one data source. Ultimate Notion keeps that container transparent
-— a data source presents as a direct child of its page — but exposes it as a [Database] object
+single database can hold more than one data source. Ultimate Notion keeps that container transparent,
+so a data source presents as a direct child of its page, but exposes it as a [Database] object
 whenever you need to work with the container itself.
 
 Use [create_db] to create a database together with its first data source:
