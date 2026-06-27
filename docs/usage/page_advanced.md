@@ -284,12 +284,22 @@ tabs[0].append(uno.Paragraph('Overview content'))
 tabs[1].append(uno.Paragraph('Details content'))
 ```
 
-To add another tab later, use `add_tab` and then index into the block to append content to it:
+To add another tab later, use `add_tab` and then index into the block to append content to it. A tab
+label can carry an icon, shown alongside the label in Notion, which we set via the optional `icon`
+argument (an emoji, custom emoji, built-in icon, or file). The icon of a tab is also exposed through
+the [Paragraph] `icon` property:
 
 ```python
-tabs.add_tab('More')
+tabs.add_tab('More', icon='📋')
 tabs[-1].append(uno.Paragraph('Even more content'))
+assert str(tabs[-1].icon) == '📋'
 ```
+
+!!! note
+
+    Notion only allows an icon on a paragraph that is a tab label. Setting `icon` on any other
+    [Paragraph] is rejected by Notion, so the `Paragraph.icon` property is only useful for the tabs
+    returned by a [Tabs] block.
 
 ## Advanced blocks
 

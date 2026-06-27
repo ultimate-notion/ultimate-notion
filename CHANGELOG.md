@@ -3,6 +3,7 @@
 ## Version 0.10, 2026-
 
 - New: Support tab blocks via the new `Tabs` block, which groups content into labeled tabs. Each tab is a `Paragraph` whose text is the tab label and whose children hold the tab content. Create tabs up front with `Tabs([...labels])` or add them later with `Tabs.add_tab()`, issue #188.
+- New: Support icons on tab labels (and paragraphs): read or write a paragraph's icon via the new `Paragraph.icon` property (mirroring `Page.icon`), pass an optional `icon` to `Tabs.add_tab()`, and render it in `Tabs.to_markdown()`, issue #421.
 - New: Support the `Heading4` block introduced by the Notion API (March 30, 2026 changelog), mirroring `Heading1`/`Heading2`/`Heading3` and rendering as a level-5 markdown heading, issue #405.
 - New: Lock or unlock pages, data sources, and databases for editing via the writable `Page.is_locked`, `DataSource.is_locked`, and `Database.is_locked` properties, and move a data source to a different parent database with `DataSource.move()`. Enabled by the Notion API version 2025-09-03, issue #402.
 - New: Better logging of model validation errors, issue #152.
