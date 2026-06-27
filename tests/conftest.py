@@ -325,14 +325,28 @@ _shared_ids = _SharedIdRegistry()
 
 
 def _scrub_request_body(body: Any) -> Any:
-    """Return a request body with shared ids normalised, preserving its `str`/`bytes`/`None` type."""
+    """Return a request body with the root title and shared ids normalised, preserving its type.
+
+    Mirrors the response-body normalisation so the `/v1/search` (and other) request bodies match the
+    committed cassettes regardless of the recording workspace's root page title.
+    """
+
+    def _norm(text: str) -> str:
+        # Map a non-default root page title (set via `UNO_TEST_ROOT_PAGE`) back to the canonical
+        # `Tests` so a request recorded against a differently named root replays against the committed
+        # cassettes -- in particular so the `/v1/search` body matcher succeeds in CI, which uses the
+        # default title. A no-op for the default `Tests`.
+        if TESTS_PAGE != 'Tests':
+            text = text.replace(TESTS_PAGE, 'Tests')
+        return _shared_ids.scrub(text)
+
     if isinstance(body, bytes):
         try:
-            return _shared_ids.scrub(body.decode('utf-8')).encode('utf-8')
+            return _norm(body.decode('utf-8')).encode('utf-8')
         except UnicodeDecodeError:
             return body
     if isinstance(body, str):
-        return _shared_ids.scrub(body)
+        return _norm(body)
     return body
 
 
