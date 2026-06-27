@@ -11,6 +11,7 @@ Following blocks can be nested, i.e. they can contain children:
 - ToDoItem
 - ToggleItem
 - Column within a Columns object (*)
+- Tab within a Tabs object (*)
 - Table as list of TableRow objects (*)
 - Synced Block
 - Template (read-only)
@@ -585,6 +586,20 @@ class ColoredTextBlock(TextBlock[TB], wraps=obj_blocks.ColoredTextBlock):
 
 class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.Paragraph], wraps=obj_blocks.Paragraph):
     """Paragraph block."""
+
+    @property
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon | None:
+        """Icon shown alongside the paragraph, e.g. when the paragraph is used as a tab label."""
+        if is_unset(icon := self.obj_ref.paragraph.icon) or icon is None:
+            return None
+        return wrap_icon(icon)
+
+    @icon.setter
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None) -> None:
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+            icon = Emoji(icon)
+        self.obj_ref.paragraph.icon = icon.obj_ref if icon is not None else None
+        self._update_in_notion(exclude_attrs=['paragraph.children'])
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -1274,6 +1289,80 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
             col._update_in_notion(exclude_attrs=['column.children'])
 
 
+class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
+    """Tabs block grouping content into labeled tabs.
+
+    Each tab is a `Paragraph` whose rich text is the tab label, with an optional icon, and whose
+    children hold the tab content. Only paragraphs may be direct children of a tabs block.
+    See https://developers.notion.com/changelog/tab-block-support
+    """
+
+    def __init__(self, tabs: Sequence[str] = ()) -> None:
+        """Create a new `Tabs` block with an initially empty tab for each given label."""
+        super().__init__()
+        self.obj_ref.tab.children = [Paragraph(label).obj_ref for label in tabs]
+
+    def __getitem__(self, index: int) -> Paragraph:
+        tab = self.blocks[index]
+        if not isinstance(tab, Paragraph):
+            msg = f'Expected a `Paragraph` tab at index {index}, got `{type(tab).__name__}`.'
+            raise TypeError(msg)
+        return tab
+
+    @property
+    def tabs(self) -> tuple[Paragraph, ...]:
+        """Return all tabs of this block."""
+        tabs: list[Paragraph] = []
+        for tab in super().children:
+            if not isinstance(tab, Paragraph):
+                msg = f'Expected a `Paragraph` tab, got `{type(tab).__name__}`.'
+                raise TypeError(msg)
+            tabs.append(tab)
+        return tuple(tabs)
+
+    @property
+    def children(self) -> tuple[Paragraph, ...]:
+        """Return all tabs of this block. Alias for `tabs`."""
+        return self.tabs
+
+    def add_tab(
+        self,
+        label: str,
+        *,
+        icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None = None,
+        index: int | None = None,
+    ) -> Paragraph:
+        """Add a new tab with the given label and optional icon to this block.
+
+        The index must be between 0 and the number of tabs (inclusive). If no index is given, the
+        new tab is added at the end. Returns the created tab so that content can be appended to it.
+        """
+        if index is None:
+            index = len(self.tabs)
+        if not 0 <= index <= len(self.tabs):
+            msg = f'Tab index must be between 0 and {len(self.tabs)} (inclusive).'
+            raise IndexError(msg)
+        tab = Paragraph(label)
+        if icon is not None:
+            tab.icon = icon
+        super().append(tab, after=self.tabs[index - 1] if index > 0 else None)
+        return tab
+
+    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:  # noqa: PLR6301
+        """Append a block or a sequence of blocks to the content of this block."""
+        msg = 'Use `add_tab` to append a new tab.'
+        raise InvalidAPIUsageError(msg)
+
+    def to_markdown(self) -> str:
+        """Return the content of all tabs as Markdown."""
+        tabs_md = []
+        for tab in self.tabs:
+            label = str(tab)
+            content = '\n'.join(child.to_markdown() for child in tab.children)
+            tabs_md.append(md_comment(f'tab: {label}' if label else 'tab') + content)
+        return '\n'.join(tabs_md)
+
+
 class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
     """Table row block behaving like a tuple."""
 
@@ -1623,6 +1712,11 @@ def _chunk_blocks_for_api(parent: Block | Page, blocks: Sequence[Block]) -> Iter
                     node.children.extend(col_nodes)
                     for col_node, col in zip(col_nodes, cols.columns, strict=True):
                         queue.append((col_node, [_Node(block=child) for child in col.blocks]))
+                case Tabs() as tabs:
+                    tab_nodes = [_Node(block=tab) for tab in tabs.tabs]
+                    node.children.extend(tab_nodes)
+                    for tab_node, tab in zip(tab_nodes, tabs.tabs, strict=True):
+                        queue.append((tab_node, [_Node(block=child) for child in tab.blocks]))
                 case Table() as table:
                     node.children.extend([_Node(block=row) for row in table.rows])
                 case ParentBlock() as parent_block if parent_block.has_children:

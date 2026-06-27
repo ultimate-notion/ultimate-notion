@@ -14,6 +14,7 @@ from ultimate_notion.emoji import BuiltInIcon
 from ultimate_notion.errors import InvalidAPIUsageError
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.blocks import Block as ObjBlock
+from ultimate_notion.obj_api.blocks import Tab as ObjTab
 from ultimate_notion.obj_api.core import ObjectRef, Unset, UserRef
 from ultimate_notion.rich_text import Text
 
@@ -554,6 +555,109 @@ def test_modify_column_blocks_width_ratios(root_page: uno.Page, notion: uno.Sess
 
     with pytest.raises(ValueError):
         cols.width_ratios = (-1, 2, 3)
+
+
+def _build_tabs_obj_ref() -> uno.Tabs:
+    """Reconstruct a `Tabs` block as the API would return it after creation, for offline tests."""
+    tab_obj = ObjTab()
+    overview = uno.Paragraph('Overview')
+    overview.icon = '📋'
+    overview.obj_ref.paragraph.children = [uno.Paragraph('Welcome!').obj_ref]
+    details = uno.Paragraph('Details')
+    details.obj_ref.paragraph.children = [uno.Paragraph('Fine print').obj_ref]
+    tab_obj.tab.children = [overview.obj_ref, details.obj_ref]
+    return uno.Tabs.wrap_obj_ref(tab_obj)
+
+
+def test_tabs_offline() -> None:
+    tabs = uno.Tabs(['Overview', 'Details'])
+    # Like `Columns`, tabs are embedded in the obj_ref and only surfaced once the block is in Notion.
+    assert tabs.tabs == ()
+    labels = [child.paragraph.rich_text[0].plain_text for child in tabs.obj_ref.tab.children]
+    assert labels == ['Overview', 'Details']
+
+    with pytest.raises(InvalidAPIUsageError):
+        tabs.append(uno.Paragraph('Not allowed, use add_tab'))
+
+
+def test_tabs_add_tab_index_validation() -> None:
+    tabs = _build_tabs_obj_ref()
+    assert len(tabs.tabs) == 2
+    with pytest.raises(IndexError):
+        tabs.add_tab('Out of range', index=-1)
+    with pytest.raises(IndexError):
+        tabs.add_tab('Out of range', index=len(tabs.tabs) + 1)
+
+
+def test_tabs_paragraph_icon() -> None:
+    paragraph = uno.Paragraph('Labelled')
+    assert paragraph.icon is None
+    paragraph.icon = '📋'
+    assert isinstance(paragraph.icon, uno.Emoji)
+    assert str(paragraph.icon) == '📋'
+    paragraph.icon = None
+    assert paragraph.icon is None
+
+
+def test_tabs_to_markdown() -> None:
+    tabs = _build_tabs_obj_ref()
+    assert [str(tab) for tab in tabs.tabs] == ['Overview', 'Details']
+    assert str(tabs.tabs[0].icon) == '📋'
+    assert str(tabs[1]) == 'Details'
+
+    output = tabs.to_markdown()
+    exp_output = dedent("""
+        <!--- tab: Overview -->
+        Welcome!
+        <!--- tab: Details -->
+        Fine print""")
+    assert output == exp_output.strip('\n')
+
+
+@pytest.mark.vcr()
+def test_create_tab_blocks(root_page: uno.Page, notion: uno.Session) -> None:
+    page = notion.create_page(parent=root_page, title='Page for creating tab blocks')
+    tabs = uno.Tabs(['Overview', 'Details'])
+    page.append(tabs)
+    tabs[0].append(uno.Paragraph('Overview content'))
+    tabs[1].append(uno.Paragraph('Details content'))
+
+    page.reload()
+    reloaded_tabs = page.children[0]
+    assert isinstance(reloaded_tabs, uno.Tabs)
+    assert [str(tab) for tab in reloaded_tabs.tabs] == ['Overview', 'Details']
+    assert str(reloaded_tabs.tabs[0].children[0]) == 'Overview content'
+
+    output = page.to_markdown()
+    exp_output = dedent("""
+        # Page for creating tab blocks
+
+        <!--- tab: Overview -->
+        Overview content
+        <!--- tab: Details -->
+        Details content
+    """)
+    for exp, act in zip(exp_output.strip('\n').split('\n'), output.split('\n'), strict=True):
+        assert exp == act
+
+
+@pytest.mark.vcr()
+def test_modify_tab_blocks(root_page: uno.Page, notion: uno.Session) -> None:
+    page = notion.create_page(parent=root_page, title='Page for modifying tab blocks')
+    tabs = uno.Tabs(['Overview'])
+    page.append(tabs)
+
+    tabs.add_tab('Details', icon='📋')
+    tabs[1].append(uno.Paragraph('Details content'))
+    page.reload()
+
+    reloaded_tabs = page.children[0]
+    assert isinstance(reloaded_tabs, uno.Tabs)
+    assert [str(tab) for tab in reloaded_tabs.tabs] == ['Overview', 'Details']
+    assert str(reloaded_tabs.tabs[1].icon) == '📋'
+
+    with pytest.raises(InvalidAPIUsageError):
+        reloaded_tabs.append(uno.Paragraph('Use add_tab instead'))
 
 
 @pytest.mark.vcr()
