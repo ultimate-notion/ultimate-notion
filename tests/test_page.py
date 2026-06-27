@@ -86,14 +86,7 @@ def test_parent_children(intro_page: uno.Page) -> None:
     assert all(isinstance(block, Block) for block in intro_page.blocks)
 
 
-# Pin to replay-only: Notion no longer echoes `/icons/*.svg` back as an external file -- it now stores
-# such URLs as a built-in-icon type (`{'type': 'icon', 'icon': {'name': 'snake', 'color': 'purple'}}`)
-# which the pre-migration library does not model, so the `ExternalFile` round-trip below cannot be
-# re-recorded live. `record_mode='none'` makes pytest-recording always replay the committed cassette
-# (recorded before Notion changed this) -- it overrides the CLI record mode and, crucially, is applied
-# before the `rewrite` branch that would delete the cassette -- so a full `vcr-rewrite` preserves it.
-# Remove once built-in-icon-type support lands (it models the new shape); see #376. See #372 (part of #361).
-@pytest.mark.vcr(record_mode='none')
+@pytest.mark.vcr()
 def test_icon_attr(notion: uno.Session, root_page: uno.Page) -> None:
     new_page = notion.create_page(parent=root_page, title='My new page with icon')
 
@@ -116,12 +109,18 @@ def test_icon_attr(notion: uno.Session, root_page: uno.Page) -> None:
     # as a `BuiltInIcon` (with a name and colour) rather than an external file.
     notion_icon_url = 'https://www.notion.so/icons/snake_purple.svg'
     new_page.icon = uno.url(notion_icon_url)
-    assert isinstance(new_page.icon, uno.BuiltInIcon)
-    assert str(new_page.icon) == ':snake:'
+    icon = new_page.icon
+    assert isinstance(icon, uno.BuiltInIcon)
+    assert icon.name == 'snake'
+    assert icon.color == 'purple'
+    assert str(icon) == ':snake:'
 
     new_page.reload()
-    assert isinstance(new_page.icon, uno.BuiltInIcon)
-    assert str(new_page.icon) == ':snake:'
+    icon = new_page.icon
+    assert isinstance(icon, uno.BuiltInIcon)
+    assert icon.name == 'snake'
+    assert icon.color == 'purple'
+    assert str(icon) == ':snake:'
 
     new_page.icon = None
     new_page.reload()
