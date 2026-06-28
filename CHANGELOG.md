@@ -4,6 +4,7 @@
 
 ## Version 0.10.1, 2026-06-28
 
+- Fix: Default the undocumented read-only `archived` and `in_trash` fields on `FileUpload`, since the file-upload create endpoint omits `archived`, which previously raised a pydantic `ValidationError` and blocked every local-file upload via `Session.upload`, issue #427.
 - Fix: Populate the high-level children cache when constructing `Tabs` or `Columns` directly, so an offline-built block exposes its tabs/columns (`.tabs`/`.columns`, `has_children`) and uploads its children instead of an empty container when pushed to Notion. Previously only the low-level `obj_ref` was filled, contradicting the documented offline build-then-push workflow, issue #424.
 
 ## Version 0.10, 2026-06-27

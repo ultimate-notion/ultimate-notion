@@ -786,8 +786,8 @@ class FileUpload(NotionObject, object='file_upload'):
     upload_url: str | None = None
     complete_url: str | None = None
     file_import_result: FileImportResult | None = None
-    archived: bool  # undocumented but sent by the API
-    in_trash: bool  # undocumented but sent by the API
+    archived: bool = False  # undocumented and not sent by the create endpoint
+    in_trash: bool = False  # undocumented but sent by the API
     created_by: User  # undocumented but sent by the API
 
 

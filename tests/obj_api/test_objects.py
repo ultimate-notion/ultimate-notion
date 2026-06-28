@@ -100,3 +100,25 @@ def test_unsupported_block() -> None:
     }
     block = obj_blocks.UnsupportedBlock.model_validate(raw_block)
     assert block.unsupported.block_type == 'button'
+
+
+def test_file_upload_create_response_without_archived() -> None:
+    # The file-upload create endpoint does not return the undocumented read-only
+    # `archived` field. Validation must still succeed with a safe default,
+    # otherwise every local-file upload fails. See issue #427.
+    raw_upload = {
+        'object': 'file_upload',
+        'id': '00000000-0000-4000-8000-0000000004bc',
+        'created_time': '2026-06-18T17:19:00.000Z',
+        'last_edited_time': '2026-06-18T17:19:00.000Z',
+        'expiry_time': '2026-06-18T18:19:00.000Z',
+        'status': 'pending',
+        'filename': 'favicon.png',
+        'content_type': 'image/png',
+        'content_length': None,
+        'upload_url': 'https://api.notion.com/v1/file_uploads/x/send',
+        'in_trash': False,
+        'created_by': {'object': 'user', 'id': '00000000-0000-4000-8000-0000000000f1'},
+    }
+    upload = objs.FileUpload.model_validate(raw_upload)
+    assert upload.archived is False
