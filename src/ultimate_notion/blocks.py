@@ -1221,17 +1221,20 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
                 if n_columns < MIN_COLS:
                     msg = f'Number of columns must be at least {MIN_COLS}.'
                     raise ValueError(msg)
-                self.obj_ref.column_list.children = [obj_blocks.Column.build() for _ in range(n_columns)]
+                self._children = [Column.wrap_obj_ref(obj_blocks.Column.build()) for _ in range(n_columns)]
             case ratios if isinstance(ratios, Sequence) and all(isinstance(x, float | int) for x in ratios):
                 if not ratios or any(r <= 0 for r in ratios):
                     msg = 'Ratios must be a non-empty sequence of positive numbers.'
                     raise ValueError(msg)
                 ratios_arr = np.array(ratios, dtype=float)
                 ratios_arr /= ratios_arr.sum()  # normalize ratios to sum to 1 as asked by the Notion API
-                self.obj_ref.column_list.children = [obj_blocks.Column.build(width_ratio=ratio) for ratio in ratios_arr]
+                self._children = [
+                    Column.wrap_obj_ref(obj_blocks.Column.build(width_ratio=ratio)) for ratio in ratios_arr
+                ]
             case _:
                 msg = 'Columns must be initialized with an integer or a sequence of floats/integers.'
                 raise TypeError(msg)
+        self.obj_ref.has_children = True
 
     def __getitem__(self, index: int) -> Column:
         column = self.blocks[index]
@@ -1332,7 +1335,8 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
         if len(tabs) < MIN_TABS:
             msg = f'Number of tabs must be at least {MIN_TABS}.'
             raise ValueError(msg)
-        self.obj_ref.tab.children = [Paragraph(label).obj_ref for label in tabs]
+        self._children = [Paragraph(label) for label in tabs]
+        self.obj_ref.has_children = True
 
     def __getitem__(self, index: int) -> Paragraph:
         tab = self.blocks[index]
