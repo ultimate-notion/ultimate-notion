@@ -31,6 +31,7 @@ from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
     Bot,
+    BuiltInIconObject,
     Comment,
     CustomEmojiObject,
     DatabaseRef,
@@ -508,7 +509,7 @@ class PagesEndpoint(Endpoint):
         properties: dict[str, PropertyValue] | None = None,
         children: list[Block] | None = None,
         cover: FileObject | None = None,
-        icon: FileObject | EmojiObject | CustomEmojiObject | None = None,
+        icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None,
     ) -> Page:
         """Add a page to the given parent (Page or DataSource)."""
         if parent is None:
@@ -581,7 +582,7 @@ class PagesEndpoint(Endpoint):
         *,
         properties: dict[str, PropertyValue] | None = None,
         cover: FileObject | UnsetType | None = Unset,
-        icon: FileObject | EmojiObject | CustomEmojiObject | UnsetType | None = Unset,
+        icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset,
         in_trash: bool | UnsetType = Unset,
         is_locked: bool | UnsetType = Unset,
     ) -> None:
@@ -633,7 +634,7 @@ class PagesEndpoint(Endpoint):
         page: Page,
         *,
         cover: FileObject | UnsetType | None = Unset,
-        icon: FileObject | EmojiObject | CustomEmojiObject | UnsetType | None = Unset,
+        icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset,
         in_trash: bool | UnsetType = Unset,
         is_locked: bool | UnsetType = Unset,
     ) -> None:

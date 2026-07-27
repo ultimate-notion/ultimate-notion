@@ -82,7 +82,10 @@ class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
 
     @property
     def icon(self) -> AnyFile | Emoji | CustomEmoji | BuiltInIcon | None:
-        """Return the icon of this data source as file or emoji."""
+        """Return the read-only database or data-source icon.
+
+        The icon can be a file, emoji, custom emoji, built-in Notion icon, or `None`.
+        """
         if (icon := self.obj_ref.icon) is None:
             return None
         else:

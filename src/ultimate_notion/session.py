@@ -19,7 +19,7 @@ from notion_client.errors import APIResponseError
 from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database, DataSource
-from ultimate_notion.emoji import CustomEmoji, Emoji
+from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import (
     SessionError,
     UnknownDatabaseError,
@@ -396,7 +396,7 @@ class Session:
         blocks: Sequence[Block] | None = None,
         *,
         cover: AnyFile | None = None,
-        icon: AnyFile | Emoji | CustomEmoji | str | None = None,
+        icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None = None,
     ) -> Page:
         """Create a new page in a `parent` page or data source with a given `title`.
 
@@ -408,7 +408,7 @@ class Session:
         title_obj = title if title is None else Title(title).obj_ref
         cover_obj = None if cover is None else cover.obj_ref
 
-        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
             icon = Emoji(icon)
         icon_obj = None if icon is None else icon.obj_ref
 

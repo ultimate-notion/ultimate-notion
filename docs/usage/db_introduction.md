@@ -57,7 +57,8 @@ my_db.description = 'This is my data source for cool Python libraries!'
 ```
 
 !!! info
-    Unfortunately, the Notion API does not support setting the *icon* or the *cover* of a data source.
+    Ultimate Notion currently exposes the *icon* and *cover* of data sources and database containers
+    as read-only attributes.
 
 We can now simply add a new page to this data source and set some attributes:
 
