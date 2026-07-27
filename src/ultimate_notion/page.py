@@ -235,7 +235,7 @@ class Page(
     @icon.setter
     def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None) -> None:
         """Set the icon of this page."""
-        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
             icon = Emoji(icon)
         icon_obj = None if icon is None else icon.obj_ref
         session = get_active_session()

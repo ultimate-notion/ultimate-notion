@@ -1240,6 +1240,11 @@ def test_built_in_icon_wrapper() -> None:
     assert str(icon) == ':snake:'
     assert icon.to_code == ':snake:'
 
+    callout = uno_blocks.Callout('Built-in icon callout', icon=icon)
+    assert isinstance(callout.icon, BuiltInIcon)
+    assert callout.icon.name == 'snake'
+    assert callout.icon.color == 'purple'
+
     # built-in icons cannot be constructed by the user, only retrieved from Notion
     with pytest.raises(InvalidAPIUsageError):
         BuiltInIcon()

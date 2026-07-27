@@ -610,7 +610,7 @@ class Paragraph(ColoredTextBlock[obj_blocks.Paragraph], ParentBlock[obj_blocks.P
 
     @icon.setter
     def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None) -> None:
-        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
             icon = Emoji(icon)
         self.obj_ref.paragraph.icon = icon.obj_ref if icon is not None else None
         # `_update_in_notion` pushes this to Notion, which raises if the paragraph is not a tab
@@ -712,7 +712,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         icon: AnyFile | str | Emoji | CustomEmoji | BuiltInIcon = '💡',
     ) -> None:
         super().__init__(text, color=color)
-        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
             icon = Emoji(icon)
 
         # Setting icon to None explicitly and sending `null` to Notion does NOT remove the icon
@@ -1384,7 +1384,7 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
         if 0 <= index <= len(self.tabs):
             new_tab = Paragraph(label)
             if icon is not None:
-                if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji):
+                if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
                     icon = Emoji(icon)
                 # Bake the icon into the obj_ref so it is sent as part of the tab's creation under
                 # the `Tabs` block. We must NOT use `Paragraph.icon` here: its setter eagerly calls

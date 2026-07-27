@@ -4,7 +4,9 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from ultimate_notion.obj_api.blocks import Page, Paragraph
+from ultimate_notion.database import Database as DatabaseWrapper
+from ultimate_notion.emoji import BuiltInIcon
+from ultimate_notion.obj_api.blocks import Database, Page, Paragraph
 from ultimate_notion.obj_api.core import extract_id
 from ultimate_notion.obj_api.objects import Bot, BuiltInIconObject, Person, User
 
@@ -98,6 +100,26 @@ def test_page_accepts_built_in_icon() -> None:
     assert isinstance(page.icon, BuiltInIconObject)
     assert page.icon.icon.name == 'snake'
     assert page.icon.icon.color == 'purple'
+
+
+def test_database_accepts_built_in_icon() -> None:
+    """A database with a built-in icon must validate, see issue #431."""
+    database = Database.model_validate(
+        {
+            'object': 'database',
+            'id': '00000000-0000-0000-0000-000000000000',
+            'icon': {'type': 'icon', 'icon': {'name': 'table', 'color': 'purple'}},
+        }
+    )
+
+    assert isinstance(database.icon, BuiltInIconObject)
+    assert database.icon.icon.name == 'table'
+    assert database.icon.icon.color == 'purple'
+
+    wrapped_database = DatabaseWrapper.wrap_obj_ref(database)
+    assert isinstance(wrapped_database.icon, BuiltInIcon)
+    assert wrapped_database.icon.name == 'table'
+    assert wrapped_database.icon.color == 'purple'
 
 
 def test_block_serialization_omits_read_only_archive_flags() -> None:
