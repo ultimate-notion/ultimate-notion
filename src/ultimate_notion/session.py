@@ -31,6 +31,7 @@ from ultimate_notion.file import MAX_FILE_SIZE, AnyFile, UploadedFile, get_file_
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
+from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
 from ultimate_notion.obj_api.objects import get_uuid
@@ -204,13 +205,21 @@ class Session:
         return block
 
     def create_ds(
-        self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
+        self,
+        parent: Page,
+        *,
+        schema: type[Schema] | None = None,
+        title: str | None = None,
+        inline: bool = False,
+        icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | UnsetType = Unset,
     ) -> DataSource:
         """Create a new data source within a page.
 
         In API version 2025-09-03+ a data source under a page is created via the Create Database
         endpoint, which creates the database container together with its initial data source. This
         method returns that data source. Pass `inline=True` to display the database inline on the page.
+        `icon` sets the icon of the database container and may be a file, emoji, custom emoji, built-in
+        Notion icon, or emoji string.
 
         In case a title and a schema are provided, title overrides the schema's `db_title` attribute if it exists.
         """
@@ -223,7 +232,12 @@ class Session:
         _logger.info(f'Creating data source `{title or "<NoTitle>"}` in `{parent.title}` with schema:\n{ds_schema}')
 
         # The Create Database endpoint creates the container and its initial data source in one call.
-        db_obj = self.api.databases.create(parent=parent.obj_ref, schema=schema_dct, title=title_obj, inline=inline)
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
+            icon = Emoji(icon)
+        icon_obj = icon if is_unset(icon) else icon.obj_ref
+        db_obj = self.api.databases.create(
+            parent=parent.obj_ref, schema=schema_dct, title=title_obj, inline=inline, icon=icon_obj
+        )
         # `description` lives on the database container; set it before retrieving the data source so the
         # data-source response (which mirrors the database's description) reflects it.
         if schema and schema._db_desc:
@@ -266,7 +280,13 @@ class Session:
         return ds
 
     def create_db(
-        self, parent: Page, *, schema: type[Schema] | None = None, title: str | None = None, inline: bool = False
+        self,
+        parent: Page,
+        *,
+        schema: type[Schema] | None = None,
+        title: str | None = None,
+        inline: bool = False,
+        icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | UnsetType = Unset,
     ) -> Database:
         """Create a new database (a container of data sources) within a page.
 
@@ -274,8 +294,9 @@ class Session:
         that container together with its first data source (from `schema`, or a default single-title
         schema) and returns the `Database`. Use `db.create_ds(...)` to add further data sources, and
         `db.data_sources` to list them. Pass `inline=True` to display the database inline on the page.
+        `icon` sets the database icon.
         """
-        ds = self.create_ds(parent, schema=schema, title=title, inline=inline)
+        ds = self.create_ds(parent, schema=schema, title=title, inline=inline, icon=icon)
         return self.get_db(ds.database_id)
 
     def search_ds(

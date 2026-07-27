@@ -386,6 +386,7 @@ class DatabasesEndpoint(Endpoint):
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
         is_locked: bool | None = None,
+        icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType = Unset,
     ) -> dict[str, Any]:
         """Build a request payload from the given items.
 
@@ -409,6 +410,9 @@ class DatabasesEndpoint(Endpoint):
         if is_locked is not None:
             request['is_locked'] = is_locked
 
+        if not is_unset(icon):
+            request['icon'] = icon.serialize_for_api()
+
         return request
 
     # https://developers.notion.com/reference/create-a-database
@@ -419,17 +423,19 @@ class DatabasesEndpoint(Endpoint):
         schema: Mapping[str, Property] | None = None,
         title: list[RichTextBaseObject] | None = None,
         inline: bool = False,
+        icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType = Unset,
     ) -> Database:
         """Create a new database container in the given Page parent.
 
         In API version 2025-09-03+ a database is created together with its first data source,
         whose schema (properties) is passed via the `initial_data_source` payload. This is the
         only supported way to create a data source under a page; the `data_sources` endpoint
-        only adds further data sources to an existing database.
+        only adds further data sources to an existing database. `icon` may be any writable Notion
+        icon object; omit it with `Unset`.
         """
         parent_ref = PageRef.build(parent)
         _logger.debug(f'Creating new database below page with id `{parent_ref.page_id}`.')
-        request = self._build_request(parent=parent_ref, title=title, inline=inline)
+        request = self._build_request(parent=parent_ref, title=title, inline=inline, icon=icon)
         if schema is not None:
             request['initial_data_source'] = {
                 'properties': {name: value.serialize_for_api() for name, value in schema.items()}
@@ -453,16 +459,21 @@ class DatabasesEndpoint(Endpoint):
         description: list[RichTextBaseObject] | None = None,
         inline: bool | None = None,
         is_locked: bool | None = None,
+        icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType = Unset,
     ) -> None:
         """Update the Database object on the server.
 
         The database info will be updated to the latest version from the server.
+        Pass `icon=Unset` (the default) to leave the icon unchanged. `None` is intentionally
+        unsupported because Notion currently rejects attempts to remove database icons.
 
         API reference: https://developers.notion.com/reference/update-a-database
         """
         _logger.debug(f'Updating info of database with id `{db.id}`.')
 
-        if request := self._build_request(title=title, description=description, inline=inline, is_locked=is_locked):
+        if request := self._build_request(
+            title=title, description=description, inline=inline, is_locked=is_locked, icon=icon
+        ):
             data = self._as_dict(self.raw_api.update(str(db.id), **request))
             db.update(**data)
 

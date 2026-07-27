@@ -100,9 +100,13 @@ class CustomEmoji(EmojiBase[objs.CustomEmojiObject], wraps=objs.CustomEmojiObjec
 class BuiltInIcon(EmojiBase[objs.BuiltInIconObject], wraps=objs.BuiltInIconObject):
     """Built-in icon from Notion's icon gallery, identified by a name and color."""
 
-    def __init__(self) -> None:
-        msg = 'To use a built-in icon, pick one from the icon gallery in Notion.'
-        raise InvalidAPIUsageError(msg)
+    def __init__(self, name: str, *, color: str = 'gray') -> None:
+        """Create a built-in Notion icon.
+
+        `name` may be an internal Notion icon name or the label shown in Notion's icon picker.
+        Notion validates the name and color when the icon is written.
+        """
+        super().__init__(icon=objs.BuiltInIconTypeData(name=name, color=color))
 
     @property
     def name(self) -> str:

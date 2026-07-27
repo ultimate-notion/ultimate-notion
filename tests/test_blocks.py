@@ -1245,9 +1245,11 @@ def test_built_in_icon_wrapper() -> None:
     assert callout.icon.name == 'snake'
     assert callout.icon.color == 'purple'
 
-    # built-in icons cannot be constructed by the user, only retrieved from Notion
-    with pytest.raises(InvalidAPIUsageError):
-        BuiltInIcon()
+    built_icon = BuiltInIcon('table', color='blue')
+    assert built_icon.obj_ref.serialize_for_api() == {
+        'type': 'icon',
+        'icon': {'name': 'table', 'color': 'blue'},
+    }
 
 
 def test_callout_with_built_in_icon_markdown() -> None:

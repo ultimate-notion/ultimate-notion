@@ -57,8 +57,12 @@ my_db.description = 'This is my data source for cool Python libraries!'
 ```
 
 !!! info
-    Ultimate Notion currently exposes the *icon* and *cover* of data sources and database containers
-    as read-only attributes.
+    Pass an emoji string or icon object as `icon=...` to `create_ds()`/`create_db()`, or assign one
+    later, for example `my_db.icon = uno.BuiltInIcon('table', color='purple')`.
+
+    A data source's icon belongs to its database container. Setting `DataSource.icon` therefore changes
+    the icon shared by that container. Notion currently rejects `icon=None` for databases, so database
+    icons can be set but not removed through the API. Covers remain read-only.
 
 We can now simply add a new page to this data source and set some attributes:
 

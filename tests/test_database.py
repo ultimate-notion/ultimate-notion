@@ -131,17 +131,12 @@ def test_db_attributes(contacts_db: uno.DataSource) -> None:
 
 @pytest.mark.vcr()
 def test_db_with_built_in_icon(notion: uno.Session, article_db: uno.DataSource) -> None:
-    """A built-in icon returned by Notion can be read through the high-level API."""
-    notion.client.databases.update(
-        database_id=str(article_db.database_id),
-        icon={'type': 'icon', 'icon': {'name': 'table', 'color': 'purple'}},
-    )
+    """A built-in icon can be written and read through the high-level data-source API."""
+    article_db.icon = uno.BuiltInIcon('table', color='purple')
 
-    database = notion.get_db(article_db.database_id, use_cache=False)
-
-    assert isinstance(database.icon, uno.BuiltInIcon)
-    assert database.icon.name == 'table'
-    assert database.icon.color == 'purple'
+    assert isinstance(article_db.icon, uno.BuiltInIcon)
+    assert article_db.icon.name == 'table'
+    assert article_db.icon.color == 'purple'
 
 
 @pytest.mark.vcr()
@@ -348,13 +343,17 @@ def test_create_db(notion: uno.Session, root_page: uno.Page) -> None:
         name = uno.PropType.Title('Name')
         cost = uno.PropType.Number('Cost', format=uno.NumberFormat.DOLLAR)
 
-    db = notion.create_db(parent=root_page, schema=Article)
+    db = notion.create_db(parent=root_page, schema=Article, icon=uno.BuiltInIcon('table', color='blue'))
     assert isinstance(db, uno.Database)
     assert db.is_db
     assert db.title == 'My Articles'
+    assert isinstance(db.icon, uno.BuiltInIcon)
+    assert db.icon.name == 'table'
+    assert db.icon.color == 'blue'
 
     ds = db.data_sources.item()
     assert isinstance(ds, uno.DataSource)
+    assert isinstance(ds.icon, uno.BuiltInIcon)
     # The container is transparent: the data source presents as a child of the page, while its
     # `database_id` points back to the container we just created.
     assert ds.parent == root_page

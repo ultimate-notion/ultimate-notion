@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- New: Create databases with icons and update `Database.icon`/`DataSource.icon`, including native
+  Notion icons constructed with `BuiltInIcon(name, color=...)`. Database icons cannot be removed
+  because Notion rejects `icon=null`, issue #434.
+
 ## Version 0.10.1, 2026-06-28
 
 - Fix: Default the undocumented read-only `archived` and `in_trash` fields on `FileUpload`, since the file-upload create endpoint omits `archived`, which previously raised a pydantic `ValidationError` and blocked every local-file upload via `Session.upload`, issue #427.
