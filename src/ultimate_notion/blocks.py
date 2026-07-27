@@ -123,7 +123,12 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
 
     @property
     def has_children(self) -> bool:
-        """Return whether the object has children."""
+        """Return whether the object has children without fetching them.
+
+        This value comes from metadata included in the object's Notion API response. In contrast,
+        accessing `children` (including through `len(obj.children)`) can make an API call when the
+        children have not been cached yet.
+        """
         return self.obj_ref.has_children
 
     def _delete_me_from_parent(self) -> None:
