@@ -8,6 +8,7 @@ from ultimate_notion.database import Database as DatabaseWrapper
 from ultimate_notion.emoji import BuiltInIcon
 from ultimate_notion.obj_api.blocks import Database, Page, Paragraph
 from ultimate_notion.obj_api.core import extract_id
+from ultimate_notion.obj_api.endpoints import DatabasesEndpoint
 from ultimate_notion.obj_api.objects import Bot, BuiltInIconObject, Person, User
 
 
@@ -120,6 +121,16 @@ def test_database_accepts_built_in_icon() -> None:
     assert isinstance(wrapped_database.icon, BuiltInIcon)
     assert wrapped_database.icon.name == 'table'
     assert wrapped_database.icon.color == 'purple'
+
+
+def test_database_icon_request_serialization() -> None:
+    """Writable database icons serialize into the create/update request shape."""
+    icon = BuiltInIcon('table', color='blue')
+
+    assert DatabasesEndpoint._build_request(icon=icon.obj_ref) == {
+        'icon': {'type': 'icon', 'icon': {'name': 'table', 'color': 'blue'}}
+    }
+    assert DatabasesEndpoint._build_request() == {}
 
 
 def test_block_serialization_omits_read_only_archive_flags() -> None:

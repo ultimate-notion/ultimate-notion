@@ -7,7 +7,7 @@ In API version 2025-09-03+:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from pydantic import ValidationError
@@ -82,7 +82,7 @@ class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
 
     @property
     def icon(self) -> AnyFile | Emoji | CustomEmoji | BuiltInIcon | None:
-        """Return the read-only database or data-source icon.
+        """Return the database or data-source icon.
 
         The icon can be a file, emoji, custom emoji, built-in Notion icon, or `None`.
         """
@@ -90,6 +90,20 @@ class DataContainer(DataObject[DC_co], wraps=obj_blocks.DataObject):
             return None
         else:
             return wrap_icon(icon)
+
+    @icon.setter
+    def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str) -> None:
+        """Set the database or data-source icon.
+
+        Notion does not currently support removing a database icon, so `None` is intentionally
+        not accepted. Setting a data-source icon updates its containing database.
+        """
+        if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
+            icon = Emoji(icon)
+        if isinstance(obj_ref := self.obj_ref, obj_blocks.Database):
+            get_active_session().api.databases.update(obj_ref, icon=icon.obj_ref)
+        else:
+            cast(DataSource, self)._update_container_db(icon=icon.obj_ref)
 
     @property
     def cover(self) -> AnyFile | None:

@@ -88,7 +88,8 @@ These limitations include:
 - referencing in a formula expression another formula property, e.g., `prop("other formula")`. Use a substitution instead.
 - creating a two-way relation with the same source and target data source, i.e., self-referencing. The update data source call
   is currently accepted but only a one-way relation is created, which seems to be a bug within the Notion API itself.
-- setting the icon and cover of a data source.
+- setting the cover of a data source.
+- removing a database or data-source icon (setting `icon` to `null` is rejected).
 - moving pages since a [page’s parent cannot be changed].
 - setting a [reminder] based on date and/or time.
 - modifying the URL of file-like blocks, e.g., `File`, `Image`, etc. Replace the block with a new upload instead.
