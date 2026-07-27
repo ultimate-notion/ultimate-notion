@@ -130,6 +130,21 @@ def test_db_attributes(contacts_db: uno.DataSource) -> None:
 
 
 @pytest.mark.vcr()
+def test_db_with_built_in_icon(notion: uno.Session, article_db: uno.DataSource) -> None:
+    """A built-in icon returned by Notion can be read through the high-level API."""
+    notion.client.databases.update(
+        database_id=str(article_db.database_id),
+        icon={'type': 'icon', 'icon': {'name': 'table', 'color': 'purple'}},
+    )
+
+    database = notion.get_db(article_db.database_id, use_cache=False)
+
+    assert isinstance(database.icon, uno.BuiltInIcon)
+    assert database.icon.name == 'table'
+    assert database.icon.color == 'purple'
+
+
+@pytest.mark.vcr()
 def test_title_setter(notion: uno.Session, article_db: uno.DataSource) -> None:
     old_title = 'Articles'
     assert article_db.title == old_title
