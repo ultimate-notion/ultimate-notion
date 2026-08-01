@@ -14,6 +14,13 @@ class SortDirection(str, Enum):
     DESCENDING = 'descending'
 
 
+class InsertPosition(str, Enum):
+    """Possible positions when inserting pages, blocks, or Markdown content."""
+
+    START = 'start'
+    END = 'end'
+
+
 class TimestampKind(str, Enum):
     """Possible timestamp types."""
 

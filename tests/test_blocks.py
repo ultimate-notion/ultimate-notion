@@ -1261,3 +1261,23 @@ def test_callout_with_built_in_icon_markdown() -> None:
 
     assert isinstance(callout.icon, BuiltInIcon)
     assert callout.to_markdown().strip() == ':snake: Built-in icon callout'
+
+
+def test_prepend_blocks_offline() -> None:
+    toggle = uno.ToggleItem('Parent')
+    second = uno.Paragraph('Second')
+    first = uno.Paragraph('First')
+    toggle.append(second)
+
+    toggle.append(first, position=uno.InsertPosition.START)
+
+    assert toggle.children == (first, second)
+
+
+def test_append_rejects_after_and_position() -> None:
+    toggle = uno.ToggleItem('Parent')
+    first = uno.Paragraph('First')
+    toggle.append(first)
+
+    with pytest.raises(ValueError, match='mutually exclusive'):
+        toggle.append(uno.Paragraph('Second'), after=first, position=uno.InsertPosition.END)

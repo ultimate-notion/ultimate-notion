@@ -22,12 +22,13 @@ from ultimate_notion.obj_api.core import (
     GenericObject,
     ObjectRef,
     ParentRef,
+    UniqueObject,
     Unset,
     UnsetType,
     UserRef,
     is_unset,
 )
-from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
+from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
 from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
 from ultimate_notion.obj_api.objects import (
     Bot,
@@ -64,6 +65,27 @@ _logger = logging.getLogger(__name__)
 # The Notion SDK types its responses as `Any | Awaitable[Any]`; validate them into a
 # real `dict[str, Any]` so the result is correctly typed for `**`-unpacking.
 _DictAdapter = TypeAdapter(dict[str, Any])
+
+
+def _build_insert_position(
+    position: InsertPosition | None,
+    *,
+    after: ParentRef | GenericObject | UUID | str | None = None,
+    for_page: bool = False,
+) -> dict[str, Any] | None:
+    """Build a Notion position object for page or block insertion."""
+    if position is not None and after is not None:
+        msg = "'position' and 'after' are mutually exclusive"
+        raise ValueError(msg)
+    if after is not None:
+        if isinstance(after, UniqueObject) and is_unset(after.id):
+            raise UnsetError()
+        after_id = ObjectRef.build(after).id
+        return {'type': 'after_block', 'after_block': {'id': str(after_id)}}
+    if position is None:
+        return None
+    position_type = f'page_{position.value}' if for_page else position.value
+    return {'type': position_type}
 
 
 class NotionAPI:
@@ -116,6 +138,7 @@ class BlocksEndpoint(Endpoint):
             blocks: builtins.list[Block],
             *,
             after: Block | None = None,
+            position: InsertPosition | None = None,
         ) -> tuple[builtins.list[Block], builtins.list[Block]]:
             """Add the given blocks as children of the specified parent.
 
@@ -128,18 +151,14 @@ class BlocksEndpoint(Endpoint):
             _logger.debug(f'Appending {len(children)} blocks to parent with id `{parent_id}`.')
 
             block_iter = EndpointIterator[Block](endpoint=self.raw_api.append, pagination=self.raw_api.list)
-            if after is None:
+            position_obj = _build_insert_position(position, after=after)
+            if position_obj is None:
                 appended_blocks = list(block_iter(block_id=parent_id, children=children))
                 if len(appended_blocks) != len(blocks):
                     msg = 'Number of appended blocks does not match the number of provided blocks.'
                     raise ValueError(msg)
             else:
-                if is_unset(after_id := after.id):
-                    raise UnsetError()
-                # API 2026-03-11 replaced the `after` parameter with a typed `position` object:
-                # `{"type": "after_block", "after_block": {"id": <block-id>}}`.
-                position = {'type': 'after_block', 'after_block': {'id': str(after_id)}}
-                appended_blocks = list(block_iter(block_id=parent_id, children=children, position=position))
+                appended_blocks = list(block_iter(block_id=parent_id, children=children, position=position_obj))
 
             # the first len(blocks) of appended_blocks correspond to the blocks we passed, the rest are updated
             # blocks after the specified block, where we append the blocks.
@@ -521,6 +540,8 @@ class PagesEndpoint(Endpoint):
         children: list[Block] | None = None,
         cover: FileObject | None = None,
         icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None,
+        after: GenericObject | UUID | str | None = None,
+        position: InsertPosition | None = None,
     ) -> Page:
         """Add a page to the given parent (Page or DataSource)."""
         if parent is None:
@@ -539,6 +560,9 @@ class PagesEndpoint(Endpoint):
                 raise ValueError(msg)
 
         request: dict[str, Any] = {'parent': parent.serialize_for_api()}
+
+        if position_obj := _build_insert_position(position, after=after, for_page=True):
+            request['position'] = position_obj
 
         # the API requires a properties object, even if empty
         if properties is None:
@@ -563,6 +587,51 @@ class PagesEndpoint(Endpoint):
         _logger.debug(f'Creating new page below page with id `{parent_id}`.')
         data = self.raw_api.create(**request)
         return Page.model_validate(data)
+
+    # https://developers.notion.com/reference/move-page
+    def move(self, page: Page, parent: Page | DataSource) -> None:
+        """Move a page below a different page or data source."""
+        if is_unset(page_id := page.id):
+            raise UnsetError()
+        match parent:
+            case Page():
+                parent_ref: ParentRef = PageRef.build(parent)
+            case DataSource():
+                parent_ref = DataSourceRef.build(parent)
+            case _:
+                msg = f'Unsupported parent of type {type(parent)}'
+                raise ValueError(msg)
+
+        _logger.debug(f'Moving page with id `{page_id}` to parent `{parent_ref.value}`.')
+        data = self._as_dict(self.raw_api.move(str(page_id), parent=parent_ref.serialize_for_api()))
+        if 'parent' in data:
+            page.update(**data)
+        else:
+            page.parent = parent_ref
+
+    # https://developers.notion.com/reference/update-page-markdown
+    def insert_markdown(
+        self,
+        page: Page | UUID | str,
+        markdown: str,
+        *,
+        after: str | None = None,
+        position: InsertPosition | None = None,
+    ) -> dict[str, Any]:
+        """Insert Markdown into a page at the requested position."""
+        if position is not None and after is not None:
+            msg = "'position' and 'after' are mutually exclusive"
+            raise ValueError(msg)
+
+        insert_content: dict[str, Any] = {'content': markdown}
+        if after is not None:
+            insert_content['after'] = after
+        elif position is not None:
+            insert_content['position'] = {'type': position.value}
+
+        page_id = ObjectRef.build(page).id
+        data = self.raw_api.update_markdown(str(page_id), type='insert_content', insert_content=insert_content)
+        return self._as_dict(data)
 
     def delete(self, page: Page) -> None:
         """Delete (archive) the specified Page."""

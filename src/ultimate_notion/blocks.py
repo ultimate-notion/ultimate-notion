@@ -46,7 +46,7 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import is_unset
-from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color
+from ultimate_notion.obj_api.enums import BGColor, CodeLang, Color, InsertPosition
 from ultimate_notion.rich_text import Text
 from ultimate_notion.user import User
 from ultimate_notion.utils import set_attr_none
@@ -238,7 +238,14 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         """Return all contained blocks within this block (excluding child pages and data sources)"""
         return tuple(block for block in self.children if not is_page(block) and not is_ds(block))
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
+    def append(
+        self,
+        blocks: Block | Sequence[Block],
+        *,
+        after: Block | None = None,
+        position: InsertPosition | None = None,
+        sync: bool | None = None,
+    ) -> Self:
         """Append a block or a sequence of blocks to the content of this block.
 
         If *this* block is already in Notion, the blocks are appended directly to Notion, otherwise
@@ -249,10 +256,14 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
         Args:
             blocks: A block or a sequence of blocks to append.
             after: A block to append the new blocks after.
+            position: Insert at the start or end. Cannot be combined with `after`.
             sync: Whether to sync the changes with Notion directly or in one batch call later.
                   If `sync = None` (default), the blocks are appended directly if this block is already in Notion,
                   otherwise they are prepared to be appended in one batch call, later.
         """
+        if position is not None and after is not None:
+            msg = "'position' and 'after' are mutually exclusive"
+            raise ValueError(msg)
         blocks = [blocks] if isinstance(blocks, Block) else blocks
 
         for block in blocks:
@@ -293,10 +304,13 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
             for block in blocks:
                 block._parent = parent_obj  # set fallback parent for offline use
             # Don't store it in the potential `children` field of the obj_ref and let the Notion API do it.
-            self._children.extend(blocks)
+            if position is InsertPosition.START:
+                self._children[0:0] = blocks
+            else:
+                self._children.extend(blocks)
         else:  # self.in_notion and sync is not False
             blocks_iter = _chunk_blocks_for_api(parent_obj, blocks)
-            _append_block_chunks(blocks_iter, after=after)
+            _append_block_chunks(blocks_iter, after=after, position=position)
 
         return self
 
@@ -658,11 +672,18 @@ class Heading(ColoredTextBlock[HT], ParentBlock[HT], wraps=obj_blocks.Heading):
         self.obj_ref.value.is_toggleable = toggleable
         self._update_in_notion()
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:
+    def append(
+        self,
+        blocks: Block | Sequence[Block],
+        *,
+        after: Block | None = None,
+        position: InsertPosition | None = None,
+        sync: bool | None = None,
+    ) -> Self:
         if not self.toggleable:
             msg = 'Cannot append blocks to a non-toggleable heading.'
             raise InvalidAPIUsageError(msg)
-        return super().append(blocks, after=after, sync=sync)
+        return super().append(blocks, after=after, position=position, sync=sync)
 
 
 class Heading1(Heading[obj_blocks.Heading1], wraps=obj_blocks.Heading1):
@@ -1282,7 +1303,14 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
             msg = f'Column index must be between 0 and {len(self.blocks)} (inclusive).'
             raise IndexError(msg)
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:  # noqa: PLR6301
+    def append(  # noqa: PLR6301
+        self,
+        blocks: Block | Sequence[Block],
+        *,
+        after: Block | None = None,
+        position: InsertPosition | None = None,
+        sync: bool | None = None,
+    ) -> Self:
         """Append a block or a sequence of blocks to the content of this block."""
         msg = 'Use `add_column` to append a new column.'
         raise InvalidAPIUsageError(msg)
@@ -1402,7 +1430,14 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
             msg = f'Tab index must be between 0 and {len(self.tabs)} (inclusive).'
             raise IndexError(msg)
 
-    def append(self, blocks: Block | Sequence[Block], *, after: Block | None = None, sync: bool | None = None) -> Self:  # noqa: PLR6301
+    def append(  # noqa: PLR6301
+        self,
+        blocks: Block | Sequence[Block],
+        *,
+        after: Block | None = None,
+        position: InsertPosition | None = None,
+        sync: bool | None = None,
+    ) -> Self:
         """Append a block or a sequence of blocks to the content of this block."""
         msg = 'Use `add_tab` to append a new tab.'
         raise InvalidAPIUsageError(msg)
@@ -1801,7 +1836,12 @@ def _build_obj_ref(node: _Node[Block]) -> Block:
     return block
 
 
-def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = None) -> None:
+def _append_block_chunks(
+    batch_trees: Iterator[_Node],
+    *,
+    after: Block | None = None,
+    position: InsertPosition | None = None,
+) -> None:
     """Append chunks of blocks to a parent block, respecting API limits."""
     session = get_active_session()
     curr_after = after
@@ -1810,25 +1850,33 @@ def _append_block_chunks(batch_trees: Iterator[_Node], *, after: Block | None = 
         parent = parent_node.block
         blocks = [_build_obj_ref(child) for child in parent_node.children]
 
-        after = curr_after if parent_node.is_root and curr_after is not None else None
+        batch_after = curr_after if parent_node.is_root and curr_after is not None else None
+        batch_position = position if parent_node.is_root and batch_after is None else None
 
         block_objs = [block.obj_ref for block in blocks]
-        after_obj = None if after is None else after.obj_ref
-        block_objs, after_block_objs = session.api.blocks.children.append(parent.obj_ref, block_objs, after=after_obj)
+        after_obj = None if batch_after is None else batch_after.obj_ref
+        block_objs, after_block_objs = session.api.blocks.children.append(
+            parent.obj_ref, block_objs, after=after_obj, position=batch_position
+        )
         parent.obj_ref.has_children = True
 
         if parent_node.is_root and isinstance(parent, ChildrenMixin):
             parent._children = [] if parent._children is None else parent._children
             # update the parent's children cache
-            if after is None:
+            if batch_after is None and batch_position is not InsertPosition.START:
                 parent._children.extend(blocks)
             else:
-                insert_idx = next(idx for idx, block in enumerate(parent._children) if block.id == after.id) + 1
+                insert_idx = (
+                    0
+                    if batch_after is None
+                    else next(idx for idx, block in enumerate(parent._children) if block.id == batch_after.id) + 1
+                )
                 # we also update the blocks after the position we inserted.
                 for block, updated_block_obj in zip(parent._children[insert_idx:], after_block_objs, strict=True):
                     block.obj_ref.update(**updated_block_obj.model_dump())
                 parent._children[insert_idx:insert_idx] = blocks
                 curr_after = blocks[-1]  # update to the last inserted block to continue appending after it
+            position = None
 
         for block_node, block_obj in zip(parent_node.children, block_objs, strict=True):
             # update the appended blocks with the returned objects from the API. This only works at the top level.
