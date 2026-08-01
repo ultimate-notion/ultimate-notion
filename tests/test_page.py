@@ -82,6 +82,25 @@ def test_parent_subpages(notion: uno.Session, root_page: uno.Page) -> None:
 
 
 @pytest.mark.vcr()
+def test_positioned_page_content(notion: uno.Session, root_page: uno.Page) -> None:
+    page = notion.create_page(root_page, title='Positioned content')
+    end = uno.Paragraph('End')
+    page.append(end)
+
+    first_page = notion.create_page(page, title='First page', position=uno.InsertPosition.START)
+    start = uno.Paragraph('Start')
+    page.append(start, position=uno.InsertPosition.START)
+    middle_page = notion.create_page(page, title='Middle page', after=start)
+    page.insert_markdown('## Markdown start', position=uno.InsertPosition.START)
+
+    children = page.children
+    assert isinstance(children[0], uno.Heading2)
+    assert [child.id for child in children[1:]] == [start.id, middle_page.id, first_page.id, end.id]
+
+    page.delete()
+
+
+@pytest.mark.vcr()
 def test_parent_children(intro_page: uno.Page) -> None:
     assert all(isinstance(block, Block) for block in intro_page.blocks)
 

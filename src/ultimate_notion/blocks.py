@@ -1873,7 +1873,11 @@ def _append_block_chunks(
                 )
                 # we also update the blocks after the position we inserted.
                 for block, updated_block_obj in zip(parent._children[insert_idx:], after_block_objs, strict=True):
-                    block.obj_ref.update(**updated_block_obj.model_dump())
+                    # The blocks endpoint represents child pages and data sources as lightweight
+                    # `child_page`/`child_database` blocks. Their cached object refs are full page/data
+                    # source objects, so those incompatible representations must not be merged.
+                    if not is_page(block) and not is_ds(block):
+                        block.obj_ref.update(**updated_block_obj.model_dump())
                 parent._children[insert_idx:insert_idx] = blocks
                 curr_after = blocks[-1]  # update to the last inserted block to continue appending after it
             position = None
