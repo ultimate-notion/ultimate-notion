@@ -346,6 +346,18 @@ class Page(
             self._delete_me_from_parent()
         return self
 
+    def move(self, parent: Page | DataSource) -> Self:
+        """Move this page below a different page or data source."""
+        session = get_active_session()
+        old_parent = self.parent
+        session.api.pages.move(self.obj_ref, parent.obj_ref)
+        self.obj_ref = session.api.pages.retrieve(self.id)
+        self.props = self._create_page_props_ns()
+        for cached_parent in (old_parent, parent):
+            if isinstance(cached_parent, ChildrenMixin):
+                cached_parent._children = None  # forces a new retrieval of children next time
+        return self
+
     def restore(self) -> Self:
         """Restore this page."""
         if self.is_deleted:
