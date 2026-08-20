@@ -612,6 +612,27 @@ class PagesEndpoint(Endpoint):
         data = self.raw_api.update_markdown(str(page_id), type='insert_content', insert_content=insert_content)
         return self._as_dict(data)
 
+    # https://developers.notion.com/reference/move-page
+    def move(self, page: Page, parent: Page | DataSource) -> None:
+        """Move a page below a different page or data source."""
+        if is_unset(page_id := page.id):
+            raise UnsetError()
+        match parent:
+            case Page():
+                parent_ref: ParentRef = PageRef.build(parent)
+            case DataSource():
+                parent_ref = DataSourceRef.build(parent)
+            case _:
+                msg = f'Unsupported parent of type {type(parent)}'
+                raise ValueError(msg)
+
+        _logger.debug(f'Moving page with id `{page_id}` to parent `{parent_ref.value}`.')
+        data = self._as_dict(self.raw_api.move(str(page_id), parent=parent_ref.serialize_for_api()))
+        if 'parent' in data:
+            page.update(**data)
+        else:
+            page.parent = parent_ref
+
     def delete(self, page: Page) -> None:
         """Delete (archive) the specified Page."""
         self.set_attr(page, in_trash=True)

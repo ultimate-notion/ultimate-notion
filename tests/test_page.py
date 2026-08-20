@@ -101,6 +101,22 @@ def test_positioned_page_content(notion: uno.Session, root_page: uno.Page) -> No
 
 
 @pytest.mark.vcr()
+def test_move_page(notion: uno.Session, root_page: uno.Page) -> None:
+    source_parent = notion.create_page(root_page, title='Move source')
+    target_parent = notion.create_page(root_page, title='Move target')
+    page = notion.create_page(source_parent, title='Movable page')
+
+    assert page.parent == source_parent
+    page.move(target_parent)
+    assert page.parent == target_parent
+    assert page in target_parent.subpages
+    assert page not in source_parent.subpages
+
+    target_parent.delete()
+    source_parent.delete()
+
+
+@pytest.mark.vcr()
 def test_parent_children(intro_page: uno.Page) -> None:
     assert all(isinstance(block, Block) for block in intro_page.blocks)
 

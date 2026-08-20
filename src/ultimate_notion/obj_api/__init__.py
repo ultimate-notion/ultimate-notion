@@ -64,6 +64,9 @@ def create_notion_client(cfg: Config, **kwargs: Any) -> notion_client.Client:
     kwargs.setdefault('logger', logging.getLogger('notion_client'))
     kwargs.setdefault('log_level', logging.NOTSET)
     kwargs.setdefault('notion_version', NOTION_API_VERSION)
+    # Retry transient API failures (rate limits and idempotent requests that receive 5xx responses) using the
+    # SDK's exponential backoff. Configure this explicitly even though the SDK currently enables it by default.
+    kwargs.setdefault('retry', notion_client.RetryOptions())
 
     def log_request(request: httpx.Request) -> None:
         msg = f'Request: {request.method} {request.url}'

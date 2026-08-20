@@ -24,6 +24,8 @@ New pages are appended by default. Pass `position=uno.InsertPosition.START` or
 `position=uno.InsertPosition.END` to place one explicitly, or use `after=some_child`
 to create it after an existing direct child of its parent.
 
+An existing page can be reparented with `page.move(new_parent)`; the new parent may be a page or data source.
+
 Our new page is empty and we can check that with:
 
 ```python
