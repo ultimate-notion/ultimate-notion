@@ -18,6 +18,7 @@ from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.obj_api.core import is_unset
+from ultimate_notion.obj_api.enums import InsertPosition
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.props import PropertyValue, Title
 from ultimate_notion.rich_text import Text
@@ -344,6 +345,23 @@ class Page(
             session = get_active_session()
             session.api.pages.delete(self.obj_ref)
             self._delete_me_from_parent()
+        return self
+
+    def insert_markdown(
+        self,
+        markdown: str,
+        *,
+        after: str | None = None,
+        position: InsertPosition | None = None,
+    ) -> Self:
+        """Insert enhanced Markdown content into this page.
+
+        By default, content is appended. Use `position=InsertPosition.START` to prepend it,
+        or `after` with Notion's ellipsis selection syntax to insert after matching content.
+        """
+        session = get_active_session()
+        session.api.pages.insert_markdown(self.obj_ref, markdown, after=after, position=position)
+        self._children = None  # forces a new retrieval of children next time
         return self
 
     def move(self, parent: Page | DataSource) -> Self:

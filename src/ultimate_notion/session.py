@@ -16,7 +16,7 @@ import httpx
 import notion_client
 from notion_client.errors import APIResponseError
 
-from ultimate_notion.blocks import Block, DataObject, _append_block_chunks, _chunk_blocks_for_api
+from ultimate_notion.blocks import Block, ChildrenMixin, DataObject, _append_block_chunks, _chunk_blocks_for_api
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database, DataSource
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
@@ -33,7 +33,7 @@ from ultimate_notion.obj_api import create_notion_client
 from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
-from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus
+from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
 from ultimate_notion.obj_api.objects import get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
@@ -418,6 +418,8 @@ class Session:
         *,
         cover: AnyFile | None = None,
         icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None = None,
+        after: DataObject | None = None,
+        position: InsertPosition | None = None,
     ) -> Page:
         """Create a new page in a `parent` page or data source with a given `title`.
 
@@ -435,10 +437,20 @@ class Session:
 
         # We don't use the `children` parameter as we would need to call `list` afterwards to get the children,
         # in order to initialize them, which would be another API call. So we append the blocks manually here.
+        after_obj = None if after is None else after.obj_ref
         page = Page.wrap_obj_ref(
-            self.api.pages.create(parent=parent.obj_ref, title=title_obj, cover=cover_obj, icon=icon_obj)
+            self.api.pages.create(
+                parent=parent.obj_ref,
+                title=title_obj,
+                cover=cover_obj,
+                icon=icon_obj,
+                after=after_obj,
+                position=position,
+            )
         )
         self.cache[page.id] = page
+        if isinstance(parent, ChildrenMixin):
+            parent._children = None  # forces a new retrieval of children next time
 
         if blocks:
             blocks_iter = _chunk_blocks_for_api(page, blocks)
