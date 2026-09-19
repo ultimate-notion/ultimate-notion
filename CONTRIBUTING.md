@@ -104,6 +104,28 @@ This lets the suite run offline and much faster, with no Notion account needed:
 hatch run vcr-only
 ```
 
+Choose the test mode that matches what you need:
+
+- `hatch run vcr-only` replays existing cassettes offline and blocks network access.
+  Use this for the normal test run; it does not need a Notion token.
+- `hatch run vcr-off` allows live API requests but disables cassette recording. Use
+  this for a live smoke test when you do not intend to change recordings.
+- `hatch run vcr-rewrite` records live API responses and can rewrite shared fixture
+  cassettes. Run it only when you intentionally need to record or update cassettes,
+  and use a dedicated disposable test workspace rather than production data.
+
+Before running a live or mutating test, you can inspect the integration's accessible
+workspace objects without creating or pruning anything:
+
+```console
+UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace --audit-only
+```
+
+Keep `NOTION_TOKEN` in an environment variable; do not paste it into issues, chats,
+or logs. Rotate the token if it is exposed. Use a dedicated integration shared only
+with a disposable test root, and review its access before running tests that create,
+modify, or delete Notion content.
+
 You only need your own Notion workspace and integration token if you want to
 **run the tests live** against the Notion API, or to **add a new test** or
 **re-record an existing cassette**:
