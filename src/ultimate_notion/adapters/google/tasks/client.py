@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from datetime import UTC, date, datetime, time
-from enum import Enum
+from enum import StrEnum
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Literal, Self, cast
 
@@ -55,7 +55,7 @@ def _drop_none(**kwargs: Any) -> dict[str, Any]:
     return {key: value for key, value in kwargs.items() if value is not None}
 
 
-class Scope(str, Enum):
+class Scope(StrEnum):
     TASKS_RO = 'https://www.googleapis.com/auth/tasks.readonly'
     """Allows read-only access to Google Tasks"""
     TASKS_RW = 'https://www.googleapis.com/auth/tasks'
@@ -71,14 +71,14 @@ class Link(BaseModel):
     type: str
 
 
-class Status(str, Enum):
+class Status(StrEnum):
     """Representation of the different statuses of a Google Task."""
 
     NEEDS_ACTION = 'needsAction'
     COMPLETED = 'completed'
 
 
-class Kind(str, Enum):
+class Kind(StrEnum):
     """Representation of the different kinds of Google Objects."""
 
     TASK = 'tasks#task'

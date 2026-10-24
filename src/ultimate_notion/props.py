@@ -335,7 +335,7 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
     @property
     def value_type(self) -> RollupType | None:
         """Return the type of the rollup result."""
-        return RollupType(self.obj_ref.rollup.type) if self.obj_ref.rollup else None
+        return RollupType(self.obj_ref.rollup._type_name) if self.obj_ref.rollup else None
 
 
 class CreatedTime(PropertyValue[obj_props.CreatedTime], wraps=obj_props.CreatedTime):

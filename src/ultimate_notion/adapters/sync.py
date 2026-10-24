@@ -8,7 +8,7 @@ import pickle  # noqa: S403
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Self, TypeAlias
 
 from pydantic import BaseModel, Field
@@ -20,7 +20,7 @@ _logger = logging.getLogger(__name__)
 ID: TypeAlias = str
 
 
-class ConflictMode(str, Enum):
+class ConflictMode(StrEnum):
     """Conflict resolution modes."""
 
     NEWER = 'newer'

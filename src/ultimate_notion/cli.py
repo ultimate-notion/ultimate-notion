@@ -45,7 +45,7 @@ def handle_exceptions(*, verbose: bool = False) -> Callable[[Callable[P, R]], Ca
     return decorator
 
 
-class LogLevel(str, enum.Enum):
+class LogLevel(enum.StrEnum):
     CRITICAL = 'critical'
     ERROR = 'error'
     WARNING = 'warning'
