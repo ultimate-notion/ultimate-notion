@@ -18,7 +18,7 @@ import logging
 import re
 from abc import ABC
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, TypeAlias, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Self, TypeAlias, cast
 from uuid import UUID
 
 from pydantic import (
@@ -31,7 +31,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from typing_extensions import Self, TypeIs, TypeVar
+from typing_extensions import TypeIs, TypeVar
 
 from ultimate_notion.obj_api.enums import Color
 from ultimate_notion.utils import is_stable_release, pydantic_apply

@@ -15,10 +15,10 @@ Official REST documentation: https://developers.google.com/tasks/reference/rest
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import date, datetime, time, timezone
-from enum import Enum
+from datetime import UTC, date, datetime, time
+from enum import StrEnum
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Generic, Literal, cast
+from typing import TYPE_CHECKING, Any, Generic, Literal, Self, cast
 
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
@@ -26,7 +26,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow  # type: ignore[import-untyped]
 from googleapiclient.discovery import build
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, PrivateAttr, ValidationInfo, model_validator
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeVar
 
 from ultimate_notion.config import Config, get_or_create_cfg
 from ultimate_notion.utils import SList, is_stable_release
@@ -56,7 +56,7 @@ def _drop_none(**kwargs: Any) -> dict[str, Any]:
     return {key: value for key, value in kwargs.items() if value is not None}
 
 
-class Scope(str, Enum):
+class Scope(StrEnum):
     TASKS_RO = 'https://www.googleapis.com/auth/tasks.readonly'
     """Allows read-only access to Google Tasks"""
     TASKS_RW = 'https://www.googleapis.com/auth/tasks'
@@ -72,14 +72,14 @@ class Link(BaseModel):
     type: str
 
 
-class Status(str, Enum):
+class Status(StrEnum):
     """Representation of the different statuses of a Google Task."""
 
     NEEDS_ACTION = 'needsAction'
     COMPLETED = 'completed'
 
 
-class Kind(str, Enum):
+class Kind(StrEnum):
     """Representation of the different kinds of Google Objects."""
 
     TASK = 'tasks#task'
@@ -535,7 +535,7 @@ def assert_datetime(dt: date | datetime | None) -> datetime | None:
         case datetime():
             return dt
         case date():
-            return datetime.combine(dt, time(tzinfo=timezone.utc))
+            return datetime.combine(dt, time(tzinfo=UTC))
         case _:
             msg = f'Expected a datetime object or None, but got {type(dt)}!'
             raise TypeError(msg)

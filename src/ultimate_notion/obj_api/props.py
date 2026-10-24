@@ -15,10 +15,10 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Generic, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Generic, NotRequired, Self, TypedDict, cast
 
 from pydantic import Field, SerializeAsAny, field_validator, model_serializer
-from typing_extensions import NotRequired, Self, TypeVar
+from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, ObjectRef, TypedObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import AggFunc, FormulaType, RollupType, VState

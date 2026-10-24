@@ -8,12 +8,12 @@ import mimetypes
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import BinaryIO, Literal
+from typing import BinaryIO, Literal, Self
 from urllib.parse import urlparse
 from uuid import UUID
 
 import pendulum as pnd
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.core import Wrapper, get_active_session, get_repr

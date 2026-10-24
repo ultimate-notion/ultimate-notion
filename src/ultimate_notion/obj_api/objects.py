@@ -128,7 +128,7 @@ class DateRange(GenericObject, MentionMixin):
 
             case dt.datetime():
                 # We don't trust the timezone of naive datetime and convert to UTC
-                return cls.model_construct(time_zone='UTC', start=dt_spec.astimezone(dt.timezone.utc), end=None)
+                return cls.model_construct(time_zone='UTC', start=dt_spec.astimezone(dt.UTC), end=None)
 
             case pnd.Date() | dt.date():
                 return cls.model_construct(time_zone=None, start=dt_spec, end=None)

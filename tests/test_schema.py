@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import pendulum as pnd
@@ -73,10 +73,10 @@ def test_all_createable_props_schema(
         SchemaB.create(non_existent_attr_name=None)
 
     with pytest.raises(ReadOnlyPropertyError):
-        SchemaB.create(created_time=datetime.now(tz=timezone.utc))
+        SchemaB.create(created_time=datetime.now(tz=UTC))
 
     with pytest.raises(ReadOnlyPropertyError):
-        SchemaB.create(last_edited_time=datetime.now(tz=timezone.utc))
+        SchemaB.create(last_edited_time=datetime.now(tz=UTC))
 
     myself = notion.whoami()
 
