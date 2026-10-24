@@ -114,18 +114,6 @@ strict = true
 
 # ty configuration
 
-[[tool.ty.overrides]]
-# These Pydantic models intentionally refine inherited API fields, such as a
-# generic object's ID becoming a UUID or a property item's ID becoming a string.
-# Keep this exception limited to the Pydantic model modules.
-include = [
-    "src/ultimate_notion/adapters/google/tasks/client.py",
-    "src/ultimate_notion/obj_api/core.py",
-    "src/ultimate_notion/obj_api/objects.py",
-    "src/ultimate_notion/obj_api/props.py",
-]
-rules.invalid-mutable-override = "ignore"
-
 [tool.ty.src]
 include = ["src/ultimate_notion", "tests", "examples"]
 

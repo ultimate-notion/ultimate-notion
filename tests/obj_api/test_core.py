@@ -3,13 +3,15 @@ from __future__ import annotations
 from uuid import UUID, uuid4
 
 import pytest
+from pydantic import ValidationError
 
 from ultimate_notion.database import Database as DatabaseWrapper
 from ultimate_notion.emoji import BuiltInIcon
 from ultimate_notion.obj_api.blocks import Database, Page, Paragraph
-from ultimate_notion.obj_api.core import extract_id
+from ultimate_notion.obj_api.core import UniqueObject, Unset, UserRef, extract_id
 from ultimate_notion.obj_api.endpoints import DatabasesEndpoint
 from ultimate_notion.obj_api.objects import Bot, BuiltInIconObject, Person, User
+from ultimate_notion.obj_api.props import Number, NumberPropertyItem, PropertyItem
 
 
 @pytest.fixture(autouse=True)
@@ -34,6 +36,27 @@ def test_extract_id() -> None:
         block_id = uuid4()
         page_url = f'{base_url}/username/page-title-{page_id}#{block_id!s}'
         assert UUID(extract_id(page_url)) == block_id
+
+
+def test_model_id_defaults_and_property_item_round_trip() -> None:
+    object_id = UUID('00000000-0000-0000-0000-000000000001')
+    assert UniqueObject.model_validate({'id': str(object_id)}).id == object_id
+    assert UniqueObject().id is Unset
+    assert Number(number=1).id is Unset
+    assert Number(number=1).serialize_for_api() == {'type': 'number', 'number': 1}
+
+    payload = {'object': 'property_item', 'type': 'number', 'id': 'abc', 'number': 1}
+    item = PropertyItem.model_validate(payload)
+    assert isinstance(item, NumberPropertyItem)
+    assert item.id == 'abc'
+    assert item.serialize_for_api() == payload
+
+
+def test_references_and_property_items_require_ids() -> None:
+    with pytest.raises(ValidationError, match='id'):
+        UserRef.model_validate({})
+    with pytest.raises(ValidationError, match='id'):
+        NumberPropertyItem.model_validate({'number': 1})
 
 
 def test_user_object_default_propagates_to_subtypes() -> None:
