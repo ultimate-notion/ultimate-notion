@@ -5,11 +5,11 @@ from __future__ import annotations
 import datetime as dt
 import re
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, Any, TypeGuard
+from typing import TYPE_CHECKING, Any, Self, TypeGuard
 from urllib.parse import urlparse
 
 import pendulum as pnd
-from typing_extensions import Self, TypeIs, TypeVar
+from typing_extensions import TypeIs, TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.core import Wrapper

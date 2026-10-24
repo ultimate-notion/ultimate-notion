@@ -10,7 +10,7 @@ build-backend = "hatchling.build"
 name = "ultimate-notion"
 description = "The ultimate Python client for Notion!"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 keywords = ["notion", "notion client"]
 authors = [
@@ -19,7 +19,6 @@ authors = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -38,12 +37,11 @@ dependencies = [
     "tabulate>=0.9",
     "numpy>=1.24",
     "emoji>=2.8",
-    "tomli>=2.2",  # ToDo: Remove when `python_requires = 3.11`, use tomllib then
     "pydantic>=2.0",
     "mistune>=3.0",  # markdown parser
     "packaging",
     "pendulum>=3.0",
-    "typing_extensions", # for Python 3.10 compatibility, check if still needed when pumbing `requires-python`
+    "typing_extensions",  # for TypeIs and TypeVar defaults on older Python versions
     "typer>=0.16",
     "tomli_w>=1.2",
     "url-normalize>=2.2",  # normalize URLs for better comparison
@@ -105,7 +103,7 @@ exclude = [
 # Mypy configuration
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 plugins = ["pydantic.mypy"]
 files = ["src/ultimate_notion", "tests", "examples"]
 show_column_numbers = true
@@ -176,7 +174,7 @@ exclude_lines = [
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 indent-width = 4
 include = [
     "src/**/*.py",
@@ -221,6 +219,8 @@ select = [
     "RUF100", # Automatically remove unused # noqa directives
 ]
 ignore = [
+    # Preserve the string representation of existing str/Enum subclasses.
+    "UP042",
     # Allow defining __eq__ without __hash__ as it is set to None in `GenericObject` anyway
     "PLW1641",
     # Allow non-abstract empty methods in abstract base classes
@@ -413,7 +413,7 @@ extra-dependencies = [
 # Production environment taking latest Ultimate Notion from PyPI
 [tool.hatch.envs.prod]
 detached = true
-python = "3.10"
+python = "3.11"
 dependencies = [
     "ultimate-notion[all]",
     "pytest",

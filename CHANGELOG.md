@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Chg: Drop support for Python 3.10, which is end-of-life. Python 3.11 or higher is now required.
+
 - New: Create databases with icons and update `Database.icon`/`DataSource.icon`, including native
   Notion icons constructed with `BuiltInIcon(name, color=...)`. Database icons cannot be removed
   because Notion rejects `icon=null`, issue #434.

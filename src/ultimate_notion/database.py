@@ -7,11 +7,11 @@ In API version 2025-09-03+:
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any, Self, cast
 from uuid import UUID
 
 from pydantic import ValidationError
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeVar
 
 from ultimate_notion.blocks import ChildrenMixin, DataObject, wrap_icon
 from ultimate_notion.core import NotionEntity, WorkspaceType, get_active_session, get_repr, resolve_ref

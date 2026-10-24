@@ -5,10 +5,9 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Self
 
 from pydantic import BaseModel, Field
-from typing_extensions import Self
 
 from ultimate_notion import props, schema
 from ultimate_notion.core import get_active_session

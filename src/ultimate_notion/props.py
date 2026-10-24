@@ -7,10 +7,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Self
 
 import pendulum as pnd
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeVar
 
 import ultimate_notion.obj_api.props as obj_props
 from ultimate_notion import rich_text as rt

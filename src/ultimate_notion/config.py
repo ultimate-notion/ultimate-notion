@@ -4,10 +4,10 @@ import logging
 import os
 import re
 import sys
+import tomllib
 from pathlib import Path
 from typing import Any
 
-import tomli
 from pydantic import BaseModel, FilePath, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
@@ -107,8 +107,7 @@ def get_cfg() -> Config:
     cfg_path = get_cfg_file()
     _logger.info(f'Loading configuration from path `{cfg_path}`.')
     with open(cfg_path, 'rb') as fh:
-        # ToDo: Use `tomllib` when Python 3.11 is the minimum version
-        cfg_dict = tomli.load(fh)
+        cfg_dict = tomllib.load(fh)
 
     # Resolve environment variable values in the configuration
     def resolve_values(data: Any) -> None:

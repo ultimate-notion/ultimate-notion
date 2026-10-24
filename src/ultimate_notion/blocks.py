@@ -29,11 +29,11 @@ from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Generic, TypeGuard, overload
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeGuard, overload
 
 import numpy as np
 from tabulate import tabulate
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeVar
 from url_normalize import url_normalize
 
 from ultimate_notion.comment import Comment, Discussion

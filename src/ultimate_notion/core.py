@@ -6,10 +6,10 @@ import datetime as dt
 import logging
 from abc import ABC
 from enum import Enum
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, TypeAlias
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Literal, Self, TypeAlias
 from uuid import UUID
 
-from typing_extensions import Self, TypeIs, TypeVar
+from typing_extensions import TypeIs, TypeVar
 
 from ultimate_notion.errors import UnknownDatabaseError, UnknownDataSourceError, UnknownPageError, UnsetError
 from ultimate_notion.obj_api import core as obj_core

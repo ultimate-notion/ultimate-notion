@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING, Self, overload
 from uuid import UUID
-
-from typing_extensions import Self
 
 from ultimate_notion.core import NotionEntity, get_active_session
 from ultimate_notion.errors import InvalidAPIUsageError

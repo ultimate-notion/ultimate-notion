@@ -9,10 +9,9 @@ from abc import ABC, abstractmethod
 from collections.abc import Generator
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, TypeAlias
+from typing import Any, Self, TypeAlias
 
 from pydantic import BaseModel, Field
-from typing_extensions import Self
 
 from ultimate_notion.config import get_cfg
 

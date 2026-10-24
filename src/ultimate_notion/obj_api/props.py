@@ -15,10 +15,9 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TYPE_CHECKING, Any, NotRequired, Self, TypedDict
 
 from pydantic import Field, SerializeAsAny, field_validator, model_serializer
-from typing_extensions import NotRequired, Self
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, ObjectRef, TypedObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import AggFunc, FormulaType, RollupType, VState

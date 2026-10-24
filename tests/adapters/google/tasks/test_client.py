@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -66,7 +66,7 @@ def test_gtask_tasklist(gtasks: GTasksClient) -> None:
 @pytest.mark.vcr()
 def test_gtask_task(gtasks: GTasksClient) -> None:
     new_list = gtasks.create_tasklist('My new tasklist')
-    today = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    today = datetime(2024, 1, 1, tzinfo=UTC)
     tomorrow = today + timedelta(days=1)
     new_task = new_list.create_task('My new task', due=today)
     assert new_task.title == 'My new task'
