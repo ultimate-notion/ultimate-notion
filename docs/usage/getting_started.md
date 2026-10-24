@@ -14,7 +14,7 @@ or to install all additional dependencies, use:
 pip install 'ultimate-notion[all]'
 ```
 
-Ultimate Notion requires Python 3.10 or higher. Depending on your system,
+Ultimate Notion requires Python 3.11 or higher. Depending on your system,
 you might need to use [pyenv], [conda], etc. to install a more recent version.
 
 ## Creating an integration

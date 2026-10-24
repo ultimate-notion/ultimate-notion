@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
-from typing_extensions import Self, TypeIs
+from typing_extensions import TypeIs
 
 from ultimate_notion.blocks import ChildrenMixin, CommentMixin, DataObject, wrap_icon
 from ultimate_notion.comment import Discussion

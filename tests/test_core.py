@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 import pytest
 from pydantic import ValidationError
-from typing_extensions import assert_type
 
 import ultimate_notion as uno
 from ultimate_notion.obj_api.objects import RichTextBaseObject, User

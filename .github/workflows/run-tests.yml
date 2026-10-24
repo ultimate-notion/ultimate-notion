@@ -30,8 +30,6 @@ jobs:
         include:
           # Linux - all Python versions
           - os: ubuntu-latest
-            python-version: '3.10'
-          - os: ubuntu-latest
             python-version: '3.11'
           - os: ubuntu-latest
             python-version: '3.12'
@@ -39,12 +37,12 @@ jobs:
             python-version: '3.13'
           - os: ubuntu-latest
             python-version: '3.14'
-          # Windows - only Python 3.10
+          # Windows - only Python 3.11
           - os: windows-latest
-            python-version: '3.10'
-          # macOS - only Python 3.10
+            python-version: '3.11'
+          # macOS - only Python 3.11
           - os: macos-latest
-            python-version: '3.10'
+            python-version: '3.11'
 
     steps:
     - name: Checkout
@@ -76,7 +74,7 @@ jobs:
         Get-Content $env:GITHUB_ENV
 
     - name: Lint
-      if: matrix.python-version == '3.10' && runner.os == 'Linux'
+      if: matrix.python-version == '3.11' && runner.os == 'Linux'
       run: hatch run lint:all
 
     - name: Run tests and track code coverage

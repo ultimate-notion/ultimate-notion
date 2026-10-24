@@ -2,40 +2,38 @@
 
 from __future__ import annotations
 
-from enum import Enum
-
-# ToDo: Let Enums inherit form StrEnum instead of Enum & str, when we require Python >= 3.11
+from enum import StrEnum
 
 
-class SortDirection(str, Enum):
+class SortDirection(StrEnum):
     """Sort direction options."""
 
     ASCENDING = 'ascending'
     DESCENDING = 'descending'
 
 
-class InsertPosition(str, Enum):
+class InsertPosition(StrEnum):
     """Possible positions when inserting pages, blocks, or Markdown content."""
 
     START = 'start'
     END = 'end'
 
 
-class TimestampKind(str, Enum):
+class TimestampKind(StrEnum):
     """Possible timestamp types."""
 
     CREATED_TIME = 'created_time'
     LAST_EDITED_TIME = 'last_edited_time'
 
 
-class VState(str, Enum):
+class VState(StrEnum):
     """Verification states for pages in wiki databases."""
 
     VERIFIED = 'verified'
     UNVERIFIED = 'unverified'
 
 
-class Color(str, Enum):
+class Color(StrEnum):
     """Basic colors
 
     DEFAULT is a light gray, which is the default color in the Notion App.
@@ -53,7 +51,7 @@ class Color(str, Enum):
     RED = 'red'
 
 
-class BGColor(str, Enum):
+class BGColor(StrEnum):
     """Background colors for most textual blocks, e.g. paragraphs, callouts, etc."""
 
     DEFAULT = 'default'
@@ -68,7 +66,7 @@ class BGColor(str, Enum):
     RED = 'red_background'
 
 
-class FormulaType(str, Enum):
+class FormulaType(StrEnum):
     """Formula types for formulas.
 
     The type of the formula as well as the mapping to the Notion API keyword when filtering in a query.
@@ -88,7 +86,7 @@ class FormulaType(str, Enum):
         return obj
 
 
-class RollupType(str, Enum):
+class RollupType(StrEnum):
     """Rollup types for rollups."""
 
     NUMBER = 'number'
@@ -98,7 +96,7 @@ class RollupType(str, Enum):
     UNSUPPORTED = 'unsupported'
 
 
-class ArrayQuantifier(str, Enum):
+class ArrayQuantifier(StrEnum):
     """Array quantifiers for rollups."""
 
     ANY = 'any'
@@ -106,7 +104,7 @@ class ArrayQuantifier(str, Enum):
     NONE = 'none'
 
 
-class OptionGroupType(str, Enum):
+class OptionGroupType(StrEnum):
     """Option group type of the Status property."""
 
     TO_DO = 'to_do'
@@ -114,7 +112,7 @@ class OptionGroupType(str, Enum):
     COMPLETE = 'complete'
 
 
-class FileUploadStatus(str, Enum):
+class FileUploadStatus(StrEnum):
     """Status of a file upload."""
 
     PENDING = 'pending'
@@ -123,7 +121,7 @@ class FileUploadStatus(str, Enum):
     FAILED = 'failed'
 
 
-class FileUploadMode(str, Enum):
+class FileUploadMode(StrEnum):
     """File upload modes."""
 
     SINGLE_PART = 'single_part'
@@ -131,7 +129,7 @@ class FileUploadMode(str, Enum):
     EXTERNAL_URL = 'external_url'
 
 
-class CodeLang(str, Enum):
+class CodeLang(StrEnum):
     """Coding languages for code blocks."""
 
     ABAP = 'abap'
@@ -209,7 +207,7 @@ class CodeLang(str, Enum):
     MISC = 'java/c/c++/c#'
 
 
-class AggFunc(str, Enum):
+class AggFunc(StrEnum):
     """Aggregation functions for formulas.
 
     The categories naming corresonds mostly to the naming in the Notion App but
@@ -267,7 +265,7 @@ class AggFunc(str, Enum):
         raise ValueError(msg)
 
 
-class NumberFormat(str, Enum):
+class NumberFormat(StrEnum):
     """Number formats for numbers."""
 
     NUMBER = 'number'
