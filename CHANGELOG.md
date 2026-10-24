@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New: Add support for Python 3.15.
+
 - Chg: Drop support for Python 3.10, which is end-of-life. Python 3.11 or higher is now required.
 - Chg: Migrate string enums to `enum.StrEnum`. Calling `str()` or formatting an enum now returns its
   value instead of its qualified member name, e.g. `str(Color.RED)` returns `'red'` instead of `'Color.RED'`.

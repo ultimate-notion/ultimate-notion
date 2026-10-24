@@ -37,6 +37,8 @@ jobs:
             python-version: '3.13'
           - os: ubuntu-latest
             python-version: '3.14'
+          - os: ubuntu-latest
+            python-version: '3.15'
           # Windows - only Python 3.11
           - os: windows-latest
             python-version: '3.11'
@@ -70,6 +72,8 @@ jobs:
       run: hatch run lint:all
 
     - name: Run tests and track code coverage
+      env:
+        HATCH_ENV: ${{ matrix.python-version == '3.15' && 'py315' || 'default' }}
       run: hatch run ci
 
     # The macOS runner's Homebrew refuses to load the coveralls formula from
