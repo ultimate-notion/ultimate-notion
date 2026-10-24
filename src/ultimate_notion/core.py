@@ -94,7 +94,7 @@ class Wrapper(Generic[GT_co], ABC):
         # Once `cls` already is the resolved class we build the object directly to break the recursion.
         if cls is hl_cls:
             hl_obj = hl_cls.__new__(hl_cls)
-            hl_obj._obj_ref = obj_ref
+            hl_obj.obj_ref = obj_ref
             hl_obj._finalize_wrap()
         else:
             hl_obj = hl_cls.wrap_obj_ref(obj_ref)
@@ -188,7 +188,7 @@ def resolve_ref(obj_ref: obj_core.ParentRef) -> NotionEntity | WorkspaceType | N
 
 
 class NotionEntity(NotionObject[NE_co], ABC, wraps=obj_core.NotionEntity):
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: object, /) -> bool:
         if other is None:
             return False
         elif not isinstance(other, NotionEntity):

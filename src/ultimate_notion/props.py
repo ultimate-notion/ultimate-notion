@@ -39,7 +39,7 @@ class PropertyValue(Wrapper[PV_co], ABC, wraps=obj_props.PropertyValue):
     readonly: bool = False  # value of property can not be set by us
     _type_value_map: ClassVar[dict[str, type[PropertyValue]]] = {}
 
-    def __init_subclass__(cls, wraps: type[PV_co], **kwargs: Any):
+    def __init_subclass__(cls, wraps: type[obj_props.PropertyValue], **kwargs: Any):
         super().__init_subclass__(wraps=wraps, **kwargs)
         # When this is called, the model is not yet constructed, thus no direct field access with .type.
         type_name = wraps.model_fields['type'].get_default()

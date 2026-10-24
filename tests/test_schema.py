@@ -247,13 +247,15 @@ def test_to_pydantic_model() -> None:
         created_on = uno.PropType.CreatedTime('Created on')
 
     rw_props_model = Schema.to_pydantic_model(with_ro_props=False)
-    rw_props_item = rw_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2']})
+    rw_props_item = rw_props_model.model_validate({'Name': 'Name', 'Tags': ['Tag1', 'Tag2']})
     assert len(rw_props_item.__class__.model_fields) == 2
     assert isinstance(rw_props_item.name, PropertyValue)  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
     all_props_model = Schema.to_pydantic_model(with_ro_props=True)
     created_on = props.CreatedTime(pnd.parse('2021-01-01T12:00:00Z'))
-    all_props_item = all_props_model(**{'Name': 'Name', 'Tags': ['Tag1', 'Tag2'], 'Created on': created_on})
+    all_props_item = all_props_model.model_validate(
+        {'Name': 'Name', 'Tags': ['Tag1', 'Tag2'], 'Created on': created_on}
+    )
     assert len(all_props_item.__class__.model_fields) == 3
 
 
@@ -295,9 +297,7 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert 'Number' in [prop.name for prop in db.schema]
     assert 'number' in [prop.attr_name for prop in db.schema]
 
-    # ty does not resolve class-attribute writes through the schema metaclass `__setattr__`.
-    # See https://github.com/astral-sh/ty/issues/3845
-    db.schema.date = uno.PropType.Date('Date')  # ty: ignore[unresolved-attribute]
+    db.schema.date = uno.PropType.Date('Date')
     assert 'Date' in [prop.name for prop in db.schema]
     assert 'date' in [prop.attr_name for prop in db.schema]
     db.reload()
@@ -335,9 +335,7 @@ def test_add_del_update_prop(notion: uno.Session, root_page: uno.Page) -> None:
     assert isinstance(formula, uno.PropType.Formula)
     assert formula.formula.startswith('{{notion:block_property:title:')
 
-    # ty does not resolve class-attribute writes through the schema metaclass `__setattr__`.
-    # See https://github.com/astral-sh/ty/issues/3845
-    db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)  # ty: ignore[unresolved-attribute]
+    db.schema.number = uno.PropType.Number(format=uno.NumberFormat.PERCENT)
     number = db.schema['Number']
     assert isinstance(number, uno.PropType.Number)
     assert number.format == uno.NumberFormat.PERCENT

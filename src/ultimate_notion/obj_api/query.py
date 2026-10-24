@@ -268,16 +268,17 @@ class DataSourceQuery(Query):
 
 
 T = TypeVar('T', bound=Page | DataSource, default=Page | DataSource)
+Q = TypeVar('Q', bound=Query, default=Query)
 
 
-class QueryBuilder(Generic[T], ABC):
+class QueryBuilder(Generic[T, Q], ABC):
     """General query builder for the Notion search & data source query API."""
 
-    query: Query
+    query: Q
     endpoint: NCEndpointCall
     params: dict[str, str]
 
-    def __init__(self, endpoint: NCEndpointCall, query: Query, params: Mapping[str, str | None]):
+    def __init__(self, endpoint: NCEndpointCall, query: Q, params: Mapping[str, str | None]):
         self.endpoint = endpoint
         self.query = query
         self.params = {k: v for k, v in params.items() if v is not None}  # API doesn't like "undefined" values
@@ -289,15 +290,13 @@ class QueryBuilder(Generic[T], ABC):
         return EndpointIterator[T](self.endpoint)(**query)
 
 
-class SearchQueryBuilder(QueryBuilder[T]):
+class SearchQueryBuilder(QueryBuilder[T, SearchQuery]):
     """Search query builder to search for pages and data sources.
 
     By default and not changed by `sort`, then the most recently edited results are returned first.
 
     Notion API: https://developers.notion.com/reference/post-search
     """
-
-    query: SearchQuery
 
     def __init__(self, endpoint: NCEndpointCall, text: str | None = None):
         super().__init__(endpoint=endpoint, query=SearchQuery(), params={'query': text})
@@ -335,13 +334,11 @@ class SearchQueryBuilder(QueryBuilder[T]):
         return builder
 
 
-class DataSourceQueryBuilder(QueryBuilder[Page]):
+class DataSourceQueryBuilder(QueryBuilder[Page, DataSourceQuery]):
     """Query builder to query a data source.
 
     Notion API: https://developers.notion.com/reference/post-data-source-query
     """
-
-    query: DataSourceQuery
 
     def __init__(self, endpoint: NCEndpointCall, data_source_id: str):
         super().__init__(endpoint=endpoint, query=DataSourceQuery(), params={'data_source_id': data_source_id})
