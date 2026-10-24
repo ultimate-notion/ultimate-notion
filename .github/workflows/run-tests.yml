@@ -37,6 +37,8 @@ jobs:
             python-version: '3.13'
           - os: ubuntu-latest
             python-version: '3.14'
+          - os: ubuntu-latest
+            python-version: '3.15'
           # Windows - only Python 3.11
           - os: windows-latest
             python-version: '3.11'
@@ -53,31 +55,25 @@ jobs:
     - name: Setup environment requirements
       uses: ./.github/actions/setup-venv-reqs
 
-    - name: Install Python version (Linux/macOS)
-      if: runner.os != 'Windows'
-      shell: bash
-      run: |
-        hatch python install ${{ matrix.python-version }}
-        # Save the path to the installed Python version to the environment for later injection
-        PY="$(hatch --no-color python find ${{ matrix.python-version }} | tr -d '\n')"
-        printf 'HATCH_PYTHON=%s\n' "$PY" >> "$GITHUB_ENV"
-        cat "$GITHUB_ENV"
+    - name: Install Python version
+      id: python
+      uses: actions/setup-python@v7
+      with:
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install Python version (Windows)
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        hatch python install "${{ matrix.python-version }}"
-        # Save the path to the installed Python version to the environment for later injection
-        $PY = (hatch --no-color python find "${{ matrix.python-version }}").Trim()
-        "HATCH_PYTHON=$PY" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-        Get-Content $env:GITHUB_ENV
+    - name: Select Python for Hatch
+      shell: bash
+      env:
+        HATCH_SELECTED_PYTHON: ${{ steps.python.outputs.python-path }}
+      run: printf 'HATCH_PYTHON=%s\n' "$HATCH_SELECTED_PYTHON" >> "$GITHUB_ENV"
 
     - name: Lint
       if: matrix.python-version == '3.11' && runner.os == 'Linux'
       run: hatch run lint:all
 
     - name: Run tests and track code coverage
+      env:
+        HATCH_ENV: ${{ matrix.python-version == '3.15' && 'py315' || 'default' }}
       run: hatch run ci
 
     # The macOS runner's Homebrew refuses to load the coveralls formula from

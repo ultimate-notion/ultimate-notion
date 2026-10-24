@@ -104,6 +104,9 @@ This lets the suite run offline and much faster, with no Notion account needed:
 hatch run vcr-only
 ```
 
+To run the offline suite on Python 3.15, use `hatch run py315:vcr-only`.
+This environment uses a separate lockfile for dependencies that require newer Python versions.
+
 You only need your own Notion workspace and integration token if you want to
 **run the tests live** against the Notion API, or to **add a new test** or
 **re-record an existing cassette**:
