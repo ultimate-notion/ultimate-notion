@@ -27,7 +27,7 @@
 # - packaging
 # - pendulum>=3.0
 # - typing_extensions
-# - typer>=0.16
+# - typer>=0.27
 # - tomli_w>=1.2
 # - url-normalize>=2.2
 # - google-api-python-client
@@ -37,6 +37,8 @@
 # - polars>=1.17
 #
 
+annotated-doc==0.0.5
+    # via typer
 annotated-types==0.8.0
     # via pydantic
 anyio==4.15.1
@@ -78,8 +80,6 @@ cfgv==3.5.0
     # via pre-commit
 charset-normalizer==3.5.2
     # via requests
-click==8.5.0
-    # via typer
 comm==0.2.3
     # via ipykernel
 contourpy==1.4.0
@@ -470,7 +470,7 @@ traitlets==5.16.1
     #   nbclient
     #   nbconvert
     #   nbformat
-typer==0.20.0
+typer==0.27.3
     # via hatch.envs.py315
 typing-extensions==4.16.0
     # via
@@ -480,7 +480,6 @@ typing-extensions==4.16.0
     #   opentelemetry-api
     #   pydantic
     #   pydantic-core
-    #   typer
     #   typing-inspection
 typing-inspection==0.4.4
     # via pydantic
