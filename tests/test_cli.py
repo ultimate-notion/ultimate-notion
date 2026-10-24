@@ -8,8 +8,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from click.testing import Result
-from typer.testing import CliRunner
+from typer.testing import CliRunner, Result
 
 import ultimate_notion as uno
 from ultimate_notion import Session, __version__
