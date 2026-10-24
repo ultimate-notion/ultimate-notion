@@ -15,9 +15,10 @@ from __future__ import annotations
 import datetime as dt
 from abc import ABC
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, NotRequired, Self, TypedDict
+from typing import TYPE_CHECKING, Any, Generic, NotRequired, Self, TypedDict, cast
 
 from pydantic import Field, SerializeAsAny, field_validator, model_serializer
+from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, ObjectRef, TypedObject, Unset, UnsetType
 from ultimate_notion.obj_api.enums import AggFunc, FormulaType, RollupType, VState
@@ -47,10 +48,14 @@ Source: https://developers.notion.com/reference/retrieve-a-page
 ###################
 
 
-class PropertyValue(TypedObject[Any], polymorphic_base=True):
+PID_co = TypeVar('PID_co', bound=str | UnsetType, default=str | UnsetType, covariant=True)
+
+
+class PropertyValue(TypedObject[Any], Generic[PID_co], polymorphic_base=True):
     """Base class for Notion property values."""
 
-    id: str | UnsetType = Unset
+    # PropertyItem redeclares the ID as required when values are returned as items.
+    id: PID_co = Field(default=cast(PID_co, Unset))
     _is_retrieved: bool = False  # fetched separately as property item from the server
 
     @classmethod
@@ -72,31 +77,31 @@ class PropertyValue(TypedObject[Any], polymorphic_base=True):
         return dump_dct
 
 
-class Title(PropertyValue, type='title'):
+class Title(PropertyValue[PID_co], type='title'):
     """Notion title type."""
 
     title: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
-class RichText(PropertyValue, type='rich_text'):
+class RichText(PropertyValue[PID_co], type='rich_text'):
     """Notion rich text type."""
 
     rich_text: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
 
 
-class Number(PropertyValue, type='number'):
+class Number(PropertyValue[PID_co], type='number'):
     """Simple number type."""
 
     number: float | int | None = None
 
 
-class Checkbox(PropertyValue, type='checkbox'):
+class Checkbox(PropertyValue[PID_co], type='checkbox'):
     """Simple checkbox type; represented as a boolean."""
 
     checkbox: bool | None = None
 
 
-class Date(PropertyValue, type='date'):
+class Date(PropertyValue[PID_co], type='date'):
     """Notion complex date type - may include timestamp and/or be a date range."""
 
     date: DateRange | None = None
@@ -111,25 +116,25 @@ class Date(PropertyValue, type='date'):
         return obj
 
 
-class Status(PropertyValue, type='status'):
+class Status(PropertyValue[PID_co], type='status'):
     """Notion status property."""
 
     status: SelectOption | None = None
 
 
-class Select(PropertyValue, type='select'):
+class Select(PropertyValue[PID_co], type='select'):
     """Notion select type."""
 
     select: SelectOption | None = None
 
 
-class MultiSelect(PropertyValue, type='multi_select'):
+class MultiSelect(PropertyValue[PID_co], type='multi_select'):
     """Notion multi-select type."""
 
     multi_select: list[SelectOption] = Field(default_factory=list)
 
 
-class People(PropertyValue, type='people'):
+class People(PropertyValue[PID_co], type='people'):
     """Notion people type."""
 
     people: list[User] = Field(default_factory=list)
@@ -141,25 +146,25 @@ class People(PropertyValue, type='people'):
         return {'people': [{'id': user.id, 'object': user.object} for user in self.people], 'type': 'people'}
 
 
-class URL(PropertyValue, type='url'):
+class URL(PropertyValue[PID_co], type='url'):
     """Notion URL type."""
 
     url: str | None = None
 
 
-class Email(PropertyValue, type='email'):
+class Email(PropertyValue[PID_co], type='email'):
     """Notion email type."""
 
     email: str | None = None
 
 
-class PhoneNumber(PropertyValue, type='phone_number'):
+class PhoneNumber(PropertyValue[PID_co], type='phone_number'):
     """Notion phone type."""
 
     phone_number: str | None = None
 
 
-class Files(PropertyValue, type='files'):
+class Files(PropertyValue[PID_co], type='files'):
     """Notion files type."""
 
     files: list[SerializeAsAny[FileObject]] = Field(default_factory=list)
@@ -196,13 +201,13 @@ class BooleanFormula(FormulaResult, type=FormulaType.BOOLEAN.value):
     boolean: bool | None = None
 
 
-class Formula(PropertyValue, type='formula'):
+class Formula(PropertyValue[PID_co], type='formula'):
     """A Notion formula property value."""
 
     formula: SerializeAsAny[FormulaResult] | None = None
 
 
-class Relation(PropertyValue, type='relation'):
+class Relation(PropertyValue[PID_co], type='relation'):
     """A Notion relation property value."""
 
     relation: list[ObjectRef] = Field(default_factory=list)
@@ -258,37 +263,37 @@ class RollupUnsupported(RollupObject, type=RollupType.UNSUPPORTED.value):
     unsupported: TypeData
 
 
-class Rollup(PropertyValue, type='rollup'):
+class Rollup(PropertyValue[PID_co], type='rollup'):
     """A Notion rollup property value."""
 
     rollup: SerializeAsAny[RollupObject] | None = None
 
 
-class CreatedTime(PropertyValue, type='created_time'):
+class CreatedTime(PropertyValue[PID_co], type='created_time'):
     """A Notion created-time property value."""
 
     created_time: dt.datetime
 
 
-class CreatedBy(PropertyValue, type='created_by'):
+class CreatedBy(PropertyValue[PID_co], type='created_by'):
     """A Notion created-by property value."""
 
     created_by: SerializeAsAny[User]
 
 
-class LastEditedTime(PropertyValue, type='last_edited_time'):
+class LastEditedTime(PropertyValue[PID_co], type='last_edited_time'):
     """A Notion last-edited-time property value."""
 
     last_edited_time: dt.datetime
 
 
-class LastEditedBy(PropertyValue, type='last_edited_by'):
+class LastEditedBy(PropertyValue[PID_co], type='last_edited_by'):
     """A Notion last-edited-by property value."""
 
     last_edited_by: SerializeAsAny[User]
 
 
-class UniqueID(PropertyValue, type='unique_id'):
+class UniqueID(PropertyValue[PID_co], type='unique_id'):
     """A Notion unique-id property value."""
 
     class TypeData(GenericObject):
@@ -298,7 +303,7 @@ class UniqueID(PropertyValue, type='unique_id'):
     unique_id: TypeData = Field(default_factory=TypeData)
 
 
-class Verification(PropertyValue, type='verification'):
+class Verification(PropertyValue[PID_co], type='verification'):
     """A Notion verification property value."""
 
     class TypeData(GenericObject):
@@ -316,7 +321,7 @@ class Verification(PropertyValue, type='verification'):
     verification: TypeData = Field(default_factory=TypeData)
 
 
-class Button(PropertyValue, type='button'):
+class Button(PropertyValue[PID_co], type='button'):
     """A Notion button property value."""
 
     class TypeData(GenericObject): ...
@@ -335,7 +340,7 @@ class PlaceDict(TypedDict):
     google_place_id: NotRequired[str]
 
 
-class Place(PropertyValue, type='place'):
+class Place(PropertyValue[PID_co], type='place'):
     """A Notion place property value."""
 
     class TypeData(GenericObject):
@@ -363,7 +368,7 @@ class Place(PropertyValue, type='place'):
 ##################
 
 
-class PropertyItem(NotionObject, TypedObject, polymorphic_base=True, object='property_item'):
+class PropertyItem(NotionObject[str], TypedObject, polymorphic_base=True, object='property_item'):
     """A `PropertyItem` returned by the Notion API.
 
     Basic property items have a similar schema to corresponding property values.
@@ -390,27 +395,27 @@ class RichTextPropertyItem(PropertyItem, type='rich_text'):
     rich_text: SerializeAsAny[RichTextBaseObject]
 
 
-class NumberPropertyItem(PropertyItem, Number, type='number'):
+class NumberPropertyItem(PropertyItem, Number[str], type='number'):
     """A `PropertyItem` returned by the Notion API containing the `Number` property."""
 
 
-class CheckboxPropertyItem(PropertyItem, Checkbox, type='checkbox'):
+class CheckboxPropertyItem(PropertyItem, Checkbox[str], type='checkbox'):
     """A `PropertyItem` returned by the Notion API containing the `Checkbox` property."""
 
 
-class DatePropertyItem(PropertyItem, Date, type='date'):
+class DatePropertyItem(PropertyItem, Date[str], type='date'):
     """A `PropertyItem` returned by the Notion API containing the `Date` property."""
 
 
-class StatusPropertyItem(PropertyItem, Status, type='status'):
+class StatusPropertyItem(PropertyItem, Status[str], type='status'):
     """A `PropertyItem` returned by the Notion API containing the `Status` property."""
 
 
-class SelectPropertyItem(PropertyItem, Select, type='select'):
+class SelectPropertyItem(PropertyItem, Select[str], type='select'):
     """A `PropertyItem` returned by the Notion API containing the `Select` property."""
 
 
-class MultiSelectPropertyItem(PropertyItem, MultiSelect, type='multi_select'):
+class MultiSelectPropertyItem(PropertyItem, MultiSelect[str], type='multi_select'):
     """A `PropertyItem` returned by the Notion API containing the `MultiSelect` property."""
 
 
@@ -422,23 +427,23 @@ class PeoplePropertyItem(PropertyItem, type='people'):
     people: User
 
 
-class URLPropertyItem(PropertyItem, URL, type='url'):
+class URLPropertyItem(PropertyItem, URL[str], type='url'):
     """A `PropertyItem` returned by the Notion API containing the `URL` property."""
 
 
-class EmailPropertyItem(PropertyItem, Email, type='email'):
+class EmailPropertyItem(PropertyItem, Email[str], type='email'):
     """A `PropertyItem` returned by the Notion API containing the `Email` property."""
 
 
-class PhoneNumberPropertyItem(PropertyItem, PhoneNumber, type='phone_number'):
+class PhoneNumberPropertyItem(PropertyItem, PhoneNumber[str], type='phone_number'):
     """A `PropertyItem` returned by the Notion API containing the `PhoneNumber` property."""
 
 
-class FilesPropertyItem(PropertyItem, Files, type='files'):
+class FilesPropertyItem(PropertyItem, Files[str], type='files'):
     """A `FilesPropertyItem` returned by the Notion API containing the `Files` property."""
 
 
-class FormulaPropertyItem(PropertyItem, Formula, type='formula'):
+class FormulaPropertyItem(PropertyItem, Formula[str], type='formula'):
     """A `PropertyItem` returned by the Notion API containing the `Formula` property."""
 
 
@@ -448,39 +453,39 @@ class RelationPropertyItem(PropertyItem, type='relation'):
     relation: ObjectRef
 
 
-class RollupPropertyItem(PropertyItem, Rollup, type='rollup'):
+class RollupPropertyItem(PropertyItem, Rollup[str], type='rollup'):
     """A `PropertyItem` returned by the Notion API containing the `Rollup` property."""
 
 
-class CreatedTimePropertyItem(PropertyItem, CreatedTime, type='created_time'):
+class CreatedTimePropertyItem(PropertyItem, CreatedTime[str], type='created_time'):
     """A `PropertyItem` returned by the Notion API containing the `CreatedTime` property."""
 
 
-class CreatedByPropertyItem(PropertyItem, CreatedBy, type='created_by'):
+class CreatedByPropertyItem(PropertyItem, CreatedBy[str], type='created_by'):
     """A `PropertyItem` returned by the Notion API containing the `CreatedBy` property."""
 
 
-class LastEditedTimePropertyItem(PropertyItem, LastEditedTime, type='last_edited_time'):
+class LastEditedTimePropertyItem(PropertyItem, LastEditedTime[str], type='last_edited_time'):
     """A `PropertyItem` returned by the Notion API containing the `LastEditedTime` property."""
 
 
-class LastEditedByPropertyItem(PropertyItem, LastEditedBy, type='last_edited_by'):
+class LastEditedByPropertyItem(PropertyItem, LastEditedBy[str], type='last_edited_by'):
     """A `PropertyItem` returned by the Notion API containing the `LastEditedBy` property."""
 
 
-class UniqueIDPropertyItem(PropertyItem, UniqueID, type='unique_id'):
+class UniqueIDPropertyItem(PropertyItem, UniqueID[str], type='unique_id'):
     """A `PropertyItem` returned by the Notion API containing the `UniqueID` property."""
 
 
-class VerificationPropertyItem(PropertyItem, Verification, type='verification'):
+class VerificationPropertyItem(PropertyItem, Verification[str], type='verification'):
     """A `PropertyItem` returned by the Notion API containing the `Verification` property."""
 
 
-class ButtonPropertyItem(PropertyItem, Button, type='button'):
+class ButtonPropertyItem(PropertyItem, Button[str], type='button'):
     """A `PropertyItem` returned by the Notion API containing the `Button` property."""
 
 
-class PlacePropertyItem(PropertyItem, Place, type='place'):
+class PlacePropertyItem(PropertyItem, Place[str], type='place'):
     """A `PropertyItem` returned by the Notion API containing the `Place` property."""
 
 

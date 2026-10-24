@@ -18,7 +18,7 @@ import logging
 import re
 from abc import ABC
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, Self, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Self, TypeAlias, cast
 from uuid import UUID
 
 from pydantic import (
@@ -274,7 +274,11 @@ def _normalize_model(obj: T) -> T:
     return cast(T, _recurse(obj))
 
 
-class UniqueObject(GenericObject):
+ObjectID: TypeAlias = Annotated[UUID | str | UnsetType, Field(union_mode='left_to_right')]
+ID_co = TypeVar('ID_co', bound=UUID | str | UnsetType, default=ObjectID, covariant=True)
+
+
+class UniqueObject(GenericObject, Generic[ID_co]):
     """A Notion object that has a unique ID.
 
     This is the base class for all Notion objects that have a unique identifier, i.e. `id`.
@@ -284,11 +288,12 @@ class UniqueObject(GenericObject):
         The `id` field is only set when the object is sent or retrieved from the API, not when created locally.
     """
 
-    id: UUID | str | UnsetType = Field(union_mode='left_to_right', default=Unset)
+    # Models whose ID excludes Unset redeclare this field as required.
+    id: ID_co = Field(default=cast(ID_co, Unset))
     """`id` is an `UUID` if possible or a string (possibly not unique) depending on the object"""
 
 
-class NotionObject(UniqueObject):
+class NotionObject(UniqueObject[ID_co]):
     """A top-level Notion API resource.
 
     Many objects in the Notion API follow a standard pattern with a `object` property, which
@@ -363,7 +368,7 @@ class ObjectRef(GenericObject):
                 raise ValueError(msg)
 
 
-class UserRef(NotionObject, object='user'):
+class UserRef(NotionObject[UUID], object='user'):
     """Reference to a user, e.g. in `created_by`, `last_edited_by`, mentioning, unknown user, etc."""
 
     id: UUID
@@ -375,7 +380,7 @@ class UserRef(NotionObject, object='user'):
         return UserRef.model_construct(id=ref.id)
 
 
-class NotionEntity(NotionObject):
+class NotionEntity(NotionObject[UUID | UnsetType]):
     """A materialized entity, which was created by a user."""
 
     id: UUID | UnsetType = Unset

@@ -435,7 +435,7 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
             msg = 'Cannot insert a block that has no parent.'
             raise InvalidAPIUsageError(msg)
 
-    def __eq__(self, other: Any | Block) -> bool:
+    def __eq__(self, other: Any | Block, /) -> bool:
         """Compare blocks by their content, not by their metadata like id, timestamp etc."""
         if not isinstance(other, Block):
             return NotImplemented

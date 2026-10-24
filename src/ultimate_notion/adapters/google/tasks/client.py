@@ -18,7 +18,7 @@ from collections.abc import Iterator
 from datetime import UTC, date, datetime, time
 from enum import StrEnum
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Literal, Self, cast
+from typing import TYPE_CHECKING, Any, Generic, Literal, Self, cast
 
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
@@ -26,6 +26,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow  # type: ignore[import-untyped]
 from googleapiclient.discovery import build
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, PrivateAttr, ValidationInfo, model_validator
+from typing_extensions import TypeVar
 
 from ultimate_notion.config import Config, get_or_create_cfg
 from ultimate_notion.utils import SList, is_stable_release
@@ -85,14 +86,17 @@ class Kind(StrEnum):
     TASK_LIST = 'tasks#taskList'
 
 
-class GObject(BaseModel):
+GK = TypeVar('GK', bound=Kind, default=Kind)
+
+
+class GObject(BaseModel, Generic[GK]):
     """Representation of a general Google Object from the Tasks API."""
 
     model_config = ConfigDict(extra='ignore' if is_stable_release() else 'forbid')
 
     id: str  # A003
     title_: str = Field(..., alias='title')
-    kind: Kind
+    kind: GK
     etag: str
     updated: datetime
     self_link: HttpUrl = Field(..., alias='selfLink')
@@ -123,10 +127,9 @@ class GObject(BaseModel):
             setattr(self, k, getattr(new_obj, k))
 
 
-class GTask(GObject):
+class GTask(GObject[Literal[Kind.TASK]]):
     """Representation of a Google Task."""
 
-    kind: Literal[Kind.TASK]  # ToDo: This is nonsense, replace with proper generic
     completed_at: datetime | None = Field(alias='completed', default=None)
     is_deleted: bool = Field(alias='deleted', default=False)
     hidden: bool = False
@@ -267,10 +270,8 @@ class GTask(GObject):
         return self
 
 
-class _GTaskListData(GObject):
+class _GTaskListData(GObject[Literal[Kind.TASK_LIST]]):
     """Pydantic representation of the JSON fields of a Google Task List."""
-
-    kind: Literal[Kind.TASK_LIST]
 
 
 class GTaskList:

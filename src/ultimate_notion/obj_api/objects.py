@@ -762,7 +762,7 @@ class FileImportError(FileImportResult, type='error'):
     error: FileImportTypeData
 
 
-class FileUpload(NotionObject, object='file_upload'):
+class FileUpload(NotionObject[UUID], object='file_upload'):
     """A Notion file upload object.
 
     This object is used to handle the process of uploading a file to Notion.

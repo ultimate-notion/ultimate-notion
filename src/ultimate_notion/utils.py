@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import re
-from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
+from collections.abc import Callable, Generator, Mapping, Sequence
 from contextlib import contextmanager
 from hashlib import sha256
 from typing import Any, TypeAlias, TypeVar
@@ -224,7 +224,7 @@ def to_pendulum(dt_spec: str | DateTimeOrRange) -> DateTimeOrRange:
 
 
 @contextmanager
-def temp_timezone(tz: str | pnd.Timezone) -> Iterator[None]:
+def temp_timezone(tz: str | pnd.Timezone) -> Generator[None, None, None]:
     """Temporarily set the local timezone to the given timezone. Mostly used by unit tests."""
     if not isinstance(tz, pnd.Timezone):
         tz = pnd.timezone(tz)
