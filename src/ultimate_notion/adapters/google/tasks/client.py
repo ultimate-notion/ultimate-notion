@@ -451,7 +451,7 @@ class GTasksClient:
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
-                    creds.refresh(Request())  # type: ignore[no-untyped-call]
+                    creds.refresh(Request())
                 except RefreshError as e:
                     msg = f'Error refreshing token. Please delete {token_path} and try again!'
                     raise RuntimeError(msg) from e

@@ -53,7 +53,7 @@ def is_notebook() -> bool:
     except ModuleNotFoundError:
         return False  # Probably standard Python interpreter
     else:
-        shell = get_ipython().__class__.__name__  # type: ignore[no-untyped-call]
+        shell = get_ipython().__class__.__name__
         if shell == 'ZMQInteractiveShell':
             return True  # Jupyter notebook or qtconsole
         elif shell == 'TerminalInteractiveShell':

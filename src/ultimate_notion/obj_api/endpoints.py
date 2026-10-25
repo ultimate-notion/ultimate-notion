@@ -64,7 +64,7 @@ _logger = logging.getLogger(__name__)
 
 # The Notion SDK types its responses as `Any | Awaitable[Any]`; validate them into a
 # real `dict[str, Any]` so the result is correctly typed for `**`-unpacking.
-_DictAdapter = TypeAdapter(dict[str, Any])
+_DictAdapter: TypeAdapter[dict[str, Any]] = TypeAdapter(dict[str, Any])
 
 
 def _build_insert_position(
