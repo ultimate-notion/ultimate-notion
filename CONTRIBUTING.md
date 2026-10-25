@@ -238,6 +238,20 @@ are written. Property, option and block ids *inside* the manually created databa
 workspace-specific and are **not** normalised, so a brand-new test that asserts on those
 (e.g. a formula's internal property reference) may still need a hand edit.
 
+### Update dependency lockfiles
+
+The lockfiles in `locks/` pin dependency versions for the development environments.
+The default lockfile also constrains the docs, lint, and VS Code environments.
+
+To refresh all dependency versions and their constraints, run these commands in order:
+
+```console
+hatch run upgrade-all
+hatch run docs:upgrade-all
+hatch run lint:upgrade-all
+hatch run vscode:upgrade-all
+```
+
 ### Implement your changes
 
 1. Create a branch to hold your changes:
