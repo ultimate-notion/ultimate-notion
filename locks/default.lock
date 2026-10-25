@@ -45,7 +45,7 @@ anyio==4.15.1
     # via
     #   httpx
     #   jupyter-server
-appnope==1.0.0
+appnope==1.0.0 ; sys_platform == 'darwin'
     # via ipykernel
 argon2-cffi==25.1.0
     # via jupyter-server
@@ -76,13 +76,21 @@ cffi==2.1.1
     # via
     #   argon2-cffi-bindings
     #   cryptography
+    #   pyzmq
 cfgv==3.5.0
     # via pre-commit
 charset-normalizer==3.5.2
     # via requests
+colorama==0.4.6 ; sys_platform == 'win32'
+    # via
+    #   ipython
+    #   pytest
+    #   typer
 comm==0.2.3
     # via ipykernel
-contourpy==1.3.3
+contourpy==1.3.3 ; python_full_version < '3.12'
+    # via matplotlib
+contourpy==1.4.0 ; python_full_version >= '3.12'
     # via matplotlib
 coverage==7.17.0
     # via
@@ -262,7 +270,13 @@ notebook-shim==0.2.4
     # via jupyterlab
 notion-client==3.1.0
     # via hatch.envs.default
-numpy==2.4.6
+numpy==2.4.6 ; python_full_version < '3.12'
+    # via
+    #   hatch.envs.default
+    #   contourpy
+    #   matplotlib
+    #   pandas
+numpy==2.5.4 ; python_full_version >= '3.12'
     # via
     #   hatch.envs.default
     #   contourpy
@@ -272,7 +286,7 @@ oauthlib==4.0.0
     # via requests-oauthlib
 opentelemetry-api==1.45.1
     # via google-api-core
-overrides==7.7.0
+overrides==7.7.0 ; python_full_version < '3.12'
     # via jupyter-server
 packaging==26.3
     # via
@@ -294,7 +308,7 @@ parso==0.8.7
     # via jedi
 pendulum==3.3.0
     # via hatch.envs.default
-pexpect==4.9.0
+pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     # via ipython
 pillow==13.0.0
     # via matplotlib
@@ -325,9 +339,9 @@ protobuf==7.36.2
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==7.2.2
+psutil==7.2.2 ; sys_platform != 'cygwin' and sys_platform != 'emscripten'
     # via ipython
-ptyprocess==0.7.0
+ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
     #   pexpect
     #   terminado
@@ -337,7 +351,7 @@ pyasn1==0.6.4
     # via pyasn1-modules
 pyasn1-modules==0.4.2
     # via google-auth
-pycparser==3.12
+pycparser==3.12 ; implementation_name != 'PyPy'
     # via cffi
 pydantic==2.14.1
     # via hatch.envs.default
@@ -385,6 +399,11 @@ python-dotenv==1.2.4
     # via pytest-dotenv
 python-json-logger==4.2.0
     # via jupyter-events
+pywinpty==3.1.0 ; os_name == 'nt'
+    # via
+    #   jupyter-server
+    #   jupyter-server-terminals
+    #   terminado
 pyyaml==6.0.3
     # via
     #   jupyter-events
@@ -433,7 +452,9 @@ six==1.17.0
     #   rfc3339-validator
 sortedcontainers==2.4.0
     # via hypothesis
-soupsieve==3.0.4
+soupsieve==2.10 ; python_full_version < '3.11.5'
+    # via beautifulsoup4
+soupsieve==3.0.4 ; python_full_version >= '3.11.5'
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
@@ -492,6 +513,7 @@ typing-inspection==0.4.4
 tzdata==2026.5
     # via
     #   arrow
+    #   pandas
     #   pendulum
     #   python-dateutil
 uri-template==1.3.0
