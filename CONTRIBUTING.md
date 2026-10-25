@@ -240,8 +240,7 @@ workspace-specific and are **not** normalised, so a brand-new test that asserts 
 
 ### Update dependency lockfiles
 
-Hatch uses `hatch-pip-compile` with pip-tools to generate the lockfiles in `locks/`.
-Each lockfile reflects the Python version and platform used to generate it.
+The lockfiles in `locks/` pin dependency versions for the development environments.
 The default lockfile also constrains the docs, lint, and VS Code environments.
 
 To refresh all dependency versions and their constraints, run these commands in order:
