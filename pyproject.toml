@@ -265,6 +265,12 @@ ban-relative-imports = "all"
 # [tool.pyright]
 # typeCheckingMode = "strict"
 
+# uv configuration
+
+[tool.uv.pip]
+universal = true
+python-version = "3.11"  # Keep aligned with the minimum in requires-python.
+
 
 ###########################
 # Hatch Environment Setup #
@@ -281,7 +287,7 @@ post-install-commands = ["hatch run pre-commit install"]
 features = ["google", "polars", "pandas"]  # state them explicitly, not just "all", to avoid installing ultimate-notion from PyPI!
 pip-compile-installer = "pip"  # or "uv"
 pip-compile-constraint = "default"  # keep locks between default & others consistent
-pip-compile-resolver = "pip-compile" # or "uv"
+pip-compile-resolver = "uv"
 pip-compile-hashes = false  # no hashes in lock files
 lock-filename = "locks/{env_name}.lock"
 dependencies = [
@@ -318,13 +324,6 @@ doctest = "pytest docs/examples/"
 md2py = "python -c \"from ultimate_notion.utils import convert_md_to_py; convert_md_to_py('{args}')\""
 upgrade-all = "PIP_COMPILE_UPGRADE=1 hatch env run --env {env_name} -- python --version"
 upgrade-pkg = "PIP_COMPILE_UPGRADE_PACKAGE='{args}' hatch env run --env {env_name} -- python --version"
-
-# Python 3.15 needs newer dependencies than the Python 3.11-compatible default lock.
-[tool.hatch.envs.py315]
-template = "default"
-python = "3.15"
-pip-compile-constraint = "py315"
-post-install-commands = ["pre-commit install"]
 
 # Docs environment
 [tool.hatch.envs.docs]
