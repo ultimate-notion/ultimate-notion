@@ -264,6 +264,12 @@ ban-relative-imports = "all"
 # [tool.pyright]
 # typeCheckingMode = "strict"
 
+# uv configuration
+
+[tool.uv.pip]
+universal = true
+python-version = "3.11"  # Keep aligned with the minimum in requires-python.
+
 
 ###########################
 # Hatch Environment Setup #
@@ -280,7 +286,7 @@ post-install-commands = ["hatch run pre-commit install"]
 features = ["google", "polars", "pandas"]  # state them explicitly, not just "all", to avoid installing ultimate-notion from PyPI!
 pip-compile-installer = "pip"  # or "uv"
 pip-compile-constraint = "default"  # keep locks between default & others consistent
-pip-compile-resolver = "pip-compile" # or "uv"
+pip-compile-resolver = "uv"
 pip-compile-hashes = false  # no hashes in lock files
 lock-filename = "locks/{env_name}.lock"
 dependencies = [
