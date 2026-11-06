@@ -39,7 +39,9 @@ The `db_title` parameter in the schema definition is optional but highly recomme
 it sets the default title for the data source when calling `create_ds()` without an explicit `title`
 argument. Also it allows you to relate your schema to an existing data source.
 
-Alternatively, you can specify a `db_id` parameter to bind the schema to an existing data source:
+Alternatively, use the `db_id` parameter to identify an existing data source. This must be the
+data source's ID (`ds.id`), not its database container's ID (`ds.database_id`). See
+[Identifiers](getting_started.md#identifiers) for how to find the data source ID.
 
 ```python
 class Item(uno.Schema, db_id='550e8400-e29b-41d4-a716-446655440000'):
@@ -49,8 +51,9 @@ class Item(uno.Schema, db_id='550e8400-e29b-41d4-a716-446655440000'):
     price = uno.PropType.Number('Price', format=uno.NumberFormat.DOLLAR)
 ```
 
-When `db_id` is provided, you can easily bind the schema to the existing data source using `bind_ds()`
-without having to manually search for it.If neither `db_id` nor `db_title` is provided, you'll need
+When `db_id` is provided, call `bind_ds()` to bind the schema to that data source without searching by title.
+If both `db_id` and `db_title` are provided, `bind_ds()` uses `db_id`.
+If neither `db_id` nor `db_title` is provided, you'll need
 to pass a data source object explicitly to `bind_ds()` or provide a title when creating the data source.
 
 Since a data source needs to be a block within a page, we assume there is a page called
