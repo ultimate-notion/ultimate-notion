@@ -85,17 +85,21 @@ Run the code to see the rendered output. In [JupyterLab], you'll see formatted M
 
 ### Pages and blocks
 
-In Notion, everything is either a **page** or a **block**. A page contains blocks like headings, text, lists, tables, and quotes.
+A **page** contains **blocks** like headings, text, lists, tables, and quotes.
 
 If a page is deleted using Ultimate Notion, it is not deleted directly but moved to the trash can, i.e.,
 "🗑️ Trash" in the sidebar, for a period of 30 days before it is deleted.
 
+### Databases
+
+A **database** is a container for one or more **data sources**. The database can be displayed inline within
+a page or as a full-page database. Each data source holds its own schema and pages.
+
+Since Notion API version `2025-09-03`, these are separate objects: `Database` represents the container,
+while `DataSource` provides access to the schema, page creation, and queries. See
+[Databases: containers of data sources](db_introduction.md#databases-containers-of-data-sources) for examples.
+
 ### Data sources
-
-A **data source** is a special block type that can exist:
-
-- Within a page (inline data source)
-- At the same level as pages (full-page data source)
 
 Every data source has a **schema** defined by a set of **properties** (columns) with specific types (text, number,
 URL, etc.) that impose structured data on every page within that data source. Only pages contained in a data source
@@ -108,7 +112,7 @@ Think of the title property as a human-readable identifier, which does not have 
 important when **relation** properties are used between different data sources, as the title property of a linked
 page will show up in the relation property of the other data source.
 
-A special type of data source is a **wiki database** that comes with a pre-defined schema, i.e., title,
+A special type of database is a **wiki database** that comes with a pre-defined schema, i.e., title,
 last-edited-time, owner, tags, verification.
 
 !!! warning
@@ -129,12 +133,25 @@ Integration permissions inherit from parent pages, so granting access to a paren
 Notion assigns a **UUID** (32-character identifier) to every page, block, user, and property. These UUIDs remain
 constant even when titles change.
 
-You can find page/data source UUIDs by:
+You can find page/database UUIDs by:
 
 1. Using <kbd>Copy link</kbd> from the **···** menu
 2. Extracting from the URL: `https://www.notion.so/{TITLE}-{UUID}`
 
 Notion also provides a shortened URL format: `https://notion.so/{UUID}`
+
+Database IDs and data source IDs are different. The ID in a database's URL identifies the container;
+use `notion.get_db(database_id)` to retrieve it. To find its data source IDs, inspect `db.data_sources`:
+
+```python
+db = notion.get_db(database_id)
+for ds in db.data_sources:
+    print(ds.id, ds.title)
+```
+
+Use a data source ID with `notion.get_ds(data_source_id)` to access its schema and pages. You can also
+copy that ID in Notion under **Manage data sources** → **Copy data source ID**. See the
+[Notion API upgrade guide] for details.
 
 ### Text handling
 
@@ -147,3 +164,4 @@ maintain consistency, but displays them as `""` when converting objects to strin
 [pyenv]: https://github.com/pyenv/pyenv
 [conda]: https://docs.conda.io/
 [JupyterLab]: https://jupyterlab.readthedocs.io/
+[Notion API upgrade guide]: https://developers.notion.com/guides/get-started/upgrade-guide-2025-09-03
