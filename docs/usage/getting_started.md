@@ -95,8 +95,8 @@ If a page is deleted using Ultimate Notion, it is not deleted directly but moved
 A **database** is a container for one or more **data sources**. The database can be displayed inline within
 a page or as a full-page database. Each data source holds its own schema and pages.
 
-Since Notion API version `2025-09-03`, these are separate objects: `Database` represents the container,
-while `DataSource` provides access to the schema, page creation, and queries. See
+In Ultimate Notion, `Database` represents the container, while `DataSource` provides access to the schema,
+page creation, and queries. See
 [Databases: containers of data sources](db_introduction.md#databases-containers-of-data-sources) for examples.
 
 ### Data sources
@@ -150,8 +150,7 @@ for ds in db.data_sources:
 ```
 
 Use a data source ID with `notion.get_ds(data_source_id)` to access its schema and pages. You can also
-copy that ID in Notion under **Manage data sources** → **Copy data source ID**. See the
-[Notion API upgrade guide] for details.
+copy that ID in Notion under **Manage data sources** → **Copy data source ID**.
 
 ### Text handling
 
@@ -164,4 +163,3 @@ maintain consistency, but displays them as `""` when converting objects to strin
 [pyenv]: https://github.com/pyenv/pyenv
 [conda]: https://docs.conda.io/
 [JupyterLab]: https://jupyterlab.readthedocs.io/
-[Notion API upgrade guide]: https://developers.notion.com/guides/get-started/upgrade-guide-2025-09-03
