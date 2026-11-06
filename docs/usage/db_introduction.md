@@ -40,8 +40,8 @@ assert contacts_db.description == 'Database of all my contacts!'
 
 ## Creating a data source and adding pages
 
-A simple data source with the default columns `Name` for the title of pages and the Multi-select column `Tags`
-can be created using [create_ds]. To tell Notion where to put the data source, we have to provide an existing page.
+A simple data source with a single `Name` title property can be created using [create_ds].
+To tell Notion where to put the data source, we have to provide an existing page.
 Let's assume we have a page called `Tests` that is shared with our integration:
 
 ```python
@@ -73,7 +73,7 @@ new_page.icon = '🚀'
 new_page.cover = uno.url('https://www.notion.so/images/page-cover/woodcuts_2.jpg')
 ```
 
-This is how *My DB* looks right now.
+The following example includes an additional `Tags` column:
 
 ![Notion My DB](../assets/images/notion-my-db.png){:style="width:500px; display:block; margin-left:auto; margin-right:auto;"}
 
@@ -86,13 +86,12 @@ Tool = my_db.schema
 Tool.show()
 ```
 
-This shows us that our data source has two columns, `Name` and `Tags`, as well as the name of the arguments for [create_page].
+This shows the `Name` title property and its corresponding argument, `name`, for [create_page].
 
 ```console
-Name    Property     Attribute
-------  -----------  -----------
-Tags    MultiSelect  tags
-Name    Title        name
+Name    Property    Attribute
+------  ----------  -----------
+Name    Title       name
 ```
 
 A new page can now also be created using `Tool`, i.e.:
