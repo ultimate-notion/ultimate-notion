@@ -20,6 +20,20 @@ env:
   PIPX_HOME: "${{ github.workspace }}/.pipx"
 
 jobs:
+  docs:
+    name: Documentation
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.11'
+    - uses: ./.github/actions/setup-venv-reqs
+    - run: hatch run docs:build-check
+
   run-github-job-matrix:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
