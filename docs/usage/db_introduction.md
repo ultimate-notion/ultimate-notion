@@ -193,7 +193,7 @@ shop_db = notion.create_db(parent=root_page, schema=Item)
 assert len(shop_db.data_sources) == 1
 ```
 
-Add further data sources with [add_ds] and remove them again with [delete_ds]:
+Add further data sources with [Database.create_ds] and remove them again with [delete_ds]:
 
 ```python
 customers_ds = shop_db.create_ds(schema=Customer)
@@ -240,5 +240,5 @@ shop_db.delete()
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema
 [Database]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
 [create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
-[add_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_ds
+[Database.create_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_ds
 [delete_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.delete_ds
