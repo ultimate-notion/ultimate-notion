@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from io import BytesIO
 from typing import Any
 from uuid import UUID
 
@@ -9,10 +10,12 @@ import notion_client
 import pytest
 from pydantic import ConfigDict, ValidationError
 
+from tests._file_upload_vcr import FILE_UPLOAD_QUERY_PARAMS, redact_file_response
 from ultimate_notion.blocks import Embed
 from ultimate_notion.file import UploadedFile
 from ultimate_notion.obj_api.blocks import EmbedTypeData
 from ultimate_notion.obj_api.objects import FileUpload
+from ultimate_notion.page import Page
 from ultimate_notion.session import Session
 
 UPLOAD_ID = UUID('59833787-2cf9-4fdf-8782-e53db20768a5')
@@ -101,6 +104,7 @@ def test_html_embed_append_update_and_refresh() -> None:
     assert requests[0]['children'][0]['embed']['file_upload'] == {'id': str(UPLOAD_ID)}
     assert requests[1]['embed']['file_upload'] == {'id': str(UPLOAD_ID)}
     assert 'url' not in requests[1]['embed']
+    assert 'type' not in requests[1]['embed']
 
 
 def test_file_upload_source_validation() -> None:
@@ -114,3 +118,39 @@ def test_ambiguous_embed_sources_rejected_with_lenient_parsing() -> None:
 
     with pytest.raises(ValidationError):
         LenientEmbed.model_validate({'url': 'https://example.com/chart', 'file_upload': {'id': str(UPLOAD_ID)}})
+
+
+@pytest.mark.vcr(filter_query_parameters=FILE_UPLOAD_QUERY_PARAMS, before_record_response=redact_file_response)
+def test_uploaded_html_round_trip(notion: Session, root_page: Page) -> None:
+    page = notion.create_page(parent=root_page, title='Uploaded HTML embed round trip')
+    try:
+        first = notion.upload(
+            BytesIO(b'<!doctype html><html><body>First embedded document</body></html>'),
+            file_name='first.html',
+            mime_type='text/html',
+        )
+        first.wait_until_uploaded()
+        embed = Embed(first, caption='Interactive document')
+        page.append(embed)
+        embed.reload()
+        assert embed.caption is not None and str(embed.caption) == 'Interactive document'
+        assert embed.url is not None
+        original = httpx.get(embed.url)
+        original.raise_for_status()
+        assert 'First embedded document' in original.text
+
+        replacement = notion.upload(
+            BytesIO(b'<!doctype html><html><body>Replacement embedded document</body></html>'),
+            file_name='replacement.html',
+            mime_type='text/html',
+        )
+        replacement.wait_until_uploaded()
+        embed.set_file_upload(replacement)
+        embed.reload()
+        assert embed.url is not None
+        updated = httpx.get(embed.url)
+        updated.raise_for_status()
+        assert 'Replacement embedded document' in updated.text
+        assert embed.caption is not None and str(embed.caption) == 'Interactive document'
+    finally:
+        page.delete()

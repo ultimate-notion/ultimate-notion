@@ -17,7 +17,7 @@ from uuid import UUID
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.errors import UnsetError
-from ultimate_notion.obj_api.blocks import Block, Database, DataSource, FileBase, Page
+from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Embed, FileBase, Page
 from ultimate_notion.obj_api.core import (
     GenericObject,
     ObjectRef,
@@ -221,6 +221,10 @@ class BlocksEndpoint(Endpoint):
             raise TypeError(msg)
         _logger.debug(f'Updating block with id `{block_id}`.')
         params = block.serialize_for_api()
+
+        if isinstance(block, Embed):
+            # Embed updates reject the source discriminator accepted during creation.
+            params['embed'].pop('type', None)
 
         if isinstance(block, FileBase):
             # The Notiopn API does not support setting a new typed FileObject, e.g. `external` or `file`
