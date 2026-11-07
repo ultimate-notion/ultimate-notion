@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+from unittest.mock import Mock
+from uuid import UUID
+
+import pytest
+
 from ultimate_notion.obj_api.blocks import DataSource, Page
-from ultimate_notion.obj_api.iterator import ObjectList
+from ultimate_notion.obj_api.iterator import EndpointIterator, ObjectList
 
 
 def test_object_list_tolerates_pages_without_properties() -> None:
@@ -51,3 +56,22 @@ def test_object_list_tolerates_data_sources_without_properties() -> None:
     for result in obj_list.results:
         assert isinstance(result, DataSource)
         assert result.properties == {}
+
+
+@pytest.fixture(autouse=True)
+def notion_cleanups() -> None:
+    """Disable live cleanup for response-parsing tests."""
+
+
+def test_query_response_without_request_status() -> None:
+    page_id = UUID('59833787-2cf9-4fdf-8782-e53db20768a5')
+    response = {
+        'object': 'list',
+        'type': 'page_or_data_source',
+        'page_or_data_source': {},
+        'results': [{'object': 'page', 'id': str(page_id)}],
+        'has_more': False,
+        'next_cursor': None,
+    }
+    pages = list(EndpointIterator[Page](Mock(return_value=response))())
+    assert [page.id for page in pages] == [page_id]
