@@ -46,7 +46,7 @@ _logger = logging.getLogger(__name__)
 
 UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
 
-UUID_RE = re.compile(rf'^(?P<id>{UUID_PATTERN})$')
+UUID_RE = re.compile(rf'^(?P<id>{UUID_PATTERN})$', flags=re.IGNORECASE)
 PAGE_PATH_RE = re.compile(rf'(?:^|[-/])(?P<id>{UUID_PATTERN})$', flags=re.IGNORECASE)
 NOTION_HOSTS = frozenset(('notion.so', 'www.notion.so', 'notion.com', 'www.notion.com', 'app.notion.com'))
 

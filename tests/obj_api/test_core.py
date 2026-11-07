@@ -66,6 +66,11 @@ def test_unrelated_or_invalid_notion_urls(url: str) -> None:
     assert extract_id(url) is None
 
 
+def test_uppercase_notion_block_url() -> None:
+    url = 'https://APP.NOTION.COM/p/598337872CF94FDF8782E53DB20768A5#C02FC1D3DB8B45C5A22227595B15AEA7'
+    assert ObjectRef.build(url).id == UUID('c02fc1d3-db8b-45c5-a222-27595b15aea7')
+
+
 def test_model_id_defaults_and_property_item_round_trip() -> None:
     object_id = UUID('00000000-0000-0000-0000-000000000001')
     assert UniqueObject.model_validate({'id': str(object_id)}).id == object_id
