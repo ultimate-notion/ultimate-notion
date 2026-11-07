@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 from io import BytesIO
-from unittest.mock import MagicMock
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
+from tests._file_upload_vcr import FILE_UPLOAD_QUERY_PARAMS, redact_file_response
+from ultimate_notion import Image, Page
+from ultimate_notion.file import NotionFile
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.session import Session
 
@@ -56,3 +60,26 @@ def test_upload_mime_metadata(
         assert call.kwargs['file'][2] == expected
     assert client.file_uploads.complete.call_count == int(multipart)
     assert result.content_type == expected
+
+
+@pytest.mark.vcr(filter_query_parameters=FILE_UPLOAD_QUERY_PARAMS, before_record_response=redact_file_response)
+def test_upload_generic_mime_round_trip(notion: Session, root_page: Page) -> None:
+    page = notion.create_page(parent=root_page, title='Generic MIME upload round trip')
+    try:
+        content = Path('docs/assets/images/favicon.svg').read_bytes()
+        with patch.object(
+            notion.client.file_uploads, 'create', wraps=notion.client.file_uploads.create
+        ) as create_upload:
+            uploaded = notion.upload(BytesIO(content), file_name='image.svg', mime_type='application/octet-stream')
+        assert create_upload.call_args.kwargs['content_type'] == 'application/octet-stream'
+        uploaded.wait_until_uploaded()
+        assert uploaded.content_type == 'image/svg+xml'
+
+        page.append(Image(uploaded, caption='Detected image type'))
+        page.reload()
+        (image,) = page.children
+        assert isinstance(image, Image)
+        assert isinstance(image.file_info, NotionFile)
+        assert image.caption is not None and str(image.caption) == 'Detected image type'
+    finally:
+        page.delete()
