@@ -201,6 +201,14 @@ class BooleanFormula(FormulaResult, type=FormulaType.BOOLEAN.value):
     boolean: bool | None = None
 
 
+class UnsupportedFormula(FormulaResult, type=FormulaType.UNSUPPORTED.value):
+    """A formula result unavailable because its evaluation exceeded Notion's limits."""
+
+    class TypeData(GenericObject): ...
+
+    unsupported: TypeData
+
+
 class Formula(PropertyValue[PID_co], type='formula'):
     """A Notion formula property value."""
 
