@@ -533,11 +533,8 @@ class Session:
                 file_name = os.path.basename(file.name)  # BinaryIO has a 'name' unless it is e.g. a BytesIO
             except AttributeError:
                 file_name = 'unknown_file'
-        mime_type = mime_type if mime_type is not None else get_mime_type(file)
+        mime_type = mime_type if mime_type is not None else get_mime_type(file_name)
         file_size = get_file_size(file)
-        if mime_type == 'application/octet-stream':
-            _logger.warning(f'File `{file_name}` has unknown MIME type, falling back to text/plain.')
-            mime_type = 'text/plain'  # Notion does not support application/octet-stream
         mode = FileUploadMode.SINGLE_PART if file_size <= MAX_FILE_SIZE else FileUploadMode.MULTI_PART
         _logger.info(
             f'Uploading file `{file_name}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'
