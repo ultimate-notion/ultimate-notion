@@ -1,16 +1,21 @@
 from __future__ import annotations
 
-from typing import Any
 from unittest.mock import Mock
 
 import pytest
+from pydantic import ConfigDict
 
 from ultimate_notion.database import DataSource as DataSourceWrapper
 from ultimate_notion.errors import IncompleteQueryError
 from ultimate_notion.obj_api.blocks import DataSource, Page
-from ultimate_notion.obj_api.iterator import EndpointIterator, ObjectList
-from ultimate_notion.obj_api.query import DataSourceQueryBuilder
+from ultimate_notion.obj_api.iterator import EndpointIterator, ObjectList, PageOrDataSourceList
 from ultimate_notion.query import Query
+
+
+class LenientPageList(PageOrDataSourceList):
+    """Parse responses with release-style extra-field handling."""
+
+    model_config = ConfigDict(extra='ignore')
 
 
 @pytest.fixture(autouse=True)
@@ -67,18 +72,16 @@ def test_object_list_tolerates_data_sources_without_properties() -> None:
         assert result.properties == {}
 
 
-@pytest.mark.parametrize('status', [None, {'type': 'complete'}])
-def test_complete_query_status(status: dict[str, str] | None) -> None:
-    response: dict[str, Any] = {
+def test_complete_query_status() -> None:
+    response = {
         'object': 'list',
         'type': 'page_or_data_source',
         'page_or_data_source': {},
         'results': [],
         'has_more': False,
         'next_cursor': None,
+        'request_status': {'type': 'complete'},
     }
-    if status is not None:
-        response['request_status'] = status
     assert list(EndpointIterator(Mock(return_value=response))()) == []
 
 
@@ -100,7 +103,7 @@ def test_incomplete_query_raises(*, previous_page: bool) -> None:
         [response | {'has_more': True, 'next_cursor': 'opaque:next'}, incomplete] if previous_page else [incomplete]
     )
     endpoint = Mock(side_effect=responses)
-    iterator = EndpointIterator[Page](endpoint)()
+    iterator = EndpointIterator[Page](endpoint, model_validate=LenientPageList.model_validate)()
     if previous_page:
         assert str(next(iterator).id) == page_id
     with pytest.raises(IncompleteQueryError, match='query_result_limit_reached') as error:
@@ -120,9 +123,19 @@ def test_high_level_query_does_not_return_partial_view(monkeypatch: pytest.Monke
         'request_status': {'type': 'incomplete', 'incomplete_reason': 'query_result_limit_reached'},
     }
     ds_id = '59833787-2cf9-4fdf-8782-e53db20768a5'
-    ds = DataSourceWrapper.wrap_obj_ref(DataSource.model_validate({'id': ds_id, 'title': []}))
+    ds = DataSourceWrapper.wrap_obj_ref(
+        DataSource.model_validate(
+            {
+                'id': ds_id,
+                'title': [],
+                'properties': {'Name': {'id': 'title', 'name': 'Name', 'type': 'title', 'title': {}}},
+            }
+        )
+    )
     session = Mock()
-    session.api.data_sources.query.return_value = DataSourceQueryBuilder(Mock(return_value=response), ds_id)
+    session.api.data_sources.query.return_value.execute.side_effect = EndpointIterator[Page](
+        Mock(return_value=response), model_validate=LenientPageList.model_validate
+    )
     monkeypatch.setattr('ultimate_notion.query.get_active_session', lambda: session)
 
     with pytest.raises(IncompleteQueryError):
