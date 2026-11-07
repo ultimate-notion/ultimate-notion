@@ -210,6 +210,10 @@ items_ds = shop_db.data_sources.item()
 assert notion.get_db(items_ds.database_id) == shop_db
 ```
 
+[Database.query] requires exactly one data source. With multiple data sources, build a query through
+the selected data source's `query` property. To retrieve all pages from all data sources,
+[Database.get_all_pages] returns one [View] per data source.
+
 Finally, delete the whole database (and all of its data sources) again:
 
 ```python
@@ -239,6 +243,8 @@ shop_db.delete()
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.create_page
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema
 [Database]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
+[Database.query]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.query
+[Database.get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.get_all_pages
 [create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
 [Database.create_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_ds
 [delete_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.delete_ds
