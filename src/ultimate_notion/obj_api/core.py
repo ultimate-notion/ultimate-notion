@@ -19,6 +19,7 @@ import re
 from abc import ABC
 from datetime import datetime
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Self, TypeAlias, cast
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from pydantic import (
@@ -43,38 +44,11 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-BASE_URL_PATTERN = r'https://(www.)?notion.so/'
 UUID_PATTERN = r'[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'
 
 UUID_RE = re.compile(rf'^(?P<id>{UUID_PATTERN})$')
-
-PAGE_URL_SHORT_RE = re.compile(
-    rf"""^
-      {BASE_URL_PATTERN}
-      (?P<page_id>{UUID_PATTERN})
-    $""",
-    flags=re.IGNORECASE | re.VERBOSE,
-)
-
-PAGE_URL_LONG_RE = re.compile(
-    rf"""^
-      {BASE_URL_PATTERN}
-      (?P<title>.*)-
-      (?P<page_id>{UUID_PATTERN})
-    $""",
-    flags=re.IGNORECASE | re.VERBOSE,
-)
-
-BLOCK_URL_LONG_RE = re.compile(
-    rf"""^
-      {BASE_URL_PATTERN}
-      (?P<username>.*)/
-      (?P<title>.*)-
-      (?P<page_id>{UUID_PATTERN})
-      \#(?P<block_id>{UUID_PATTERN})
-    $""",
-    flags=re.IGNORECASE | re.VERBOSE,
-)
+PAGE_PATH_RE = re.compile(rf'(?:^|[-/])(?P<id>{UUID_PATTERN})$', flags=re.IGNORECASE)
+NOTION_HOSTS = frozenset(('notion.so', 'www.notion.so', 'notion.com', 'www.notion.com', 'app.notion.com'))
 
 
 # ToDo: Replace with MISSING when stable: https://docs.pydantic.dev/latest/concepts/experimental/#missing-sentinel
@@ -121,23 +95,21 @@ def is_unset(v: Any) -> TypeIs[UnsetType]:
 def extract_id(text: str) -> str | None:
     """Examine the given text to find a valid Notion object ID."""
 
-    m = UUID_RE.match(text)
+    m = UUID_RE.fullmatch(text)
     if m is not None:
         return m.group('id')
 
-    m = PAGE_URL_LONG_RE.match(text)
-    if m is not None:
-        return m.group('page_id')
-
-    m = PAGE_URL_SHORT_RE.match(text)
-    if m is not None:
-        return m.group('page_id')
-
-    m = BLOCK_URL_LONG_RE.match(text)
-    if m is not None:
-        return m.group('block_id')
-
-    return None
+    try:
+        url = urlsplit(text)
+    except ValueError:
+        return None
+    if url.scheme != 'https' or url.netloc.lower() not in NOTION_HOSTS:
+        return None
+    page_match = PAGE_PATH_RE.search(url.path)
+    if page_match is None:
+        return None
+    block_match = UUID_RE.fullmatch(url.fragment)
+    return block_match.group('id') if block_match is not None else page_match.group('id')
 
 
 class GenericObject(BaseModel):
