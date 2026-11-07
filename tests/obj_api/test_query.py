@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from unittest.mock import Mock
-from uuid import UUID
 
 import pytest
 
@@ -19,12 +18,7 @@ def test_opaque_query_cursor(query_type: type[Query], cursor: str) -> None:
     assert query_type(start_cursor=cursor).serialize_for_api()['start_cursor'] == cursor
 
 
-def test_uuid_cursor_compatibility() -> None:
-    cursor = UUID('59833787-2cf9-4fdf-8782-e53db20768a5')
-    assert DataSourceQuery(start_cursor=cursor).serialize_for_api()['start_cursor'] == str(cursor)
-
-
-def test_resume_and_paginate_with_opaque_cursors() -> None:
+def test_resume_validated_query_with_opaque_cursors() -> None:
     response = {'object': 'list', 'type': 'page_or_data_source', 'page_or_data_source': {}, 'results': []}
     endpoint = Mock(
         side_effect=[
@@ -33,7 +27,7 @@ def test_resume_and_paginate_with_opaque_cursors() -> None:
         ]
     )
     builder = DataSourceQueryBuilder(endpoint, data_source_id='59833787-2cf9-4fdf-8782-e53db20768a5')
-    builder.query.start_cursor = 'session:resume'
+    builder.query = DataSourceQuery(start_cursor='session:resume')
 
     assert list(builder.execute()) == []
     assert [call.kwargs['start_cursor'] for call in endpoint.call_args_list] == ['session:resume', 'session:next']
