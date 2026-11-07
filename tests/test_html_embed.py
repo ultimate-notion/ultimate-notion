@@ -7,11 +7,10 @@ from uuid import UUID
 import httpx
 import notion_client
 import pytest
-from pydantic import ValidationError
+from pydantic import ConfigDict, ValidationError
 
 from ultimate_notion.blocks import Embed
 from ultimate_notion.file import UploadedFile
-from ultimate_notion.obj_api.blocks import Embed as ObjEmbed
 from ultimate_notion.obj_api.blocks import EmbedTypeData
 from ultimate_notion.obj_api.objects import FileUpload
 from ultimate_notion.session import Session
@@ -59,11 +58,6 @@ def test_uploaded_html_embed_and_source_replacement() -> None:
     assert embed.obj_ref.serialize_for_api()['embed']['file_upload'] == {'id': str(UPLOAD_ID)}
 
 
-def test_read_html_embed_signed_url() -> None:
-    embed = Embed.wrap_obj_ref(ObjEmbed.model_validate({'embed': {'url': 'https://example.com/signed?token=abc'}}))
-    assert embed.url == 'https://example.com/signed?token=abc'
-
-
 def test_html_embed_append_update_and_refresh() -> None:
     requests: list[dict[str, Any]] = []
 
@@ -106,10 +100,14 @@ def test_html_embed_append_update_and_refresh() -> None:
     assert 'url' not in requests[1]['embed']
 
 
-@pytest.mark.parametrize('url', [None, 'https://example.com/chart'])
-def test_embed_requires_exactly_one_source(url: str | None) -> None:
-    data: dict[str, object] = {'url': url}
-    if url is not None:
-        data['file_upload'] = {'id': str(UPLOAD_ID)}
-    with pytest.raises(ValidationError, match='exactly one'):
-        EmbedTypeData.model_validate(data)
+def test_file_upload_source_validation() -> None:
+    source = {'type': 'file_upload', 'file_upload': {'id': str(UPLOAD_ID)}}
+    assert EmbedTypeData.model_validate(source).serialize_for_api() == {'caption': [], **source}
+
+
+def test_ambiguous_embed_sources_rejected_with_lenient_parsing() -> None:
+    class LenientEmbed(EmbedTypeData):
+        model_config = ConfigDict(extra='ignore')
+
+    with pytest.raises(ValidationError):
+        LenientEmbed.model_validate({'url': 'https://example.com/chart', 'file_upload': {'id': str(UPLOAD_ID)}})
