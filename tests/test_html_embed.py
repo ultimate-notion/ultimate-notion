@@ -60,15 +60,17 @@ def test_uploaded_html_embed_and_source_replacement() -> None:
 
 def test_html_embed_append_update_and_refresh() -> None:
     requests: list[dict[str, Any]] = []
+    calls: list[httpx.Request] = []
 
     def handle(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
         if request.method != 'GET':
             requests.append(json.loads(request.content))
         block = {
             'object': 'block',
             'id': str(UPLOAD_ID),
             'type': 'embed',
-            'embed': {'url': f'https://example.com/html?signature={len(requests)}', 'caption': []},
+            'embed': {'url': f'https://example.com/html?signature={len(calls)}', 'caption': []},
         }
         if request.url.path.endswith('/children'):
             return httpx.Response(
@@ -93,8 +95,9 @@ def test_html_embed_append_update_and_refresh() -> None:
         embed.set_file_upload(uploaded)
         assert embed.url == 'https://example.com/html?signature=2'
         embed.reload()
-        assert embed.url == 'https://example.com/html?signature=2'
+        assert embed.url == 'https://example.com/html?signature=3'
 
+    assert [call.method for call in calls] == ['PATCH', 'PATCH', 'GET']
     assert requests[0]['children'][0]['embed']['file_upload'] == {'id': str(UPLOAD_ID)}
     assert requests[1]['embed']['file_upload'] == {'id': str(UPLOAD_ID)}
     assert 'url' not in requests[1]['embed']
