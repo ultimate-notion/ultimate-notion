@@ -56,9 +56,9 @@ If both `db_id` and `db_title` are provided, `bind_ds()` uses `db_id`.
 If neither `db_id` nor `db_title` is provided, you'll need
 to pass a data source object explicitly to `bind_ds()` or provide a title when creating the data source.
 
-Since a data source needs to be a block within a page, we assume there is a page called
-`Tests` that is connected with this integration. We retrieve the object of
-this page and create the data source with the page as parent:
+We assume a page called `Tests` is shared with the integration. `notion.create_ds()` creates a
+database container within that page and returns its initial data source. The `parent` argument
+identifies the page that contains the database:
 
 ```python
 root_page = notion.search_page('Tests', exact=True).item()
