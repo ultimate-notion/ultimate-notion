@@ -59,6 +59,13 @@ view_of_all_pages = article_db.query.execute()
 assert len(view_of_all_pages) == num_of_articles
 ```
 
+Notion limits a single query to 10,000 results. If the response reports that the
+query is incomplete, execution raises `ultimate_notion.errors.IncompleteQueryError`
+instead of returning a view that appears complete. Narrow large queries with
+filters, for example by creation date, and combine the results of disjoint ranges.
+Ordinary cursor pagination does not bypass this limit. Low-level iterators may
+have yielded earlier pages before raising the error.
+
 ## Filtering & sorting
 
 The concept of filtering is really easy. We use a *boolean condition* to filter for the
