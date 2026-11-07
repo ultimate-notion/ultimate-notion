@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from ultimate_notion.database import Database as DatabaseWrapper
 from ultimate_notion.emoji import BuiltInIcon
 from ultimate_notion.obj_api.blocks import Database, Page, Paragraph
-from ultimate_notion.obj_api.core import UniqueObject, Unset, UserRef, extract_id
+from ultimate_notion.obj_api.core import ObjectRef, UniqueObject, Unset, UserRef, extract_id
 from ultimate_notion.obj_api.endpoints import DatabasesEndpoint
 from ultimate_notion.obj_api.objects import Bot, BuiltInIconObject, Person, User
 from ultimate_notion.obj_api.props import Number, NumberPropertyItem, PropertyItem
@@ -36,6 +36,27 @@ def test_extract_id() -> None:
         block_id = uuid4()
         page_url = f'{base_url}/username/page-title-{page_id}#{block_id!s}'
         assert UUID(extract_id(page_url)) == block_id
+
+
+@pytest.mark.parametrize('host', ['app.notion.com', 'notion.com', 'www.notion.com', 'notion.so', 'www.notion.so'])
+@pytest.mark.parametrize('compact', [False, True])
+def test_current_notion_url_references(host: str, *, compact: bool) -> None:
+    page_id = UUID('59833787-2cf9-4fdf-8782-e53db20768a5')
+    block_id = UUID('c02fc1d3-db8b-45c5-a222-27595b15aea7')
+    page_text = page_id.hex if compact else str(page_id)
+    url = f'https://{host}/p/{page_text}?source=copy_link'
+
+    assert ObjectRef.build(url).id == page_id
+    assert ObjectRef.build(f'{url}#{block_id.hex}').id == block_id
+
+
+def test_rejects_lookalike_notion_host() -> None:
+    assert extract_id('https://notionXso/59833787-2cf9-4fdf-8782-e53db20768a5') is None
+
+
+def test_uppercase_notion_block_url() -> None:
+    url = 'https://APP.NOTION.COM/p/598337872CF94FDF8782E53DB20768A5#C02FC1D3DB8B45C5A22227595B15AEA7'
+    assert ObjectRef.build(url).id == UUID('c02fc1d3-db8b-45c5-a222-27595b15aea7')
 
 
 def test_model_id_defaults_and_property_item_round_trip() -> None:
