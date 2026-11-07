@@ -76,6 +76,7 @@ class FormulaType(StrEnum):
     STRING = 'string', 'string'
     BOOLEAN = 'boolean', 'checkbox'  # inconsistency in the Notion API
     DATE = 'date', 'date'
+    UNSUPPORTED = 'unsupported', ''
 
     formula_kwarg: str
 
