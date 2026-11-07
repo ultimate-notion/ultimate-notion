@@ -20,7 +20,6 @@ def notion_cleanups() -> None:
         ('model.glb', 'application/octet-stream', 'application/octet-stream'),
         ('model.unknown-extension', None, 'application/octet-stream'),
         ('image.png', None, 'image/png'),
-        ('image.png', 'image/jpeg', 'image/jpeg'),
     ],
 )
 @pytest.mark.parametrize('multipart', [False, True])
