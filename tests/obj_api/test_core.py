@@ -184,3 +184,18 @@ def test_block_serialization_omits_read_only_archive_flags() -> None:
     assert 'in_trash' not in data
     assert 'archived' not in data
     assert 'is_archived' not in data
+
+
+@pytest.mark.parametrize(
+    'url',
+    [
+        'https://example.com/p/59833787-2cf9-4fdf-8782-e53db20768a5',
+        'https://app.notion.com.example.com/p/59833787-2cf9-4fdf-8782-e53db20768a5',
+        'https://user@app.notion.com/p/59833787-2cf9-4fdf-8782-e53db20768a5',
+        'http://app.notion.com/p/59833787-2cf9-4fdf-8782-e53db20768a5',
+        'https://app.notion.com/p/not-a-page#598337872cf94fdf8782e53db20768a5',
+        'https://[invalid',
+    ],
+)
+def test_unrelated_or_invalid_notion_urls(url: str) -> None:
+    assert extract_id(url) is None
