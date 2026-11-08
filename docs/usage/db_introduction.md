@@ -203,6 +203,10 @@ shop_db.delete_ds(customers_ds)
 assert [ds.title for ds in shop_db.data_sources] == ['Items']
 ```
 
+[delete_ds] moves only the selected data source to the trash and excludes it from `shop_db.data_sources`.
+The database and its other data sources remain available. Use [Database.restore_ds] to restore the
+removed data source.
+
 Given a data source, you can always retrieve its container database via its `database_id`:
 
 ```python
@@ -248,3 +252,4 @@ shop_db.delete()
 [create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
 [Database.create_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_ds
 [delete_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.delete_ds
+[Database.restore_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.restore_ds
