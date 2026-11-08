@@ -63,6 +63,17 @@ with open('LICENSE.txt', 'rb') as file:
 Ultimate Notion automatically detects MIME types for uploaded files using the suffix of the file name.
 If the MIME type cannot be determined, it defaults to `application/octet-stream` since Notion doesn't support `text/plain`.
 
+### Interactive HTML embeds
+
+Upload an `.html` or `.htm` file and pass the returned `UploadedFile` to
+`uno.Embed(uploaded_file, caption='Interactive chart')`. Notion renders the HTML
+in a sandboxed iframe. Use `embed.set_file_upload(another_upload)` to replace it,
+or assign `embed.url` to switch back to a URL embed.
+
+After the embed is saved, `embed.url` contains a temporary signed URL. Reload the
+block to refresh an expired URL; keep object IDs rather than caching that URL.
+Before an uploaded embed is saved, its URL is `None`.
+
 ## External URL Import
 
 You can import files directly from external URLs without downloading them locally first:
