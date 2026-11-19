@@ -17,10 +17,10 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Annotated, Any, Generic
+from typing import Annotated, Any, Generic, Self
 from uuid import UUID
 
-from pydantic import AfterValidator, Field, SerializeAsAny
+from pydantic import AfterValidator, Field, SerializeAsAny, model_validator
 from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import (
@@ -49,6 +49,8 @@ from ultimate_notion.obj_api.objects import (
     MentionPage,
     RichTextBaseObject,
     TextObject,
+    UploadedFile,
+    UploadedFileTypeData,
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import Property
@@ -464,7 +466,17 @@ class Breadcrumb(Block[BreadcrumbTypeData], type='breadcrumb'):
 class EmbedTypeData(CaptionMixin):
     """Type data for `Embed` block."""
 
-    url: str
+    url: str | None = None
+    type: str | None = None
+    file_upload: UploadedFileTypeData | None = None
+
+    @model_validator(mode='after')
+    def validate_source(self) -> Self:
+        """Require exactly one embed source."""
+        if (self.url is None) == (self.file_upload is None):
+            msg = 'Embed requires exactly one of url or file_upload.'
+            raise ValueError(msg)
+        return self
 
 
 class Embed(Block[EmbedTypeData], type='embed'):
@@ -473,7 +485,11 @@ class Embed(Block[EmbedTypeData], type='embed'):
     embed: EmbedTypeData
 
     @classmethod
-    def build(cls, url: str, caption: list[RichTextBaseObject]) -> Embed:
+    def build(cls, url: str | UploadedFile, caption: list[RichTextBaseObject]) -> Embed:
+        if isinstance(url, UploadedFile):
+            return Embed.model_construct(
+                embed=EmbedTypeData.model_construct(type='file_upload', file_upload=url.file_upload, caption=caption)
+            )
         return Embed.model_construct(embed=EmbedTypeData.model_construct(url=url, caption=caption))
 
 

@@ -40,7 +40,7 @@ from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import EmptyListError, InvalidAPIUsageError, UnknownDataSourceError, UnsetError
-from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
+from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, UploadedFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import core as obj_core
@@ -863,25 +863,35 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
 
 
 class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
-    """Embed block."""
+    """Embed a URL or an uploaded HTML file."""
 
-    def __init__(self, url: str, *, caption: str | None = None) -> None:
+    def __init__(self, url: str | UploadedFile, *, caption: str | None = None) -> None:
         caption_obj = Text(caption).obj_ref if caption is not None else None
-        super().__init__(url=url_normalize(url), caption=caption_obj)
+        source = url.obj_ref if isinstance(url, UploadedFile) else url_normalize(url)
+        super().__init__(url=source, caption=caption_obj)
 
     @property
-    def url(self) -> str:
-        """Return the URL of the embedded item."""
+    def url(self) -> str | None:
+        """Return the embed URL, or `None` before an uploaded embed is saved.
+
+        Uploaded HTML URLs expire. Reload the block to obtain a fresh URL.
+        """
         return self.obj_ref.value.url
 
     @url.setter
     def url(self, url: str) -> None:
         if (norm_url := url_normalize(url)) is not None:
-            self.obj_ref.value.url = norm_url
+            self.obj_ref.embed = obj_blocks.Embed.build(url=norm_url, caption=self.obj_ref.embed.caption).embed
             self._update_in_notion()
         else:
             msg = f'Invalid URL: {url}'
             raise ValueError(msg)
+
+    def set_file_upload(self, file: UploadedFile) -> Self:
+        """Replace the source with an uploaded HTML file, preserving its caption."""
+        self.obj_ref.embed = obj_blocks.Embed.build(url=file.obj_ref, caption=self.obj_ref.embed.caption).embed
+        self._update_in_notion()
+        return self
 
     def to_markdown(self) -> str:
         title = self.caption.to_plain_text() if self.caption is not None else self.url
