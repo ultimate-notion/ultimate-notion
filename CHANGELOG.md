@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- New: Move an existing page under another page or data source with `Page.move()`, issue #403.
+- New: Choose the start or end when creating pages, inserting blocks, or inserting Markdown
+  with `InsertPosition`, issue #403.
+
 - New: Add support for Python 3.15.
 
 - Chg: Drop support for Python 3.10, which is end-of-life. Python 3.11 or higher is now required.
