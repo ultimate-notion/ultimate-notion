@@ -9,7 +9,10 @@ import httpx
 import pytest
 from notion_client import Client
 
+from tests._views_vcr import normalize_test_root_response
+from tests.conftest import TESTS_PAGE
 from ultimate_notion import Session, ViewType
+from ultimate_notion.blocks import ChildDatabase
 from ultimate_notion.obj_api import NOTION_API_VERSION
 
 PAGE_ID = '21e91325-4fb6-4d6b-8cdb-e556333affd8'
@@ -94,3 +97,35 @@ def test_list_saved_views_follows_cursor() -> None:
         {'database_id': DATABASE_ID, 'page_size': '100'},
         {'database_id': DATABASE_ID, 'page_size': '100', 'start_cursor': cursor},
     ]
+
+
+@pytest.mark.vcr(before_record_response=normalize_test_root_response, decode_compressed_response=True)
+def test_saved_view_round_trip() -> None:
+    with Session() as notion:
+        root = notion.search_page(TESTS_PAGE, exact=True).item()
+        page = notion.create_page(root, title='Saved view API test')
+        try:
+            db = notion.create_db(page, title='View API database')
+            ds = db.data_sources.item()
+            view = notion.create_view(db, name='Items', view_type=ViewType.TABLE, data_source=ds)
+            saved = notion.get_view(view.id)
+            assert saved.name == 'Items'
+            assert saved.type is ViewType.TABLE
+            assert saved.database_id == db.id
+            assert saved.data_source_id == ds.id
+
+            renamed = view.update(name='Inventory')
+            assert renamed.name == 'Inventory'
+            assert {item.id: item.name for item in notion.list_views(db)}[view.id] == 'Inventory'
+
+            view.delete()
+            assert view.id not in {item.id for item in notion.api.views.list(database=db.id)}
+
+            target = notion.create_page(page, title='Linked view target')
+            linked_view = notion.create_view(target, name='Linked items', view_type=ViewType.TABLE, data_source=ds)
+            (linked_block,) = target.children
+            assert isinstance(linked_block, ChildDatabase)
+            assert linked_block.id == linked_view.database_id
+            assert linked_view.data_source_id == ds.id
+        finally:
+            page.delete()
