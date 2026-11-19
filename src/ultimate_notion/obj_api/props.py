@@ -311,13 +311,21 @@ class UniqueID(PropertyValue[PID_co], type='unique_id'):
     unique_id: TypeData = Field(default_factory=TypeData)
 
 
+class VerificationPeriod(GenericObject):
+    """The start and optional expiration of a verification."""
+
+    start: dt.datetime
+    end: dt.datetime | None = None
+    time_zone: str | None = None
+
+
 class Verification(PropertyValue[PID_co], type='verification'):
     """A Notion verification property value."""
 
     class TypeData(GenericObject):
         state: VState = VState.UNVERIFIED
         verified_by: SerializeAsAny[User] | None = None
-        date: dt.datetime | None = None
+        date: VerificationPeriod | dt.datetime | None = None
 
         # leads to better error messages, see
         # https://github.com/pydantic/pydantic/issues/355
@@ -326,7 +334,22 @@ class Verification(PropertyValue[PID_co], type='verification'):
         def validate_enum_field(cls, field: str) -> VState:
             return VState(field)
 
-    verification: TypeData = Field(default_factory=TypeData)
+    verification: TypeData | None = Field(default_factory=TypeData)
+
+    def serialize_for_api(self) -> dict[str, Any]:
+        verification = self.verification
+        state = VState.UNVERIFIED if verification is None else verification.state
+        if state is VState.EXPIRED:
+            msg = 'Notion assigns the expired verification state. Write verified or unverified.'
+            raise ValueError(msg)
+
+        data: dict[str, Any] = {'state': state.value}
+        if state is VState.VERIFIED and verification is not None and (period := verification.date) is not None:
+            if isinstance(period, dt.datetime):
+                period = VerificationPeriod(start=period)
+            data['date'] = period.serialize_for_api()
+
+        return {'type': 'verification', 'verification': data}
 
 
 class Button(PropertyValue[PID_co], type='button'):
