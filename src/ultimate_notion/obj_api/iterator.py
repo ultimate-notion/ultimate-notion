@@ -5,7 +5,9 @@ from __future__ import annotations
 import logging
 import warnings
 from collections.abc import Awaitable, Callable, Iterator
-from typing import Annotated, Any, Generic, TypeVar, cast
+from datetime import datetime
+from typing import Annotated, Any, Generic, Literal, TypeVar, cast
+from uuid import UUID
 
 from pydantic import ConfigDict, Field, ValidationError
 from pydantic.functional_validators import BeforeValidator
@@ -57,6 +59,41 @@ class RequestStatus(GenericObject):
 
     type: str
     incomplete_reason: str | None = None
+
+
+class ViewQueryPage(GenericObject):
+    """A page reference returned by a saved view query."""
+
+    object: Literal['page']
+    id: UUID
+
+
+class ViewQueryResults(GenericObject):
+    """One page of saved view query results and its pagination state."""
+
+    results: list[ViewQueryPage]
+    next_cursor: str | None = None
+    has_more: bool
+    request_status: RequestStatus | None = None
+    request_id: UUID | None = None
+
+
+class ViewQuery(ViewQueryResults):
+    """A saved view query snapshot, including its first page of results."""
+
+    object: Literal['view_query']
+    id: UUID
+    view_id: UUID
+    expires_at: datetime
+    total_count: int
+
+
+class ViewQueryResultList(ViewQueryResults):
+    """A subsequent page of cached saved view query results."""
+
+    object: Literal['list']
+    type: Literal['page']
+    page: dict[str, Any]
 
 
 class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True):

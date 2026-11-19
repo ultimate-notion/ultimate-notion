@@ -30,7 +30,7 @@ from ultimate_notion.obj_api.core import (
     is_unset,
 )
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
-from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList
+from ultimate_notion.obj_api.iterator import EndpointIterator, PropertyItemList, ViewQuery, ViewQueryResultList
 from ultimate_notion.obj_api.objects import (
     Bot,
     BuiltInIconObject,
@@ -610,6 +610,28 @@ class ViewsEndpoint(Endpoint):
             msg = 'Specify a database or a data source.'
             raise ValueError(msg)
         return EndpointIterator[ViewRef](self.raw_api.list)(**query)
+
+    def create_query(self, view: ViewRef | UUID | str, *, page_size: int | None = None) -> ViewQuery:
+        """Run the saved view's filters and sort order and return the first page of references."""
+        return ViewQuery.model_validate(self.raw_api.queries.create(str(get_uuid(view)), page_size=page_size))
+
+    def query_results(
+        self,
+        view: ViewRef | UUID | str,
+        query_id: UUID | str,
+        *,
+        start_cursor: str | None = None,
+        page_size: int | None = None,
+    ) -> ViewQueryResultList:
+        """Return the next page from a cached view query."""
+        response = self.raw_api.queries.results(
+            str(get_uuid(view)), str(query_id), start_cursor=start_cursor, page_size=page_size
+        )
+        return ViewQueryResultList.model_validate(response)
+
+    def delete_query(self, view: ViewRef | UUID | str, query_id: UUID | str) -> None:
+        """Delete a cached query without changing the saved view."""
+        self.raw_api.queries.delete(str(get_uuid(view)), str(query_id))
 
 
 class PagesEndpoint(Endpoint):
