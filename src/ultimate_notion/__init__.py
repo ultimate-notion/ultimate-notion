@@ -51,6 +51,7 @@ from ultimate_notion.blocks import (
 )
 from ultimate_notion.core import Workspace, WorkspaceType, get_active_session
 from ultimate_notion.database import Database, DataSource
+from ultimate_notion.database_view import DatabaseView
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, url
 from ultimate_notion.obj_api.enums import (
@@ -66,6 +67,7 @@ from ultimate_notion.obj_api.enums import (
 )
 from ultimate_notion.obj_api.objects import PageMarkdown, PageTemplate
 from ultimate_notion.obj_api.props import PlaceDict
+from ultimate_notion.obj_api.views import ViewType
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.page import Page
 from ultimate_notion.query import Condition, prop
@@ -96,6 +98,7 @@ __all__ = [
     'CustomEmoji',
     'DataSource',
     'Database',
+    'DatabaseView',
     'DateTimeOrRange',  # for type hinting only
     'Divider',
     'Embed',
@@ -143,6 +146,7 @@ __all__ = [
     'User',
     'VState',
     'Video',
+    'ViewType',
     'Workspace',
     'WorkspaceType',  # for type hinting only
     '__version__',

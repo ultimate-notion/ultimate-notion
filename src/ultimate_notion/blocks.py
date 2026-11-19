@@ -39,7 +39,13 @@ from url_normalize import url_normalize
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
-from ultimate_notion.errors import EmptyListError, InvalidAPIUsageError, UnknownDataSourceError, UnsetError
+from ultimate_notion.errors import (
+    EmptyListError,
+    InvalidAPIUsageError,
+    UnknownDatabaseError,
+    UnknownDataSourceError,
+    UnsetError,
+)
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, UploadedFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -203,17 +209,15 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
             if isinstance(child_block, ChildPage):
                 child_blocks[idx] = child_block.page
             elif isinstance(child_block, ChildDatabase):
-                ref_block: Block | DataSource
                 try:
-                    ref_block = child_block.ds
-                except (UnknownDataSourceError, EmptyListError):
-                    # A linked database (a linked view of another database) cannot be resolved to a data
-                    # source via the API: its container either is not retrievable (`UnknownDataSourceError`)
-                    # or exposes no data sources (`EmptyListError`). Fall back to the block itself, which
-                    # renders as an unsupported linked database. Check the docs:
-                    # https://developers.notion.com/reference/retrieve-a-database
-                    ref_block = child_block
-                child_blocks[idx] = ref_block
+                    data_source = child_block.ds
+                except (UnknownDatabaseError, UnknownDataSourceError, EmptyListError):
+                    # Some linked containers cannot be retrieved or expose no accessible data sources.
+                    continue
+                # A linked container can also expose a data source owned by another database.
+                # Keep the link as a block so it doesn't appear as a second child of the source's owner.
+                if data_source.database_id == child_block.id:
+                    child_blocks[idx] = data_source
 
         # A `ChildDatabase` still present here is an unresolved linked database (resolved ones became
         # `DataSource` above). Its id is the container database's id, already cached as a `Database` while
@@ -1202,9 +1206,7 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
     """Child database block.
 
     This block is used to represent a data source if it is a child of e.g. a page.
-    We try to resolve it via the API to get the actual data source object. This does not work
-    if it is a `linked database` as mentioned in the Notion API docs:
-    https://developers.notion.com/reference/retrieve-a-database
+    When reading page children, we resolve owned data sources and keep linked databases as blocks.
 
     !!! note
 
