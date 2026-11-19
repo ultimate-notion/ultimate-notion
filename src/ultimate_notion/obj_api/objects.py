@@ -791,6 +791,23 @@ class FileUpload(NotionObject[UUID], object='file_upload'):
     created_by: User  # undocumented but sent by the API
 
 
+class PageMarkdownWarning(GenericObject):
+    """A warning returned by Notion's Markdown endpoint."""
+
+    code: str
+    message: str
+
+
+class PageMarkdown(NotionObject[UUID], object='page_markdown'):
+    """Markdown content and its completeness metadata returned by Notion."""
+
+    id: UUID
+    markdown: str
+    truncated: bool
+    unknown_block_ids: list[UUID]
+    warnings: list[PageMarkdownWarning] = Field(default_factory=list)
+
+
 class PageTemplate(GenericObject):
     """A page template listed for a Notion data source."""
 
