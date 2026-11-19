@@ -60,11 +60,13 @@ def test_verification_create_and_update() -> None:
         page = source.create_page(
             title='Temporary page', verification=uno.Verification('verified', start=START, end=END)
         )
-        assert page.props['Verification'].state is uno.VState.VERIFIED
-        assert page.props['Verification'].date == START
-        assert page.props['Verification'].expires_at == END
+        created_verification = page.props['Verification']
+        assert created_verification.state is uno.VState.VERIFIED
+        assert created_verification.date == START
+        assert created_verification.expires_at == END
         page.props['Verification'] = 'unverified'
-        assert page.props['Verification'].state is uno.VState.UNVERIFIED
+        updated_verification = page.props['Verification']
+        assert updated_verification.state is uno.VState.UNVERIFIED
 
     assert [method for method, _ in requests] == ['POST', 'PATCH']
     assert [body['properties'] for _, body in requests][1] == {
