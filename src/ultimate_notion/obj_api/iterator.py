@@ -75,6 +75,7 @@ class ViewQueryResults(GenericObject):
     next_cursor: str | None = None
     has_more: bool
     request_status: RequestStatus | None = None
+    request_id: UUID | None = None
 
 
 class ViewQuery(ViewQueryResults):
