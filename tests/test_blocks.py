@@ -1281,6 +1281,16 @@ def test_callout_with_built_in_icon_markdown() -> None:
     assert callout.to_markdown().strip() == ':snake: Built-in icon callout'
 
 
+def test_iconless_callout_markdown() -> None:
+    callout = uno.Callout('Callout text')
+    assert callout.icon == '💡'
+
+    callout.obj_ref.value.icon = None  # The Blocks API returns null for iconless callouts.
+
+    assert callout.icon is None
+    assert callout.to_markdown() == 'Callout text\n'
+
+
 def test_prepend_blocks_offline() -> None:
     toggle = uno.ToggleItem('Parent')
     second = uno.Paragraph('Second')

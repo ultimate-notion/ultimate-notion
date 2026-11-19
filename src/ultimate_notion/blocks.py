@@ -727,8 +727,9 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
 
     !!! note
 
-        The default icon is an electric light bulb, i.e. 💡. Currently it is not supported by the Notion API
-        to have a callout block without an icon.
+        The default icon is 💡. To create a callout without an icon, use
+        [Page.insert_markdown][ultimate_notion.page.Page.insert_markdown]
+        with a `<callout>` tag and omit the `icon` attribute.
     """
 
     def __init__(
@@ -742,9 +743,6 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
             icon = Emoji(icon)
 
-        # Setting icon to None explicitly and sending `null` to Notion does NOT remove the icon
-        # but sets it to the default icon (💡). Right now there seems to be no way to have a callout
-        # block without an icon.
         self.obj_ref.value.icon = icon.obj_ref
 
     @staticmethod
@@ -753,13 +751,11 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         return Emoji('💡')
 
     @property
-    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon:
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon | None:
+        """Return the icon, or `None` if the callout has no icon."""
         if is_unset(icon := self.obj_ref.value.icon):
             raise UnsetError()
-        if icon is None:
-            return self.get_default_icon()
-        else:
-            return wrap_icon(icon)
+        return None if icon is None else wrap_icon(icon)
 
     @icon.setter
     def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon) -> None:
@@ -767,15 +763,17 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         self._update_in_notion()
 
     def to_markdown(self) -> str:
-        match self.icon:
+        match icon := self.icon:
+            case None:
+                return f'{super().to_markdown()}\n'
             case Emoji():
-                return f'{self.icon} {super().to_markdown()}\n'
+                return f'{icon} {super().to_markdown()}\n'
             case CustomEmoji() | BuiltInIcon():
-                return f':{self.icon.name}: {super().to_markdown()}\n'
+                return f':{icon.name}: {super().to_markdown()}\n'
             case AnyFile():
-                return f'![icon]({self.icon.url}) {super().to_markdown()}\n'
+                return f'![icon]({icon.url}) {super().to_markdown()}\n'
             case _:
-                msg = f'Invalid icon type {type(self.icon)}'
+                msg = f'Invalid icon type {type(icon)}'
                 raise ValueError(msg)
 
 
