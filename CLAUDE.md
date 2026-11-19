@@ -2,14 +2,9 @@
 
 ## 1. Project Overview
 
-Ultimate-Notion is a pythonic, high-level API for Notion. It provides a comprehensive interface to interact
-with Notion's API, allowing users to manage pages, databases (data sources), blocks, and more.
-
-**Current Major Work**: Migration to Notion API 2025-09-03
-
-- Migrating from "database" terminology to "data source" for what Notion previously called databases
-- Introducing a NEW "Database" concept that represents collections of data sources
-- Adopting `ds` abbreviation for data sources, reserving `db` for the new database collections
+Ultimate Notion is a high-level Python client for the Notion API. A `Database` contains one
+or more data sources. A `DataSource` owns the property schema and holds the pages that
+queries return.
 
 ## 2. Key Technologies & Conventions
 
@@ -25,8 +20,7 @@ with Notion's API, allowing users to manage pages, databases (data sources), blo
 - **Type Safety**: Full static type checking required (mypy and ty, via `hatch run lint:typing`)
 - **Code Style**: Ruff for linting and formatting
 - **Naming Conventions**:
-  - `ds` = data source (what was previously called "database")
-  - `db` = database collection (NEW concept in API 2025-09-03)
+  - Use `ds` for a data source and `db` for its database container.
   - Use snake_case for functions, variables, and methods
   - Use PascalCase for classes
   - Use UPPER_CASE for constants
@@ -61,7 +55,7 @@ with Notion's API, allowing users to manage pages, databases (data sources), blo
 **DataObject Wrapper Pattern:**
 
 ```python
-class DataSource(DataObject[obj_blocks.DataSource], wraps=obj_blocks.DataSource):
+class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSource):
     """High-level wrapper for data source objects"""
 ```
 
@@ -103,12 +97,12 @@ src/ultimate_notion/
 
 ### Key Files
 
-- `session.py` (528 lines): Main entry point for API operations
-- `database.py` (308 lines): DataSource and Database classes
-- `schema.py` (1376 lines): Schema definition and property system
-- `page.py` (664 lines): Page operations and management
-- `blocks.py` (1840 lines): Block type wrappers
-- `query.py` (656 lines): Query building and filtering
+- `session.py`: Main entry point for API operations
+- `database.py`: Data source and database classes
+- `schema.py`: Schema definition and property system
+- `page.py`: Page operations and management
+- `blocks.py`: Block type wrappers
+- `query.py`: Query building and filtering
 
 ## 5. Testing
 
@@ -163,14 +157,6 @@ hatch run vcr-only
 - `pyproject.toml`: Project dependencies, scripts, and tool configuration
 - `.gitignore`: Git ignore patterns (includes `issues/` for test files)
 - `CLAUDE.md`: This file - project documentation for Claude
-- `issues/issue188.md`: Migration plan for Notion API 2025-09-03
-
-### Migration Documentation
-
-- **`issues/issue188.md`**: Complete migration plan and progress log
-  - Detailed phase-by-phase migration steps
-  - Progress log with all commits
-  - Known issues and next steps
 
 ### Source Directories
 
@@ -261,43 +247,14 @@ hatch run vcr-rewrite -k test_name
 ### Examples
 
 ```text
-feat(obj_api): Add DataSource class and DataSourcesEndpoint for API 2025-09-03
+feat(obj_api): add a data source endpoint
 
-refactor: Use 'ds' abbreviation for data source throughout codebase
+refactor(query): simplify filter construction
 
-docs: Add comprehensive progress log for Phase 3 & 4
+docs: explain schema binding
 ```
 
-## 9. Migration Status (API 2025-09-03)
-
-### Completed Phases
-
-- ✅ Phase 1: Preparation and analysis
-- ✅ Phase 2: Low-level obj_api layer migration
-- ✅ Phase 3: High-level API migration (Database → DataSource with `ds` abbreviation)
-- ✅ Phase 4: Examples and tests updated
-- ✅ NEW Database class added (placeholder)
-
-### Current State
-
-- All source code uses `ds` for data sources
-- All tests and examples updated
-- `DataSource` class: What was previously called "database"
-- `Database` class: NEW concept for collections (placeholder implementation)
-
-### Next Steps (Phase 5)
-
-1. Rewrite VCR cassettes
-2. Run full test suite
-3. Fix remaining type errors
-4. Verify all tests pass
-
-### Key Terminology
-
-- **DataSource** (`ds`): A single data source with schema and pages (formerly "database")
-- **Database** (`db`): A collection of data sources (NEW in API 2025-09-03, not yet implemented)
-
-## 10. Important Notes for AI Assistants
+## 9. Important Notes for AI Assistants
 
 ### Critical Git Rules
 
@@ -322,7 +279,7 @@ docs: Add comprehensive progress log for Phase 3 & 4
 
 ### When in Doubt
 
-- Check `issues/issue188.md` for migration context
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) for development and test workspace setup.
 - Review existing code patterns in similar modules
 - Run `hatch run lint:all` before committing
 - Use specific file paths for git operations
