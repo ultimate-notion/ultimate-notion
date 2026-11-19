@@ -9,8 +9,8 @@ from uuid import UUID
 
 from pydantic import ConfigDict
 
-from ultimate_notion.obj_api.core import NotionObject
-from ultimate_notion.obj_api.objects import DatabaseRef, UserRef
+from ultimate_notion.obj_api.core import NotionObject, UserRef
+from ultimate_notion.obj_api.objects import DatabaseRef
 
 
 class ViewType(StrEnum):
