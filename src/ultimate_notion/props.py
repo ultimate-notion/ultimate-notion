@@ -19,9 +19,9 @@ from ultimate_notion.errors import UnsetError
 from ultimate_notion.file import AnyFile
 from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.enums import FormulaType, RollupType, VState
-from ultimate_notion.obj_api.objects import DateRange
+from ultimate_notion.obj_api.objects import Bot, DateRange
 from ultimate_notion.option import Option
-from ultimate_notion.user import User
+from ultimate_notion.user import CustomAgentRef, User
 from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
@@ -198,15 +198,18 @@ class MultiSelect(PropertyValue[obj_props.MultiSelect], wraps=obj_props.MultiSel
 class Person(PropertyValue[obj_props.People], wraps=obj_props.People):
     """Person/People property value."""
 
-    def __init__(self, users: User | Sequence[User]):
-        if not isinstance(users, Sequence):
-            users = [users]
-        super().__init__(users)
+    def __init__(self, users: User | CustomAgentRef | Sequence[User | CustomAgentRef]):
+        user_sequence = [users] if isinstance(users, (User, CustomAgentRef)) else users
+        super().__init__([user.obj_ref for user in user_sequence])
 
     @property
     def value(self) -> list[User]:
-        session = get_active_session()
-        return [session.get_user(user.id, raise_on_unknown=False) for user in self.obj_ref.people]
+        return [
+            User.wrap_obj_ref(user)
+            if isinstance(user, Bot) and user.agent_id is not None
+            else get_active_session().get_user(user.id, raise_on_unknown=False)
+            for user in self.obj_ref.people
+        ]
 
 
 class URL(PropertyValue[obj_props.URL], wraps=obj_props.URL):

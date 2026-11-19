@@ -19,6 +19,18 @@ class WorkSpaceInfo(objs.WorkSpaceLimits):
     name: str
 
 
+class CustomAgentRef:
+    """A reference to a shared Custom Agent by its agent ID or its bot user ID."""
+
+    def __init__(self, agent_or_bot_id: UUID | str) -> None:
+        self.obj_ref = UserRef.build(agent_or_bot_id)
+
+    @property
+    def id(self) -> UUID:
+        """Return the ID supplied when constructing this reference."""
+        return self.obj_ref.id
+
+
 U_co = TypeVar('U_co', bound=objs.User, default=objs.User, covariant=True)
 
 
@@ -97,6 +109,11 @@ class Bot(User[objs.Bot], wraps=objs.Bot):
     @property
     def is_bot(self) -> bool:
         return True
+
+    @property
+    def agent_id(self) -> UUID | None:
+        """Return the Custom Agent ID when this bot represents one."""
+        return self.obj_ref.agent_id
 
     @property
     def workspace_info(self) -> WorkSpaceInfo:

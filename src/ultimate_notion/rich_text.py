@@ -19,7 +19,7 @@ from ultimate_notion.obj_api import objects as objs
 from ultimate_notion.obj_api.core import Unset
 from ultimate_notion.obj_api.enums import BGColor, Color
 from ultimate_notion.obj_api.objects import MAX_TEXT_OBJECT_SIZE
-from ultimate_notion.user import User
+from ultimate_notion.user import CustomAgentRef, User
 from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
@@ -121,7 +121,7 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
 
     def __init__(
         self,
-        target: User | Page | DataSource | CustomEmoji | DateTimeOrRange,
+        target: User | CustomAgentRef | Page | DataSource | CustomEmoji | DateTimeOrRange,
         *,
         bold: bool = False,
         italic: bool = False,
@@ -135,6 +135,8 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
         )
         if _is_date_or_range(target):
             self.obj_ref = objs.DateRange.build(target).build_mention(style=annotations)
+        elif isinstance(target, CustomAgentRef):
+            self.obj_ref = objs.MentionUser.build_mention_from(target.obj_ref, style=annotations)
         else:
             self.obj_ref = target.obj_ref.build_mention(style=annotations)
 
@@ -143,9 +145,16 @@ class Mention(RichTextBase[objs.MentionObject], wraps=objs.MentionObject):
         """Type of the mention, e.g. user, page, etc."""
         return self.obj_ref.mention._type_name
 
+    @property
+    def user(self) -> User | None:
+        """Return the inline user for a user mention, if present."""
+        if isinstance(payload := self.obj_ref.mention, objs.MentionUser):
+            return User.wrap_obj_ref(payload.user)
+        return None
+
 
 def mention(
-    target: User | Page | DataSource | CustomEmoji | DateTimeOrRange,
+    target: User | CustomAgentRef | Page | DataSource | CustomEmoji | DateTimeOrRange,
     *,
     bold: bool = False,
     italic: bool = False,

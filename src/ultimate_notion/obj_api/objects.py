@@ -449,6 +449,7 @@ class Bot(User[BotTypeData], type='bot'):
     # not present when a new page is created by a bot within a data source with a `CreatedBy` Property.
     # For ease of use, we include a default instance of the bot type data.
     bot: BotTypeData = Field(default_factory=BotTypeData)
+    agent_id: UUID | None = None
 
 
 class MentionPage(MentionBase[ObjectRef], type='page'):
