@@ -237,6 +237,7 @@ class Query(GenericObject, ABC):
     """Abstract query object in Notion for searching pages/data sources and querying data sources."""
 
     filter: SerializeAsAny[QueryFilter] | None = None
+    # Pass opaque cursor strings through unchanged. Accept UUID objects for compatibility with existing callers.
     start_cursor: str | UUID | None = None
     page_size: int = MAX_PAGE_SIZE
 
