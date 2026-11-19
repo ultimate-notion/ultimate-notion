@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import time
-from textwrap import dedent
 
 import pytest
 
 import ultimate_notion as uno
 from tests.conftest import assert_eventually
-from ultimate_notion.blocks import Block, Unsupported
+from ultimate_notion.blocks import Block, ChildDatabase, Unsupported
 from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.page import Page
@@ -213,101 +212,6 @@ def test_created_edited_by(notion: uno.Session, root_page: uno.Page) -> None:
 
 
 @pytest.mark.vcr()
-def test_page_to_markdown(md_page: uno.Page, md_subpage: uno.Page, root_page: uno.Page) -> None:
-    image = next(block for block in md_page.children if isinstance(block, uno.Image))
-    # Notion serves the image from a signed URL. Keep checking the filename in the alt text.
-    _, query_separator, image_query = image.url.rsplit('/', 1)[-1].partition('?')
-
-    exp_output = dedent(
-        f"""
-        # Markdown Test
-
-        ## Headline 1
-        ### Headline 2
-        #### Headline 3
-        ---
-
-        ## Toggle Headline 1
-        ### Toggle Headline 2
-        #### Toggle Headline 3
-        - Item 1
-
-        - Item 2
-        with a new line
-
-        - Item 3
-
-        - [ ] ToDo1
-
-        - [ ] ToDo2
-        with a new line
-
-        - [x] Checked ToDo3
-
-        1. First item
-
-        1. Second item
-        with a new line
-
-        1. Third item
-
-        > This is a quote
-        with a new line
-
-        💡 Callout!
-
-        |           |           |
-        |-----------|-----------|
-        | Cell 1, 1 | Cell 1, 2 |
-        | Cell 2, 1 | Cell 2, 2 |
-        | Cell 3, 1 | Cell 3, 2 |
-
-        This is an emoji! 😀😀
-        $$
-        |x|=\\begin{{cases}}x, &\\quad x \\geq 0\\\\-x, &\\quad x < 0\\end{{cases}}
-        $$
-
-        ```python
-        # Python Code
-        import ultimate_notion
-        ```
-        [Caption](https://picsum.photos/300/300)
-
-        ![1004-300x300.jpg{query_separator}{image_query}]({image.url})
-
-        [📎 logo_with_text.svg](https://ultimate-notion.com/latest/assets/images/logo_with_text.svg)
-
-        <audio controls><source src="https://samplelib.com/lib/preview/mp3/sample-3s.mp3" type="audio/mpeg"></audio>
-
-        ### Unsupported Stuff in Markdown
-        <!--- column 1 -->
-        Column 1
-        <!--- column 2 -->
-        Column
-        ```{{toc}}
-        ```
-        {root_page.title} / Markdown Test
-
-        [📄 **<u>Markdown SubPage Test</u>**]({md_subpage.url})
-
-        <!--- original block -->
-        This is the original Paragraph on Page
-        <!--- synced block -->
-        This is the original Paragraph on SubPage
-        [**↗️ <u>Markdown SubPage Test</u>**]({md_subpage.url})
-
-        <kbd>Unsupported block</kbd>
-
-        <kbd>Unsupported block</kbd>
-    """
-    )
-    markdown = md_page.to_markdown().strip().split('\n')
-
-    for exp, act in zip(exp_output.strip().split('\n'), markdown, strict=True):
-        assert exp == act
-
-
-@pytest.mark.vcr()
 def test_page_with_unsupported_blocks(md_page: Page) -> None:
     """Regression test for issue #356.
 
@@ -316,12 +220,10 @@ def test_page_with_unsupported_blocks(md_page: Page) -> None:
     children of a page that contains such a block previously raised a pydantic
     `ValidationError` on dev/CI installs (`extra='forbid'`), which also made every
     sibling block after the unsupported one inaccessible. Accessing the children
-    must succeed, capture the read-only `block_type`, and render a placeholder.
+    must succeed and capture the read-only `block_type`.
     """
     unsupported = [block for block in md_page.children if isinstance(block, Unsupported)]
     assert {block.obj_ref.unsupported.block_type for block in unsupported} == {'button', 'ai_block'}
-    for block in unsupported:
-        assert block.to_markdown() == '<kbd>Unsupported block</kbd>\n'
 
 
 @pytest.mark.vcr()
@@ -394,8 +296,7 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
 def test_embed_blocks(notion: uno.Session, embed_page: uno.Page) -> None:
     blocks = embed_page.children
     assert len(blocks) >= 4
-    md = embed_page.to_markdown()
-    assert md.strip().split('\n')[-1] == '<kbd>↗️ Linked database (unsupported)</kbd>'
+    assert isinstance(blocks[-1], ChildDatabase)
 
 
 @pytest.mark.vcr()
@@ -447,17 +348,6 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
     assert custom_emoji_page.icon.name == 'ultimate-notion'
     assert str(custom_emoji_page.icon) == ':ultimate-notion:'
 
-    exp_md = dedent(
-        """
-        # Custom Emoji Page
-
-        This page has a custom emoji :ultimate-notion: compared to 🚀.
-        💡 Callout block without an emoji
-        """
-    ).strip()
-
-    assert custom_emoji_page.to_markdown().strip() == exp_md
-
     page = notion.create_page(
         parent=root_page,
         title='Page with Custom Emoji Icon',
@@ -467,7 +357,11 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
 
     text = 'This page has a user-added custom emoji icon '
     page.append(uno.Paragraph(uno.text(text) + custom_emoji_page.icon))
-    assert page.children[0].to_markdown() == text + f'{custom_emoji_page.icon}'
+    paragraph = page.children[0]
+    assert isinstance(paragraph, uno.Paragraph)
+    rich_text = paragraph.rich_text
+    assert rich_text is not None
+    assert rich_text.to_markdown() == text + f'{custom_emoji_page.icon}'
 
 
 @pytest.mark.vcr()

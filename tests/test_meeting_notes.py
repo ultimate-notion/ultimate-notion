@@ -62,7 +62,8 @@ def test_query_and_retrieve_meeting_notes() -> None:
         (selected,) = result.results
         assert result.has_more
         assert selected.id == UUID(NOTE_ID)
-        assert selected.to_markdown() == 'Weekly sync\n'
+        assert selected.metadata.title is not None
+        assert [part.plain_text for part in selected.metadata.title] == ['Weekly sync']
         assert selected.metadata.children is not None
         assert selected.metadata.children.transcript_block_id == UUID(TRANSCRIPT_ID)
         assert selected.metadata.recording is not None and selected.metadata.recording.start_time is not None

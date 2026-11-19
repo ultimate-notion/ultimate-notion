@@ -179,11 +179,6 @@ def rich_texts_to_markdown(rich_texts: Sequence[RichTextBase]) -> str:
     return ''.join(md_rich_texts)
 
 
-def md_comment(text: str) -> str:
-    """Create a markdown comment."""
-    return f'<!--- {text} -->\n'
-
-
 def get_md_renderer() -> Callable[[str], str]:
     """Create a markdown renderer."""
 

@@ -79,7 +79,11 @@ def test_mention(
         f' : ↗[All Properties DB]({db_mention_url(all_props_db)})'
         ' : [2022-01-01T00:00:00.000+00:00]()'
     )
-    actual = re.sub(r'^\[@[^\]]+\]\(\)', '[@USER]()', page.children[0].to_markdown())
+    child = page.children[0]
+    assert isinstance(child, uno.Paragraph)
+    rich_text = child.rich_text
+    assert rich_text is not None
+    actual = re.sub(r'^\[@[^\]]+\]\(\)', '[@USER]()', rich_text.to_markdown())
     assert actual == exp_text
 
 
@@ -95,12 +99,20 @@ def test_rich_text_bases(person: uno.User, root_page: uno.Page, notion: uno.Sess
 
     page = notion.create_page(parent=root_page, title='RichText Test')
     page.append(uno.Paragraph(text))
-    actual = re.sub(r'\[@[^\]]+\]\(\)$', '[@USER]()', page.children[0].to_markdown())
+    child = page.children[0]
+    assert isinstance(child, uno.Paragraph)
+    rich_text = child.rich_text
+    assert rich_text is not None
+    actual = re.sub(r'\[@[^\]]+\]\(\)$', '[@USER]()', rich_text.to_markdown())
     assert actual == exp_text
 
     notion.cache.clear()
     page = notion.get_page(page.id)
-    actual = re.sub(r'\[@[^\]]+\]\(\)$', '[@USER]()', page.children[0].to_markdown())
+    child = page.children[0]
+    assert isinstance(child, uno.Paragraph)
+    rich_text = child.rich_text
+    assert rich_text is not None
+    actual = re.sub(r'\[@[^\]]+\]\(\)$', '[@USER]()', rich_text.to_markdown())
     assert actual == exp_text
 
 

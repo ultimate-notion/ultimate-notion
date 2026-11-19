@@ -14,6 +14,7 @@ from scripts.bootstrap_test_workspace import Bootstrap, RetryingClient
 from tests._views_vcr import normalize_test_root_response
 from tests.conftest import TESTS_PAGE
 from ultimate_notion import DataSource, Page, Session
+from ultimate_notion.blocks import ChildDatabase
 from ultimate_notion.obj_api import NOTION_API_VERSION
 from ultimate_notion.obj_api import blocks as obj_blocks
 
@@ -104,7 +105,7 @@ def test_bootstrap_linked_view_round_trip() -> None:
             with patch.object(bootstrap, 'find_page', return_value=None) as find_page:
                 page = bootstrap.ensure_embed_page(task_ds)
                 assert len(page.children) == 4
-                assert page.to_markdown().rstrip().endswith('<kbd>↗️ Linked database (unsupported)</kbd>')
+                assert isinstance(page.children[-1], ChildDatabase)
                 linked_db_id = page.children[-1].id
 
                 page.reload()

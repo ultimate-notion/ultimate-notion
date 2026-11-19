@@ -23,15 +23,14 @@ notion = uno.Session.get_or_create()  # if NOTION_TOKEN is set in environment
 intro_page = notion.search_page('Getting Started').item()
 ```
 
-We can also display the content of the page within [JupyterLab] or even at the console with
+Print the page title to confirm the lookup.
 
 ```python
-intro_page.show()
+print(intro_page.title)
 ```
 
-In a Jupyter notebook, you would see
-
-![Getting started page](../assets/images/notion-getting-started-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
+Use `intro_page.show()` to fetch and display its content in [JupyterLab] or in the
+console, or `intro_page.to_markdown()` to get the content as a string.
 
 ## Waiting for a page template
 

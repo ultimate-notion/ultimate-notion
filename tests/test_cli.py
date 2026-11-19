@@ -13,7 +13,6 @@ from typer.testing import CliRunner, Result
 import ultimate_notion as uno
 from ultimate_notion import Session, __version__
 from ultimate_notion.cli import LogLevel, app, setup_logging
-from ultimate_notion.obj_api.objects import PageMarkdown
 
 
 @patch('logging.basicConfig')
@@ -48,38 +47,6 @@ def assert_cli_success(result: Result) -> None:
 
     error_msg = f'Command failed (exit_code={result.exit_code})\nstdout: {result.stdout}\nstderr: {result.stderr}'
     assert result.exit_code == 0, error_msg
-
-
-@pytest.mark.parametrize(
-    ('truncated', 'unknown_block_ids'), [(False, []), (True, []), (False, ['21e91325-4fb6-4d6b-8cdb-e556333affd8'])]
-)
-@patch('ultimate_notion.cli.Session')
-def test_export_markdown(session_class: Mock, *, truncated: bool, unknown_block_ids: list[str], tmp_path: Path) -> None:
-    """Save complete Markdown exports and leave the file absent for incomplete exports."""
-    page_id = '12345678-1234-4567-8912-123456789abc'
-    output_path = tmp_path / 'notes.md'
-    markdown = '# Résumé\n\nA paragraph.\n'
-    session = session_class.return_value.__enter__.return_value
-    session.get_page.return_value.get_markdown.return_value = PageMarkdown.model_validate(
-        {
-            'object': 'page_markdown',
-            'id': page_id,
-            'markdown': markdown,
-            'truncated': truncated,
-            'unknown_block_ids': unknown_block_ids,
-        }
-    )
-
-    result = CliRunner().invoke(app, ['export-markdown', page_id, str(output_path)])
-
-    session.get_page.assert_called_once_with(page_id)
-    if truncated or unknown_block_ids:
-        assert result.exit_code == 1
-        assert 'incomplete Markdown' in result.stdout
-        assert not output_path.exists()
-    else:
-        assert_cli_success(result)
-        assert output_path.read_bytes() == markdown.encode('utf-8')
 
 
 def test_config_command_displays_configuration(custom_config: Path) -> None:

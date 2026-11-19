@@ -24,12 +24,11 @@ This is a technical detail and should not affect the user experience.
 from __future__ import annotations
 
 import itertools
-import mimetypes
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeGuard, overload
+from typing import TYPE_CHECKING, Any, Generic, Self, overload
 
 import numpy as np
 from tabulate import tabulate
@@ -47,7 +46,6 @@ from ultimate_notion.errors import (
     UnsetError,
 )
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, UploadedFile
-from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import core as obj_core
 from ultimate_notion.obj_api import objects as objs
@@ -163,15 +161,7 @@ class DataObject(NotionEntity[DO_co], wraps=obj_blocks.DataObject):
 
     @abstractmethod
     def to_markdown(self) -> str:
-        """Return the content of the block as Markdown."""
-
-    def _to_markdown(self) -> str:
-        """Return the content of the block as Markdown.
-
-        This method can be overridden to provide a custom Markdown representation,
-        e.g. for a page/database child block.
-        """
-        return self.to_markdown()
+        """Return a Markdown representation of this object."""
 
 
 class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
@@ -391,6 +381,11 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
         self.obj_ref = session.api.blocks.retrieve(self.id)
         return self
 
+    def to_markdown(self) -> str:
+        """Retrieve this saved block's content from Notion as Markdown."""
+        block_id = self.id
+        return get_active_session().api.pages.retrieve_markdown(block_id).markdown
+
     def _update_in_notion(self, *, exclude_attrs: Sequence[str] | None = None) -> None:
         """Update the locally modified block on Notion."""
         if self.in_notion:
@@ -537,12 +532,6 @@ class TextBlock(Block[TB_co], ABC, wraps=obj_blocks.TextBlock):
         """Return the text content of this block as string."""
         return self.rich_text.to_plain_text() if self.rich_text else ''
 
-    def to_markdown(self) -> str:
-        """Return the text content of this block as Markdown."""
-        if self.rich_text is None:
-            return ''
-        return self.rich_text.to_markdown()
-
 
 class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_blocks.Code):
     """Code block."""
@@ -569,11 +558,6 @@ class Code(TextBlock[obj_blocks.Code], CaptionMixin[obj_blocks.Code], wraps=obj_
     def language(self, language: CodeLang) -> None:
         self.obj_ref.value.language = language
         self._update_in_notion()
-
-    def to_markdown(self) -> str:
-        """Return the code content of this block as Markdown."""
-        lang = self.obj_ref.value.language
-        return f'```{lang.value}\n{super().to_markdown()}\n```'
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -694,36 +678,21 @@ class Heading(ColoredTextBlock[HT], ParentBlock[HT], wraps=obj_blocks.Heading):
 class Heading1(Heading[obj_blocks.Heading1], wraps=obj_blocks.Heading1):
     """Heading 1 block."""
 
-    def to_markdown(self) -> str:
-        return f'## {super().to_markdown()}'  # we use ## as # is used for page titles
-
 
 class Heading2(Heading[obj_blocks.Heading2], wraps=obj_blocks.Heading2):
     """Heading 2 block."""
-
-    def to_markdown(self) -> str:
-        return f'### {super().to_markdown()}'
 
 
 class Heading3(Heading[obj_blocks.Heading3], wraps=obj_blocks.Heading3):
     """Heading 3 block."""
 
-    def to_markdown(self) -> str:
-        return f'#### {super().to_markdown()}'
-
 
 class Heading4(Heading[obj_blocks.Heading4], wraps=obj_blocks.Heading4):
     """Heading 4 block."""
 
-    def to_markdown(self) -> str:
-        return f'##### {super().to_markdown()}'
-
 
 class Quote(ColoredTextBlock[obj_blocks.Quote], ParentBlock[obj_blocks.Quote], wraps=obj_blocks.Quote):
     """Quote block."""
-
-    def to_markdown(self) -> str:
-        return f'> {super().to_markdown()}\n'
 
 
 class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callout], wraps=obj_blocks.Callout):
@@ -767,20 +736,6 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         self.obj_ref.value.icon = icon.obj_ref
         self._update_in_notion()
 
-    def to_markdown(self) -> str:
-        match icon := self.icon:
-            case None:
-                return f'{super().to_markdown()}\n'
-            case Emoji():
-                return f'{icon} {super().to_markdown()}\n'
-            case CustomEmoji() | BuiltInIcon():
-                return f':{icon.name}: {super().to_markdown()}\n'
-            case AnyFile():
-                return f'![icon]({icon.url}) {super().to_markdown()}\n'
-            case _:
-                msg = f'Invalid icon type {type(icon)}'
-                raise ValueError(msg)
-
 
 class BulletedItem(
     ColoredTextBlock[obj_blocks.BulletedListItem],
@@ -789,9 +744,6 @@ class BulletedItem(
 ):
     """Bulleted list item."""
 
-    def to_markdown(self) -> str:
-        return f'- {super().to_markdown()}\n'
-
 
 class NumberedItem(
     ColoredTextBlock[obj_blocks.NumberedListItem],
@@ -799,9 +751,6 @@ class NumberedItem(
     wraps=obj_blocks.NumberedListItem,
 ):
     """Numbered list item."""
-
-    def to_markdown(self) -> str:
-        return f'1. {super().to_markdown()}\n'
 
 
 class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ParentBlock[obj_blocks.ToDo], wraps=obj_blocks.ToDo):
@@ -826,23 +775,13 @@ class ToDoItem(ColoredTextBlock[obj_blocks.ToDo], ParentBlock[obj_blocks.ToDo], 
         self.obj_ref.value.checked = checked
         self._update_in_notion()
 
-    def to_markdown(self) -> str:
-        mark = 'x' if self.checked else ' '
-        return f'- [{mark}] {super().to_markdown()}\n'
-
 
 class ToggleItem(ColoredTextBlock[obj_blocks.Toggle], ParentBlock[obj_blocks.Toggle], wraps=obj_blocks.Toggle):
     """Toggle list item."""
 
-    def to_markdown(self) -> str:
-        return f'- {super().to_markdown()}\n'
-
 
 class Divider(Block[obj_blocks.Divider], wraps=obj_blocks.Divider):
     """Divider block."""
-
-    def to_markdown(self) -> str:  # noqa: PLR6301
-        return '---\n'
 
 
 class TableOfContents(Block[obj_blocks.TableOfContents], wraps=obj_blocks.TableOfContents):
@@ -852,18 +791,9 @@ class TableOfContents(Block[obj_blocks.TableOfContents], wraps=obj_blocks.TableO
         super().__init__()
         self.obj_ref.value.color = color
 
-    def to_markdown(self) -> str:  # noqa: PLR6301
-        return '```{toc}\n```'
-
 
 class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
     """Breadcrumb block."""
-
-    def to_markdown(self) -> str:
-        def is_page(obj: NotionEntity) -> TypeGuard[Page]:
-            return obj.is_page
-
-        return ' / '.join(ancestor.title or 'Untitled Page' for ancestor in self.ancestors if is_page(ancestor)) + '\n'
 
 
 class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
@@ -897,13 +827,6 @@ class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
         self._update_in_notion()
         return self
 
-    def to_markdown(self) -> str:
-        title = self.caption.to_plain_text() if self.caption is not None else self.url
-        if self.url is not None:
-            return f'[{title}]({self.url})\n'
-        else:
-            return ''
-
 
 class Bookmark(CaptionMixin[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
     """Bookmark block."""
@@ -925,13 +848,6 @@ class Bookmark(CaptionMixin[obj_blocks.Bookmark], wraps=obj_blocks.Bookmark):
         self.obj_ref.value.url = '' if url is None else url
         self._update_in_notion()
 
-    def to_markdown(self) -> str:
-        title = self.caption.to_plain_text() if self.caption is not None else self.url
-        if self.url is not None:
-            return f'Bookmark: [{title}]({self.url})\n'
-        else:
-            return 'Bookmark: [Add a web bookmark]()\n'  # emtpy bookmark
-
 
 class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
     """Link preview block.
@@ -952,11 +868,6 @@ class LinkPreview(Block[obj_blocks.LinkPreview], wraps=obj_blocks.LinkPreview):
     @property
     def url(self) -> str | None:
         return self.obj_ref.value.url
-
-    def to_markdown(self) -> str:
-        if self.block_url is not None:
-            return f'Link preview: [{self.url}]({self.url})\n'
-        return super().to_markdown()
 
 
 class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
@@ -981,10 +892,6 @@ class Equation(Block[obj_blocks.Equation], wraps=obj_blocks.Equation):
     def latex(self, latex: str) -> None:
         self.obj_ref.value.expression = latex
         self._update_in_notion()
-
-    def to_markdown(self) -> str:
-        """Return the LaTeX expression of the equation as Markdown."""
-        return f'$$\n{self.latex}\n$$\n'
 
 
 FT = TypeVar('FT', bound=obj_blocks.FileBase)
@@ -1061,13 +968,6 @@ class File(FileBaseBlock[obj_blocks.File], wraps=obj_blocks.File):
         self.obj_ref.value.name = name
         self._update_in_notion()
 
-    def to_markdown(self) -> str:
-        """Return the file link as Markdown."""
-        md = f'[📎 {self.name}]({self.url})\n'
-        if self.caption is not None:
-            md += f'{self.caption.to_markdown()}\n'
-        return md
-
 
 class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
     """Image block.
@@ -1079,15 +979,6 @@ class Image(FileBaseBlock[obj_blocks.Image], wraps=obj_blocks.Image):
 
     def __init__(self, file: AnyFile, *, caption: str | None = None) -> None:
         super().__init__(file, caption=caption)
-
-    def to_markdown(self) -> str:
-        """Return the image as Markdown."""
-        alt = self.url.rsplit('/').pop()
-        if self.caption is not None:
-            caption = self.caption.to_plain_text()
-            return f'<figure><img src="{self.url}" alt="{alt}" /><figcaption>{caption}</figcaption></figure>\n'
-        else:
-            return f'![{alt}]({self.url})\n'
 
 
 class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
@@ -1102,14 +993,6 @@ class PDF(FileBaseBlock[obj_blocks.PDF], wraps=obj_blocks.PDF):
         file.name = None  # PDF files cannot have a name
         super().__init__(file, caption=caption)
 
-    def to_markdown(self) -> str:
-        """Return the PDF as Markdown."""
-        name = self.url.rsplit('/').pop()
-        md = f'[📖 {name}]({self.url})\n'
-        if self.caption:
-            md += f'{self.caption.to_markdown()}\n'
-        return md
-
 
 class Video(FileBaseBlock[obj_blocks.Video], wraps=obj_blocks.Video):
     """Video block.
@@ -1122,14 +1005,6 @@ class Video(FileBaseBlock[obj_blocks.Video], wraps=obj_blocks.Video):
     def __init__(self, file: AnyFile, *, caption: str | None = None) -> None:
         file.name = None  # Video files cannot have a name
         super().__init__(file, caption=caption)
-
-    def to_markdown(self) -> str:
-        """Return the video as Markdown."""
-        mime_type, _ = mimetypes.guess_type(self.url)
-        vtype = f' type="{mime_type}"' if mime_type else ''
-        caption = '' if self.caption is None else self.caption.to_markdown()
-        md = f'<video width="320" height="240" controls><source src="{self.url}"{vtype}>{caption}</video>\n'
-        return md
 
 
 class Audio(FileBaseBlock[obj_blocks.Audio], wraps=obj_blocks.Audio):
@@ -1144,14 +1019,6 @@ class Audio(FileBaseBlock[obj_blocks.Audio], wraps=obj_blocks.Audio):
         file.name = None  # Audio files cannot have a name
         super().__init__(file, caption=caption)
 
-    def to_markdown(self) -> str:
-        """Return the audio as Markdown."""
-        mime_type, _ = mimetypes.guess_type(self.url)
-        atype = f' type="{mime_type}"' if mime_type else ''
-        caption = '' if self.caption is None else self.caption.to_markdown()
-        md = f'<audio controls><source src="{self.url}"{atype}>{caption}</audio>\n'
-        return md
-
 
 class MeetingNotes(Block[obj_blocks.MeetingNotes], wraps=obj_blocks.MeetingNotes):
     """A read-only Notion AI meeting note block."""
@@ -1164,11 +1031,6 @@ class MeetingNotes(Block[obj_blocks.MeetingNotes], wraps=obj_blocks.MeetingNotes
     def metadata(self) -> obj_blocks.MeetingNotesTypeData:
         """Return the meeting note's metadata, including its transcript block ID when available."""
         return self.obj_ref.meeting_notes
-
-    def to_markdown(self) -> str:
-        """Return the meeting note title as Markdown."""
-        title = Text.wrap_obj_ref(self.metadata.title)
-        return f'{title or "Meeting notes"}\n'
 
 
 class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
@@ -1196,10 +1058,6 @@ class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
         """Return the actual Page object."""
         sess = get_active_session()
         return sess.get_page(self.id)
-
-    def to_markdown(self) -> str:  # noqa: PLR6301
-        msg = '`ChildPage` is only used internally, work with a proper `Page` instead.'
-        raise InvalidAPIUsageError(msg)
 
 
 class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatabase):
@@ -1236,10 +1094,6 @@ class ChildDatabase(Block[obj_blocks.ChildDatabase], wraps=obj_blocks.ChildDatab
         sess = get_active_session()
         return sess.get_db(self.id).data_sources.item()
 
-    def to_markdown(self) -> str:  # noqa: PLR6301
-        """Return the child database as Markdown."""
-        return '<kbd>↗️ Linked database (unsupported)</kbd>'
-
 
 class Column(ParentBlock[obj_blocks.Column], wraps=obj_blocks.Column):
     """Column block."""
@@ -1247,13 +1101,6 @@ class Column(ParentBlock[obj_blocks.Column], wraps=obj_blocks.Column):
     def __init__(self) -> None:
         msg = 'Column blocks cannot be created directly. Use `Columns` instead.'
         raise InvalidAPIUsageError(msg)
-
-    def to_markdown(self) -> str:
-        """Return the content of this column as Markdown."""
-        mds = []
-        for block in self.children:
-            mds.append(block.to_markdown())
-        return '\n'.join(mds)
 
     @property
     def width_ratio(self) -> float | None:
@@ -1344,14 +1191,6 @@ class Columns(ParentBlock[obj_blocks.ColumnList], wraps=obj_blocks.ColumnList):
         """Append a block or a sequence of blocks to the content of this block."""
         msg = 'Use `add_column` to append a new column.'
         raise InvalidAPIUsageError(msg)
-
-    def to_markdown(self) -> str:
-        """Return the content of all columns as Markdown."""
-        cols = []
-        for i, block in enumerate(self.columns):
-            md = md_comment(f'column {i + 1}')
-            cols.append(md + block.to_markdown())
-        return '\n'.join(cols)
 
     @property
     def width_ratios(self) -> tuple[float | None, ...]:
@@ -1472,24 +1311,6 @@ class Tabs(ParentBlock[obj_blocks.Tab], wraps=obj_blocks.Tab):
         msg = 'Use `add_tab` to append a new tab.'
         raise InvalidAPIUsageError(msg)
 
-    def to_markdown(self) -> str:
-        """Return the content of all tabs as Markdown."""
-        tabs_md = []
-        for tab in self.tabs:
-            label = str(tab)
-            match tab.icon:
-                case Emoji():
-                    label = f'{tab.icon} {label}'.strip()
-                case CustomEmoji() | BuiltInIcon():
-                    label = f':{tab.icon.name}: {label}'.strip()
-                case AnyFile():
-                    label = f'![icon]({tab.icon.url}) {label}'.strip()
-                case None:
-                    pass
-            content = '\n'.join(child.to_markdown() for child in tab.children)
-            tabs_md.append(md_comment(f'tab: {label}' if label else 'tab') + content)
-        return '\n'.join(tabs_md)
-
 
 class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_blocks.TableRow):
     """Table row block behaving like a tuple."""
@@ -1514,10 +1335,6 @@ class TableRow(tuple[Text | None, ...], Block[obj_blocks.TableRow], wraps=obj_bl
         row = TableRow(*[Text.wrap_obj_ref(cell) if cell else None for cell in obj_ref.table_row.cells])
         row.obj_ref = obj_ref
         return row
-
-    def to_markdown(self) -> str:
-        """Return the row as Markdown."""
-        return ' | '.join(s or '' for s in self)  # convert None to ''
 
 
 class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
@@ -1555,7 +1372,8 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
         return row_idx, col_idx
 
     def __str__(self) -> str:
-        return self.to_markdown()
+        headers = 'firstrow' if self.has_header_row else [''] * self.width
+        return tabulate(self.rows, headers, tablefmt='github') + '\n'
 
     @overload
     def __getitem__(self, index: int) -> TableRow: ...
@@ -1644,11 +1462,6 @@ class Table(ParentBlock[obj_blocks.Table], wraps=obj_blocks.Table):
         self.obj_ref.table.has_row_header = header_col
         self._update_in_notion(exclude_attrs=['table.table_width', 'table.children'])
 
-    def to_markdown(self) -> str:
-        """Return the table as Markdown."""
-        headers = 'firstrow' if self.has_header_row else [''] * self.width
-        return tabulate(self.rows, headers, tablefmt='github') + '\n'
-
     def insert_row(self, index: int, values: Sequence[str]) -> Self:
         """Insert a new row at the given index."""
         if not (1 <= index <= len(self.rows)):
@@ -1691,10 +1504,6 @@ class LinkToPage(Block[obj_blocks.LinkToPage], wraps=obj_blocks.LinkToPage):
         # self._update_in_notion()
         msg = 'Updating a link to page block is not supported by the API. Use `.replace(new_block)` instead.'
         raise InvalidAPIUsageError(msg)
-
-    def to_markdown(self) -> str:
-        """ "Return the link to page block as Markdown."""
-        return f'[**↗️ <u>{self.page.title}</u>**]({self.page.url})\n'
 
 
 class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBlock):
@@ -1745,16 +1554,6 @@ class SyncedBlock(ParentBlock[obj_blocks.SyncedBlock], wraps=obj_blocks.SyncedBl
         obj.synced_block.synced_from = objs.BlockRef.build(self.obj_ref)
         return self.wrap_obj_ref(obj)
 
-    def to_markdown(self, *, with_comment: bool = True) -> str:
-        """Return the content of this synced block as Markdown."""
-        if self.is_original:
-            md = md_comment('original block') if with_comment else ''
-            md += '\n'.join([child.to_markdown() for child in self.children])
-        else:
-            md = md_comment('synced block') if with_comment else ''
-            md += self.get_original().to_markdown(with_comment=False)
-        return md
-
 
 class Template(TextBlock[obj_blocks.Template], ParentBlock[obj_blocks.Template], wraps=obj_blocks.Template):
     """Template block.
@@ -1768,10 +1567,6 @@ class Template(TextBlock[obj_blocks.Template], ParentBlock[obj_blocks.Template],
         msg = 'A template block cannot be created by a user.'
         raise InvalidAPIUsageError(msg)
 
-    def to_markdown(self) -> str:
-        """Return the template content as Markdown."""
-        return f'<button type="button">{super().to_markdown()}</button>\n'
-
 
 class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.UnsupportedBlock):
     """Unsupported block in the API.
@@ -1783,10 +1578,6 @@ class Unsupported(Block[obj_blocks.UnsupportedBlock], wraps=obj_blocks.Unsupport
     def __init__(self) -> None:
         msg = 'An unsupported block cannot be created by a user.'
         raise InvalidAPIUsageError(msg)
-
-    def to_markdown(self) -> str:  # noqa: PLR6301
-        """Return a placeholder for unsupported blocks."""
-        return '<kbd>Unsupported block</kbd>\n'
 
 
 NB_co = TypeVar('NB_co', bound='Block | Page', default='Block | Page', covariant=True)

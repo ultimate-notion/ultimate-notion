@@ -306,19 +306,8 @@ class Page(
         return self._get_property(prop_name).value
 
     def to_markdown(self) -> str:
-        """Return the content of the page as Markdown.
-
-        !!! note
-
-            This will not include nested blocks, i.e. the children of top-level blocks.
-        """
-        md = f'# {self.title}\n\n'
-        md += '\n'.join(block._to_markdown() for block in self.children)
-        return md
-
-    def _to_markdown(self) -> str:
-        """Return the reference to this page as Markdown."""
-        return f'[📄 **<u>{self.title}</u>**]({self.url})\n'
+        """Return the enhanced Markdown from Notion. Use `get_markdown()` to check completeness."""
+        return self.get_markdown().markdown
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
