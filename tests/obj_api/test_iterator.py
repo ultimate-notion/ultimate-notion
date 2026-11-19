@@ -1,16 +1,20 @@
 from __future__ import annotations
 
+from pathlib import Path
 from unittest.mock import Mock
 from uuid import UUID
 
+import httpx
+import notion_client
 import pytest
 from pydantic import ConfigDict
 
-from ultimate_notion.database import DataSource as DataSourceWrapper
+from ultimate_notion.config import Config, UNOCfg
 from ultimate_notion.errors import IncompleteQueryError
+from ultimate_notion.obj_api import NOTION_API_VERSION
 from ultimate_notion.obj_api.blocks import DataSource, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, ObjectList, PageOrDataSourceList
-from ultimate_notion.query import Query
+from ultimate_notion.session import Session
 
 
 class LenientPageList(PageOrDataSourceList):
@@ -113,34 +117,56 @@ def test_incomplete_query_raises(*, previous_page: bool) -> None:
     assert endpoint.call_count == len(responses)
 
 
-def test_high_level_query_does_not_return_partial_view(monkeypatch: pytest.MonkeyPatch) -> None:
-    response = {
-        'object': 'list',
-        'type': 'page_or_data_source',
-        'page_or_data_source': {},
-        'results': [],
-        'has_more': False,
-        'next_cursor': None,
-        'request_status': {'type': 'incomplete', 'incomplete_reason': 'query_result_limit_reached'},
-    }
+def test_high_level_query_does_not_return_partial_view(tmp_path: Path) -> None:
     ds_id = '59833787-2cf9-4fdf-8782-e53db20768a5'
-    ds = DataSourceWrapper.wrap_obj_ref(
-        DataSource.model_validate(
-            {
-                'id': ds_id,
-                'title': [],
-                'properties': {'Name': {'id': 'title', 'name': 'Name', 'type': 'title', 'title': {}}},
-            }
-        )
-    )
-    session = Mock()
-    session.api.data_sources.query.return_value.execute.side_effect = EndpointIterator[Page](
-        Mock(return_value=response), model_validate=LenientPageList.model_validate
-    )
-    monkeypatch.setattr('ultimate_notion.query.get_active_session', lambda: session)
+    page_id = 'd1a617a5-b98b-4bd4-886f-c8582c8503e7'
+    reason = 'query_result_limit_reached'
+    ds_path = f'/v1/data_sources/{ds_id}'
+    requests: list[tuple[str, str]] = []
 
-    with pytest.raises(IncompleteQueryError):
-        Query(ds).execute()
+    def handle_request(request: httpx.Request) -> httpx.Response:
+        assert len(requests) < 2, 'A capped query should stop after the first query response'
+        requests.append((request.method, request.url.path))
+        if request.method == 'GET':
+            return httpx.Response(
+                200,
+                json={
+                    'object': 'data_source',
+                    'id': ds_id,
+                    'title': [],
+                    'properties': {'Name': {'id': 'title', 'name': 'Name', 'type': 'title', 'title': {}}},
+                },
+            )
+        return httpx.Response(
+            200,
+            json={
+                'object': 'list',
+                'type': 'page_or_data_source',
+                'page_or_data_source': {},
+                'results': [
+                    {
+                        'object': 'page',
+                        'id': page_id,
+                        'parent': {'type': 'data_source_id', 'data_source_id': ds_id},
+                        'properties': {'Name': {'id': 'title', 'type': 'title', 'title': []}},
+                    }
+                ],
+                'has_more': True,
+                'next_cursor': 'opaque:next',
+                'request_status': {'type': 'incomplete', 'incomplete_reason': reason},
+            },
+        )
+
+    cfg = Config(ultimate_notion=UNOCfg(cfg_path=Path(__file__), sync_state_dir=tmp_path))
+    http_client = httpx.Client(transport=httpx.MockTransport(handle_request))
+    client = notion_client.Client(auth='test-token', client=http_client, notion_version=NOTION_API_VERSION)
+    with Session(cfg, client=client) as session:
+        ds = session.get_ds(ds_id)
+        with pytest.raises(IncompleteQueryError, match=reason) as error:
+            ds.query.execute()
+
+    assert error.value.reason == reason
+    assert requests == [('GET', ds_path), ('POST', f'{ds_path}/query')]
 
 
 def test_query_response_without_request_status() -> None:
