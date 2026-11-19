@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import closing
+from pathlib import Path
 
 import pytest
 from notion_client import Client
@@ -22,7 +23,10 @@ def test_opaque_query_cursor(query_type: type[Query], cursor: str) -> None:
     assert query_type(start_cursor=cursor).serialize_for_api()['start_cursor'] == cursor
 
 
-@pytest.mark.vcr('../../../cassettes/test_database/test_more_than_max_page_size_pages.yaml', record_mode='none')
+@pytest.mark.vcr(
+    str(Path(__file__).resolve().parents[1] / 'cassettes/test_database/test_more_than_max_page_size_pages.yaml'),
+    record_mode='none',
+)
 def test_resume_validated_query_with_opaque_cursors(vcr: Cassette | None) -> None:
     if vcr is None:
         pytest.skip('This test reuses the database pagination recording')
