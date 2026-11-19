@@ -45,7 +45,7 @@ def serialize_block_with_children(block: Block) -> dict[str, Any]:
         if not isinstance(block.obj_ref.value, WithChildren):
             msg = f'{type(block).__name__} cannot carry its children in a serialized block payload.'
             raise ValueError(msg)
-        payload[block.obj_ref.type]['children'] = [serialize_block_with_children(child) for child in children]
+        payload[block.obj_ref._type_name]['children'] = [serialize_block_with_children(child) for child in children]
     return payload
 
 
