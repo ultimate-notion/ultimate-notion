@@ -8,7 +8,7 @@ import re
 from collections.abc import Callable, Generator, Mapping, Sequence
 from contextlib import contextmanager
 from hashlib import sha256
-from typing import Any, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 import numpy as np
 import pendulum as pnd
@@ -21,7 +21,32 @@ from pydantic import BaseModel
 from ultimate_notion import __version__
 from ultimate_notion.errors import EmptyListError, MultipleItemsError
 
+if TYPE_CHECKING:
+    from ultimate_notion.blocks import Block
+
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
+
+
+def serialize_block_with_children(block: Block) -> dict[str, Any]:
+    """Serialize a writable block and its nested blocks for offline reconstruction.
+
+    This can fetch uncached children of a block stored in Notion. Child pages and
+    data sources are outside the block tree and are skipped. A parent with block
+    children needs a payload that can carry them for the round trip.
+    """
+    from ultimate_notion.blocks import ParentBlock  # noqa: PLC0415
+    from ultimate_notion.obj_api.blocks import WithChildren  # noqa: PLC0415
+
+    children = block.blocks if isinstance(block, ParentBlock) else ()
+    payload = block.obj_ref.serialize_for_api()
+    for key in ('id', 'parent', 'created_time', 'created_by', 'last_edited_time', 'last_edited_by'):
+        payload.pop(key, None)
+    if children:
+        if not isinstance(block.obj_ref.value, WithChildren):
+            msg = f'{type(block).__name__} cannot carry its children in a serialized block payload.'
+            raise ValueError(msg)
+        payload[block.obj_ref.type]['children'] = [serialize_block_with_children(child) for child in children]
+    return payload
 
 
 class SList(list[T]):
