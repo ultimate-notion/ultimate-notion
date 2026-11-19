@@ -306,7 +306,7 @@ dependencies = [
     "sybil>=6",  # ships py.typed, unlike mktestdocs
     "packaging",
     "matplotlib",
-    "vcrpy~=5.1",  # even in version 7.0 the async tests like sync_google_tasks.py don't work
+    "vcrpy~=9.4.2",
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -384,7 +384,7 @@ dependencies = [
     "hypothesis",
     "ipython", # ships py.typed, so mypy checks against its real types
     "sybil", # ships py.typed, so mypy checks against its real types
-    "vcrpy~=5.1", # untyped, but installed so its import resolves to import-untyped rather than import-not-found
+    "vcrpy~=9.4.2", # untyped, but installed so its import resolves to import-untyped rather than import-not-found
 ]
 [tool.hatch.envs.lint.scripts]
 typing = [
@@ -425,7 +425,7 @@ dependencies = [
     "pytest-dotenv",
     "pytest-sugar",
     "pytest-recording>=0.13.1",
-    "vcrpy~=5.1",  # even in version 7.0 the async tests like sync_google_tasks.py don't work
+    "vcrpy~=9.4.2",
     ]
 [tool.hatch.envs.prod.scripts]
 test = "pytest tests/test_latest_release.py --disable-recording --check-latest-release {args}"
