@@ -8,7 +8,7 @@ import pytest
 
 from tests._file_upload_vcr import FILE_UPLOAD_QUERY_PARAMS, redact_file_response
 from ultimate_notion import Image, Page
-from ultimate_notion.file import NotionFile
+from ultimate_notion.file import MAX_FILE_SIZE, NotionFile
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.session import Session
 
@@ -27,10 +27,7 @@ def notion_cleanups() -> None:
     ],
 )
 @pytest.mark.parametrize('multipart', [False, True])
-def test_upload_mime_metadata(
-    monkeypatch: pytest.MonkeyPatch, filename: str, mime_type: str | None, expected: str, *, multipart: bool
-) -> None:
-    monkeypatch.setattr('ultimate_notion.session.MAX_FILE_SIZE', 4 if multipart else 8)
+def test_upload_mime_metadata(filename: str, mime_type: str | None, expected: str, *, multipart: bool) -> None:
     upload_data = {
         'object': 'file_upload',
         'id': '59833787-2cf9-4fdf-8782-e53db20768a5',
@@ -48,7 +45,8 @@ def test_upload_mime_metadata(
     session = Session.__new__(Session)
     session.api = NotionAPI(client)
 
-    result = session.upload(BytesIO(b'abcdef'), file_name=filename, mime_type=mime_type)
+    file_size = MAX_FILE_SIZE + 1 if multipart else 6
+    result = session.upload(BytesIO(bytes(file_size)), file_name=filename, mime_type=mime_type)
 
     creation = client.file_uploads.create.call_args.kwargs
     assert creation['filename'] == filename
