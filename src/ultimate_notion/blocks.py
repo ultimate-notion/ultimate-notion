@@ -743,6 +743,7 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
             icon = Emoji(icon)
 
+        # The Blocks API rejects icon=null on writes and uses 💡 when icon is omitted.
         self.obj_ref.value.icon = icon.obj_ref
 
     @staticmethod
