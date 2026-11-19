@@ -16,6 +16,7 @@ from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.objects import Comment, FileUpload, User
 from ultimate_notion.obj_api.props import PropertyItem
+from ultimate_notion.obj_api.views import ViewRef
 
 MAX_PAGE_SIZE = 100
 
@@ -44,6 +45,7 @@ def convert_to_notion_obj(
         User,
         Comment,
         FileUpload,
+        ViewRef,
     )
     model_mapping = {model.model_fields[obj_field].default: model for model in models}
     model_class = model_mapping.get(data[obj_field], GenericObject)
@@ -136,6 +138,14 @@ class FileUploadList(ObjectList, type='file_upload'):
     class TypeData(GenericObject): ...
 
     file_upload: TypeData
+
+
+class ViewList(ObjectList, type='view'):
+    """A list of references to saved database views."""
+
+    class TypeData(GenericObject): ...
+
+    view: TypeData
 
 
 T = TypeVar('T', bound=NotionObject)

@@ -11,7 +11,7 @@ import builtins
 import logging
 from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, BinaryIO
+from typing import TYPE_CHECKING, Any, BinaryIO, Unpack
 from uuid import UUID
 
 from notion_client.helpers import iterate_paginated_api
@@ -52,6 +52,7 @@ from ultimate_notion.obj_api.objects import (
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DataSourceQueryBuilder, SearchQueryBuilder
 from ultimate_notion.obj_api.schema import Property, RenameProp
+from ultimate_notion.obj_api.views import View, ViewRef, ViewSettings, ViewType
 
 if TYPE_CHECKING:
     from notion_client import Client as NCClient
@@ -65,6 +66,7 @@ if TYPE_CHECKING:
     from notion_client.api_endpoints import PagesEndpoint as NCPagesEndpoint
     from notion_client.api_endpoints import PagesPropertiesEndpoint as NCPagesPropertiesEndpoint
     from notion_client.api_endpoints import UsersEndpoint as NCUsersEndpoint
+    from notion_client.api_endpoints import ViewsEndpoint as NCViewsEndpoint
 
 _logger = logging.getLogger(__name__)
 
@@ -102,6 +104,7 @@ class NotionAPI:
         self.blocks = BlocksEndpoint(self)
         self.data_sources = DataSourcesEndpoint(self)
         self.databases = DatabasesEndpoint(self)
+        self.views = ViewsEndpoint(self)
         self.pages = PagesEndpoint(self)
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
@@ -533,6 +536,80 @@ class DatabasesEndpoint(Endpoint):
         ):
             data = self._as_dict(self.raw_api.update(str(db.id), **request))
             db.update(**data)
+
+
+class ViewsEndpoint(Endpoint):
+    """Manage saved Notion database views."""
+
+    @property
+    def raw_api(self) -> NCViewsEndpoint:
+        """Return the underlying endpoint in the Notion SDK."""
+        return self.api.client.views
+
+    def create(
+        self,
+        *,
+        name: str,
+        view_type: ViewType,
+        data_source: DataSource | UUID | str | None = None,
+        database: Database | UUID | str | None = None,
+        page: Page | UUID | str | None = None,
+        dashboard: ViewRef | UUID | str | None = None,
+        position: dict[str, Any] | None = None,
+        placement: dict[str, Any] | None = None,
+        **settings: Unpack[ViewSettings],
+    ) -> View:
+        """Save a view on a database, on a page as a linked database, or in a dashboard."""
+        if sum(target is not None for target in (database, page, dashboard)) != 1:
+            msg = 'Specify exactly one of database, page, or dashboard.'
+            raise ValueError(msg)
+
+        body: dict[str, Any] = {'name': name, 'type': view_type.value, **settings}
+        if data_source is not None:
+            body['data_source_id'] = str(get_uuid(data_source))
+        if database is not None:
+            body['database_id'] = str(get_uuid(database))
+        if page is not None:
+            body['create_database'] = {'parent': PageRef.build(page).serialize_for_api()}
+        if dashboard is not None:
+            body['view_id'] = str(get_uuid(dashboard))
+        if position is not None:
+            body['position'] = position
+        if placement is not None:
+            body['placement'] = placement
+        return View.model_validate(self.raw_api.create(**body))
+
+    def retrieve(self, view: ViewRef | UUID | str) -> View:
+        """Return the full definition of a saved view."""
+        return View.model_validate(self.raw_api.retrieve(str(get_uuid(view))))
+
+    def update(self, view: ViewRef | UUID | str, *, name: str | None = None, **settings: Unpack[ViewSettings]) -> View:
+        """Update a saved view. Pass None for a nullable setting to clear it."""
+        body: dict[str, Any] = dict(settings)
+        if name is not None:
+            body['name'] = name
+        return View.model_validate(self.raw_api.update(str(get_uuid(view)), **body))
+
+    def delete(self, view: ViewRef | UUID | str) -> View:
+        """Delete a saved view and return the deleted view."""
+        return View.model_validate(self.raw_api.delete(str(get_uuid(view))))
+
+    def list(
+        self,
+        *,
+        database: Database | UUID | str | None = None,
+        data_source: DataSource | UUID | str | None = None,
+    ) -> Iterator[ViewRef]:
+        """Iterate over saved view references in a database or for a data source."""
+        query: dict[str, str] = {}
+        if database is not None:
+            query['database_id'] = str(get_uuid(database))
+        if data_source is not None:
+            query['data_source_id'] = str(get_uuid(data_source))
+        if not query:
+            msg = 'Specify a database or a data source.'
+            raise ValueError(msg)
+        return EndpointIterator[ViewRef](self.raw_api.list)(**query)
 
 
 class PagesEndpoint(Endpoint):

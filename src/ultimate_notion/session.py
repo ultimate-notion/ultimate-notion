@@ -11,7 +11,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from threading import RLock
 from types import TracebackType
-from typing import Any, BinaryIO, ClassVar, TypeVar, cast
+from typing import Any, BinaryIO, ClassVar, TypeVar, Unpack, cast
 from uuid import UUID
 
 import httpx
@@ -28,6 +28,7 @@ from ultimate_notion.blocks import (
 )
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database, DataSource
+from ultimate_notion.database_view import DatabaseView
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import (
     SessionError,
@@ -44,6 +45,7 @@ from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
 from ultimate_notion.obj_api.objects import BlockRef, PageRef, PageTemplate, get_uuid
+from ultimate_notion.obj_api.views import ViewSettings, ViewType
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.rich_text import Text
@@ -362,6 +364,41 @@ class Session:
         if not deleted:
             data_sources = [ds for ds in data_sources if not ds.is_deleted]
         return SList(data_sources)
+
+    def create_view(
+        self,
+        parent: Database | Page | DatabaseView,
+        *,
+        name: str,
+        view_type: ViewType,
+        data_source: DataSource | None = None,
+        **settings: Unpack[ViewSettings],
+    ) -> DatabaseView:
+        """Create a saved view in a database, on a page, or as a widget in a dashboard."""
+        view = self.api.views.create(
+            name=name,
+            view_type=view_type,
+            data_source=data_source.obj_ref if data_source is not None else None,
+            database=parent.obj_ref if isinstance(parent, Database) else None,
+            page=parent.obj_ref if isinstance(parent, Page) else None,
+            dashboard=parent.obj_ref if isinstance(parent, DatabaseView) else None,
+            **settings,
+        )
+        if isinstance(parent, Page):
+            parent._children = None  # The Views API appended a linked database block.
+        return DatabaseView.wrap_obj_ref(view)
+
+    def get_view(self, view_id: UUID | str) -> DatabaseView:
+        """Retrieve a saved view by ID."""
+        return DatabaseView.wrap_obj_ref(self.api.views.retrieve(view_id))
+
+    def list_views(self, parent: Database | DataSource) -> list[DatabaseView]:
+        """List and retrieve views in a database or across a data source's linked databases."""
+        view_refs = self.api.views.list(
+            database=parent.obj_ref if isinstance(parent, Database) else None,
+            data_source=parent.obj_ref if isinstance(parent, DataSource) else None,
+        )
+        return [self.get_view(view_ref.id) for view_ref in view_refs]
 
     def get_ds(self, ds_ref: UUID | str, *, use_cache: bool = True) -> DataSource:
         """Retrieve Notion data source by uuid."""
