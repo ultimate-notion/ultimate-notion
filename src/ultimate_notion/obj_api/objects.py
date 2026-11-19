@@ -809,3 +809,5 @@ class Comment(NotionEntity, object='comment'):
     discussion_id: UUID
     rich_text: list[RichTextBaseObject]
     display_name: TypeData
+    original_content_deleted: bool = False
+    has_pending_attachments: bool = False

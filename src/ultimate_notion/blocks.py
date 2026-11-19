@@ -379,7 +379,7 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
     @property
     def discussions(self) -> tuple[Discussion, ...]:
         """Return comments of this block as list of discussions, i.e. threads of comments."""
-        return self._discussions
+        return tuple(discussion for discussion in self._discussions if discussion)
 
     def reload(self) -> Self:
         """Reload the block from the API."""
