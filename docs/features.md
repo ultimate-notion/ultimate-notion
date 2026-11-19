@@ -35,6 +35,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 - [x] retrieve a page by its ID
 - [x] search for a page by its title
 - [x] create a new page
+- [x] move a page under another page or data source
 - [x] delete and restore a page
 - [x] read page attributes like title, cover, icon, etc.
 - [x] change page attributes like title, cover, icon, etc.
@@ -90,7 +91,6 @@ These limitations include:
   is currently accepted but only a one-way relation is created, which seems to be a bug within the Notion API itself.
 - setting the cover of a data source.
 - removing a database or data-source icon (setting `icon` to `null` is rejected).
-- moving pages since a [page’s parent cannot be changed].
 - setting a [reminder] based on date and/or time.
 - modifying the URL of file-like blocks, e.g., `File`, `Image`, etc. Replace the block with a new upload instead.
 - creating inline comments to start a new discussion thread.
@@ -112,6 +112,5 @@ If you think those limitations should be fixed, [let the developers of Notion kn
 [updating the data source schema]: https://developers.notion.com/reference/update-a-database#errors
 [Google Tasks API]: https://developers.google.com/tasks/overview
 [Google Sheets API]: https://developers.google.com/sheets
-[page’s parent cannot be changed]: https://developers.notion.com/reference/patch-page
 [reminder]: https://www.notion.com/help/reminders
 [official Notion API]: https://developers.notion.com/reference/
