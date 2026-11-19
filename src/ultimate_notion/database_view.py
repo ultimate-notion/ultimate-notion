@@ -6,6 +6,7 @@ from typing import Self, Unpack
 from uuid import UUID
 
 from ultimate_notion.core import NotionObject, get_active_session
+from ultimate_notion.obj_api.iterator import ViewQuery, ViewQueryResultList
 from ultimate_notion.obj_api.views import View, ViewSettings, ViewType
 
 
@@ -45,3 +46,19 @@ class DatabaseView(NotionObject[View], wraps=View):
     def delete(self) -> None:
         """Delete the saved view from Notion."""
         get_active_session().api.views.delete(self.obj_ref)
+
+    def query(self, *, page_size: int | None = None) -> ViewQuery:
+        """Run the saved view and return its first page of page references."""
+        return get_active_session().api.views.create_query(self.obj_ref, page_size=page_size)
+
+    def query_results(
+        self, query_id: UUID | str, *, start_cursor: str | None = None, page_size: int | None = None
+    ) -> ViewQueryResultList:
+        """Return the next page of references using the cursor from a cached query."""
+        return get_active_session().api.views.query_results(
+            self.obj_ref, query_id, start_cursor=start_cursor, page_size=page_size
+        )
+
+    def delete_query(self, query_id: UUID | str) -> None:
+        """Release cached results without deleting the saved view."""
+        get_active_session().api.views.delete_query(self.obj_ref, query_id)

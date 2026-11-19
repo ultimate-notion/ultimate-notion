@@ -228,6 +228,12 @@ to load the views that display a data source, including linked views. Retrieve a
 with `notion.get_view(view_id)`. Call `saved_view.update(name='Inventory')` to rename a view
 or `saved_view.delete()` to delete it.
 
+Call `saved_view.query()` to run the view's saved filters and sort order. The query returns
+page references with IDs. Use the query's `id` and `next_cursor` with
+`saved_view.query_results(query.id, start_cursor=query.next_cursor)` while `has_more` is true.
+Check `request_status` for an incomplete query when Notion caps the result set. The cached
+results expire at `query.expires_at`. Call `saved_view.delete_query(query.id)` to release them sooner.
+
 Finally, delete the whole database (and all of its data sources) again:
 
 ```python

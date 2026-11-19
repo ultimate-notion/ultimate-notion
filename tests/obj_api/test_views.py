@@ -19,6 +19,7 @@ PAGE_ID = '21e91325-4fb6-4d6b-8cdb-e556333affd8'
 DATABASE_ID = 'df2dfbb0-f527-4136-b31a-c0d50bef1179'
 SOURCE_ID = '991b892a-dd14-48a6-b93e-722bc5659a22'
 VIEW_ID = 'bbfd6492-70e7-4e58-8982-e5d8ff8d1ffa'
+QUERY_ID = '6399cff2-29cd-46f5-bfd5-81c6d12700ae'
 
 
 @pytest.fixture(autouse=True)
@@ -97,6 +98,69 @@ def test_list_saved_views_follows_cursor() -> None:
         {'database_id': DATABASE_ID, 'page_size': '100'},
         {'database_id': DATABASE_ID, 'page_size': '100', 'start_cursor': cursor},
     ]
+
+
+def test_saved_view_query_lifecycle() -> None:
+    cursor = 'opaque:cursor+next/='
+    query_path = f'/v1/views/{VIEW_ID}/queries'
+    requests: list[httpx.Request] = []
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        match request.method, request.url.path:
+            case 'GET', path if path == f'/v1/views/{VIEW_ID}':
+                payload = {
+                    'object': 'view',
+                    'id': VIEW_ID,
+                    'parent': {'type': 'database_id', 'database_id': DATABASE_ID},
+                    'type': 'table',
+                }
+            case 'POST', _:
+                payload = {
+                    'object': 'view_query',
+                    'id': QUERY_ID,
+                    'view_id': VIEW_ID,
+                    'expires_at': '2026-11-19T10:00:00Z',
+                    'total_count': 2,
+                    'results': [{'object': 'page', 'id': PAGE_ID}],
+                    'next_cursor': cursor,
+                    'has_more': True,
+                    'request_status': {'type': 'incomplete', 'incomplete_reason': 'query_result_limit_reached'},
+                }
+            case 'GET', _:
+                payload = {
+                    'object': 'list',
+                    'type': 'page',
+                    'page': {},
+                    'results': [{'object': 'page', 'id': SOURCE_ID}],
+                    'next_cursor': None,
+                    'has_more': False,
+                }
+            case _:
+                payload = {'object': 'view_query', 'id': QUERY_ID, 'deleted': True}
+        return httpx.Response(200, json=payload)
+
+    client = Client(auth='test', client=httpx.Client(transport=httpx.MockTransport(handle)))
+    with Session(client=client) as notion:
+        view = notion.get_view(VIEW_ID)
+        first = view.query(page_size=1)
+        assert first.id == UUID(QUERY_ID)
+        assert first.results[0].id == UUID(PAGE_ID)
+        assert first.request_status is not None and first.request_status.type == 'incomplete'
+        assert first.next_cursor is not None
+        second = view.query_results(first.id, start_cursor=first.next_cursor, page_size=1)
+        assert second.results[0].id == UUID(SOURCE_ID)
+        assert second.next_cursor is None
+        view.delete_query(first.id)
+
+    assert [(req.method, req.url.path) for req in requests] == [
+        ('GET', f'/v1/views/{VIEW_ID}'),
+        ('POST', query_path),
+        ('GET', f'{query_path}/{QUERY_ID}'),
+        ('DELETE', f'{query_path}/{QUERY_ID}'),
+    ]
+    assert json.loads(requests[1].content) == {'page_size': 1}
+    assert dict(requests[2].url.params) == {'start_cursor': cursor, 'page_size': '1'}
 
 
 @pytest.mark.vcr(before_record_response=normalize_test_root_response, decode_compressed_response=True)
