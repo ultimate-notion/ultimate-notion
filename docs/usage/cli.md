@@ -42,6 +42,16 @@ Display information about your Notion integration, including version details and
 uno info
 ```
 
+### `export-markdown`
+
+Save a page as a UTF-8 file using Notion's native Markdown export. Specify the
+page by unique title or UUID. The command requires a new output path and
+reports an error if Notion returns incomplete content.
+
+```console
+uno export-markdown "My Project Notes" notes.md
+```
+
 ### `upload`
 
 Upload a file to a Notion page and automatically append it as the appropriate block type:

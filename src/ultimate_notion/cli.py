@@ -162,6 +162,31 @@ def _find_page_by_name(session: Session, page_name: str) -> Page:
 
 
 @app.command()
+def export_markdown(
+    notion_page: Annotated[str, typer.Argument(help='Page name or UUID to export')],
+    output_path: Annotated[Path, typer.Argument(help='Path for the new UTF-8 Markdown file', dir_okay=False)],
+    *,
+    verbose: Annotated[bool, typer.Option('--verbose', '-v', help='Show detailed error information')] = False,
+) -> None:
+    """Save a Notion page as Markdown using Notion's native export."""
+
+    @handle_exceptions(verbose=verbose)
+    def _export_markdown() -> None:
+        with Session() as session:
+            page = session.get_page(notion_page) if _is_uuid(notion_page) else _find_page_by_name(session, notion_page)
+            result = page.get_markdown()
+
+        if result.truncated or result.unknown_block_ids:
+            msg = 'Notion returned incomplete Markdown. The export file was not written.'
+            raise ValueError(msg)
+
+        with output_path.open('x', encoding='utf-8', newline='') as output:
+            output.write(result.markdown)
+
+    _export_markdown()
+
+
+@app.command()
 def upload(
     file_name: Annotated[str, typer.Argument(help='Path to the file to upload')],
     notion_page: Annotated[str, typer.Argument(help='Page name or UUID to upload the file to')],
