@@ -70,6 +70,7 @@ from ultimate_notion.obj_api.props import PlaceDict
 from ultimate_notion.obj_api.views import ViewType
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.page import Page
+from ultimate_notion.props import Verification
 from ultimate_notion.query import Condition, prop
 from ultimate_notion.rich_text import join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SelfRef
@@ -145,6 +146,7 @@ __all__ = [
     'ToggleItem',
     'User',
     'VState',
+    'Verification',
     'Video',
     'ViewType',
     'Workspace',

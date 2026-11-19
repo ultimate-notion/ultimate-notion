@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, ClassVar, Self
 
 import pendulum as pnd
@@ -409,8 +410,24 @@ class ID(PropertyValue[obj_props.UniqueID], wraps=obj_props.UniqueID):
 class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verification):
     """Verification property value of pages in wiki data sources."""
 
-    # ToDo: Write a unit test for this!
-    readonly = True
+    def __init__(self, state: VState | str, *, start: datetime | None = None, end: datetime | None = None) -> None:
+        state = VState(state)
+        if state is VState.EXPIRED:
+            msg = 'Notion assigns the expired verification state. Write verified or unverified.'
+            raise ValueError(msg)
+        if end is not None and start is None:
+            msg = 'A verification expiration requires a start time.'
+            raise ValueError(msg)
+        period = None
+        if start is not None:
+            if state is not VState.VERIFIED:
+                msg = 'Only verified pages can have a verification period.'
+                raise ValueError(msg)
+            if start.utcoffset() is None or (end is not None and end.utcoffset() is None):
+                msg = 'Verification dates must include a time zone.'
+                raise ValueError(msg)
+            period = obj_props.VerificationPeriod(start=start, end=end)
+        super().__init__(obj_props.Verification.TypeData(state=state, date=period))
 
     @property
     def value(self) -> Self:
@@ -418,22 +435,31 @@ class Verification(PropertyValue[obj_props.Verification], wraps=obj_props.Verifi
 
     @property
     def state(self) -> VState:
-        return self.obj_ref.verification.state
+        verification = self.obj_ref.verification
+        return VState.UNVERIFIED if verification is None else verification.state
 
     @property
     def verified_by(self) -> User | None:
-        if self.obj_ref.verification.verified_by is None:
+        verification = self.obj_ref.verification
+        if verification is None or verification.verified_by is None:
             return None
-        else:
-            session = get_active_session()
-            return session.get_user(self.obj_ref.verification.verified_by.id, raise_on_unknown=False)
+        return get_active_session().get_user(verification.verified_by.id, raise_on_unknown=False)
 
     @property
     def date(self) -> pnd.DateTime | None:
-        if self.obj_ref.verification.date is None:
+        """Return the verification start time."""
+        verification = self.obj_ref.verification
+        if verification is None or (period := verification.date) is None:
             return None
-        else:
-            return pnd.instance(self.obj_ref.verification.date)
+        return pnd.instance(period.start if isinstance(period, obj_props.VerificationPeriod) else period)
+
+    @property
+    def expires_at(self) -> pnd.DateTime | None:
+        """Return the verification expiration when one is set."""
+        verification = self.obj_ref.verification
+        if verification is not None and isinstance(period := verification.date, obj_props.VerificationPeriod):
+            return pnd.instance(period.end) if period.end is not None else None
+        return None
 
 
 class Button(PropertyValue[obj_props.Button], wraps=obj_props.Button):

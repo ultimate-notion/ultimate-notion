@@ -741,7 +741,7 @@ class Place(Property[obj_schema.Place], wraps=obj_schema.Place):
 
 
 class Verification(Property[obj_schema.Verification], wraps=obj_schema.Verification):
-    """Defines a unique ID property in a data source."""
+    """Defines the Verification property in a wiki data source."""
 
     allowed_at_creation = False
 

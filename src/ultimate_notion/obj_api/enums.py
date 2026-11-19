@@ -31,6 +31,7 @@ class VState(StrEnum):
 
     VERIFIED = 'verified'
     UNVERIFIED = 'unverified'
+    EXPIRED = 'expired'
 
 
 class Color(StrEnum):

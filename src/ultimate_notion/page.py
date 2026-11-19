@@ -21,7 +21,7 @@ from ultimate_notion.obj_api import props as obj_props
 from ultimate_notion.obj_api.core import is_unset
 from ultimate_notion.obj_api.enums import InsertPosition
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
-from ultimate_notion.props import PropertyValue, Title
+from ultimate_notion.props import PropertyValue, Title, Verification
 from ultimate_notion.rich_text import Text
 from ultimate_notion.schema import Property
 from ultimate_notion.templates import page_html
@@ -79,10 +79,14 @@ class PagePropertiesNS(Mapping[str, Any]):
         db = self._page.parent_ds
 
         if db is None:
-            msg = f'Trying to set a property but page {self._page} is not bound to any data source'
-            raise RuntimeError(msg)
-
-        if not isinstance(value, PropertyValue):
+            # Notion can return a wiki page with a database parent. Use the
+            # inline Verification property to determine its type on that path.
+            if not isinstance(self._obj_prop_vals.get(prop_name), obj_props.Verification):
+                msg = f'Trying to set a property but page {self._page} is not bound to any data source'
+                raise RuntimeError(msg)
+            if not isinstance(value, Verification):
+                value = Verification(value)
+        elif not isinstance(value, PropertyValue):
             # construct concrete PropertyValue using the schema
             value = db.schema.get_prop(prop_name).prop_value(value)
 

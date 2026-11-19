@@ -159,6 +159,16 @@ task.props.status = 'Blocked'
     The functionality around updating select/multi-select properties will be changed in
     the future to make the experience more user-friendly.
 
+## Verifying a wiki page
+
+Verify a wiki page with `page.props['Verification'] = uno.Verification('verified')`.
+Assign `'unverified'` to clear it. You can also pass a `Verification` value
+to `wiki.create_page()` using the property name from your schema.
+
+For a timed verification, pass timezone-aware datetimes as `start` and
+`end`. Notion records the acting connection as the verifier. Update the
+wiki's Owner property in a separate request if needed.
+
 [Page object]: ../../reference/ultimate_notion/page/#ultimate_notion.page.Page
 [Notion's template readiness guide]: https://developers.notion.com/guides/data-apis/creating-pages-from-templates#step-3-confirm-page-contents-are-ready
 [Task List example]: ../../examples/simple_taskdb/
