@@ -107,6 +107,7 @@ def test_saved_view_query_lifecycle() -> None:
 
     def handle(request: httpx.Request) -> httpx.Response:
         requests.append(request)
+        payload: dict[str, object]
         match request.method, request.url.path:
             case 'GET', path if path == f'/v1/views/{VIEW_ID}':
                 payload = {
