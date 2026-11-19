@@ -80,6 +80,15 @@ Upload a video file:
 uno upload demo.mp4 "Product Demo Page"
 ```
 
+## Import Markdown
+
+Append a UTF-8 Markdown file to an existing page as editable Notion content.
+Specify the page by unique title or UUID.
+
+```console
+uno import-markdown notes.md "My Project Notes"
+```
+
 ## Options
 
 The CLI supports a `--log-level` option to control output verbosity. Available levels are `critical`, `error`,

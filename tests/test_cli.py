@@ -112,6 +112,22 @@ def test_log_level_option_affects_logging() -> None:
         mock_setup.assert_called_with(LogLevel.ERROR)
 
 
+@patch('ultimate_notion.cli.Session')
+def test_import_markdown_appends_utf8_file(session_class: Mock, tmp_path: Path) -> None:
+    """Import Markdown content through the target page's native insertion method."""
+    file_path = tmp_path / 'notes.md'
+    markdown = '# Résumé\n\nA paragraph.\n'
+    file_path.write_text(markdown, encoding='utf-8')
+    page_id = '12345678-1234-4567-8912-123456789abc'
+    session = session_class.return_value.__enter__.return_value
+
+    result = CliRunner().invoke(app, ['import-markdown', str(file_path), page_id])
+
+    assert_cli_success(result)
+    session.get_page.assert_called_once_with(page_id)
+    session.get_page.return_value.insert_markdown.assert_called_once_with(markdown)
+
+
 @pytest.mark.file_upload
 def test_upload_image_by_page_name(notion: Session, root_page: uno.Page) -> None:
     """Test uploading an image file by page name."""

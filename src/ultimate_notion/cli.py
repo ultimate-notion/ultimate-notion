@@ -218,3 +218,24 @@ def upload(
             _logger.info(f"Successfully appended {block_class.__name__} block to page '{page.title}'")
 
     _upload()
+
+
+@app.command()
+def import_markdown(
+    file_path: Annotated[
+        Path, typer.Argument(help='Path to a UTF-8 Markdown file', exists=True, dir_okay=False, readable=True)
+    ],
+    notion_page: Annotated[str, typer.Argument(help='Page name or UUID to append Markdown to')],
+    *,
+    verbose: Annotated[bool, typer.Option('--verbose', '-v', help='Show detailed error information')] = False,
+) -> None:
+    """Append a Markdown file to a Notion page as editable content."""
+
+    @handle_exceptions(verbose=verbose)
+    def _import_markdown() -> None:
+        markdown = file_path.read_text(encoding='utf-8')
+        with Session() as session:
+            page = session.get_page(notion_page) if _is_uuid(notion_page) else _find_page_by_name(session, notion_page)
+            page.insert_markdown(markdown)
+
+    _import_markdown()
