@@ -220,20 +220,13 @@ the selected data source's `query` property. To retrieve all pages from all data
 
 ## Saved Notion views
 
-A `DatabaseView` represents a view saved in Notion. To add a table view to a database, pass the
-database and the data source the view should display:
-
-```python
-saved_view = notion.create_view(
-    shop_db, name='Items table', view_type=uno.ViewType.TABLE, data_source=items_ds
-)
-saved_view.update(name='Inventory')
-```
-
+A `DatabaseView` represents a view saved in Notion. Use `notion.create_view()` with a
+database, a name, a view type such as `uno.ViewType.TABLE`, and the data source to display.
 Pass a page as the first argument to create a linked database view on that page. Use
 `notion.list_views(shop_db)` to load the views in a database or `notion.list_views(items_ds)`
 to load the views that display a data source, including linked views. Retrieve a view by ID
-with `notion.get_view(view_id)`, or delete it with `saved_view.delete()`.
+with `notion.get_view(view_id)`. Call `saved_view.update(name='Inventory')` to rename a view
+or `saved_view.delete()` to delete it.
 
 Finally, delete the whole database (and all of its data sources) again:
 
