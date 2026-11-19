@@ -1,0 +1,35 @@
+# Synthetic responses for a two-page resume with opaque cursors.
+interactions:
+- request:
+    body: '{"start_cursor": "session:resume", "page_size": 100}'
+    headers:
+      content-type:
+      - application/json
+    method: POST
+    uri: https://api.notion.com/v1/data_sources/59833787-2cf9-4fdf-8782-e53db20768a5/query
+  response:
+    content: >-
+      {"object":"list","type":"page_or_data_source","page_or_data_source":{},
+      "results":[],"has_more":true,"next_cursor":"session:next"}
+    headers:
+      Content-Type:
+      - application/json
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"start_cursor": "session:next", "page_size": 100}'
+    headers:
+      content-type:
+      - application/json
+    method: POST
+    uri: https://api.notion.com/v1/data_sources/59833787-2cf9-4fdf-8782-e53db20768a5/query
+  response:
+    content: >-
+      {"object":"list","type":"page_or_data_source","page_or_data_source":{},
+      "results":[],"has_more":false,"next_cursor":null}
+    headers:
+      Content-Type:
+      - application/json
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
