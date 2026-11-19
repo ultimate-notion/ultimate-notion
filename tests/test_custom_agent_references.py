@@ -13,6 +13,9 @@ from ultimate_notion.props import Person
 from ultimate_notion.rich_text import Text
 from ultimate_notion.user import Bot
 
+# A live VCR cassette needs a Custom Agent shared with the test integration.
+# Our Free test workspace does not support Custom Agents, and assigning or
+# mentioning a live agent can trigger a run that consumes Notion credits.
 AGENT_ID = 'ef82a3bc-58dc-47ca-8ab6-56d144d166cc'
 BOT_ID = '9188c6a5-7381-452f-b3dc-d4865aa89bdf'
 
