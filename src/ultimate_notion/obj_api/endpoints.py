@@ -42,6 +42,7 @@ from ultimate_notion.obj_api.objects import (
     EmojiObject,
     FileObject,
     FileUpload,
+    PageMarkdown,
     PageRef,
     PageTemplate,
     RichTextBaseObject,
@@ -624,6 +625,17 @@ class PagesEndpoint(Endpoint):
         return Page.model_validate(data)
 
     # https://developers.notion.com/reference/update-page-markdown
+    def retrieve_markdown(self, page: Page | UUID | str) -> PageMarkdown:
+        """Retrieve Notion's Markdown representation of a page or block subtree."""
+        page_id = ObjectRef.build(page).id
+        return PageMarkdown.model_validate(self.raw_api.retrieve_markdown(str(page_id)))
+
+    def replace_markdown(self, page: Page | UUID | str, markdown: str) -> PageMarkdown:
+        """Replace a page's content with Markdown."""
+        page_id = ObjectRef.build(page).id
+        data = self.raw_api.update_markdown(str(page_id), type='replace_content', replace_content={'new_str': markdown})
+        return PageMarkdown.model_validate(data)
+
     def insert_markdown(
         self,
         page: Page | UUID | str,
