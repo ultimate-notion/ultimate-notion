@@ -16,12 +16,13 @@ when constructing the property objects. For this reason `name` is `Unset` by def
 
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID
 
 from pydantic import Field, field_validator
 from typing_extensions import TypeVar
 
-from ultimate_notion.obj_api.core import GenericObject, TypedObject, Unset, UnsetType
+from ultimate_notion.obj_api.core import GenericObject, TypedObject, Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.enums import AggFunc, NumberFormat
 from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
 
@@ -120,6 +121,12 @@ class StatusTypeData(GenericObject):
 
     options: list[SelectOption] = Field(default_factory=list)
     groups: list[SelectGroup] = Field(default_factory=list)
+    default_option: str | None = None
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, StatusTypeData):
+            return NotImplemented
+        return self.options == other.options and self.groups == other.groups
 
 
 class Status(Property[StatusTypeData], type='status'):
@@ -129,14 +136,23 @@ class Status(Property[StatusTypeData], type='status'):
 
     @classmethod
     def build(cls, options: list[SelectOption], groups: list[SelectGroup]) -> Status:
-        """Create a `Status` object from the list of `SelectOption`'s.
-
-        !!! warning
-
-            While a Status property can be built, it can only be used to
-            check a schema, not to create a data source having such a property.
-        """
+        """Create a Status configuration with the given options and group assignments."""
         return cls.model_construct(status=StatusTypeData(options=options, groups=groups))
+
+    def serialize_for_api(self) -> dict[str, Any]:
+        """Write group assignments on individual options, omitting response-only fields."""
+        payload = super().serialize_for_api()
+        groups = {option_id: group.name for group in self.status.groups for option_id in group.option_ids}
+        options = []
+        for option in self.status.options:
+            data = option.serialize_for_api()
+            key = option.name if is_unset(option_id := option.id) else option_id
+            if key in groups:
+                data['group'] = groups[key]
+            options.append(data)
+
+        payload['status'] = {'options': options} if options else {}
+        return payload
 
 
 class DateTypeData(GenericObject):

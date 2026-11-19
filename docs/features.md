@@ -81,8 +81,7 @@ icon, last edited by/time, etc., are called *page attributes*.
 Some features that the Notion UI provides are impossible to implement due to limitations of the Notion API itself.
 These limitations include:
 
-- creating a [Status] property or updating the options as well as option groups. Sending a Status property within a
-  create data source call is currently accepted but just ignored, i.e., a data source without the property will show up.
+- changing the names or order of the three [Status] option groups.
 - creating a [Wiki database], which has a special [Verification] property.
 - [updating the data source schema] with respect to the options of a select/multi-select property, the formula of a
   formula property, and synced content.

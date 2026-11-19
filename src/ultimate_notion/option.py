@@ -110,9 +110,7 @@ class OptionGroup(Wrapper[objs.SelectGroup], wraps=objs.SelectGroup):
                 color = Color.GREEN
 
         self._options = options
-        # Note that we use option names (not IDs, which may not be present) to identify options in the group.
-        # OptionGroups cannot be created with the Notion API and thus we only use it for convenience
-        # during local development and testing and when checking schemas it will be ignored.
+        # New options have no ID, so use their names to look up their group when writing the schema.
         option_ids = []
         for option in options:
             try:
