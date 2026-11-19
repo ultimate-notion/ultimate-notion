@@ -98,20 +98,15 @@ This often provides additional considerations and avoids unnecessary work.
 Ultimate Notion deals with unit tests in two ways. Most tests are recorded as
 cassettes using [VCR.py], which captures the HTTP interactions a test makes the
 first time it runs against the Notion API and replays them on subsequent runs.
-This lets the suite run offline and much faster, with no Notion account needed:
 
-```console
-hatch run vcr-only
-```
-
-You only need your own Notion workspace and integration token if you want to
-**run the tests live** against the Notion API, or to **add a new test** or
-**re-record an existing cassette**:
-
-```console
-hatch run vcr-rewrite          # re-record all cassettes
-hatch run test -k NEW_TEST     # run/record a specific test live
-```
+- For **offline replay**, run `hatch run vcr-only`. It uses existing cassettes, blocks
+  network access, and needs no Notion account.
+- For a **live smoke test**, run `hatch run vcr-off -k TEST_NAME`. It calls the Notion API
+  with cassette recording disabled.
+- To **record cassettes**, run `hatch run vcr-rewrite -k TEST_NAME`. It runs the selected
+  tests against Notion and rewrites the cassettes they use. Omit `-k TEST_NAME` to re-record
+  the suite. See the [recording workflow](#add-a-new-live-vcr-test)
+  before committing cassette changes.
 
 Running tests live requires a configured test workspace, described next.
 
@@ -119,7 +114,7 @@ Running tests live requires a configured test workspace, described next.
 
 You only need this section to run the tests live or to re-record cassettes.
 
-1. **Create an internal integration.** Open [My integrations] and click
+1. **Create a dedicated internal test integration.** Open [My integrations] and click
    *New integration*. Choose **Internal**, associate it with the workspace you
    want to use for testing, and give it a name.
 
@@ -137,18 +132,27 @@ You only need this section to run the tests live or to re-record cassettes.
 3. **Copy the token.** From the integration's *Configuration* page copy the
    *Internal Integration Secret*. It looks like `ntn_…`.
 
-4. **Create and share a root page.** In your test workspace create a page that
-   acts as the parent for all test content, then connect your integration to it
-   via the page's ••• menu → *Connections*. Sharing the parent grants the
+4. **Create and share a disposable test root page.** Use it as the parent for
+   all test content and connect the integration only to that page via its
+   ••• menu → *Connections*. Sharing the parent grants the
    integration access to everything created beneath it. By default the suite
    looks for a page titled `Tests`; set the `UNO_TEST_ROOT_PAGE` environment
    variable to point it at a page with a different title.
 
 5. **Point the configuration at the token.** Set `NOTION_TOKEN` to the secret
    from step 3 (see the `.vscode/.env` example above); the Ultimate Notion config
-   resolves the token from this environment variable by default.
+   resolves the token from this environment variable by default. Keep the token
+   out of source control, logs, and chat. Rotate it if it is exposed.
 
-6. **Bootstrap the API-creatable objects.** Run:
+6. **Audit the integration's access.** Before bootstrapping or running live tests,
+   run the read-only audit below. Check the reported stray objects for unexpected
+   access before proceeding.
+
+   ```console
+   hatch run bootstrap-test-workspace --audit-only
+   ```
+
+7. **Bootstrap the API-creatable objects.** Run:
 
    ```console
    UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
