@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, BinaryIO
 from uuid import UUID
 
+from notion_client.helpers import iterate_paginated_api
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.errors import UnsetError
@@ -41,8 +42,10 @@ from ultimate_notion.obj_api.objects import (
     FileObject,
     FileUpload,
     PageRef,
+    PageTemplate,
     RichTextBaseObject,
     User,
+    get_uuid,
 )
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DataSourceQueryBuilder, SearchQueryBuilder
@@ -249,6 +252,17 @@ class DataSourcesEndpoint(Endpoint):
     def raw_api(self) -> NCDataSourcesEndpoint:
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.data_sources
+
+    def list_templates(self, data_source: DataSource | UUID | str) -> Iterator[PageTemplate]:
+        """List the available page templates for a data source."""
+        data_source_id = str(DataSourceRef.build(data_source).data_source_id)
+
+        def fetch(**kwargs: Any) -> dict[str, Any]:
+            page = self._as_dict(self.raw_api.list_templates(data_source_id, **kwargs))
+            return {**page, 'results': page['templates']}
+
+        for entry in iterate_paginated_api(fetch):
+            yield PageTemplate.model_validate(entry)
 
     @staticmethod
     def _build_request(
@@ -534,6 +548,13 @@ class PagesEndpoint(Endpoint):
         """Return the underlying endpoint in the Notion SDK"""
         return self.api.client.pages
 
+    @staticmethod
+    def _template_payload(template: PageTemplate | UUID | str) -> dict[str, str]:
+        if template == 'default':
+            return {'type': 'default'}
+        template_id = template.id if isinstance(template, PageTemplate) else get_uuid(template)
+        return {'type': 'template_id', 'template_id': str(template_id)}
+
     # https://developers.notion.com/reference/post-page
     def create(
         self,
@@ -546,6 +567,7 @@ class PagesEndpoint(Endpoint):
         icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None,
         after: GenericObject | UUID | str | None = None,
         position: InsertPosition | None = None,
+        template: PageTemplate | UUID | str | None = None,
     ) -> Page:
         """Add a page to the given parent (Page or DataSource)."""
         if parent is None:
@@ -564,6 +586,12 @@ class PagesEndpoint(Endpoint):
                 raise ValueError(msg)
 
         request: dict[str, Any] = {'parent': parent.serialize_for_api()}
+
+        if template is not None:
+            if children is not None:
+                msg = 'Provide either a template or children when creating a page.'
+                raise ValueError(msg)
+            request['template'] = self._template_payload(template)
 
         if position_obj := _build_insert_position(position, after=after, for_page=True):
             request['position'] = position_obj
@@ -669,6 +697,8 @@ class PagesEndpoint(Endpoint):
         icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset,
         in_trash: bool | UnsetType = Unset,
         is_locked: bool | UnsetType = Unset,
+        template: PageTemplate | UUID | str | None = None,
+        erase_content: bool | None = None,
     ) -> None:
         """Update the Page object properties on the server."""
         if is_unset(page_id := page.id):
@@ -676,6 +706,11 @@ class PagesEndpoint(Endpoint):
         _logger.debug(f'Updating info on page with id `{page_id}`.')
 
         request: dict[str, Any] = {}
+
+        if template is not None:
+            request['template'] = self._template_payload(template)
+        if erase_content is not None:
+            request['erase_content'] = erase_content
 
         if properties is not None:
             request['properties'] = {

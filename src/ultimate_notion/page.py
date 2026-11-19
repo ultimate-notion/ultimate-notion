@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any, Self
+from uuid import UUID
 
 from typing_extensions import TypeIs
 
@@ -362,6 +363,19 @@ class Page(
         session = get_active_session()
         session.api.pages.insert_markdown(self.obj_ref, markdown, after=after, position=position)
         self._children = None  # forces a new retrieval of children next time
+        return self
+
+    def apply_template(self, template: objs.PageTemplate | UUID | str, *, erase_content: bool = False) -> Self:
+        """Apply a template by object or ID, or use `'default'` for the data source's default.
+
+        Notion applies templates asynchronously. Use `reload()` to refresh the page
+        after the template is applied. With `erase_content=True`, Notion removes
+        the page's existing content before applying the template.
+        """
+        session = get_active_session()
+        session.api.pages.update(self.obj_ref, template=template, erase_content=erase_content)
+        self._children = None
+        self.props = self._create_page_props_ns()
         return self
 
     def move(self, parent: Page | DataSource) -> Self:
