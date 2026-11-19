@@ -536,7 +536,7 @@ class Session:
         self,
         *,
         filter_by: Mapping[str, Any] | None = None,
-        sort: list[Mapping[str, Any]] | None = None,
+        sort: Sequence[Mapping[str, Any]] | None = None,
         limit: int | None = None,
     ) -> MeetingNotesQueryResult:
         """Query Notion AI meeting notes.

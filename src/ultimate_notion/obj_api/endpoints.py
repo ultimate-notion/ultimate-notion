@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import builtins
 import logging
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, BinaryIO
 from uuid import UUID
@@ -189,7 +189,7 @@ class BlocksEndpoint(Endpoint):
         self,
         *,
         filter_by: Mapping[str, Any] | None = None,
-        sort: list[Mapping[str, Any]] | None = None,
+        sort: Sequence[Mapping[str, Any]] | None = None,
         limit: int | None = None,
     ) -> MeetingNotesQueryResult:
         """Query AI meeting notes with optional Notion filter and sort specifications."""
