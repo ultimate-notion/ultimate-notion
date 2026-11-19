@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, BinaryIO
 from uuid import UUID
 
+from notion_client.helpers import iterate_paginated_api
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.errors import UnsetError
@@ -35,6 +36,7 @@ from ultimate_notion.obj_api.objects import (
     BuiltInIconObject,
     Comment,
     CustomEmojiObject,
+    CustomEmojiObjectTypeData,
     DatabaseRef,
     DataSourceRef,
     EmojiObject,
@@ -53,6 +55,7 @@ if TYPE_CHECKING:
     from notion_client.api_endpoints import BlocksChildrenEndpoint as NCBlocksChildrenEndpoint
     from notion_client.api_endpoints import BlocksEndpoint as NCBlocksEndpoint
     from notion_client.api_endpoints import CommentsEndpoint as NCCommentsEndpoint
+    from notion_client.api_endpoints import CustomEmojisEndpoint as NCCustomEmojisEndpoint
     from notion_client.api_endpoints import DatabasesEndpoint as NCDatabasesEndpoint
     from notion_client.api_endpoints import DataSourcesEndpoint as NCDataSourcesEndpoint
     from notion_client.api_endpoints import FileUploadsEndpoint as NCFileUploadsEndpoint
@@ -100,6 +103,7 @@ class NotionAPI:
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
         self.comments = CommentsEndpoint(self)
+        self.custom_emojis = CustomEmojisEndpoint(self)
         self.uploads = UploadsEndpoint(self)
 
 
@@ -801,6 +805,22 @@ class UsersEndpoint(Endpoint):
         _logger.debug('Retrieving current integration bot')
         data = self.raw_api.me()
         return Bot.model_validate(data)
+
+
+class CustomEmojisEndpoint(Endpoint):
+    """Interface to the API 'custom_emojis' endpoint."""
+
+    @property
+    def raw_api(self) -> NCCustomEmojisEndpoint:
+        """Return the underlying endpoint in the Notion SDK."""
+        return self.api.client.custom_emojis
+
+    def list(self, *, name: str | None = None) -> Iterator[CustomEmojiObject]:
+        """List workspace custom emojis, optionally filtering by exact name."""
+        query = {} if name is None else {'name': name}
+        for item in iterate_paginated_api(self.raw_api.list, **query):
+            # The list endpoint returns the emoji details without the icon wrapper.
+            yield CustomEmojiObject(custom_emoji=CustomEmojiObjectTypeData.model_validate(item))
 
 
 class CommentsEndpoint(Endpoint):
