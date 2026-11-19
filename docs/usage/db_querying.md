@@ -76,6 +76,17 @@ a property and a boolean operation, e.g., `uno.prop('Name') == 'Article 1'`. We 
 `==`, `contains(...)`, etc. Several conditions can be composed with the boolean operators
 `&` for logical *and* as well as `|` for *or*.
 
+Compare a select or status property against several options with
+`uno.prop('Status') == ['In Progress', 'Done']` or exclude those options with
+`!=`. For multi-select properties, pass a list to `contains()` to match any
+of the listed options or to `does_not_contain()` to match none of them.
+
+Date comparisons support values such as `uno.prop('Due') <= 'today'` and
+`uno.prop('Due') > 'one_week_ago'`. Notion resolves these when the query runs.
+For People filters, `uno.prop('Assignee').contains('me')` matches the user
+associated with the token. Internal connections have no associated user, so
+`contains('me')` returns no results and `does_not_contain('me')` matches every entry.
+
 A simple example illustrates this. Assume that we want to retrieve all articles about the
 topic *Tech* that were released this week. We then want to sort those articles descending
 by their release date and ascending by their name, i.e., alphabetically sorted,

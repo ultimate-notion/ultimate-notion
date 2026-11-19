@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Self
 
 from pydantic import BaseModel, Field
@@ -25,6 +26,13 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__name__)
+
+
+def _option_filter_value(value: Any) -> str | list[str]:
+    """Convert an option or sequence of options to Notion's filter values."""
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [str(option) for option in value]
+    return str(value)
 
 
 class PageProperty(BaseModel):
@@ -67,10 +75,10 @@ class PageProperty(BaseModel):
     def __str__(self) -> str:
         return repr(self)
 
-    def contains(self, value: str | User | Page | Option) -> Condition:
+    def contains(self, value: str | User | Page | Option | Sequence[str | Option]) -> Condition:
         return Contains(prop=self, value=value)
 
-    def does_not_contain(self, value: str | User | Page | Option) -> Condition:
+    def does_not_contain(self, value: str | User | Page | Option | Sequence[str | Option]) -> Condition:
         return ContainsNot(prop=self, value=value)
 
     def starts_with(self, value: str) -> Condition:
@@ -366,8 +374,11 @@ class Equals(PropertyCondition):
                 kwargs['number'] = obj_query.NumberCondition.model_validate({self._condition_kw: self.value})
             case schema.Checkbox():
                 kwargs['checkbox'] = obj_query.CheckboxCondition.model_validate({self._condition_kw: bool(self.value)})
-            case schema.Select():
-                kwargs['select'] = obj_query.SelectCondition.model_validate({self._condition_kw: str(self.value)})
+            case schema.Select() | schema.Status():
+                kind = 'select' if isinstance(prop_type, schema.Select) else 'status'
+                kwargs[kind] = obj_query.SelectCondition.model_validate(
+                    {self._condition_kw: _option_filter_value(self.value)}
+                )
             case schema.Date() if self._condition_kw == 'equals':  # date has no `does_not_equal` condition
                 kwargs['date'] = obj_query.DateCondition.model_validate({self._condition_kw: self.value})
             case schema.Formula():
@@ -565,10 +576,13 @@ class Contains(PropertyCondition):
                 kwargs['rich_text'] = obj_query.TextCondition.model_validate({self._condition_kw: self.value})
             case schema.MultiSelect():
                 kwargs['multi_select'] = obj_query.MultiSelectCondition.model_validate(
-                    {self._condition_kw: str(self.value)}
+                    {self._condition_kw: _option_filter_value(self.value)}
                 )
-            case schema.Person() if isinstance(self.value, User):
-                kwargs['people'] = obj_query.PeopleCondition.model_validate({self._condition_kw: self.value.id})
+            case schema.Person() | schema.CreatedBy() | schema.LastEditedBy() if isinstance(self.value, User) or (
+                isinstance(self.value, str) and self.value == 'me'
+            ):
+                user = self.value.id if isinstance(self.value, User) else 'me'
+                kwargs['people'] = obj_query.PeopleCondition.model_validate({self._condition_kw: user})
             case schema.Relation() if isinstance(self.value, Page):
                 kwargs['relation'] = obj_query.RelationCondition.model_validate({self._condition_kw: self.value.id})
             case schema.Formula():

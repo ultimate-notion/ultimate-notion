@@ -71,10 +71,10 @@ class CheckboxCondition(Condition):
 
 
 class SelectCondition(Condition):
-    """Represents select criteria in Notion."""
+    """Represents select or status criteria in Notion."""
 
-    equals: str | None = None
-    does_not_equal: str | None = None
+    equals: str | list[str] | None = None
+    does_not_equal: str | list[str] | None = None
     is_empty: bool | None = None
     is_not_empty: bool | None = None
 
@@ -82,20 +82,31 @@ class SelectCondition(Condition):
 class MultiSelectCondition(Condition):
     """Represents a multi_select criteria in Notion."""
 
-    contains: str | None = None
-    does_not_contain: str | None = None
+    contains: str | list[str] | None = None
+    does_not_contain: str | list[str] | None = None
     is_empty: bool | None = None
     is_not_empty: bool | None = None
+
+
+RelativeDate: TypeAlias = Literal[
+    'today',
+    'tomorrow',
+    'yesterday',
+    'one_week_ago',
+    'one_week_from_now',
+    'one_month_ago',
+    'one_month_from_now',
+]
 
 
 class DateCondition(Condition):
     """Represents date criteria in Notion."""
 
-    equals: date | datetime | None = None
-    before: date | datetime | None = None
-    after: date | datetime | None = None
-    on_or_before: date | datetime | None = None
-    on_or_after: date | datetime | None = None
+    equals: date | datetime | RelativeDate | None = None
+    before: date | datetime | RelativeDate | None = None
+    after: date | datetime | RelativeDate | None = None
+    on_or_before: date | datetime | RelativeDate | None = None
+    on_or_after: date | datetime | RelativeDate | None = None
 
     is_empty: bool | None = None
     is_not_empty: bool | None = None
@@ -114,8 +125,8 @@ class DateCondition(Condition):
 class PeopleCondition(Condition):
     """Represents people criteria in Notion."""
 
-    contains: UUID | None = None
-    does_not_contain: UUID | None = None
+    contains: UUID | Literal['me'] | None = None
+    does_not_contain: UUID | Literal['me'] | None = None
     is_empty: bool | None = None
     is_not_empty: bool | None = None
 
@@ -153,6 +164,7 @@ class RollupArrayCondition(Condition):
     number: NumberCondition | None = None
     checkbox: CheckboxCondition | None = None
     select: SelectCondition | None = None
+    status: SelectCondition | None = None
     multi_select: MultiSelectCondition | None = None
     date: DateCondition | None = None
     people: PeopleCondition | None = None
