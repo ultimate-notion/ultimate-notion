@@ -310,10 +310,13 @@ class _SharedIdRegistry:
             workspace_id = user.get('bot', {}).get('workspace_id') or owner.get('workspace_id')
             if isinstance(workspace_id, str) and workspace_id not in PLACEHOLDER_IDS:
                 self._add(workspace_id, PLACEHOLDER_WORKSPACE)
-        elif user.get('type') == 'person' and user['id'] not in self._placeholders:
-            if self._persons_seen < len(PLACEHOLDER_PERSONS):
-                self._add(user['id'], PLACEHOLDER_PERSONS[self._persons_seen])
-                self._persons_seen += 1
+        elif (
+            user.get('type') == 'person'
+            and user['id'] not in self._placeholders
+            and self._persons_seen < len(PLACEHOLDER_PERSONS)
+        ):
+            self._add(user['id'], PLACEHOLDER_PERSONS[self._persons_seen])
+            self._persons_seen += 1
 
     def scrub(self, text: str) -> str:
         """Replace every registered shared id (dashed and dash-less) with its placeholder."""
@@ -744,7 +747,7 @@ def vcr_fixture(
                 try:
                     with vcr.use_cassette(cassette_name):
                         value = next(gen)
-                    yield value
+                    yield value  # noqa: RUF070  # Close the cassette before yielding to the test.
                 except StopIteration as e:
                     if e.value is not None:
                         yield e.value

@@ -21,11 +21,12 @@ repos:
     args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: 'v0.14.5'  # make sure this is consistent with pyproject.toml
+  rev: 'v0.17.5'  # make sure this is consistent with pyproject.toml
   hooks:
-    - id: ruff
+    - id: ruff-check
     - id: ruff-format
       args: [--check]
+      types_or: [python, pyi, jupyter]  # Markdown contains MkDocs snippet directives.
 
 # Deactivate as mypy behaves differently if project is installed locally or not.
 # With hatch we checked when it is installed locally to get more feedback, here it is not possible

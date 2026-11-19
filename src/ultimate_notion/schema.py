@@ -55,7 +55,6 @@ from ultimate_notion.utils import SList, dict_diff_str, display_html, is_noteboo
 
 if TYPE_CHECKING:
     from ultimate_notion.database import DataSource
-    from ultimate_notion.obj_api.core import UnsetType
     from ultimate_notion.page import Page
 
 T = TypeVar('T')
