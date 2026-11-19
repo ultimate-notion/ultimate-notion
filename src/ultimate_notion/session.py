@@ -336,7 +336,7 @@ class Session:
                 ds = DataSource.wrap_obj_ref(self.api.data_sources.retrieve(ds_uuid))
             except APIResponseError as e:
                 msg = f'Data source with id `{ds_uuid}` does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownDataSourceError(msg) from e
             self.cache[ds.id] = ds
         _logger.info(f'Retrieved data source `{ds.title}`.')
@@ -354,7 +354,7 @@ class Session:
                 db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
             except APIResponseError as e:
                 msg = f'Database with id `{db_uuid}` does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownDatabaseError(msg) from e
             self.cache[db.id] = db
         _logger.info(f'Retrieved database `{db.title}`.')
@@ -404,7 +404,7 @@ class Session:
                 page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
             except APIResponseError as e:
                 msg = f'Page with id {page_uuid} does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownPageError(msg) from e
             self.cache[page.id] = page
         _logger.info(f'Retrieved page `{page.title}`.')
@@ -495,7 +495,7 @@ class Session:
                 user_obj = self.api.users.retrieve(user_uuid)
             except APIResponseError as e:
                 msg = f'User with id {user_uuid} not found!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 if raise_on_unknown:
                     raise UnknownUserError(msg) from e
                 else:  # we do not cache!
