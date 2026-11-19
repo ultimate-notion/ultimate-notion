@@ -244,7 +244,10 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         return self
 
     def delete(self) -> Self:
-        """Delete this data source."""
+        """Move this data source's database and all its data sources to the trash.
+
+        Use `Database.delete_ds()` to remove only this data source.
+        """
         if not self.is_deleted:
             session = get_active_session()
             session.api.data_sources.delete(self.obj_ref)
@@ -252,7 +255,10 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         return self
 
     def restore(self) -> Self:
-        """Restore this data source."""
+        """Restore this data source's containing database from the trash.
+
+        Use `Database.restore_ds()` to restore a single data source removed with `Database.delete_ds()`.
+        """
         if self.is_deleted:
             session = get_active_session()
             session.api.data_sources.restore(self.obj_ref)

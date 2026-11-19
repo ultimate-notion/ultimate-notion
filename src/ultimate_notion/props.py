@@ -293,7 +293,10 @@ class Formula(PropertyValue[obj_props.Formula], wraps=obj_props.Formula):
 
     @property
     def value(self) -> str | float | int | DateTimeOrRange | None:
-        """Return the result value of the formula."""
+        """Return the formula result, or `None` when it is empty or unsupported.
+
+        Inspect `value_type` to distinguish unsupported results from empty values.
+        """
         # returns all values of subclasses of `FormulaResult`
         if self.obj_ref.formula is None:
             return None
@@ -318,9 +321,14 @@ class Rollup(PropertyValue[obj_props.Rollup], wraps=obj_props.Rollup):
 
     @property
     def value(self) -> float | int | DateTimeOrRange | list[Any] | None:
-        """Return the result value of the rollup."""
+        """Return the rollup result, or `None` when it is empty or unsupported.
+
+        Inspect `value_type` to distinguish unsupported results from empty values.
+        """
         match rollup_type := self.obj_ref.rollup:
             case None:
+                return None
+            case obj_props.RollupUnsupported():
                 return None
             case obj_props.RollupArray():
                 return [PropertyValue.wrap_obj_ref(prop).value for prop in rollup_type.array]

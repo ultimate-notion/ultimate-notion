@@ -228,6 +228,10 @@ class PropertyCondition(Condition, ABC):
             msg = f'The property {self.prop.name} does not have a formula type set.'
             raise FilterQueryError(msg)
 
+        if prop_type is FormulaType.UNSUPPORTED:
+            msg = f'The property {self.prop.name} has an unsupported formula result; its filter type is unavailable.'
+            raise FilterQueryError(msg)
+
         return prop_type
 
     def _get_rollup_type(self, ds: DataSource) -> RollupType:

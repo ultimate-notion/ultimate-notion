@@ -203,12 +203,20 @@ shop_db.delete_ds(customers_ds)
 assert [ds.title for ds in shop_db.data_sources] == ['Items']
 ```
 
+[delete_ds] moves only the selected data source to the trash and excludes it from `shop_db.data_sources`.
+The database and its other data sources remain available. Use [Database.restore_ds] to restore the
+removed data source.
+
 Given a data source, you can always retrieve its container database via its `database_id`:
 
 ```python
 items_ds = shop_db.data_sources.item()
 assert notion.get_db(items_ds.database_id) == shop_db
 ```
+
+[Database.query] requires exactly one data source. With multiple data sources, build a query through
+the selected data source's `query` property. To retrieve all pages from all data sources,
+[Database.get_all_pages] returns one [View] per data source.
 
 Finally, delete the whole database (and all of its data sources) again:
 
@@ -239,6 +247,9 @@ shop_db.delete()
 [create_page]: ../../reference/ultimate_notion/database/#ultimate_notion.database.DataSource.create_page
 [schema]: ../../reference/ultimate_notion/schema/#ultimate_notion.schema.Schema
 [Database]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database
+[Database.query]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.query
+[Database.get_all_pages]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.get_all_pages
 [create_db]: ../../reference/ultimate_notion/session/#ultimate_notion.session.Session.create_db
 [Database.create_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.create_ds
 [delete_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.delete_ds
+[Database.restore_ds]: ../../reference/ultimate_notion/database/#ultimate_notion.database.Database.restore_ds
