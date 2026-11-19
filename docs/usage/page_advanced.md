@@ -113,11 +113,14 @@ Enhanced Markdown can be inserted with `page.insert_markdown(markdown)`. It appe
 by default; `position=uno.InsertPosition.START` prepends, while `after='start...end'`
 uses Notion's ellipsis selection syntax to insert after matching content.
 
-To create a callout without an icon, insert a `<callout>` tag with no `icon`
-attribute. Indent the callout text with a tab in enhanced Markdown.
+To create a callout without an icon, pass the following Markdown to
+`my_page.insert_markdown()`. Indent the callout text with a tab and omit the
+`icon` attribute.
 
-```python
-my_page.insert_markdown('<callout>\n\tThis callout has no icon.\n</callout>')
+```text
+<callout>
+	This callout has no icon.
+</callout>
 ```
 
 The callout's `icon` property returns `None`. The Blocks API adds a lightbulb
