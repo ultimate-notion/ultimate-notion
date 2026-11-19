@@ -84,7 +84,7 @@ class SelectGroup(GenericObject):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SelectGroup):
             return False
-        # we don't compare option_ids since we might not always have them (Status property can't be created)
+        # Local schemas identify new options by name, while the API returns option IDs.
         my_color, other_color = _normalize_color(self.color), _normalize_color(other.color)
         return self.name == other.name and my_color == other_color
 

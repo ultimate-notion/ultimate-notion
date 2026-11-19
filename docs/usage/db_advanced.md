@@ -145,6 +145,17 @@ employee_db.schema.hiring_date_as_str.delete()
 
 Again using both the dictionary and the property approach.
 
+## Status options
+
+Add a status property with `uno.PropType.Status('Status')` to use Notion's default
+options. To define custom options, pass lists of `uno.Option` objects through
+`to_do`, `in_progress`, and `complete`. An omitted group receives no custom options.
+
+Call `set_options(to_do=..., in_progress=..., complete=...)` on a bound Status
+property to update the options and their group assignments. Include every option
+to retain, since omitted options are removed. To move an existing option to another
+group, include it in that group's list.
+
 ## New data source entries
 
 Now that we have created those two data sources, we can start filling them with entries

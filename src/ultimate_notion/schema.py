@@ -1,8 +1,7 @@
 """Functionality around defining a data source schema.
 
 Currently only normal data sources, no wiki data sources, can be created [1].
-Neither the `Unique ID` nor `Status` nor the `Verfication` page property can be set as a data source property
-in a custom Schema when creating the data source.
+Unique ID and Verification cannot be declared in a custom schema when creating a data source.
 
 [1] https://developers.notion.com/docs/working-with-databases#wiki-databases
 
@@ -311,20 +310,7 @@ class MultiSelect(Property[obj_schema.MultiSelect], wraps=obj_schema.MultiSelect
 
 
 class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
-    """Defines a status property in a data source.
-
-    The Notion API doesn't allow to create a property of this type.
-    Sending it to the API with options and option groups defined results in an error
-    about the existence of the keys `options` and `groups` and removing them
-    creates a data source with the property missing... ignorance is bliss.
-
-    Also the Status configuration is not mentioned as a
-    [Property Schema Object])https://developers.notion.com/reference/property-schema-object).
-
-    It can still be used to check a schema.
-    """
-
-    allowed_at_creation = False
+    """Defines a status property. Omit the options to use Notion's defaults when creating it."""
 
     def __init__(
         self,
@@ -372,8 +358,7 @@ class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
 
         groups = []
         for group_obj in self.obj_ref.status.groups:
-            # note that opt_id might be a name here, as explained in `OptionGroup``
-            group_options = [option_ids[opt_id] for opt_id in set(group_obj.option_ids) & set(option_ids.keys())]
+            group_options = [option_ids[opt_id] for opt_id in group_obj.option_ids if opt_id in option_ids]
             groups.append((group_obj, group_options))
 
         return groups
@@ -382,6 +367,27 @@ class Status(Property[obj_schema.Status], wraps=obj_schema.Status):
     def groups(self) -> list[OptionGroup]:
         """Return the option groups of this status property."""
         return [OptionGroup.wrap_obj_ref(group, options=options) for group, options in self._extract_groups()]
+
+    def set_options(
+        self,
+        *,
+        to_do: list[Option] | type[OptionNS],
+        in_progress: list[Option] | type[OptionNS],
+        complete: list[Option] | type[OptionNS],
+    ) -> None:
+        """Set the full list of options and their groups on a bound status property.
+
+        Pass every option to retain. Notion removes omitted options and matches existing ones by ID or name.
+        """
+        schema = self._get_owner()
+        ds = schema.get_ds()
+        updated = type(self)(to_do=to_do, in_progress=in_progress, complete=complete)
+        if not updated.options:
+            msg = 'Provide at least one status option.'
+            raise ValueError(msg)
+
+        get_active_session().api.data_sources.update(ds.obj_ref, schema={self.name: updated.obj_ref})
+        schema._set_obj_refs()
 
 
 class Date(Property[obj_schema.Date], wraps=obj_schema.Date):
@@ -1134,6 +1140,10 @@ class Schema(metaclass=SchemaType):
         other_schema_dct = other_schema.to_dict()
 
         if during_init:
+            for name, prop in other_schema_dct.items():
+                if isinstance(prop, Status) and not prop.options and isinstance(own_schema_dct.get(name), Status):
+                    own_schema_dct[name] = prop
+
             # backward relation was not yet initialised in the other schema (during the creation of the data model)
             # or self-referencing relation was not yet initialised
             own_schema_dct = {
