@@ -2,9 +2,8 @@
 
 ## Unreleased
 
-- Chg: `Page.to_markdown()` and `Block.to_markdown()` retrieve Notion enhanced Markdown. They require
-  an active session and saved content. Use `Page.get_markdown()` for completeness metadata and
-  `Page.set_markdown()` to replace page content, issue #412.
+- New: Retrieve Notion-generated Markdown and truncation metadata for a saved block with
+  `Block.get_markdown()`, issue #412.
 
 - New: Move an existing page under another page or data source with `Page.move()`, issue #403.
 - New: Choose the start or end when creating pages, inserting blocks, or inserting Markdown

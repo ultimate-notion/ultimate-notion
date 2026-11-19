@@ -47,9 +47,7 @@ def test_rich_text_md(md_text_page: uno.Page) -> None:
     ]
     for block, expected in zip(md_text_page.children, correct_mds, strict=True):
         assert isinstance(block, TextBlock)
-        rich_text = block.rich_text
-        assert rich_text is not None
-        our_md = _neutralize_mention(rich_text.to_markdown())
+        our_md = _neutralize_mention(block.to_markdown())
         # Notion can return a different host or slug for the mention than for the page URL.
         our_md = re.sub(
             r'(↗\[Markdown Text Test\]\()([^)]+)\)',

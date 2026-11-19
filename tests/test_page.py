@@ -7,7 +7,7 @@ import pytest
 
 import ultimate_notion as uno
 from tests.conftest import assert_eventually
-from ultimate_notion.blocks import Block, ChildDatabase, Unsupported
+from ultimate_notion.blocks import Block, Unsupported
 from ultimate_notion.emoji import CustomEmoji
 from ultimate_notion.obj_api.props import MAX_ITEMS_PER_PROPERTY
 from ultimate_notion.page import Page
@@ -212,10 +212,8 @@ def test_created_edited_by(notion: uno.Session, root_page: uno.Page) -> None:
     assert isinstance(root_page.last_edited_by, uno.User)
 
 
-@pytest.mark.vcr('test_page_to_markdown.yaml')
-def test_page_show(
-    md_page: uno.Page, md_subpage: uno.Page, root_page: uno.Page, capsys: pytest.CaptureFixture[str]
-) -> None:
+@pytest.mark.vcr()
+def test_page_to_markdown(md_page: uno.Page, md_subpage: uno.Page, root_page: uno.Page) -> None:
     image = next(block for block in md_page.children if isinstance(block, uno.Image))
     # Notion serves the image from a signed URL. Keep checking the filename in the alt text.
     _, query_separator, image_query = image.url.rsplit('/', 1)[-1].partition('?')
@@ -303,14 +301,13 @@ def test_page_show(
         <kbd>Unsupported block</kbd>
     """
     )
-    md_page.show(simple=True)
-    markdown = capsys.readouterr().out.strip().split('\n')
+    markdown = md_page.to_markdown().strip().split('\n')
 
     for exp, act in zip(exp_output.strip().split('\n'), markdown, strict=True):
         assert exp == act
 
 
-@pytest.mark.vcr('test_page_to_markdown.yaml')
+@pytest.mark.vcr()
 def test_page_with_unsupported_blocks(md_page: Page) -> None:
     """Regression test for issue #356.
 
@@ -319,10 +316,12 @@ def test_page_with_unsupported_blocks(md_page: Page) -> None:
     children of a page that contains such a block previously raised a pydantic
     `ValidationError` on dev/CI installs (`extra='forbid'`), which also made every
     sibling block after the unsupported one inaccessible. Accessing the children
-    must succeed and capture the read-only `block_type`.
+    must succeed, capture the read-only `block_type`, and render a placeholder.
     """
     unsupported = [block for block in md_page.children if isinstance(block, Unsupported)]
     assert {block.obj_ref.unsupported.block_type for block in unsupported} == {'button', 'ai_block'}
+    for block in unsupported:
+        assert block.to_markdown() == '<kbd>Unsupported block</kbd>\n'
 
 
 @pytest.mark.vcr()
@@ -395,7 +394,8 @@ def test_more_than_max_mentions_per_text_property(notion: uno.Session, root_page
 def test_embed_blocks(notion: uno.Session, embed_page: uno.Page) -> None:
     blocks = embed_page.children
     assert len(blocks) >= 4
-    assert isinstance(blocks[-1], ChildDatabase)
+    md = embed_page.to_markdown()
+    assert md.strip().split('\n')[-1] == '<kbd>↗️ Linked database (unsupported)</kbd>'
 
 
 @pytest.mark.vcr()
@@ -447,6 +447,17 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
     assert custom_emoji_page.icon.name == 'ultimate-notion'
     assert str(custom_emoji_page.icon) == ':ultimate-notion:'
 
+    exp_md = dedent(
+        """
+        # Custom Emoji Page
+
+        This page has a custom emoji :ultimate-notion: compared to 🚀.
+        💡 Callout block without an emoji
+        """
+    ).strip()
+
+    assert custom_emoji_page.to_markdown().strip() == exp_md
+
     page = notion.create_page(
         parent=root_page,
         title='Page with Custom Emoji Icon',
@@ -456,11 +467,7 @@ def test_custom_emoji_icon(notion: uno.Session, root_page: uno.Page, custom_emoj
 
     text = 'This page has a user-added custom emoji icon '
     page.append(uno.Paragraph(uno.text(text) + custom_emoji_page.icon))
-    paragraph = page.children[0]
-    assert isinstance(paragraph, uno.Paragraph)
-    rich_text = paragraph.rich_text
-    assert rich_text is not None
-    assert rich_text.to_markdown() == text + f'{custom_emoji_page.icon}'
+    assert page.children[0].to_markdown() == text + f'{custom_emoji_page.icon}'
 
 
 @pytest.mark.vcr()

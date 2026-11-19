@@ -306,11 +306,12 @@ class Page(
         return self._get_property(prop_name).value
 
     def to_markdown(self) -> str:
-        """Return the enhanced Markdown from Notion. Use `get_markdown()` to check completeness."""
-        return self.get_markdown().markdown
+        """Return the content of the page as Markdown.
 
-    def _display_markdown(self) -> str:
-        """Render the page for HTML, notebook, and console display."""
+        !!! note
+
+            This will not include nested blocks, i.e. the children of top-level blocks.
+        """
         md = f'# {self.title}\n\n'
         md += '\n'.join(block._to_markdown() for block in self.children)
         return md
@@ -321,7 +322,7 @@ class Page(
 
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
-        html = render_md(self._display_markdown())
+        html = render_md(self.to_markdown())
         if not raw:
             html = page_html(html, title=self.title or 'Untitled Page')
         return html
@@ -329,7 +330,7 @@ class Page(
     def show(self, *, simple: bool | None = None) -> None:
         """Show the content of the page, rendered in JupyterLab"""
         simple = simple if simple is not None else not is_notebook()
-        md = self._display_markdown()
+        md = self.to_markdown()
 
         if simple:
             print(md)  # noqa: T201

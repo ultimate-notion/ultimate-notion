@@ -160,8 +160,9 @@ symptom of the plain-column mistake above. A green line confirms the manual step
 
 ## 5. `Markdown Test` page
 
-This is a content fixture for the console preview, HTML export, and unsupported-block
-tests in `tests/test_page.py`.
+This is a content fixture for `tests/test_page.py::test_page_to_markdown`, which asserts
+the page renders to **exactly** the markdown in that test's `exp_output` (compared
+line-by-line with `strict=True`).
 
 **The bootstrap builds the entire body automatically** — headings, a divider, toggle
 headings, bulleted / to-do / numbered lists, a quote, a callout, a 3×2 table, a block

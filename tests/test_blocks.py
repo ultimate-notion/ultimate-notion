@@ -70,7 +70,7 @@ def test_delete_blocks(root_page: uno.Page, notion: uno.Session) -> None:
 
 
 @pytest.mark.vcr()
-def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session, capsys: pytest.CaptureFixture[str]) -> None:
+def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating basic blocks')
     children: list[uno.Block] = [
         uno.Heading1('My new page'),
@@ -106,8 +106,7 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session, capsys: p
         uno.Equation(r'-1 = \exp(i \pi)'),
     ]
     page.append(children)
-    page.show(simple=True)
-    output = capsys.readouterr().out.removesuffix('\n')
+    output = page.to_markdown()
     exp_output = dedent("""
         # Page for creating basic blocks
 
@@ -184,9 +183,7 @@ def test_create_basic_blocks(root_page: uno.Page, notion: uno.Session, capsys: p
 
 
 @pytest.mark.vcr()
-def test_create_file_blocks(
-    root_page: uno.Page, notion: uno.Session, dummy_urls: URL, capsys: pytest.CaptureFixture[str]
-) -> None:
+def test_create_file_blocks(root_page: uno.Page, notion: uno.Session, dummy_urls: URL) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating file blocks')
     children: list[uno.Block] = [
         uno.File(uno.url(dummy_urls.file)),
@@ -201,8 +198,7 @@ def test_create_file_blocks(
         uno.Audio(uno.url(dummy_urls.audio), caption='Sample Audio'),
     ]
     page.append(children)
-    page.show(simple=True)
-    output = capsys.readouterr().out.removesuffix('\n')
+    output = page.to_markdown()
     exp_output = dedent(f"""
         # Page for creating file blocks
 
@@ -270,14 +266,13 @@ def test_columns_offline() -> None:
 
 
 @pytest.mark.vcr()
-def test_create_column_blocks(root_page: uno.Page, notion: uno.Session, capsys: pytest.CaptureFixture[str]) -> None:
+def test_create_column_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating column blocks')
     cols = uno.Columns(2)
     page.append(cols)
     cols[0].append(uno.Paragraph('Column 1'))
     cols[1].append(uno.Paragraph('Column 2'))
-    page.show(simple=True)
-    output = capsys.readouterr().out.removesuffix('\n')
+    output = page.to_markdown()
     exp_output = dedent("""
         # Page for creating column blocks
 
@@ -291,7 +286,7 @@ def test_create_column_blocks(root_page: uno.Page, notion: uno.Session, capsys: 
 
 
 @pytest.mark.vcr()
-def test_create_table_blocks(root_page: uno.Page, notion: uno.Session, capsys: pytest.CaptureFixture[str]) -> None:
+def test_create_table_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating table blocks')
     table = uno.Table(3, 2, header_row=True)
     page.append(table)
@@ -300,8 +295,7 @@ def test_create_table_blocks(root_page: uno.Page, notion: uno.Session, capsys: p
     table[1, 1] = 'Cell 1,1'
     table[2, 0] = 'Cell 2,0'
     table[2, 1] = 'Cell 2,1'
-    page.show(simple=True)
-    output = capsys.readouterr().out.removesuffix('\n')
+    output = page.to_markdown()
     exp_output = dedent("""
         # Page for creating table blocks
 
@@ -320,13 +314,13 @@ def test_create_link_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     target_page = notion.create_page(parent=root_page, title='Target Page')
     link = uno.LinkToPage(target_page)
     page.append(link)
-    output = page.children[0]._display_markdown()
+    output = page.children[0].to_markdown()
     exp_output = '[**↗️ <u>Target Page</u>**]('
     assert output.startswith(exp_output)
 
 
 @pytest.mark.vcr()
-def test_create_sync_blocks(root_page: uno.Page, notion: uno.Session, capsys: pytest.CaptureFixture[str]) -> None:
+def test_create_sync_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating sync blocks')
     orig_block = uno.SyncedBlock(uno.Paragraph('This is a synced paragraph'))
     with pytest.raises(RuntimeError):
@@ -336,8 +330,7 @@ def test_create_sync_blocks(root_page: uno.Page, notion: uno.Session, capsys: py
     sync_block = orig_block.create_synced()
     page.append(sync_block)
 
-    page.show(simple=True)
-    output = capsys.readouterr().out.removesuffix('\n')
+    output = page.to_markdown()
     exp_output = dedent("""
         # Page for creating sync blocks
 
@@ -645,7 +638,7 @@ def test_tabs_to_markdown() -> None:
     assert str(tabs.tabs[0].icon) == '📋'
     assert str(tabs[1]) == 'Details'
 
-    output = tabs._display_markdown()
+    output = tabs.to_markdown()
     exp_output = dedent("""
         <!--- tab: 📋 Overview -->
         Welcome!
@@ -655,7 +648,7 @@ def test_tabs_to_markdown() -> None:
 
 
 @pytest.mark.vcr()
-def test_create_tab_blocks(root_page: uno.Page, notion: uno.Session, capsys: pytest.CaptureFixture[str]) -> None:
+def test_create_tab_blocks(root_page: uno.Page, notion: uno.Session) -> None:
     page = notion.create_page(parent=root_page, title='Page for creating tab blocks')
     tabs = uno.Tabs(['Overview', 'Details'])
     page.append(tabs)
@@ -668,8 +661,7 @@ def test_create_tab_blocks(root_page: uno.Page, notion: uno.Session, capsys: pyt
     assert [str(tab) for tab in reloaded_tabs.tabs] == ['Overview', 'Details']
     assert str(reloaded_tabs.tabs[0].children[0]) == 'Overview content'
 
-    page.show(simple=True)
-    output = capsys.readouterr().out.removesuffix('\n')
+    output = page.to_markdown()
     exp_output = dedent("""
         # Page for creating tab blocks
 
@@ -890,10 +882,10 @@ def test_serialize_strips_meta_from_nested_children() -> None:
 
 def test_heading_markdown() -> None:
     """Headings render with increasing markdown levels (page titles take `#`)."""
-    assert uno.Heading1('H1')._display_markdown() == '## H1'
-    assert uno.Heading2('H2')._display_markdown() == '### H2'
-    assert uno.Heading3('H3')._display_markdown() == '#### H3'
-    assert uno.Heading4('H4')._display_markdown() == '##### H4'
+    assert uno.Heading1('H1').to_markdown() == '## H1'
+    assert uno.Heading2('H2').to_markdown() == '### H2'
+    assert uno.Heading3('H3').to_markdown() == '#### H3'
+    assert uno.Heading4('H4').to_markdown() == '##### H4'
 
 
 @pytest.mark.vcr()
@@ -1286,7 +1278,7 @@ def test_callout_with_built_in_icon_markdown() -> None:
     )
 
     assert isinstance(callout.icon, BuiltInIcon)
-    assert callout._display_markdown().strip() == ':snake: Built-in icon callout'
+    assert callout.to_markdown().strip() == ':snake: Built-in icon callout'
 
 
 def test_iconless_callout_markdown() -> None:
@@ -1296,7 +1288,7 @@ def test_iconless_callout_markdown() -> None:
     callout.obj_ref.value.icon = None  # The Blocks API returns null for iconless callouts.
 
     assert callout.icon is None
-    assert callout._display_markdown() == 'Callout text\n'
+    assert callout.to_markdown() == 'Callout text\n'
 
 
 def test_prepend_blocks_offline() -> None:
