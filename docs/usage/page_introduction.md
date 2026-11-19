@@ -33,6 +33,17 @@ In a Jupyter notebook, you would see
 
 ![Getting started page](../assets/images/notion-getting-started-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
+## Waiting for a page template
+
+When you create a page with `notion.create_page(..., template=...)` or call
+`page.apply_template(...)`, Notion fills in the template in the background.
+If your next step depends on specific blocks, poll `page.reload().children`
+until those blocks appear. Reloading clears the cached child list so each check
+fetches fresh blocks. Pause between checks and stop polling after a timeout.
+
+See [Notion's template readiness guide] for webhook timing and what to do if
+the page is blank or only partially populated when the wait times out.
+
 ## Properties of a page
 
 The properties of a page can be accessed with the `props` attribute of each page object.
@@ -149,6 +160,7 @@ task.props.status = 'Blocked'
     the future to make the experience more user-friendly.
 
 [Page object]: ../../reference/ultimate_notion/page/#ultimate_notion.page.Page
+[Notion's template readiness guide]: https://developers.notion.com/guides/data-apis/creating-pages-from-templates#step-3-confirm-page-contents-are-ready
 [Task List example]: ../../examples/simple_taskdb/
 [View]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View
 [SList]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList
