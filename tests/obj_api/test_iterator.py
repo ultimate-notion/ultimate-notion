@@ -6,11 +6,11 @@ from uuid import UUID
 import pytest
 from pydantic import ConfigDict
 
-from ultimate_notion.database import DataSource as DataSourceWrapper
+import ultimate_notion as uno
+from tests.conftest import require_ds
 from ultimate_notion.errors import IncompleteQueryError
 from ultimate_notion.obj_api.blocks import DataSource, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, ObjectList, PageOrDataSourceList
-from ultimate_notion.query import Query
 
 
 class LenientPageList(PageOrDataSourceList):
@@ -113,34 +113,15 @@ def test_incomplete_query_raises(*, previous_page: bool) -> None:
     assert endpoint.call_count == len(responses)
 
 
-def test_high_level_query_does_not_return_partial_view(monkeypatch: pytest.MonkeyPatch) -> None:
-    response = {
-        'object': 'list',
-        'type': 'page_or_data_source',
-        'page_or_data_source': {},
-        'results': [],
-        'has_more': False,
-        'next_cursor': None,
-        'request_status': {'type': 'incomplete', 'incomplete_reason': 'query_result_limit_reached'},
-    }
-    ds_id = '59833787-2cf9-4fdf-8782-e53db20768a5'
-    ds = DataSourceWrapper.wrap_obj_ref(
-        DataSource.model_validate(
-            {
-                'id': ds_id,
-                'title': [],
-                'properties': {'Name': {'id': 'title', 'name': 'Name', 'type': 'title', 'title': {}}},
-            }
-        )
-    )
-    session = Mock()
-    session.api.data_sources.query.return_value.execute.side_effect = EndpointIterator[Page](
-        Mock(return_value=response), model_validate=LenientPageList.model_validate
-    )
-    monkeypatch.setattr('ultimate_notion.query.get_active_session', lambda: session)
+@pytest.mark.vcr()
+def test_high_level_query_does_not_return_partial_view(notion: uno.Session) -> None:
+    """Record against a dedicated data source with more than 10,000 rows."""
+    ds = require_ds(notion, 'Ultimate Notion query cap test')
 
-    with pytest.raises(IncompleteQueryError):
-        Query(ds).execute()
+    with pytest.raises(IncompleteQueryError) as error:
+        ds.query.execute()
+
+    assert error.value.reason == 'query_result_limit_reached'
 
 
 def test_query_response_without_request_status() -> None:
