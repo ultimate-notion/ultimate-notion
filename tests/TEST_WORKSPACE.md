@@ -25,7 +25,6 @@ content finished by hand, because each needs something the API cannot create:
 | Page | Manual content needed |
 | --- | --- |
 | `Markdown Test` | Body is built automatically; add the final two **unsupported blocks** (a Button and an AI block) the API cannot create. See [§5](#5-markdown-test-page). |
-| `Embed/Inline/Linked & Unfurl` | Must end with a real **linked-database view**, which the API cannot create. See [§6](#6-embed-page-linked-database). |
 | `Comments` | Page comments are seeded; add **2 inline discussions** to the heading (first = `Infinite discussion!`). The API cannot *start* inline discussions. See [§7](#7-comments-page-inline-discussions). |
 | `Markdown Text Test` | Needs 12 paragraphs of intricately-styled **rich text** (a hand-crafted fixture). See [§8](#8-markdown-text-test-page-rich-text). |
 
@@ -184,12 +183,10 @@ subpage, then the page is complete.
 
 ## 6. `Embed/Inline/Linked & Unfurl` page
 
-The bootstrap creates this page with an embed, a bookmark and an inline-link paragraph.
-`test_embed_blocks` additionally requires the **last** block to be a real **linked
-database** view (it asserts the final rendered line is
-`<kbd>↗️ Linked database (unsupported)</kbd>`). The API cannot create a linked-database
-view, so add one by hand at the end of the page: type `/linked`, choose **Create linked
-database**, and point it at any existing database (e.g. `Task DB`).
+The bootstrap creates this page with an embed, a bookmark, an inline-link paragraph and
+a linked table view of `Task DB`. If the page already ends with a linked database view, the
+bootstrap reuses it. `test_embed_blocks` checks that the last block renders as
+`<kbd>↗️ Linked database (unsupported)</kbd>`.
 
 ## 7. `Comments` page inline discussions
 
@@ -223,7 +220,7 @@ fixture: the styling combinations are not reliably reproducible through the API.
 
 The sections above cover the parts the API **cannot** create: the three fully-manual
 objects (§1–§3), the `Formula DB` formula columns (§4) and the manual content on the
-`Markdown Test` / embed / `Comments` pages (§5–§7). A full live run / cassette re-record
+`Markdown Test` and `Comments` pages (§5 and §7). A full live run / cassette re-record
 also needs the remaining API-creatable objects (`Contacts DB`, `Task DB`, `Formula DB`,
 the `Getting Started` / markdown / embed / comment page shells, etc.) to exist under the
 same root page. Create any missing API-creatable objects with:

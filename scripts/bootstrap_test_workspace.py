@@ -17,7 +17,9 @@ from notion_client import Client
 from notion_client.errors import HTTPResponseError
 
 import ultimate_notion as uno
+from ultimate_notion.blocks import ChildDatabase
 from ultimate_notion.errors import SchemaError
+from ultimate_notion.obj_api import NOTION_API_VERSION
 from ultimate_notion.rich_text import math as rt_math
 from ultimate_notion.rich_text import mention as rt_mention
 from ultimate_notion.rich_text import text as rt_text
@@ -365,11 +367,11 @@ class Bootstrap:
             )
         typer.echo('seeded Contacts DB: 10 rows')
 
-    def ensure_task_db(self) -> None:
+    def ensure_task_db(self) -> uno.DataSource:
         database, _ = self.get_or_create_ds('Task DB', Tasks)
         if not database.is_empty:
             typer.echo('Task DB already has rows')
-            return
+            return database
         rows = [
             ('Run first Marathon', 'In Progress', '✹ High', '2026-07-01T12:00:00.000+00:00'),
             ('Buy milk', 'Backlog', '✶ Low', '2026-07-02T12:00:00.000+00:00'),
@@ -383,6 +385,7 @@ class Bootstrap:
                 due_date=due_date,
             )
         typer.echo('seeded Task DB: 3 rows')
+        return database
 
     def ensure_formula_db(self) -> None:
         database, _ = self.get_or_create_ds('Formula DB', Formulas)
@@ -456,7 +459,7 @@ class Bootstrap:
         else:
             typer.echo(f'{manual_hint} (String for row "Item 1" reads {computed!r}, expected "Item 1")')
 
-    def ensure_static_pages(self) -> None:
+    def ensure_static_pages(self, task_ds: uno.DataSource) -> None:
         self.create_page(
             'Getting Started',
             blocks=[
@@ -466,7 +469,11 @@ class Bootstrap:
         )
         self.ensure_markdown_text_page()
         self.ensure_markdown_test_page()
-        self.create_page(
+        self.ensure_embed_page(task_ds)
+        self.ensure_comments_page()
+
+    def ensure_embed_page(self, task_ds: uno.DataSource) -> uno.Page:
+        page = self.create_page(
             'Embed/Inline/Linked & Unfurl',
             blocks=[
                 uno.Embed('https://ultimate-notion.com/'),
@@ -474,11 +481,16 @@ class Bootstrap:
                 uno.Paragraph('Inline link: https://ultimate-notion.com/'),
             ],
         )
-        # `test_embed_blocks` requires the last block to be a real linked-database view, which the API
-        # cannot create. (A placeholder paragraph would only render the wrong markdown, so we omit it.)
-        typer.echo('manual step: add a linked-database view to the Embed page (see tests/TEST_WORKSPACE.md §6)')
-
-        self.ensure_comments_page()
+        children = page.children
+        if children and isinstance(children[-1], ChildDatabase):
+            typer.echo('embed page already ends with a linked database view')
+            return page
+        if any(isinstance(child, ChildDatabase) for child in children):
+            msg = 'Move the existing linked database view to the end of the Embed/Inline/Linked & Unfurl page.'
+            raise RuntimeError(msg)
+        self.notion.create_view(page, name='Tasks', view_type=uno.ViewType.TABLE, data_source=task_ds)
+        typer.echo('created linked Task DB view on the embed page')
+        return page
 
     def ensure_comments_page(self) -> None:
         """Create the `Comments` page and seed its 5 page-level comments (`test_list_comments`).
@@ -743,10 +755,10 @@ class Bootstrap:
     def run(self) -> None:
         self.ensure_wiki_shell()
         self.ensure_contacts_db()
-        self.ensure_task_db()
+        task_ds = self.ensure_task_db()
         self.ensure_formula_db()
         self.ensure_all_props_db_rows()
-        self.ensure_static_pages()
+        self.ensure_static_pages(task_ds)
         self.audit_manual_objects()
         self.audit_workspace_objects()
 
@@ -772,7 +784,7 @@ def main() -> None:
     token = os.environ.get('NOTION_TOKEN')
     if not token:
         parser.error('NOTION_TOKEN must be set')
-    with uno.Session(client=RetryingClient(auth=token)) as notion:
+    with uno.Session(client=RetryingClient(auth=token, notion_version=NOTION_API_VERSION)) as notion:
         if args.audit_only:
             Bootstrap.for_audit(notion, prune=args.prune).audit_workspace_objects()
         else:
