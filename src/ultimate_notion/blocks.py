@@ -52,7 +52,7 @@ from ultimate_notion.user import User
 from ultimate_notion.utils import set_attr_none
 
 if TYPE_CHECKING:
-    from ultimate_notion.database import DataSource
+    from ultimate_notion.database import Database, DataSource
     from ultimate_notion.page import Page
 
 
@@ -363,15 +363,16 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
     _parent: Block | Page | None = None  # fallback if block is not in Notion, e.g. offline assembly of blocks
 
     @property
-    def parent(self) -> Block | Page | None:
-        """Return the parent block or page, or None if not accessible."""
+    def parent(self) -> Block | Page | Database | None:
+        """Return the parent block, page, or database, or None if not accessible."""
+        from ultimate_notion.database import Database  # noqa: PLC0415  # Avoid circular import.
         from ultimate_notion.page import Page  # noqa: PLC0415  # Avoid circular import.
 
         if not self.in_notion:
             return self._parent
         parent = super().parent
-        if parent is not None and not isinstance(parent, (Block, Page)):
-            msg = f'Expected the parent to be a block or page, got `{type(parent).__name__}`.'
+        if parent is not None and not isinstance(parent, (Block, Page, Database)):
+            msg = f'Expected the parent to be a block, page, or database, got `{type(parent).__name__}`.'
             raise TypeError(msg)
         return parent
 

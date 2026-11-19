@@ -120,6 +120,8 @@ class Database(DataObject, MentionMixin, object='database'):
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
     is_locked: bool | UnsetType = Unset
+    database_type: str | UnsetType = Unset
+    show_data_source_title: bool | UnsetType = Unset
     data_sources: list[DataSourceRefInfo] = Field(default_factory=list)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
