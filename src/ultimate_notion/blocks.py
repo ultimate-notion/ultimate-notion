@@ -39,7 +39,13 @@ from url_normalize import url_normalize
 from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
-from ultimate_notion.errors import EmptyListError, InvalidAPIUsageError, UnknownDataSourceError, UnsetError
+from ultimate_notion.errors import (
+    EmptyListError,
+    InvalidAPIUsageError,
+    UnknownDatabaseError,
+    UnknownDataSourceError,
+    UnsetError,
+)
 from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, UploadedFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -206,11 +212,10 @@ class ChildrenMixin(DataObject[DO_co], wraps=obj_blocks.DataObject):
                 ref_block: Block | DataSource
                 try:
                     ref_block = child_block.ds
-                except (UnknownDataSourceError, EmptyListError):
+                except (UnknownDatabaseError, UnknownDataSourceError, EmptyListError):
                     # A linked database (a linked view of another database) cannot be resolved to a data
-                    # source via the API: its container either is not retrievable (`UnknownDataSourceError`)
-                    # or exposes no data sources (`EmptyListError`). Fall back to the block itself, which
-                    # renders as an unsupported linked database. Check the docs:
+                    # source via the API if its container is not retrievable or it exposes no accessible
+                    # data sources. Keep the block so it renders as an unsupported linked database.
                     # https://developers.notion.com/reference/retrieve-a-database
                     ref_block = child_block
                 child_blocks[idx] = ref_block
