@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import time
 from textwrap import dedent
 
@@ -214,14 +213,13 @@ def test_created_edited_by(notion: uno.Session, root_page: uno.Page) -> None:
 
 
 @pytest.mark.vcr()
-def test_page_to_markdown(md_page: uno.Page) -> None:
-    def remove_query_string(line: str) -> str:
-        line = re.sub(r'\?.*?\]', ']', line)
-        line = re.sub(r'prod.*?\)', ')', line)
-        return line
+def test_page_to_markdown(md_page: uno.Page, md_subpage: uno.Page, root_page: uno.Page) -> None:
+    image = next(block for block in md_page.children if isinstance(block, uno.Image))
+    # Notion serves the image from a signed URL. Keep checking the filename in the alt text.
+    _, query_separator, image_query = image.url.rsplit('/', 1)[-1].partition('?')
 
     exp_output = dedent(
-        """
+        f"""
         # Markdown Test
 
         ## Headline 1
@@ -266,7 +264,7 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
 
         This is an emoji! 😀😀
         $$
-        |x|=\\begin{cases}x, &\\quad x \\geq 0\\\\-x, &\\quad x < 0\\end{cases}
+        |x|=\\begin{{cases}}x, &\\quad x \\geq 0\\\\-x, &\\quad x < 0\\end{{cases}}
         $$
 
         ```python
@@ -275,7 +273,7 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
         ```
         [Caption](https://picsum.photos/300/300)
 
-        ![1004-300x300.jpg](https://)
+        ![1004-300x300.jpg{query_separator}{image_query}]({image.url})
 
         [📎 logo_with_text.svg](https://ultimate-notion.com/latest/assets/images/logo_with_text.svg)
 
@@ -286,17 +284,17 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
         Column 1
         <!--- column 2 -->
         Column
-        ```{toc}
+        ```{{toc}}
         ```
-        Tests / Markdown Test
+        {root_page.title} / Markdown Test
 
-        [📄 **<u>Markdown SubPage Test</u>**](https://www.notion.so/Markdown-SubPage-Test-00000000000040008000000000000005)
+        [📄 **<u>Markdown SubPage Test</u>**]({md_subpage.url})
 
         <!--- original block -->
         This is the original Paragraph on Page
         <!--- synced block -->
         This is the original Paragraph on SubPage
-        [**↗️ <u>Markdown SubPage Test</u>**](https://www.notion.so/Markdown-SubPage-Test-00000000000040008000000000000005)
+        [**↗️ <u>Markdown SubPage Test</u>**]({md_subpage.url})
 
         <kbd>Unsupported block</kbd>
 
@@ -304,8 +302,6 @@ def test_page_to_markdown(md_page: uno.Page) -> None:
     """
     )
     markdown = md_page.to_markdown().strip().split('\n')
-    idx = 53
-    markdown[idx] = remove_query_string(markdown[idx])
 
     for exp, act in zip(exp_output.strip().split('\n'), markdown, strict=True):
         assert exp == act

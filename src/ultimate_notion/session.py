@@ -42,7 +42,7 @@ from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
-from ultimate_notion.obj_api.objects import get_uuid
+from ultimate_notion.obj_api.objects import PageTemplate, get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.rich_text import Text
@@ -352,7 +352,7 @@ class Session:
                 ds = DataSource.wrap_obj_ref(self.api.data_sources.retrieve(ds_uuid))
             except APIResponseError as e:
                 msg = f'Data source with id `{ds_uuid}` does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownDataSourceError(msg) from e
             self.cache[ds.id] = ds
         _logger.info(f'Retrieved data source `{ds.title}`.')
@@ -370,7 +370,7 @@ class Session:
                 db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
             except APIResponseError as e:
                 msg = f'Database with id `{db_uuid}` does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownDatabaseError(msg) from e
             self.cache[db.id] = db
         _logger.info(f'Retrieved database `{db.title}`.')
@@ -420,7 +420,7 @@ class Session:
                 page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
             except APIResponseError as e:
                 msg = f'Page with id {page_uuid} does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownPageError(msg) from e
             self.cache[page.id] = page
         _logger.info(f'Retrieved page `{page.title}`.')
@@ -436,13 +436,20 @@ class Session:
         icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None = None,
         after: DataObject | None = None,
         position: InsertPosition | None = None,
+        template: PageTemplate | UUID | str | None = None,
     ) -> Page:
         """Create a new page in a `parent` page or data source with a given `title`.
 
         The `blocks` are optional and can be used to create a page with content right away.
         Note that some nested blocks may not be supported by the API and must be created separately, i.e.
         with an `append` call to a given block.
+
+        Pass a template from `DataSource.list_templates()`, its ID, or `'default'`
+        to apply the data source's default template. Notion applies templates asynchronously.
         """
+        if template is not None and blocks:
+            msg = 'Provide either a template or blocks when creating a page.'
+            raise ValueError(msg)
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
         cover_obj = None if cover is None else cover.obj_ref
@@ -462,6 +469,7 @@ class Session:
                 icon=icon_obj,
                 after=after_obj,
                 position=position,
+                template=template,
             )
         )
         self.cache[page.id] = page
@@ -511,7 +519,7 @@ class Session:
                 user_obj = self.api.users.retrieve(user_uuid)
             except APIResponseError as e:
                 msg = f'User with id {user_uuid} not found!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 if raise_on_unknown:
                     raise UnknownUserError(msg) from e
                 else:  # we do not cache!
@@ -548,6 +556,10 @@ class Session:
         return MeetingNotesQueryResult(
             results=[MeetingNotes.wrap_obj_ref(note) for note in response.results], has_more=response.has_more
         )
+
+    def list_custom_emojis(self, *, name: str | None = None) -> list[CustomEmoji]:
+        """Return the workspace's custom emojis, optionally filtering by exact name."""
+        return [CustomEmoji.wrap_obj_ref(emoji) for emoji in self.api.custom_emojis.list(name=name)]
 
     def whoami(self) -> Bot:
         """Return the integration as bot object."""

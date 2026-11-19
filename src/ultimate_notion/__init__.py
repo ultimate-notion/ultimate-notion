@@ -64,6 +64,7 @@ from ultimate_notion.obj_api.enums import (
     OptionGroupType,
     VState,
 )
+from ultimate_notion.obj_api.objects import PageTemplate
 from ultimate_notion.obj_api.props import PlaceDict
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.page import Page
@@ -121,6 +122,7 @@ __all__ = [
     'OptionGroupType',
     'OptionNS',
     'Page',  # for type hinting only
+    'PageTemplate',
     'Paragraph',
     'PlaceDict',
     'PropType',

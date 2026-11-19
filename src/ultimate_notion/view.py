@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ultimate_notion.database import DataSource
+    from ultimate_notion.obj_api.iterator import RequestStatus
     from ultimate_notion.props import PropertyValue
     from ultimate_notion.query import Query
 
@@ -43,9 +44,12 @@ T = TypeVar('T')
 
 
 class View(Sequence[Page]):
-    def __init__(self, ds: DataSource, pages: Sequence[Page], query: Query):
+    def __init__(
+        self, ds: DataSource, pages: Sequence[Page], query: Query, *, incomplete_status: RequestStatus | None = None
+    ):
         self.ds = ds
         self._query = query
+        self._incomplete_status = incomplete_status
         self._title_col = ds.schema.get_title_prop().name
         self._columns = self._get_columns(self._title_col)
         self._pages: NDArray[Any] = np.array(pages)
@@ -299,6 +303,16 @@ class View(Sequence[Page]):
         """Is this view empty?"""
         return len(self) == 0
 
+    @property
+    def is_complete(self) -> bool:
+        """Did the query run without Notion reporting an incomplete result?"""
+        return self._incomplete_status is None
+
+    @property
+    def incomplete_reason(self) -> str | None:
+        """Return Notion's reason for an incomplete query, if supplied."""
+        return self._incomplete_status.incomplete_reason if self._incomplete_status is not None else None
+
     def __bool__(self) -> bool:
         """Overwrite default behaviour."""
         msg = 'Use .is_empty instead of bool(view) to check if a view is empty.'
@@ -429,7 +443,9 @@ class View(Sequence[Page]):
     def reload(self) -> View:
         """Reload all pages by re-executing the query that generated the view."""
         view = self.clone()
-        view._pages = np.array(self._query.execute().to_pages())
+        latest = self._query.execute()
+        view._pages = np.array(latest.to_pages())
+        view._incomplete_status = latest._incomplete_status
         return view
 
 

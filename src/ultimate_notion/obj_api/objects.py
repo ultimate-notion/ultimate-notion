@@ -791,6 +791,14 @@ class FileUpload(NotionObject[UUID], object='file_upload'):
     created_by: User  # undocumented but sent by the API
 
 
+class PageTemplate(GenericObject):
+    """A page template listed for a Notion data source."""
+
+    id: UUID
+    name: str
+    is_default: bool
+
+
 class Comment(NotionEntity, object='comment'):
     """A Notion comment object."""
 
@@ -801,3 +809,5 @@ class Comment(NotionEntity, object='comment'):
     discussion_id: UUID
     rich_text: list[RichTextBaseObject]
     display_name: TypeData
+    original_content_deleted: bool = False
+    has_pending_attachments: bool = False
