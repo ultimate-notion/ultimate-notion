@@ -1,0 +1,68 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/custom_emojis
+  response:
+    body:
+      string: '{"object": "list", "type": "custom_emoji", "results": [{"id": "3839ce7b-60a4-804c-bdcd-007ad3034fba",
+        "name": "ultimate-notion", "url": "https://example.com/custom-emoji/0.png"}],
+        "has_more": false, "next_cursor": null, "request_id": "69060d59-1ff0-4e99-ba69-2507398171fb"}'
+    headers:
+      cf-cache-status:
+      - DYNAMIC
+      cf-ray:
+      - a5ccc98278e6774d-LHR
+      connection:
+      - keep-alive
+      content-security-policy:
+      - default-src 'none'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Thu, 19 Nov 2026 05:24:11 GMT
+      etag:
+      - W/"161-dTgt5YpkRZornaU8VW4GirkgNHw"
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      server:
+      - cloudflare
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains; preload
+      transfer-encoding:
+      - chunked
+      vary:
+      - Origin, Accept-Encoding
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 69060d59-1ff0-4e99-ba69-2507398171fb
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

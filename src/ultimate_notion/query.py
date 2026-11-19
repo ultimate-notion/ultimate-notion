@@ -836,8 +836,9 @@ class Query:
         if sort_objs := self._sorts_obj_ref():
             query_obj = query_obj.sort(sort_objs)
 
-        pages = [session._cache_add(Page.wrap_obj_ref(page)) for page in query_obj.execute()]
-        return View(ds=self.ds, pages=pages, query=self)
+        results, iterator = query_obj._execute()
+        pages = [session._cache_add(Page.wrap_obj_ref(page)) for page in results]
+        return View(ds=self.ds, pages=pages, query=self, incomplete_status=iterator.incomplete_status)
 
     def filter(self, expr: Condition) -> Query:
         """Filter the query by the given properties.

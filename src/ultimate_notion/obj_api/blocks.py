@@ -17,10 +17,11 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Annotated, Any, Generic
+from datetime import datetime
+from typing import Annotated, Any, Generic, Self
 from uuid import UUID
 
-from pydantic import AfterValidator, Field, SerializeAsAny
+from pydantic import AfterValidator, Field, SerializeAsAny, model_validator
 from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import (
@@ -49,6 +50,8 @@ from ultimate_notion.obj_api.objects import (
     MentionPage,
     RichTextBaseObject,
     TextObject,
+    UploadedFile,
+    UploadedFileTypeData,
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import Property
@@ -81,6 +84,7 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
     properties: dict[str, SerializeAsAny[Property]] = Field(default_factory=dict)
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     database_parent: SerializeAsAny[ParentRef] | UnsetType = Unset
+    database_type: str | UnsetType | None = Unset
     is_inline: bool = False  # the 2025-09-03 API still returns this on data-source objects
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
@@ -118,6 +122,8 @@ class Database(DataObject, MentionMixin, object='database'):
     description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
     is_inline: bool = False
     is_locked: bool | UnsetType = Unset
+    database_type: str | UnsetType = Unset
+    show_data_source_title: bool | UnsetType = Unset
     data_sources: list[DataSourceRefInfo] = Field(default_factory=list)
 
     def build_mention(self, style: Annotations | None = None) -> MentionObject:
@@ -464,7 +470,17 @@ class Breadcrumb(Block[BreadcrumbTypeData], type='breadcrumb'):
 class EmbedTypeData(CaptionMixin):
     """Type data for `Embed` block."""
 
-    url: str
+    url: str | None = None
+    type: str | None = None
+    file_upload: UploadedFileTypeData | None = None
+
+    @model_validator(mode='after')
+    def validate_source(self) -> Self:
+        """Require exactly one embed source."""
+        if (self.url is None) == (self.file_upload is None):
+            msg = 'Embed requires exactly one of url or file_upload.'
+            raise ValueError(msg)
+        return self
 
 
 class Embed(Block[EmbedTypeData], type='embed'):
@@ -473,7 +489,11 @@ class Embed(Block[EmbedTypeData], type='embed'):
     embed: EmbedTypeData
 
     @classmethod
-    def build(cls, url: str, caption: list[RichTextBaseObject]) -> Embed:
+    def build(cls, url: str | UploadedFile, caption: list[RichTextBaseObject]) -> Embed:
+        if isinstance(url, UploadedFile):
+            return Embed.model_construct(
+                embed=EmbedTypeData.model_construct(type='file_upload', file_upload=url.file_upload, caption=caption)
+            )
         return Embed.model_construct(embed=EmbedTypeData.model_construct(url=url, caption=caption))
 
 
@@ -549,6 +569,54 @@ class Audio(FileBase, type='audio'):
     """An audio block in Notion."""
 
     audio: SerializeAsAny[FileObject] | None = None
+
+
+class MeetingNotesChildren(GenericObject):
+    """IDs of the generated sections of an AI meeting note."""
+
+    summary_block_id: UUID | None = None
+    notes_block_id: UUID | None = None
+    transcript_block_id: UUID | None = None
+
+
+class MeetingNotesRecording(GenericObject):
+    """Time range of a meeting note recording."""
+
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+
+
+class MeetingNotesCalendarEvent(GenericObject):
+    """Calendar event associated with a meeting note."""
+
+    event_id: str | None = None
+    attendees: list[UUID] | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+
+
+class MeetingNotesTypeData(GenericObject):
+    """Metadata returned for an AI meeting note block."""
+
+    is_full_page: bool
+    title: list[SerializeAsAny[RichTextBaseObject]] | None = None
+    status: str | None = None
+    children: MeetingNotesChildren | None = None
+    calendar_event: MeetingNotesCalendarEvent | None = None
+    recording: MeetingNotesRecording | None = None
+
+
+class MeetingNotes(Block[MeetingNotesTypeData], type='meeting_notes'):
+    """An AI meeting note block."""
+
+    meeting_notes: MeetingNotesTypeData
+
+
+class MeetingNotesQueryResult(GenericObject):
+    """Results from Notion's meeting notes query endpoint."""
+
+    results: list[MeetingNotes]
+    has_more: bool
 
 
 class ChildPageTypeData(GenericObject):

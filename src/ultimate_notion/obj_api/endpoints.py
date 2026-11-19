@@ -9,15 +9,16 @@ from __future__ import annotations
 
 import builtins
 import logging
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, BinaryIO
 from uuid import UUID
 
+from notion_client.helpers import iterate_paginated_api
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.errors import UnsetError
-from ultimate_notion.obj_api.blocks import Block, Database, DataSource, FileBase, Page
+from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Embed, FileBase, MeetingNotesQueryResult, Page
 from ultimate_notion.obj_api.core import (
     GenericObject,
     ObjectRef,
@@ -35,14 +36,18 @@ from ultimate_notion.obj_api.objects import (
     BuiltInIconObject,
     Comment,
     CustomEmojiObject,
+    CustomEmojiObjectTypeData,
     DatabaseRef,
     DataSourceRef,
     EmojiObject,
     FileObject,
     FileUpload,
+    PageMarkdown,
     PageRef,
+    PageTemplate,
     RichTextBaseObject,
     User,
+    get_uuid,
 )
 from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DataSourceQueryBuilder, SearchQueryBuilder
@@ -53,6 +58,7 @@ if TYPE_CHECKING:
     from notion_client.api_endpoints import BlocksChildrenEndpoint as NCBlocksChildrenEndpoint
     from notion_client.api_endpoints import BlocksEndpoint as NCBlocksEndpoint
     from notion_client.api_endpoints import CommentsEndpoint as NCCommentsEndpoint
+    from notion_client.api_endpoints import CustomEmojisEndpoint as NCCustomEmojisEndpoint
     from notion_client.api_endpoints import DatabasesEndpoint as NCDatabasesEndpoint
     from notion_client.api_endpoints import DataSourcesEndpoint as NCDataSourcesEndpoint
     from notion_client.api_endpoints import FileUploadsEndpoint as NCFileUploadsEndpoint
@@ -100,6 +106,7 @@ class NotionAPI:
         self.search = SearchEndpoint(self)
         self.users = UsersEndpoint(self)
         self.comments = CommentsEndpoint(self)
+        self.custom_emojis = CustomEmojisEndpoint(self)
         self.uploads = UploadsEndpoint(self)
 
 
@@ -185,6 +192,22 @@ class BlocksEndpoint(Endpoint):
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.blocks
 
+    def query_meeting_notes(
+        self,
+        *,
+        filter_by: Mapping[str, Any] | None = None,
+        sort: Sequence[Mapping[str, Any]] | None = None,
+        limit: int | None = None,
+    ) -> MeetingNotesQueryResult:
+        """Query AI meeting notes with optional Notion filter and sort specifications."""
+        options = {
+            name: value
+            for name, value in {'filter': filter_by, 'sort': sort, 'limit': limit}.items()
+            if value is not None
+        }
+        data = self.raw_api.meeting_notes.query(**options)
+        return MeetingNotesQueryResult.model_validate(data)
+
     # https://developers.notion.com/reference/delete-a-block
     def delete(self, block: Block | UUID | str) -> Block:
         """Delete (archive) the specified Block."""
@@ -222,6 +245,10 @@ class BlocksEndpoint(Endpoint):
         _logger.debug(f'Updating block with id `{block_id}`.')
         params = block.serialize_for_api()
 
+        if isinstance(block, Embed):
+            # Embed updates reject the source discriminator accepted during creation.
+            params['embed'].pop('type', None)
+
         if isinstance(block, FileBase):
             # The Notiopn API does not support setting a new typed FileObject, e.g. `external` or `file`
             # It even must be removed from the params
@@ -245,6 +272,17 @@ class DataSourcesEndpoint(Endpoint):
     def raw_api(self) -> NCDataSourcesEndpoint:
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.data_sources
+
+    def list_templates(self, data_source: DataSource | UUID | str) -> Iterator[PageTemplate]:
+        """List the available page templates for a data source."""
+        data_source_id = str(DataSourceRef.build(data_source).data_source_id)
+
+        def fetch(**kwargs: Any) -> dict[str, Any]:
+            page = self._as_dict(self.raw_api.list_templates(data_source_id, **kwargs))
+            return {**page, 'results': page['templates']}
+
+        for entry in iterate_paginated_api(fetch):
+            yield PageTemplate.model_validate(entry)
 
     @staticmethod
     def _build_request(
@@ -530,6 +568,13 @@ class PagesEndpoint(Endpoint):
         """Return the underlying endpoint in the Notion SDK"""
         return self.api.client.pages
 
+    @staticmethod
+    def _template_payload(template: PageTemplate | UUID | str) -> dict[str, str]:
+        if template == 'default':
+            return {'type': 'default'}
+        template_id = template.id if isinstance(template, PageTemplate) else get_uuid(template)
+        return {'type': 'template_id', 'template_id': str(template_id)}
+
     # https://developers.notion.com/reference/post-page
     def create(
         self,
@@ -542,6 +587,7 @@ class PagesEndpoint(Endpoint):
         icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None,
         after: GenericObject | UUID | str | None = None,
         position: InsertPosition | None = None,
+        template: PageTemplate | UUID | str | None = None,
     ) -> Page:
         """Add a page to the given parent (Page or DataSource)."""
         if parent is None:
@@ -560,6 +606,12 @@ class PagesEndpoint(Endpoint):
                 raise ValueError(msg)
 
         request: dict[str, Any] = {'parent': parent.serialize_for_api()}
+
+        if template is not None:
+            if children is not None:
+                msg = 'Provide either a template or children when creating a page.'
+                raise ValueError(msg)
+            request['template'] = self._template_payload(template)
 
         if position_obj := _build_insert_position(position, after=after, for_page=True):
             request['position'] = position_obj
@@ -589,6 +641,17 @@ class PagesEndpoint(Endpoint):
         return Page.model_validate(data)
 
     # https://developers.notion.com/reference/update-page-markdown
+    def retrieve_markdown(self, page: Page | UUID | str) -> PageMarkdown:
+        """Retrieve Notion's Markdown representation of a page or block subtree."""
+        page_id = ObjectRef.build(page).id
+        return PageMarkdown.model_validate(self.raw_api.retrieve_markdown(str(page_id)))
+
+    def replace_markdown(self, page: Page | UUID | str, markdown: str) -> PageMarkdown:
+        """Replace a page's content with Markdown."""
+        page_id = ObjectRef.build(page).id
+        data = self.raw_api.update_markdown(str(page_id), type='replace_content', replace_content={'new_str': markdown})
+        return PageMarkdown.model_validate(data)
+
     def insert_markdown(
         self,
         page: Page | UUID | str,
@@ -665,6 +728,8 @@ class PagesEndpoint(Endpoint):
         icon: FileObject | EmojiObject | CustomEmojiObject | BuiltInIconObject | UnsetType | None = Unset,
         in_trash: bool | UnsetType = Unset,
         is_locked: bool | UnsetType = Unset,
+        template: PageTemplate | UUID | str | None = None,
+        erase_content: bool | None = None,
     ) -> None:
         """Update the Page object properties on the server."""
         if is_unset(page_id := page.id):
@@ -672,6 +737,11 @@ class PagesEndpoint(Endpoint):
         _logger.debug(f'Updating info on page with id `{page_id}`.')
 
         request: dict[str, Any] = {}
+
+        if template is not None:
+            request['template'] = self._template_payload(template)
+        if erase_content is not None:
+            request['erase_content'] = erase_content
 
         if properties is not None:
             request['properties'] = {
@@ -799,6 +869,22 @@ class UsersEndpoint(Endpoint):
         return Bot.model_validate(data)
 
 
+class CustomEmojisEndpoint(Endpoint):
+    """Interface to the API 'custom_emojis' endpoint."""
+
+    @property
+    def raw_api(self) -> NCCustomEmojisEndpoint:
+        """Return the underlying endpoint in the Notion SDK."""
+        return self.api.client.custom_emojis
+
+    def list(self, *, name: str | None = None) -> Iterator[CustomEmojiObject]:
+        """List workspace custom emojis, optionally filtering by exact name."""
+        query = {} if name is None else {'name': name}
+        for item in iterate_paginated_api(self.raw_api.list, **query):
+            # The list endpoint returns the emoji details without the icon wrapper.
+            yield CustomEmojiObject(custom_emoji=CustomEmojiObjectTypeData.model_validate(item))
+
+
 class CommentsEndpoint(Endpoint):
     """Interface to the API 'comments' endpoint."""
 
@@ -807,22 +893,57 @@ class CommentsEndpoint(Endpoint):
         """Return the underlying endpoint in the Notion SDK"""
         return self.api.client.comments
 
+    @staticmethod
+    def _content(rich_text: builtins.list[RichTextBaseObject] | None, markdown: str | None) -> dict[str, Any]:
+        if (rich_text is None) == (markdown is None):
+            msg = 'Provide exactly one of rich_text or markdown.'
+            raise ValueError(msg)
+        if rich_text is not None:
+            return {'rich_text': [item.serialize_for_api() for item in rich_text]}
+        return {'markdown': markdown}
+
     # https://developers.notion.com/reference/create-a-comment
-    def create(self, page: Page | UUID | str, rich_text: builtins.list[RichTextBaseObject]) -> Comment:
+    def create(
+        self,
+        page: Page | UUID | str,
+        rich_text: builtins.list[RichTextBaseObject] | None = None,
+        *,
+        markdown: str | None = None,
+    ) -> Comment:
         """Create a comment on the specified Page."""
         page_ref = PageRef.build(page)
         _logger.debug(f'Creating a comment on page with id `{page_ref.page_id}.')
-        rich_text_json = [rt.serialize_for_api() for rt in rich_text]
-        data = self.raw_api.create(parent=page_ref.serialize_for_api(), rich_text=rich_text_json)
+        data = self.raw_api.create(parent=page_ref.serialize_for_api(), **self._content(rich_text, markdown))
         return Comment.model_validate(data)
 
     # https://developers.notion.com/reference/create-a-comment
-    def append(self, discussion_id: UUID | str, rich_text: builtins.list[RichTextBaseObject]) -> Comment:
+    def append(
+        self,
+        discussion_id: UUID | str,
+        rich_text: builtins.list[RichTextBaseObject] | None = None,
+        *,
+        markdown: str | None = None,
+    ) -> Comment:
         """Append a comment to the specified discussion."""
         _logger.debug(f'Appending a comment to discussion with id `{discussion_id}`.')
-        rich_text_json = [rt.serialize_for_api() for rt in rich_text]
-        data = self.raw_api.create(discussion_id=str(discussion_id), rich_text=rich_text_json)
+        data = self.raw_api.create(discussion_id=str(discussion_id), **self._content(rich_text, markdown))
         return Comment.model_validate(data)
+
+    def update(
+        self,
+        comment: Comment,
+        rich_text: builtins.list[RichTextBaseObject] | None = None,
+        *,
+        markdown: str | None = None,
+    ) -> None:
+        """Replace a comment's content and update the local object."""
+        comment_id = str(ObjectRef.build(comment).id)
+        data = self.raw_api.update(comment_id, **self._content(rich_text, markdown))
+        comment.update(**self._as_dict(data))
+
+    def delete(self, comment: Comment | UUID | str) -> None:
+        """Delete a comment."""
+        self.raw_api.delete(str(ObjectRef.build(comment).id))
 
     # https://developers.notion.com/reference/retrieve-a-comment
     def list(self, block: Block | Page | UUID | str) -> Iterator[Comment]:

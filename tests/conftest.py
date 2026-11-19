@@ -549,6 +549,7 @@ def normalize_response(response: dict[str, Any]) -> dict[str, Any]:
     """
     for secret in SECRET_PARAMS:
         response['headers'].pop(secret, None)
+    response['headers'] = {name: value for name, value in response['headers'].items() if name.lower() != 'set-cookie'}
     if isinstance(response.get('body'), dict) and 'string' in response['body']:
         response['body']['string'] = _normalize_ids_in_body(_redact_google_oauth_body(response['body']['string']))
     elif 'content' in response:

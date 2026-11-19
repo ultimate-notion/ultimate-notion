@@ -1,0 +1,643 @@
+interactions:
+- request:
+    body: '{"parent": {"type": "page_id", "page_id": "00000000-0000-4000-8000-000000000001"},
+      "properties": {"title": {"type": "title", "title": [{"type": "text", "plain_text":
+      "Generic MIME upload round trip", "annotations": {"bold": false, "italic": false,
+      "strikethrough": false, "underline": false, "code": false}, "text": {"content":
+      "Generic MIME upload round trip"}}]}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '339'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"4119ce7b-60a4-8182-bdac-cc2f86829169","created_time":"2026-11-07T13:34:00.000Z","last_edited_time":"2026-11-07T13:34:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Generic
+      MIME upload round trip","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Generic
+      MIME upload round trip","href":null}]}},"url":"https://www.notion.so/Generic-MIME-upload-round-trip-4119ce7b60a48182bdaccc2f86829169","public_url":null,"request_id":"8d5d1b84-c84d-432b-935c-e97d8954acd7"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb7246a4f7738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=mL6ykVi.7i9nxQgKEr8.OjmoNirIevpSIhmDQem2RU0-1794058465.9961054-1.0.1.1-loQrmoLMaxvizHUsHFmFrjwRnUrQBonxa_c0egomj0GMa0e2hePRY_D6579nZcIlDExpPAXsmVGeY6fSEGrMQnNgiPkJ0Tz9MaNHHVVpZKKvyVv5_Qzci4Zq9wi9VcHd;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:26 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 8d5d1b84-c84d-432b-935c-e97d8954acd7
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/pages/00000000-0000-4000-8000-000000000001
+  response:
+    content: '{"object":"page","id":"00000000-0000-4000-8000-000000000001","created_time":"2026-06-18T15:44:00.000Z","last_edited_time":"2026-11-07T13:34:00.000Z","created_by":{"object":"user","id":"fc820d21-80ec-4d06-878c-f991bc8070d2"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-00000000000040008000000000000001","public_url":null,"request_id":"7d19ea3b-e836-4785-81ce-aa2ee490f34e"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb7264c957738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      set-cookie:
+      - __cf_bm=exsyOAFjFjIneCk2KFp8VF4wRxJQIFWgsVlpz14V39s-1794058466.2855303-1.0.1.1-xj0qJy2IgD8m7WbBDacN42MkYfAslqQh5m0_j_1pavkC8TzknPX4EZU2O2aRZE831Pk1z9GFckkGSUvW3EsDyAlglHJofMaWIDVHPCwfPoPXBvjnjh84zceE1JVBXZvx;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:26 GMT
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 7d19ea3b-e836-4785-81ce-aa2ee490f34e
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"mode": "single_part", "filename": "image.svg", "content_type": "application/octet-stream"}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '87'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/file_uploads
+  response:
+    content: '{"object":"file_upload","id":"4119ce7b-60a4-81c9-8c57-00b2a7533045","created_time":"2026-11-07T13:34:00.000Z","created_by":{"id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c","type":"bot"},"last_edited_time":"2026-11-07T13:34:00.000Z","expiry_time":"2026-11-07T14:34:00.000Z","upload_url":"https://api.notion.com/v1/file_uploads/4119ce7b-60a4-81c9-8c57-00b2a7533045/send","in_trash":false,"status":"pending","filename":"image.svg","content_type":"image/svg+xml","content_length":null,"request_id":"596451c5-d83c-4934-84c3-46e0b097a06a"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb727ddd77738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=mjLnebwVtQFPz_lkxBnq.5yKMwvwl9TxVWVPOoN4CzI-1794058466.5544975-1.0.1.1-nf31zeHSXraW7YZqShebi4akeOWtonFzsYd4JXlAAJIFKaiDXaiTsk2pt4pnWjBcVUF2FAAdkhHcMTXDHXohpzZCrpLwN7ntTLk7EMHIbit4NzcNLiYfYRMekrwo.EL7;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:26 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 596451c5-d83c-4934-84c3-46e0b097a06a
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: "--ac34ca67ba91c059bafc4c4e00ac8ba4\r\nContent-Disposition: form-data; name=\"file\";
+      filename=\"image.svg\"\r\nContent-Type: image/svg+xml\r\n\r\n<svg xmlns=\"http://www.w3.org/2000/svg\"
+      width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"#a03fb1\" d=\"m13.13
+      22.19l-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27l-2.77 6.1M5.64 12.5l-3.83-1.63l6.1-2.77C7
+      9.46 6.22 10.93 5.64 12.5M19.22 4c.28 0 .53 0 .74.05c.17 1.39-.02 4.25-3.3 7.53c-1.7
+      1.71-3.73 3.02-6.01 3.89l-2.15-2.1c.92-2.31 2.23-4.34 3.92-6.03C15.18 4.58 17.64
+      4 19.22 4m0-2c-1.98 0-4.98.69-8.22 3.93c-2.19 2.19-3.5 4.6-4.35 6.71c-.28.75-.09
+      1.57.46 2.13l2.13 2.12c.38.38.89.61 1.42.61c.23 0 .47-.06.7-.15A19.1 19.1 0
+      0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61S20.7 2 19.22 2m-4.68 7.46c-.78-.78-.78-2.05
+      0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83c-.78.78-2.05.78-2.83 0m-5.66 7.07l-1.41-1.41l1.41
+      1.41M6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22h1.41M2 22h1.41l4.77-4.76l-1.42-1.41L2
+      20.59V22m0-2.83l4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76v1.41Z\"/></svg>\n\r\n--ac34ca67ba91c059bafc4c4e00ac8ba4--\r\n"
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '1051'
+      content-type:
+      - multipart/form-data; boundary=ac34ca67ba91c059bafc4c4e00ac8ba4
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/file_uploads/4119ce7b-60a4-81c9-8c57-00b2a7533045/send
+  response:
+    content: '{"object":"file_upload","id":"4119ce7b-60a4-81c9-8c57-00b2a7533045","created_time":"2026-11-07T13:34:00.000Z","created_by":{"id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c","type":"bot"},"last_edited_time":"2026-11-07T13:34:00.000Z","expiry_time":"2026-11-07T14:34:00.000Z","in_trash":false,"status":"uploaded","filename":"image.svg","content_type":"image/svg+xml","content_length":877,"request_id":"dd620778-3d30-4ad0-8361-03588e7dab2f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb7299efe7738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      set-cookie:
+      - __cf_bm=4uhtvt64JkNsPjqA2rzBdIcuLfWbMIQoCbD1Ja7tYZE-1794058466.8129463-1.0.1.1-LAZtBFkxAdbzcPtayGk6SPXA8I7xE.Y9PBlboY9wCl9umkhhmYr7sdEfUbgFWuVbsyog48M4VCRlP39DpSSmFAD1QEQrmGJuV8Kl6XvjXdL6HRv9WrH4gYZf1873C2.T;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:27 GMT
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - dd620778-3d30-4ad0-8361-03588e7dab2f
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/4119ce7b-60a4-8182-bdac-cc2f86829169/children?page_size=100
+  response:
+    content: '{"object":"list","results":[],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"48f8f7f4-876a-4d4b-9464-dcda03da07f0"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb72be8e67738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=ZkxPJKIdJ906aJn.PAeX4C6QzNgNdJVzvxtwXIuhUIQ-1794058467.203118-1.0.1.1-DZgM3oae29zs2qsu6.c3BrRqWVsnwyA1cwrHADEGGsjFq7L.2yI877ZVZ7zKY.URgNV4oiSBV9jxE26FnQADupqP_S_TiaxW07zESJZapt6bhI88gYgP0stEm4q3QvmM;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:27 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 48f8f7f4-876a-4d4b-9464-dcda03da07f0
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"children":[{"object":"block","type":"image","image":{"type":"file_upload","caption":[{"type":"text","plain_text":"Detected
+      image type","annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false},"text":{"content":"Detected
+      image type"}}],"file_upload":{"id":"4119ce7b-60a4-81c9-8c57-00b2a7533045"}}}]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '340'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: PATCH
+    uri: https://api.notion.com/v1/blocks/4119ce7b-60a4-8182-bdac-cc2f86829169/children
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"4119ce7b-60a4-818e-90de-ea06ba0d46a4","parent":{"type":"page_id","page_id":"4119ce7b-60a4-8182-bdac-cc2f86829169"},"created_time":"2026-11-07T13:34:00.000Z","last_edited_time":"2026-11-07T13:34:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"has_children":false,"in_trash":false,"type":"image","image":{"caption":[{"type":"text","text":{"content":"Detected
+      image type","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Detected
+      image type","href":null}],"type":"file","file":{"url":"https://prod-files-secure.s3.us-west-2.amazonaws.com/4bb9ce7b-60a4-817c-8dc5-0003eac3b97a/2fa853df-4e92-44a5-ab96-50b0f3b09d1c/image.svg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=secret...&X-Amz-Date=20261107T133427Z&X-Amz-Expires=3600&X-Amz-Security-Token=secret...&X-Amz-Signature=secret...&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject","expiry_time":"2026-11-07T14:34:27.718Z"}}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"cde165ca-8fe3-4fc1-998a-8f2b562dae4f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb72d8a547738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      set-cookie:
+      - __cf_bm=RzWUCP3.8SoseRqdmvpLTRfyegJMpbBJMY7eJ54kA4I-1794058467.4422152-1.0.1.1-lo0bekzwkrpFVpa79_dSvNMUZVJtYgCuJm_Iu9hARb1y2ELAsz1n_V9XUaNHkrbt16rUZghJ5eD9iS9WZlG.4QuMGUCVAijJUM5Fkq2HdKOmRm.ZWT9iP2Z.fpwkX7ZI;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:27 GMT
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - cde165ca-8fe3-4fc1-998a-8f2b562dae4f
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/pages/4119ce7b-60a4-8182-bdac-cc2f86829169
+  response:
+    content: '{"object":"page","id":"4119ce7b-60a4-8182-bdac-cc2f86829169","created_time":"2026-11-07T13:34:00.000Z","last_edited_time":"2026-11-07T13:34:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Generic
+      MIME upload round trip","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Generic
+      MIME upload round trip","href":null}]}},"url":"https://www.notion.so/Generic-MIME-upload-round-trip-4119ce7b60a48182bdaccc2f86829169","public_url":null,"request_id":"15994d6e-9ed6-44a0-bff9-b33197548c78"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb7301c897738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=rR83TVrpdYgqgb73uHI5siy0h8eHjii3rHo7cpwm9ms-1794058467.8714232-1.0.1.1-RF9g9llumJaa_0tT5AgTH8DnIlvtgtnDcJeFZSkuojEfBq5WgTtVjfhpuW916BZwmXNyaF1wRUMftabnd_pa8D4bSvEiOpkRGhnZNw8HrKh7dXCGk3f0SasF17qtkE11;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:28 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 15994d6e-9ed6-44a0-bff9-b33197548c78
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/4119ce7b-60a4-8182-bdac-cc2f86829169/children?page_size=100
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"4119ce7b-60a4-818e-90de-ea06ba0d46a4","parent":{"type":"page_id","page_id":"4119ce7b-60a4-8182-bdac-cc2f86829169"},"created_time":"2026-11-07T13:34:00.000Z","last_edited_time":"2026-11-07T13:34:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"has_children":false,"in_trash":false,"type":"image","image":{"caption":[{"type":"text","text":{"content":"Detected
+      image type","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Detected
+      image type","href":null}],"type":"file","file":{"url":"https://prod-files-secure.s3.us-west-2.amazonaws.com/4bb9ce7b-60a4-817c-8dc5-0003eac3b97a/2fa853df-4e92-44a5-ab96-50b0f3b09d1c/image.svg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=secret...&X-Amz-Date=20261107T133428Z&X-Amz-Expires=3600&X-Amz-Security-Token=secret...&X-Amz-Signature=secret...&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject","expiry_time":"2026-11-07T14:34:28.251Z"}}}],"next_cursor":null,"has_more":false,"type":"block","block":{},"request_id":"d22ee5de-b371-43ca-aa9f-43104e70ec75"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb731bdf07738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      set-cookie:
+      - __cf_bm=dBm1JE2UjWboGk3msVBxDuPJzVkQZBKl3HBaAIeew74-1794058468.1172817-1.0.1.1-euZWqj26bVyeiBEhhZTLOimIA2AWGL53pKCqfiQHfw2OjDFedSKmPss06.ZC5DCZzrqjiauRCG06EHmOihh471qxw.6wr3h96.x5Z0hhrQFGg_eiIj5VvuEbURxVsdo3;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:28 GMT
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - d22ee5de-b371-43ca-aa9f-43104e70ec75
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"in_trash":true}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '17'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: PATCH
+    uri: https://api.notion.com/v1/pages/4119ce7b60a48182bdaccc2f86829169
+  response:
+    content: '{"object":"page","id":"4119ce7b-60a4-8182-bdac-cc2f86829169","created_time":"2026-11-07T13:34:00.000Z","last_edited_time":"2026-11-07T13:34:00.000Z","created_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"last_edited_by":{"object":"user","id":"3839ce7b-60a4-81d7-9c8f-0027e2be250c"},"cover":null,"icon":null,"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"in_trash":true,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Generic
+      MIME upload round trip","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Generic
+      MIME upload round trip","href":null}]}},"url":"https://www.notion.so/Generic-MIME-upload-round-trip-4119ce7b60a48182bdaccc2f86829169","public_url":null,"request_id":"387ee832-b030-4642-b999-5d56e8c38a4f"}'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - a56cb7336fb67738-LHR
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=g0tnKL3SeQIBicK9BXzpT2AtYDf.4.n_EiO1mbEZZGU-1794058468.4007459-1.0.1.1-e2hYffEibXPPXQHqmAPFDYdz2nn7YAUCMMe4J.CFkxysM2xj_08Qboyl0WLIoAhIIHiZ8CxqJixRgJo20n285F8hWQAJ9GReA9WflngwiyOBJItyLREVnEbZ5u6OJSB3;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=notion.com; Expires=Sat,
+        07 Nov 2026 14:04:28 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin, Accept-Encoding
+      content-security-policy:
+      - default-src 'none'
+      referrer-policy:
+      - strict-origin-when-cross-origin
+      x-content-type-options:
+      - nosniff
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - SAMEORIGIN
+      x-notion-request-id:
+      - 387ee832-b030-4642-b999-5d56e8c38a4f
+      x-permitted-cross-domain-policies:
+      - none
+      x-xss-protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

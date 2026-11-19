@@ -36,6 +36,7 @@ from ultimate_notion.blocks import (
     Image,
     LinkPreview,
     LinkToPage,
+    MeetingNotes,
     NumberedItem,
     Paragraph,
     Quote,
@@ -63,13 +64,14 @@ from ultimate_notion.obj_api.enums import (
     OptionGroupType,
     VState,
 )
+from ultimate_notion.obj_api.objects import PageMarkdown, PageTemplate
 from ultimate_notion.obj_api.props import PlaceDict
 from ultimate_notion.option import Option, OptionGroup, OptionNS
 from ultimate_notion.page import Page
 from ultimate_notion.query import Condition, prop
 from ultimate_notion.rich_text import join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SelfRef
-from ultimate_notion.session import Session
+from ultimate_notion.session import MeetingNotesQueryResult, Session
 from ultimate_notion.user import User
 from ultimate_notion.utils import DateTimeOrRange, SList
 
@@ -110,6 +112,8 @@ __all__ = [
     'InsertPosition',
     'LinkPreview',
     'LinkToPage',
+    'MeetingNotes',
+    'MeetingNotesQueryResult',
     'NotionFile',
     'NumberFormat',
     'NumberedItem',
@@ -118,6 +122,8 @@ __all__ = [
     'OptionGroupType',
     'OptionNS',
     'Page',  # for type hinting only
+    'PageMarkdown',
+    'PageTemplate',
     'Paragraph',
     'PlaceDict',
     'PropType',

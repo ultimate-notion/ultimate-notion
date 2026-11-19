@@ -17,6 +17,7 @@ from ultimate_notion.obj_api.blocks import Block as ObjBlock
 from ultimate_notion.obj_api.blocks import Tab as ObjTab
 from ultimate_notion.obj_api.core import ObjectRef, Unset, UserRef
 from ultimate_notion.rich_text import Text
+from ultimate_notion.utils import serialize_block_with_children
 
 
 @pytest.mark.vcr()
@@ -839,6 +840,23 @@ def test_offline_block_assembly(root_page: uno.Page, notion: uno.Session) -> Non
     heading.append(uno.Paragraph('This is a child paragraph.'))
 
 
+def test_serialize_block_tree_round_trip() -> None:
+    parent = uno.Paragraph('Parent').append(uno.Quote('Child').append(uno.Paragraph('Grandchild')))
+
+    payload = serialize_block_with_children(parent)
+    reconstructed = uno.Block.wrap_obj_ref(ObjBlock.model_validate(payload))
+
+    assert reconstructed == parent
+    assert serialize_block_with_children(reconstructed) == payload
+    assert parent.obj_ref.value.children == []
+
+
+def test_serialize_block_tree_rejects_children_without_a_payload_field() -> None:
+    heading = uno.Heading1('Heading', toggleable=True).append(uno.Paragraph('Child'))
+    with pytest.raises(ValueError, match='cannot carry its children'):
+        serialize_block_with_children(heading)
+
+
 def test_serialize_strips_meta_from_nested_children() -> None:
     """Read-only block meta fields must not leak into nested children when serializing.
 
@@ -1261,6 +1279,16 @@ def test_callout_with_built_in_icon_markdown() -> None:
 
     assert isinstance(callout.icon, BuiltInIcon)
     assert callout.to_markdown().strip() == ':snake: Built-in icon callout'
+
+
+def test_iconless_callout_markdown() -> None:
+    callout = uno.Callout('Callout text')
+    assert callout.icon == '💡'
+
+    callout.obj_ref.value.icon = None  # The Blocks API returns null for iconless callouts.
+
+    assert callout.icon is None
+    assert callout.to_markdown() == 'Callout text\n'
 
 
 def test_prepend_blocks_offline() -> None:

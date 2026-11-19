@@ -102,7 +102,6 @@ These limitations include:
 - changing the description of a data source property.
 - resolve linked databases, i.e. views to a data source.
 - setting the font and background color independently of each other for rich texts.
-- having a callout block without an icon as sending `null` is rejected by the Notion API.
 - repositioning a page's cover image.
 
 If you think those limitations should be fixed, [let the developers of Notion know](mailto:developers@makenotion.com) 😆

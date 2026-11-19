@@ -6,7 +6,9 @@ import io
 import logging
 import os
 import time
-from collections.abc import Callable, Sequence
+from collections import defaultdict
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from threading import RLock
 from types import TracebackType
 from typing import Any, BinaryIO, ClassVar, TypeVar, cast
@@ -16,7 +18,14 @@ import httpx
 import notion_client
 from notion_client.errors import APIResponseError
 
-from ultimate_notion.blocks import Block, ChildrenMixin, DataObject, _append_block_chunks, _chunk_blocks_for_api
+from ultimate_notion.blocks import (
+    Block,
+    ChildrenMixin,
+    DataObject,
+    MeetingNotes,
+    _append_block_chunks,
+    _chunk_blocks_for_api,
+)
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database, DataSource
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
@@ -34,7 +43,7 @@ from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
-from ultimate_notion.obj_api.objects import get_uuid
+from ultimate_notion.obj_api.objects import BlockRef, PageRef, PageTemplate, get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.rich_text import Text
@@ -64,6 +73,14 @@ def _wait_for_consistency(predicate: Callable[[], bool], description: str) -> No
         _logger.info(f'Waiting for {description} to be fully created.')
         time.sleep(delay)
         delay = min(delay * 2, _CONSISTENCY_POLL_MAX_DELAY)
+
+
+@dataclass
+class MeetingNotesQueryResult:
+    """Meeting notes returned by a query and whether more results matched."""
+
+    results: list[MeetingNotes]
+    has_more: bool
 
 
 class Session:
@@ -186,6 +203,28 @@ class Session:
             msg = f'Cached object `{key}` is a `{type(obj).__name__}`, expected `{expected_type.__name__}`.'
             raise TypeError(msg)
         return obj
+
+    def _invalidate_page_blocks(self, page_id: UUID) -> None:
+        """Drop cached blocks that Notion may have changed during a page replacement."""
+        cache = self.cache.copy()
+        children: dict[UUID, list[UUID]] = defaultdict(list)
+        roots = [page_id]
+        for block_id, block in cache.items():
+            if not isinstance(block, Block):
+                continue
+            match block.obj_ref.parent:
+                case PageRef(page_id=parent_id):
+                    children[parent_id].append(block_id)
+                case BlockRef(block_id=parent_id):
+                    children[parent_id].append(block_id)
+                    if parent_id not in cache:
+                        # The ancestry of a block fetched by ID may be unknown.
+                        roots.append(parent_id)
+
+        while roots:
+            for block_id in children.pop(roots.pop(), ()):
+                self.cache.pop(block_id, None)
+                roots.append(block_id)
 
     def get_block(self, block_ref: UUID | str, *, use_cache: bool = True) -> Block:
         """Retrieve a single block by an object reference."""
@@ -336,7 +375,7 @@ class Session:
                 ds = DataSource.wrap_obj_ref(self.api.data_sources.retrieve(ds_uuid))
             except APIResponseError as e:
                 msg = f'Data source with id `{ds_uuid}` does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownDataSourceError(msg) from e
             self.cache[ds.id] = ds
         _logger.info(f'Retrieved data source `{ds.title}`.')
@@ -354,7 +393,7 @@ class Session:
                 db = Database.wrap_obj_ref(self.api.databases.retrieve(db_uuid))
             except APIResponseError as e:
                 msg = f'Database with id `{db_uuid}` does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownDatabaseError(msg) from e
             self.cache[db.id] = db
         _logger.info(f'Retrieved database `{db.title}`.')
@@ -404,7 +443,7 @@ class Session:
                 page = Page.wrap_obj_ref(self.api.pages.retrieve(page_uuid))
             except APIResponseError as e:
                 msg = f'Page with id {page_uuid} does not exist or is not accessible!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 raise UnknownPageError(msg) from e
             self.cache[page.id] = page
         _logger.info(f'Retrieved page `{page.title}`.')
@@ -420,13 +459,20 @@ class Session:
         icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None = None,
         after: DataObject | None = None,
         position: InsertPosition | None = None,
+        template: PageTemplate | UUID | str | None = None,
     ) -> Page:
         """Create a new page in a `parent` page or data source with a given `title`.
 
         The `blocks` are optional and can be used to create a page with content right away.
         Note that some nested blocks may not be supported by the API and must be created separately, i.e.
         with an `append` call to a given block.
+
+        Pass a template from `DataSource.list_templates()`, its ID, or `'default'`
+        to apply the data source's default template. Notion applies templates asynchronously.
         """
+        if template is not None and blocks:
+            msg = 'Provide either a template or blocks when creating a page.'
+            raise ValueError(msg)
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
         cover_obj = None if cover is None else cover.obj_ref
@@ -446,6 +492,7 @@ class Session:
                 icon=icon_obj,
                 after=after_obj,
                 position=position,
+                template=template,
             )
         )
         self.cache[page.id] = page
@@ -495,7 +542,7 @@ class Session:
                 user_obj = self.api.users.retrieve(user_uuid)
             except APIResponseError as e:
                 msg = f'User with id {user_uuid} not found!'
-                _logger.warning(msg)
+                _logger.debug(msg)
                 if raise_on_unknown:
                     raise UnknownUserError(msg) from e
                 else:  # we do not cache!
@@ -516,6 +563,27 @@ class Session:
         _logger.info('Retrieving all users.')
         return [self._cache_add(User.wrap_obj_ref(user)) for user in self.api.users.list()]
 
+    def query_meeting_notes(
+        self,
+        *,
+        filter_by: Mapping[str, Any] | None = None,
+        sort: Sequence[Mapping[str, Any]] | None = None,
+        limit: int | None = None,
+    ) -> MeetingNotesQueryResult:
+        """Query Notion AI meeting notes.
+
+        Filter and sort use the Notion API's meeting notes query format.
+        If `has_more` is true, refine the filter to retrieve a smaller set of matches.
+        """
+        response = self.api.blocks.query_meeting_notes(filter_by=filter_by, sort=sort, limit=limit)
+        return MeetingNotesQueryResult(
+            results=[MeetingNotes.wrap_obj_ref(note) for note in response.results], has_more=response.has_more
+        )
+
+    def list_custom_emojis(self, *, name: str | None = None) -> list[CustomEmoji]:
+        """Return the workspace's custom emojis, optionally filtering by exact name."""
+        return [CustomEmoji.wrap_obj_ref(emoji) for emoji in self.api.custom_emojis.list(name=name)]
+
     def whoami(self) -> Bot:
         """Return the integration as bot object."""
         _logger.info('Retrieving information about this integration bot.')
@@ -533,11 +601,8 @@ class Session:
                 file_name = os.path.basename(file.name)  # BinaryIO has a 'name' unless it is e.g. a BytesIO
             except AttributeError:
                 file_name = 'unknown_file'
-        mime_type = mime_type if mime_type is not None else get_mime_type(file)
+        mime_type = mime_type if mime_type is not None else get_mime_type(file_name)
         file_size = get_file_size(file)
-        if mime_type == 'application/octet-stream':
-            _logger.warning(f'File `{file_name}` has unknown MIME type, falling back to text/plain.')
-            mime_type = 'text/plain'  # Notion does not support application/octet-stream
         mode = FileUploadMode.SINGLE_PART if file_size <= MAX_FILE_SIZE else FileUploadMode.MULTI_PART
         _logger.info(
             f'Uploading file `{file_name}` of size {file_size} bytes with MIME type `{mime_type}` in mode `{mode}`.'

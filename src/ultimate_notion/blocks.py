@@ -40,7 +40,7 @@ from ultimate_notion.comment import Comment, Discussion
 from ultimate_notion.core import NotionEntity, get_active_session, get_url, is_ds, is_page
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
 from ultimate_notion.errors import EmptyListError, InvalidAPIUsageError, UnknownDataSourceError, UnsetError
-from ultimate_notion.file import AnyFile, ExternalFile, NotionFile
+from ultimate_notion.file import AnyFile, ExternalFile, NotionFile, UploadedFile
 from ultimate_notion.markdown import md_comment
 from ultimate_notion.obj_api import blocks as obj_blocks
 from ultimate_notion.obj_api import core as obj_core
@@ -52,7 +52,7 @@ from ultimate_notion.user import User
 from ultimate_notion.utils import set_attr_none
 
 if TYPE_CHECKING:
-    from ultimate_notion.database import DataSource
+    from ultimate_notion.database import Database, DataSource
     from ultimate_notion.page import Page
 
 
@@ -363,22 +363,23 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
     _parent: Block | Page | None = None  # fallback if block is not in Notion, e.g. offline assembly of blocks
 
     @property
-    def parent(self) -> Block | Page | None:
-        """Return the parent block or page, or None if not accessible."""
+    def parent(self) -> Block | Page | Database | None:
+        """Return the parent block, page, or database, or None if not accessible."""
+        from ultimate_notion.database import Database  # noqa: PLC0415  # Avoid circular import.
         from ultimate_notion.page import Page  # noqa: PLC0415  # Avoid circular import.
 
         if not self.in_notion:
             return self._parent
         parent = super().parent
-        if parent is not None and not isinstance(parent, (Block, Page)):
-            msg = f'Expected the parent to be a block or page, got `{type(parent).__name__}`.'
+        if parent is not None and not isinstance(parent, (Block, Page, Database)):
+            msg = f'Expected the parent to be a block, page, or database, got `{type(parent).__name__}`.'
             raise TypeError(msg)
         return parent
 
     @property
     def discussions(self) -> tuple[Discussion, ...]:
         """Return comments of this block as list of discussions, i.e. threads of comments."""
-        return self._discussions
+        return tuple(discussion for discussion in self._discussions if discussion)
 
     def reload(self) -> Self:
         """Reload the block from the API."""
@@ -726,8 +727,9 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
 
     !!! note
 
-        The default icon is an electric light bulb, i.e. 💡. Currently it is not supported by the Notion API
-        to have a callout block without an icon.
+        The default icon is 💡. To create a callout without an icon, use
+        [Page.insert_markdown][ultimate_notion.page.Page.insert_markdown]
+        with a `<callout>` tag and omit the `icon` attribute.
     """
 
     def __init__(
@@ -741,9 +743,6 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         if isinstance(icon, str) and not isinstance(icon, Emoji | CustomEmoji | BuiltInIcon):
             icon = Emoji(icon)
 
-        # Setting icon to None explicitly and sending `null` to Notion does NOT remove the icon
-        # but sets it to the default icon (💡). Right now there seems to be no way to have a callout
-        # block without an icon.
         self.obj_ref.value.icon = icon.obj_ref
 
     @staticmethod
@@ -752,13 +751,11 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         return Emoji('💡')
 
     @property
-    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon:
+    def icon(self) -> NotionFile | ExternalFile | Emoji | CustomEmoji | BuiltInIcon | None:
+        """Return the icon, or `None` if the callout has no icon."""
         if is_unset(icon := self.obj_ref.value.icon):
             raise UnsetError()
-        if icon is None:
-            return self.get_default_icon()
-        else:
-            return wrap_icon(icon)
+        return None if icon is None else wrap_icon(icon)
 
     @icon.setter
     def icon(self, icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon) -> None:
@@ -766,15 +763,17 @@ class Callout(ColoredTextBlock[obj_blocks.Callout], ParentBlock[obj_blocks.Callo
         self._update_in_notion()
 
     def to_markdown(self) -> str:
-        match self.icon:
+        match icon := self.icon:
+            case None:
+                return f'{super().to_markdown()}\n'
             case Emoji():
-                return f'{self.icon} {super().to_markdown()}\n'
+                return f'{icon} {super().to_markdown()}\n'
             case CustomEmoji() | BuiltInIcon():
-                return f':{self.icon.name}: {super().to_markdown()}\n'
+                return f':{icon.name}: {super().to_markdown()}\n'
             case AnyFile():
-                return f'![icon]({self.icon.url}) {super().to_markdown()}\n'
+                return f'![icon]({icon.url}) {super().to_markdown()}\n'
             case _:
-                msg = f'Invalid icon type {type(self.icon)}'
+                msg = f'Invalid icon type {type(icon)}'
                 raise ValueError(msg)
 
 
@@ -863,25 +862,35 @@ class Breadcrumb(Block[obj_blocks.Breadcrumb], wraps=obj_blocks.Breadcrumb):
 
 
 class Embed(CaptionMixin[obj_blocks.Embed], wraps=obj_blocks.Embed):
-    """Embed block."""
+    """Embed a URL or an uploaded HTML file."""
 
-    def __init__(self, url: str, *, caption: str | None = None) -> None:
+    def __init__(self, url: str | UploadedFile, *, caption: str | None = None) -> None:
         caption_obj = Text(caption).obj_ref if caption is not None else None
-        super().__init__(url=url_normalize(url), caption=caption_obj)
+        source = url.obj_ref if isinstance(url, UploadedFile) else url_normalize(url)
+        super().__init__(url=source, caption=caption_obj)
 
     @property
-    def url(self) -> str:
-        """Return the URL of the embedded item."""
+    def url(self) -> str | None:
+        """Return the embed URL, or `None` before an uploaded embed is saved.
+
+        Uploaded HTML URLs expire. Reload the block to obtain a fresh URL.
+        """
         return self.obj_ref.value.url
 
     @url.setter
     def url(self, url: str) -> None:
         if (norm_url := url_normalize(url)) is not None:
-            self.obj_ref.value.url = norm_url
+            self.obj_ref.embed = obj_blocks.Embed.build(url=norm_url, caption=self.obj_ref.embed.caption).embed
             self._update_in_notion()
         else:
             msg = f'Invalid URL: {url}'
             raise ValueError(msg)
+
+    def set_file_upload(self, file: UploadedFile) -> Self:
+        """Replace the source with an uploaded HTML file, preserving its caption."""
+        self.obj_ref.embed = obj_blocks.Embed.build(url=file.obj_ref, caption=self.obj_ref.embed.caption).embed
+        self._update_in_notion()
+        return self
 
     def to_markdown(self) -> str:
         title = self.caption.to_plain_text() if self.caption is not None else self.url
@@ -1137,6 +1146,24 @@ class Audio(FileBaseBlock[obj_blocks.Audio], wraps=obj_blocks.Audio):
         caption = '' if self.caption is None else self.caption.to_markdown()
         md = f'<audio controls><source src="{self.url}"{atype}>{caption}</audio>\n'
         return md
+
+
+class MeetingNotes(Block[obj_blocks.MeetingNotes], wraps=obj_blocks.MeetingNotes):
+    """A read-only Notion AI meeting note block."""
+
+    def __init__(self) -> None:
+        msg = 'Meeting notes must be retrieved from Notion.'
+        raise InvalidAPIUsageError(msg)
+
+    @property
+    def metadata(self) -> obj_blocks.MeetingNotesTypeData:
+        """Return the meeting note's metadata, including its transcript block ID when available."""
+        return self.obj_ref.meeting_notes
+
+    def to_markdown(self) -> str:
+        """Return the meeting note title as Markdown."""
+        title = Text.wrap_obj_ref(self.metadata.title)
+        return f'{title or "Meeting notes"}\n'
 
 
 class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):

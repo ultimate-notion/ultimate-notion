@@ -1,0 +1,225 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/00000000-0000-4000-8000-000000000001/children?page_size=100
+  response:
+    content: '{"object":"list","results":[{"object":"block","id":"00000000-0000-4000-8000-00000000000a","parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"created_time":"2026-06-18T21:33:00.000Z","last_edited_time":"2026-11-19T04:58:00.000Z","created_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"last_edited_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"has_children":false,"in_trash":false,"type":"child_database","child_database":{"title":"Wiki
+      DB"}}],"next_cursor":null,"has_more":false,"type":"block","block":{}}'
+    headers:
+      content-type:
+      - application/json; charset=utf-8
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/databases/00000000-0000-4000-8000-00000000000a
+  response:
+    content: '{"object":"database","id":"00000000-0000-4000-8000-00000000000a","title":[{"type":"text","text":{"content":"Wiki
+      DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Wiki
+      DB","href":null}],"description":[],"parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"is_inline":false,"database_type":"wiki","in_trash":false,"is_locked":false,"show_data_source_title":true,"created_time":"2026-06-18T21:33:00.199+00:00","last_edited_time":"2026-11-19T04:58:34.984+00:00","data_sources":[{"id":"43200000-0000-4000-8000-000000000001","name":"Wiki
+      DB"}],"icon":null,"cover":null,"url":"https://www.notion.so/0000000000004000800000000000000a","public_url":null}'
+    headers:
+      content-type:
+      - application/json; charset=utf-8
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/data_sources/43200000-0000-4000-8000-000000000001
+  response:
+    content: '{"object":"data_source","id":"43200000-0000-4000-8000-000000000001","cover":null,"icon":null,"created_time":"2026-06-18T21:33:00.000Z","created_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"last_edited_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"last_edited_time":"2026-11-19T04:58:00.000Z","title":[{"type":"text","text":{"content":"Wiki
+      DB","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Wiki
+      DB","href":null}],"description":[],"is_inline":false,"database_type":"wiki","properties":{"Tags":{"id":"dju%60","name":"Tags","description":null,"type":"multi_select","multi_select":{"options":[{"id":"ffb414b1-7c94-4e2d-81bf-5dad675b029d","name":"Onboarding","color":"blue","description":null},{"id":"a3b0e7d6-d0c6-4b60-abb3-e1e4e61c69ac","name":"Design","color":"green","description":null}]}},"Last
+      edited time":{"id":"nI%7Bq","name":"Last edited time","description":null,"type":"last_edited_time","last_edited_time":{}},"Page":{"id":"title","name":"Page","description":null,"type":"title","title":{}},"Verification":{"id":"verification","name":"Verification","description":null,"type":"verification","verification":{}},"Owner":{"id":"verification_owner","name":"Owner","description":null,"type":"people","people":{}}},"parent":{"type":"database_id","database_id":"00000000-0000-4000-8000-00000000000a"},"database_parent":{"type":"page_id","page_id":"00000000-0000-4000-8000-000000000001"},"url":"https://www.notion.so/0000000000004000800000000000000a","public_url":null,"in_trash":false}'
+    headers:
+      content-type:
+      - application/json; charset=utf-8
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"parent": {"type": "data_source_id", "data_source_id": "43200000-0000-4000-8000-000000000001"}, "properties":
+      {"title": {"type": "title", "title": [{"type": "text", "plain_text": "Temporary wiki ancestry test", "annotations":
+      {"bold": false, "italic": false, "strikethrough": false, "underline": false, "code": false}, "text": {"content": "Temporary
+      wiki ancestry test"}}]}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '349'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: POST
+    uri: https://api.notion.com/v1/pages
+  response:
+    content: '{"object":"page","id":"43200000-0000-4000-8000-000000000002","created_time":"2026-11-19T05:04:00.000Z","last_edited_time":"2026-11-19T05:04:00.000Z","created_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"last_edited_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"00000000-0000-4000-8000-00000000000a"},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"Tags":{"id":"dju%60","type":"multi_select","multi_select":[]},"Last
+      edited time":{"id":"nI%7Bq","type":"last_edited_time","last_edited_time":"2026-11-19T05:04:00.000Z"},"Page":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Temporary
+      wiki ancestry test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Temporary
+      wiki ancestry test","href":null}]},"Verification":{"id":"verification","type":"verification","verification":{"state":"unverified","verified_by":null,"date":null}},"Owner":{"id":"verification_owner","type":"people","people":[{"object":"user","id":"43200000-0000-4000-8000-000000000005","name":"Ultimate
+      Notion Tests","avatar_url":null,"type":"bot","bot":{}}]}},"url":"https://www.notion.so/Temporary-wiki-ancestry-test-43200000000040008000000000000002","public_url":null}'
+    headers:
+      content-type:
+      - application/json; charset=utf-8
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/pages/00000000-0000-4000-8000-000000000001
+  response:
+    content: '{"object":"page","id":"00000000-0000-4000-8000-000000000001","created_time":"2026-06-18T15:44:00.000Z","last_edited_time":"2026-11-19T04:42:00.000Z","created_by":{"object":"user","id":"43200000-0000-4000-8000-000000000006"},"last_edited_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"cover":null,"icon":null,"parent":{"type":"workspace","workspace":true},"in_trash":false,"is_archived":false,"is_locked":false,"properties":{"title":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Tests","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Tests","href":null}]}},"url":"https://www.notion.so/Tests-00000000000040008000000000000001","public_url":null}'
+    headers:
+      content-type:
+      - application/json; charset=utf-8
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: GET
+    uri: https://api.notion.com/v1/blocks/43200000-0000-4000-8000-000000000002
+  response:
+    content: '{"object":"block","id":"43200000-0000-4000-8000-000000000002","parent":{"type":"database_id","database_id":"00000000-0000-4000-8000-00000000000a"},"created_time":"2026-11-19T05:04:00.000Z","last_edited_time":"2026-11-19T05:04:00.000Z","created_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"last_edited_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"has_children":false,"in_trash":false,"type":"child_page","child_page":{"title":"Temporary
+      wiki ancestry test"}}'
+    headers:
+      content-type:
+      - application/json; charset=utf-8
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"in_trash": true}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      authorization:
+      - secret...
+      connection:
+      - keep-alive
+      content-length:
+      - '17'
+      content-type:
+      - application/json
+      cookie:
+      - secret...
+      host:
+      - api.notion.com
+      notion-version:
+      - '2026-03-11'
+      user-agent:
+      - secret...
+    method: PATCH
+    uri: https://api.notion.com/v1/pages/43200000000040008000000000000002
+  response:
+    content: '{"object":"page","id":"43200000-0000-4000-8000-000000000002","created_time":"2026-11-19T05:04:00.000Z","last_edited_time":"2026-11-19T05:04:00.000Z","created_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"last_edited_by":{"object":"user","id":"43200000-0000-4000-8000-000000000005"},"cover":null,"icon":null,"parent":{"type":"database_id","database_id":"00000000-0000-4000-8000-00000000000a"},"in_trash":true,"is_archived":false,"is_locked":false,"properties":{"Tags":{"id":"dju%60","type":"multi_select","multi_select":[]},"Last
+      edited time":{"id":"nI%7Bq","type":"last_edited_time","last_edited_time":"2026-11-19T05:04:00.000Z"},"Page":{"id":"title","type":"title","title":[{"type":"text","text":{"content":"Temporary
+      wiki ancestry test","link":null},"annotations":{"bold":false,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"default"},"plain_text":"Temporary
+      wiki ancestry test","href":null}]},"Verification":{"id":"verification","type":"verification","verification":{"state":"unverified","verified_by":null,"date":null}},"Owner":{"id":"verification_owner","type":"people","people":[{"object":"user","id":"43200000-0000-4000-8000-000000000005","name":"Ultimate
+      Notion Tests","avatar_url":null,"type":"bot","bot":{}}]}},"url":"https://www.notion.so/Temporary-wiki-ancestry-test-43200000000040008000000000000002","public_url":null}'
+    headers:
+      content-type:
+      - application/json; charset=utf-8
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
