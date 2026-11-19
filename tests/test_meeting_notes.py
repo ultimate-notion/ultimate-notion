@@ -21,6 +21,11 @@ def notion_cleanups() -> None:
 
 
 def test_query_and_retrieve_meeting_notes() -> None:
+    # The test workspace returns HTTP 400 for this endpoint because its plan
+    # does not include AI Meeting Notes. Recording a successful VCR cassette
+    # requires a Business or Enterprise workspace with AI Meeting Notes enabled
+    # and a meeting note shared with the test integration. Mock the HTTP
+    # responses here so the test can exercise the SDK request and parsing offline.
     requests: list[httpx.Request] = []
     note = {
         'object': 'block',
