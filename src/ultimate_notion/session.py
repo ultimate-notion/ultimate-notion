@@ -516,6 +516,10 @@ class Session:
         _logger.info('Retrieving all users.')
         return [self._cache_add(User.wrap_obj_ref(user)) for user in self.api.users.list()]
 
+    def list_custom_emojis(self, *, name: str | None = None) -> list[CustomEmoji]:
+        """Return the workspace's custom emojis, optionally filtering by exact name."""
+        return [CustomEmoji.wrap_obj_ref(emoji) for emoji in self.api.custom_emojis.list(name=name)]
+
     def whoami(self) -> Bot:
         """Return the integration as bot object."""
         _logger.info('Retrieving information about this integration bot.')
