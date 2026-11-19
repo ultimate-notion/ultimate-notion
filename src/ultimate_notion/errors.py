@@ -51,6 +51,10 @@ class FilterQueryError(ValueError, UltimateNotionError):
     """An exception that is raised when a filter query is invalid."""
 
 
+class IncompleteQueryWarning(UserWarning):
+    """Notion could only return part of a query's results."""
+
+
 class SListError(UltimateNotionError):
     """Base class for all exceptions in SList."""
 
