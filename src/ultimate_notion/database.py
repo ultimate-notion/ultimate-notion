@@ -366,6 +366,10 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
 
     def to_markdown(self) -> str:
         """Return the reference to this data source as Markdown."""
+        return self._to_markdown()
+
+    def _to_markdown(self) -> str:
+        """Return the reference to this data source as Markdown."""
         return f'[**🗄️ {self.title}**]({self.block_url})\n'
 
 
@@ -531,5 +535,9 @@ class Database(DataContainer[obj_blocks.Database], wraps=obj_blocks.Database):
         raise NotImplementedError
 
     def to_markdown(self) -> str:
+        """Return the reference to this database as Markdown."""
+        return self._to_markdown()
+
+    def _to_markdown(self) -> str:
         """Return the reference to this database as Markdown."""
         return f'[**📚 {self.title}**]({self.block_url})\n'

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from textwrap import dedent
 
 import pytest
 
@@ -211,7 +212,105 @@ def test_created_edited_by(notion: uno.Session, root_page: uno.Page) -> None:
     assert isinstance(root_page.last_edited_by, uno.User)
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr('test_page_to_markdown.yaml')
+def test_page_show(
+    md_page: uno.Page, md_subpage: uno.Page, root_page: uno.Page, capsys: pytest.CaptureFixture[str]
+) -> None:
+    image = next(block for block in md_page.children if isinstance(block, uno.Image))
+    # Notion serves the image from a signed URL. Keep checking the filename in the alt text.
+    _, query_separator, image_query = image.url.rsplit('/', 1)[-1].partition('?')
+
+    exp_output = dedent(
+        f"""
+        # Markdown Test
+
+        ## Headline 1
+        ### Headline 2
+        #### Headline 3
+        ---
+
+        ## Toggle Headline 1
+        ### Toggle Headline 2
+        #### Toggle Headline 3
+        - Item 1
+
+        - Item 2
+        with a new line
+
+        - Item 3
+
+        - [ ] ToDo1
+
+        - [ ] ToDo2
+        with a new line
+
+        - [x] Checked ToDo3
+
+        1. First item
+
+        1. Second item
+        with a new line
+
+        1. Third item
+
+        > This is a quote
+        with a new line
+
+        💡 Callout!
+
+        |           |           |
+        |-----------|-----------|
+        | Cell 1, 1 | Cell 1, 2 |
+        | Cell 2, 1 | Cell 2, 2 |
+        | Cell 3, 1 | Cell 3, 2 |
+
+        This is an emoji! 😀😀
+        $$
+        |x|=\\begin{{cases}}x, &\\quad x \\geq 0\\\\-x, &\\quad x < 0\\end{{cases}}
+        $$
+
+        ```python
+        # Python Code
+        import ultimate_notion
+        ```
+        [Caption](https://picsum.photos/300/300)
+
+        ![1004-300x300.jpg{query_separator}{image_query}]({image.url})
+
+        [📎 logo_with_text.svg](https://ultimate-notion.com/latest/assets/images/logo_with_text.svg)
+
+        <audio controls><source src="https://samplelib.com/lib/preview/mp3/sample-3s.mp3" type="audio/mpeg"></audio>
+
+        ### Unsupported Stuff in Markdown
+        <!--- column 1 -->
+        Column 1
+        <!--- column 2 -->
+        Column
+        ```{{toc}}
+        ```
+        {root_page.title} / Markdown Test
+
+        [📄 **<u>Markdown SubPage Test</u>**]({md_subpage.url})
+
+        <!--- original block -->
+        This is the original Paragraph on Page
+        <!--- synced block -->
+        This is the original Paragraph on SubPage
+        [**↗️ <u>Markdown SubPage Test</u>**]({md_subpage.url})
+
+        <kbd>Unsupported block</kbd>
+
+        <kbd>Unsupported block</kbd>
+    """
+    )
+    md_page.show(simple=True)
+    markdown = capsys.readouterr().out.strip().split('\n')
+
+    for exp, act in zip(exp_output.strip().split('\n'), markdown, strict=True):
+        assert exp == act
+
+
+@pytest.mark.vcr('test_page_to_markdown.yaml')
 def test_page_with_unsupported_blocks(md_page: Page) -> None:
     """Regression test for issue #356.
 
@@ -224,6 +323,12 @@ def test_page_with_unsupported_blocks(md_page: Page) -> None:
     """
     unsupported = [block for block in md_page.children if isinstance(block, Unsupported)]
     assert {block.obj_ref.unsupported.block_type for block in unsupported} == {'button', 'ai_block'}
+
+
+@pytest.mark.vcr('test_page_to_markdown.yaml')
+def test_page_to_html_preserves_child_page_link(md_page: Page, md_subpage: Page) -> None:
+    html = md_page.to_html(raw=True)
+    assert f'<a href="{md_subpage.url}">📄 <strong><u>{md_subpage.title}</u></strong></a>' in html
 
 
 @pytest.mark.vcr()

@@ -123,7 +123,8 @@ when the icon is omitted and rejects an explicit `null`.
 Use `page.to_markdown()` to retrieve the page's content as Notion enhanced Markdown.
 It returns a string with nested content. Access the page title separately through
 `page.title`. Call `page.get_markdown()` when you need the full response, including
-`truncated`, `unknown_block_ids`, and `warnings`.
+`truncated` and `unknown_block_ids`. Use `page.to_html()` to export the page as
+HTML or `page.show()` to preview it in JupyterLab or at the console.
 
 Pass enhanced Markdown to `page.set_markdown(markdown)` to replace the page's
 content. The returned response includes the updated Markdown and any warnings.

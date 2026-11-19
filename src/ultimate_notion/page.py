@@ -309,9 +309,19 @@ class Page(
         """Return the enhanced Markdown from Notion. Use `get_markdown()` to check completeness."""
         return self.get_markdown().markdown
 
+    def _display_markdown(self) -> str:
+        """Render the page for HTML, notebook, and console display."""
+        md = f'# {self.title}\n\n'
+        md += '\n'.join(block._to_markdown() for block in self.children)
+        return md
+
+    def _to_markdown(self) -> str:
+        """Return the reference to this page as Markdown."""
+        return f'[📄 **<u>{self.title}</u>**]({self.url})\n'
+
     def to_html(self, *, raw: bool = False) -> str:
         """Return the content of the page as HTML."""
-        html = render_md(self.to_markdown())
+        html = render_md(self._display_markdown())
         if not raw:
             html = page_html(html, title=self.title or 'Untitled Page')
         return html
@@ -319,7 +329,7 @@ class Page(
     def show(self, *, simple: bool | None = None) -> None:
         """Show the content of the page, rendered in JupyterLab"""
         simple = simple if simple is not None else not is_notebook()
-        md = self.to_markdown()
+        md = self._display_markdown()
 
         if simple:
             print(md)  # noqa: T201

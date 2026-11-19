@@ -160,8 +160,8 @@ symptom of the plain-column mistake above. A green line confirms the manual step
 
 ## 5. `Markdown Test` page
 
-This is a content fixture for `tests/test_page.py::test_page_with_unsupported_blocks`,
-which checks how the Blocks API exposes unsupported block types.
+This is a content fixture for the console preview, HTML export, and unsupported-block
+tests in `tests/test_page.py`.
 
 **The bootstrap builds the entire body automatically** — headings, a divider, toggle
 headings, bulleted / to-do / numbered lists, a quote, a callout, a 3×2 table, a block
@@ -170,7 +170,8 @@ two-column block, a table of contents, a breadcrumb, the child subpage
 `Markdown SubPage Test`, both synced blocks and the link to the subpage. It (re)builds
 whenever the page is missing or incomplete, and leaves a complete page untouched.
 
-Only the **last two blocks must be added by hand**. The Blocks API reads them as unsupported:
+Only the **last two blocks must be added by hand**, because the API cannot create them —
+they render as `<kbd>Unsupported block</kbd>`:
 
 1. Add a **Button** block (`/button`).
 2. Add an **AI block** (e.g. `/ai` summary) as the final block.

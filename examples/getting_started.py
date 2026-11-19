@@ -6,10 +6,10 @@ PAGE_TITLE = 'Getting Started'
 
 with uno.Session() as notion:
     page = notion.search_page(PAGE_TITLE).item()
-    print(page.title)
+    page.show()
 
 # Alternatively, without a context manager:
 notion = uno.Session()
 page = notion.search_page(PAGE_TITLE).item()
-print(page.title)
+page.show()
 notion.close()
