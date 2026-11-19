@@ -50,21 +50,22 @@ for i in range(num_of_articles):
 ```
 
 To query this data source, we can retrieve a [Query][query object] object from the attribute
-[query][query property] of `article_db`. Calling the method [execute] of the [Query][query object] object
-will retrieve all pages, which is equivalent to calling the method [get_all_pages] of `article_db`
-to get a [View]:
+[query][query property] of `article_db`. Calling [execute] on that query returns a [View]
+of the matching pages. For a query without filters, this is equivalent to calling
+[get_all_pages] on `article_db`.
 
 ```python
 view_of_all_pages = article_db.query.execute()
 assert len(view_of_all_pages) == num_of_articles
 ```
 
-Notion limits a single query to 10,000 results. If the response reports that the
-query is incomplete, execution raises `ultimate_notion.errors.IncompleteQueryError`
-instead of returning a view that appears complete. Narrow large queries with
-filters, for example by creation date, and combine the results of disjoint ranges.
-Ordinary cursor pagination does not bypass this limit. Low-level iterators may
-have yielded earlier pages before raising the error.
+Notion limits a single query to 10,000 results. When Notion reports an incomplete
+query, execution emits `ultimate_notion.errors.IncompleteQueryWarning` and returns
+the pages Notion provided. The view's `is_complete` is `False`, and
+`incomplete_reason` gives Notion's reason if one was supplied.
+Low-level iterators also warn and yield the available pages. To retrieve more
+than 10,000 matching pages, query non-overlapping ranges, for example by creation
+date, and combine the results.
 
 ## Filtering & sorting
 

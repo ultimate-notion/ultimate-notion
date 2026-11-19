@@ -51,15 +51,8 @@ class FilterQueryError(ValueError, UltimateNotionError):
     """An exception that is raised when a filter query is invalid."""
 
 
-class IncompleteQueryError(UltimateNotionError):
-    """Raised when Notion cannot return every result of a query."""
-
-    def __init__(self, reason: str | None) -> None:
-        self.reason = reason
-        super().__init__(
-            f'Notion returned an incomplete query ({reason or "unspecified reason"}). '
-            'Narrow the query with filters before retrying.'
-        )
+class IncompleteQueryWarning(UserWarning):
+    """Notion could only return part of a query's results."""
 
 
 class SListError(UltimateNotionError):

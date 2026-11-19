@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from itertools import islice
 from unittest.mock import Mock
 from uuid import UUID
 
@@ -8,7 +9,7 @@ from pydantic import ConfigDict
 
 import ultimate_notion as uno
 from tests.conftest import require_ds
-from ultimate_notion.errors import IncompleteQueryError
+from ultimate_notion.errors import IncompleteQueryWarning
 from ultimate_notion.obj_api.blocks import DataSource, Page
 from ultimate_notion.obj_api.iterator import EndpointIterator, ObjectList, PageOrDataSourceList
 
@@ -83,11 +84,13 @@ def test_complete_query_status() -> None:
         'next_cursor': None,
         'request_status': {'type': 'complete'},
     }
-    assert list(EndpointIterator(Mock(return_value=response))()) == []
+    iterator = EndpointIterator[Page](Mock(return_value=response))
+    assert list(iterator()) == []
+    assert iterator.incomplete_status is None
 
 
-@pytest.mark.parametrize('previous_page', [False, True])
-def test_incomplete_query_raises(*, previous_page: bool) -> None:
+@pytest.mark.parametrize('earlier_page_status', [None, 'complete', 'incomplete'])
+def test_incomplete_query_preserves_results(earlier_page_status: str | None) -> None:
     page_id = '59833787-2cf9-4fdf-8782-e53db20768a5'
     response = {
         'object': 'list',
@@ -100,28 +103,31 @@ def test_incomplete_query_raises(*, previous_page: bool) -> None:
     incomplete = response | {
         'request_status': {'type': 'incomplete', 'incomplete_reason': 'query_result_limit_reached'},
     }
-    responses = (
-        [response | {'has_more': True, 'next_cursor': 'opaque:next'}, incomplete] if previous_page else [incomplete]
-    )
+    responses = [incomplete]
+    if earlier_page_status is not None:
+        previous = (
+            incomplete if earlier_page_status == 'incomplete' else response | {'request_status': {'type': 'complete'}}
+        )
+        responses.insert(0, previous | {'has_more': True, 'next_cursor': 'opaque:next'})
     endpoint = Mock(side_effect=responses)
-    iterator = EndpointIterator[Page](endpoint, model_validate=LenientPageList.model_validate)()
-    if previous_page:
-        assert str(next(iterator).id) == page_id
-    with pytest.raises(IncompleteQueryError, match='query_result_limit_reached') as error:
-        list(iterator)
-    assert error.value.reason == 'query_result_limit_reached'
+    iterator = EndpointIterator[Page](endpoint, model_validate=LenientPageList.model_validate)
+    with pytest.warns(IncompleteQueryWarning, match='query_result_limit_reached') as warnings:
+        assert [str(page.id) for page in iterator()] == [page_id] * len(responses)
+
+    assert len(warnings) == 1
+    assert iterator.incomplete_status is not None
+    assert iterator.incomplete_status.incomplete_reason == 'query_result_limit_reached'
     assert endpoint.call_count == len(responses)
 
 
 @pytest.mark.vcr()
-def test_high_level_query_does_not_return_partial_view(notion: uno.Session) -> None:
+def test_capped_query_yields_first_page(notion: uno.Session) -> None:
     """Record against a dedicated data source with more than 10,000 rows."""
     ds = require_ds(notion, 'Ultimate Notion query cap test')
 
-    with pytest.raises(IncompleteQueryError) as error:
-        ds.query.execute()
-
-    assert error.value.reason == 'query_result_limit_reached'
+    results = notion.api.data_sources.query(ds.obj_ref).execute()
+    with pytest.warns(IncompleteQueryWarning, match='query_result_limit_reached'):
+        assert len(list(islice(results, 100))) == 100
 
 
 def test_query_response_without_request_status() -> None:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import warnings
 from collections.abc import Awaitable, Callable, Iterator
 from typing import Annotated, Any, Generic, TypeVar, cast
 
@@ -10,7 +11,7 @@ from pydantic import ConfigDict, Field, ValidationError
 from pydantic.functional_validators import BeforeValidator
 
 from ultimate_notion.config import get_cfg
-from ultimate_notion.errors import IncompleteQueryError
+from ultimate_notion.errors import IncompleteQueryWarning
 from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Page
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, TypedObject
 from ultimate_notion.obj_api.objects import Comment, FileUpload, User
@@ -65,6 +66,7 @@ class ObjectList(NotionObject, TypedObject, object='list', polymorphic_base=True
     results: list[Annotated[NotionObject, BeforeValidator(convert_to_notion_obj)]] = Field(default_factory=list)
     has_more: bool = False
     next_cursor: str | None = None
+    incomplete_status: RequestStatus | None = None
     request_status: RequestStatus | None = None
 
 
@@ -170,6 +172,7 @@ class EndpointIterator(Generic[T]):
         self.has_more = True
         self.page_num = 0
         self.total_items = 0
+        self.incomplete_status = None
 
         if 'page_size' not in kwargs:
             kwargs['page_size'] = MAX_PAGE_SIZE
@@ -194,8 +197,15 @@ class EndpointIterator(Generic[T]):
                 raise
 
             if isinstance(obj_or_list, ObjectList):
-                if obj_or_list.request_status is not None and obj_or_list.request_status.type == 'incomplete':
-                    raise IncompleteQueryError(obj_or_list.request_status.incomplete_reason)
+                status = obj_or_list.request_status
+                if self.incomplete_status is None and status is not None and status.type == 'incomplete':
+                    self.incomplete_status = status
+                    reason = status.incomplete_reason or 'unspecified reason'
+                    warnings.warn(
+                        f'Notion returned partial query results ({reason}). Narrow the query with filters.',
+                        IncompleteQueryWarning,
+                        stacklevel=2,
+                    )
                 for obj in obj_or_list.results:
                     self.total_items += 1
                     yield cast(T, obj)

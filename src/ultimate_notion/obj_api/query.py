@@ -286,9 +286,14 @@ class QueryBuilder(Generic[T, Q], ABC):
 
     def execute(self, **nc_params: int | str) -> Iterator[T]:
         """Execute the current query and return an iterator for the results."""
+        results, _ = self._execute(**nc_params)
+        return results
+
+    def _execute(self, **nc_params: int | str) -> tuple[Iterator[T], EndpointIterator[T]]:
         query = self.query.serialize_for_api()
         query |= self.params | nc_params
-        return EndpointIterator[T](self.endpoint)(**query)
+        iterator = EndpointIterator[T](self.endpoint)
+        return iterator(**query), iterator
 
 
 class SearchQueryBuilder(QueryBuilder[T, SearchQuery]):
@@ -344,9 +349,9 @@ class DataSourceQueryBuilder(QueryBuilder[Page, DataSourceQuery]):
     def __init__(self, endpoint: NCEndpointCall, data_source_id: str):
         super().__init__(endpoint=endpoint, query=DataSourceQuery(), params={'data_source_id': data_source_id})
 
-    def execute(self, **nc_params: int | str) -> Iterator[Page]:
+    def _execute(self, **nc_params: int | str) -> tuple[Iterator[Page], EndpointIterator[Page]]:
         _logger.debug(f'Searching for pages in data source with id: {self.params["data_source_id"]}')
-        return super().execute(**nc_params)
+        return super()._execute(**nc_params)
 
     def filter(self, condition: QueryFilter) -> DataSourceQueryBuilder:
         """Add the given filter to the query."""
