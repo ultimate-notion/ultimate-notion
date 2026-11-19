@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import closing
+
 import pytest
 from notion_client import Client
 from vcr.cassette import Cassette  # type: ignore[import-untyped]
@@ -28,7 +30,7 @@ def test_resume_validated_query_with_opaque_cursors(vcr: Cassette | None) -> Non
     # The pagination test creates a new data source each time the cassette is recorded.
     query_request = next(request for request in vcr.requests if request.path.endswith('/query'))
     data_source_id = query_request.path.split('/')[-2]
-    with Client(auth='secret') as client:
+    with closing(Client(auth='secret')) as client:
         first_page = PageOrDataSourceList.model_validate(
             client.data_sources.query(data_source_id=data_source_id, page_size=MAX_PAGE_SIZE)
         )
