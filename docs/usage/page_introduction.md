@@ -35,23 +35,14 @@ In a Jupyter notebook, you would see
 
 ## Waiting for a page template
 
-When you pass a template to `notion.create_page(..., template=...)`, Notion
-returns the new page while it fills in the template in the background. Before
-running work that depends on the template, poll `page.reload().children` until
-the expected blocks are present. For example, check for a heading near the end
-of the template. Reloading clears the cached child list so each check reads
-fresh blocks.
+When you create a page with `notion.create_page(..., template=...)` or call
+`page.apply_template(...)`, Notion fills in the template in the background.
+If your next step depends on specific blocks, poll `page.reload().children`
+until those blocks appear. Reloading clears the cached child list so each check
+fetches fresh blocks. Pause between checks and stop polling after a timeout.
 
-If you consume Notion webhooks, `page.created` usually arrives within a few
-seconds and the page may still be blank. Check the blocks when it arrives.
-If the expected content is missing, check again when `page.content_updated`
-arrives for that page. A later content update can also arrive after you have
-already processed the page, so track which page IDs you have handled.
-
-Set a timeout and inspect the page if it expires. A failed template job can
-leave a blank or partially populated page. Reapplying the template automatically
-can duplicate content. See [Notion's template readiness guide] for timeout and
-partial-application behavior.
+See [Notion's template readiness guide] for webhook timing and what to do if
+the page is blank or only partially populated when the wait times out.
 
 ## Properties of a page
 
