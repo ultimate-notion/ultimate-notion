@@ -348,6 +348,20 @@ class Page(
             self._delete_me_from_parent()
         return self
 
+    def get_markdown(self) -> objs.PageMarkdown:
+        """Read this page using Notion's Markdown endpoint, including truncation metadata."""
+        return get_active_session().api.pages.retrieve_markdown(self.obj_ref)
+
+    def set_markdown(self, markdown: str) -> objs.PageMarkdown:
+        """Replace this page's content with Markdown and return Notion's response."""
+        session = get_active_session()
+        page_id = self.id
+        try:
+            return session.api.pages.replace_markdown(self.obj_ref, markdown)
+        finally:
+            self._children = None
+            session._invalidate_page_blocks(page_id)  # Notion can reuse a block ID for a different block type.
+
     def insert_markdown(
         self,
         markdown: str,

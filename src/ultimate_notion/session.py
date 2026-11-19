@@ -6,6 +6,7 @@ import io
 import logging
 import os
 import time
+from collections import defaultdict
 from collections.abc import Callable, Sequence
 from threading import RLock
 from types import TracebackType
@@ -34,7 +35,7 @@ from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
-from ultimate_notion.obj_api.objects import PageTemplate, get_uuid
+from ultimate_notion.obj_api.objects import BlockRef, PageRef, PageTemplate, get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.rich_text import Text
@@ -186,6 +187,28 @@ class Session:
             msg = f'Cached object `{key}` is a `{type(obj).__name__}`, expected `{expected_type.__name__}`.'
             raise TypeError(msg)
         return obj
+
+    def _invalidate_page_blocks(self, page_id: UUID) -> None:
+        """Drop cached blocks that Notion may have changed during a page replacement."""
+        cache = self.cache.copy()
+        children: dict[UUID, list[UUID]] = defaultdict(list)
+        roots = [page_id]
+        for block_id, block in cache.items():
+            if not isinstance(block, Block):
+                continue
+            match block.obj_ref.parent:
+                case PageRef(page_id=parent_id):
+                    children[parent_id].append(block_id)
+                case BlockRef(block_id=parent_id):
+                    children[parent_id].append(block_id)
+                    if parent_id not in cache:
+                        # The ancestry of a block fetched by ID may be unknown.
+                        roots.append(parent_id)
+
+        while roots:
+            for block_id in children.pop(roots.pop(), ()):
+                self.cache.pop(block_id, None)
+                roots.append(block_id)
 
     def get_block(self, block_ref: UUID | str, *, use_cache: bool = True) -> Block:
         """Retrieve a single block by an object reference."""
