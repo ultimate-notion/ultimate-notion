@@ -335,6 +335,10 @@ class DataSource(DataContainer[obj_blocks.DataSource], wraps=obj_blocks.DataSour
         msg = 'Use .is_empty instead of bool(ds) to check if a data source is empty.'
         raise RuntimeError(msg)
 
+    def list_templates(self) -> list[objs.PageTemplate]:
+        """Return the available page templates for this data source."""
+        return list(get_active_session().api.data_sources.list_templates(self.obj_ref))
+
     def create_page(self, **kwargs: Any) -> Page:
         """Create a page with properties according to the schema within the corresponding data source."""
         attr_to_name = {prop.attr_name: prop.name for prop in self.schema.get_props()}

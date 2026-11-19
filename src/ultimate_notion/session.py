@@ -34,7 +34,7 @@ from ultimate_notion.obj_api import query as obj_query
 from ultimate_notion.obj_api.core import Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.endpoints import NotionAPI
 from ultimate_notion.obj_api.enums import FileUploadMode, FileUploadStatus, InsertPosition
-from ultimate_notion.obj_api.objects import get_uuid
+from ultimate_notion.obj_api.objects import PageTemplate, get_uuid
 from ultimate_notion.page import Page
 from ultimate_notion.props import Title
 from ultimate_notion.rich_text import Text
@@ -420,13 +420,20 @@ class Session:
         icon: AnyFile | Emoji | CustomEmoji | BuiltInIcon | str | None = None,
         after: DataObject | None = None,
         position: InsertPosition | None = None,
+        template: PageTemplate | UUID | str | None = None,
     ) -> Page:
         """Create a new page in a `parent` page or data source with a given `title`.
 
         The `blocks` are optional and can be used to create a page with content right away.
         Note that some nested blocks may not be supported by the API and must be created separately, i.e.
         with an `append` call to a given block.
+
+        Pass a template from `DataSource.list_templates()`, its ID, or `'default'`
+        to apply the data source's default template. Notion applies templates asynchronously.
         """
+        if template is not None and blocks:
+            msg = 'Provide either a template or blocks when creating a page.'
+            raise ValueError(msg)
         _logger.info(f'Creating page with title `{title}` in parent `{parent.title}`.')
         title_obj = title if title is None else Title(title).obj_ref
         cover_obj = None if cover is None else cover.obj_ref
@@ -446,6 +453,7 @@ class Session:
                 icon=icon_obj,
                 after=after_obj,
                 position=position,
+                template=template,
             )
         )
         self.cache[page.id] = page
