@@ -75,7 +75,7 @@ from ultimate_notion.query import Condition, prop
 from ultimate_notion.rich_text import join, math, mention, text
 from ultimate_notion.schema import Property, PropType, Schema, SelfRef
 from ultimate_notion.session import MeetingNotesQueryResult, Session
-from ultimate_notion.user import User
+from ultimate_notion.user import CustomAgentRef, User
 from ultimate_notion.utils import DateTimeOrRange, SList
 
 __all__ = [
@@ -96,6 +96,7 @@ __all__ = [
     'Column',
     'Columns',
     'Condition',  # for type hinting only
+    'CustomAgentRef',
     'CustomEmoji',
     'DataSource',
     'Database',

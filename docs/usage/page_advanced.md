@@ -421,6 +421,17 @@ Let's take a look at how our fancy text page looks in the end.
 
 ![Fancy text page](../assets/images/notion-fancy-text-page.png){:style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
+### Referencing a Custom Agent
+
+Use `uno.CustomAgentRef(agent_or_bot_id)` to reference a Custom Agent by either
+its agent ID or bot user ID. Pass the reference to `uno.mention()` to mention
+the agent in text, or assign it to a People property. The agent must be shared
+with the connection, and assigning or mentioning it can start an agent run.
+
+When Notion returns an agent as a bot, `bot.id` is the bot user ID and
+`bot.agent_id` is the Custom Agent ID. For a mention, use `mention.user`
+to inspect the inline bot.
+
 ## Working with comments
 
 In Notion, there are two kinds of comments: page comments at the top of the page and inline comments, which

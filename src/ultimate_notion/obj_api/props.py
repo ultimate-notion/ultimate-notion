@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING, Any, Generic, NotRequired, Self, TypedDict, ca
 from pydantic import Field, SerializeAsAny, field_validator, model_serializer
 from typing_extensions import TypeVar
 
-from ultimate_notion.obj_api.core import GenericObject, NotionObject, ObjectRef, TypedObject, Unset, UnsetType
+from ultimate_notion.obj_api.core import GenericObject, NotionObject, ObjectRef, TypedObject, Unset, UnsetType, UserRef
 from ultimate_notion.obj_api.enums import AggFunc, FormulaType, RollupType, VState
 from ultimate_notion.obj_api.objects import (
     DateRange,
@@ -137,11 +137,11 @@ class MultiSelect(PropertyValue[PID_co], type='multi_select'):
 class People(PropertyValue[PID_co], type='people'):
     """Notion people type."""
 
-    people: list[User] = Field(default_factory=list)
+    people: list[SerializeAsAny[User | UserRef]] = Field(default_factory=list)
 
     # Custom serializer as we receive various UserRef subtypes but need to pass
     # a proper UserRef to the Notion API. Notion API is just so inconsistent!
-    @model_serializer
+    @model_serializer(when_used='json')
     def serialize(self) -> dict[str, Any]:
         return {'people': [{'id': user.id, 'object': user.object} for user in self.people], 'type': 'people'}
 
