@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import ultimate_notion as uno
 from ultimate_notion.blocks import TextBlock
+from ultimate_notion.obj_api.objects import get_uuid
 
 
 def _neutralize_mention(md: str) -> str:
@@ -31,7 +34,7 @@ def test_rich_text_md(md_text_page: uno.Page) -> None:
         'here is one with an inline **~~equa-*tion*~~ *$E=mc^2$ and*** no block equation',
         (
             'and here is one with ~~***person** mention [@USER]()*~~ and **page mention '
-            '↗[Markdown Text Test](https://www.notion.so/00000000000040008000000000000003)** '
+            f'↗[Markdown Text Test]({md_text_page.id})** '
         ),
         'here is one **stretching over *many\n~~many~~*\n~~lines~~**',
         # ToDo: This is not 100% right as line breaks in code blocks are ignored in Markdown.
@@ -42,7 +45,13 @@ def test_rich_text_md(md_text_page: uno.Page) -> None:
         'Half a [lin](https://google.de/)[k](https://amazon.com/) for two destinations',
         '✨Magic ✨',
     ]
-    for idx, block in enumerate(md_text_page.children):
+    for block, expected in zip(md_text_page.children, correct_mds, strict=True):
         assert isinstance(block, TextBlock)
         our_md = _neutralize_mention(block.to_markdown())
-        assert our_md == correct_mds[idx]
+        # Notion can return a different host or slug for the mention than for the page URL.
+        our_md = re.sub(
+            r'(↗\[Markdown Text Test\]\()([^)]+)\)',
+            lambda match: f'{match[1]}{get_uuid(match[2])})',
+            our_md,
+        )
+        assert our_md == expected
