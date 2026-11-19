@@ -36,6 +36,12 @@ class Comment(NotionEntity[objs.Comment], wraps=objs.Comment):
         """The ID of the discussion thread that this comment belongs to."""
         return self.obj_ref.discussion_id
 
+    def update(self, text: str | None = None, *, markdown: str | None = None) -> Self:
+        """Replace this comment's content with text or Markdown."""
+        rich_text = None if text is None else Text(text).obj_ref
+        get_active_session().api.comments.update(self.obj_ref, rich_text, markdown=markdown)
+        return self
+
     def __str__(self) -> str:
         if self.text is None:
             return ''
@@ -70,8 +76,8 @@ class Discussion(Sequence[Comment]):
     def __str__(self) -> str:
         return '\n'.join(f'{self.user}: {self.text}' for self in self._comments)
 
-    def append(self, text: str) -> Self:
-        """Add a comment to the discussion.
+    def append(self, text: str | None = None, *, markdown: str | None = None) -> Self:
+        """Add a comment to the discussion using text or Markdown.
 
         !!! note
 
@@ -86,14 +92,14 @@ class Discussion(Sequence[Comment]):
             msg = 'Cannot add a comment to a parent that is not in Notion.'
             raise RuntimeError(msg)
 
-        text = Text(text)
+        rich_text = None if text is None else Text(text).obj_ref
         session = get_active_session()
 
         if self._parent.is_page:
-            comment = session.api.comments.create(page=self._parent.id, rich_text=text.obj_ref)
+            comment = session.api.comments.create(page=self._parent.id, rich_text=rich_text, markdown=markdown)
         elif self:  # parent is a block that already has comments
             comment = session.api.comments.append(
-                rich_text=text.obj_ref, discussion_id=self._comments[-1].discussion_id
+                rich_text=rich_text, discussion_id=self._comments[-1].discussion_id, markdown=markdown
             )
         else:
             msg = 'Cannot create a new discussion thread for a block, only append to an existing discussion.'
@@ -101,3 +107,11 @@ class Discussion(Sequence[Comment]):
 
         self._comments.append(Comment.wrap_obj_ref(comment))
         return self
+
+    def remove(self, comment: Comment) -> None:
+        """Delete a comment from Notion and remove it from this discussion."""
+        if comment not in self._comments:
+            msg = 'Comment is not part of this discussion.'
+            raise ValueError(msg)
+        get_active_session().api.comments.delete(comment.obj_ref)
+        self._comments.remove(comment)

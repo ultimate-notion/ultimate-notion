@@ -811,22 +811,57 @@ class CommentsEndpoint(Endpoint):
         """Return the underlying endpoint in the Notion SDK"""
         return self.api.client.comments
 
+    @staticmethod
+    def _content(rich_text: builtins.list[RichTextBaseObject] | None, markdown: str | None) -> dict[str, Any]:
+        if (rich_text is None) == (markdown is None):
+            msg = 'Provide exactly one of rich_text or markdown.'
+            raise ValueError(msg)
+        if rich_text is not None:
+            return {'rich_text': [item.serialize_for_api() for item in rich_text]}
+        return {'markdown': markdown}
+
     # https://developers.notion.com/reference/create-a-comment
-    def create(self, page: Page | UUID | str, rich_text: builtins.list[RichTextBaseObject]) -> Comment:
+    def create(
+        self,
+        page: Page | UUID | str,
+        rich_text: builtins.list[RichTextBaseObject] | None = None,
+        *,
+        markdown: str | None = None,
+    ) -> Comment:
         """Create a comment on the specified Page."""
         page_ref = PageRef.build(page)
         _logger.debug(f'Creating a comment on page with id `{page_ref.page_id}.')
-        rich_text_json = [rt.serialize_for_api() for rt in rich_text]
-        data = self.raw_api.create(parent=page_ref.serialize_for_api(), rich_text=rich_text_json)
+        data = self.raw_api.create(parent=page_ref.serialize_for_api(), **self._content(rich_text, markdown))
         return Comment.model_validate(data)
 
     # https://developers.notion.com/reference/create-a-comment
-    def append(self, discussion_id: UUID | str, rich_text: builtins.list[RichTextBaseObject]) -> Comment:
+    def append(
+        self,
+        discussion_id: UUID | str,
+        rich_text: builtins.list[RichTextBaseObject] | None = None,
+        *,
+        markdown: str | None = None,
+    ) -> Comment:
         """Append a comment to the specified discussion."""
         _logger.debug(f'Appending a comment to discussion with id `{discussion_id}`.')
-        rich_text_json = [rt.serialize_for_api() for rt in rich_text]
-        data = self.raw_api.create(discussion_id=str(discussion_id), rich_text=rich_text_json)
+        data = self.raw_api.create(discussion_id=str(discussion_id), **self._content(rich_text, markdown))
         return Comment.model_validate(data)
+
+    def update(
+        self,
+        comment: Comment,
+        rich_text: builtins.list[RichTextBaseObject] | None = None,
+        *,
+        markdown: str | None = None,
+    ) -> None:
+        """Replace a comment's content and update the local object."""
+        comment_id = str(ObjectRef.build(comment).id)
+        data = self.raw_api.update(comment_id, **self._content(rich_text, markdown))
+        comment.update(**self._as_dict(data))
+
+    def delete(self, comment: Comment | UUID | str) -> None:
+        """Delete a comment."""
+        self.raw_api.delete(str(ObjectRef.build(comment).id))
 
     # https://developers.notion.com/reference/retrieve-a-comment
     def list(self, block: Block | Page | UUID | str) -> Iterator[Comment]:
