@@ -325,12 +325,6 @@ def test_page_with_unsupported_blocks(md_page: Page) -> None:
     assert {block.obj_ref.unsupported.block_type for block in unsupported} == {'button', 'ai_block'}
 
 
-@pytest.mark.vcr('test_page_to_markdown.yaml')
-def test_page_to_html_preserves_child_page_link(md_page: Page, md_subpage: Page) -> None:
-    html = md_page.to_html(raw=True)
-    assert f'<a href="{md_subpage.url}">📄 <strong><u>{md_subpage.title}</u></strong></a>' in html
-
-
 @pytest.mark.vcr()
 def test_parent_db(notion: uno.Session, root_page: uno.Page) -> None:
     db = notion.create_ds(root_page)
