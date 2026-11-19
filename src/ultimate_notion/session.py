@@ -7,7 +7,8 @@ import logging
 import os
 import time
 from collections import defaultdict
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from threading import RLock
 from types import TracebackType
 from typing import Any, BinaryIO, ClassVar, TypeVar, cast
@@ -17,7 +18,14 @@ import httpx
 import notion_client
 from notion_client.errors import APIResponseError
 
-from ultimate_notion.blocks import Block, ChildrenMixin, DataObject, _append_block_chunks, _chunk_blocks_for_api
+from ultimate_notion.blocks import (
+    Block,
+    ChildrenMixin,
+    DataObject,
+    MeetingNotes,
+    _append_block_chunks,
+    _chunk_blocks_for_api,
+)
 from ultimate_notion.config import Config, activate_debug_mode, get_or_create_cfg
 from ultimate_notion.database import Database, DataSource
 from ultimate_notion.emoji import BuiltInIcon, CustomEmoji, Emoji
@@ -65,6 +73,14 @@ def _wait_for_consistency(predicate: Callable[[], bool], description: str) -> No
         _logger.info(f'Waiting for {description} to be fully created.')
         time.sleep(delay)
         delay = min(delay * 2, _CONSISTENCY_POLL_MAX_DELAY)
+
+
+@dataclass
+class MeetingNotesQueryResult:
+    """Meeting notes returned by a query and whether more results matched."""
+
+    results: list[MeetingNotes]
+    has_more: bool
 
 
 class Session:
@@ -546,6 +562,23 @@ class Session:
         """Retrieve all users of this workspace."""
         _logger.info('Retrieving all users.')
         return [self._cache_add(User.wrap_obj_ref(user)) for user in self.api.users.list()]
+
+    def query_meeting_notes(
+        self,
+        *,
+        filter_by: Mapping[str, Any] | None = None,
+        sort: Sequence[Mapping[str, Any]] | None = None,
+        limit: int | None = None,
+    ) -> MeetingNotesQueryResult:
+        """Query Notion AI meeting notes.
+
+        Filter and sort use the Notion API's meeting notes query format.
+        If `has_more` is true, refine the filter to retrieve a smaller set of matches.
+        """
+        response = self.api.blocks.query_meeting_notes(filter_by=filter_by, sort=sort, limit=limit)
+        return MeetingNotesQueryResult(
+            results=[MeetingNotes.wrap_obj_ref(note) for note in response.results], has_more=response.has_more
+        )
 
     def list_custom_emojis(self, *, name: str | None = None) -> list[CustomEmoji]:
         """Return the workspace's custom emojis, optionally filtering by exact name."""

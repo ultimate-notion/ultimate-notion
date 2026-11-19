@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import builtins
 import logging
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, BinaryIO
 from uuid import UUID
@@ -18,7 +18,7 @@ from notion_client.helpers import iterate_paginated_api
 from pydantic import SerializeAsAny, TypeAdapter
 
 from ultimate_notion.errors import UnsetError
-from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Embed, FileBase, Page
+from ultimate_notion.obj_api.blocks import Block, Database, DataSource, Embed, FileBase, MeetingNotesQueryResult, Page
 from ultimate_notion.obj_api.core import (
     GenericObject,
     ObjectRef,
@@ -191,6 +191,22 @@ class BlocksEndpoint(Endpoint):
     def raw_api(self) -> NCBlocksEndpoint:
         """Return the underlying endpoint in the Notion SDK."""
         return self.api.client.blocks
+
+    def query_meeting_notes(
+        self,
+        *,
+        filter_by: Mapping[str, Any] | None = None,
+        sort: Sequence[Mapping[str, Any]] | None = None,
+        limit: int | None = None,
+    ) -> MeetingNotesQueryResult:
+        """Query AI meeting notes with optional Notion filter and sort specifications."""
+        options = {
+            name: value
+            for name, value in {'filter': filter_by, 'sort': sort, 'limit': limit}.items()
+            if value is not None
+        }
+        data = self.raw_api.meeting_notes.query(**options)
+        return MeetingNotesQueryResult.model_validate(data)
 
     # https://developers.notion.com/reference/delete-a-block
     def delete(self, block: Block | UUID | str) -> Block:

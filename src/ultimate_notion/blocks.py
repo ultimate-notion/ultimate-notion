@@ -1150,6 +1150,24 @@ class Audio(FileBaseBlock[obj_blocks.Audio], wraps=obj_blocks.Audio):
         return md
 
 
+class MeetingNotes(Block[obj_blocks.MeetingNotes], wraps=obj_blocks.MeetingNotes):
+    """A read-only Notion AI meeting note block."""
+
+    def __init__(self) -> None:
+        msg = 'Meeting notes must be retrieved from Notion.'
+        raise InvalidAPIUsageError(msg)
+
+    @property
+    def metadata(self) -> obj_blocks.MeetingNotesTypeData:
+        """Return the meeting note's metadata, including its transcript block ID when available."""
+        return self.obj_ref.meeting_notes
+
+    def to_markdown(self) -> str:
+        """Return the meeting note title as Markdown."""
+        title = Text.wrap_obj_ref(self.metadata.title)
+        return f'{title or "Meeting notes"}\n'
+
+
 class ChildPage(Block[obj_blocks.ChildPage], wraps=obj_blocks.ChildPage):
     """Child page block.
 

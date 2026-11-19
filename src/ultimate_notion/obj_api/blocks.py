@@ -17,6 +17,7 @@ values from default/unset values.
 from __future__ import annotations
 
 from abc import ABC
+from datetime import datetime
 from typing import Annotated, Any, Generic, Self
 from uuid import UUID
 
@@ -568,6 +569,54 @@ class Audio(FileBase, type='audio'):
     """An audio block in Notion."""
 
     audio: SerializeAsAny[FileObject] | None = None
+
+
+class MeetingNotesChildren(GenericObject):
+    """IDs of the generated sections of an AI meeting note."""
+
+    summary_block_id: UUID | None = None
+    notes_block_id: UUID | None = None
+    transcript_block_id: UUID | None = None
+
+
+class MeetingNotesRecording(GenericObject):
+    """Time range of a meeting note recording."""
+
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+
+
+class MeetingNotesCalendarEvent(GenericObject):
+    """Calendar event associated with a meeting note."""
+
+    event_id: str | None = None
+    attendees: list[UUID] | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+
+
+class MeetingNotesTypeData(GenericObject):
+    """Metadata returned for an AI meeting note block."""
+
+    is_full_page: bool
+    title: list[SerializeAsAny[RichTextBaseObject]] | None = None
+    status: str | None = None
+    children: MeetingNotesChildren | None = None
+    calendar_event: MeetingNotesCalendarEvent | None = None
+    recording: MeetingNotesRecording | None = None
+
+
+class MeetingNotes(Block[MeetingNotesTypeData], type='meeting_notes'):
+    """An AI meeting note block."""
+
+    meeting_notes: MeetingNotesTypeData
+
+
+class MeetingNotesQueryResult(GenericObject):
+    """Results from Notion's meeting notes query endpoint."""
+
+    results: list[MeetingNotes]
+    has_more: bool
 
 
 class ChildPageTypeData(GenericObject):
