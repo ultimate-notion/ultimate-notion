@@ -472,7 +472,7 @@ class Bootstrap:
         self.ensure_embed_page(task_ds)
         self.ensure_comments_page()
 
-    def ensure_embed_page(self, task_ds: uno.DataSource) -> None:
+    def ensure_embed_page(self, task_ds: uno.DataSource) -> uno.Page:
         page = self.create_page(
             'Embed/Inline/Linked & Unfurl',
             blocks=[
@@ -484,12 +484,13 @@ class Bootstrap:
         children = page.children
         if children and isinstance(children[-1], ChildDatabase):
             typer.echo('embed page already ends with a linked database view')
-            return
+            return page
         if any(isinstance(child, ChildDatabase) for child in children):
             msg = 'Move the existing linked database view to the end of the Embed/Inline/Linked & Unfurl page.'
             raise RuntimeError(msg)
         self.notion.create_view(page, name='Tasks', view_type=uno.ViewType.TABLE, data_source=task_ds)
         typer.echo('created linked Task DB view on the embed page')
+        return page
 
     def ensure_comments_page(self) -> None:
         """Create the `Comments` page and seed its 5 page-level comments (`test_list_comments`).

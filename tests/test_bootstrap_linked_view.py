@@ -11,6 +11,8 @@ import httpx
 import pytest
 
 from scripts.bootstrap_test_workspace import Bootstrap, RetryingClient
+from tests._views_vcr import normalize_test_root_response
+from tests.conftest import TESTS_PAGE
 from ultimate_notion import DataSource, Page, Session
 from ultimate_notion.obj_api import NOTION_API_VERSION
 from ultimate_notion.obj_api import blocks as obj_blocks
@@ -87,3 +89,28 @@ def test_bootstrap_embed_page_reuses_linked_view(*, already_linked: bool) -> Non
             }
         ]
     )
+
+
+@pytest.mark.vcr(before_record_response=normalize_test_root_response, decode_compressed_response=True)
+def test_bootstrap_linked_view_round_trip() -> None:
+    with Session() as notion:
+        bootstrap = Bootstrap(notion, TESTS_PAGE)
+        workspace = notion.create_page(bootstrap.root, title='Linked view bootstrap test')
+        bootstrap.root = workspace
+        try:
+            task_ds = notion.create_ds(workspace, title='Bootstrap test tasks')
+            # Restrict the fixture lookup to this run's page. The normal bootstrap
+            # searches by title across the workspace, where the shared fixture may exist.
+            with patch.object(bootstrap, 'find_page', return_value=None) as find_page:
+                page = bootstrap.ensure_embed_page(task_ds)
+                assert len(page.children) == 4
+                assert page.to_markdown().rstrip().endswith('<kbd>↗️ Linked database (unsupported)</kbd>')
+                linked_db_id = page.children[-1].id
+
+                page.reload()
+                find_page.return_value = page
+                repeated = bootstrap.ensure_embed_page(task_ds)
+                assert len(repeated.children) == 4
+                assert repeated.children[-1].id == linked_db_id
+        finally:
+            workspace.delete()
