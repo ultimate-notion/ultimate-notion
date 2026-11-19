@@ -1,48 +1,37 @@
 from __future__ import annotations
 
-from uuid import uuid4
-
-import httpx
-import notion_client
 import pytest
 
-from ultimate_notion.blocks import ChildPage
+from tests.conftest import WIKI_DB
+from ultimate_notion.blocks import ChildDatabase, ChildPage
+from ultimate_notion.obj_api.blocks import ChildDatabase as ChildDatabaseObject
+from ultimate_notion.page import Page
 from ultimate_notion.session import Session
 
 
 @pytest.fixture(autouse=True)
 def notion_cleanups() -> None:
-    """Disable workspace cleanup for the mock API test."""
+    """Use the test's own cleanup for the temporary wiki page."""
 
 
-def test_wiki_child_block_parent_and_ancestors() -> None:
-    wiki_id, child_id = str(uuid4()), str(uuid4())
-    responses = {
-        f'/v1/databases/{wiki_id}': {
-            'object': 'database',
-            'id': wiki_id,
-            'parent': {'type': 'workspace', 'workspace': True},
-            'title': [],
-            'database_type': 'wiki',
-            'show_data_source_title': True,
-        },
-        f'/v1/blocks/{child_id}': {
-            'object': 'block',
-            'id': child_id,
-            'parent': {'type': 'database_id', 'database_id': wiki_id},
-            'type': 'child_page',
-            'child_page': {'title': 'Wiki child'},
-        },
-    }
+@pytest.mark.vcr()
+def test_wiki_child_block_parent_and_ancestors(notion: Session, root_page: Page) -> None:
+    wiki_block = next(
+        ChildDatabase.wrap_obj_ref(block)
+        for block in notion.api.blocks.children.list(root_page.id)
+        if isinstance(block, ChildDatabaseObject) and block.child_database.title == WIKI_DB
+    )
+    wiki = notion.get_db(wiki_block.id)
+    assert wiki.obj_ref.database_type == 'wiki'
 
-    def handle(request: httpx.Request) -> httpx.Response:
-        assert request.method == 'GET'
-        return httpx.Response(200, json=responses[request.url.path])
+    page = notion.create_page(wiki.data_sources.item(), title='Temporary wiki ancestry test')
+    try:
+        assert page.parent is wiki
+        assert page.ancestors == (root_page, wiki)
 
-    client = notion_client.Client(auth='test', client=httpx.Client(transport=httpx.MockTransport(handle)))
-    with Session(client=client) as session:
-        child = session.get_block(child_id)
+        child = notion.get_block(page.id, use_cache=False)
         assert isinstance(child, ChildPage)
-        wiki = child.parent
-        assert wiki is session.get_db(wiki_id)
-        assert child.ancestors == (wiki,)
+        assert child.parent is wiki
+        assert child.ancestors == (root_page, wiki)
+    finally:
+        assert page.delete().is_deleted
