@@ -33,6 +33,26 @@ In a Jupyter notebook, you would see
 
 ![Getting started page](../assets/images/notion-getting-started-page.png){: style="width:600px; display:block; margin-left:auto; margin-right:auto;"}
 
+## Waiting for a page template
+
+When you pass a template to `notion.create_page(..., template=...)`, Notion
+returns the new page while it fills in the template in the background. Before
+running work that depends on the template, poll `page.reload().children` until
+the expected blocks are present. For example, check for a heading near the end
+of the template. Reloading clears the cached child list so each check reads
+fresh blocks.
+
+If you consume Notion webhooks, `page.created` usually arrives within a few
+seconds and the page may still be blank. Check the blocks when it arrives.
+If the expected content is missing, check again when `page.content_updated`
+arrives for that page. A later content update can also arrive after you have
+already processed the page, so track which page IDs you have handled.
+
+Set a timeout and inspect the page if it expires. A failed template job can
+leave a blank or partially populated page. Reapplying the template automatically
+can duplicate content. See [Notion's template readiness guide] for timeout and
+partial-application behavior.
+
 ## Properties of a page
 
 The properties of a page can be accessed with the `props` attribute of each page object.
@@ -149,6 +169,7 @@ task.props.status = 'Blocked'
     the future to make the experience more user-friendly.
 
 [Page object]: ../../reference/ultimate_notion/page/#ultimate_notion.page.Page
+[Notion's template readiness guide]: https://developers.notion.com/guides/data-apis/creating-pages-from-templates#step-3-confirm-page-contents-are-ready
 [Task List example]: ../../examples/simple_taskdb/
 [View]: ../../reference/ultimate_notion/view/#ultimate_notion.view.View
 [SList]: ../../reference/ultimate_notion/utils/#ultimate_notion.utils.SList
