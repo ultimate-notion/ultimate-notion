@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- New: Retrieve Notion-generated Markdown and truncation metadata for a saved block with
+  `Block.get_markdown()`, issue #412.
+
 - New: Move an existing page under another page or data source with `Page.move()`, issue #403.
 - New: Choose the start or end when creating pages, inserting blocks, or inserting Markdown
   with `InsertPosition`, issue #403.

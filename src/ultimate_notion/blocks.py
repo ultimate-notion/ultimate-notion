@@ -391,6 +391,11 @@ class Block(CommentMixin[B_co], ABC, wraps=obj_blocks.Block):
         self.obj_ref = session.api.blocks.retrieve(self.id)
         return self
 
+    def get_markdown(self) -> objs.PageMarkdown:
+        """Read this saved block from Notion as Markdown, including truncation metadata."""
+        block_id = self.id
+        return get_active_session().api.pages.retrieve_markdown(block_id)
+
     def _update_in_notion(self, *, exclude_attrs: Sequence[str] | None = None) -> None:
         """Update the locally modified block on Notion."""
         if self.in_notion:

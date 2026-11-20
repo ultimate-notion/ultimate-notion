@@ -126,6 +126,10 @@ includes `markdown`, `truncated`, and `unknown_block_ids`. Use
 updated Markdown and any warnings. Notion protects child pages and databases
 during replacement.
 
+Use `block.get_markdown()` for Notion-generated Markdown from a saved block. It
+returns the same response type as `page.get_markdown()`. The `to_markdown()`
+methods on pages and blocks render Markdown using Ultimate Notion's formatter.
+
 To delete a block from a page, we can just call `.delete()` on it:
 
 ```python
