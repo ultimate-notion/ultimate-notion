@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## Version 0.11.0, 2026-11-20
+
 - New: Retrieve Notion-generated Markdown and truncation metadata for a saved block with
   `Block.get_markdown()`, issue #412.
 
@@ -19,6 +21,23 @@
 - New: Create databases with icons and update `Database.icon`/`DataSource.icon`, including native
   Notion icons constructed with `BuiltInIcon(name, color=...)`. Database icons cannot be removed
   because Notion rejects `icon=null`, issue #434.
+
+- New: List saved database views and query their results through the Notion Views API, #495 and #504.
+- New: Read and replace pages using the native Markdown API, #488.
+- New: Create Markdown comments and edit or delete existing comments, #484.
+- New: List data source templates and apply them when creating pages, #485.
+- New: Query and read AI meeting notes, #486.
+- New: Serialize and restore block trees for offline round trips, #487.
+- New: List workspace custom emoji and use Custom Agent references in People properties and
+  mentions, #483 and #500.
+- New: Configure Status options and groups, and write wiki page verification, #505 and #501.
+- New: Filter data source queries using multiple values and relative date conditions, #499.
+- New: Embed HTML uploaded to Notion and configure SDK retry behavior, #472 and #442.
+- Fix: Return available results when Notion caps a query, with completeness metadata and a warning, #469.
+- Fix: Preserve opaque pagination cursors and accept current `app.notion.com` URLs, #468 and #467.
+- Fix: Handle unsupported formula and rollup results, preserve generic upload MIME types,
+  and support read-back of iconless callouts, #470, #471 and #492.
+- Fix: Resolve the parent of a wiki database, #478.
 
 ## Version 0.10.1, 2026-06-28
 
