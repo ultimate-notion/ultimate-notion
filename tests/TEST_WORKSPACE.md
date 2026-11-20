@@ -26,7 +26,6 @@ content finished by hand, because each needs something the API cannot create:
 | --- | --- |
 | `Markdown Test` | Body is built automatically; add the final two **unsupported blocks** (a Button and an AI block) the API cannot create. See [§5](#5-markdown-test-page). |
 | `Comments` | Page comments are seeded; add **2 inline discussions** to the heading (first = `Infinite discussion!`). The API cannot *start* inline discussions. See [§7](#7-comments-page-inline-discussions). |
-| `Markdown Text Test` | Needs 12 paragraphs of intricately-styled **rich text** (a hand-crafted fixture). See [§8](#8-markdown-text-test-page-rich-text). |
 
 ---
 
@@ -154,7 +153,8 @@ record until the formula columns are recreated in the UI:
 The bootstrap script verifies this automatically: after seeding it reads the `String`
 formula of row `Item 1` and prints either `Formula DB: formula columns OK` or
 `Formula DB: manual setup required …`. The latter (`String … reads None`) is exactly the
-symptom of the plain-column mistake above. A green line confirms the manual step worked.
+symptom of the plain-column mistake above. The bootstrap checks the computed value.
+`test_query_formula` exercises the actual filters during recording.
 
 ---
 
@@ -206,13 +206,10 @@ start *page* discussions, but it cannot **start an inline discussion**.
 
 ## 8. `Markdown Text Test` page rich text
 
-The bootstrap creates this page with a placeholder paragraph.
-`tests/test_markdown.py::test_rich_text_md` expects **12 paragraphs** of intricately-styled
-rich text — nested bold/italic/strikethrough/underline, inline `code` and `$equations$`,
-a person and a self page-mention, and mid-word links. The exact target for each paragraph is
-the `correct_mds` list in `tests/test_markdown.py`; build the 12 paragraphs (e.g. in
-StackEdit, then paste) so each renders to its corresponding entry. This is a hand-crafted
-fixture: the styling combinations are not reliably reproducible through the API.
+The bootstrap builds all 12 styled paragraphs for this page, including inline code
+and equations, person and page mentions, and mid-word links.
+`tests/test_markdown.py::test_rich_text_md` verifies the rendered Markdown against
+`correct_mds`.
 
 ---
 
@@ -229,15 +226,6 @@ same root page. Create any missing API-creatable objects with:
 NOTION_TOKEN=ntn_... UNO_TEST_ROOT_PAGE='My Test Root' hatch run bootstrap-test-workspace
 ```
 
-The script is idempotent and leaves existing objects unchanged. It also builds the
-intricately-styled rich text on the `Markdown Text Test` page that
-`tests/test_markdown.py::test_rich_text_md` expects (nested bold/italic/strikethrough/
-underline, inline code and equations, a person and a self page-mention, mid-word links).
-This rich text *is* reproducible through the API, so it is no longer a manual step. A few
-content-sensitive tests still require manual workspace content the API cannot create —
-notably the `Comments` page's **inline discussions** (the API cannot start an inline
-discussion) and the `Formula DB` formula columns (§4).
-
 After creating objects, the script runs an **audit**: it lists every page and database
 the integration can see, reports any **missing** expected object, and lists **stray**
 objects that are not part of the expected set (`EXPECTED_PAGE_TITLES` /
@@ -252,5 +240,14 @@ move accessible stray pages to trash:
 NOTION_TOKEN=ntn_... hatch run bootstrap-test-workspace --prune
 ```
 
-Once every named object exists under your shared root page, re-record with
-`hatch run vcr-rewrite`.
+Once the fixtures are ready, run the full recording in one invocation against the
+disposable test workspace. The tests share fixtures and clean up test content, so
+run only one live suite against the workspace at a time.
+
+```console
+hatch run vcr-rewrite
+hatch run vcr-only
+```
+
+The Google Tasks test skips during live recording if its credentials are absent.
+Keep its existing cassette for offline replay.
