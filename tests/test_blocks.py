@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from textwrap import dedent
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -849,6 +849,18 @@ def test_serialize_block_tree_round_trip() -> None:
     assert reconstructed == parent
     assert serialize_block_with_children(reconstructed) == payload
     assert parent.obj_ref.value.children == []
+
+
+def test_serialize_saved_block_without_children_offline() -> None:
+    paragraph = uno.Paragraph('Saved paragraph')
+    obj_ref = paragraph.obj_ref.model_copy(
+        update={'id': UUID('6ffefbb2-156b-4465-91e0-09a7fc99d68f'), 'has_children': False},
+    )
+    saved = uno.Block.wrap_obj_ref(obj_ref)
+
+    assert saved.in_notion
+    assert not saved.has_children
+    assert serialize_block_with_children(saved) == serialize_block_with_children(paragraph)
 
 
 def test_serialize_block_tree_rejects_children_without_a_payload_field() -> None:
