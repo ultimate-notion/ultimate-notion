@@ -874,8 +874,18 @@ def test_serialize_strips_meta_from_nested_children() -> None:
     data = top.obj_ref.serialize_for_api()
     meta_fields = ('has_children', 'in_trash', 'archived', 'is_archived')
 
-    child = data['callout']['children'][0]
-    grandchild = child['callout']['children'][0]
+    outer_callout = data['callout']
+    assert isinstance(outer_callout, dict)
+    children = outer_callout['children']
+    assert isinstance(children, list)
+    child = children[0]
+    assert isinstance(child, dict)
+    inner_callout = child['callout']
+    assert isinstance(inner_callout, dict)
+    grandchildren = inner_callout['children']
+    assert isinstance(grandchildren, list)
+    grandchild = grandchildren[0]
+    assert isinstance(grandchild, dict)
     for level in (data, child, grandchild):
         assert not any(field in level for field in meta_fields)
 
@@ -1097,7 +1107,9 @@ def test_chunk_deeply_nested_wrapped_blocks() -> None:
         block_type = block.obj_ref.type
         assert block_type is not None
         if isinstance(block, ChildrenMixin) and block.has_children:
-            data[block_type]['children'] = [serialize(child) for child in block.blocks]
+            type_data = data[block_type]
+            assert isinstance(type_data, dict)
+            type_data['children'] = [serialize(child) for child in block.blocks]
         return data
 
     def depth(block_dict: dict[str, Any]) -> int:

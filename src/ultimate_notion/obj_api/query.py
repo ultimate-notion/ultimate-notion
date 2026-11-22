@@ -303,7 +303,8 @@ class QueryBuilder(Generic[T, Q], ABC):
 
     def _execute(self, **nc_params: int | str) -> tuple[Iterator[T], EndpointIterator[T]]:
         query = self.query.serialize_for_api()
-        query |= self.params | nc_params
+        query.update(self.params)
+        query.update(nc_params)
         iterator = EndpointIterator[T](self.endpoint)
         return iterator(**query), iterator
 
