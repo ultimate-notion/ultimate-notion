@@ -76,13 +76,13 @@ class DataSource(DataObject, MentionMixin, object='data_source'):
     databases are containers that can hold multiple data sources.
     """
 
-    title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    title: list[RichTextBaseObject] | UnsetType = Unset
     url: str | UnsetType = Unset
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
     properties: dict[str, SerializeAsAny[Property]] = Field(default_factory=dict)
-    description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    description: list[RichTextBaseObject] | UnsetType = Unset
     database_parent: SerializeAsAny[ParentRef] | UnsetType = Unset
     database_type: str | UnsetType | None = Unset
     is_inline: bool = False  # the 2025-09-03 API still returns this on data-source objects
@@ -114,12 +114,12 @@ class Database(DataObject, MentionMixin, object='database'):
     The actual schema/properties are now on the DataSource objects.
     """
 
-    title: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    title: list[RichTextBaseObject] | UnsetType = Unset
     url: str | UnsetType = Unset
     public_url: str | None = None
     icon: SerializeAsAny[FileObject] | EmojiObject | CustomEmojiObject | BuiltInIconObject | None = None
     cover: SerializeAsAny[FileObject] | None = None
-    description: list[SerializeAsAny[RichTextBaseObject]] | UnsetType = Unset
+    description: list[RichTextBaseObject] | UnsetType = Unset
     is_inline: bool = False
     is_locked: bool | UnsetType = Unset
     database_type: str | UnsetType | None = Unset
@@ -265,9 +265,7 @@ def normalize_text_objs(rt_objs: list[RichTextBaseObject]) -> list[RichTextBaseO
 class TextBlockTypeData(GenericObject):
     """Type data for `TextBlock`."""
 
-    rich_text: Annotated[list[SerializeAsAny[RichTextBaseObject]], AfterValidator(normalize_text_objs)] = Field(
-        default_factory=list
-    )
+    rich_text: Annotated[list[RichTextBaseObject], AfterValidator(normalize_text_objs)] = Field(default_factory=list)
 
 
 # ToDo: Use new syntax when requires-python >= 3.12
@@ -351,7 +349,7 @@ class Quote(ColoredTextBlock[QuoteTypeData], type='quote'):
 class CaptionMixin(GenericObject, ABC):
     """Mixin for blocks having a caption."""
 
-    caption: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
+    caption: list[RichTextBaseObject] = Field(default_factory=list)
 
 
 class CodeTypeData(TextBlockTypeData, CaptionMixin):
@@ -599,7 +597,7 @@ class MeetingNotesTypeData(GenericObject):
     """Metadata returned for an AI meeting note block."""
 
     is_full_page: bool
-    title: list[SerializeAsAny[RichTextBaseObject]] | None = None
+    title: list[RichTextBaseObject] | None = None
     status: str | None = None
     children: MeetingNotesChildren | None = None
     calendar_event: MeetingNotesCalendarEvent | None = None
@@ -712,7 +710,7 @@ class Tab(Block[TabTypeData], type='tab'):
 class TableRowTypeData(GenericObject):
     """Type data for `TableRow` block."""
 
-    cells: list[list[SerializeAsAny[RichTextBaseObject]]] = Field(default_factory=list)
+    cells: list[list[RichTextBaseObject]] = Field(default_factory=list)
 
 
 class TableRow(Block[TableRowTypeData], type='table_row'):

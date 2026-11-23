@@ -84,13 +84,13 @@ class PropertyValue(TypedObject[Any], Generic[PID_co], polymorphic_base=True):
 class Title(PropertyValue[PID_co], type='title'):
     """Notion title type."""
 
-    title: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
+    title: list[RichTextBaseObject] = Field(default_factory=list)
 
 
 class RichText(PropertyValue[PID_co], type='rich_text'):
     """Notion rich text type."""
 
-    rich_text: list[SerializeAsAny[RichTextBaseObject]] = Field(default_factory=list)
+    rich_text: list[RichTextBaseObject] = Field(default_factory=list)
 
 
 class Number(PropertyValue[PID_co], type='number'):
@@ -419,7 +419,7 @@ class TitlePropertyItem(PropertyItem, type='title'):
 
     # According to the Notion API docs, this should be a list of rich text objects.
     # Nevertheless, the Notion API returns a single rich text object
-    title: SerializeAsAny[RichTextBaseObject]
+    title: RichTextBaseObject
 
 
 class RichTextPropertyItem(PropertyItem, type='rich_text'):
@@ -427,7 +427,7 @@ class RichTextPropertyItem(PropertyItem, type='rich_text'):
 
     # According to the Notion API docs, this should be a list of rich text objects.
     # Nevertheless, the Notion API returns a single rich text object
-    rich_text: SerializeAsAny[RichTextBaseObject]
+    rich_text: RichTextBaseObject
 
 
 class NumberPropertyItem(PropertyItem, Number[str], type='number'):

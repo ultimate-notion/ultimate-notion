@@ -10,7 +10,7 @@ from ultimate_notion.emoji import BuiltInIcon
 from ultimate_notion.obj_api.blocks import Database, Page, Paragraph
 from ultimate_notion.obj_api.core import ObjectRef, UniqueObject, Unset, UserRef, extract_id
 from ultimate_notion.obj_api.endpoints import DatabasesEndpoint
-from ultimate_notion.obj_api.objects import Bot, BuiltInIconObject, Person, User
+from ultimate_notion.obj_api.objects import Bot, BuiltInIconObject, MentionUser, Person, SelectOption, TextObject, User
 from ultimate_notion.obj_api.props import Number, NumberPropertyItem, PropertyItem
 
 
@@ -175,6 +175,15 @@ def test_database_icon_request_serialization() -> None:
         'icon': {'type': 'icon', 'icon': {'name': 'table', 'color': 'blue'}}
     }
     assert DatabasesEndpoint._build_request() == {}
+
+
+def test_select_option_description_serializes_rich_text_subclasses() -> None:
+    user_id = UUID('59833787-2cf9-4fdf-8782-e53db20768a5')
+    text = TextObject.build('Hello')
+    mention = MentionUser.build_mention_from(UserRef(id=user_id))
+    option = SelectOption(name='Example', description=[text, mention])
+
+    assert option.serialize_for_api()['description'] == [text.serialize_for_api(), mention.serialize_for_api()]
 
 
 def test_block_serialization_omits_read_only_archive_flags() -> None:
