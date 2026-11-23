@@ -29,7 +29,7 @@ from ultimate_notion.obj_api.objects import (
     SelectOption,
     User,
 )
-from ultimate_notion.utils import DateTimeOrRange
+from ultimate_notion.utils import DateTimeOrRange, JSONValue
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Page
@@ -70,10 +70,14 @@ class PropertyValue(TypedObject[Any], Generic[PID_co], polymorphic_base=True):
             raise TypeError(msg)
         return obj
 
-    def serialize_for_api(self) -> dict[str, Any]:
+    def serialize_for_api(self) -> dict[str, JSONValue]:
         """Serialize the object for sending it to the Notion API."""
         dump_dct = super().serialize_for_api()
-        dump_dct.setdefault(dump_dct['type'], None)
+        prop_type = dump_dct['type']
+        if not isinstance(prop_type, str):
+            msg = f'Expected a string for the serialized property type, got {type(prop_type).__name__}.'
+            raise TypeError(msg)
+        dump_dct.setdefault(prop_type, None)
         return dump_dct
 
 
@@ -336,14 +340,14 @@ class Verification(PropertyValue[PID_co], type='verification'):
 
     verification: TypeData | None = Field(default_factory=TypeData)
 
-    def serialize_for_api(self) -> dict[str, Any]:
+    def serialize_for_api(self) -> dict[str, JSONValue]:
         verification = self.verification
         state = VState.UNVERIFIED if verification is None else verification.state
         if state is VState.EXPIRED:
             msg = 'Notion assigns the expired verification state. Write verified or unverified.'
             raise ValueError(msg)
 
-        data: dict[str, Any] = {'state': state.value}
+        data: dict[str, JSONValue] = {'state': state.value}
         if state is VState.VERIFIED and verification is not None and (period := verification.date) is not None:
             if isinstance(period, dt.datetime):
                 period = VerificationPeriod(start=period)

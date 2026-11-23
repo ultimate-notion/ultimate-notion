@@ -27,7 +27,11 @@ if TYPE_CHECKING:
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-def serialize_block_with_children(block: Block) -> dict[str, Any]:
+JSONValue: TypeAlias = str | int | float | bool | list['JSONValue'] | dict[str, 'JSONValue'] | None
+"""A value produced when serializing a Notion object for the API."""
+
+
+def serialize_block_with_children(block: Block) -> dict[str, JSONValue]:
     """Serialize a writable block and its nested blocks for offline reconstruction.
 
     This can fetch uncached children when a saved block reports that it has children. Child pages and
@@ -45,7 +49,12 @@ def serialize_block_with_children(block: Block) -> dict[str, Any]:
         if not isinstance(block.obj_ref.value, WithChildren):
             msg = f'{type(block).__name__} cannot carry its children in a serialized block payload.'
             raise ValueError(msg)
-        payload[block.obj_ref._type_name]['children'] = [serialize_block_with_children(child) for child in children]
+        block_type = block.obj_ref._type_name
+        type_data = payload[block_type]
+        if not isinstance(type_data, dict):
+            msg = f'Expected a JSON object for {block_type!r}, got {type(type_data).__name__}.'
+            raise TypeError(msg)
+        type_data['children'] = [serialize_block_with_children(child) for child in children]
     return payload
 
 

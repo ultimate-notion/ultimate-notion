@@ -35,7 +35,7 @@ from pydantic import (
 from typing_extensions import TypeIs, TypeVar
 
 from ultimate_notion.obj_api.enums import Color
-from ultimate_notion.utils import is_stable_release, pydantic_apply
+from ultimate_notion.utils import JSONValue, is_stable_release, pydantic_apply
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.objects import User
@@ -170,7 +170,7 @@ class GenericObject(BaseModel):
             _logger.debug('updating object data: %s => %s', k, v)
             setattr(self, k, getattr(new_obj, k))
 
-    def serialize_for_api(self) -> dict[str, Any]:
+    def serialize_for_api(self) -> dict[str, JSONValue]:
         """Serialize the object for sending it to the Notion API."""
 
         def remove_unset(key: str, value: Any) -> Any:
@@ -179,7 +179,7 @@ class GenericObject(BaseModel):
             return value
 
         filtered_obj = pydantic_apply(self, remove_unset)
-        # Notion API doesn't like "null" values
+        # Notion API doesn't like "null" values. JSON mode returns only JSON values.
         return filtered_obj.model_dump(mode='json', exclude_none=True, by_alias=True)
 
     @classmethod

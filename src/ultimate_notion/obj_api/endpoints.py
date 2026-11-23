@@ -250,14 +250,25 @@ class BlocksEndpoint(Endpoint):
 
         if isinstance(block, Embed):
             # Embed updates reject the source discriminator accepted during creation.
-            params['embed'].pop('type', None)
+            embed_data = params['embed']
+            if not isinstance(embed_data, dict):
+                msg = f'Expected a JSON object for embed, got {type(embed_data).__name__}.'
+                raise TypeError(msg)
+            embed_data.pop('type', None)
 
         if isinstance(block, FileBase):
             # The Notiopn API does not support setting a new typed FileObject, e.g. `external` or `file`
             # It even must be removed from the params
             block_type = block._type_name
-            dtype = params[block_type].pop('type')
-            del params[block_type][dtype]
+            file_data = params[block_type]
+            if not isinstance(file_data, dict):
+                msg = f'Expected a JSON object for {block_type!r}, got {type(file_data).__name__}.'
+                raise TypeError(msg)
+            dtype = file_data.pop('type')
+            if not isinstance(dtype, str):
+                msg = f'Expected a string for the serialized file type, got {type(dtype).__name__}.'
+                raise TypeError(msg)
+            del file_data[dtype]
 
         data = self._as_dict(self.raw_api.update(block_id.hex, **params))
         block.update(**data)

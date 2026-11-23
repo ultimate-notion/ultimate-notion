@@ -16,7 +16,6 @@ when constructing the property objects. For this reason `name` is `Unset` by def
 
 from __future__ import annotations
 
-from typing import Any
 from uuid import UUID
 
 from pydantic import Field, field_validator
@@ -25,6 +24,7 @@ from typing_extensions import TypeVar
 from ultimate_notion.obj_api.core import GenericObject, TypedObject, Unset, UnsetType, is_unset
 from ultimate_notion.obj_api.enums import AggFunc, NumberFormat
 from ultimate_notion.obj_api.objects import SelectGroup, SelectOption
+from ultimate_notion.utils import JSONValue
 
 # ToDo: Use new syntax when requires-python >= 3.12
 GO_co = TypeVar('GO_co', bound=GenericObject, covariant=True, default=GenericObject)
@@ -139,11 +139,11 @@ class Status(Property[StatusTypeData], type='status'):
         """Create a Status configuration with the given options and group assignments."""
         return cls.model_construct(status=StatusTypeData(options=options, groups=groups))
 
-    def serialize_for_api(self) -> dict[str, Any]:
+    def serialize_for_api(self) -> dict[str, JSONValue]:
         """Write group assignments on individual options, omitting response-only fields."""
         payload = super().serialize_for_api()
         groups = {option_id: group.name for group in self.status.groups for option_id in group.option_ids}
-        options = []
+        options: list[JSONValue] = []
         for option in self.status.options:
             data = option.serialize_for_api()
             key = option.name if is_unset(option_id := option.id) else option_id

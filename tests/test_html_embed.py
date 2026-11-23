@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from io import BytesIO
-from typing import Any
+from typing import Any, assert_type
 from uuid import UUID
 
 import httpx
@@ -17,6 +17,7 @@ from ultimate_notion.obj_api.blocks import EmbedTypeData
 from ultimate_notion.obj_api.objects import FileUpload
 from ultimate_notion.page import Page
 from ultimate_notion.session import Session
+from ultimate_notion.utils import JSONValue
 
 UPLOAD_ID = UUID('59833787-2cf9-4fdf-8782-e53db20768a5')
 
@@ -45,7 +46,9 @@ def _uploaded_html() -> UploadedFile:
 def test_uploaded_html_embed_and_source_replacement() -> None:
     uploaded = _uploaded_html()
     embed = Embed(uploaded, caption='Interactive chart')
-    payload = embed.obj_ref.serialize_for_api()['embed']
+    serialized = assert_type(embed.obj_ref.serialize_for_api(), dict[str, JSONValue])
+    payload = serialized['embed']
+    assert isinstance(payload, dict)
     assert payload['type'] == 'file_upload'
     assert payload['file_upload'] == {'id': str(UPLOAD_ID)}
     assert 'url' not in payload
@@ -54,11 +57,14 @@ def test_uploaded_html_embed_and_source_replacement() -> None:
 
     embed.url = 'https://example.com/chart'
     payload = embed.obj_ref.serialize_for_api()['embed']
+    assert isinstance(payload, dict)
     assert payload['url'] == 'https://example.com/chart'
     assert 'file_upload' not in payload
     assert 'type' not in payload
     assert embed.set_file_upload(uploaded) is embed
-    assert embed.obj_ref.serialize_for_api()['embed']['file_upload'] == {'id': str(UPLOAD_ID)}
+    payload = embed.obj_ref.serialize_for_api()['embed']
+    assert isinstance(payload, dict)
+    assert payload['file_upload'] == {'id': str(UPLOAD_ID)}
 
 
 def test_html_embed_append_update_and_refresh() -> None:
