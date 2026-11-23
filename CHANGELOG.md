@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+## Version 0.12.0, 2026-11-23
+
 - Chg: Require Pydantic 2.14 or newer and use its `JsonValue` type for serialized payloads, issue #515.
 
 - Fix: Serialize saved blocks that report no children without requiring a Notion session, issue #511.
+
+- Fix: Preserve text, equation, and mention content in serialized select option descriptions, #517.
 
 ## Version 0.11.0, 2026-11-20
 
