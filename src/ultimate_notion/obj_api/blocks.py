@@ -55,7 +55,7 @@ from ultimate_notion.obj_api.objects import (
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import Property
-from ultimate_notion.utils import JSONValue, _json_object_field
+from ultimate_notion.utils import JSONValue
 
 
 class DataObject(NotionEntity, ABC):
@@ -767,7 +767,10 @@ class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
         model_data = super().serialize_for_api()
         # Everywhere else we have to remove "null" values but `synced_from` is an exception
         if self.synced_block.synced_from is None:
-            synced_block = _json_object_field(model_data, 'synced_block')
+            synced_block = model_data['synced_block']
+            if not isinstance(synced_block, dict):
+                msg = f'Expected a JSON object for synced_block, got {type(synced_block).__name__}.'
+                raise TypeError(msg)
             synced_block['synced_from'] = None
         return model_data
 

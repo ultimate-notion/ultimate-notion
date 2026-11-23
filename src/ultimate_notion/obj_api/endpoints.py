@@ -53,7 +53,6 @@ from ultimate_notion.obj_api.props import PropertyItem, PropertyValue, Title
 from ultimate_notion.obj_api.query import DataSourceQueryBuilder, SearchQueryBuilder
 from ultimate_notion.obj_api.schema import Property, RenameProp
 from ultimate_notion.obj_api.views import View, ViewRef, ViewSettings, ViewType
-from ultimate_notion.utils import _json_object_field
 
 if TYPE_CHECKING:
     from notion_client import Client as NCClient
@@ -251,14 +250,20 @@ class BlocksEndpoint(Endpoint):
 
         if isinstance(block, Embed):
             # Embed updates reject the source discriminator accepted during creation.
-            embed_data = _json_object_field(params, 'embed')
+            embed_data = params['embed']
+            if not isinstance(embed_data, dict):
+                msg = f'Expected a JSON object for embed, got {type(embed_data).__name__}.'
+                raise TypeError(msg)
             embed_data.pop('type', None)
 
         if isinstance(block, FileBase):
             # The Notiopn API does not support setting a new typed FileObject, e.g. `external` or `file`
             # It even must be removed from the params
             block_type = block._type_name
-            file_data = _json_object_field(params, block_type)
+            file_data = params[block_type]
+            if not isinstance(file_data, dict):
+                msg = f'Expected a JSON object for {block_type!r}, got {type(file_data).__name__}.'
+                raise TypeError(msg)
             dtype = file_data.pop('type')
             if not isinstance(dtype, str):
                 msg = f'Expected a string for the serialized file type, got {type(dtype).__name__}.'
