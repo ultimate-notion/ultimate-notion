@@ -16,7 +16,7 @@ import tomli_w
 from numpy.typing import NDArray
 from packaging.version import Version
 from pendulum.tz import local_timezone
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
 
 from ultimate_notion import __version__
 from ultimate_notion.errors import EmptyListError, MultipleItemsError
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-JSONValue: TypeAlias = str | int | float | bool | list['JSONValue'] | dict[str, 'JSONValue'] | None
+JSONValue: TypeAlias = JsonValue
 """A value produced when serializing a Notion object for the API."""
 
 

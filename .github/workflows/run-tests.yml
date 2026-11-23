@@ -106,6 +106,22 @@ jobs:
         parallel: true
         path-to-lcov: coverage.lcov
 
+    - name: Replay tests with the minimum Pydantic version
+      if: runner.os == 'Linux' && (matrix.python-version == '3.11' || matrix.python-version == '3.15')
+      shell: bash
+      run: |
+        test_python="$(hatch env find)/bin/python"
+        minimum="$("$test_python" - <<'PYTHON'
+        import tomllib
+        from pathlib import Path
+
+        dependencies = tomllib.loads(Path("pyproject.toml").read_text())["project"]["dependencies"]
+        print(next(dep.removeprefix("pydantic>=") for dep in dependencies if dep.startswith("pydantic>=")))
+        PYTHON
+        )"
+        "$test_python" -m pip install "pydantic==$minimum"
+        "$test_python" -m pytest --record-mode=none --block-network
+
   finish-coveralls:
       if: ${{ always() }}
       needs: run-github-job-matrix

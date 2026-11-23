@@ -150,8 +150,6 @@ class GenericObject(BaseModel):
         # through generic parameterizations (e.g. `Person(User[PersonTypeData])` losing the
         # `object='user'` default inherited from `User`), whereas declared defaults do.
         # See: https://github.com/ultimate-notion/ultimate-notion/issues/189
-        # Note: on pydantic <=2.6 this surfaces a benign "Field name shadows an attribute in
-        # parent" UserWarning (silenced in pydantic 2.7+); it has no functional impact.
         setattr(cls, name, default)
         # Rebuild model to avoid UserWarning about shadowing an attribute in parent.
         # More details here: https://github.com/pydantic/pydantic/issues/6966
