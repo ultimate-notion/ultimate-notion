@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 import pendulum as pnd
-from pydantic import Field, SerializeAsAny
+from pydantic import ConfigDict, Field, SerializeAsAny
 from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import (
@@ -301,6 +301,8 @@ MAX_TEXT_OBJECT_SIZE = 2_000
 
 class RichTextBaseObject(TypedObject[GenericObject], polymorphic_base=True):
     """Base class for Notion rich text elements."""
+
+    model_config = ConfigDict(polymorphic_serialization=True)
 
     plain_text: str
     href: str | None = None
@@ -668,7 +670,7 @@ class FileObject(TypedObject[GO_co], polymorphic_base=True):
     """
 
     name: str | None = None
-    caption: list[SerializeAsAny[RichTextBaseObject]] | None = None
+    caption: list[RichTextBaseObject] | None = None
 
 
 class HostedTypedata(GenericObject):
