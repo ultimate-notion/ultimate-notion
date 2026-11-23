@@ -30,14 +30,14 @@ T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 def serialize_block_with_children(block: Block) -> dict[str, Any]:
     """Serialize a writable block and its nested blocks for offline reconstruction.
 
-    This can fetch uncached children of a block stored in Notion. Child pages and
+    This can fetch uncached children when a saved block reports that it has children. Child pages and
     data sources are outside the block tree and are skipped. A parent with block
     children needs a payload that can carry them for the round trip.
     """
     from ultimate_notion.blocks import ParentBlock  # noqa: PLC0415
     from ultimate_notion.obj_api.blocks import WithChildren  # noqa: PLC0415
 
-    children = block.blocks if isinstance(block, ParentBlock) else ()
+    children = block.blocks if isinstance(block, ParentBlock) and block.has_children else ()
     payload = block.obj_ref.serialize_for_api()
     for key in ('id', 'parent', 'created_time', 'created_by', 'last_edited_time', 'last_edited_by'):
         payload.pop(key, None)

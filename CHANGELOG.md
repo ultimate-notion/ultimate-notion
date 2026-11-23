@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: Serialize saved blocks that report no children without requiring a Notion session, issue #511.
+
 ## Version 0.11.0, 2026-11-20
 
 - New: Retrieve Notion-generated Markdown and truncation metadata for a saved block with
