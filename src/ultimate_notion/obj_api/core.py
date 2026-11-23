@@ -26,6 +26,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    JsonValue,
     SerializeAsAny,
     ValidationError,
     ValidatorFunctionWrapHandler,
@@ -35,7 +36,7 @@ from pydantic import (
 from typing_extensions import TypeIs, TypeVar
 
 from ultimate_notion.obj_api.enums import Color
-from ultimate_notion.utils import JSONValue, is_stable_release, pydantic_apply
+from ultimate_notion.utils import is_stable_release, pydantic_apply
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.objects import User
@@ -168,7 +169,7 @@ class GenericObject(BaseModel):
             _logger.debug('updating object data: %s => %s', k, v)
             setattr(self, k, getattr(new_obj, k))
 
-    def serialize_for_api(self) -> dict[str, JSONValue]:
+    def serialize_for_api(self) -> dict[str, JsonValue]:
         """Serialize the object for sending it to the Notion API."""
 
         def remove_unset(key: str, value: Any) -> Any:

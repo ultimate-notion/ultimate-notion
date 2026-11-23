@@ -27,11 +27,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-JSONValue: TypeAlias = JsonValue
-"""A value produced when serializing a Notion object for the API."""
-
-
-def serialize_block_with_children(block: Block) -> dict[str, JSONValue]:
+def serialize_block_with_children(block: Block) -> dict[str, JsonValue]:
     """Serialize a writable block and its nested blocks for offline reconstruction.
 
     This can fetch uncached children when a saved block reports that it has children. Child pages and

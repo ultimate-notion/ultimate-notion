@@ -21,7 +21,7 @@ from datetime import datetime
 from typing import Annotated, Any, Generic, Self
 from uuid import UUID
 
-from pydantic import AfterValidator, Field, SerializeAsAny, model_validator
+from pydantic import AfterValidator, Field, JsonValue, SerializeAsAny, model_validator
 from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import (
@@ -55,7 +55,6 @@ from ultimate_notion.obj_api.objects import (
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import Property
-from ultimate_notion.utils import JSONValue
 
 
 class DataObject(NotionEntity, ABC):
@@ -184,7 +183,7 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
         # ignore meta fields, e.g. id, created_time, etc. for equality, only use content
         return self.type == other.type and self.value == other.value
 
-    def serialize_for_api(self) -> dict[str, JSONValue]:
+    def serialize_for_api(self) -> dict[str, JsonValue]:
         """Serialize the block for sending it to the Notion API."""
         data = super().serialize_for_api()
         _strip_block_meta_fields(data)
@@ -196,7 +195,7 @@ class Block(TypedObject[GO_co], DataObject, object='block', polymorphic_base=Tru
 _API_EXCLUDED_BLOCK_FIELDS = ('has_children', 'in_trash', 'archived', 'is_archived')
 
 
-def _strip_block_meta_fields(data: JSONValue) -> None:
+def _strip_block_meta_fields(data: JsonValue) -> None:
     """Recursively remove read-only block meta fields from a serialized block tree.
 
     Nested children are serialized via pydantic's recursive `model_dump` rather than by
@@ -762,7 +761,7 @@ class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
 
     synced_block: SyncedBlockTypeData = Field(default_factory=SyncedBlockTypeData)
 
-    def serialize_for_api(self) -> dict[str, JSONValue]:
+    def serialize_for_api(self) -> dict[str, JsonValue]:
         """Serialize the object for sending it to the Notion API."""
         model_data = super().serialize_for_api()
         # Everywhere else we have to remove "null" values but `synced_from` is an exception

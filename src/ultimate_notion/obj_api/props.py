@@ -17,7 +17,7 @@ from abc import ABC
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Generic, NotRequired, Self, TypedDict, cast
 
-from pydantic import Field, SerializeAsAny, field_validator, model_serializer
+from pydantic import Field, JsonValue, SerializeAsAny, field_validator, model_serializer
 from typing_extensions import TypeVar
 
 from ultimate_notion.obj_api.core import GenericObject, NotionObject, ObjectRef, TypedObject, Unset, UnsetType, UserRef
@@ -29,7 +29,7 @@ from ultimate_notion.obj_api.objects import (
     SelectOption,
     User,
 )
-from ultimate_notion.utils import DateTimeOrRange, JSONValue
+from ultimate_notion.utils import DateTimeOrRange
 
 if TYPE_CHECKING:
     from ultimate_notion.obj_api.blocks import Page
@@ -70,7 +70,7 @@ class PropertyValue(TypedObject[Any], Generic[PID_co], polymorphic_base=True):
             raise TypeError(msg)
         return obj
 
-    def serialize_for_api(self) -> dict[str, JSONValue]:
+    def serialize_for_api(self) -> dict[str, JsonValue]:
         """Serialize the object for sending it to the Notion API."""
         dump_dct = super().serialize_for_api()
         prop_type = dump_dct['type']
@@ -340,14 +340,14 @@ class Verification(PropertyValue[PID_co], type='verification'):
 
     verification: TypeData | None = Field(default_factory=TypeData)
 
-    def serialize_for_api(self) -> dict[str, JSONValue]:
+    def serialize_for_api(self) -> dict[str, JsonValue]:
         verification = self.verification
         state = VState.UNVERIFIED if verification is None else verification.state
         if state is VState.EXPIRED:
             msg = 'Notion assigns the expired verification state. Write verified or unverified.'
             raise ValueError(msg)
 
-        data: dict[str, JSONValue] = {'state': state.value}
+        data: dict[str, JsonValue] = {'state': state.value}
         if state is VState.VERIFIED and verification is not None and (period := verification.date) is not None:
             if isinstance(period, dt.datetime):
                 period = VerificationPeriod(start=period)
