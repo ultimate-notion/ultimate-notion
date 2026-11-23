@@ -179,8 +179,8 @@ class GenericObject(BaseModel):
             return value
 
         filtered_obj = pydantic_apply(self, remove_unset)
-        # Notion API doesn't like "null" values. Pydantic's return type also covers Python mode.
-        return cast(dict[str, JSONValue], filtered_obj.model_dump(mode='json', exclude_none=True, by_alias=True))
+        # Notion API doesn't like "null" values. JSON mode returns only JSON values.
+        return filtered_obj.model_dump(mode='json', exclude_none=True, by_alias=True)
 
     @classmethod
     def build(cls, *args: Any, **kwargs: Any) -> Self:

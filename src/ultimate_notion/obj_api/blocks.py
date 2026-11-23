@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from abc import ABC
 from datetime import datetime
-from typing import Annotated, Any, Generic, Self, cast
+from typing import Annotated, Any, Generic, Self
 from uuid import UUID
 
 from pydantic import AfterValidator, Field, SerializeAsAny, model_validator
@@ -55,7 +55,7 @@ from ultimate_notion.obj_api.objects import (
 )
 from ultimate_notion.obj_api.props import PropertyValue, Title
 from ultimate_notion.obj_api.schema import Property
-from ultimate_notion.utils import JSONValue
+from ultimate_notion.utils import JSONValue, _json_object_field
 
 
 class DataObject(NotionEntity, ABC):
@@ -767,7 +767,7 @@ class SyncedBlock(Block[SyncedBlockTypeData], type='synced_block'):
         model_data = super().serialize_for_api()
         # Everywhere else we have to remove "null" values but `synced_from` is an exception
         if self.synced_block.synced_from is None:
-            synced_block = cast(dict[str, JSONValue], model_data['synced_block'])
+            synced_block = _json_object_field(model_data, 'synced_block')
             synced_block['synced_from'] = None
         return model_data
 

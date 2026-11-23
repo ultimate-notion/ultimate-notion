@@ -8,7 +8,7 @@ import re
 from collections.abc import Callable, Generator, Mapping, Sequence
 from contextlib import contextmanager
 from hashlib import sha256
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 import numpy as np
 import pendulum as pnd
@@ -31,6 +31,15 @@ JSONValue: TypeAlias = str | int | float | bool | list['JSONValue'] | dict[str, 
 """A value produced when serializing a Notion object for the API."""
 
 
+def _json_object_field(payload: dict[str, JSONValue], key: str) -> dict[str, JSONValue]:
+    """Read an object-valued field of a serialized payload."""
+    value = payload[key]
+    if not isinstance(value, dict):
+        msg = f'Expected a JSON object for {key!r}, got {type(value).__name__}.'
+        raise TypeError(msg)
+    return value
+
+
 def serialize_block_with_children(block: Block) -> dict[str, JSONValue]:
     """Serialize a writable block and its nested blocks for offline reconstruction.
 
@@ -49,7 +58,7 @@ def serialize_block_with_children(block: Block) -> dict[str, JSONValue]:
         if not isinstance(block.obj_ref.value, WithChildren):
             msg = f'{type(block).__name__} cannot carry its children in a serialized block payload.'
             raise ValueError(msg)
-        type_data = cast(dict[str, JSONValue], payload[block.obj_ref._type_name])
+        type_data = _json_object_field(payload, block.obj_ref._type_name)
         type_data['children'] = [serialize_block_with_children(child) for child in children]
     return payload
 
