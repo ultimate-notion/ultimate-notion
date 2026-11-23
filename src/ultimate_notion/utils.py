@@ -16,7 +16,7 @@ import tomli_w
 from numpy.typing import NDArray
 from packaging.version import Version
 from pendulum.tz import local_timezone
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
 
 from ultimate_notion import __version__
 from ultimate_notion.errors import EmptyListError, MultipleItemsError
@@ -27,11 +27,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')  # ToDo: Use new syntax when requires-python >= 3.12
 
 
-JSONValue: TypeAlias = str | int | float | bool | list['JSONValue'] | dict[str, 'JSONValue'] | None
-"""A value produced when serializing a Notion object for the API."""
-
-
-def serialize_block_with_children(block: Block) -> dict[str, JSONValue]:
+def serialize_block_with_children(block: Block) -> dict[str, JsonValue]:
     """Serialize a writable block and its nested blocks for offline reconstruction.
 
     This can fetch uncached children when a saved block reports that it has children. Child pages and

@@ -8,7 +8,7 @@ from uuid import UUID
 import httpx
 import notion_client
 import pytest
-from pydantic import ConfigDict, ValidationError
+from pydantic import ConfigDict, JsonValue, ValidationError
 
 from tests._file_upload_vcr import FILE_UPLOAD_QUERY_PARAMS, redact_file_response
 from ultimate_notion.blocks import Embed
@@ -17,7 +17,6 @@ from ultimate_notion.obj_api.blocks import EmbedTypeData
 from ultimate_notion.obj_api.objects import FileUpload
 from ultimate_notion.page import Page
 from ultimate_notion.session import Session
-from ultimate_notion.utils import JSONValue
 
 UPLOAD_ID = UUID('59833787-2cf9-4fdf-8782-e53db20768a5')
 
@@ -46,7 +45,7 @@ def _uploaded_html() -> UploadedFile:
 def test_uploaded_html_embed_and_source_replacement() -> None:
     uploaded = _uploaded_html()
     embed = Embed(uploaded, caption='Interactive chart')
-    serialized = assert_type(embed.obj_ref.serialize_for_api(), dict[str, JSONValue])
+    serialized = assert_type(embed.obj_ref.serialize_for_api(), dict[str, JsonValue])
     payload = serialized['embed']
     assert isinstance(payload, dict)
     assert payload['type'] == 'file_upload'
